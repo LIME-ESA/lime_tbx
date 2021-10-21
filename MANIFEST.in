@@ -1,0 +1,2 @@
+include versioneer.py
+include lime_tbx/_version.py
