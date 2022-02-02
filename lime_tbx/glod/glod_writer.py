@@ -1,26 +1,29 @@
-"""Tests for classname module"""
+"""describe class"""
 
 """___Built-In Modules___"""
 #import here
 
 """___Third-Party Modules___"""
-import unittest
+#import here
 
 """___NPL Modules___"""
 #import here
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
-__created__ = "01/02/2021"
+__created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class TestClassName(unittest.TestCase):
-    def test_function1(self):
-        pass
+class GlodWriter:
+    def __init__(
+        self,
+        something
+    ):
+        self.something = something
 
-if __name__ == "__main__":
-    unittest.main()
+    def function1(self, argument1, argument2):
+        return argument1+argument2
         

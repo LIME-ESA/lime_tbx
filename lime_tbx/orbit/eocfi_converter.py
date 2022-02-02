@@ -11,13 +11,13 @@
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
-__created__ = "01/02/2021"
+__created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class ClassName:
+class EOCFIConverter:
     def __init__(
         self,
         something
