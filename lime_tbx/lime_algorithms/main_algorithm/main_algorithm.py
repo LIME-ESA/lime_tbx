@@ -16,14 +16,16 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class MainAlgoritm:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class IMainAlgorithm(ABC):
+    @abstractmethod
+    def get_eli(wavelengths, distance_sun_moon, distance_observer_moon, selen_obs_lat,
+        selen_obs_lon, selen_sun_lon, abs_moon_phase_angle) -> list:
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
-        
+class MainAlgorithm(IMainAlgorithm):
+    
+    def get_eli(wavelengths, distance_sun_moon, distance_observer_moon, selen_obs_lat,
+        selen_obs_lon, selen_sun_lon, abs_moon_phase_angle) -> list:
+        pass

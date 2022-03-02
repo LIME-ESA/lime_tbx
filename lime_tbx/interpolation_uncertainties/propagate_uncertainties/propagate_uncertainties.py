@@ -16,14 +16,14 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class Comparison:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class IPropagateUncertainties(ABC):
+    @abstractmethod
+    def get_uncertainties_standard(measurement_func,input_qty,u_input_qty,corr_input_qty):
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
-        
+class PropagateUncertainties(IPropagateUncertainties):
+
+    def get_uncertainties_standard(measurement_func,input_qty,u_input_qty,corr_input_qty):
+        pass

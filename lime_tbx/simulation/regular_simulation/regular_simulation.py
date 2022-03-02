@@ -16,14 +16,35 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class Comparison:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class IRegularSimulation(ABC):
+    @abstractmethod
+    def get_eli_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
+        pass
+    @abstractmethod
+    def get_polarized_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
+        pass
+    @abstractmethod
+    def get_eli_from_custom(srf, distance_sun_moon, distance_observer_moon, selen_obs_lat,
+        selen_obs_lon, selen_sun_lon, abs_moon_phase_angle) -> list:
+        pass
+    @abstractmethod
+    def get_polarized_from_custom(srf, selen_obs_lat, selen_obs_lon, selen_sun_lon,
+        abs_moon_phase_angle) -> list:
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
-        
+class RegularSimulation(IRegularSimulation):
+    def get_eli_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
+        pass
+
+    def get_polarized_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
+        pass
+
+    def get_eli_from_custom(srf, distance_sun_moon, distance_observer_moon, selen_obs_lat,
+        selen_obs_lon, selen_sun_lon, abs_moon_phase_angle) -> list:
+        pass
+
+    def get_polarized_from_custom(srf, selen_obs_lat, selen_obs_lon, selen_sun_lon,
+        abs_moon_phase_angle) -> list:
+        pass

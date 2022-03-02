@@ -16,14 +16,15 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class Comparison:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class ISPICEAdapter(ABC):
+    @abstractmethod
+    def get_moon_data_from_earth(latitude, longitude, altitude, datetime):
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
+class SPICEAdapter(ISPICEAdapter):
+
+    def get_moon_data_from_earth(latitude, longitude, altitude, datetime):
+        pass
         

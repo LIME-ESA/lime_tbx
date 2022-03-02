@@ -16,14 +16,20 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class Comparison:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class IAccessData(ABC):
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
-        
+    @abstractmethod
+    def get_all_coefficients_irradiance() -> list:
+        pass
+    @abstractmethod
+    def get_all_coefficients_polarization() -> list:
+        pass
+
+class AccessData(IAccessData):
+
+    def get_all_coefficients_irradiance() -> list:
+        pass
+    def get_all_coefficients_polarization() -> list:
+        pass

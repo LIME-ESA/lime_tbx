@@ -16,14 +16,19 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class Comparison:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class IESASatellites(ABC):
+    @abstractmethod
+    def get_eli_from_satellite(srf, satellite, datetime) -> list:
+        pass
+    @abstractmethod
+    def get_polarized_from_satellite(srf, satellite, datetime) -> list:
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
+class ESASatellites(IESASatellites):
+    def get_eli_from_satellite(srf, satellite, datetime) -> list:
+        pass
+    def get_polarized_from_satellite(srf, satellite, datetime) -> list:
+        pass
         

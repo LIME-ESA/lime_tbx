@@ -16,14 +16,20 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class Comparison:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class ISpectralInterpolation(ABC):
+    @abstractmethod
+    def get_best_asd_reference(selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle):
+        pass
+    @abstractmethod
+    def get_interpolated_refl(cimel_refl,asd_reference):
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
+class SpectralInterpolation(ISpectralInterpolation):
+
+    def get_best_asd_reference(selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle):
+        pass
+    def get_interpolated_refl(cimel_refl,asd_reference):
+        pass
         
