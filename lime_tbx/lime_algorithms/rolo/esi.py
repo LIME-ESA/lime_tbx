@@ -1,10 +1,32 @@
-from typing import Dict, Tuple
+"""
+This module calculates the extra-terrestrial solar irradiance.
+
+It exports the following functions:
+    * get_esi_per_nm - Calculates the expected solar extra-terrestrial irradiance
+    for a given wavelength in nanometers. Based on Wehrli 1985 data, passed through
+    some filters.
+"""
+
+"""___Built-In Modules___"""
 import pkgutil
-from io import StringIO
 import csv
+from io import StringIO
+from typing import Dict, Tuple
+
+"""___Third-Party Modules___"""
 import numpy as np
 
-WEHRLI_FILE = "assets/wehrli_asc.csv"
+"""___LIME Modules___"""
+# import here
+
+"""___Authorship___"""
+__author__ = "Javier Gatón Herguedas"
+__created__ = "2022/03/03"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
+__status__ = "Development"
+
+_WEHRLI_FILE = "assets/wehrli_asc.csv"
 
 _loaded_data = {}
 
@@ -20,7 +42,7 @@ def _get_wehrli_data() -> Dict[float, Tuple[float, float]]:
     global _loaded_data
     if _loaded_data:
         return _loaded_data
-    wehrli_bytes = pkgutil.get_data(__name__, WEHRLI_FILE)
+    wehrli_bytes = pkgutil.get_data(__name__, _WEHRLI_FILE)
     wehrli_string = wehrli_bytes.decode()
     file = StringIO(wehrli_string)
     csvreader = csv.reader(file)
@@ -35,7 +57,10 @@ def _get_wehrli_data() -> Dict[float, Tuple[float, float]]:
 
 def get_esi_per_nm(wavelength_nm: float) -> float:
     """Gets the expected extraterrestrial solar irradiance at a concrete wavelength
-    Returns the data in Wm⁻²/nm
+    Returns the data in Wm⁻²/nm.
+
+    It uses Wehrli 1985 data passed through different filters, the same data used in
+    AEMET's RimoApp and others.
 
     Parameters
     ----------

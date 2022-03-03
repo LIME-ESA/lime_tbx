@@ -1,8 +1,21 @@
-from ...datatypes.datatypes import MoonData, IrradianceCoefficients
+"""
+This module calculates the extra-terrestrial lunar irradiance.
+
+It exports the following functions:
+    * calculate_eli - Calculates the expected extra-terrestrial lunar irradiance
+    for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020.
+"""
+
+"""___Built-In Modules___"""
 import math
 from typing import List
+
+"""___Third-Party Modules___"""
 import numpy as np
+
+"""___LIME Modules___"""
 import esi
+from ...datatypes.datatypes import MoonData, IrradianceCoefficients
 
 
 def _summatory_a(

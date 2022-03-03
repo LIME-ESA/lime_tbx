@@ -14,13 +14,15 @@ retrieval and comparison with a star photometer.
 """
 
 """___Built-In Modules___"""
-# import here
+from abc import ABC, abstractmethod
+from typing import List, Union
 
 """___Third-Party Modules___"""
 # import here
 
-"""___NPL Modules___"""
-# import here
+"""___LIME Modules___"""
+import eli
+from ...datatypes.datatypes import MoonData, IrradianceCoefficients
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -28,11 +30,6 @@ __created__ = "2022/03/02"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
-
-from abc import ABC, abstractmethod
-from typing import List, Union
-from ...datatypes.datatypes import MoonData, IrradianceCoefficients
-import eli
 
 
 class IROLO(ABC):
