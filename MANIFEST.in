@@ -1,2 +1,3 @@
 include versioneer.py
 include lime_tbx/_version.py
+include lime_tbx/assets/wehrli_asc.csv
