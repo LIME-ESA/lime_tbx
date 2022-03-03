@@ -17,7 +17,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class DOLPAlgorithm:
+class Comparison:
     def __init__(
         self,
         something

@@ -16,14 +16,15 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+from abc import ABC, abstractmethod
 
-class EOCFIConverter:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+class IEOCFIConverter(ABC):
+    @abstractmethod
+    def get_satellite_location(satellite, datetime):
+        pass
 
-    def function1(self, argument1, argument2):
-        return argument1+argument2
+class EOCFIConverter(IEOCFIConverter): 
+
+    def get_satellite_location(satellite, datetime):
+        pass
         

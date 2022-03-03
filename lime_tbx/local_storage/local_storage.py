@@ -17,7 +17,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class MainAlgoritm:
+class Comparison:
     def __init__(
         self,
         something
