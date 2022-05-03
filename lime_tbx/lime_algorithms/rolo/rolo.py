@@ -21,7 +21,7 @@ from typing import List, Union
 # import here
 
 """___LIME Modules___"""
-import eli
+from . import eli
 from ...datatypes.datatypes import MoonData, IrradianceCoefficients
 
 """___Authorship___"""

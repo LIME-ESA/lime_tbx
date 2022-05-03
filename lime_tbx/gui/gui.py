@@ -1,13 +1,13 @@
 """describe class"""
 
 """___Built-In Modules___"""
-#import here
+# import here
 
 """___Third-Party Modules___"""
-#import here
+from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-#import here
+from . import constants
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -17,13 +17,22 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
+class LimeTBXWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+
+
 class GUI:
-    def __init__(
-        self,
-        something
-    ):
-        self.something = something
+    def __init__(self):
+        app = QtWidgets.QApplication([constants.APPLICATION_NAME])
+        window = QtWidgets.QMainWindow()
+        main_widget = LimeTBXWidget()
+        window.resize(650, 450)
+        window.setCentralWidget(main_widget)
+        window.show()
+        window.setWindowTitle(constants.APPLICATION_NAME)
+        # window.setStyleSheet(filepathToStr(constants.MAIN_QSS_PATH))
+        # window.setWindowIcon(QtGui.QIcon(resource_path(constants.ICON_PATH)))
 
     def function1(self, argument1, argument2):
-        return argument1+argument2
-        
+        return argument1 + argument2

@@ -14,7 +14,7 @@ from typing import List
 import numpy as np
 
 """___LIME Modules___"""
-import esi
+from . import esi
 from ...datatypes.datatypes import MoonData, IrradianceCoefficients
 
 
