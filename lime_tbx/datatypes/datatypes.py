@@ -9,7 +9,7 @@ It exports the following classes:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass
-from typing import List
+from typing import Dict, List
 
 """___Third-Party Modules___"""
 # import here
@@ -47,13 +47,69 @@ class MoonData:
     absolute_mpa_degrees: float
 
 
+@dataclass
+class SpectralResponseFunction:
+    """
+    Dataclass containing the spectral response function. Consists of a set of pairs wavelength:percentage.
+
+    Attributes
+    ----------
+    spectral_response : dict of float, float
+        Set of pairs wavelength, percentage. 100% = 1.0.
+    """
+
+    spectral_response: Dict[float, float]
+
+
 class IrradianceCoefficients:
     """
     Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
     """
 
-    def __init__(self):
-        pass
+    @dataclass
+    class CoefficientsWln:
+        """
+        Coefficients data for a wavelength. It includes only the a, b and d coefficients.
+
+        Attributes
+        ----------
+        a_coeffs : tuple of 4 floats, corresponding to coefficients a0, a1, a2, and a3
+        b_coeffs : tuple of 3 floats, corresponding to coefficients b1, b2, and b3
+        d_coeffs : tuple of 3floats, corresponding to coefficients d1, d2, and d3
+        """
+
+        __slots__ = ["a_coeffs", "b_coeffs", "d_coeffs"]
+
+        def __init__(self, coeffs: List[float]):
+            """
+            Parameters
+            ----------
+            coeffs : list of float
+                List of floats consisting of all coefficients. In order: a0, a1, a2, a3, b1, b2, b3,
+                d1, d2 and d3.
+
+            Returns
+            -------
+            CoefficientsWln
+                Instance of Coefficients with the correct data
+            """
+            self.a_coeffs = (coeffs[0], coeffs[1], coeffs[2], coeffs[3])
+            self.b_coeffs = (coeffs[4], coeffs[5], coeffs[6])
+            self.d_coeffs = (coeffs[7], coeffs[8], coeffs[9])
+
+    def __init__(
+        self,
+        wavelengths: List[float],
+        wlen_coeffs: List[CoefficientsWln],
+        c_coeffs: List[float],
+        p_coeffs: List[float],
+        apollo_coeffs: List[float],
+    ):
+        self.wavelengths = wavelengths
+        self.wlen_coeffs = wlen_coeffs
+        self.c_coeffs = c_coeffs
+        self.p_coeffs = p_coeffs
+        self.apollo_coeffs = apollo_coeffs
 
     def get_wavelengths(self) -> List[float]:
         """Gets all wavelengths present in the model, in nanometers
@@ -63,9 +119,9 @@ class IrradianceCoefficients:
         list of float
             A list of floats that are the wavelengths in nanometers, in order
         """
-        pass
+        return self.wavelengths
 
-    def get_coefficients_a(wavelength_nm: float) -> List[float]:
+    def get_coefficients_a(self, wavelength_nm: float) -> List[float]:
         """Gets all 'a' coefficients for a concrete wavelength
 
         Parameters
@@ -78,9 +134,10 @@ class IrradianceCoefficients:
         list of float
             A list containing the 'a' coefficients for the wavelength
         """
-        pass
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.wlen_coeffs[index].a_coeffs
 
-    def get_coefficients_b(wavelength_nm: float) -> List[float]:
+    def get_coefficients_b(self, wavelength_nm: float) -> List[float]:
         """Gets all 'b' coefficients for a concrete wavelength
 
         Parameters
@@ -93,9 +150,10 @@ class IrradianceCoefficients:
         list of float
             A list containing the 'b' coefficients for the wavelength
         """
-        pass
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.wlen_coeffs[index].b_coeffs
 
-    def get_coefficients_d(wavelength_nm: float) -> List[float]:
+    def get_coefficients_d(self, wavelength_nm: float) -> List[float]:
         """Gets all 'd' coefficients for a concrete wavelength
 
         Parameters
@@ -108,9 +166,10 @@ class IrradianceCoefficients:
         list of float
             A list containing the 'd' coefficients for the wavelength
         """
-        pass
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.wlen_coeffs[index].d_coeffs
 
-    def get_coefficients_c() -> List[float]:
+    def get_coefficients_c(self) -> List[float]:
         """Gets all 'c' coefficients
 
         Returns
@@ -118,9 +177,9 @@ class IrradianceCoefficients:
         list of float
             A list containing all 'c' coefficients
         """
-        pass
+        return self.c_coeffs
 
-    def get_coefficients_p() -> List[float]:
+    def get_coefficients_p(self) -> List[float]:
         """Gets all 'p' coefficients
 
         Returns
@@ -128,7 +187,7 @@ class IrradianceCoefficients:
         list of float
             A list containing all 'p' coefficients
         """
-        pass
+        return self.p_coeffs
 
     def get_apollo_coefficients(self) -> List[float]:
         """Coefficients used for the adjustment of the ROLO model using Apollo spectra.
@@ -138,4 +197,4 @@ class IrradianceCoefficients:
         list of float
             A list containing all Apollo coefficients
         """
-        pass
+        return self.apollo_coeffs
