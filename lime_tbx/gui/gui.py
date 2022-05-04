@@ -27,7 +27,8 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
 
 class GUI:
-    def __init__(self):
+    def __init__(self, kernels_path):
+        self.kernels_path = kernels_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
         window = QtWidgets.QMainWindow()
         main_widget = LimeTBXWidget()

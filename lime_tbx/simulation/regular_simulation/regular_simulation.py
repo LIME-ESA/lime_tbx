@@ -36,7 +36,27 @@ class IRegularSimulation(ABC):
         altitude: float,
         dt: datetime,
         coefficients: IrradianceCoefficients,
+        kernels_path: str,
     ) -> List[float]:
+        """
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        latitude: float
+            Geographic latitude in decimal degrees.
+        longitude: float
+            Geographic longitude in decimal degrees.
+        altitude: float
+            Altitude over the sea level in meters.
+        dt: datetime
+            Time at which the lunar data will be calculated.
+        coefficients: IrradianceCoefficients
+            Values of the chosen coefficients for the ROLO algorithm.
+        kernels_path: str
+            Path where the needed SPICE kernels are located.
+            The user must have write access to that directory.
+        """
         pass
 
     @staticmethod
@@ -61,8 +81,28 @@ class IRegularSimulation(ABC):
         selen_obs_lon: float,
         selen_sun_lon: float,
         abs_moon_phase_angle: float,
-        coefficients,
+        coefficients: IrradianceCoefficients,
     ) -> List[float]:
+        """
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        distance_sun_moon : float
+            Distance between the Sun and the Moon (in astronomical units)
+        distance_observer_moon : float
+            Distance between the Observer and the Moon (in kilometers)
+        selen_sun_lon_rad : float
+            Selenographic longitude of the Sun (in radians)
+        selen_obs_lat : float
+            Selenographic latitude of the observer (in degrees)
+        selen_obs_lon : float
+            Selenographic longitude of the observer (in degrees)
+        abs_moon_phase_angle : float
+            Absolute Moon phase angle (in degrees)
+        coefficients: IrradianceCoefficients
+            Values of the chosen coefficients for the ROLO algorithm.
+        """
         pass
 
     @staticmethod
@@ -95,10 +135,13 @@ class RegularSimulation(IRegularSimulation):
         altitude: float,
         dt: datetime,
         coefficients: IrradianceCoefficients,
+        kernels_path: str,
     ) -> List[float]:
         rl = rolo.ROLO()
         wlens = list(srf.spectral_response.keys())
-        md = SPICEAdapter().get_moon_data_from_earth(latitude, longitude, altitude, dt)
+        md = SPICEAdapter().get_moon_data_from_earth(
+            latitude, longitude, altitude, dt, kernels_path
+        )
         irradiances = rl.get_eli(wlens, md, coefficients)
         for i, w in enumerate(wlens):
             irradiances[i] = irradiances[i] * srf[w]

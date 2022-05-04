@@ -17,14 +17,16 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
-_KERNELS_PATH = "./kernels"
-
 
 class ISPICEAdapter(ABC):
     @staticmethod
     @abstractmethod
     def get_moon_data_from_earth(
-        latitude: float, longitude: float, altitude: float, dt: datetime
+        latitude: float,
+        longitude: float,
+        altitude: float,
+        dt: datetime,
+        kernels_path: str,
     ) -> spicedmoon.MoonData:
         """
         Calculate lunar data for a position on earth surface at a concrete datetime.
@@ -39,6 +41,9 @@ class ISPICEAdapter(ABC):
             Altitude over the sea level in meters.
         dt: datetime
             Time at which the lunar data will be calculated.
+        kernels_path: str
+            Path where the needed SPICE kernels are located.
+            The user must have write access to that directory.
 
         Returns
         -------
@@ -51,8 +56,12 @@ class ISPICEAdapter(ABC):
 class SPICEAdapter(ISPICEAdapter):
     @staticmethod
     def get_moon_data_from_earth(
-        latitude: float, longitude: float, altitude: float, dt: datetime
+        latitude: float,
+        longitude: float,
+        altitude: float,
+        dt: datetime,
+        kernels_path: str,
     ) -> spicedmoon.MoonData:
         return spicedmoon.get_moon_datas(
-            latitude, longitude, altitude, [dt], _KERNELS_PATH
+            latitude, longitude, altitude, [dt], kernels_path
         )[0]
