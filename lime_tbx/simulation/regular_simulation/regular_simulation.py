@@ -39,6 +39,8 @@ class IRegularSimulation(ABC):
         kernels_path: str,
     ) -> List[float]:
         """
+        Simulate the extraterrestrial lunar irradiance for a geographic point.
+
         Parameters
         ----------
         srf: SpectralResponseFunction
@@ -56,6 +58,11 @@ class IRegularSimulation(ABC):
         kernels_path: str
             Path where the needed SPICE kernels are located.
             The user must have write access to that directory.
+
+        Returns
+        -------
+        elis: list of float
+            Extraterrestrial lunar irradiances for the given srf at the specified point.
         """
         pass
 
@@ -84,6 +91,8 @@ class IRegularSimulation(ABC):
         coefficients: IrradianceCoefficients,
     ) -> List[float]:
         """
+        Simulate the extraterrestrial lunar irradiance for custom lunar parameters.
+
         Parameters
         ----------
         srf: SpectralResponseFunction
@@ -102,6 +111,11 @@ class IRegularSimulation(ABC):
             Absolute Moon phase angle (in degrees)
         coefficients: IrradianceCoefficients
             Values of the chosen coefficients for the ROLO algorithm.
+
+        Returns
+        -------
+        elis: list of float
+            Extraterrestrial lunar irradiances for the given srf and the specified parameters.
         """
         pass
 
