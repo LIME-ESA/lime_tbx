@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import List, Union
 
 """___Third-Party Modules___"""
 import spicedmoon
@@ -25,9 +26,9 @@ class ISPICEAdapter(ABC):
         latitude: float,
         longitude: float,
         altitude: float,
-        dt: datetime,
+        dt: Union[datetime, List[datetime]],
         kernels_path: str,
-    ) -> spicedmoon.MoonData:
+    ) -> Union[spicedmoon.MoonData, List[spicedmoon.MoonData]]:
         """
         Calculate lunar data for a position on earth surface at a concrete datetime.
 
@@ -39,16 +40,17 @@ class ISPICEAdapter(ABC):
             Geographic longitude in decimal degrees.
         altitude: float
             Altitude over the sea level in meters.
-        dt: datetime
-            Time at which the lunar data will be calculated.
+        dt: datetime | list of datetimes
+            Time or time series at which the lunar data will be calculated.
         kernels_path: str
             Path where the needed SPICE kernels are located.
             The user must have write access to that directory.
 
         Returns
         -------
-        md: MoonData
-            Lunar data for the given parameters.
+        md: MoonData | list of MoonData
+            Lunar data for the given parameters. If the parameter dt was a list,
+            this will be a list. Otherwise not.
         """
         pass
 
@@ -59,9 +61,13 @@ class SPICEAdapter(ISPICEAdapter):
         latitude: float,
         longitude: float,
         altitude: float,
-        dt: datetime,
+        dt: Union[datetime, List[datetime]],
         kernels_path: str,
-    ) -> spicedmoon.MoonData:
+    ) -> Union[spicedmoon.MoonData, List[spicedmoon.MoonData]]:
+        if isinstance(dt, list):
+            return spicedmoon.get_moon_datas(
+                latitude, longitude, altitude, dt, kernels_path
+            )
         return spicedmoon.get_moon_datas(
             latitude, longitude, altitude, [dt], kernels_path
         )[0]

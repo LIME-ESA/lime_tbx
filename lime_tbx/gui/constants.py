@@ -1,1 +1,2 @@
 APPLICATION_NAME = "LIME TBX"
+MAIN_QSS_PATH = "assets/style.qss"

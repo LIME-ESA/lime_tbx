@@ -2,6 +2,7 @@
 
 """___Built-In Modules___"""
 import sys
+import pkgutil
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -18,8 +19,13 @@ __status__ = "Development"
 
 
 class LimeTBXWidget(QtWidgets.QWidget):
-    def __init__(self):
+    """
+    Main widget of the lime toolbox desktop app.
+    """
+
+    def __init__(self, kernels_path: str):
         super().__init__()
+        self.kernels_path = kernels_path
         self._build_layout()
 
     def _build_layout(self):
@@ -27,16 +33,18 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
 
 class GUI:
-    def __init__(self, kernels_path):
+    def __init__(self, kernels_path: str):
         self.kernels_path = kernels_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
         window = QtWidgets.QMainWindow()
-        main_widget = LimeTBXWidget()
+        main_widget = LimeTBXWidget(kernels_path)
         window.resize(650, 450)
         window.setCentralWidget(main_widget)
         window.show()
         window.setWindowTitle(constants.APPLICATION_NAME)
-        # window.setStyleSheet(filepathToStr(constants.MAIN_QSS_PATH))
+
+        qss_bytes = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH)
+        window.setStyleSheet(qss_bytes.decode())
         # window.setWindowIcon(QtGui.QIcon(resource_path(constants.ICON_PATH)))
         sys.exit(app.exec_())
 

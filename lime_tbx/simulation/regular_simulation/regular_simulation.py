@@ -2,7 +2,7 @@
 
 """___Built-In Modules___"""
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
 """___Third-Party Modules___"""
 # import here
@@ -34,10 +34,10 @@ class IRegularSimulation(ABC):
         latitude: float,
         longitude: float,
         altitude: float,
-        dt: datetime,
+        dt: Union[datetime, List[datetime]],
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         """
         Simulate the extraterrestrial lunar irradiance for a geographic point.
 
@@ -51,8 +51,8 @@ class IRegularSimulation(ABC):
             Geographic longitude in decimal degrees.
         altitude: float
             Altitude over the sea level in meters.
-        dt: datetime
-            Time at which the lunar data will be calculated.
+        dt: datetime | list of datetime
+            Time or time series at which the lunar data will be calculated.
         coefficients: IrradianceCoefficients
             Values of the chosen coefficients for the ROLO algorithm.
         kernels_path: str
@@ -61,8 +61,10 @@ class IRegularSimulation(ABC):
 
         Returns
         -------
-        elis: list of float
+        elis: list of float | list of list of float
             Extraterrestrial lunar irradiances for the given srf at the specified point.
+            It will be a list of lists of float if the parameter dt is a list. Otherwise it
+            will only be a list of float.
         """
         pass
 
@@ -142,24 +144,58 @@ class IRegularSimulation(ABC):
 
 class RegularSimulation(IRegularSimulation):
     @staticmethod
+    def _get_eli_from_md(
+        srf: SpectralResponseFunction,
+        md: Union[MoonData, List[MoonData]],
+        coefficients: IrradianceCoefficients,
+    ) -> Union[List[float], List[List[float]]]:
+        """
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        md: MoonData | list of MoonData
+            MoonData for one observation, or for multiple observations in case that
+            it's a list.
+        coefficients: IrradianceCoefficients
+            Values of the chosen coefficients for the ROLO algorithm.
+
+        Returns
+        -------
+        irradiances: list of float | list of list of float
+            Extraterrestrial lunar irradiances for the given srf at the specified point.
+            It will be a list of lists of float if the parameter md is a list. Otherwise it
+            will only be a list of float.
+        """
+        rl = rolo.ROLO()
+        wlens = list(srf.spectral_response.keys())
+        if not isinstance(md, list):
+            irradiances = rl.get_eli(wlens, md, coefficients)
+            for i, w in enumerate(wlens):
+                irradiances[i] = irradiances[i] * srf[w]
+            return irradiances
+        times_irr = []
+        for m in md:
+            irradiances = rl.get_eli(wlens, m, coefficients)
+            for i, w in enumerate(wlens):
+                irradiances[i] = irradiances[i] * srf[w]
+            times_irr.append(irradiances)
+        return times_irr
+
+    @staticmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
         latitude: float,
         longitude: float,
         altitude: float,
-        dt: datetime,
+        dt: Union[datetime, List[datetime]],
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> List[float]:
-        rl = rolo.ROLO()
-        wlens = list(srf.spectral_response.keys())
+    ) -> Union[List[float], List[List[float]]]:
         md = SPICEAdapter().get_moon_data_from_earth(
             latitude, longitude, altitude, dt, kernels_path
         )
-        irradiances = rl.get_eli(wlens, md, coefficients)
-        for i, w in enumerate(wlens):
-            irradiances[i] = irradiances[i] * srf[w]
-        return irradiances
+        return RegularSimulation._get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_elref_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
@@ -182,8 +218,6 @@ class RegularSimulation(IRegularSimulation):
         abs_moon_phase_angle: float,
         coefficients: IrradianceCoefficients,
     ) -> List[float]:
-        rl = rolo.ROLO()
-        wlens = list(srf.spectral_response.keys())
         md = MoonData(
             distance_sun_moon,
             distance_observer_moon,
@@ -192,10 +226,7 @@ class RegularSimulation(IRegularSimulation):
             selen_obs_lon,
             abs_moon_phase_angle,
         )
-        irradiances = rl.get_eli(wlens, md, coefficients)
-        for i, w in enumerate(wlens):
-            irradiances[i] = irradiances[i] * srf[w]
-        return irradiances
+        return RegularSimulation._get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_elref_from_custom(
