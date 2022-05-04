@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-# import here
+import sys
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -20,6 +20,10 @@ __status__ = "Development"
 class LimeTBXWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
 
 
 class GUI:
@@ -33,6 +37,7 @@ class GUI:
         window.setWindowTitle(constants.APPLICATION_NAME)
         # window.setStyleSheet(filepathToStr(constants.MAIN_QSS_PATH))
         # window.setWindowIcon(QtGui.QIcon(resource_path(constants.ICON_PATH)))
+        sys.exit(app.exec_())
 
     def function1(self, argument1, argument2):
         return argument1 + argument2
