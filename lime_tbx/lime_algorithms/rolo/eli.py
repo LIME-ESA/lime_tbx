@@ -106,8 +106,8 @@ def _ln_moon_disk_reflectance(
     p_coeffs: List[float] = coeffs.get_coefficients_p()
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
-    sum_a = _summatory_a(wavelength_nm, gr_value)
-    sum_b = _summatory_b(wavelength_nm, phi)
+    sum_a = _summatory_a(wavelength_nm, gr_value, coeffs)
+    sum_b = _summatory_b(wavelength_nm, phi, coeffs)
     d1_value = d_coeffs[0] * math.exp(-gd_value / p_coeffs[0])
     d2_value = d_coeffs[1] * math.exp(-gd_value / p_coeffs[1])
     d3_value = d_coeffs[2] * math.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
@@ -188,13 +188,17 @@ def _interpolated_moon_disk_reflectance(
     y_values = []
     y_values.append(
         math.exp(
-            _ln_moon_disk_reflectance(absolute_mpa_degrees, x_values[0], moon_data)
+            _ln_moon_disk_reflectance(
+                absolute_mpa_degrees, x_values[0], moon_data, coeffs
+            )
         )
         * apollo_coeffs[left_index]
     )
     y_values.append(
         math.exp(
-            _ln_moon_disk_reflectance(absolute_mpa_degrees, x_values[1], moon_data)
+            _ln_moon_disk_reflectance(
+                absolute_mpa_degrees, x_values[1], moon_data, coeffs
+            )
         )
         * apollo_coeffs[right_index]
     )

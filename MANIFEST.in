@@ -1,5 +1,5 @@
 include versioneer.py
 include lime_tbx/_version.py
-include lime_tbx/assets/wehrli_asc.csv
-include lime_tbx/assets/coefficients.csv
+include lime_tbx/lime_algorithms/rolo/assets/wehrli_asc.csv
+include lime_tbx/coefficients/access_data/assets/coefficients.csv
 include lime_tbx/gui/assets/style.qss

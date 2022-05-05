@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import SpectralResponseFunction, IrradianceCoefficients
@@ -37,7 +38,7 @@ class ISettingsManager(ABC):
 class MockSettingsManager(ISettingsManager):
     def get_srf(self) -> SpectralResponseFunction:
         # generate an arbitrary default srf
-        spectral_response = {i: 1 for i in range(10)}
+        spectral_response = {i: 1.0 for i in np.arange(400, 1500, 2)}
         return SpectralResponseFunction(spectral_response)
 
     def get_irr_coeffs(self) -> IrradianceCoefficients:

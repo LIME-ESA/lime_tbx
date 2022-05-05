@@ -7,7 +7,7 @@ from typing import List
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from . import input, settings
+from . import input, settings, output
 from ..simulation.regular_simulation import regular_simulation
 
 """___Authorship___"""
@@ -23,6 +23,7 @@ class ELISurfaceWidget(QtWidgets.QWidget):
         super().__init__()
         self.kernels_path = kernels_path
         self.settings_manager = settings_manager
+        self.graph = output.GraphWidget()
         self._build_layout()
 
     def _build_layout(self):
@@ -41,3 +42,5 @@ class ELISurfaceWidget(QtWidgets.QWidget):
         elis: List[float] = rs.get_eli_from_surface(
             srf, latitude, longitude, altitude, datetime, coeffs, self.kernels_path
         )
+        self.graph.show()
+        self.graph.update_plot(list(srf.spectral_response.keys()), elis)

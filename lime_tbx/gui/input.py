@@ -76,6 +76,7 @@ class SurfaceWidget(QtWidgets.QWidget):
         self.surface_input = SurfaceInputWidget()
         self.action_button = QtWidgets.QPushButton("Calculate")
         self.action_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.action_button.clicked.connect(self.push_action_button)
         self.main_layout.addWidget(self.title_label)
         self.main_layout.addWidget(self.surface_input)
         self.main_layout.addWidget(self.action_button)

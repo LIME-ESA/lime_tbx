@@ -9,7 +9,7 @@ from typing import List, Union
 import spicedmoon
 
 """___NPL Modules___"""
-# import here
+from ..datatypes import datatypes
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -65,9 +65,29 @@ class SPICEAdapter(ISPICEAdapter):
         kernels_path: str,
     ) -> Union[spicedmoon.MoonData, List[spicedmoon.MoonData]]:
         if isinstance(dt, list):
-            return spicedmoon.get_moon_datas(
+            mds = spicedmoon.get_moon_datas(
                 latitude, longitude, altitude, dt, kernels_path
             )
-        return spicedmoon.get_moon_datas(
+            mds2 = []
+            for md in mds:
+                md2 = datatypes.MoonData(
+                    md.dist_sun_moon_au,
+                    md.dist_obs_moon,
+                    md.lon_sun_rad,
+                    md.lat_obs,
+                    md.lon_obs,
+                    abs(md.mpa_deg),
+                )
+                mds2.append(md2)
+            return mds2
+        md = spicedmoon.get_moon_datas(
             latitude, longitude, altitude, [dt], kernels_path
         )[0]
+        return datatypes.MoonData(
+            md.dist_sun_moon_au,
+            md.dist_obs_moon,
+            md.lon_sun_rad,
+            md.lat_obs,
+            md.lon_obs,
+            abs(md.mpa_deg),
+        )
