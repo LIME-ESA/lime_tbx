@@ -11,10 +11,10 @@ from PySide2 import QtWidgets, QtCore, QtGui
 # import here
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "03/05/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
@@ -44,6 +44,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.longitude_spinbox.setMaximum(180)
         self.altitude_spinbox.setMinimum(0)
         self.altitude_spinbox.setMaximum(10000000)
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.main_layout.addRow(self.latitude_label, self.latitude_spinbox)
         self.main_layout.addRow(self.longitude_label, self.longitude_spinbox)
         self.main_layout.addRow(self.altitude_label, self.altitude_spinbox)
@@ -71,9 +72,10 @@ class SurfaceWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.title_label = QtWidgets.QLabel(self.title)
+        self.title_label = QtWidgets.QLabel(self.title, alignment=QtCore.Qt.AlignCenter)
         self.surface_input = SurfaceInputWidget()
         self.action_button = QtWidgets.QPushButton("Calculate")
+        self.action_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.main_layout.addWidget(self.title_label)
         self.main_layout.addWidget(self.surface_input)
         self.main_layout.addWidget(self.action_button)

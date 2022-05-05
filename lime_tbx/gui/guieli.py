@@ -1,33 +1,34 @@
 """describe class"""
 
 """___Built-In Modules___"""
-# import here
+from typing import List
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from . import input
+from . import input, settings
 from ..simulation.regular_simulation import regular_simulation
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "03/05/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
 class ELISurfaceWidget(QtWidgets.QWidget):
-    def __init__(self, kernels_path):
+    def __init__(self, kernels_path: str, settings_manager: settings.ISettingsManager):
         super().__init__()
         self.kernels_path = kernels_path
+        self.settings_manager = settings_manager
         self._build_layout()
 
     def _build_layout(self):
-        self.main_layout = QtWidgets.QWidget(self)
+        self.main_layout = QtWidgets.QVBoxLayout(self)
         self.surface_widget = input.SurfaceWidget("Calculate ELI", self.calculate)
-        pass
+        self.main_layout.addWidget(self.surface_widget)
 
     def calculate(self):
         rs = regular_simulation.RegularSimulation()
@@ -35,6 +36,8 @@ class ELISurfaceWidget(QtWidgets.QWidget):
         longitude = self.surface_widget.get_longitude()
         altitude = self.surface_widget.get_altitude()
         datetime = self.surface_widget.get_datetime()
-        rs.get_eli_from_surface(
+        srf = self.settings_manager.get_srf()
+        coeffs = self.settings_manager.get_irr_coeffs()
+        elis: List[float] = rs.get_eli_from_surface(
             srf, latitude, longitude, altitude, datetime, coeffs, self.kernels_path
         )
