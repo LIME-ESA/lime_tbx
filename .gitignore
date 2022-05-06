@@ -115,3 +115,6 @@ ENV/
 
 # IDE settings
 .vscode/.git.old
+
+# SPICE kernels for development and testing
+kernels

@@ -41,6 +41,8 @@ class IRegularSimulation(ABC):
         """
         Simulate the extraterrestrial lunar irradiance for a geographic point.
 
+        Returns the data in Wm⁻²/nm
+
         Parameters
         ----------
         srf: SpectralResponseFunction
@@ -94,6 +96,8 @@ class IRegularSimulation(ABC):
     ) -> List[float]:
         """
         Simulate the extraterrestrial lunar irradiance for custom lunar parameters.
+
+        Returns the data in Wm⁻²/nm
 
         Parameters
         ----------

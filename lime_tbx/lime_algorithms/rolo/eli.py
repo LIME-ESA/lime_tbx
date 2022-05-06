@@ -17,6 +17,13 @@ import numpy as np
 from . import esi
 from ...datatypes.datatypes import MoonData, IrradianceCoefficients
 
+"""___Authorship___"""
+__author__ = "Javier Gatón Herguedas"
+__created__ = "2022/03/02"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
+__status__ = "Development"
+
 
 def _summatory_a(
     wavelength_nm: float, gr_value: float, coeffs: IrradianceCoefficients

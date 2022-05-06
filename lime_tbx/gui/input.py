@@ -45,6 +45,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.altitude_spinbox.setMinimum(0)
         self.altitude_spinbox.setMaximum(10000000)
         self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
         self.main_layout.addRow(self.latitude_label, self.latitude_spinbox)
         self.main_layout.addRow(self.longitude_label, self.longitude_spinbox)
         self.main_layout.addRow(self.altitude_label, self.altitude_spinbox)

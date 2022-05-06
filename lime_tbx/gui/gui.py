@@ -34,12 +34,25 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.eli_page = guieli.ELISurfaceWidget(self.kernels_path, settings_manager)
         self.main_layout.addWidget(self.eli_page)
 
+    def propagate_close_event(self):
+        self.eli_page.propagate_close_event()
+
+
+class LimeTBXWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w.propagate_close_event()
+        return super().closeEvent(event)
+
 
 class GUI:
     def __init__(self, kernels_path: str):
         self.kernels_path = kernels_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
-        window = QtWidgets.QMainWindow()
+        window = LimeTBXWindow()
         main_widget = LimeTBXWidget(kernels_path)
         # window.resize(400, 400)
         window.setCentralWidget(main_widget)
@@ -50,6 +63,3 @@ class GUI:
         window.setStyleSheet(qss_bytes.decode())
         # window.setWindowIcon(QtGui.QIcon(resource_path(constants.ICON_PATH)))
         sys.exit(app.exec_())
-
-    def function1(self, argument1, argument2):
-        return argument1 + argument2

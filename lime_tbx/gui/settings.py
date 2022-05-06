@@ -38,7 +38,7 @@ class ISettingsManager(ABC):
 class MockSettingsManager(ISettingsManager):
     def get_srf(self) -> SpectralResponseFunction:
         # generate an arbitrary default srf
-        spectral_response = {i: 1.0 for i in np.arange(400, 1500, 2)}
+        spectral_response = {i: 1.0 for i in np.arange(380, 2500, 2)}
         return SpectralResponseFunction(spectral_response)
 
     def get_irr_coeffs(self) -> IrradianceCoefficients:

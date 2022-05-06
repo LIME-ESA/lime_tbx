@@ -23,8 +23,11 @@ class ELISurfaceWidget(QtWidgets.QWidget):
         super().__init__()
         self.kernels_path = kernels_path
         self.settings_manager = settings_manager
-        self.graph = output.GraphWidget()
+        self.graph = output.GraphWindow()
         self._build_layout()
+
+    def propagate_close_event(self):
+        self.graph.close()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -44,3 +47,8 @@ class ELISurfaceWidget(QtWidgets.QWidget):
         )
         self.graph.show()
         self.graph.update_plot(list(srf.spectral_response.keys()), elis)
+        self.graph.update_labels(
+            "Extraterrestrial Lunar Irradiances",
+            "wavelengths (nm)",
+            "irradiances (Wm⁻²/nm)",
+        )
