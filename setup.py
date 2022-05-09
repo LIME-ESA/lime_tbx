@@ -25,7 +25,7 @@ setup(
     description="The LIME TBX isa python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare to remote sensing observations of the moon.",
     long_description=read("README.rst"),
     packages=find_packages(exclude=("tests",)),
-    install_requires=[],
+    install_requires=["numpy","matplotlib","pyside2","spicedmoon","scipy","sklearn","punpy"],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

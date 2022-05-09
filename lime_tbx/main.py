@@ -17,7 +17,7 @@ __status__ = "Development"
 
 
 def main():
-    gui = GUI()
+    #gui = GUI()
     main_alg = rolo.ROLO()
 
 
