@@ -47,7 +47,7 @@ class SpectralInterpolation(ISpectralInterpolation):
     def __init__(self,relative=True,method_main="cubic",method_hr="cubic"):
         self.intp = Interpolator(relative=relative,method_main=method_main,method_hr=method_hr,
                             min_scale=0.3)
-        self.prop =
+        self.prop = punpy.MCPropagation(1000)
 
     def get_best_asd_reference(self,selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle):
         pass
@@ -179,6 +179,7 @@ def interpolate_1d(x_i,y_i,x,method="cubic",unc_methods=None,u_y_i=None,min_scal
         return gaussian_progress_regression(x_i, y_i, x, min_scale=min_scale, u_y_i=u_y_i, return_uncertainties=return_uncertainties,add_error=add_error,return_corr=return_corr)
 
     else:
+        y=interpolate_classic(x_i,y_i,x,method)
         if return_uncertainties or return_corr:
             if unc_methods is None:
                 unc_methods = unc_methods_interpolate_1d(method)
@@ -187,18 +188,7 @@ def interpolate_1d(x_i,y_i,x,method="cubic",unc_methods=None,u_y_i=None,min_scal
 
         if add_error:
             method=random.choice(unc_methods)
-
-        if method.lower() in ["linear", "nearest", "nearest-up", "zero", "slinear", "quadratic", "cubic", "previous", "next"]:
-            f_i = interp1d(x_i, y_i, kind=method.lower())
-            y= f_i(x).squeeze()
-
-        elif method.lower()=="ius":
-            f_i = InterpolatedUnivariateSpline(x_i, y_i)
-            y=f_i(x).squeeze()
-
-        elif method.lower()=="lagrange":
-            f_i = lagrange(x_i, y_i)
-            y = f_i(x).squeeze()
+            y=interpolate_classic(x_i,y_i,x,method)
 
         else:
             raise ValueError(
@@ -216,6 +206,21 @@ def interpolate_1d(x_i,y_i,x,method="cubic",unc_methods=None,u_y_i=None,min_scal
                 return y,y_corr
             else:
                 return y
+
+def interpolate_classic(x_i,y_i,x,method="cubic"):
+    if method.lower() in ["linear","nearest","nearest-up","zero","slinear","quadratic",
+                          "cubic","previous","next"]:
+        f_i = interp1d(x_i,y_i,kind=method.lower())
+        y = f_i(x).squeeze()
+
+    elif method.lower() == "ius":
+        f_i = InterpolatedUnivariateSpline(x_i,y_i)
+        y = f_i(x).squeeze()
+
+    elif method.lower() == "lagrange":
+        f_i = lagrange(x_i,y_i)
+        y = f_i(x).squeeze()
+    return y
 
 
 def unc_methods_interpolate_1d(method):
