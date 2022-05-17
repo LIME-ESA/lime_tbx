@@ -8,7 +8,7 @@ import pkgutil
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from . import constants, guieli, settings
+from . import constants, maingui
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -18,42 +18,12 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-class LimeTBXWidget(QtWidgets.QWidget):
-    """
-    Main widget of the lime toolbox desktop app.
-    """
-
-    def __init__(self, kernels_path: str):
-        super().__init__()
-        self.kernels_path = kernels_path
-        self._build_layout()
-
-    def _build_layout(self):
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-        settings_manager = settings.MockSettingsManager()
-        self.eli_page = guieli.ELISurfaceWidget(self.kernels_path, settings_manager)
-        self.main_layout.addWidget(self.eli_page)
-
-    def propagate_close_event(self):
-        self.eli_page.propagate_close_event()
-
-
-class LimeTBXWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
-        lime_tbx_w: LimeTBXWidget = self.centralWidget()
-        lime_tbx_w.propagate_close_event()
-        return super().closeEvent(event)
-
-
 class GUI:
     def __init__(self, kernels_path: str):
         self.kernels_path = kernels_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
-        window = LimeTBXWindow()
-        main_widget = LimeTBXWidget(kernels_path)
+        window = maingui.LimeTBXWindow()
+        main_widget = maingui.LimeTBXWidget(kernels_path)
         # window.resize(400, 400)
         window.setCentralWidget(main_widget)
         window.show()

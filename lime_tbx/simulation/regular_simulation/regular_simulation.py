@@ -13,6 +13,8 @@ from ...datatypes.datatypes import (
     IrradianceCoefficients,
     MoonData,
     SpectralResponseFunction,
+    SurfacePoint,
+    CustomPoint,
 )
 from ...lime_algorithms.rolo import rolo
 
@@ -31,10 +33,7 @@ class IRegularSimulation(ABC):
     @abstractmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
-        latitude: float,
-        longitude: float,
-        altitude: float,
-        dt: Union[datetime, List[datetime]],
+        sp: SurfacePoint,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
     ) -> Union[List[float], List[List[float]]]:
@@ -47,14 +46,8 @@ class IRegularSimulation(ABC):
         ----------
         srf: SpectralResponseFunction
             Spectral Response Function that the simulation will be computed for.
-        latitude: float
-            Geographic latitude in decimal degrees.
-        longitude: float
-            Geographic longitude in decimal degrees.
-        altitude: float
-            Altitude over the sea level in meters.
-        dt: datetime | list of datetime
-            Time or time series at which the lunar data will be calculated.
+        sp: SurfacePoint
+            Earth's surface point for which the simulation will be computed for.
         coefficients: IrradianceCoefficients
             Values of the chosen coefficients for the ROLO algorithm.
         kernels_path: str
@@ -72,13 +65,45 @@ class IRegularSimulation(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_elref_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
+    def get_elref_from_surface(
+        srf: SpectralResponseFunction,
+        sp: SurfacePoint,
+        coefficients: IrradianceCoefficients,
+        kernels_path: str,
+    ) -> Union[List[float], List[List[float]]]:
+        """
+        Simulate the extraterrestrial lunar reflectance for a geographic point.
+
+        Returns the data in fractions of unity.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        sp: SurfacePoint
+            Earth's surface point for which the simulation will be computed for.
+        coefficients: IrradianceCoefficients
+            Values of the chosen coefficients for the ROLO algorithm.
+        kernels_path: str
+            Path where the needed SPICE kernels are located.
+            The user must have write access to that directory.
+
+        Returns
+        -------
+        elrefs: list of float | list of list of float
+            Extraterrestrial lunar reflectances for the given srf at the specified point.
+            It will be a list of lists of float if the parameter dt is a list. Otherwise it
+            will only be a list of float.
+        """
         pass
 
     @staticmethod
     @abstractmethod
     def get_polarized_from_surface(
-        srf, latitude, longitude, altitude, datetime
+        srf: SpectralResponseFunction,
+        sp: SurfacePoint,
+        coefficients: IrradianceCoefficients,
+        kernels_path: str,
     ) -> list:
         pass
 
@@ -86,12 +111,7 @@ class IRegularSimulation(ABC):
     @abstractmethod
     def get_eli_from_custom(
         srf: SpectralResponseFunction,
-        distance_sun_moon: float,
-        distance_observer_moon: float,
-        selen_obs_lat: float,
-        selen_obs_lon: float,
-        selen_sun_lon: float,
-        abs_moon_phase_angle: float,
+        cp: CustomPoint,
         coefficients: IrradianceCoefficients,
     ) -> List[float]:
         """
@@ -103,18 +123,8 @@ class IRegularSimulation(ABC):
         ----------
         srf: SpectralResponseFunction
             Spectral Response Function that the simulation will be computed for.
-        distance_sun_moon : float
-            Distance between the Sun and the Moon (in astronomical units)
-        distance_observer_moon : float
-            Distance between the Observer and the Moon (in kilometers)
-        selen_sun_lon_rad : float
-            Selenographic longitude of the Sun (in radians)
-        selen_obs_lat : float
-            Selenographic latitude of the observer (in degrees)
-        selen_obs_lon : float
-            Selenographic longitude of the observer (in degrees)
-        abs_moon_phase_angle : float
-            Absolute Moon phase angle (in degrees)
+        cp: CustomPoint
+            Custom point with custom lunar data for which the simulation will be computed for.
         coefficients: IrradianceCoefficients
             Values of the chosen coefficients for the ROLO algorithm.
 
@@ -128,20 +138,37 @@ class IRegularSimulation(ABC):
     @staticmethod
     @abstractmethod
     def get_elref_from_custom(
-        srf,
-        distance_sun_moon,
-        distance_observer_moon,
-        selen_obs_lat,
-        selen_obs_lon,
-        selen_sun_lon,
-        abs_moon_phase_angle,
-    ) -> list:
+        srf: SpectralResponseFunction,
+        cp: CustomPoint,
+        coefficients: IrradianceCoefficients,
+    ) -> List[float]:
+        """
+        Simulate the extraterrestrial lunar reflectance for custom lunar parameters.
+
+        Returns the data in fractions of unity.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        cp: CustomPoint
+            Custom point with custom lunar data for which the simulation will be computed for.
+        coefficients: IrradianceCoefficients
+            Values of the chosen coefficients for the ROLO algorithm.
+
+        Returns
+        -------
+        elrefs: list of float
+            Extraterrestrial lunar reflectances for the given srf and the specified parameters.
+        """
         pass
 
     @staticmethod
     @abstractmethod
     def get_polarized_from_custom(
-        srf, selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle
+        srf: SpectralResponseFunction,
+        cp: CustomPoint,
+        coefficients: IrradianceCoefficients,
     ) -> list:
         pass
 
@@ -187,65 +214,113 @@ class RegularSimulation(IRegularSimulation):
         return times_irr
 
     @staticmethod
+    def _get_elref_from_md(
+        srf: SpectralResponseFunction,
+        md: Union[MoonData, List[MoonData]],
+        coefficients: IrradianceCoefficients,
+    ) -> Union[List[float], List[List[float]]]:
+        """
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        md: MoonData | list of MoonData
+            MoonData for one observation, or for multiple observations in case that
+            it's a list.
+        coefficients: IrradianceCoefficients
+            Values of the chosen coefficients for the ROLO algorithm.
+
+        Returns
+        -------
+        reflectances: list of float | list of list of float
+            Extraterrestrial lunar reflectances for the given srf at the specified point.
+            It will be a list of lists of float if the parameter md is a list. Otherwise it
+            will only be a list of float.
+        """
+        rl = rolo.ROLO()
+        wlens = list(srf.spectral_response.keys())
+        if not isinstance(md, list):
+            reflectances = rl.get_elref(wlens, md, coefficients)
+            for i, w in enumerate(wlens):
+                reflectances[i] = reflectances[i] * srf.spectral_response[w]
+            return reflectances
+        times_refl = []
+        for m in md:
+            reflectances = rl.get_elref(wlens, m, coefficients)
+            for i, w in enumerate(wlens):
+                reflectances[i] = reflectances[i] * srf.spectral_response[w]
+            times_refl.append(reflectances)
+        return times_refl
+
+    @staticmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
-        latitude: float,
-        longitude: float,
-        altitude: float,
-        dt: Union[datetime, List[datetime]],
+        sp: SurfacePoint,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
     ) -> Union[List[float], List[List[float]]]:
         md = SPICEAdapter().get_moon_data_from_earth(
-            latitude, longitude, altitude, dt, kernels_path
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
         return RegularSimulation._get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
-    def get_elref_from_surface(srf, latitude, longitude, altitude, datetime) -> list:
-        pass
+    def get_elref_from_surface(
+        srf: SpectralResponseFunction,
+        sp: SurfacePoint,
+        coefficients: IrradianceCoefficients,
+        kernels_path: str,
+    ) -> Union[List[float], List[List[float]]]:
+        md = SPICEAdapter().get_moon_data_from_earth(
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
+        )
+        return RegularSimulation._get_elref_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_polarized_from_surface(
-        srf, latitude, longitude, altitude, datetime
-    ) -> list:
+        srf: SpectralResponseFunction,
+        sp: SurfacePoint,
+        coefficients: IrradianceCoefficients,
+        kernels_path: str,
+    ) -> List[float]:
         pass
 
     @staticmethod
     def get_eli_from_custom(
         srf: SpectralResponseFunction,
-        distance_sun_moon: float,
-        distance_observer_moon: float,
-        selen_obs_lat: float,
-        selen_obs_lon: float,
-        selen_sun_lon: float,
-        abs_moon_phase_angle: float,
+        cp: CustomPoint,
         coefficients: IrradianceCoefficients,
     ) -> List[float]:
         md = MoonData(
-            distance_sun_moon,
-            distance_observer_moon,
-            selen_sun_lon,
-            selen_obs_lat,
-            selen_obs_lon,
-            abs_moon_phase_angle,
+            cp.distance_sun_moon,
+            cp.distance_observer_moon,
+            cp.selen_sun_lon,
+            cp.selen_obs_lat,
+            cp.selen_obs_lon,
+            cp.abs_moon_phase_angle,
         )
         return RegularSimulation._get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_elref_from_custom(
-        srf,
-        distance_sun_moon,
-        distance_observer_moon,
-        selen_obs_lat,
-        selen_obs_lon,
-        selen_sun_lon,
-        abs_moon_phase_angle,
-    ) -> list:
-        pass
+        srf: SpectralResponseFunction,
+        cp: CustomPoint,
+        coefficients: IrradianceCoefficients,
+    ) -> List[float]:
+        md = MoonData(
+            cp.distance_sun_moon,
+            cp.distance_observer_moon,
+            cp.selen_sun_lon,
+            cp.selen_obs_lat,
+            cp.selen_obs_lon,
+            cp.abs_moon_phase_angle,
+        )
+        return RegularSimulation._get_elref_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_polarized_from_custom(
-        srf, selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle
+        srf: SpectralResponseFunction,
+        cp: CustomPoint,
+        coefficients: IrradianceCoefficients,
     ) -> list:
         pass

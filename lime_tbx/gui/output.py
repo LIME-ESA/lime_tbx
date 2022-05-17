@@ -30,6 +30,11 @@ class MplCanvas(FigureCanvas):
 class GraphWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.title = ""
+        self.xlabel = ""
+        self.ylabel = ""
+        self.x_data = []
+        self.y_data = []
         self._build_layout()
 
     def _build_layout(self):
@@ -40,24 +45,18 @@ class GraphWidget(QtWidgets.QWidget):
     def update_plot(self, x_data: list, y_data: list):
         self.x_data = x_data
         self.y_data = y_data
+        self._redraw()
+
+    def update_labels(self, title: str, xlabel: str, ylabel: str):
+        self.title = title
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self._redraw()
+
+    def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        self.canvas.axes.plot(self.x_data, self.y_data, "r")
+        self.canvas.axes.plot(self.x_data, self.y_data, "o", markersize=2)
+        self.canvas.axes.set_title(self.title)
+        self.canvas.axes.set_xlabel(self.xlabel)
+        self.canvas.axes.set_ylabel(self.ylabel)
         self.canvas.draw()
-
-    def update_labels(self, title: str, xlabel: str, ylabel: str):
-        self.canvas.axes.set_title(title)
-        self.canvas.axes.set_xlabel(xlabel)
-        self.canvas.axes.set_ylabel(ylabel)
-
-
-class GraphWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.graph = GraphWidget()
-        self.setCentralWidget(self.graph)
-
-    def update_plot(self, x_data: list, y_data: list):
-        self.graph.update_plot(x_data, y_data)
-
-    def update_labels(self, title: str, xlabel: str, ylabel: str):
-        self.graph.update_labels(title, xlabel, ylabel)

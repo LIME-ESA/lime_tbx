@@ -9,7 +9,8 @@ It exports the following classes:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Union
+from datetime import datetime
 
 """___Third-Party Modules___"""
 # import here
@@ -59,6 +60,62 @@ class SpectralResponseFunction:
     """
 
     spectral_response: Dict[float, float]
+
+
+@dataclass
+class SurfacePoint:
+    """
+    Dataclass representing a point on Earth's surface.
+
+    The needed parameters for the calculation from a surface point.
+
+    Attributes
+    ----------
+    latitude: float
+        Geographic latitude in decimal degrees.
+    longitude: float
+        Geographic longitude in decimal degrees.
+    altitude: float
+        Altitude over the sea level in meters.
+    dt: datetime | list of datetime
+        Time or time series at which the lunar data will be calculated.
+    """
+
+    latitude: float
+    longitude: float
+    altitude: float
+    dt: Union[datetime, List[datetime]]
+
+
+@dataclass
+class CustomPoint:
+    """
+    Dataclass representing a point which custom Moon data.
+
+    The needed parameters for the calculation from a custom point.
+
+    Attributes
+    ----------
+    distance_sun_moon : float
+        Distance between the Sun and the Moon (in astronomical units)
+    distance_observer_moon : float
+        Distance between the Observer and the Moon (in kilometers)
+    selen_obs_lat : float
+        Selenographic latitude of the observer (in degrees)
+    selen_obs_lon : float
+        Selenographic longitude of the observer (in degrees)
+    selen_sun_lon : float
+        Selenographic longitude of the Sun (in radians)
+    abs_moon_phase_angle : float
+        Absolute Moon phase angle (in degrees)
+    """
+
+    distance_sun_moon: float
+    distance_observer_moon: float
+    selen_obs_lat: float
+    selen_obs_lon: float
+    selen_sun_lon: float
+    abs_moon_phase_angle: float
 
 
 class IrradianceCoefficients:
