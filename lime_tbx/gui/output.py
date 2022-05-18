@@ -6,7 +6,10 @@
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 from matplotlib.axes import Axes
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar,
+)
 from matplotlib.figure import Figure
 
 """___NPL Modules___"""
@@ -22,13 +25,13 @@ __status__ = "Development"
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes: Axes = fig.add_subplot(111)
-        super(MplCanvas, self).__init__(fig)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes: Axes = self.fig.add_subplot(111)
+        super(MplCanvas, self).__init__(self.fig)
 
 
 class GraphWidget(QtWidgets.QWidget):
-    def __init__(self, title = "", xlabel = "", ylabel = ""):
+    def __init__(self, title="", xlabel="", ylabel=""):
         super().__init__()
         self.title = title
         self.xlabel = xlabel
@@ -44,23 +47,39 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
+        self.toolbar = NavigationToolbar(self.canvas, self)
         self._redraw()
-        # save button
-        self.save_button = QtWidgets.QPushButton("Save")
-        self.save_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.save_button.clicked.connect(self._save_image)
-        self.save_button.setDisabled(True)
+        # save buttons
+        self.buttons_layout = QtWidgets.QHBoxLayout()
+        self.export_button = QtWidgets.QPushButton("Export graph (.png, .jpg, .pdf...)")
+        self.export_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.export_button.clicked.connect(self.export_graph)
+        self.disable_buttons(True)
+        self.buttons_layout.addWidget(self.export_button)
+        # error message
+        self.error_message = QtWidgets.QLabel("")
+        self.error_message.setWordWrap(True)
+        self.error_message.hide()
         # finish main
-        self.main_layout.addWidget(self.canvas)
-        self.main_layout.addWidget(self.save_button)
+        self.main_layout.addWidget(self.toolbar)
+        self.main_layout.addWidget(self.canvas, 1)
+        self.main_layout.addLayout(self.buttons_layout)
+        self.main_layout.addWidget(self.error_message)
+
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(event)
+        self._redraw()
+
+    def disable_buttons(self, disable: bool):
+        self.export_button.setDisabled(disable)
 
     def update_plot(self, x_data: list, y_data: list):
         self.x_data = x_data
         self.y_data = y_data
         if len(x_data) > 0 and len(y_data) > 0:
-            self.save_button.setDisabled(False)
+            self.disable_buttons(False)
         else:
-            self.save_button.setDisabled(True)
+            self.disable_buttons(True)
         self._redraw()
 
     def update_labels(self, title: str, xlabel: str, ylabel: str):
@@ -75,11 +94,34 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
+        try:
+            self.canvas.fig.tight_layout()
+        except:
+            pass
         self.canvas.draw()
 
-    @QtCore.Slot()
-    def _save_image(self):
-        self._save_jpg()
+    def clear_error(self):
+        self.error_message.hide()
 
-    def _save_jpg(self):
-        self.canvas.print_figure("test.jpg")
+    def show_error(self, msg: str):
+        color_red = "#c70000"
+        self.error_message.setText(msg)
+        self.error_message.setStyleSheet("background-color: {}".format(color_red))
+        self.error_message.repaint()
+        self.error_message.show()
+
+    @QtCore.Slot()
+    def export_graph(self):
+        self.clear_error()
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
+        )[0]
+        self.parentWidget().setDisabled(True)
+        self.disable_buttons(True)
+        if name is not None and name != "":
+            try:
+                self.canvas.print_figure(name)
+            except Exception as e:
+                self.show_error(str(e))
+        self.disable_buttons(False)
+        self.parentWidget().setDisabled(False)

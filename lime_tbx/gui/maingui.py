@@ -106,23 +106,27 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.elref_button)
         self.buttons_layout.addWidget(self.polar_button)
         # graph
-        self.graph = output.GraphWidget("Simulation output", "Wavelengths (nm)", "Units")
+        self.graph = output.GraphWidget(
+            "Simulation output", "Wavelengths (nm)", "Units"
+        )
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.graph)
+        self.main_layout.addWidget(self.graph, 1)
 
     def _unblock_gui(self):
         self.eli_button.setDisabled(False)
         self.elref_button.setDisabled(False)
         self.polar_button.setDisabled(False)
         self.input_widget.setDisabled(False)
+        self.graph.setDisabled(False)
 
     def _block_gui_loading(self):
         self.eli_button.setDisabled(True)
         self.elref_button.setDisabled(True)
         self.polar_button.setDisabled(True)
         self.input_widget.setDisabled(True)
+        self.graph.setDisabled(True)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
@@ -206,6 +210,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
     def __init__(self, kernels_path: str):
         super().__init__()
+        self.setLocale("English")
         self.kernels_path = kernels_path
         self._build_layout()
 

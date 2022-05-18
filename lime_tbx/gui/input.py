@@ -157,6 +157,7 @@ class InputWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.tabs = QtWidgets.QTabWidget()
+        self.tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         self.surface = SurfaceInputWidget()
         self.tabs.addTab(self.surface, "Surface")
         self.custom = CustomInputWidget()
