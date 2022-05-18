@@ -106,7 +106,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.elref_button)
         self.buttons_layout.addWidget(self.polar_button)
         # graph
-        self.graph = output.GraphWidget()
+        self.graph = output.GraphWidget("Simulation output", "Wavelengths (nm)", "Units")
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
@@ -153,7 +153,6 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def eli_finished(self, data: Tuple[List[float], List[float]]):
         self._unblock_gui()
-        self.graph.show()
         self.graph.update_plot(data[0], data[1])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
@@ -181,7 +180,6 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def elref_finished(self, data: Tuple[List[float], List[float]]):
         self._unblock_gui()
-        self.graph.show()
         self.graph.update_plot(data[0], data[1])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",

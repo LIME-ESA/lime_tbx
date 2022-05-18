@@ -28,23 +28,39 @@ class MplCanvas(FigureCanvas):
 
 
 class GraphWidget(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, title = "", xlabel = "", ylabel = ""):
         super().__init__()
-        self.title = ""
-        self.xlabel = ""
-        self.ylabel = ""
+        self.title = title
+        self.xlabel = xlabel
+        self.ylabel = ylabel
         self.x_data = []
         self.y_data = []
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        # canvas
         self.canvas = MplCanvas(self)
+        self.canvas.axes.set_title(self.title)
+        self.canvas.axes.set_xlabel(self.xlabel)
+        self.canvas.axes.set_ylabel(self.ylabel)
+        self._redraw()
+        # save button
+        self.save_button = QtWidgets.QPushButton("Save")
+        self.save_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.save_button.clicked.connect(self._save_image)
+        self.save_button.setDisabled(True)
+        # finish main
         self.main_layout.addWidget(self.canvas)
+        self.main_layout.addWidget(self.save_button)
 
     def update_plot(self, x_data: list, y_data: list):
         self.x_data = x_data
         self.y_data = y_data
+        if len(x_data) > 0 and len(y_data) > 0:
+            self.save_button.setDisabled(False)
+        else:
+            self.save_button.setDisabled(True)
         self._redraw()
 
     def update_labels(self, title: str, xlabel: str, ylabel: str):
@@ -60,3 +76,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
         self.canvas.draw()
+
+    @QtCore.Slot()
+    def _save_image(self):
+        self._save_jpg()
+
+    def _save_jpg(self):
+        self.canvas.print_figure("test.jpg")
