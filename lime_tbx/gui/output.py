@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-# import here
+from typing import Union
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -13,7 +13,11 @@ from matplotlib.backends.backend_qt5agg import (
 from matplotlib.figure import Figure
 
 """___NPL Modules___"""
-# import here
+from ..datatypes.datatypes import (
+    SurfacePoint,
+    CustomPoint,
+)
+from ..filedata import csv
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -54,8 +58,12 @@ class GraphWidget(QtWidgets.QWidget):
         self.export_button = QtWidgets.QPushButton("Export graph (.png, .jpg, .pdf...)")
         self.export_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_button.clicked.connect(self.export_graph)
+        self.csv_button = QtWidgets.QPushButton("Export CSV")
+        self.csv_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.csv_button.clicked.connect(self.export_csv)
         self.disable_buttons(True)
         self.buttons_layout.addWidget(self.export_button)
+        self.buttons_layout.addWidget(self.csv_button)
         # error message
         self.error_message = QtWidgets.QLabel("")
         self.error_message.setWordWrap(True)
@@ -72,10 +80,14 @@ class GraphWidget(QtWidgets.QWidget):
 
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
+        self.csv_button.setDisabled(disable)
 
-    def update_plot(self, x_data: list, y_data: list):
+    def update_plot(
+        self, x_data: list, y_data: list, point: Union[SurfacePoint, CustomPoint]
+    ):
         self.x_data = x_data
         self.y_data = y_data
+        self.point = point
         if len(x_data) > 0 and len(y_data) > 0:
             self.disable_buttons(False)
         else:
@@ -121,6 +133,24 @@ class GraphWidget(QtWidgets.QWidget):
         if name is not None and name != "":
             try:
                 self.canvas.print_figure(name)
+            except Exception as e:
+                self.show_error(str(e))
+        self.disable_buttons(False)
+        self.parentWidget().setDisabled(False)
+
+    @QtCore.Slot()
+    def export_csv(self):
+        self.clear_error()
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export CSV", "{}.csv".format(self.title)
+        )[0]
+        self.parentWidget().setDisabled(True)
+        self.disable_buttons(True)
+        if name is not None and name != "":
+            try:
+                csv.export_csv(
+                    self.x_data, self.y_data, self.xlabel, self.ylabel, self.point, name
+                )
             except Exception as e:
                 self.show_error(str(e))
         self.disable_buttons(False)

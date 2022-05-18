@@ -50,12 +50,13 @@ def eli_callback(
     kernels_path: str,
 ) -> Tuple[List[float], List[float]]:
     rs = regular_simulation.RegularSimulation()
+    time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
     if isinstance(point, SurfacePoint):
         elis: List[float] = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
     else:
         elis: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
     wlens = list(srf.spectral_response.keys())
-    return wlens, elis
+    return wlens, elis, point
 
 
 def elref_callback(
@@ -72,7 +73,7 @@ def elref_callback(
     else:
         elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
     wlens = list(srf.spectral_response.keys())
-    return wlens, elrefs
+    return wlens, elrefs, point
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):
@@ -146,18 +147,20 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         """
         Calculate and show extraterrestrial lunar irradiances for the given input.
         """
+        self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
-        self._block_gui_loading()
         self.worker = CallbackWorker(
             eli_callback, [srf, point, coeffs, self.kernels_path]
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
-    def eli_finished(self, data: Tuple[List[float], List[float]]):
+    def eli_finished(
+        self, data: Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint]]
+    ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1])
+        self.graph.update_plot(data[0], data[1], data[2])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -173,18 +176,20 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         """
         Calculate and show extraterrestrial lunar reflectances for the given input.
         """
+        self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
-        self._block_gui_loading()
         self.worker = CallbackWorker(
             elref_callback, [srf, point, coeffs, self.kernels_path]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
-    def elref_finished(self, data: Tuple[List[float], List[float]]):
+    def elref_finished(
+        self, data: Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint]]
+    ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1])
+        self.graph.update_plot(data[0], data[1], data[2])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
