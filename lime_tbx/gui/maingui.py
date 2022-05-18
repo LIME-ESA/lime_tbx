@@ -232,6 +232,20 @@ class LimeTBXWidget(QtWidgets.QWidget):
 class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self._create_menu_bar()
+    
+    def _create_actions(self):
+        self.eli_from_file_action = QtWidgets.QAction(self)
+        self.eli_from_file_action.setText("Calculate EL&I from file")
+
+    def _create_menu_bar(self):
+        self._create_actions()
+        self.menu_bar = self.menuBar()
+        file_menu = QtWidgets.QMenu("&File", self)
+        file_menu.addAction(self.eli_from_file_action)
+        coeffs_menu = QtWidgets.QMenu("&Coefficients", self)
+        self.menu_bar.addMenu(file_menu)
+        self.menu_bar.addMenu(coeffs_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
