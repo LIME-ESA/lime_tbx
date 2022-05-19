@@ -9,7 +9,7 @@ It exports the following classes:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 from datetime import datetime
 
 """___Third-Party Modules___"""
@@ -38,6 +38,8 @@ class MoonData:
         Selenographic longitude of the observer (in degrees)
     abs_moon_phase_angle : float
         Absolute Moon phase angle (in degrees)
+    mpa_degrees : float
+        Moon phase angle (in degrees)
     """
 
     distance_sun_moon: float
@@ -46,6 +48,7 @@ class MoonData:
     lat_obs: float
     long_obs: float
     absolute_mpa_degrees: float
+    mpa_degrees: float
 
 
 @dataclass
@@ -108,6 +111,8 @@ class CustomPoint:
         Selenographic longitude of the Sun (in radians)
     abs_moon_phase_angle : float
         Absolute Moon phase angle (in degrees)
+    moon_phase_angle : float
+        Absolute Moon phase angle (in degrees)
     """
 
     distance_sun_moon: float
@@ -116,6 +121,79 @@ class CustomPoint:
     selen_obs_lon: float
     selen_sun_lon: float
     abs_moon_phase_angle: float
+    moon_phase_angle: float
+
+
+class PolarizationCoefficients:
+    """
+    Coefficients used in the DoLP algorithm.
+    """
+
+    def __init__(
+        self,
+        wavelengths: List[float],
+        pos_coeffs: List[Tuple[float, float, float, float]],
+        neg_coeffs: List[Tuple[float, float, float, float]],
+    ):
+        """
+        Parameters
+        ----------
+        wavelengths: list of float
+            Wavelengths present in the model, in nanometers
+        pos_coeffs: list of tuples of 4 floats
+            Positive phase angles related to the given wavelengths
+        neg_coeffs: list of tuples of 4 floats
+            Negative phase angles related to the given wavelengths
+        """
+        self.wavelengths = wavelengths
+        self.pos_coeffs = pos_coeffs
+        self.neg_coeffs = neg_coeffs
+
+    def get_wavelengths(self) -> List[float]:
+        """Gets all wavelengths present in the model, in nanometers
+
+        Returns
+        -------
+        list of float
+            A list of floats that are the wavelengths in nanometers, in order
+        """
+        return self.wavelengths
+
+    def get_coefficients_positive(
+        self, wavelength_nm: float
+    ) -> Tuple[float, float, float, float]:
+        """Gets all positive phase angle coefficients for a concrete wavelength
+
+        Parameters
+        ----------
+        wavelength_nm : float
+            Wavelength in nanometers from which one wants to obtain the coefficients.
+
+        Returns
+        -------
+        list of float
+            A list containing the 'a' coefficients for the wavelength
+        """
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.pos_coeffs[index]
+
+    def get_coefficients_negative(
+        self, wavelength_nm: float
+    ) -> Tuple[float, float, float, float]:
+        """Gets all negative phase angle coefficients for a concrete wavelength
+
+        Parameters
+        ----------
+        wavelength_nm : float
+            Wavelength in nanometers from which one wants to obtain the coefficients.
+
+        Returns
+        -------
+        list of float
+            A list containing the 'a' coefficients for the wavelength
+        """
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.neg_coeffs[index]
 
 
 class IrradianceCoefficients:

@@ -11,7 +11,10 @@ from io import StringIO
 # import here
 
 """___NPL Modules___"""
-from lime_tbx.datatypes.datatypes import IrradianceCoefficients
+from lime_tbx.datatypes.datatypes import (
+    IrradianceCoefficients,
+    PolarizationCoefficients,
+)
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -75,6 +78,24 @@ _DEFAULT_APOLLO_COEFFS = [
     0.8945,
     0.9689,
 ]
+_POLARIZATION_WLENS = [440, 500, 675, 870, 1020, 1640]
+# POLAR COEFFS MIGHT BE WRONG
+_DEFAULT_POS_POLAR_COEFFS = [
+    (0.003008799098, 0.000177889155, 0.000002581092, 0.000000012553),
+    (0.002782607290, 0.000161111675, 0.000002331213, 0.000000011175),
+    (0.002467126521, 0.000140139814, 0.000002021823, 0.000000009468),
+    (0.002536989960, 0.000150448307, 0.000002233876, 0.000000010661),
+    (0.002481149030, 0.000149814043, 0.000002238987, 0.000000010764),
+    (0.002135380897, 0.000126059235, 0.000001888331, 0.000000009098),
+]
+_DEFAULT_NEG_POLAR_COEFFS = [
+    (-0.003328093061, 0.000221328429, -0.000003441781, 0.000000018163),
+    (-0.002881735316, 0.000186855017, -0.000002860010, 0.000000014778),
+    (-0.002659373268, 0.000170314209, -0.000002652223, 0.000000013710),
+    (-0.002521475080, 0.000157719602, -0.000002452656, 0.000000012597),
+    (-0.002546369943, 0.000158157867, -0.000002469036, 0.000000012675),
+    (-0.002726077195, 0.000171190004, -0.000002850707, 0.000000015473),
+]
 
 
 def _get_default_irradiance_coefficients() -> IrradianceCoefficients:
@@ -84,6 +105,15 @@ def _get_default_irradiance_coefficients() -> IrradianceCoefficients:
     coeffs = IrradianceCoefficients(
         wlens, w_coeffs, _DEFAULT_C_COEFFS, _DEFAULT_P_COEFFS, _DEFAULT_APOLLO_COEFFS
     )
+    return coeffs
+
+
+def _get_default_polarization_coefficients() -> PolarizationCoefficients:
+    data = _get_coefficients_data()
+    wlens = _POLARIZATION_WLENS
+    pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
+    neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
+    coeffs = PolarizationCoefficients(wlens, pos_coeffs, neg_coeffs)
     return coeffs
 
 

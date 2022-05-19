@@ -77,6 +77,7 @@ class SPICEAdapter(ISPICEAdapter):
                     md.lat_obs,
                     md.lon_obs,
                     abs(md.mpa_deg),
+                    md.mpa_deg,
                 )
                 mds2.append(md2)
             return mds2
@@ -90,4 +91,5 @@ class SPICEAdapter(ISPICEAdapter):
             md.lat_obs,
             md.lon_obs,
             abs(md.mpa_deg),
+            md.mpa_deg,
         )

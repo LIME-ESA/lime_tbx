@@ -45,15 +45,13 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.selen_sun_lon_label = QtWidgets.QLabel(
             "Selenographic longitude of the Sun (RAD):"
         )
-        self.abs_moon_phase_angle_label = QtWidgets.QLabel(
-            "Absolute Moon phase angle (°):"
-        )
+        self.moon_phase_angle_label = QtWidgets.QLabel("Moon phase angle (°):")
         self.dist_sun_moon_spinbox = QtWidgets.QDoubleSpinBox()
         self.dist_obs_moon_spinbox = QtWidgets.QDoubleSpinBox()
         self.selen_obs_lat_spinbox = QtWidgets.QDoubleSpinBox()
         self.selen_obs_lon_spinbox = QtWidgets.QDoubleSpinBox()
         self.selen_sun_lon_spinbox = QtWidgets.QDoubleSpinBox()
-        self.abs_moon_phase_angle_spinbox = QtWidgets.QDoubleSpinBox()
+        self.moon_phase_angle_spinbox = QtWidgets.QDoubleSpinBox()
         self.dist_sun_moon_spinbox.setMinimum(0.00001)
         self.dist_sun_moon_spinbox.setMaximum(1.5)
         self.dist_sun_moon_spinbox.setDecimals(6)
@@ -72,16 +70,16 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.selen_sun_lon_spinbox.setMinimum(-180)
         self.selen_sun_lon_spinbox.setMaximum(180)
         self.selen_sun_lon_spinbox.setDecimals(4)
-        self.abs_moon_phase_angle_spinbox.setMinimum(-180)
-        self.abs_moon_phase_angle_spinbox.setMaximum(180)
-        self.abs_moon_phase_angle_spinbox.setDecimals(5)
+        self.moon_phase_angle_spinbox.setMinimum(-180)
+        self.moon_phase_angle_spinbox.setMaximum(180)
+        self.moon_phase_angle_spinbox.setDecimals(5)
         self.main_layout.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
         self.main_layout.addRow(self.dist_obs_moon_label, self.dist_obs_moon_spinbox)
         self.main_layout.addRow(self.selen_obs_lat_label, self.selen_obs_lat_spinbox)
         self.main_layout.addRow(self.selen_obs_lon_label, self.selen_obs_lon_spinbox)
         self.main_layout.addRow(self.selen_sun_lon_label, self.selen_sun_lon_spinbox)
         self.main_layout.addRow(
-            self.abs_moon_phase_angle_label, self.abs_moon_phase_angle_spinbox
+            self.moon_phase_angle_label, self.moon_phase_angle_spinbox
         )
 
     def get_dist_sun_moon(self) -> float:
@@ -99,8 +97,8 @@ class CustomInputWidget(QtWidgets.QWidget):
     def get_selen_sun_lon(self) -> float:
         return self.selen_sun_lon_spinbox.value()
 
-    def get_abs_moon_phase_angle(self) -> float:
-        return self.abs_moon_phase_angle_spinbox.value()
+    def get_moon_phase_angle(self) -> float:
+        return self.moon_phase_angle_spinbox.value()
 
 
 class SurfaceInputWidget(QtWidgets.QWidget):
@@ -180,7 +178,8 @@ class InputWidget(QtWidgets.QWidget):
             olat = self.custom.get_selen_obs_lat()
             olon = self.custom.get_selen_obs_lon()
             slon = self.custom.get_selen_sun_lon()
-            mpa = self.custom.get_abs_moon_phase_angle()
-            return CustomPoint(dsm, dom, olat, olon, slon, mpa)
+            mpa = self.custom.get_moon_phase_angle()
+            ampa = abs(mpa)
+            return CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
         else:
             pass

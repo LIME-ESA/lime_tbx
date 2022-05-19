@@ -12,6 +12,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 from . import settings, output, input
 from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
+    PolarizationCoefficients,
     SpectralResponseFunction,
     IrradianceCoefficients,
     SurfacePoint,
@@ -74,6 +75,23 @@ def elref_callback(
         elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
     wlens = list(srf.spectral_response.keys())
     return wlens, elrefs, point
+
+
+def polar_callback(
+    srf: SpectralResponseFunction,
+    point: Union[SurfacePoint, CustomPoint],
+    coeffs: PolarizationCoefficients,
+    kernels_path: str,
+) -> Tuple[List[float], List[float]]:
+    rs = regular_simulation.RegularSimulation()
+    if isinstance(point, SurfacePoint):
+        polars: List[float] = rs.get_polarized_from_surface(
+            srf, point, coeffs, kernels_path
+        )
+    else:
+        polars: List[float] = rs.get_polarized_from_custom(srf, point, coeffs)
+    wlens = list(srf.spectral_response.keys())
+    return wlens, polars, point
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):
@@ -205,7 +223,29 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         """
         Calculate and show extraterrestrial lunar polarization for the given input.
         """
-        pass
+        self._block_gui_loading()
+        point = self.input_widget.get_point()
+        srf = self.settings_manager.get_srf()
+        coeffs = self.settings_manager.get_polar_coeffs()
+        self.worker = CallbackWorker(
+            polar_callback, [srf, point, coeffs, self.kernels_path]
+        )
+        self._start_thread(self.polar_finished, self.polar_error)
+
+    def polar_finished(
+        self, data: Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint]]
+    ):
+        self._unblock_gui()
+        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_labels(
+            "Lunar polarization",
+            "Wavelengths (nm)",
+            "Polarizations (Fraction of unity)",
+        )
+
+    def polar_error(self, error: Exception):
+        self._unblock_gui()
+        raise error
 
 
 class LimeTBXWidget(QtWidgets.QWidget):

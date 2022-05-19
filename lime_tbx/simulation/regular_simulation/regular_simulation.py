@@ -12,11 +12,13 @@ from ...spice_adapter.spice_adapter import SPICEAdapter
 from ...datatypes.datatypes import (
     IrradianceCoefficients,
     MoonData,
+    PolarizationCoefficients,
     SpectralResponseFunction,
     SurfacePoint,
     CustomPoint,
 )
 from ...lime_algorithms.rolo import rolo
+from ...lime_algorithms.dolp import dolp
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -102,9 +104,31 @@ class IRegularSimulation(ABC):
     def get_polarized_from_surface(
         srf: SpectralResponseFunction,
         sp: SurfacePoint,
-        coefficients: IrradianceCoefficients,
+        coefficients: PolarizationCoefficients,
         kernels_path: str,
-    ) -> list:
+    ) -> List[float]:
+        """
+        Simulate the lunar polarization for custom lunar parameters.
+
+        Returns the data in fractions of unity.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        sp: SurfacePoint
+            Earth's surface point for which the simulation will be computed for.
+        coefficients: PolarizationCoefficients
+            Values of the chosen coefficients for the DOLP algorithm.
+        kernels_path: str
+            Path where the needed SPICE kernels are located.
+            The user must have write access to that directory.
+
+        Returns
+        -------
+        polarizations: list of float
+            Lunar polarizations for the given srf and the specified parameters.
+        """
         pass
 
     @staticmethod
@@ -168,8 +192,27 @@ class IRegularSimulation(ABC):
     def get_polarized_from_custom(
         srf: SpectralResponseFunction,
         cp: CustomPoint,
-        coefficients: IrradianceCoefficients,
-    ) -> list:
+        coefficients: PolarizationCoefficients,
+    ) -> List[float]:
+        """
+        Simulate the lunar polarization for custom lunar parameters.
+
+        Returns the data in fractions of unity.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        cp: CustomPoint
+            Custom point with custom lunar data for which the simulation will be computed for.
+        coefficients: PolarizationCoefficients
+            Values of the chosen coefficients for the DOLP algorithm.
+
+        Returns
+        -------
+        polarizations: list of float
+            Lunar polarizations for the given srf and the specified parameters.
+        """
         pass
 
 
@@ -253,6 +296,45 @@ class RegularSimulation(IRegularSimulation):
         return times_refl
 
     @staticmethod
+    def _get_polar_from_md(
+        srf: SpectralResponseFunction,
+        md: Union[MoonData, List[MoonData]],
+        coefficients: PolarizationCoefficients,
+    ) -> Union[List[float], List[List[float]]]:
+        """
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral Response Function that the simulation will be computed for.
+        md: MoonData | list of MoonData
+            MoonData for one observation, or for multiple observations in case that
+            it's a list.
+        coefficients: PolarizationCoefficients
+            Values of the chosen coefficients for the DOLP algorithm.
+
+        Returns
+        -------
+        polarizations: list of float | list of list of float
+            Extraterrestrial lunar polarizations for the given srf at the specified point.
+            It will be a list of lists of float if the parameter md is a list. Otherwise it
+            will only be a list of float.
+        """
+        dl = dolp.DOLP()
+        wlens = list(srf.spectral_response.keys())
+        if not isinstance(md, list):
+            polarizations = dl.get_polarized(wlens, md.mpa_degrees, coefficients)
+            for i, w in enumerate(wlens):
+                polarizations[i] = polarizations[i] * srf.spectral_response[w]
+            return polarizations
+        times_polar = []
+        for m in md:
+            polarizations = dl.get_polarized(wlens, m.mpa_degrees, coefficients)
+            for i, w in enumerate(wlens):
+                polarizations[i] = polarizations[i] * srf.spectral_response[w]
+            times_polar.append(polarizations)
+        return times_polar
+
+    @staticmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
         sp: SurfacePoint,
@@ -283,7 +365,10 @@ class RegularSimulation(IRegularSimulation):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
     ) -> List[float]:
-        pass
+        md = SPICEAdapter().get_moon_data_from_earth(
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
+        )
+        return RegularSimulation._get_polar_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_eli_from_custom(
@@ -298,6 +383,7 @@ class RegularSimulation(IRegularSimulation):
             cp.selen_obs_lat,
             cp.selen_obs_lon,
             cp.abs_moon_phase_angle,
+            cp.moon_phase_angle,
         )
         return RegularSimulation._get_eli_from_md(srf, md, coefficients)
 
@@ -314,6 +400,7 @@ class RegularSimulation(IRegularSimulation):
             cp.selen_obs_lat,
             cp.selen_obs_lon,
             cp.abs_moon_phase_angle,
+            cp.moon_phase_angle,
         )
         return RegularSimulation._get_elref_from_md(srf, md, coefficients)
 
@@ -321,6 +408,15 @@ class RegularSimulation(IRegularSimulation):
     def get_polarized_from_custom(
         srf: SpectralResponseFunction,
         cp: CustomPoint,
-        coefficients: IrradianceCoefficients,
-    ) -> list:
-        pass
+        coefficients: PolarizationCoefficients,
+    ) -> List[float]:
+        md = MoonData(
+            cp.distance_sun_moon,
+            cp.distance_observer_moon,
+            cp.selen_sun_lon,
+            cp.selen_obs_lat,
+            cp.selen_obs_lon,
+            cp.abs_moon_phase_angle,
+            cp.moon_phase_angle,
+        )
+        return RegularSimulation._get_polar_from_md(srf, md, coefficients)

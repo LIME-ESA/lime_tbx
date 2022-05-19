@@ -8,7 +8,11 @@ from PySide2 import QtWidgets, QtCore, QtGui
 import numpy as np
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import SpectralResponseFunction, IrradianceCoefficients
+from ..datatypes.datatypes import (
+    PolarizationCoefficients,
+    SpectralResponseFunction,
+    IrradianceCoefficients,
+)
 from ..coefficients.access_data import access_data
 
 """___Authorship___"""
@@ -34,6 +38,11 @@ class ISettingsManager(ABC):
         """Obtain the current IrradianceCoefficients chosen by the user."""
         pass
 
+    @abstractmethod
+    def get_polar_coeffs(self) -> PolarizationCoefficients:
+        """Obtain the current PolarizationCoefficients chosen by the user."""
+        pass
+
 
 class MockSettingsManager(ISettingsManager):
     def get_srf(self) -> SpectralResponseFunction:
@@ -43,3 +52,6 @@ class MockSettingsManager(ISettingsManager):
 
     def get_irr_coeffs(self) -> IrradianceCoefficients:
         return access_data._get_default_irradiance_coefficients()
+
+    def get_polar_coeffs(self) -> PolarizationCoefficients:
+        return access_data._get_default_polarization_coefficients()
