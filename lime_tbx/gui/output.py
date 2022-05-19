@@ -102,7 +102,7 @@ class GraphWidget(QtWidgets.QWidget):
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        self.canvas.axes.plot(self.x_data, self.y_data, "o", markersize=2)
+        self.canvas.axes.plot(self.x_data, self.y_data)
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
