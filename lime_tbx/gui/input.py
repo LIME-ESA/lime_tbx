@@ -162,6 +162,8 @@ class InputWidget(QtWidgets.QWidget):
         self.tabs.addTab(self.surface, "Surface")
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Custom")
+        self.satellite = QtWidgets.QLabel("Satellite not yet implemented")
+        self.tabs.addTab(self.satellite, "Satellite")
         self.main_layout.addWidget(self.tabs)
 
     def get_point(self) -> Union[SurfacePoint, CustomPoint]:
@@ -172,7 +174,7 @@ class InputWidget(QtWidgets.QWidget):
             alt = self.surface.get_altitude()
             dt = self.surface.get_datetime()
             return SurfacePoint(lat, lon, alt, dt)
-        else:
+        elif isinstance(tab, CustomInputWidget):
             dsm = self.custom.get_dist_sun_moon()
             dom = self.custom.get_dist_obs_moon()
             olat = self.custom.get_selen_obs_lat()
@@ -180,3 +182,5 @@ class InputWidget(QtWidgets.QWidget):
             slon = self.custom.get_selen_sun_lon()
             mpa = self.custom.get_abs_moon_phase_angle()
             return CustomPoint(dsm, dom, olat, olon, slon, mpa)
+        else:
+            pass

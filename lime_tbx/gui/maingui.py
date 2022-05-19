@@ -233,17 +233,41 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self._create_menu_bar()
-    
+
     def _create_actions(self):
+        # File actions
         self.eli_from_file_action = QtWidgets.QAction(self)
         self.eli_from_file_action.setText("Calculate EL&I from file")
+        self.eli_from_file_action.triggered.connect(self.eli_from_file)
+        self.elref_from_file_action = QtWidgets.QAction(self)
+        self.elref_from_file_action.setText("Calculate EL&Ref from file")
+        self.elref_from_file_action.triggered.connect(self.elref_from_file)
+        self.polar_from_file_action = QtWidgets.QAction(self)
+        self.polar_from_file_action.setText("Calculate &Polarization from file")
+        self.polar_from_file_action.triggered.connect(self.polar_from_file)
+        self.exit_action = QtWidgets.QAction(self)
+        self.exit_action.setText("E&xit")
+        self.exit_action.triggered.connect(self.exit)
+        # Coefficients actions
+        self.download_coefficients_action = QtWidgets.QAction(self)
+        self.download_coefficients_action.setText("&Download updated coefficients")
+        self.download_coefficients_action.triggered.connect(self.download_coefficients)
+        self.select_coefficients_action = QtWidgets.QAction(self)
+        self.select_coefficients_action.setText("&Select coefficients")
+        self.select_coefficients_action.triggered.connect(self.select_coefficients)
 
     def _create_menu_bar(self):
         self._create_actions()
         self.menu_bar = self.menuBar()
         file_menu = QtWidgets.QMenu("&File", self)
         file_menu.addAction(self.eli_from_file_action)
+        file_menu.addAction(self.elref_from_file_action)
+        file_menu.addAction(self.polar_from_file_action)
+        file_menu.addSeparator()
+        file_menu.addAction(self.exit_action)
         coeffs_menu = QtWidgets.QMenu("&Coefficients", self)
+        coeffs_menu.addAction(self.download_coefficients_action)
+        coeffs_menu.addAction(self.select_coefficients_action)
         self.menu_bar.addMenu(file_menu)
         self.menu_bar.addMenu(coeffs_menu)
 
@@ -251,3 +275,23 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
         lime_tbx_w.propagate_close_event()
         return super().closeEvent(event)
+
+    # ACTIONS
+
+    def eli_from_file(self):
+        pass
+
+    def elref_from_file(self):
+        pass
+
+    def polar_from_file(self):
+        pass
+
+    def exit(self):
+        pass
+
+    def download_coefficients(self):
+        pass
+
+    def select_coefficients(self):
+        pass
