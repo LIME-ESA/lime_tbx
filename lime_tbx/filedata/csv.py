@@ -14,6 +14,13 @@ from ..datatypes.datatypes import (
     CustomPoint,
 )
 
+"""___Authorship___"""
+__author__ = "Javier Gatón Herguedas"
+__created__ = "15/05/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
+__status__ = "Development"
+
 
 def export_csv(
     x_data: List[float],
