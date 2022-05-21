@@ -328,7 +328,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         pass
 
     def exit(self):
-        pass
+        self.close()
 
     def download_coefficients(self):
         pass

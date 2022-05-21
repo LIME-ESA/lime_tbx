@@ -66,7 +66,7 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.selen_obs_lat_spinbox.setDecimals(4)
         self.selen_obs_lon_spinbox.setMinimum(-180)
         self.selen_obs_lon_spinbox.setMaximum(180)
-        self.selen_obs_lon_spinbox.setMaximum(4)
+        self.selen_obs_lon_spinbox.setDecimals(4)
         self.selen_sun_lon_spinbox.setMinimum(-180)
         self.selen_sun_lon_spinbox.setMaximum(180)
         self.selen_sun_lon_spinbox.setDecimals(4)
