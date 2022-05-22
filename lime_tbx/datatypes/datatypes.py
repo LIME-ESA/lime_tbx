@@ -58,10 +58,13 @@ class SpectralResponseFunction:
 
     Attributes
     ----------
+    name : str
+        Name of the SRF, the identifier.
     spectral_response : dict of float, float
         Set of pairs wavelength, percentage. 100% = 1.0.
     """
 
+    name: str
     spectral_response: Dict[float, float]
 
 

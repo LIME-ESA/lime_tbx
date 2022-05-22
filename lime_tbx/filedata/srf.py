@@ -1,8 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import Union, List
-from datetime import datetime
+import os
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -56,5 +55,9 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
         for factor in factor_arr:
             if not isinstance(factor, np.ma.core.MaskedConstant):
                 factors.append(factor)
-    spectral_response = dict(zip(wvlens, factors))
-    return SpectralResponseFunction(spectral_response)
+    unordered_spec_resp = dict(zip(wvlens, factors))
+    spectral_response = {}
+    for i in sorted(unordered_spec_resp):
+        spectral_response[i] = unordered_spec_resp[i]
+    name = os.path.basename(filepath)
+    return SpectralResponseFunction(name, spectral_response)

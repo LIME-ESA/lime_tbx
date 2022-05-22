@@ -9,7 +9,7 @@ import time
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from . import settings, output, input
+from . import settings, output, input, srf
 from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
@@ -110,6 +110,8 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
         self.input_widget = input.InputWidget()
+        # srf
+        self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
         # buttons
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.eli_button = QtWidgets.QPushButton("Irradiance")
@@ -130,6 +132,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         )
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
+        self.main_layout.addWidget(self.srf_widget)
         self.main_layout.addLayout(self.buttons_layout)
         self.main_layout.addWidget(self.graph, 1)
 
@@ -139,6 +142,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.polar_button.setDisabled(False)
         self.input_widget.setDisabled(False)
         self.graph.setDisabled(False)
+        self.srf_widget.setDisabled(False)
 
     def _block_gui_loading(self):
         self.eli_button.setDisabled(True)
@@ -146,6 +150,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.polar_button.setDisabled(True)
         self.input_widget.setDisabled(True)
         self.graph.setDisabled(True)
+        self.srf_widget.setDisabled(True)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()

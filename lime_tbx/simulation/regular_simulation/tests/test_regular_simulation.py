@@ -31,13 +31,13 @@ VALL_NAME = "VALLADOLID"
 COEFFS = access_data._get_default_irradiance_coefficients()
 
 rs = RegularSimulation()
-srf = SpectralResponseFunction({i: 1.0 for i in np.arange(380, 2500, 2)})
+srf = SpectralResponseFunction("", {i: 1.0 for i in np.arange(380, 2500, 2)})
 
 # Surface point test
 def _test_valladolid_no_corr(ts: unittest.TestCase, wavelength, expected, date):
     sp = SurfacePoint(VALL_LAT, VALL_LON, VALL_ALT, date)
     res = rs.get_eli_from_surface(
-        SpectralResponseFunction({wavelength: 1.0}), sp, COEFFS, KERNELS_PATH
+        SpectralResponseFunction("", {wavelength: 1.0}), sp, COEFFS, KERNELS_PATH
     )
     ts.assertAlmostEqual(res[0], expected, delta=expected * DEFAULT_PROP_ERROR)
 
@@ -48,7 +48,7 @@ class TestRegularSimulation(unittest.TestCase):
     def test_get_eli_Valladolid(self):
         sp = SurfacePoint(VALL_LAT, VALL_LON, VALL_ALT, datetime(2022, 1, 17, 2, 30, 0))
         res = rs.get_eli_from_surface(
-            SpectralResponseFunction({400: 1.0}), sp, COEFFS, KERNELS_PATH
+            SpectralResponseFunction("", {400: 1.0}), sp, COEFFS, KERNELS_PATH
         )
         self.assertGreater(res[0], 0, "Should be greater than 0")
 

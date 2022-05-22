@@ -43,15 +43,27 @@ class ISettingsManager(ABC):
         """Obtain the current PolarizationCoefficients chosen by the user."""
         pass
 
+    @abstractmethod
+    def update_srf(self, srf: SpectralResponseFunction) -> None:
+        """Update the selected srf to the given one."""
+        pass
+
 
 class MockSettingsManager(ISettingsManager):
-    def get_srf(self) -> SpectralResponseFunction:
+
+    def __init__(self):
         # generate an arbitrary default srf
         spectral_response = {i: 1.0 for i in np.arange(380, 2500, 2)}
-        return SpectralResponseFunction(spectral_response)
+        self.srf = SpectralResponseFunction("mock srf", spectral_response)
+
+    def get_srf(self) -> SpectralResponseFunction:
+        return self.srf
 
     def get_irr_coeffs(self) -> IrradianceCoefficients:
         return access_data._get_default_irradiance_coefficients()
 
     def get_polar_coeffs(self) -> PolarizationCoefficients:
         return access_data._get_default_polarization_coefficients()
+    
+    def update_srf(self, srf: SpectralResponseFunction):
+        self.srf = srf
