@@ -11,6 +11,7 @@ import numpy as np
 from ..datatypes.datatypes import (
     SpectralResponseFunction,
 )
+from ..datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -58,6 +59,7 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
     unordered_spec_resp = dict(zip(wvlens, factors))
     spectral_response = {}
     for i in sorted(unordered_spec_resp):
-        spectral_response[i] = unordered_spec_resp[i]
+        if i >= constants.MIN_WLEN and i <= constants.MAX_WLEN:
+            spectral_response[i] = unordered_spec_resp[i]
     name = os.path.basename(filepath)
     return SpectralResponseFunction(name, spectral_response)

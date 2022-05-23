@@ -2,6 +2,7 @@
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
+from typing import List
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -13,6 +14,7 @@ from ..datatypes.datatypes import (
     SpectralResponseFunction,
     IrradianceCoefficients,
 )
+from ..datatypes import constants
 from ..coefficients.access_data import access_data
 
 """___Authorship___"""
@@ -44,17 +46,29 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def update_srf(self, srf: SpectralResponseFunction) -> None:
-        """Update the selected srf to the given one."""
+    def load_srf(self, srf: SpectralResponseFunction) -> None:
+        """Add the srf to the available srf list."""
+        pass
+
+    @abstractmethod
+    def select_srf(self, index: int) -> None:
+        """Select the srf from the srf list at the given position."""
+        pass
+
+    @abstractmethod
+    def get_available_srfs(self) -> List[SpectralResponseFunction]:
+        """Obtain a list with all the SRFS the user can choose"""
         pass
 
 
 class MockSettingsManager(ISettingsManager):
-
     def __init__(self):
         # generate an arbitrary default srf
-        spectral_response = {i: 1.0 for i in np.arange(380, 2500, 2)}
-        self.srf = SpectralResponseFunction("mock srf", spectral_response)
+        spectral_response = {
+            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
+        }
+        self.srfs = [SpectralResponseFunction("Mock", spectral_response)]
+        self.srf = self.srfs[0]
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
@@ -64,6 +78,12 @@ class MockSettingsManager(ISettingsManager):
 
     def get_polar_coeffs(self) -> PolarizationCoefficients:
         return access_data._get_default_polarization_coefficients()
-    
-    def update_srf(self, srf: SpectralResponseFunction):
-        self.srf = srf
+
+    def load_srf(self, srf: SpectralResponseFunction):
+        self.srfs.append(srf)
+
+    def select_srf(self, index: int):
+        self.srf = self.srfs[index]
+
+    def get_available_srfs(self) -> List[SpectralResponseFunction]:
+        return self.srfs
