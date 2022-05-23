@@ -309,6 +309,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.select_coefficients_action = QtWidgets.QAction(self)
         self.select_coefficients_action.setText("&Select coefficients")
         self.select_coefficients_action.triggered.connect(self.select_coefficients)
+        # Help actions
+        self.about_action = QtWidgets.QAction(self)
+        self.about_action.setText("&About")
+        self.about_action.triggered.connect(self.about)
 
     def _create_menu_bar(self):
         self._create_actions()
@@ -322,8 +326,11 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         coeffs_menu = QtWidgets.QMenu("&Coefficients", self)
         coeffs_menu.addAction(self.download_coefficients_action)
         coeffs_menu.addAction(self.select_coefficients_action)
+        help_menu = QtWidgets.QMenu("&Help", self)
+        help_menu.addAction(self.about_action)
         self.menu_bar.addMenu(file_menu)
         self.menu_bar.addMenu(coeffs_menu)
+        self.menu_bar.addMenu(help_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
@@ -348,4 +355,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         pass
 
     def select_coefficients(self):
+        pass
+
+    def about(self):
         pass
