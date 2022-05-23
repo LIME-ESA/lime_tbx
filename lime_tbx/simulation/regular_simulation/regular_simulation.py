@@ -284,14 +284,10 @@ class RegularSimulation(IRegularSimulation):
         wlens = list(srf.spectral_response.keys())
         if not isinstance(md, list):
             reflectances = rl.get_elref(wlens, md, coefficients)
-            for i, w in enumerate(wlens):
-                reflectances[i] = reflectances[i] * srf.spectral_response[w]
             return reflectances
         times_refl = []
         for m in md:
             reflectances = rl.get_elref(wlens, m, coefficients)
-            for i, w in enumerate(wlens):
-                reflectances[i] = reflectances[i] * srf.spectral_response[w]
             times_refl.append(reflectances)
         return times_refl
 
@@ -323,14 +319,10 @@ class RegularSimulation(IRegularSimulation):
         wlens = list(srf.spectral_response.keys())
         if not isinstance(md, list):
             polarizations = dl.get_polarized(wlens, md.mpa_degrees, coefficients)
-            for i, w in enumerate(wlens):
-                polarizations[i] = polarizations[i] * srf.spectral_response[w]
             return polarizations
         times_polar = []
         for m in md:
             polarizations = dl.get_polarized(wlens, m.mpa_degrees, coefficients)
-            for i, w in enumerate(wlens):
-                polarizations[i] = polarizations[i] * srf.spectral_response[w]
             times_polar.append(polarizations)
         return times_polar
 
