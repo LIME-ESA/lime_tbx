@@ -111,7 +111,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         # input
         self.input_widget = input.InputWidget()
         # srf
-        self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
+        # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
         # buttons
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.eli_button = QtWidgets.QPushButton("Irradiance")
@@ -126,15 +126,22 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.eli_button)
         self.buttons_layout.addWidget(self.elref_button)
         self.buttons_layout.addWidget(self.polar_button)
+        # Lower tab
+        self.lower_tabs = QtWidgets.QTabWidget()
+        self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         # graph
         self.graph = output.GraphWidget(
             "Simulation output", "Wavelengths (nm)", "Units"
         )
+        # srf widget
+        self.srf_widget = srf.SRFEditWidget(self.settings_manager)
+        # finish tab
+        self.lower_tabs.addTab(self.graph, "Result")
+        self.lower_tabs.addTab(self.srf_widget, "SRF")
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
-        self.main_layout.addWidget(self.srf_widget)
         self.main_layout.addLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.graph, 1)
+        self.main_layout.addWidget(self.lower_tabs, 1)
 
     def _unblock_gui(self):
         self.eli_button.setDisabled(False)
@@ -143,6 +150,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.input_widget.setDisabled(False)
         self.graph.setDisabled(False)
         self.srf_widget.setDisabled(False)
+        self.lower_tabs.setDisabled(False)
 
     def _block_gui_loading(self):
         self.eli_button.setDisabled(True)
@@ -151,6 +159,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.input_widget.setDisabled(True)
         self.graph.setDisabled(True)
         self.srf_widget.setDisabled(True)
+        self.lower_tabs.setDisabled(True)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()

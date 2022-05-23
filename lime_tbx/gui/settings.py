@@ -67,7 +67,7 @@ class MockSettingsManager(ISettingsManager):
         spectral_response = {
             i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
         }
-        self.srfs = [SpectralResponseFunction("Mock", spectral_response)]
+        self.srfs = [SpectralResponseFunction("Default", spectral_response)]
         self.srf = self.srfs[0]
 
     def get_srf(self) -> SpectralResponseFunction:
