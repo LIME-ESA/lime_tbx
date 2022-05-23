@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 import sys
 import pkgutil
+import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -31,5 +32,7 @@ class GUI:
 
         qss_bytes = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH)
         window.setStyleSheet(qss_bytes.decode())
-        # window.setWindowIcon(QtGui.QIcon(resource_path(constants.ICON_PATH)))
+        package = pkgutil.get_loader(__name__)
+        logo_path = os.path.join(os.path.dirname(package.path), constants.LOGO_PATH)
+        window.setWindowIcon(QtGui.QIcon(logo_path))
         sys.exit(app.exec_())
