@@ -1,5 +1,5 @@
 # https://eop-cfi.esa.int/Repo/PUBLIC/DOCUMENTATION/MISSION_DATA/ORBIT_SWATH_DATA/
-BIOMAS:
+BIOMASS:
   id: 141
   n_files: 1
   orbit_files:

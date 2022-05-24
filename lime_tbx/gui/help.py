@@ -35,6 +35,8 @@ class AboutDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        title = "Lunar Irradiance Model of ESA ToolBox"
+        self.title_label = QtWidgets.QLabel(title, alignment=QtCore.Qt.AlignCenter)
         description = "Lunar Irradiance Model of ESA ToolBox."
         self.description_label = QtWidgets.QLabel(
             description, alignment=QtCore.Qt.AlignCenter
@@ -43,5 +45,6 @@ class AboutDialog(QtWidgets.QDialog):
         self.version_label = QtWidgets.QLabel(
             "Version: Development", alignment=QtCore.Qt.AlignCenter
         )
+        self.main_layout.addWidget(self.title_label)
         self.main_layout.addWidget(self.description_label)
         self.main_layout.addWidget(self.version_label)
