@@ -9,7 +9,7 @@ import time
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from . import settings, output, input, srf
+from . import settings, output, input, srf, help
 from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
@@ -358,4 +358,5 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         pass
 
     def about(self):
-        pass
+        about_dialog = help.AboutDialog(self)
+        about_dialog.exec_()
