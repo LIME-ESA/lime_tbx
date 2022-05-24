@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Earth_Observation_File
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://eop-cfi.esa.int/CFI http://eop-cfi.esa.int/CFI/EE_CFI_SCHEMAS/EO_OPER_INT_SATCFG_0300.XSD" schemaVersion="3.0" xmlns="http://eop-cfi.esa.int/CFI">
+	<Earth_Observation_Header>
+		<Fixed_Header>
+			<File_Name>CRT_TEST_INT_SATCFG_00000000T000000_99999999T999999_0001</File_Name>
+			<File_Description>Satellite Configuration</File_Description>
+			<Notes></Notes>
+			<Mission>CRISTAL</Mission>
+			<File_Class>TEST</File_Class>
+			<File_Type>INT_SATCFG</File_Type>
+			<Validity_Period>
+				<Validity_Start>UTC=0000-00-00T00:00:00</Validity_Start>
+				<Validity_Stop>UTC=9999-99-99T99:99:99</Validity_Stop>
+			</Validity_Period>
+			<File_Version>0001</File_Version>
+			<EOFFS_Version>3.0</EOFFS_Version>
+			<Source>
+				<System>EOCFI</System>
+				<Creator>ESTEC</Creator>
+				<Creator_Version>1</Creator_Version>
+				<Creation_Date>UTC=2020-11-30T12:00:00</Creation_Date>
+			</Source>
+		</Fixed_Header>
+		<Variable_Header></Variable_Header>
+	</Earth_Observation_Header>
+   <Data_Block type="xml">
+   	<Satellite_Name>CRISTAL</Satellite_Name>
+		<NORAD_Data>
+			<Satellite_Number>00000</Satellite_Number>
+			<NORAD_Sat_Name>CRISTAL</NORAD_Sat_Name>
+			<Int_Designator>00000AAA</Int_Designator>
+		</NORAD_Data>
+   	<Lib_Init>
+   		<Low_Tolerances> 
+   			<Min_Semi_Major_Axis>1000000.0</Min_Semi_Major_Axis>
+   			<Max_Semi_Major_Axis>10000000.0</Max_Semi_Major_Axis>
+   			<Min_Inclination>91.7</Min_Inclination>
+   			<Max_Inclination>92.3</Max_Inclination>
+   			<Min_Eccentricity>0.0</Min_Eccentricity>
+   			<Max_Eccentricity>0.5</Max_Eccentricity>
+   		</Low_Tolerances>
+   		<Tight_Tolerances> 
+   			<Min_Semi_Major_Axis>1000000.0</Min_Semi_Major_Axis>
+   			<Max_Semi_Major_Axis>10000000.0</Max_Semi_Major_Axis>
+   			<Min_Inclination>91.9</Min_Inclination>
+   			<Max_Inclination>92.1</Max_Inclination>
+   			<Min_Eccentricity>0.0</Min_Eccentricity>
+   			<Max_Eccentricity>0.007</Max_Eccentricity>
+   		</Tight_Tolerances>
+   	</Lib_Init>
+   	<Orbit_Init>
+   		<Min_Semi_Major_Axis>7104500.0</Min_Semi_Major_Axis>
+   		<Nom_Semi_Major_Axis>7114135.214403</Nom_Semi_Major_Axis>
+   		<Max_Semi_Major_Axis>7123500.0</Max_Semi_Major_Axis>
+   		<Min_Inclination>91.995</Min_Inclination>
+   		<Nom_Inclination>92.0</Nom_Inclination>
+   		<Max_Inclination>92.005</Max_Inclination>
+   		<Nom_Eccentricity>0.001164</Nom_Eccentricity>
+   		<Nom_Arg_Perigee>90.0</Nom_Arg_Perigee>
+   	</Orbit_Init>
+   </Data_Block>
+</Earth_Observation_File>

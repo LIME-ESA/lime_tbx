@@ -20,11 +20,12 @@ __status__ = "Development"
 
 
 class GUI:
-    def __init__(self, kernels_path: str):
+    def __init__(self, kernels_path: str, eocfi_path: str):
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
         window = maingui.LimeTBXWindow()
-        main_widget = maingui.LimeTBXWidget(kernels_path)
+        main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path)
         # window.resize(400, 400)
         window.setCentralWidget(main_widget)
         window.show()

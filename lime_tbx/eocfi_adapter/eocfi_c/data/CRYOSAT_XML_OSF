@@ -1,0 +1,129 @@
+<?xml version = "1.0"?>
+<Earth_Explorer_File>
+  <Earth_Explorer_Header>
+    <Fixed_Header>
+      <File_Name>CS_TEST_MPL_ORBREF_19990818T215929_99999999T999999_0001</File_Name>
+      <File_Description>Reference Orbit Scenario File</File_Description>
+      <Notes/>
+      <Mission>CryoSat</Mission>
+      <File_Class>TEST</File_Class>
+      <File_Type>MPL_ORBREF</File_Type>
+      <Validity_Period>
+        <Validity_Start>UTC=1999-08-18T21:59:29</Validity_Start>
+        <Validity_Stop>UTC=9999-99-99T99:99:99</Validity_Stop>
+      </Validity_Period>
+      <File_Version>0001</File_Version>
+      <Source>
+        <System>What system?</System>
+        <Creator>EXPLORER_GEN_FILES: xg_gen_osf_create</Creator>
+        <Creator_Version>1.1</Creator_Version>
+        <Creation_Date>UTC=2002-11-28T18:11:45</Creation_Date>
+      </Source>
+    </Fixed_Header>
+    <Variable_Header/>
+  </Earth_Explorer_Header>
+  <Data_Block type="xml">
+      <List_of_Orbit_Changes count="5">
+         <Orbit_Change>
+            <Orbit>
+               <Absolute_Orbit>270</Absolute_Orbit>
+               <Relative_Orbit>1</Relative_Orbit>
+               <Cycle_Number>1</Cycle_Number>
+               <Phase_Number>1</Phase_Number>
+            </Orbit>
+            <Cycle>
+               <Repeat_Cycle unit="day">369</Repeat_Cycle>
+               <Cycle_Length unit="orbit">5344</Cycle_Length>
+               <ANX_Longitude unit="deg">0.1335</ANX_Longitude>
+               <MLST>08:40:00.000000</MLST>
+               <MLST_Drift unit="s/day">188.160000</MLST_Drift>
+            </Cycle>
+            <Time_of_ANX>
+               <TAI>TAI=1999-08-18T21:59:58.967155</TAI>
+               <UTC>UTC=1999-08-18T21:59:29.967155</UTC>
+               <UT1>UT1=1999-08-18T21:59:29.807155</UT1>
+            </Time_of_ANX>
+         </Orbit_Change>
+         <Orbit_Change>
+            <Orbit>
+               <Absolute_Orbit>3004</Absolute_Orbit>
+               <Relative_Orbit>1</Relative_Orbit>
+               <Cycle_Number>7</Cycle_Number>
+               <Phase_Number>2</Phase_Number>
+            </Orbit>
+            <Cycle>
+               <Repeat_Cycle unit="day">2</Repeat_Cycle>
+               <Cycle_Length unit="orbit">29</Cycle_Length>
+               <ANX_Longitude unit="deg">0.86</ANX_Longitude>
+               <MLST>08:40:00.000000</MLST>
+               <MLST_Drift unit="s/day">188.160000</MLST_Drift>
+            </Cycle>
+            <Time_of_ANX>
+               <TAI>TAI=2000-02-25T21:57:05.714679</TAI>
+               <UTC>UTC=2000-02-25T21:56:35.714679</UTC>
+               <UT1>UT1=2000-02-25T21:56:35.015684</UT1>
+            </Time_of_ANX>
+         </Orbit_Change>
+         <Orbit_Change>
+            <Orbit>
+               <Absolute_Orbit>5713</Absolute_Orbit>
+               <Relative_Orbit>230</Relative_Orbit>
+               <Cycle_Number>70</Cycle_Number>
+               <Phase_Number>2</Phase_Number>
+            </Orbit>
+            <Cycle>
+               <Repeat_Cycle unit="day">369</Repeat_Cycle>
+               <Cycle_Length unit="orbit">5344</Cycle_Length>
+               <ANX_Longitude unit="deg">0.851828</ANX_Longitude>
+               <MLST>08:40:00.000000</MLST>
+               <MLST_Drift unit="s/day">188.160000</MLST_Drift>
+            </Cycle>
+            <Time_of_ANX>
+               <TAI>TAI=2000-09-01T21:57:07.777146</TAI>
+               <UTC>UTC=2000-09-01T21:56:37.777146</UTC>
+               <UT1>UT1=2000-09-01T21:56:36.895214</UT1>
+            </Time_of_ANX>
+         </Orbit_Change>
+         <Orbit_Change>
+            <Orbit>
+               <Absolute_Orbit>7488</Absolute_Orbit>
+               <Relative_Orbit>1</Relative_Orbit>
+               <Cycle_Number>74</Cycle_Number>
+               <Phase_Number>3</Phase_Number>
+            </Orbit>
+            <Cycle>
+               <Repeat_Cycle unit="day">2</Repeat_Cycle>
+               <Cycle_Length unit="orbit">29</Cycle_Length>
+               <ANX_Longitude unit="deg">0.133500</ANX_Longitude>
+               <MLST>08:40:00.000000</MLST>
+               <MLST_Drift unit="s/day">188.160000</MLST_Drift>
+            </Cycle>
+            <Time_of_ANX>
+               <TAI>TAI=2001-01-03T22:00:21.227417</TAI>
+               <UTC>UTC=2001-01-03T21:59:50.227417</UTC>
+               <UT1>UT1=2001-01-03T21:59:50.001256</UT1>
+            </Time_of_ANX>
+         </Orbit_Change>
+         <Orbit_Change>
+            <Orbit>
+               <Absolute_Orbit>8991</Absolute_Orbit>
+               <Relative_Orbit>1</Relative_Orbit>
+               <Cycle_Number>77</Cycle_Number>
+               <Phase_Number>4</Phase_Number>
+            </Orbit>
+            <Cycle>
+               <Repeat_Cycle unit="day">369</Repeat_Cycle>
+               <Cycle_Length unit="orbit">5344</Cycle_Length>
+               <ANX_Longitude unit="deg">0.133500</ANX_Longitude>
+               <MLST>08:40:00.000000</MLST>
+               <MLST_Drift unit="s/day">188.160000</MLST_Drift>
+            </Cycle>
+            <Time_of_ANX>
+               <TAI>TAI=2001-04-18T22:00:10.320057</TAI>
+               <UTC>UTC=2001-04-18T21:59:39.320057</UTC>
+               <UT1>UT1=2001-04-18T21:59:39.102456</UT1>
+            </Time_of_ANX>
+         </Orbit_Change>
+      </List_of_Orbit_Changes>
+   </Data_Block>
+</Earth_Explorer_File>

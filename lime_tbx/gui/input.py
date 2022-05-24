@@ -5,13 +5,14 @@ from datetime import datetime
 from typing import Union, Tuple
 
 """___Third-Party Modules___"""
-from typing import Callable
+from typing import Callable, List, Optional
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
+    SatellitePoint,
 )
 
 """___Authorship___"""
@@ -147,9 +148,38 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         return self.datetime_edit.dateTime().toPython()
 
 
-class InputWidget(QtWidgets.QWidget):
-    def __init__(self):
+class SatelliteInputWidget(QtWidgets.QWidget):
+    def __init__(self, sat_names: List[str]) -> None:
         super().__init__()
+        self.sat_names = sat_names
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QFormLayout(self)
+        # satellite
+        self.satellite_label = QtWidgets.QLabel("Satellite:")
+        self.combo_sats = QtWidgets.QComboBox()
+        self.combo_sats.addItems(self.sat_names)
+        # datetime
+        self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
+        self.datetime_edit = QtWidgets.QDateTimeEdit()
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
+        # finish layout
+        self.main_layout.addRow(self.satellite_label, self.combo_sats)
+        self.main_layout.addRow(self.datetime_label, self.datetime_edit)
+
+    def get_satellite(self) -> str:
+        return self.sat_names[self.combo_sats.currentIndex()]
+
+    def get_datetime(self) -> datetime:
+        return self.datetime_edit.dateTime().toPython()
+
+
+class InputWidget(QtWidgets.QWidget):
+    def __init__(self, sat_names: List[str]):
+        super().__init__()
+        self.sat_names = sat_names
         self._build_layout()
 
     def _build_layout(self):
@@ -160,11 +190,11 @@ class InputWidget(QtWidgets.QWidget):
         self.tabs.addTab(self.surface, "Surface")
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Custom")
-        self.satellite = QtWidgets.QLabel("Satellite not yet implemented")
+        self.satellite = SatelliteInputWidget(self.sat_names)
         self.tabs.addTab(self.satellite, "Satellite")
         self.main_layout.addWidget(self.tabs)
 
-    def get_point(self) -> Union[SurfacePoint, CustomPoint]:
+    def get_point(self) -> Union[SurfacePoint, CustomPoint, SatellitePoint]:
         tab = self.tabs.currentWidget()
         if isinstance(tab, SurfaceInputWidget):
             lat = self.surface.get_latitude()
@@ -182,4 +212,6 @@ class InputWidget(QtWidgets.QWidget):
             ampa = abs(mpa)
             return CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
         else:
-            pass
+            sat = self.satellite.get_satellite()
+            dt = self.satellite.get_datetime()
+            return SatellitePoint(sat, dt)

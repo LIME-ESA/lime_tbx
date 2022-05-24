@@ -1,0 +1,68 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<Earth_Explorer_File>
+  <Earth_Explorer_Header>
+    <Fixed_Header>
+      <File_Name>FPO</File_Name>
+      <File_Description>Predicted Orbit File</File_Description>
+      <Notes/>
+      <Mission>CryoSat</Mission>
+      <File_Class>TEST</File_Class>
+      <File_Type>MPL_ORBPRE</File_Type>
+      <Validity_Period>
+        <Validity_Start>UTC=2002-12-12T10:00:00</Validity_Start>
+        <Validity_Stop>UTC=2002-12-31T20:16:05</Validity_Stop>
+      </Validity_Period>
+      <File_Version>0001</File_Version>
+      <Source>
+        <System>What system?</System>
+        <Creator>Creator</Creator>
+        <Creator_Version>1.1</Creator_Version>
+        <Creation_Date>UTC=2002-11-28T18:19:27</Creation_Date>
+      </Source>
+    </Fixed_Header>
+    <Variable_Header/>
+  </Earth_Explorer_Header>
+   <Data_Block type="xml">
+      <List_of_OSVs count="3">
+         <OSV>
+            <TAI>TAI=2000-01-01T19:43:07.000000</TAI>
+            <UTC>UTC=2000-01-01T19:42:32.000000</UTC>
+            <UT1>UT1=2000-01-01T19:42:32.800000</UT1>
+            <Absolute_Orbit>+1000</Absolute_Orbit>
+            <X unit="m">+5388458.259</X>
+            <Y unit="m">+4780263.394</Y>
+            <Z unit="m">+0205478.132</Z>
+            <VX unit="m/s">+0932.748682</VX>
+            <VY unit="m/s">-1380.744404</VY>
+            <VZ unit="m/s">+7349.979723</VZ>
+           <Quality>0</Quality>
+         </OSV>
+         <OSV>
+            <TAI>TAI=2000-01-01T21:24:07.000000</TAI>
+            <UTC>UTC=2000-01-01T21:23:32.000000</UTC>
+            <UT1>UT1=2000-01-01T21:23:32.800000</UT1>
+            <Absolute_Orbit>+1001</Absolute_Orbit>
+            <X unit="m">+6906883.237</X>
+            <Y unit="m">+2055987.299</Y>
+            <Z unit="m">+0001130.570</Z>
+            <VX unit="m/s">+0461.742151</VX>
+            <VY unit="m/s">-1586.002742</VY>
+            <VZ unit="m/s">+7353.033868</VZ>
+           <Quality>0</Quality>
+         </OSV>
+         <OSV>
+            <TAI>TAI=2000-01-01T23:06:07.000000</TAI>
+            <UTC>UTC=2000-01-01T23:05:32.000000</UTC>
+            <UT1>UT1=2000-01-01T23:05:32.800000</UT1>
+            <Absolute_Orbit>+1002</Absolute_Orbit>
+            <X unit="m">+7109308.923</X>
+            <Y unit="m">-1152993.906</Y>
+            <Z unit="m">+0238370.529</Z>
+            <VX unit="m/s">-0513.496854</VX>
+            <VY unit="m/s">-1590.568217</VY>
+            <VZ unit="m/s">+7348.860705</VZ>
+           <Quality>0</Quality>
+         </OSV>
+      </List_of_OSVs>
+   </Data_Block>
+</Earth_Explorer_File>

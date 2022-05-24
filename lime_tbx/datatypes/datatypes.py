@@ -96,7 +96,7 @@ class SurfacePoint:
 @dataclass
 class CustomPoint:
     """
-    Dataclass representing a point which custom Moon data.
+    Dataclass representing a point with custom Moon data.
 
     The needed parameters for the calculation from a custom point.
 
@@ -125,6 +125,23 @@ class CustomPoint:
     selen_sun_lon: float
     abs_moon_phase_angle: float
     moon_phase_angle: float
+
+
+@dataclass
+class SatellitePoint:
+    """
+    Dataclass representing a Satellite in a concrete datetime
+
+    Attributes
+    ----------
+    name : str
+        Name of the satellite
+    dt : datetime
+        Datetime
+    """
+
+    name: str
+    dt: datetime
 
 
 class PolarizationCoefficients:

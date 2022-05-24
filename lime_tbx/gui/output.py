@@ -14,6 +14,7 @@ from matplotlib.figure import Figure
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    SatellitePoint,
     SurfacePoint,
     CustomPoint,
 )
@@ -83,7 +84,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.csv_button.setDisabled(disable)
 
     def update_plot(
-        self, x_data: list, y_data: list, point: Union[SurfacePoint, CustomPoint]
+        self,
+        x_data: list,
+        y_data: list,
+        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     ):
         self.x_data = x_data
         self.y_data = y_data

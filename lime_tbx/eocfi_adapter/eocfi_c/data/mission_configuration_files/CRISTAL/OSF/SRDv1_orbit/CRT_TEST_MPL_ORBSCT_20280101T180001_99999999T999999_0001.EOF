@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<Earth_Observation_File xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://eop-cfi.esa.int/CFI http://eop-cfi.esa.int/CFI/EE_CFI_SCHEMAS/EO_OPER_MPL_ORBSCT_0300.XSD" schemaVersion="3.0" xmlns="http://eop-cfi.esa.int/CFI">
+  <Earth_Observation_Header>
+    <Fixed_Header>
+      <File_Name>CRT_TEST_MPL_ORBSCT_20280101T180001_99999999T999999_0001</File_Name>
+      <File_Description>Reference Orbit Scenario File</File_Description>
+      <Notes>ORBSCT for EOCFI SW v4.16 or above</Notes>
+      <Mission>CRISTAL</Mission>
+      <File_Class>TEST</File_Class>
+      <File_Type>MPL_ORBSCT</File_Type>
+      <Validity_Period>
+        <Validity_Start>UTC=2028-01-01T18:00:01</Validity_Start>
+        <Validity_Stop>UTC=9999-99-99T99:99:99</Validity_Stop>
+      </Validity_Period>
+      <File_Version>0001</File_Version>
+      <EOFFS_Version>3.0</EOFFS_Version>
+      <Source>
+        <System/>
+        <Creator>EO_ORBIT:xo_gen_osf_create</Creator>
+        <Creator_Version>4.20</Creator_Version>
+        <Creation_Date>UTC=2020-11-30T22:55:01</Creation_Date>
+      </Source>
+    </Fixed_Header>
+    <Variable_Header>
+      <Time_Reference>UT1</Time_Reference>
+    </Variable_Header>
+  </Earth_Observation_Header>
+  <Data_Block type="xml">
+    <List_of_Orbit_Changes count="1">
+      <Orbit_Change>
+        <Orbit>
+          <Absolute_Orbit>1</Absolute_Orbit>
+          <Relative_Orbit>1</Relative_Orbit>
+          <Cycle_Number>1</Cycle_Number>
+          <Phase_Number>1</Phase_Number>
+        </Orbit>
+        <Cycle>
+          <Repeat_Cycle unit="day">367</Repeat_Cycle>
+          <Cycle_Length unit="orbit">5292</Cycle_Length>
+          <ANX_Longitude unit="deg">0.000000</ANX_Longitude>
+          <MLST>18:00:00.000000</MLST>
+          <MLST_Drift unit="s/day">-179.786851</MLST_Drift>
+          <MLST_Nonlinear_Drift>
+            <Linear_Approx_Validity unit="orbit">99999</Linear_Approx_Validity>
+            <Quadratic_Term unit="s/day^2">0.000000</Quadratic_Term>
+            <Harmonics_Terms num="0"/>
+          </MLST_Nonlinear_Drift>
+        </Cycle>
+        <Time_of_ANX>
+          <TAI>TAI=2028-01-01T18:00:38.272398</TAI>
+          <UTC>UTC=2028-01-01T18:00:01.272398</UTC>
+          <UT1>UT1=2028-01-01T18:00:01.272398</UT1>
+        </Time_of_ANX>
+      </Orbit_Change>
+    </List_of_Orbit_Changes>
+  </Data_Block>
+</Earth_Observation_File>

@@ -1,0 +1,3 @@
+# https://www.iers.org/IERS/EN/Publications/Bulletins/bulletins.html
+BULLETIN_IERS:
+  file: data/207_BULLETIN_B207.txt

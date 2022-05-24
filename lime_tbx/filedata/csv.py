@@ -10,6 +10,7 @@ import csv
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    SatellitePoint,
     SurfacePoint,
     CustomPoint,
 )
@@ -27,7 +28,7 @@ def export_csv(
     y_data: List[float],
     xlabel: str,
     ylabel: str,
-    point: Union[SurfacePoint, CustomPoint],
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     name: str,
 ):
     """
@@ -43,7 +44,7 @@ def export_csv(
         Label of the x_data
     ylabel: str
         Label of the y_data
-    point: SurfacePoint | CustomPoint
+    point: SurfacePoint | CustomPoint | SatellitePoint
         Point from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
@@ -55,17 +56,28 @@ def export_csv(
                 writer.writerow(["latitude", point.latitude])
                 writer.writerow(["longitude", point.longitude])
                 writer.writerow(["altitude(m)", point.altitude])
-                dt: datetime = point.dt  # dt cant be a list of datetime in this function
+                dt: datetime = (
+                    point.dt
+                )  # dt cant be a list of datetime in this function
                 writer.writerow(["datetime", str(dt)])
-            else:
-                writer.writerow(["absolute moon phase angle", point.abs_moon_phase_angle])
-                writer.writerow(["distance observer moon", point.distance_observer_moon])
+            elif isinstance(point, CustomPoint):
+                writer.writerow(
+                    ["absolute moon phase angle", point.abs_moon_phase_angle]
+                )
+                writer.writerow(
+                    ["distance observer moon", point.distance_observer_moon]
+                )
                 writer.writerow(["distance sun moon", point.distance_sun_moon])
-                writer.writerow(["selenographic latitude of observer", point.selen_obs_lat])
+                writer.writerow(
+                    ["selenographic latitude of observer", point.selen_obs_lat]
+                )
                 writer.writerow(
                     ["selenographic longitude of observer", point.selen_obs_lon]
                 )
                 writer.writerow(["selenographic longitude of sun", point.selen_sun_lon])
+            else:
+                writer.writerow(["satellite", point.name])
+                writer.writerow(["datetime", str(point.dt)])
         writer.writerow([xlabel, ylabel])
         for i in range(len(x_data)):
             writer.writerow([x_data[i], y_data[i]])

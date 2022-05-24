@@ -1,0 +1,68 @@
+<?xml version = "1.0"?>
+<Earth_Explorer_File xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://eop-cfi.esa.int/CFI http://eop-cfi.esa.int/CFI/EE_CFI_SCHEMAS/EO_OPER_INT_ATTDEF_0205.XSD"
+  xmlns="http://eop-cfi.esa.int/CFI" schemaVersion="2.5">
+  <Earth_Explorer_Header>
+    <Fixed_Header>
+      <File_Name>INT_ADF_SC</File_Name>
+      <File_Description>Swath Definition File</File_Description>
+      <Notes>Yaw Steering Attitude + Pitch angle of 32.5 deg</Notes>
+      <Mission>SMOS</Mission>
+      <File_Class>TEST</File_Class>
+      <File_Type>INT_ATTDEF</File_Type>
+      <Validity_Period>
+        <Validity_Start>UTC=0000-00-00T00:00:00</Validity_Start>
+        <Validity_Stop>UTC=9999-99-99T99:99:99</Validity_Stop>
+      </Validity_Period>
+      <File_Version>0002</File_Version>
+      <Source>
+        <System>Manual</System>
+        <Creator>ESTEC</Creator>
+        <Creator_Version>1.0</Creator_Version>
+        <Creation_Date>UTC=2015-03-25T12:00:00</Creation_Date>
+      </Source>
+    </Fixed_Header>
+    <Variable_Header></Variable_Header>
+  </Earth_Explorer_Header>
+  <Data_Block type="xml">
+     <Attitude_Definition>
+       <Sat_Nominal_Att>
+         <Harmonic_Model>
+           <Angle_Type>0</Angle_Type>
+           <List_of_Harmonics_Pitch count="1">
+             <Harmonic>
+               <Harmonic_Type>-2</Harmonic_Type>
+               <Harmonic_Coef>-0.1684</Harmonic_Coef>
+             </Harmonic>
+           </List_of_Harmonics_Pitch>
+           <List_of_Harmonics_Roll count="1">
+             <Harmonic>
+               <Harmonic_Type>-1</Harmonic_Type>
+               <Harmonic_Coef>0.0498</Harmonic_Coef> 
+             </Harmonic>
+           </List_of_Harmonics_Roll>
+           <List_of_Harmonics_Yaw count="2">
+             <Harmonic>
+               <Harmonic_Type>-1</Harmonic_Type>
+               <Harmonic_Coef>-0.3220</Harmonic_Coef>
+             </Harmonic>
+             <Harmonic>
+               <Harmonic_Type>+1</Harmonic_Type>
+               <Harmonic_Coef>3.9050</Harmonic_Coef>
+             </Harmonic>
+           </List_of_Harmonics_Yaw>
+         </Harmonic_Model>
+       </Sat_Nominal_Att>
+       <Sat_Att>
+         <Angle_Model>
+           <Angle_1 unit="deg">32.5</Angle_1>
+           <Angle_2 unit="deg">0.0</Angle_2>
+           <Angle_3 unit="deg">0.0</Angle_3>
+         </Angle_Model>
+       </Sat_Att>
+     <Instr_Att>
+        <None></None>
+     </Instr_Att>
+    </Attitude_Definition>
+  </Data_Block>
+</Earth_Explorer_File>

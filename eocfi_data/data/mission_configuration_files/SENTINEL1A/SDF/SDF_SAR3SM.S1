@@ -1,0 +1,112 @@
+<?xml version = "1.0"?>
+<Earth_Explorer_File xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://eop-cfi.esa.int/CFI http://eop-cfi.esa.int/CFI/EE_CFI_SCHEMAS/EO_OPER_MPL_SW_DEF_0301.XSD"
+  xmlns="http://eop-cfi.esa.int/CFI" schemaVersion="3.1">
+  <Earth_Explorer_Header>
+    <Fixed_Header>
+      <File_Name>SDF_SAR3SM</File_Name>
+      <File_Description>Swath Definition File</File_Description>
+      <Notes>Zero-Doppler Attitude (AOCS mode 3) + Roll Steering</Notes>
+      <Mission>Sentinel-1</Mission>
+      <File_Class>TEST</File_Class>
+      <File_Type>MPL_SW_DEF</File_Type>
+      <Validity_Period>
+        <Validity_Start>UTC=0000-00-00T00:00:00</Validity_Start>
+        <Validity_Stop>UTC=9999-99-99T99:99:99</Validity_Stop>
+      </Validity_Period>
+      <File_Version>0002</File_Version>
+      <Source>
+        <System>Manual</System>
+        <Creator>Earth Observation CFI</Creator>
+        <Creator_Version>4.2</Creator_Version>
+        <Creation_Date>UTC=2011-05-30T17:00:00</Creation_Date>
+      </Source>
+    </Fixed_Header>
+    <Variable_Header></Variable_Header>
+  </Earth_Explorer_Header>
+  <Data_Block type="xml">
+      <Swath>
+        <Output_File_Description>SAR SM-3</Output_File_Description>
+        <Output_File_Type>MPL_SWTREF</Output_File_Type>
+        <Swath_Type>open</Swath_Type>
+        <Num_Swath_Records>1200</Num_Swath_Records>
+        <Refraction>
+          <Model>NO_REF</Model>
+          <Freq unit="MHz">0000000000</Freq>
+        </Refraction>
+        <Asar_Geometry>
+          <Left_Pt>
+            <Azimuth unit="deg">+090.000000</Azimuth>
+            <Elevation unit="deg">+061.800000</Elevation>
+            <Altitude unit="m">+000000.000</Altitude>
+          </Left_Pt>
+          <Mid_Pt>
+            <Azimuth unit="deg">+090.000000</Azimuth>
+            <Elevation unit="deg">+061.800000</Elevation>
+            <Altitude unit="m">+000000.000</Altitude>
+          </Mid_Pt>
+          <Right_Pt>
+            <Azimuth unit="deg">+090.000000</Azimuth>
+            <Elevation unit="deg">+061.800000</Elevation>
+            <Altitude unit="m">+000000.000</Altitude>
+          </Right_Pt>
+	        <Narrow_Asar>
+              <Slant_Range_Left unit="10e-6s">+0143.300000</Slant_Range_Left>
+          </Narrow_Asar>
+        </Asar_Geometry>
+        <Sat_Nominal_Att>
+          <AOCS_Model>3</AOCS_Model>
+        </Sat_Nominal_Att>
+        <Sat_Att>
+          <Harmonic_Model>
+            <Angle_Type>0</Angle_Type>
+            <List_of_Harmonics_Pitch count="0">
+            </List_of_Harmonics_Pitch>
+            <List_of_Harmonics_Roll count="9">
+              <Harmonic>
+                <Harmonic_Type>0</Harmonic_Type>
+                <Harmonic_Coef>0.0</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>-1</Harmonic_Type>
+                <Harmonic_Coef>-0.465556</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>+1</Harmonic_Type>
+                <Harmonic_Coef>-0.001084</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>-2</Harmonic_Type>
+                <Harmonic_Coef>+0.002336</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>+2</Harmonic_Type>
+                <Harmonic_Coef>-0.506010</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>-3</Harmonic_Type>
+                <Harmonic_Coef>-0.001155</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>+3</Harmonic_Type>
+                <Harmonic_Coef>-0.000008</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>-4</Harmonic_Type>
+                <Harmonic_Coef>-0.000006</Harmonic_Coef> 
+              </Harmonic>
+              <Harmonic>
+                <Harmonic_Type>+4</Harmonic_Type>
+                <Harmonic_Coef>-0.000928</Harmonic_Coef> 
+              </Harmonic>
+            </List_of_Harmonics_Roll>
+            <List_of_Harmonics_Yaw count="0">
+            </List_of_Harmonics_Yaw>
+          </Harmonic_Model>
+        </Sat_Att>
+        <Instr_Att>
+          <None></None>
+        </Instr_Att>  
+      </Swath>
+  </Data_Block>
+</Earth_Explorer_File>

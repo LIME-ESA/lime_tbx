@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<Earth_Explorer_File>
+  <Earth_Explorer_Header>
+    <Fixed_Header>
+      <File_Name>CS_TEST_MPL_ORBPRE_20020303T080917_20020304T121405_0101</File_Name>
+      <File_Description>FOS Predicted Orbit File</File_Description>
+      <Notes/>
+      <Mission>CryoSat</Mission>
+      <File_Class>TEST</File_Class>
+      <File_Type>MPL_ORBPRE</File_Type>
+      <Validity_Period>
+        <Validity_Start>UTC=2002-03-03T08:09:17.232850</Validity_Start>
+        <Validity_Stop>UTC=2002-03-04T12:14:05.305041</Validity_Stop>
+      </Validity_Period>
+      <File_Version>0101</File_Version>
+      <Source>
+        <System>CFI Acceptance</System>
+        <Creator>EXPLORER_GEN_FILES: xg_gen_pof</Creator>
+        <Creator_Version>2.1</Creator_Version>
+        <Creation_Date>UTC=2003-07-31T16:40:01</Creation_Date>
+      </Source>
+    </Fixed_Header>
+    <Variable_Header/>
+  </Earth_Explorer_Header>
+  <Data_Block type="xml">
+    <List_of_OSVs count="6">
+      <OSV>
+        <TAI>TAI=2002-03-03T19:42:26.141711</TAI>
+        <UTC>UTC=2002-03-03T19:43:01.141711</UTC>
+        <UT1>UT1=2002-03-03T19:43:01.441711</UT1>
+        <Absolute_Orbit>+0020</Absolute_Orbit>
+        <X unit="m">+6736136.511</X>
+        <Y unit="m">+2224620.175</Y>
+        <Z unit="m">+0000000.000</Z>
+        <VX unit="m/s">+0235.151030</VX>
+        <VY unit="m/s">-0740.722911</VY>
+        <VZ unit="m/s">+7493.049267</VZ>
+        <Quality>0</Quality>
+      </OSV>
+      <OSV>
+        <TAI>TAI=2002-03-03T21:21:32.414407</TAI>
+        <UTC>UTC=2002-03-03T21:22:07.414407</UTC>
+        <UT1>UT1=2002-03-03T21:22:07.714407</UT1>
+        <Absolute_Orbit>+0021</Absolute_Orbit>
+        <X unit="m">+7047645.700</X>
+        <Y unit="m">-0809419.605</Y>
+        <Z unit="m">+0000000.000</Z>
+        <VX unit="m/s">-0097.604170</VX>
+        <VY unit="m/s">-0770.999264</VY>
+        <VZ unit="m/s">+7493.049267</VZ>
+        <Quality>0</Quality>
+      </OSV>
+      <OSV>
+        <TAI>TAI=2002-03-03T23:00:38.687101</TAI>
+        <UTC>UTC=2002-03-03T23:01:13.687101</UTC>
+        <UT1>UT1=2002-03-03T23:01:13.987101</UT1>
+        <Absolute_Orbit>+0022</Absolute_Orbit>
+        <X unit="m">+6056403.589</X>
+        <Y unit="m">-3693838.868</Y>
+        <Z unit="m">+0000000.000</Z>
+        <VX unit="m/s">-0412.317325</VX>
+        <VY unit="m/s">-0658.757060</VY>
+        <VZ unit="m/s">+7493.049267</VZ>
+        <Quality>0</Quality>
+      </OSV>
+      <OSV>
+        <TAI>TAI=2002-03-04T00:39:44.959797</TAI>
+        <UTC>UTC=2002-03-04T00:40:19.959797</UTC>
+        <UT1>UT1=2002-03-04T00:40:20.259797</UT1>
+        <Absolute_Orbit>+0023</Absolute_Orbit>
+        <X unit="m">+3945640.427</X>
+        <Y unit="m">-5895455.168</Y>
+        <Z unit="m">+0000000.000</Z>
+        <VX unit="m/s">-0650.813974</VX>
+        <VY unit="m/s">-0424.744174</VY>
+        <VZ unit="m/s">+7493.049267</VZ>
+        <Quality>0</Quality>
+      </OSV>
+      <OSV>
+        <TAI>TAI=2002-03-04T02:18:51.232491</TAI>
+        <UTC>UTC=2002-03-04T02:19:26.232491</UTC>
+        <UT1>UT1=2002-03-04T02:19:26.532491</UT1>
+        <Absolute_Orbit>+0024</Absolute_Orbit>
+        <X unit="m">+1105528.982</X>
+        <Y unit="m">-7007301.598</Y>
+        <Z unit="m">+0000000.000</Z>
+        <VX unit="m/s">-0769.008214</VX>
+        <VY unit="m/s">-0112.217687</VY>
+        <VZ unit="m/s">+7493.049267</VZ>
+        <Quality>0</Quality>
+      </OSV>
+      <OSV>
+        <TAI>TAI=2002-03-04T03:57:57.505186</TAI>
+        <UTC>UTC=2002-03-04T03:58:32.505186</UTC>
+        <UT1>UT1=2002-03-04T03:58:32.805186</UT1>
+        <Absolute_Orbit>+0025</Absolute_Orbit>
+        <X unit="m">-1938938.564</X>
+        <Y unit="m">-6823854.282</Y>
+        <Z unit="m">+0000000.000</Z>
+        <VX unit="m/s">-0745.051940</VX>
+        <VY unit="m/s">+0221.052146</VY>
+        <VZ unit="m/s">+7493.049267</VZ>
+        <Quality>0</Quality>
+      </OSV>
+    </List_of_OSVs>
+  </Data_Block>
+</Earth_Explorer_File>

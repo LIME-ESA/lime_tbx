@@ -13,11 +13,13 @@ from . import settings, output, input, srf, help
 from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
+    SatellitePoint,
     SpectralResponseFunction,
     IrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
 )
+from ..eocfi_adapter import eocfi_adapter
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -46,50 +48,65 @@ class CallbackWorker(QtCore.QObject):
 
 def eli_callback(
     srf: SpectralResponseFunction,
-    point: Union[SurfacePoint, CustomPoint],
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
     kernels_path: str,
+    eocfi_path: str,
 ) -> Tuple[List[float], List[float]]:
     rs = regular_simulation.RegularSimulation()
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
     if isinstance(point, SurfacePoint):
         elis: List[float] = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
-    else:
+    elif isinstance(point, CustomPoint):
         elis: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
+    else:
+        elis: List[float] = rs.get_eli_from_satellite(
+            srf, point, coeffs, kernels_path, eocfi_path
+        )
     wlens = list(srf.spectral_response.keys())
     return wlens, elis, point
 
 
 def elref_callback(
     srf: SpectralResponseFunction,
-    point: Union[SurfacePoint, CustomPoint],
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
     kernels_path: str,
+    eocfi_path: str,
 ) -> Tuple[List[float], List[float]]:
     rs = regular_simulation.RegularSimulation()
     if isinstance(point, SurfacePoint):
         elrefs: List[float] = rs.get_elref_from_surface(
             srf, point, coeffs, kernels_path
         )
-    else:
+    elif isinstance(point, CustomPoint):
         elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
+    else:
+        elrefs: List[float] = rs.get_elref_from_satellite(
+            srf, point, coeffs, kernels_path, eocfi_path
+        )
     wlens = list(srf.spectral_response.keys())
     return wlens, elrefs, point
 
 
 def polar_callback(
     srf: SpectralResponseFunction,
-    point: Union[SurfacePoint, CustomPoint],
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: PolarizationCoefficients,
     kernels_path: str,
+    eocfi_path: str,
 ) -> Tuple[List[float], List[float]]:
     rs = regular_simulation.RegularSimulation()
     if isinstance(point, SurfacePoint):
         polars: List[float] = rs.get_polarized_from_surface(
             srf, point, coeffs, kernels_path
         )
-    else:
+    elif isinstance(point, CustomPoint):
         polars: List[float] = rs.get_polarized_from_custom(srf, point, coeffs)
+    else:
+        polars: List[float] = rs.get_polarized_from_satellite(
+            srf, point, coeffs, kernels_path, eocfi_path
+        )
     wlens = list(srf.spectral_response.keys())
     return wlens, polars, point
 
@@ -100,16 +117,24 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     of a surface point, custom input or satellite input at one moment.
     """
 
-    def __init__(self, kernels_path: str, settings_manager: settings.ISettingsManager):
+    def __init__(
+        self,
+        kernels_path: str,
+        eocfi_path: str,
+        settings_manager: settings.ISettingsManager,
+    ):
         super().__init__()
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self.settings_manager = settings_manager
+        self.eocfi = eocfi_adapter.EOCFIConverter(self.eocfi_path)
+        self.sat_names = self.eocfi.get_sat_names()
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
-        self.input_widget = input.InputWidget()
+        self.input_widget = input.InputWidget(self.sat_names)
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
         # buttons
@@ -184,12 +209,15 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         self.worker = CallbackWorker(
-            eli_callback, [srf, point, coeffs, self.kernels_path]
+            eli_callback, [srf, point, coeffs, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
     def eli_finished(
-        self, data: Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint]]
+        self,
+        data: Tuple[
+            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+        ],
     ):
         self._unblock_gui()
         self.graph.update_plot(data[0], data[1], data[2])
@@ -213,12 +241,15 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         self.worker = CallbackWorker(
-            elref_callback, [srf, point, coeffs, self.kernels_path]
+            elref_callback, [srf, point, coeffs, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
     def elref_finished(
-        self, data: Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint]]
+        self,
+        data: Tuple[
+            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+        ],
     ):
         self._unblock_gui()
         self.graph.update_plot(data[0], data[1], data[2])
@@ -242,12 +273,15 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            polar_callback, [srf, point, coeffs, self.kernels_path]
+            polar_callback, [srf, point, coeffs, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.polar_finished, self.polar_error)
 
     def polar_finished(
-        self, data: Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint]]
+        self,
+        data: Tuple[
+            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+        ],
     ):
         self._unblock_gui()
         self.graph.update_plot(data[0], data[1], data[2])
@@ -267,16 +301,19 @@ class LimeTBXWidget(QtWidgets.QWidget):
     Main widget of the lime toolbox desktop app.
     """
 
-    def __init__(self, kernels_path: str):
+    def __init__(self, kernels_path: str, eocfi_path: str):
         super().__init__()
         self.setLocale("English")
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         settings_manager = settings.MockSettingsManager()
-        self.page = MainSimulationsWidget(self.kernels_path, settings_manager)
+        self.page = MainSimulationsWidget(
+            self.kernels_path, self.eocfi_path, settings_manager
+        )
         self.main_layout.addWidget(self.page)
 
     def propagate_close_event(self):
