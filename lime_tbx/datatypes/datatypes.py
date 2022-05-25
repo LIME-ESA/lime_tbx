@@ -97,14 +97,6 @@ class SpectralResponseFunction:
             vals += list(ch.spectral_response.values())
         return vals
 
-    def get_spectral_response(self, wlen: float) -> float:
-        for ch in self.channels:
-            if wlen in ch.spectral_response:
-                return ch.spectral_response[wlen]
-        raise Exception(
-            "Wavelenght {} not present in any of the channels.".format(wlen)
-        )
-
 
 @dataclass
 class SurfacePoint:
