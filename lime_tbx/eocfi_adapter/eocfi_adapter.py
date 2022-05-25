@@ -7,6 +7,7 @@ from typing import Tuple, List
 from datetime import datetime
 import os
 import pkgutil
+import platform
 
 """___Third-Party Modules___"""
 from numpy.ctypeslib import ndpointer
@@ -25,10 +26,15 @@ __status__ = "Development"
 
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
-SO_FILE_SATELLITE = "eocfi_c/bin/get_positions.so"
+SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions.so"
+
+if platform.system() == "Linux":
+    so_file_satellite = SO_FILE_SATELLITE_LINUX
+else:
+    so_file_satellite = ""
 
 _package = pkgutil.get_loader(__name__)
-_so_path = os.path.join(os.path.dirname(_package.path), SO_FILE_SATELLITE)
+_so_path = os.path.join(os.path.dirname(_package.path), so_file_satellite)
 eocfi_sat = CDLL(_so_path)
 
 
