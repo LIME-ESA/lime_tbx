@@ -63,7 +63,7 @@ def eli_callback(
         elis: List[float] = rs.get_eli_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
-    wlens = list(srf.spectral_response.keys())
+    wlens = srf.get_wavelengths()
     return wlens, elis, point
 
 
@@ -85,7 +85,7 @@ def elref_callback(
         elrefs: List[float] = rs.get_elref_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
-    wlens = list(srf.spectral_response.keys())
+    wlens = srf.get_wavelengths()
     return wlens, elrefs, point
 
 
@@ -107,7 +107,7 @@ def polar_callback(
         polars: List[float] = rs.get_polarized_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
-    wlens = list(srf.spectral_response.keys())
+    wlens = srf.get_wavelengths()
     return wlens, polars, point
 
 

@@ -11,6 +11,7 @@ import numpy as np
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
+    SRFChannel,
     SpectralResponseFunction,
     IrradianceCoefficients,
 )
@@ -67,7 +68,10 @@ class MockSettingsManager(ISettingsManager):
         spectral_response = {
             i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
         }
-        self.srfs = [SpectralResponseFunction("Default", spectral_response)]
+        ch = SRFChannel(
+            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Default", spectral_response
+        )
+        self.srfs = [SpectralResponseFunction("Default", [ch])]
         self.srf = self.srfs[0]
 
     def get_srf(self) -> SpectralResponseFunction:

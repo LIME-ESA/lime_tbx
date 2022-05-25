@@ -52,20 +52,58 @@ class MoonData:
 
 
 @dataclass
+class SRFChannel:
+    """
+    Dataclass containing the spectral responses and metadata for a SRF Channel
+
+    center: float
+        Center wavelength
+    id: str
+        Identifier of the channel
+    spectral_response : dict of float, float
+        Set of pairs wavelength, percentage. 100% = 1.0.
+    """
+
+    center: float
+    id: str
+    spectral_response: Dict[float, float]
+
+
+@dataclass
 class SpectralResponseFunction:
     """
-    Dataclass containing the spectral response function. Consists of a set of pairs wavelength:percentage.
+    Dataclass containing the spectral response function, a set of channels with their data.
 
     Attributes
     ----------
     name : str
         Name of the SRF, the identifier.
-    spectral_response : dict of float, float
-        Set of pairs wavelength, percentage. 100% = 1.0.
+    channels: list of SRFChannel
+        List of the SRF channels.
     """
 
     name: str
-    spectral_response: Dict[float, float]
+    channels: List[SRFChannel]
+
+    def get_wavelengths(self) -> List[float]:
+        wlens = []
+        for ch in self.channels:
+            wlens += list(ch.spectral_response.keys())
+        return wlens
+
+    def get_values(self) -> List[float]:
+        vals = []
+        for ch in self.channels:
+            vals += list(ch.spectral_response.values())
+        return vals
+
+    def get_spectral_response(self, wlen: float) -> float:
+        for ch in self.channels:
+            if wlen in ch.spectral_response:
+                return ch.spectral_response[wlen]
+        raise Exception(
+            "Wavelenght {} not present in any of the channels.".format(wlen)
+        )
 
 
 @dataclass

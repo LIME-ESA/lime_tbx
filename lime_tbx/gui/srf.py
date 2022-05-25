@@ -58,8 +58,8 @@ class SRFEditWidget(QtWidgets.QWidget):
 
     def update_output_data(self):
         srf = self.settings_manager.get_srf()
-        x_data = list(srf.spectral_response.keys())
-        y_data = list(srf.spectral_response.values())
+        x_data = list(srf.get_wavelengths())
+        y_data = list(srf.get_values())
         self.graph.update_plot(x_data, y_data, None)
 
     def update_combo_srf(self):

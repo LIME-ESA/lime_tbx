@@ -9,7 +9,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..regular_simulation import RegularSimulation
-from ....datatypes.datatypes import SpectralResponseFunction, SurfacePoint
+from ....datatypes.datatypes import SRFChannel, SpectralResponseFunction, SurfacePoint
 from ....coefficients.access_data import access_data
 
 """___Authorship___"""
@@ -31,7 +31,8 @@ VALL_NAME = "VALLADOLID"
 COEFFS = access_data._get_default_irradiance_coefficients()
 
 rs = RegularSimulation()
-srf = SpectralResponseFunction("", {i: 1.0 for i in np.arange(380, 2500, 2)})
+ch = SRFChannel(5, "a", {i: 1.0 for i in np.arange(380, 2500, 2)})
+srf = SpectralResponseFunction("", ch)
 
 # Surface point test
 def _test_valladolid_no_corr(ts: unittest.TestCase, wavelength, expected, date):

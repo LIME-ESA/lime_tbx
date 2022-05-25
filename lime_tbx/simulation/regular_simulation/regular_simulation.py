@@ -349,17 +349,17 @@ class RegularSimulation(IRegularSimulation):
             will only be a list of float.
         """
         rl = rolo.ROLO()
-        wlens = list(srf.spectral_response.keys())
+        wlens = srf.get_wavelengths()
         if not isinstance(md, list):
             irradiances = rl.get_eli(wlens, md, coefficients)
             for i, w in enumerate(wlens):
-                irradiances[i] = irradiances[i] * srf.spectral_response[w]
+                irradiances[i] = irradiances[i]  # * srf.get_spectral_response(w)
             return irradiances
         times_irr = []
         for m in md:
             irradiances = rl.get_eli(wlens, m, coefficients)
             for i, w in enumerate(wlens):
-                irradiances[i] = irradiances[i] * srf.spectral_response[w]
+                irradiances[i] = irradiances[i]  # * srf.get_spectral_response(w)
             times_irr.append(irradiances)
         return times_irr
 

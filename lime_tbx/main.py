@@ -17,8 +17,7 @@ __status__ = "Development"
 
 
 def main():
-    #gui = GUI()
-    main_alg = rolo.ROLO()
+    gui = GUI("kernels", "eocfi_data")
 
 
 if __name__ == "__main__":
