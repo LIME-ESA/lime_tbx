@@ -26,7 +26,7 @@ __status__ = "Development"
 
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
-SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions.so"
+SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux.so"
 
 if platform.system() == "Linux":
     so_file_satellite = SO_FILE_SATELLITE_LINUX

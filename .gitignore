@@ -16,7 +16,7 @@ __pycache__/
 
 # C extensions
 *.so
-!*get_positions.so
+!eocfi_c/**
 
 # Distribution / packaging
 .Python
