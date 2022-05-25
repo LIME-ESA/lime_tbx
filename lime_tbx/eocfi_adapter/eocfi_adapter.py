@@ -15,7 +15,7 @@ import yaml
 import pyproj
 
 """___NPL Modules___"""
-# import here
+from ..datatypes.datatypes import OrbitFile, Satellite
 
 """___Authorship___"""
 __author__ = "Ramiro González Catón"
@@ -54,6 +54,24 @@ def _make_clist(lst: List[str]):
         ctypes array of byte strings
     """
     return (c_char_p * len(lst))(*[x.encode() for x in lst])
+
+
+def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
+    splitted = filename.split("_")
+    date0 = datetime.strptime(splitted[-3], "%Y%m%dT%H%M%S")
+    if splitted[-2] == "99999999T999999":
+        date1 = datetime(9999, 12, 31, 23, 59, 59)
+    else:
+        date1 = datetime.strptime(splitted[-2], "%Y%m%dT%H%M%S")
+    return date0, date1
+
+
+def _filter_orbit_files_datetime(sat_orbit_files: List[str], dt: datetime) -> List[str]:
+    for file in sat_orbit_files:
+        dt0, dt1 = _get_file_datetimes(file)
+        if dt >= dt0 and dt <= dt1:
+            return [file]
+    return []
 
 
 class IEOCFIConverter(ABC):
@@ -111,9 +129,9 @@ class EOCFIConverter(IEOCFIConverter):
         sat_names: list of str
             List of the satellite names
         """
-        return list(self.get_sat_list().keys())
+        return list(self._get_sat_list_yaml().keys())
 
-    def get_sat_list(self) -> dict:
+    def _get_sat_list_yaml(self) -> dict:
         """
         Read the sat list yaml and return the object.
 
@@ -125,6 +143,31 @@ class EOCFIConverter(IEOCFIConverter):
         return yaml.load(
             open(os.path.join(self.eocfi_path, ESA_SAT_LIST)), Loader=yaml.FullLoader
         )
+
+    def get_sat_list(self) -> List[Satellite]:
+        """
+        Obtain a list of the satellite data objects that are available in LIME TBX.
+
+        Returns
+        -------
+        sat_list: list of Satellite
+            List of Satellites available in LIME TBX.
+        """
+        sat_yaml = self._get_sat_list_yaml()
+        sat_list = []
+        for s in sat_yaml:
+            name = s
+            sat_data: dict = sat_yaml.get(s)
+            id = sat_data["id"]
+            orbit_files_names = sat_data["orbit_files"]
+            orbit_files = []
+            for file in orbit_files_names:
+                d0, df = _get_file_datetimes(file)
+                orbit_f = OrbitFile(file, d0, df)
+                orbit_files.append(orbit_f)
+            sat = Satellite(name, id, orbit_files)
+            sat_list.append(sat)
+        return sat_list
 
     def get_satellite_position(
         self, sat: str, dt: datetime
@@ -142,28 +185,27 @@ class EOCFIConverter(IEOCFIConverter):
         Returns
         -------
         latitude: float
-            Geocentric latitude of the satellite
+            Geocentric latitude of the satellite.
         longitude: float
-            Geocentric longitude of the satellite
+            Geocentric longitude of the satellite.
         height: float
             Height of the satellite over sea level in meters.
         """
-        sat_list = self.get_sat_list()
-        if sat not in sat_list:
-            raise Exception("Satellite is not registered in EOCFI's satellite list.")
-        sat_data = sat_list.get(sat)
-        sat_id = sat_data["id"]
-        sat_n_files = sat_data["n_files"]
-        sat_orbit_files = sat_data["orbit_files"]
-        # hay que hacer que esto sea un array
-        orbit_files = []
-        for file in range(sat_n_files):
-            orbit_file = os.path.join(
-                self.eocfi_path,
-                f"data/mission_configuration_files/{sat_orbit_files[file]}",
+        if sat not in self.get_sat_names():
+            raise Exception("Satellite is not registered in LIME's satellite list.")
+        sat: Satellite = [s for s in self.get_sat_list() if s.name == sat][0]
+        orb_f = sat.get_best_orbit_file(dt)
+        if orb_f == None:
+            raise Exception(
+                "The satellite position can't be calculated for the given datetime."
             )
-            # orbit_file = orbit_file.encode()
-            orbit_files.append(orbit_file)
+        # hay que hacer que esto sea un array
+        orbit_files = [
+            os.path.join(
+                self.eocfi_path,
+                f"data/mission_configuration_files/{orb_f.name}",
+            )
+        ]
 
         metadata = yaml.load(
             open(os.path.join(self.eocfi_path, METADATA_FILE)), Loader=yaml.FullLoader
@@ -175,7 +217,7 @@ class EOCFIConverter(IEOCFIConverter):
 
         eocfi_sat.get_satellite_position.restype = ndpointer(dtype=c_double, shape=(3,))
         sat_position = eocfi_sat.get_satellite_position(
-            c_long(sat_id),
+            c_long(sat.id),
             c_int(dt.year),
             c_int(dt.month),
             c_int(dt.day),
@@ -184,7 +226,7 @@ class EOCFIConverter(IEOCFIConverter):
             c_int(dt.second),
             bulletinb_file_init_time,
             _make_clist(orbit_files),
-            c_long(sat_n_files),
+            c_long(len(orbit_files)),
         )
 
         transformer = pyproj.Transformer.from_crs(

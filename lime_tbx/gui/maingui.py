@@ -128,13 +128,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.eocfi_path = eocfi_path
         self.settings_manager = settings_manager
         self.eocfi = eocfi_adapter.EOCFIConverter(self.eocfi_path)
-        self.sat_names = self.eocfi.get_sat_names()
+        self.satellites = self.eocfi.get_sat_list()
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
-        self.input_widget = input.InputWidget(self.sat_names)
+        self.input_widget = input.InputWidget(self.satellites)
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
         # buttons

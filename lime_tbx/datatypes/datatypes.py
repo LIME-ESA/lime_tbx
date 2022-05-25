@@ -353,3 +353,90 @@ class IrradianceCoefficients:
             A list containing all Apollo coefficients
         """
         return self.apollo_coeffs
+
+
+@dataclass
+class OrbitFile:
+    """
+    Dataclass that represents a Satellite orbit file.
+
+    Attributes
+    ----------
+    name: str
+        Name of the orbit file in the file system.
+    dt0: datetime
+        First datetime for which the orbit file works.
+    dtf: datetime
+        Last datetime for which the orbit file works
+    """
+
+    name: str
+    dt0: datetime
+    dtf: datetime
+
+
+@dataclass
+class Satellite:
+    """
+    Dataclass that represents an ESA Satellite.
+
+    Attributes
+    ----------
+    name: str
+        Satellite name
+    id: int
+        Satellite id
+    orbit_files: list of OrbitFile
+        Orbit files of the Satellite
+    """
+
+    name: str
+    id: int
+    orbit_files: List[OrbitFile]
+
+    def get_datetime_range(self) -> Tuple[datetime, datetime]:
+        """
+        Calculate all the datetime range between its orbit files.
+
+        Returns
+        -------
+        dt0: datetime
+            First datetime for which the Satellite can be simulated.
+        dtf: datetime
+            Last datetime for which the Satellite can be simulated.
+        """
+        dt0 = dtf = None
+        for orf in self.orbit_files:
+            if dt0 == None:
+                dt0 = orf.dt0
+                dtf = orf.dtf
+            else:
+                if dt0 > orf.dt0:
+                    dt0 = orf.dt0
+                if dtf < orf.dtf:
+                    dtf = orf.dtf
+        return dt0, dtf
+
+    def get_best_orbit_file(self, dt: datetime) -> OrbitFile:
+        """
+        Obtain the best orbit file for the given datetime.
+
+        Parameters
+        ----------
+        dt: datetime
+            Datetime that is queried.
+
+        Returns
+        -------
+        orbit_file: OrbitFile
+            Selected orbit file for the fiven datetime.
+        """
+        sel_td = None
+        sel_orf = None
+        for orf in self.orbit_files:
+            if dt >= orf.dt0 and dt <= orf.dtf:
+                td = min(dt - orf.dt0, orf.dtf - dt)
+                if sel_td == None or td < sel_td:
+                    sel_td = td
+                    sel_orf = orf
+        return sel_orf

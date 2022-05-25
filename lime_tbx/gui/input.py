@@ -10,6 +10,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    Satellite,
     SurfacePoint,
     CustomPoint,
     SatellitePoint,
@@ -149,10 +150,12 @@ class SurfaceInputWidget(QtWidgets.QWidget):
 
 
 class SatelliteInputWidget(QtWidgets.QWidget):
-    def __init__(self, sat_names: List[str]) -> None:
+    def __init__(self, satellites: List[Satellite]) -> None:
         super().__init__()
-        self.sat_names = sat_names
+        self.satellites = satellites
+        self.sat_names = [s.name for s in self.satellites]
         self._build_layout()
+        self.update_from_combobox(0)
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QFormLayout(self)
@@ -160,6 +163,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.satellite_label = QtWidgets.QLabel("Satellite:")
         self.combo_sats = QtWidgets.QComboBox()
         self.combo_sats.addItems(self.sat_names)
+        self.combo_sats.currentIndexChanged.connect(self.update_from_combobox)
         # datetime
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
@@ -175,11 +179,20 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     def get_datetime(self) -> datetime:
         return self.datetime_edit.dateTime().toPython()
 
+    @QtCore.Slot()
+    def update_from_combobox(self, i: int):
+        sat = self.satellites[i]
+        d0, df = sat.get_datetime_range()
+        dt0 = QtCore.QDateTime(d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second)
+        dtf = QtCore.QDateTime(df.year, df.month, df.day, df.hour, df.minute, df.second)
+        self.datetime_edit.setMinimumDateTime(dt0)
+        self.datetime_edit.setMaximumDateTime(dtf)
+
 
 class InputWidget(QtWidgets.QWidget):
-    def __init__(self, sat_names: List[str]):
+    def __init__(self, satellites: List[Satellite]):
         super().__init__()
-        self.sat_names = sat_names
+        self.satellites = satellites
         self._build_layout()
 
     def _build_layout(self):
@@ -190,7 +203,7 @@ class InputWidget(QtWidgets.QWidget):
         self.tabs.addTab(self.surface, "Surface")
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Custom")
-        self.satellite = SatelliteInputWidget(self.sat_names)
+        self.satellite = SatelliteInputWidget(self.satellites)
         self.tabs.addTab(self.satellite, "Satellite")
         self.main_layout.addWidget(self.tabs)
 
