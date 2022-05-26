@@ -597,9 +597,9 @@ class RegularSimulation(IRegularSimulation):
             for i, wl in enumerate(ch_wlens):
                 interval = 0
                 if i > 0:
-                    interval += wl - ch_wlens[i - 1]
+                    interval += (wl - ch_wlens[i - 1]) / 2
                 if i < len(ch_wlens) - 1:
-                    interval += ch_wlens[i + 1] - wl
+                    interval += (ch_wlens[i + 1] - wl) / 2
                 eli = elis[wlens.index(wl)]
                 tot_eli += ch.spectral_response[wl] * eli * interval
                 dividend += ch.spectral_response[wl] * interval
