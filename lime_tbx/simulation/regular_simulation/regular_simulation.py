@@ -411,7 +411,7 @@ class RegularSimulation(IRegularSimulation):
             will only be a list of float.
         """
         rl = rolo.ROLO()
-        wlens = list(srf.spectral_response.keys())
+        wlens = srf.get_wavelengths()
         if not isinstance(md, list):
             reflectances = rl.get_elref(wlens, md, coefficients)
             return reflectances
@@ -446,7 +446,7 @@ class RegularSimulation(IRegularSimulation):
             will only be a list of float.
         """
         dl = dolp.DOLP()
-        wlens = list(srf.spectral_response.keys())
+        wlens = srf.get_wavelengths()
         if not isinstance(md, list):
             polarizations = dl.get_polarized(wlens, md.mpa_degrees, coefficients)
             return polarizations
