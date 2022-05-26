@@ -47,24 +47,59 @@ class CallbackWorker(QtCore.QObject):
 
 
 def eli_callback(
+    def_srf: SpectralResponseFunction,
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float]]:
+) -> Tuple[List[float], List[float], List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
+    """
+    Callback that performs the Irradiance operations.
+
+    Parameters
+    ----------
+    def_srf: SpectralResponseFunction
+        SRF that will be used to calculate the first graph
+    srf: SpectralResponseFunction
+        SRF that will be used to calculate the integrated irradiance
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+        Point used
+    coeffs: IrradianceCoefficients
+    kernels_path: str
+    eocfi_path: str
+
+    Returns
+    -------
+    wlens: list of float
+        Wavelengths of def_srf
+    elis: list of float
+        Irradiances related to def_srf
+    wlens_srf: list of float
+        Wavelengths of srf
+    elis_srf: list of float
+        Irradiances related to srf
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+        Point that was used in the calculations.
+    """
     rs = regular_simulation.RegularSimulation()
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
     if isinstance(point, SurfacePoint):
-        elis: List[float] = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
+        elis: List[float] = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path)
+        elis_srf: List[float] = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
     elif isinstance(point, CustomPoint):
-        elis: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
+        elis: List[float] = rs.get_eli_from_custom(def_srf, point, coeffs)
+        elis_srf: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
     else:
         elis: List[float] = rs.get_eli_from_satellite(
+            def_srf, point, coeffs, kernels_path, eocfi_path
+        )
+        elis_srf: List[float] = rs.get_eli_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
-    wlens = srf.get_wavelengths()
-    return wlens, elis, point
+    wlens = def_srf.get_wavelengths()
+    wlens_srf = srf.get_wavelengths()
+    return wlens, elis, wlens_srf, elis_srf, point
 
 
 def elref_callback(
@@ -73,7 +108,7 @@ def elref_callback(
     coeffs: IrradianceCoefficients,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float]]:
+) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
     rs = regular_simulation.RegularSimulation()
     if isinstance(point, SurfacePoint):
         elrefs: List[float] = rs.get_elref_from_surface(
@@ -95,7 +130,7 @@ def polar_callback(
     coeffs: PolarizationCoefficients,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float]]:
+) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
     rs = regular_simulation.RegularSimulation()
     if isinstance(point, SurfacePoint):
         polars: List[float] = rs.get_polarized_from_surface(
@@ -207,20 +242,21 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
+        def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         self.worker = CallbackWorker(
-            eli_callback, [srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            eli_callback, [def_srf, srf, point, coeffs, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
     def eli_finished(
         self,
         data: Tuple[
-            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+            List[float], List[float], List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[0], data[1], data[4])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -238,10 +274,10 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        srf = self.settings_manager.get_srf()
+        def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         self.worker = CallbackWorker(
-            elref_callback, [srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            elref_callback, [def_srf, point, coeffs, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -270,10 +306,10 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        srf = self.settings_manager.get_srf()
+        def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            polar_callback, [srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            polar_callback, [def_srf, point, coeffs, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.polar_finished, self.polar_error)
 

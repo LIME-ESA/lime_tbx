@@ -32,6 +32,11 @@ class ISettingsManager(ABC):
     """
 
     @abstractmethod
+    def get_default_srf(self) -> SpectralResponseFunction:
+        """Obtain the default SRF"""
+        pass
+
+    @abstractmethod
     def get_srf(self) -> SpectralResponseFunction:
         """Obtain the current Spectral Response Function chosen by the user."""
         pass
@@ -61,18 +66,21 @@ class ISettingsManager(ABC):
         """Obtain a list with all the SRFS the user can choose"""
         pass
 
-
 class MockSettingsManager(ISettingsManager):
     def __init__(self):
         # generate an arbitrary default srf
+        self.srfs = [self.get_default_srf()]
+        self.srf = self.srfs[0]
+    
+    def get_default_srf(self) -> SpectralResponseFunction:
         spectral_response = {
             i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
         }
         ch = SRFChannel(
             (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Default", spectral_response
         )
-        self.srfs = [SpectralResponseFunction("Default", [ch])]
-        self.srf = self.srfs[0]
+        srf = SpectralResponseFunction("Default", [ch])
+        return srf 
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
