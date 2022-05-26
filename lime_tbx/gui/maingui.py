@@ -53,7 +53,7 @@ def eli_callback(
     coeffs: IrradianceCoefficients,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float], List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
+) -> Tuple[List[float], List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
     """
     Callback that performs the Irradiance operations.
 
@@ -75,12 +75,12 @@ def eli_callback(
         Wavelengths of def_srf
     elis: list of float
         Irradiances related to def_srf
-    wlens_srf: list of float
-        Wavelengths of srf
-    elis_srf: list of float
-        Irradiances related to srf
     point: Union[SurfacePoint, CustomPoint, SatellitePoint]
         Point that was used in the calculations.
+    ch_irrs: list of float
+        Integrated irradiance signals for each srf channel
+    srf: SpectralResponseFunction
+        SRF used for the integrated irradiance signal calculation.
     """
     rs = regular_simulation.RegularSimulation()
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
@@ -99,7 +99,8 @@ def eli_callback(
         )
     wlens = def_srf.get_wavelengths()
     wlens_srf = srf.get_wavelengths()
-    return wlens, elis, wlens_srf, elis_srf, point
+    ch_irrs = rs.integrate_elis(srf, wlens_srf, elis_srf)
+    return wlens, elis, point, ch_irrs, srf
 
 
 def elref_callback(
@@ -195,9 +196,12 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         )
         # srf widget
         self.srf_widget = srf.SRFEditWidget(self.settings_manager)
+        # signal widget
+        self.signal_widget = output.SignalWidget()
         # finish tab
         self.lower_tabs.addTab(self.graph, "Result")
         self.lower_tabs.addTab(self.srf_widget, "SRF")
+        self.lower_tabs.addTab(self.signal_widget, "Signal")
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
@@ -252,16 +256,17 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def eli_finished(
         self,
         data: Tuple[
-            List[float], List[float], List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint], List[float], SpectralResponseFunction
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[4])
+        self.graph.update_plot(data[0], data[1], data[2])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²/nm)",
         )
+        self.signal_widget.update_signals(data[3], data[4])
 
     def eli_error(self, error: Exception):
         self._unblock_gui()

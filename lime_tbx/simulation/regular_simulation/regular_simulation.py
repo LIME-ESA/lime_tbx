@@ -322,6 +322,29 @@ class IRegularSimulation(ABC):
         """
         pass
 
+    @staticmethod
+    @abstractmethod
+    def integrate_elis(srf: SpectralResponseFunction, wlens: List[float], elis: List[float]) -> List[float]:
+        """
+        Integrate the irradiance values for all SRF channels.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            SRF used for the integration, containing the channels.
+        wlens: list of float
+            List of all the wlens present in the srf. The order must correspond with
+            the wavelengths order in the srf, channel by channel.
+        elis: list of float
+            The corresponding irradiance values for the wlens. The order must be the same.
+
+        Returns
+        -------
+        integrated_irradiances: list of float
+            List of all the integrated irradiance values for each channel, in order.
+        """
+        pass
+
 
 class RegularSimulation(IRegularSimulation):
     @staticmethod
@@ -564,3 +587,16 @@ class RegularSimulation(IRegularSimulation):
         return RegularSimulation.get_polarized_from_surface(
             srf, srp, coefficients, kernels_path
         )
+
+    @staticmethod
+    def integrate_elis(srf: SpectralResponseFunction, wlens: List[float], elis: List[float]) -> List[float]:
+        signals = []
+        for ch in srf.channels:
+            tot_eli = 0
+            for wl in ch.spectral_response:
+                eli = elis[wlens.index(wl)]
+                tot_eli += ch.spectral_response[wl]*eli
+            ch_wlens = list(ch.spectral_response.keys())
+            signal = tot_eli/(ch_wlens[-1]-ch_wlens[0])
+            signals.append(signal)
+        return signals

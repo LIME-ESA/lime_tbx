@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import Union
+from typing import Union, List
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     SatellitePoint,
+    SpectralResponseFunction,
     SurfacePoint,
     CustomPoint,
 )
@@ -159,3 +160,23 @@ class GraphWidget(QtWidgets.QWidget):
                 self.show_error(str(e))
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
+
+class SignalWidget(QtWidgets.QWidget):
+
+    def __init__(self, parent = None):
+        super().__init__(parent)
+        self._build_layout()
+    
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QFormLayout(self)
+    
+    def _clear_layout(self):
+        for i in reversed(range(self.main_layout.count())): 
+            self.main_layout.itemAt(i).widget().setParent(None)
+
+    def update_signals(self, signals: List[float], srf: SpectralResponseFunction):
+        self._clear_layout()
+        for i, signal in enumerate(signals):
+            title = QtWidgets.QLabel("{}:".format(srf.channels[i].id))
+            value = QtWidgets.QLabel(str(signal))
+            self.main_layout.addRow(title, value)
