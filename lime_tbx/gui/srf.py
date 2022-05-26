@@ -56,6 +56,9 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.selection_layout)
         self.main_layout.addWidget(self.graph)
 
+    def update_size(self):
+        self.graph.update_size()
+
     def update_output_data(self):
         srf = self.settings_manager.get_srf()
         x_data = list(srf.get_wavelengths())

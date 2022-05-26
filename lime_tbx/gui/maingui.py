@@ -53,7 +53,12 @@ def eli_callback(
     coeffs: IrradianceCoefficients,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
+) -> Tuple[
+    List[float],
+    List[float],
+    List[float],
+    Union[SurfacePoint, CustomPoint, SatellitePoint],
+]:
     """
     Callback that performs the Irradiance operations.
 
@@ -85,8 +90,12 @@ def eli_callback(
     rs = regular_simulation.RegularSimulation()
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
     if isinstance(point, SurfacePoint):
-        elis: List[float] = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path)
-        elis_srf: List[float] = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
+        elis: List[float] = rs.get_eli_from_surface(
+            def_srf, point, coeffs, kernels_path
+        )
+        elis_srf: List[float] = rs.get_eli_from_surface(
+            srf, point, coeffs, kernels_path
+        )
     elif isinstance(point, CustomPoint):
         elis: List[float] = rs.get_eli_from_custom(def_srf, point, coeffs)
         elis_srf: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
@@ -98,8 +107,7 @@ def eli_callback(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = def_srf.get_wavelengths()
-    wlens_srf = srf.get_wavelengths()
-    ch_irrs = rs.integrate_elis(srf, wlens_srf, elis_srf)
+    ch_irrs = rs.integrate_elis(srf, elis_srf)
     return wlens, elis, point, ch_irrs, srf
 
 
@@ -202,6 +210,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.lower_tabs.addTab(self.graph, "Result")
         self.lower_tabs.addTab(self.srf_widget, "SRF")
         self.lower_tabs.addTab(self.signal_widget, "Signal")
+        self.lower_tabs.currentChanged.connect(self.lower_tabs_changed)
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
@@ -239,6 +248,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.worker_th.start()
 
     @QtCore.Slot()
+    def lower_tabs_changed(self, i: int):
+        if i == 0:
+            self.graph.update_size()
+        elif i == 1:
+            self.srf_widget.update_size()
+
+    @QtCore.Slot()
     def show_eli(self):
         """
         Calculate and show extraterrestrial lunar irradiances for the given input.
@@ -249,14 +265,19 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         self.worker = CallbackWorker(
-            eli_callback, [def_srf, srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            eli_callback,
+            [def_srf, srf, point, coeffs, self.kernels_path, self.eocfi_path],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
     def eli_finished(
         self,
         data: Tuple[
-            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint], List[float], SpectralResponseFunction
+            List[float],
+            List[float],
+            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            List[float],
+            SpectralResponseFunction,
         ],
     ):
         self._unblock_gui()
@@ -299,6 +320,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
         )
+        self.signal_widget.clear_signals()
 
     def elref_error(self, error: Exception):
         self._unblock_gui()
@@ -331,6 +353,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
         )
+        self.signal_widget.clear_signals()
 
     def polar_error(self, error: Exception):
         self._unblock_gui()

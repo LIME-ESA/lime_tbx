@@ -324,7 +324,7 @@ class IRegularSimulation(ABC):
 
     @staticmethod
     @abstractmethod
-    def integrate_elis(srf: SpectralResponseFunction, wlens: List[float], elis: List[float]) -> List[float]:
+    def integrate_elis(srf: SpectralResponseFunction, elis: List[float]) -> List[float]:
         """
         Integrate the irradiance values for all SRF channels.
 
@@ -332,11 +332,9 @@ class IRegularSimulation(ABC):
         ----------
         srf: SpectralResponseFunction
             SRF used for the integration, containing the channels.
-        wlens: list of float
-            List of all the wlens present in the srf. The order must correspond with
-            the wavelengths order in the srf, channel by channel.
         elis: list of float
-            The corresponding irradiance values for the wlens. The order must be the same.
+            The corresponding irradiance values for the wlens. The order must correspond with
+            the wavelengths order in the srf, channel by channel.
 
         Returns
         -------
@@ -589,14 +587,22 @@ class RegularSimulation(IRegularSimulation):
         )
 
     @staticmethod
-    def integrate_elis(srf: SpectralResponseFunction, wlens: List[float], elis: List[float]) -> List[float]:
+    def integrate_elis(srf: SpectralResponseFunction, elis: List[float]) -> List[float]:
         signals = []
+        wlens = srf.get_wavelengths()
         for ch in srf.channels:
             tot_eli = 0
-            for wl in ch.spectral_response:
-                eli = elis[wlens.index(wl)]
-                tot_eli += ch.spectral_response[wl]*eli
             ch_wlens = list(ch.spectral_response.keys())
-            signal = tot_eli/(ch_wlens[-1]-ch_wlens[0])
+            dividend = 0
+            for i, wl in enumerate(ch_wlens):
+                interval = 0
+                if i > 0:
+                    interval += wl - ch_wlens[i - 1]
+                if i < len(ch_wlens) - 1:
+                    interval += ch_wlens[i + 1] - wl
+                eli = elis[wlens.index(wl)]
+                tot_eli += ch.spectral_response[wl] * eli * interval
+                dividend += ch.spectral_response[wl] * interval
+            signal = tot_eli / dividend
             signals.append(signal)
         return signals

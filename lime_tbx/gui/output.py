@@ -16,6 +16,7 @@ from matplotlib.figure import Figure
 from ..datatypes.datatypes import (
     SatellitePoint,
     SpectralResponseFunction,
+    SpectralValidity,
     SurfacePoint,
     CustomPoint,
 )
@@ -76,10 +77,6 @@ class GraphWidget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.buttons_layout)
         self.main_layout.addWidget(self.error_message)
 
-    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
-        super().resizeEvent(event)
-        self._redraw()
-
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
         self.csv_button.setDisabled(disable)
@@ -103,6 +100,9 @@ class GraphWidget(QtWidgets.QWidget):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
+        self._redraw()
+
+    def update_size(self):
         self._redraw()
 
     def _redraw(self):
@@ -161,22 +161,57 @@ class GraphWidget(QtWidgets.QWidget):
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
 
-class SignalWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent = None):
+class SignalWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self._build_layout()
-    
+
     def _build_layout(self):
-        self.main_layout = QtWidgets.QFormLayout(self)
-    
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.groupbox = QtWidgets.QGroupBox()
+        self.container_layout = QtWidgets.QVBoxLayout()
+        self.data_layout = QtWidgets.QFormLayout()
+        self.container_layout.addLayout(self.data_layout)
+        self.groupbox.setLayout(self.container_layout)
+        self.range_warning = None
+
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.groupbox)
+        self.main_layout.addWidget(self.scroll_area)
+
     def _clear_layout(self):
-        for i in reversed(range(self.main_layout.count())): 
-            self.main_layout.itemAt(i).widget().setParent(None)
+        for i in reversed(range(self.data_layout.count())):
+            self.data_layout.itemAt(i).widget().setParent(None)
+        if self.range_warning:
+            self.range_warning.setParent(None)
+            self.range_warning = None
 
     def update_signals(self, signals: List[float], srf: SpectralResponseFunction):
         self._clear_layout()
+        show_range_info = False
         for i, signal in enumerate(signals):
-            title = QtWidgets.QLabel("{}:".format(srf.channels[i].id))
-            value = QtWidgets.QLabel(str(signal))
-            self.main_layout.addRow(title, value)
+            ch = srf.channels[i]
+            title = QtWidgets.QLabel("{} ({} nm):".format(ch.id, ch.center))
+            if ch.valid_spectre == SpectralValidity.VALID:
+                value = "{} Wm⁻²nm⁻¹".format(str(signal))
+            elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
+                value = "{} Wm⁻²nm⁻¹ *".format(str(signal))
+                show_range_info = True
+            else:
+                value = "Not available *"
+                show_range_info = True
+            value_label = QtWidgets.QLabel(value)
+            self.data_layout.addRow(title, value_label)
+        if show_range_info:
+            self.range_warning = QtWidgets.QLabel(
+                "* The LIME can only give a reliable simulation \
+for wavelengths between 350 and 2500 nm"
+            )
+            self.range_warning.setWordWrap(True)
+            self.container_layout.addStretch()
+            self.container_layout.addWidget(self.range_warning)
+
+    def clear_signals(self):
+        self._clear_layout()

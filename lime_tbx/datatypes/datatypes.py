@@ -11,12 +11,13 @@ It exports the following classes:
 from dataclasses import dataclass
 from typing import Dict, List, Union, Tuple
 from datetime import datetime
+from enum import Enum
 
 """___Third-Party Modules___"""
 # import here
 
 """___LIME Modules___"""
-# import here
+from . import constants
 
 
 @dataclass
@@ -51,6 +52,19 @@ class MoonData:
     mpa_degrees: float
 
 
+class SpectralValidity(Enum):
+    """
+    Enum that represents if a channel is inside LIME's spectral range.
+    VALID: Fully in the range.
+    PARTLY_OUT: Some wavelengths out of range.
+    OUT: All wavelengths out of range.
+    """
+
+    VALID = 0
+    PARTLY_OUT = 1
+    OUT = 2
+
+
 @dataclass
 class SRFChannel:
     """
@@ -62,11 +76,33 @@ class SRFChannel:
         Identifier of the channel
     spectral_response : dict of float, float
         Set of pairs wavelength, percentage. 100% = 1.0.
+    spectral_validity: SpectralValidity
+        Information about if the channel is inside LIME's spectral calculation range or not.
     """
 
     center: float
     id: str
     spectral_response: Dict[float, float]
+    valid_spectre: SpectralValidity
+
+    def __init__(
+        self,
+        center: float,
+        id: str,
+        spectral_response: Dict[float, float],
+        min_wlen: float = constants.MIN_WLEN,
+        max_wlen: float = constants.MAX_WLEN,
+    ):
+        self.center = center
+        self.id = id
+        self.spectral_response = spectral_response
+        spec = list(self.spectral_response.keys())
+        if spec[-1] < min_wlen or spec[0] > max_wlen:
+            self.valid_spectre = SpectralValidity.OUT
+        elif spec[0] < min_wlen or spec[-1] > max_wlen:
+            self.valid_spectre = SpectralValidity.PARTLY_OUT
+        else:
+            self.valid_spectre = SpectralValidity.VALID
 
 
 @dataclass

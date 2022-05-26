@@ -1,16 +1,16 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from ctypes import alignment
 from typing import List, Callable, Union, Tuple, Optional
 from datetime import datetime
-import time
+import pkgutil
+import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from . import settings, output, input, srf
+from . import settings, output, input, srf, constants
 from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
@@ -35,8 +35,10 @@ class AboutDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        # title
         title = "Lunar Irradiance Model of ESA ToolBox"
         self.title_label = QtWidgets.QLabel(title, alignment=QtCore.Qt.AlignCenter)
+        # description
         description = "Lunar Irradiance Model of ESA ToolBox."
         self.description_label = QtWidgets.QLabel(
             description, alignment=QtCore.Qt.AlignCenter
