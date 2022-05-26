@@ -172,14 +172,27 @@ class SignalWidget(QtWidgets.QWidget):
         self.groupbox = QtWidgets.QGroupBox()
         self.container_layout = QtWidgets.QVBoxLayout()
         self.data_layout = QtWidgets.QFormLayout()
-        self.container_layout.addLayout(self.data_layout)
         self.groupbox.setLayout(self.container_layout)
         self.range_warning = None
+        # error message
+        self.error_message = QtWidgets.QLabel("")
+        self.error_message.setWordWrap(True)
+        self.error_message.hide()
+        # csv button
+        self.button_csv = QtWidgets.QPushButton("Export CSV")
+        self.button_csv.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_csv.clicked.connect(self.export_csv)
+
+        self.container_layout.addLayout(self.data_layout)
+        self.container_layout.addStretch()
+        self.container_layout.addWidget(self.error_message)
+        self.container_layout.addWidget(self.button_csv)
 
         self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setWidget(self.groupbox)
         self.main_layout.addWidget(self.scroll_area)
+        self.disable_buttons(True)
 
     def _clear_layout(self):
         for i in reversed(range(self.data_layout.count())):
@@ -187,10 +200,19 @@ class SignalWidget(QtWidgets.QWidget):
         if self.range_warning:
             self.range_warning.setParent(None)
             self.range_warning = None
+        self.disable_buttons(True)
 
-    def update_signals(self, signals: List[float], srf: SpectralResponseFunction):
+    def update_signals(
+        self,
+        signals: List[float],
+        srf: SpectralResponseFunction,
+        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    ):
         self._clear_layout()
         show_range_info = False
+        self.srf = srf
+        self.irrs = signals
+        self.point = point
         for i, signal in enumerate(signals):
             ch = srf.channels[i]
             title = QtWidgets.QLabel("{} ({} nm):".format(ch.id, ch.center))
@@ -210,8 +232,39 @@ class SignalWidget(QtWidgets.QWidget):
 for wavelengths between 350 and 2500 nm"
             )
             self.range_warning.setWordWrap(True)
-            self.container_layout.addStretch()
             self.container_layout.addWidget(self.range_warning)
+        self.disable_buttons(False)
 
     def clear_signals(self):
         self._clear_layout()
+
+    def disable_buttons(self, disable: bool):
+        self.button_csv.setDisabled(disable)
+
+    def clear_error(self):
+        self.error_message.hide()
+
+    def show_error(self, msg: str):
+        color_red = "#c70000"
+        self.error_message.setText(msg)
+        self.error_message.setStyleSheet("background-color: {}".format(color_red))
+        self.error_message.repaint()
+        self.error_message.show()
+
+    @QtCore.Slot()
+    def export_csv(self):
+        self.clear_error()
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export CSV", "{}.csv".format("Signal")
+        )[0]
+        self.parentWidget().setDisabled(True)
+        self.disable_buttons(True)
+        if name is not None and name != "":
+            try:
+                csv.export_csv_integrated_irradiance(
+                    self.srf, self.irrs, name, self.point
+                )
+            except Exception as e:
+                self.show_error(str(e))
+        self.disable_buttons(False)
+        self.parentWidget().setDisabled(False)

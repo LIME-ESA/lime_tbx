@@ -287,7 +287,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²/nm)",
         )
-        self.signal_widget.update_signals(data[3], data[4])
+        self.signal_widget.update_signals(data[3], data[4], data[2])
 
     def eli_error(self, error: Exception):
         self._unblock_gui()

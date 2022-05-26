@@ -11,6 +11,8 @@ import csv
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     SatellitePoint,
+    SpectralResponseFunction,
+    SpectralValidity,
     SurfacePoint,
     CustomPoint,
 )
@@ -21,6 +23,28 @@ __created__ = "15/05/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
+
+
+def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint]):
+    if point is not None:
+        if isinstance(point, SurfacePoint):
+            writer.writerow(["latitude", point.latitude])
+            writer.writerow(["longitude", point.longitude])
+            writer.writerow(["altitude(m)", point.altitude])
+            dt: datetime = point.dt  # dt cant be a list of datetime in this function
+            writer.writerow(["datetime", str(dt)])
+        elif isinstance(point, CustomPoint):
+            writer.writerow(["absolute moon phase angle", point.abs_moon_phase_angle])
+            writer.writerow(["distance observer moon", point.distance_observer_moon])
+            writer.writerow(["distance sun moon", point.distance_sun_moon])
+            writer.writerow(["selenographic latitude of observer", point.selen_obs_lat])
+            writer.writerow(
+                ["selenographic longitude of observer", point.selen_obs_lon]
+            )
+            writer.writerow(["selenographic longitude of sun", point.selen_sun_lon])
+        else:
+            writer.writerow(["satellite", point.name])
+            writer.writerow(["datetime", str(point.dt)])
 
 
 def export_csv(
@@ -51,33 +75,30 @@ def export_csv(
     """
     with open(name, "w") as file:
         writer = csv.writer(file)
-        if point is not None:
-            if isinstance(point, SurfacePoint):
-                writer.writerow(["latitude", point.latitude])
-                writer.writerow(["longitude", point.longitude])
-                writer.writerow(["altitude(m)", point.altitude])
-                dt: datetime = (
-                    point.dt
-                )  # dt cant be a list of datetime in this function
-                writer.writerow(["datetime", str(dt)])
-            elif isinstance(point, CustomPoint):
-                writer.writerow(
-                    ["absolute moon phase angle", point.abs_moon_phase_angle]
-                )
-                writer.writerow(
-                    ["distance observer moon", point.distance_observer_moon]
-                )
-                writer.writerow(["distance sun moon", point.distance_sun_moon])
-                writer.writerow(
-                    ["selenographic latitude of observer", point.selen_obs_lat]
-                )
-                writer.writerow(
-                    ["selenographic longitude of observer", point.selen_obs_lon]
-                )
-                writer.writerow(["selenographic longitude of sun", point.selen_sun_lon])
-            else:
-                writer.writerow(["satellite", point.name])
-                writer.writerow(["datetime", str(point.dt)])
+        _write_point(writer, point)
         writer.writerow([xlabel, ylabel])
         for i in range(len(x_data)):
             writer.writerow([x_data[i], y_data[i]])
+
+
+def export_csv_integrated_irradiance(
+    srf: SpectralResponseFunction,
+    irrs: List[float],
+    name: str,
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+):
+    with open(name, "w") as file:
+        writer = csv.writer(file)
+        _write_point(writer, point)
+        writer.writerow(["srf name", srf.name])
+        writer.writerow(
+            ["id", "center (nm)", "irradiances (Wm⁻²nm⁻¹)", "inside LIME range"]
+        )
+        for i, ch in enumerate(srf.channels):
+            if ch.valid_spectre == SpectralValidity.VALID:
+                validity = "In"
+            elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
+                validity = "Partially"
+            else:
+                validity = "Out"
+            writer.writerow([ch.id, ch.center, irrs[i], validity])
