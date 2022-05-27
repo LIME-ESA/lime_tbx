@@ -11,6 +11,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
 from ..simulation.regular_simulation import regular_simulation
+from ..simulation.esa_satellites import esa_satellites
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SatellitePoint,
@@ -87,7 +88,8 @@ def eli_callback(
     srf: SpectralResponseFunction
         SRF used for the integrated irradiance signal calculation.
     """
-    rs = regular_simulation.RegularSimulation()
+    rs = regular_simulation.RegularSimulation
+    es = esa_satellites.ESASatellites
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
     if isinstance(point, SurfacePoint):
         elis: List[float] = rs.get_eli_from_surface(
@@ -100,10 +102,10 @@ def eli_callback(
         elis: List[float] = rs.get_eli_from_custom(def_srf, point, coeffs)
         elis_srf: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
     else:
-        elis: List[float] = rs.get_eli_from_satellite(
+        elis: List[float] = es.get_eli_from_satellite(
             def_srf, point, coeffs, kernels_path, eocfi_path
         )
-        elis_srf: List[float] = rs.get_eli_from_satellite(
+        elis_srf: List[float] = es.get_eli_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = def_srf.get_wavelengths()
@@ -118,7 +120,8 @@ def elref_callback(
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
-    rs = regular_simulation.RegularSimulation()
+    rs = regular_simulation.RegularSimulation
+    es = esa_satellites.ESASatellites
     if isinstance(point, SurfacePoint):
         elrefs: List[float] = rs.get_elref_from_surface(
             srf, point, coeffs, kernels_path
@@ -126,7 +129,7 @@ def elref_callback(
     elif isinstance(point, CustomPoint):
         elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
     else:
-        elrefs: List[float] = rs.get_elref_from_satellite(
+        elrefs: List[float] = es.get_elref_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = srf.get_wavelengths()
@@ -140,7 +143,8 @@ def polar_callback(
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
-    rs = regular_simulation.RegularSimulation()
+    rs = regular_simulation.RegularSimulation
+    es = esa_satellites.ESASatellites
     if isinstance(point, SurfacePoint):
         polars: List[float] = rs.get_polarized_from_surface(
             srf, point, coeffs, kernels_path
@@ -148,7 +152,7 @@ def polar_callback(
     elif isinstance(point, CustomPoint):
         polars: List[float] = rs.get_polarized_from_custom(srf, point, coeffs)
     else:
-        polars: List[float] = rs.get_polarized_from_satellite(
+        polars: List[float] = es.get_polarized_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = srf.get_wavelengths()
