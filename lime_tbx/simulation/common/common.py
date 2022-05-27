@@ -116,7 +116,7 @@ class ICommonSimulation(ABC):
 
 class CommonSimulation(ICommonSimulation):
     @staticmethod
-    def _get_eli_from_md(
+    def get_eli_from_md(
         srf: SpectralResponseFunction,
         md: Union[MoonData, List[MoonData]],
         coefficients: IrradianceCoefficients,
@@ -137,7 +137,7 @@ class CommonSimulation(ICommonSimulation):
         return times_irr
 
     @staticmethod
-    def _get_elref_from_md(
+    def get_elref_from_md(
         srf: SpectralResponseFunction,
         md: Union[MoonData, List[MoonData]],
         coefficients: IrradianceCoefficients,
@@ -154,7 +154,7 @@ class CommonSimulation(ICommonSimulation):
         return times_refl
 
     @staticmethod
-    def _get_polar_from_md(
+    def get_polar_from_md(
         srf: SpectralResponseFunction,
         md: Union[MoonData, List[MoonData]],
         coefficients: PolarizationCoefficients,

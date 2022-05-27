@@ -17,6 +17,7 @@ from ...datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
 )
+from ..common.common import CommonSimulation
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -244,7 +245,7 @@ class RegularSimulation(IRegularSimulation):
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
-        return RegularSimulation._get_eli_from_md(srf, md, coefficients)
+        return CommonSimulation.get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_elref_from_surface(
@@ -256,7 +257,7 @@ class RegularSimulation(IRegularSimulation):
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
-        return RegularSimulation._get_elref_from_md(srf, md, coefficients)
+        return CommonSimulation.get_elref_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_polarized_from_surface(
@@ -268,7 +269,7 @@ class RegularSimulation(IRegularSimulation):
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
-        return RegularSimulation._get_polar_from_md(srf, md, coefficients)
+        return CommonSimulation.get_polar_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_eli_from_custom(
@@ -285,7 +286,7 @@ class RegularSimulation(IRegularSimulation):
             cp.abs_moon_phase_angle,
             cp.moon_phase_angle,
         )
-        return RegularSimulation._get_eli_from_md(srf, md, coefficients)
+        return CommonSimulation.get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_elref_from_custom(
@@ -302,7 +303,7 @@ class RegularSimulation(IRegularSimulation):
             cp.abs_moon_phase_angle,
             cp.moon_phase_angle,
         )
-        return RegularSimulation._get_elref_from_md(srf, md, coefficients)
+        return CommonSimulation.get_elref_from_md(srf, md, coefficients)
 
     @staticmethod
     def get_polarized_from_custom(
@@ -319,7 +320,7 @@ class RegularSimulation(IRegularSimulation):
             cp.abs_moon_phase_angle,
             cp.moon_phase_angle,
         )
-        return RegularSimulation._get_polar_from_md(srf, md, coefficients)
+        return CommonSimulation.get_polar_from_md(srf, md, coefficients)
 
     @staticmethod
     def integrate_elis(srf: SpectralResponseFunction, elis: List[float]) -> List[float]:
