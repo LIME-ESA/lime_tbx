@@ -48,7 +48,12 @@ def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint]
             writer.writerow(["selenographic longitude of sun", point.selen_sun_lon])
         else:
             writer.writerow(["satellite", point.name])
-            writer.writerow(["datetime", str(point.dt)])
+            dt: Union[datetime, List[datetime]] = point.dt
+            if isinstance(dt, list):
+                str_dt = map(str, dt)
+                writer.writerow(["datetimes", *str_dt])
+            else:
+                writer.writerow(["datetime", str(dt)])
 
 
 def export_csv(

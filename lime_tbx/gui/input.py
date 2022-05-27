@@ -221,20 +221,77 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.combo_sats = QtWidgets.QComboBox()
         self.combo_sats.addItems(self.sat_names)
         self.combo_sats.currentIndexChanged.connect(self.update_from_combobox)
+        # finish layout
+        self.main_layout.addRow(self.satellite_label, self.combo_sats)
+        self._build_layout_single_datetime()
+
+    def _build_layout_single_datetime(self):
+        self.single_datetime = True
+        self.loaded_datetimes = []
         # datetime
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
         self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
-        # finish layout
-        self.main_layout.addRow(self.satellite_label, self.combo_sats)
+        self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
+        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.switch_layout = QtWidgets.QHBoxLayout()
+        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
+        self.switch_layout.addWidget(self.datetime_switch)
+        #
         self.main_layout.addRow(self.datetime_label, self.datetime_edit)
+        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
+        self.datetime_switch.clicked.connect(self.change_multiple_datetime)
+
+    def _build_layout_multiple_datetime(self):
+        self.single_datetime = False
+        self.datetime_label = QtWidgets.QLabel("Time-series file:")
+        self.datetimes_layout = QtWidgets.QHBoxLayout()
+        self.load_datetimes_button = QtWidgets.QPushButton("Load file")
+        self.load_datetimes_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.load_datetimes_button.clicked.connect(self.load_datetimes)
+        self.loaded_datetimes_label = QtWidgets.QLabel("")
+        self.datetimes_layout.addWidget(self.load_datetimes_button)
+        self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
+        self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
+        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.switch_layout = QtWidgets.QHBoxLayout()
+        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
+        self.switch_layout.addWidget(self.datetime_switch)
+        self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
+        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
+        self.datetime_switch.clicked.connect(self.change_single_datetime)
+
+    def _clear_form_rows(self):
+        self.main_layout.removeRow(2)
+        self.main_layout.removeRow(1)
+
+    @QtCore.Slot()
+    def change_single_datetime(self):
+        self._clear_form_rows()
+        self._build_layout_single_datetime()
+
+    @QtCore.Slot()
+    def change_multiple_datetime(self):
+        self._clear_form_rows()
+        self._build_layout_multiple_datetime()
+
+    @QtCore.Slot()
+    def load_datetimes(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        self.loaded_datetimes = csv.read_datetimes(path)
+        self.loaded_datetimes_label.setText(path)
 
     def get_satellite(self) -> str:
         return self.sat_names[self.combo_sats.currentIndex()]
 
-    def get_datetime(self) -> datetime:
-        return self.datetime_edit.dateTime().toPython()
+    def get_datetimes(self) -> Union[datetime, List[datetime]]:
+        if self.single_datetime:
+            return self.datetime_edit.dateTime().toPython()
+        else:
+            return self.loaded_datetimes
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
@@ -283,5 +340,5 @@ class InputWidget(QtWidgets.QWidget):
             return CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
         else:
             sat = self.satellite.get_satellite()
-            dt = self.satellite.get_datetime()
-            return SatellitePoint(sat, dt)
+            dts = self.satellite.get_datetimes()
+            return SatellitePoint(sat, dts)

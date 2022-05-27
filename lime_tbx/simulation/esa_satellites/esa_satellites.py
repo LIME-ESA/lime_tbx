@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import List
+from typing import List, Union
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
@@ -35,7 +35,7 @@ class IESASatellites(ABC):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         """
         Simulate the extraterrestrial lunar irradiance for a satellite point.
 
@@ -70,7 +70,7 @@ class IESASatellites(ABC):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         """
         Simulate the extraterrestrial lunar reflectance for a satellite point.
 
@@ -105,7 +105,7 @@ class IESASatellites(ABC):
         coefficients: PolarizationCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         """
         Simulate the extraterrestrial lunar polarization for a satellite point.
 
@@ -141,13 +141,25 @@ class ESASatellites(IESASatellites):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         eocfi = EOCFIConverter(eocfi_path)
-        lat, lon, height = eocfi.get_satellite_position(sp.name, sp.dt)
-        srp = SurfacePoint(lat, lon, height, sp.dt)
-        return RegularSimulation.get_eli_from_surface(
-            srf, srp, coefficients, kernels_path
-        )
+        dts = sp.dt
+        wasnt_list = False
+        if not isinstance(dts, list):
+            wasnt_list = True
+            dts = [dts]
+        elis = []
+        for dt in dts:
+            lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
+            srp = SurfacePoint(lat, lon, height, dt)
+            elis.append(
+                RegularSimulation.get_eli_from_surface(
+                    srf, srp, coefficients, kernels_path
+                )
+            )
+        if wasnt_list:
+            elis = elis[0]
+        return elis
 
     @staticmethod
     def get_elref_from_satellite(
@@ -156,13 +168,25 @@ class ESASatellites(IESASatellites):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         eocfi = EOCFIConverter(eocfi_path)
-        lat, lon, height = eocfi.get_satellite_position(sp.name, sp.dt)
-        srp = SurfacePoint(lat, lon, height, sp.dt)
-        return RegularSimulation.get_elref_from_surface(
-            srf, srp, coefficients, kernels_path
-        )
+        dts = sp.dt
+        wasnt_list = False
+        if not isinstance(dts, list):
+            wasnt_list = True
+            dts = [dts]
+        elrefs = []
+        for dt in dts:
+            lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
+            srp = SurfacePoint(lat, lon, height, dt)
+            elrefs.append(
+                RegularSimulation.get_elref_from_surface(
+                    srf, srp, coefficients, kernels_path
+                )
+            )
+        if wasnt_list:
+            elrefs = elrefs[0]
+        return elrefs
 
     @staticmethod
     def get_polarized_from_satellite(
@@ -171,10 +195,22 @@ class ESASatellites(IESASatellites):
         coefficients: PolarizationCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> List[float]:
+    ) -> Union[List[float], List[List[float]]]:
         eocfi = EOCFIConverter(eocfi_path)
-        lat, lon, height = eocfi.get_satellite_position(sp.name, sp.dt)
-        srp = SurfacePoint(lat, lon, height, sp.dt)
-        return RegularSimulation.get_polarized_from_surface(
-            srf, srp, coefficients, kernels_path
-        )
+        dts = sp.dt
+        wasnt_list = False
+        if not isinstance(dts, list):
+            wasnt_list = True
+            dts = [dts]
+        polars = []
+        for dt in dts:
+            lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
+            srp = SurfacePoint(lat, lon, height, dt)
+            polars.append(
+                RegularSimulation.get_polarized_from_surface(
+                    srf, srp, coefficients, kernels_path
+                )
+            )
+        if wasnt_list:
+            polars = polars[0]
+        return polars

@@ -202,12 +202,12 @@ class SatellitePoint:
     ----------
     name : str
         Name of the satellite
-    dt : datetime
-        Datetime
+    dt : datetime | list of datetime
+        Datetime/s that will be computed
     """
 
     name: str
-    dt: datetime
+    dt: Union[datetime, List[datetime]]
 
 
 class PolarizationCoefficients:
