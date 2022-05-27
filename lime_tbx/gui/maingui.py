@@ -395,15 +395,14 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def _create_actions(self):
         # File actions
-        self.eli_from_file_action = QtWidgets.QAction(self)
-        self.eli_from_file_action.setText("Calculate &Irradiance from file")
-        self.eli_from_file_action.triggered.connect(self.eli_from_file)
-        self.elref_from_file_action = QtWidgets.QAction(self)
-        self.elref_from_file_action.setText("Calculate &Reflectance from file")
-        self.elref_from_file_action.triggered.connect(self.elref_from_file)
-        self.polar_from_file_action = QtWidgets.QAction(self)
-        self.polar_from_file_action.setText("Calculate &Polarization from file")
-        self.polar_from_file_action.triggered.connect(self.polar_from_file)
+        self.time_series_action = QtWidgets.QAction(self)
+        self.time_series_action.setText("Simulate a &time series of observations")
+        self.time_series_action.triggered.connect(self.time_series_observations)
+        self.comparison_action = QtWidgets.QAction(self)
+        self.comparison_action.setText(
+            "Perform &comparisons from a remote sensing instrument"
+        )
+        self.comparison_action.triggered.connect(self.comparison)
         self.exit_action = QtWidgets.QAction(self)
         self.exit_action.setText("E&xit")
         self.exit_action.triggered.connect(self.exit)
@@ -423,9 +422,8 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._create_actions()
         self.menu_bar = self.menuBar()
         file_menu = QtWidgets.QMenu("&File", self)
-        file_menu.addAction(self.eli_from_file_action)
-        file_menu.addAction(self.elref_from_file_action)
-        file_menu.addAction(self.polar_from_file_action)
+        file_menu.addAction(self.time_series_action)
+        file_menu.addAction(self.comparison_action)
         file_menu.addSeparator()
         file_menu.addAction(self.exit_action)
         coeffs_menu = QtWidgets.QMenu("&Coefficients", self)
@@ -444,13 +442,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     # ACTIONS
 
-    def eli_from_file(self):
+    def time_series_observations(self):
         pass
 
-    def elref_from_file(self):
-        pass
-
-    def polar_from_file(self):
+    def comparison(self):
         pass
 
     def exit(self):
