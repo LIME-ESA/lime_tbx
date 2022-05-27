@@ -91,21 +91,19 @@ def eli_callback(
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
+    elis: Union[List[float], List[List[float]]] = []
+    elis_srf: Union[List[float], List[List[float]]] = []
     if isinstance(point, SurfacePoint):
-        elis: List[float] = rs.get_eli_from_surface(
-            def_srf, point, coeffs, kernels_path
-        )
-        elis_srf: List[float] = rs.get_eli_from_surface(
-            srf, point, coeffs, kernels_path
-        )
+        elis = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path)
+        elis_srf = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
     elif isinstance(point, CustomPoint):
-        elis: List[float] = rs.get_eli_from_custom(def_srf, point, coeffs)
-        elis_srf: List[float] = rs.get_eli_from_custom(srf, point, coeffs)
+        elis = rs.get_eli_from_custom(def_srf, point, coeffs)
+        elis_srf = rs.get_eli_from_custom(srf, point, coeffs)
     else:
-        elis: List[float] = es.get_eli_from_satellite(
+        elis = es.get_eli_from_satellite(
             def_srf, point, coeffs, kernels_path, eocfi_path
         )
-        elis_srf: List[float] = es.get_eli_from_satellite(
+        elis_srf = es.get_eli_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = def_srf.get_wavelengths()
@@ -278,9 +276,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self,
         data: Tuple[
             List[float],
-            List[float],
+            Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[float],
+            Union[List[float], List[List[float]]],
             SpectralResponseFunction,
         ],
     ):
@@ -395,9 +393,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def _create_actions(self):
         # File actions
-        self.time_series_action = QtWidgets.QAction(self)
-        self.time_series_action.setText("Simulate a &time series of observations")
-        self.time_series_action.triggered.connect(self.time_series_observations)
         self.comparison_action = QtWidgets.QAction(self)
         self.comparison_action.setText(
             "Perform &comparisons from a remote sensing instrument"
@@ -422,7 +417,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._create_actions()
         self.menu_bar = self.menuBar()
         file_menu = QtWidgets.QMenu("&File", self)
-        file_menu.addAction(self.time_series_action)
         file_menu.addAction(self.comparison_action)
         file_menu.addSeparator()
         file_menu.addAction(self.exit_action)
@@ -441,9 +435,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         return super().closeEvent(event)
 
     # ACTIONS
-
-    def time_series_observations(self):
-        pass
 
     def comparison(self):
         pass

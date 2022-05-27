@@ -15,6 +15,7 @@ from ..datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
 )
+from ..filedata import csv
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -118,23 +119,76 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.latitude_label = QtWidgets.QLabel("Latitude:")
         self.longitude_label = QtWidgets.QLabel("Longitude:")
         self.altitude_label = QtWidgets.QLabel("Altitude (m):")
-        self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.latitude_spinbox = QtWidgets.QDoubleSpinBox()
         self.longitude_spinbox = QtWidgets.QDoubleSpinBox()
         self.altitude_spinbox = QtWidgets.QDoubleSpinBox()
-        self.datetime_edit = QtWidgets.QDateTimeEdit()
         self.latitude_spinbox.setMinimum(-90)
         self.latitude_spinbox.setMaximum(90)
         self.longitude_spinbox.setMinimum(-180)
         self.longitude_spinbox.setMaximum(180)
         self.altitude_spinbox.setMinimum(0)
         self.altitude_spinbox.setMaximum(10000000)
-        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
-        self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
         self.main_layout.addRow(self.latitude_label, self.latitude_spinbox)
         self.main_layout.addRow(self.longitude_label, self.longitude_spinbox)
         self.main_layout.addRow(self.altitude_label, self.altitude_spinbox)
+        self._build_layout_single_datetime()
+
+    def _build_layout_single_datetime(self):
+        self.single_datetime = True
+        self.loaded_datetimes = []
+        self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
+        self.datetime_edit = QtWidgets.QDateTimeEdit()
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
+        self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
+        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.switch_layout = QtWidgets.QHBoxLayout()
+        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
+        self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetime_edit)
+        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
+        self.datetime_switch.clicked.connect(self.change_multiple_datetime)
+
+    def _build_layout_multiple_datetime(self):
+        self.single_datetime = False
+        self.datetime_label = QtWidgets.QLabel("Time-series file:")
+        self.datetimes_layout = QtWidgets.QHBoxLayout()
+        self.load_datetimes_button = QtWidgets.QPushButton("Load file")
+        self.load_datetimes_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.load_datetimes_button.clicked.connect(self.load_datetimes)
+        self.loaded_datetimes_label = QtWidgets.QLabel("")
+        self.datetimes_layout.addWidget(self.load_datetimes_button)
+        self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
+        self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
+        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.switch_layout = QtWidgets.QHBoxLayout()
+        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
+        self.switch_layout.addWidget(self.datetime_switch)
+        self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
+        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
+        self.datetime_switch.clicked.connect(self.change_single_datetime)
+
+    def _clear_form_rows(self):
+        self.main_layout.removeRow(4)
+        self.main_layout.removeRow(3)
+
+    @QtCore.Slot()
+    def change_single_datetime(self):
+        self._clear_form_rows()
+        self._build_layout_single_datetime()
+
+    @QtCore.Slot()
+    def change_multiple_datetime(self):
+        self._clear_form_rows()
+        self._build_layout_multiple_datetime()
+
+    @QtCore.Slot()
+    def load_datetimes(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        self.loaded_datetimes = csv.read_datetimes(path)
+        self.loaded_datetimes_label.setText(path)
 
     def get_latitude(self) -> float:
         return self.latitude_spinbox.value()
@@ -145,8 +199,11 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     def get_altitude(self) -> float:
         return self.altitude_spinbox.value()
 
-    def get_datetime(self) -> datetime:
-        return self.datetime_edit.dateTime().toPython()
+    def get_datetimes(self) -> Union[datetime, List[datetime]]:
+        if self.single_datetime:
+            return self.datetime_edit.dateTime().toPython()
+        else:
+            return self.loaded_datetimes
 
 
 class SatelliteInputWidget(QtWidgets.QWidget):
@@ -213,8 +270,8 @@ class InputWidget(QtWidgets.QWidget):
             lat = self.surface.get_latitude()
             lon = self.surface.get_longitude()
             alt = self.surface.get_altitude()
-            dt = self.surface.get_datetime()
-            return SurfacePoint(lat, lon, alt, dt)
+            dts = self.surface.get_datetimes()
+            return SurfacePoint(lat, lon, alt, dts)
         elif isinstance(tab, CustomInputWidget):
             dsm = self.custom.get_dist_sun_moon()
             dom = self.custom.get_dist_obs_moon()

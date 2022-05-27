@@ -214,7 +214,9 @@ class IRegularSimulation(ABC):
 
     @staticmethod
     @abstractmethod
-    def integrate_elis(srf: SpectralResponseFunction, elis: List[float]) -> List[float]:
+    def integrate_elis(
+        srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+    ) -> Union[List[float], List[List[float]]]:
         """
         Integrate the irradiance values for all SRF channels.
 
@@ -222,14 +224,16 @@ class IRegularSimulation(ABC):
         ----------
         srf: SpectralResponseFunction
             SRF used for the integration, containing the channels.
-        elis: list of float
+        elis: list of float | list of list of float
             The corresponding irradiance values for the wlens. The order must correspond with
             the wavelengths order in the srf, channel by channel.
+            It can be a list of lists in case multiple cases are passed together.
 
         Returns
         -------
-        integrated_irradiances: list of float
+        integrated_irradiances: list of float | list of list of float
             List of all the integrated irradiance values for each channel, in order.
+            It will be a list of lists if "elis" was a list of lists.
         """
         pass
 
@@ -323,22 +327,37 @@ class RegularSimulation(IRegularSimulation):
         return CommonSimulation.get_polar_from_md(srf, md, coefficients)
 
     @staticmethod
-    def integrate_elis(srf: SpectralResponseFunction, elis: List[float]) -> List[float]:
+    def integrate_elis(
+        srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+    ) -> Union[List[float], List[List[float]]]:
         signals = []
         wlens = srf.get_wavelengths()
+        if len(elis) == 0:
+            return []
+        wasnt_lists = False
+        if not isinstance(elis[0], list):
+            wasnt_lists = True
+            elis = [elis]
         for ch in srf.channels:
-            tot_eli = 0
+            tots_eli = [0 for _ in range(len(elis))]
             ch_wlens = list(ch.spectral_response.keys())
-            dividend = 0
+            dividends = [0 for _ in range(len(elis))]
             for i, wl in enumerate(ch_wlens):
                 interval = 0
                 if i > 0:
                     interval += (wl - ch_wlens[i - 1]) / 2
                 if i < len(ch_wlens) - 1:
                     interval += (ch_wlens[i + 1] - wl) / 2
-                eli = elis[wlens.index(wl)]
-                tot_eli += ch.spectral_response[wl] * eli * interval
-                dividend += ch.spectral_response[wl] * interval
-            signal = tot_eli / dividend
-            signals.append(signal)
+                extra_dividend = ch.spectral_response[wl] * interval
+                for i, sub_elis in enumerate(elis):
+                    eli = sub_elis[wlens.index(wl)]
+                    tots_eli[i] += extra_dividend * eli
+                    dividends[i] += extra_dividend
+            ch_signals = []
+            for i in range(len(tots_eli)):
+                signal = tots_eli[i] / dividends[i]
+                ch_signals.append(signal)
+            signals.append(ch_signals)
+        if wasnt_lists:
+            signals = signals[0]
         return signals

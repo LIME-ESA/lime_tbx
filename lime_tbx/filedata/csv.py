@@ -31,8 +31,12 @@ def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint]
             writer.writerow(["latitude", point.latitude])
             writer.writerow(["longitude", point.longitude])
             writer.writerow(["altitude(m)", point.altitude])
-            dt: datetime = point.dt  # dt cant be a list of datetime in this function
-            writer.writerow(["datetime", str(dt)])
+            dt: Union[datetime, List[datetime]] = point.dt
+            if isinstance(dt, list):
+                str_dt = map(str, dt)
+                writer.writerow(["datetimes", *str_dt])
+            else:
+                writer.writerow(["datetime", str(dt)])
         elif isinstance(point, CustomPoint):
             writer.writerow(["absolute moon phase angle", point.abs_moon_phase_angle])
             writer.writerow(["distance observer moon", point.distance_observer_moon])
@@ -49,7 +53,7 @@ def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint]
 
 def export_csv(
     x_data: List[float],
-    y_data: List[float],
+    y_data: Union[List[float], List[List[float]]],
     xlabel: str,
     ylabel: str,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
@@ -62,7 +66,7 @@ def export_csv(
     ----------
     x_data: list of float
         Data from the x axis, which would correspond to the key, of the key-value pair
-    y_data: list of float
+    y_data: list of float | list of list of float
         Data from the y axis, which would correspond to the value, of the key-value pair
     xlabel: str
         Label of the x_data
@@ -77,8 +81,13 @@ def export_csv(
         writer = csv.writer(file)
         _write_point(writer, point)
         writer.writerow([xlabel, ylabel])
-        for i in range(len(x_data)):
-            writer.writerow([x_data[i], y_data[i]])
+        if isinstance(y_data[0], list):
+            for i in range(len(x_data)):
+                yd = map(str, y_data[i])
+                writer.writerow([x_data[i], *yd])
+        else:
+            for i in range(len(x_data)):
+                writer.writerow([x_data[i], y_data[i]])
 
 
 def export_csv_integrated_irradiance(
@@ -92,7 +101,7 @@ def export_csv_integrated_irradiance(
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
         writer.writerow(
-            ["id", "center (nm)", "irradiances (Wm⁻²nm⁻¹)", "inside LIME range"]
+            ["id", "center (nm)", "inside LIME range", "irradiances (Wm⁻²nm⁻¹)"]
         )
         for i, ch in enumerate(srf.channels):
             if ch.valid_spectre == SpectralValidity.VALID:
@@ -101,4 +110,19 @@ def export_csv_integrated_irradiance(
                 validity = "Partially"
             else:
                 validity = "Out"
-            writer.writerow([ch.id, ch.center, irrs[i], validity])
+            if isinstance(irrs[i], list):
+                irrs_str = map(str, irrs[i])
+            else:
+                irrs_str = [str(irrs[i])]
+            writer.writerow([ch.id, ch.center, validity, *irrs_str])
+
+
+def read_datetimes(path: str) -> List[datetime]:
+    with open(path, "r") as file:
+        reader = csv.reader(file)
+        datetimes = []
+        for row in reader:
+            irow = map(int, row)
+            dt = datetime(*irow)
+            datetimes.append(dt)
+        return datetimes

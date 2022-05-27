@@ -11,6 +11,7 @@ from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
+import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
@@ -83,11 +84,13 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_plot(
         self,
-        x_data: list,
-        y_data: list,
+        x_data: List[float],
+        y_data: Union[List[float], List[List[float]]],
         point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     ):
         self.x_data = x_data
+        if isinstance(y_data[0], list):
+            y_data = np.array(y_data).T.tolist()
         self.y_data = y_data
         self.point = point
         if len(x_data) > 0 and len(y_data) > 0:
