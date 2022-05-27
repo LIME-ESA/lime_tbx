@@ -16,7 +16,6 @@ __pycache__/
 
 # C extensions
 *.so
-!eocfi_c/**
 
 # Distribution / packaging
 .Python
@@ -119,3 +118,6 @@ ENV/
 
 # Custom SPICE kernel
 kernels/custom.bsp
+
+# Exceptions
+!**/eocfi_c/**
