@@ -312,7 +312,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def elref_finished(
         self,
         data: Tuple[
-            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+            List[float],
+            Union[List[float], List[List[float]]],
+            Union[SurfacePoint, CustomPoint, SatellitePoint],
         ],
     ):
         self._unblock_gui()
@@ -345,7 +347,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def polar_finished(
         self,
         data: Tuple[
-            List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]
+            List[float],
+            Union[List[float], List[List[float]]],
+            Union[SurfacePoint, CustomPoint, SatellitePoint],
         ],
     ):
         self._unblock_gui()

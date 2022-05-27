@@ -84,7 +84,7 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_plot(
         self,
-        x_data: List[float],
+        x_data: Union[List[float], List[List[float]]],
         y_data: Union[List[float], List[List[float]]],
         point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     ):
@@ -177,6 +177,8 @@ class SignalWidget(QtWidgets.QWidget):
         self.data_layout = QtWidgets.QFormLayout()
         self.groupbox.setLayout(self.container_layout)
         self.range_warning = None
+        # table
+        self.table = QtWidgets.QTableWidget()
         # error message
         self.error_message = QtWidgets.QLabel("")
         self.error_message.setWordWrap(True)
@@ -186,7 +188,8 @@ class SignalWidget(QtWidgets.QWidget):
         self.button_csv.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_csv.clicked.connect(self.export_csv)
 
-        self.container_layout.addLayout(self.data_layout)
+        self.container_layout.addLayout(self.data_layout, 1)
+        self.data_layout.addWidget(self.table)
         self.container_layout.addStretch()
         self.container_layout.addWidget(self.error_message)
         self.container_layout.addWidget(self.button_csv)
@@ -198,8 +201,8 @@ class SignalWidget(QtWidgets.QWidget):
         self.disable_buttons(True)
 
     def _clear_layout(self):
-        for i in reversed(range(self.data_layout.count())):
-            self.data_layout.itemAt(i).widget().setParent(None)
+        while self.table.rowCount() > 0:
+            self.table.removeRow(0)
         if self.range_warning:
             self.range_warning.setParent(None)
             self.range_warning = None
@@ -216,19 +219,41 @@ class SignalWidget(QtWidgets.QWidget):
         self.srf = srf
         self.irrs = signals
         self.point = point
-        for i, signal in enumerate(signals):
+        head_id_item = QtWidgets.QTableWidgetItem("ID")
+        head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")
+        dts = point.dt
+        if not isinstance(dts, list):
+            dts = [dts]
+        self.table.setColumnCount(len(dts) + 2)
+        self.table.setRowCount(1 + len(signals))
+        self.table.setItem(0, 0, head_id_item)
+        self.table.setItem(0, 1, head_center_item)
+        for i, dt in enumerate(dts):
+            item_title_value = QtWidgets.QTableWidgetItem(
+                "Signal (Wm⁻²nm⁻¹) on {}".format(dt.strftime("%Y-%m-%d %H:%M:%S UTC"))
+            )
+            self.table.setItem(0, i + 2, item_title_value)
+        for i, ch_signals in enumerate(signals):
             ch = srf.channels[i]
-            title = QtWidgets.QLabel("{} ({} nm):".format(ch.id, ch.center))
-            if ch.valid_spectre == SpectralValidity.VALID:
-                value = "{} Wm⁻²nm⁻¹".format(str(signal))
-            elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
-                value = "{} Wm⁻²nm⁻¹ *".format(str(signal))
-                show_range_info = True
-            else:
-                value = "Not available *"
-                show_range_info = True
-            value_label = QtWidgets.QLabel(value)
-            self.data_layout.addRow(title, value_label)
+            if not isinstance(ch_signals, list):
+                ch_signals = [ch_signals]
+            id_item = QtWidgets.QTableWidgetItem(str(ch.id))
+            center_item = QtWidgets.QTableWidgetItem(str(ch.center))
+            self.table.setItem(i + 1, 0, id_item)
+            self.table.setItem(i + 1, 1, center_item)
+            for j, signal in enumerate(ch_signals):
+                if ch.valid_spectre == SpectralValidity.VALID:
+                    value = "{}".format(str(signal))
+                elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
+                    value = "{} *".format(str(signal))
+                    show_range_info = True
+                else:
+                    value = "Not available *"
+                    show_range_info = True
+                value_item = QtWidgets.QTableWidgetItem(value)
+                self.table.setItem(i + 1, j + 2, value_item)
+        self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()
         if show_range_info:
             self.range_warning = QtWidgets.QLabel(
                 "* The LIME can only give a reliable simulation \

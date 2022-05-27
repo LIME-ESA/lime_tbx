@@ -359,5 +359,5 @@ class RegularSimulation(IRegularSimulation):
                 ch_signals.append(signal)
             signals.append(ch_signals)
         if wasnt_lists:
-            signals = signals[0]
+            signals = [s[0] for s in signals]
         return signals

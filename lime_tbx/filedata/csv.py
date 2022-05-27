@@ -80,7 +80,10 @@ def export_csv(
     with open(name, "w") as file:
         writer = csv.writer(file)
         _write_point(writer, point)
-        writer.writerow([xlabel, ylabel])
+        ylabels = []
+        for dt in point.dt:
+            ylabels.append("{} {}".format(str(dt), ylabel))
+        writer.writerow([xlabel, *ylabels])
         if isinstance(y_data[0], list):
             for i in range(len(x_data)):
                 yd = map(str, y_data[i])
@@ -100,9 +103,10 @@ def export_csv_integrated_irradiance(
         writer = csv.writer(file)
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
-        writer.writerow(
-            ["id", "center (nm)", "inside LIME range", "irradiances (Wm⁻²nm⁻¹)"]
-        )
+        irr_titles = []
+        for dt in point.dt:
+            irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+        writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
         for i, ch in enumerate(srf.channels):
             if ch.valid_spectre == SpectralValidity.VALID:
                 validity = "In"
