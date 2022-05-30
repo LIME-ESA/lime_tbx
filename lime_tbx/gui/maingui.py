@@ -173,6 +173,22 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.input = input.ComparisonInput()
+        self.compare_button = QtWidgets.QPushButton("Compare")
+        self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.compare_button.clicked.connect(self.compare)
+        self.output = output.ComparisonOutput()
+        self.main_layout.addWidget(self.input)
+        self.main_layout.addWidget(self.compare_button)
+        self.main_layout.addWidget(self.output)
+
+    @QtCore.Slot()
+    def compare(self):
+        mo = self.input.get_moon_obs()
+        srf = self.input.get_srf()
+        if not mo.check_valid_srf(srf):
+            raise Exception("SRF file not valid for the chosen Moon observations file.")
+        self.output.set_channels(mo.ch_names)
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):

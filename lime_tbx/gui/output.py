@@ -296,3 +296,36 @@ for wavelengths between 350 and 2500 nm"
                 self.show_error(str(e))
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
+
+
+class ComparisonOutput(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.channels: List[GraphWidget] = []
+        self.ch_names = []
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.channel_tabs = QtWidgets.QTabWidget()
+        self.channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.main_layout.addWidget(self.channel_tabs)
+
+    def set_channels(self, channels: List[str]):
+        while self.channel_tabs.count() > 0:
+            self.channel_tabs.removeTab(0)
+        for ch in self.channels:
+            ch.setParent(None)
+        self.channels.clear()
+        self.ch_names = []
+        for ch in channels:
+            channel = GraphWidget(ch)
+            self.channels.append(channel)
+            self.ch_names.append(ch)
+            self.channel_tabs.addTab(channel, ch)
+
+    def update_plot(self, index, x_data, y_data):
+        self.channels[index].update_plot(x_data, y_data, None)
+
+    def update_labels(self, index, title, xlabel, ylabel):
+        self.channels[index].update_labels(title, xlabel, ylabel)

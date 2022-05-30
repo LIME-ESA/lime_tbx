@@ -4,18 +4,22 @@
 from datetime import datetime
 from typing import Union, Tuple
 
+from lime_tbx.filedata import moon
+
 """___Third-Party Modules___"""
 from typing import Callable, List, Optional
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    MoonObservation,
     Satellite,
+    SpectralResponseFunction,
     SurfacePoint,
     CustomPoint,
     SatellitePoint,
 )
-from ..filedata import csv
+from ..filedata import csv, srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -342,3 +346,61 @@ class InputWidget(QtWidgets.QWidget):
             sat = self.satellite.get_satellite()
             dts = self.satellite.get_datetimes()
             return SatellitePoint(sat, dts)
+
+
+class ComparisonInput(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.loaded_srf = None
+        self.loaded_moon = None
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        # MOON Observation data filepath
+        self.moon_obs_layout = QtWidgets.QFormLayout()
+        self.moon_obs_label = QtWidgets.QLabel("Moon Observation file:")
+        self.moon_obs_feedback = QtWidgets.QLabel("")
+        self.moon_obs_feedback.setWordWrap(True)
+        self.moon_obs_button = QtWidgets.QPushButton(" Load file ")
+        self.moon_obs_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.moon_obs_button.clicked.connect(self.load_obs_file)
+        self.moon_obs_layout.addRow(self.moon_obs_label, self.moon_obs_feedback)
+        obs_but_layout = QtWidgets.QHBoxLayout()
+        obs_but_layout.addWidget(QtWidgets.QLabel(), 1)
+        obs_but_layout.addWidget(self.moon_obs_button)
+        self.moon_obs_layout.addRow(QtWidgets.QLabel(), obs_but_layout)
+        # SRF filepath
+        self.srf_layout = QtWidgets.QFormLayout()
+        self.srf_label = QtWidgets.QLabel("SRF file:")
+        self.srf_feedback = QtWidgets.QLabel("")
+        self.srf_feedback.setWordWrap(True)
+        self.srf_button = QtWidgets.QPushButton(" Load file ")
+        self.srf_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.srf_button.clicked.connect(self.load_srf_file)
+        self.srf_layout.addRow(self.srf_label, self.srf_feedback)
+        srf_but_layout = QtWidgets.QHBoxLayout()
+        srf_but_layout.addWidget(QtWidgets.QLabel(), 1)
+        srf_but_layout.addWidget(self.srf_button)
+        self.srf_layout.addRow(QtWidgets.QLabel(), srf_but_layout)
+        # Finish main layout
+        self.main_layout.addLayout(self.moon_obs_layout)
+        self.main_layout.addLayout(self.srf_layout)
+
+    @QtCore.Slot()
+    def load_srf_file(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        self.loaded_srf = srf.read_srf(path)
+        self.srf_feedback.setText(path)
+
+    @QtCore.Slot()
+    def load_obs_file(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        self.loaded_moon = moon.read_moon_obs(path)
+        self.moon_obs_feedback.setText(path)
+
+    def get_srf(self) -> SpectralResponseFunction:
+        return self.loaded_srf
+
+    def get_moon_obs(self) -> MoonObservation:
+        return self.loaded_moon

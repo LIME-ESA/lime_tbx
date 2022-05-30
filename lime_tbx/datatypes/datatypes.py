@@ -14,7 +14,7 @@ from datetime import datetime
 from enum import Enum
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___LIME Modules___"""
 from . import constants
@@ -506,3 +506,23 @@ class Satellite:
                     sel_td = td
                     sel_orf = orf
         return sel_orf
+
+
+@dataclass
+class MoonObservation:
+    ch_names: List[str]
+    dates: List[datetime]
+    sat_pos_ref: str
+    sat_pos: np.ma.core.MaskedArray
+    irr_obs: np.ma.core.MaskedArray
+
+    def check_valid_srf(self, srf: SpectralResponseFunction) -> bool:
+        for ch in self.ch_names:
+            found = False
+            for ch_srf in srf.channels:
+                if ch_srf.id == ch:
+                    found = True
+                    break
+            if not found:
+                return False
+        return True
