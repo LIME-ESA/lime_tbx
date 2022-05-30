@@ -1,6 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
+from enum import Enum
 from typing import List, Callable, Union, Tuple
 from datetime import datetime
 import time
@@ -157,6 +158,23 @@ def polar_callback(
     return wlens, polars, point
 
 
+class ComparisonPageWidget(QtWidgets.QWidget):
+    def __init__(
+        self,
+        kernels_path: str,
+        eocfi_path: str,
+        settings_manager: settings.ISettingsManager,
+    ):
+        super().__init__()
+        self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
+        self.settings_manager = settings_manager
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+
+
 class MainSimulationsWidget(QtWidgets.QWidget):
     """
     Widget containing the landing gui, which lets the user calculate the eli, elref and polar
@@ -219,22 +237,10 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.lower_tabs, 1)
 
     def _unblock_gui(self):
-        self.eli_button.setDisabled(False)
-        self.elref_button.setDisabled(False)
-        self.polar_button.setDisabled(False)
-        self.input_widget.setDisabled(False)
-        self.graph.setDisabled(False)
-        self.srf_widget.setDisabled(False)
-        self.lower_tabs.setDisabled(False)
+        self.parentWidget().setDisabled(False)
 
     def _block_gui_loading(self):
-        self.eli_button.setDisabled(True)
-        self.elref_button.setDisabled(True)
-        self.polar_button.setDisabled(True)
-        self.input_widget.setDisabled(True)
-        self.graph.setDisabled(True)
-        self.srf_widget.setDisabled(True)
-        self.lower_tabs.setDisabled(True)
+        self.parentWidget().setDisabled(True)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
@@ -366,6 +372,11 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         raise error
 
 
+class LimePagesEnum(Enum):
+    SIMULATION = 0
+    COMPARISON = 1
+
+
 class LimeTBXWidget(QtWidgets.QWidget):
     """
     Main widget of the lime toolbox desktop app.
@@ -380,14 +391,35 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        settings_manager = settings.MockSettingsManager()
+        self.settings_manager = settings.MockSettingsManager()
         self.page = MainSimulationsWidget(
-            self.kernels_path, self.eocfi_path, settings_manager
+            self.kernels_path, self.eocfi_path, self.settings_manager
         )
         self.main_layout.addWidget(self.page)
 
+    def _change_page(self, pageWidget: QtWidgets.QWidget):
+        self.main_layout.removeWidget(self.page)
+        self.page.setParent(None)
+        self.page = pageWidget
+        self.main_layout.addWidget(self.page)
+
+    def setDisabled(self, arg__1: bool) -> None:
+        self.parentWidget().setDisabled(arg__1)
+        return super().setDisabled(arg__1)
+
     def propagate_close_event(self):
         pass
+
+    def change_page(self, page: LimePagesEnum):
+        if page == LimePagesEnum.COMPARISON:
+            page = ComparisonPageWidget(
+                self.kernels_path, self.eocfi_path, self.settings_manager
+            )
+        else:
+            page = MainSimulationsWidget(
+                self.kernels_path, self.eocfi_path, self.settings_manager
+            )
+        self._change_page(page)
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
@@ -441,7 +473,18 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     # ACTIONS
 
     def comparison(self):
-        pass
+        self.comparison_action.setText("Perform &simulations")
+        self.comparison_action.triggered.connect(self.simulations)
+        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
+
+    def simulations(self):
+        self.comparison_action.setText(
+            "Perform &comparisons from a remote sensing instrument"
+        )
+        self.comparison_action.triggered.connect(self.comparison)
+        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
 
     def exit(self):
         self.close()
