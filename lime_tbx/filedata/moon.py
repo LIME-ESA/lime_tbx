@@ -34,7 +34,8 @@ def read_moon_obs(path: str):
 
     Returns
     -------
-    obs:
+    moon_obs: MoonObservation
+        Generated MoonObservation from the given datafile
     """
     ds = nc.Dataset(path)
     n_channels = len(ds["channel_name"])
