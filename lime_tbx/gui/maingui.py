@@ -13,6 +13,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 from . import settings, output, input, srf, help
 from ..simulation.regular_simulation import regular_simulation
 from ..simulation.esa_satellites import esa_satellites
+from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SatellitePoint,
@@ -184,11 +185,16 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def compare(self):
+        co = comparison.Comparison()
         mo = self.input.get_moon_obs()
         srf = self.input.get_srf()
         if not mo.check_valid_srf(srf):
             raise Exception("SRF file not valid for the chosen Moon observations file.")
+        coeffs = self.settings_manager.get_irr_coeffs()
+        irrs = co.get_simulations(mo, srf, coeffs, self.kernels_path)
         self.output.set_channels(mo.ch_names)
+        for i, ch in enumerate(mo.ch_names):
+            self.output.update_plot(i, [1, 1], [mo.ch_irrs, irrs[i]])
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):

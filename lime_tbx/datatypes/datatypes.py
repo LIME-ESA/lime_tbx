@@ -509,12 +509,33 @@ class Satellite:
 
 
 @dataclass
+class SatellitePosition:
+    x: float
+    y: float
+    z: float
+
+
+@dataclass
+class MoonCapture:
+    irradiance: float
+    dt: datetime
+    sat_pos: SatellitePosition
+
+
+@dataclass
 class MoonObservation:
     ch_names: List[str]
-    dates: List[datetime]
     sat_pos_ref: str
-    sat_pos: np.ma.core.MaskedArray
-    irr_obs: np.ma.core.MaskedArray
+    ch_irrs: List[List[MoonCapture]]
+    dates: List[datetime]
+    positions: List[SatellitePosition]
+
+    def get_irradiances(self, name: str) -> List[MoonCapture]:
+        try:
+            i = self.ch_names.index(name)
+        except ValueError:
+            raise "Channel name not in data structure"
+        return self.ch_irrs[i]
 
     def check_valid_srf(self, srf: SpectralResponseFunction) -> bool:
         for ch in self.ch_names:
