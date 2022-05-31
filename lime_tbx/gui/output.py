@@ -89,8 +89,6 @@ class GraphWidget(QtWidgets.QWidget):
         point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     ):
         self.x_data = x_data
-        if isinstance(y_data[0], list):
-            y_data = np.array(y_data).T.tolist()
         self.y_data = y_data
         self.point = point
         if len(x_data) > 0 and len(y_data) > 0:
@@ -108,9 +106,25 @@ class GraphWidget(QtWidgets.QWidget):
     def update_size(self):
         self._redraw()
 
+    def _is_filled(self) -> bool:
+        if len(self.x_data) > 0 and len(self.y_data) > 0:
+            return True
+        return False
+
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        self.canvas.axes.plot(self.x_data, self.y_data)
+        marker = ""
+        if len(self.x_data) == 1:
+            marker = "o"
+        if (
+            self._is_filled()
+            and isinstance(self.y_data[0], list)
+            and not isinstance(self.x_data[0], list)
+        ):
+            for yd in self.y_data:
+                self.canvas.axes.plot(self.x_data, yd, marker=marker)
+        else:
+            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)

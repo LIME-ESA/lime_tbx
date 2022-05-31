@@ -194,7 +194,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         irrs = co.get_simulations(mo, srf, coeffs, self.kernels_path)
         self.output.set_channels(mo.ch_names)
         for i, ch in enumerate(mo.ch_names):
-            self.output.update_plot(i, [1, 1], [mo.ch_irrs, irrs[i]])
+            obs_irrs = [v.irradiance for v in mo.ch_irrs[i]]
+            ch_dates = [v.dt for v in mo.ch_irrs[i]]
+            if len(obs_irrs) > 0:
+                self.output.update_plot(i, ch_dates, [obs_irrs, irrs[i]])
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):

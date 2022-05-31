@@ -3,7 +3,7 @@
 """___Built-In Modules___"""
 import os
 from datetime import datetime
-
+from typing import List
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -53,7 +53,7 @@ def read_moon_obs(path: str):
         ch_names.append(ch_name)
         ch_irrs.append([])
     n_dates = len(ds["date"])
-    dates = []
+    dates: List[datetime] = []
     for i in range(n_dates):
         dates.append(datetime.fromtimestamp(float(ds["date"][i].data)))
     sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
@@ -69,5 +69,6 @@ def read_moon_obs(path: str):
         positions.append(satpos)
         dt = dates[i]
         for j, ch_irr in enumerate(dt_irrs):
-            ch_irrs[j].append(MoonCapture(ch_irr, dt, satpos))
+            if not isinstance(ch_irr, np.ma.core.MaskedConstant):
+                ch_irrs[j].append(MoonCapture(float(ch_irr), dt, satpos))
     return MoonObservation(ch_names, sat_pos_ref, ch_irrs, dates, positions)

@@ -65,6 +65,26 @@ class IComparison(ABC):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
     ):
+        """
+        Simulate the moon irradiance for the given scenarios.
+
+        Parameters
+        ----------
+        observations: MoonObservation
+            MoonObservationn read from a GLOD datafile.
+        srf: SpectralResponseFunction
+            SpectralResponseFunction that corresponds to the observations file
+        coefficients: IrradianceCoefficients
+            Irradiance Coefficients to be used
+        kernels_path: str
+            Path where the needed SPICE kernels are located.
+
+        Returns
+        -------
+        irrs: list of list of float
+            List containing one list per SRF channel, containing all the simulated measures
+            that have a counterpart in the observations data object.
+        """
         pass
 
 
@@ -77,7 +97,7 @@ class Comparison(IComparison):
         kernels_path: str,
     ) -> List[List[float]]:
         dts = observations.dates
-        irrs = []
+        irrs = [[] for _ in observations.ch_names]
         for i, dt in enumerate(dts):
             sat_pos = observations.positions[i]
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
@@ -86,5 +106,8 @@ class Comparison(IComparison):
                 srf, sp, coefficients, kernels_path
             )
             integrated_irrs = RegularSimulation.integrate_elis(srf, elis)
-            irrs.append(integrated_irrs)
+            for j, ch_irrs in enumerate(observations.ch_irrs):
+                ch_dts = [ch_irr.dt for ch_irr in ch_irrs]
+                if dt in ch_dts:
+                    irrs[j].append(integrated_irrs[j])
         return irrs
