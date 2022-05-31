@@ -235,18 +235,24 @@ class SignalWidget(QtWidgets.QWidget):
         self.point = point
         head_id_item = QtWidgets.QTableWidgetItem("ID")
         head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")
-        dts = point.dt
-        if not isinstance(dts, list):
-            dts = [dts]
-        self.table.setColumnCount(len(dts) + 2)
         self.table.setRowCount(1 + len(signals))
+        if isinstance(point, CustomPoint):
+            self.table.setColumnCount(2 + 1)
+            self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Signal (Wm⁻²nm⁻¹)"))
+        else:
+            dts = point.dt
+            if not isinstance(dts, list):
+                dts = [dts]
+            self.table.setColumnCount(len(dts) + 2)
+            for i, dt in enumerate(dts):
+                item_title_value = QtWidgets.QTableWidgetItem(
+                    "Signal (Wm⁻²nm⁻¹) on {}".format(
+                        dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                    )
+                )
+                self.table.setItem(0, i + 2, item_title_value)
         self.table.setItem(0, 0, head_id_item)
         self.table.setItem(0, 1, head_center_item)
-        for i, dt in enumerate(dts):
-            item_title_value = QtWidgets.QTableWidgetItem(
-                "Signal (Wm⁻²nm⁻¹) on {}".format(dt.strftime("%Y-%m-%d %H:%M:%S UTC"))
-            )
-            self.table.setItem(0, i + 2, item_title_value)
         for i, ch_signals in enumerate(signals):
             ch = srf.channels[i]
             if not isinstance(ch_signals, list):
