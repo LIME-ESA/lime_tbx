@@ -48,7 +48,7 @@ def calculate_eli(
         The extraterrestrial lunar irradiance calculated
     """
     a_l = elref.interpolated_moon_disk_reflectance(
-        moon_data.absolute_mpa_degrees, wavelength_nm, moon_data, coefficients
+        wavelength_nm, moon_data, coefficients
     )
 
     solid_angle_moon: float = 6.4177e-05
