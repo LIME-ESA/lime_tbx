@@ -54,7 +54,7 @@ def band_moon_disk_reflectance(
     b_coeffs = coeffs[4:7,:]
     c_coeffs = coeffs[7:11,:]
     d_coeffs = coeffs[11:14,:]
-    p_coeffs = coeffs[15::,:]
+    p_coeffs = coeffs[14::,:]
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
