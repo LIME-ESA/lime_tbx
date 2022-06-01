@@ -140,7 +140,16 @@ def calculate_eli_band_unc(
     distance_earth_moon_km: int = 384400
 
     lunar_irr = measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom)
-    return lunar_irr*u_a_l/a_l
+
+    # prop = punpy.MCPropagation(1000)
+    #
+    # unc = prop.propagate_random(measurement_func_eli,
+    #                             [a_l,omega,esk,dsm,distance_earth_moon_km,dom],
+    #                             [u_a_l,None,None,None,None,None])
+
+    unc=lunar_irr*u_a_l/a_l
+
+    return unc
 
 def measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom):
 
