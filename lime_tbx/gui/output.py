@@ -91,10 +91,17 @@ class GraphWidget(QtWidgets.QWidget):
         x_data: Union[List[float], List[List[float]]],
         y_data: Union[List[float], List[List[float]]],
         point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        x_data_CIMEL: Union[List[float],List[List[float]]]=[],
+        y_data_CIMEL: Union[List[float],List[List[float]]]=[],
+        u_y_data_CIMEL: Union[List[float],List[List[float]]]=[],
+
     ):
         self.x_data = x_data
         self.y_data = y_data
         self.point = point
+        self.x_data_CIMEL = x_data_CIMEL
+        self.y_data_CIMEL = y_data_CIMEL
+        self.u_y_data_CIMEL = u_y_data_CIMEL
         if len(x_data) > 0 and len(y_data) > 0:
             self.disable_buttons(False)
         else:
