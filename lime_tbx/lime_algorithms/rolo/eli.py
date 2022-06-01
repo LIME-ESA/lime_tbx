@@ -11,6 +11,7 @@ import math
 
 """___Third-Party Modules___"""
 # import here
+import numpy as np
 
 """___LIME Modules___"""
 from . import esi, elref
@@ -63,7 +64,7 @@ def calculate_eli(
 
 def calculate_eli_band(
     wavelength_nm: float, moon_data: MoonData, coefficients: IrradianceCoefficients
-) -> float:
+) -> np.ndarray:
     """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
     Simulates a lunar observation for a wavelength for any observer/solar selenographic
@@ -84,7 +85,7 @@ def calculate_eli_band(
     float
         The extraterrestrial lunar irradiance calculated
     """
-    a_l = math.exp(
+    a_l = np.exp(
                 elref.band_moon_disk_reflectance(
                     wavelength_nm, moon_data, coefficients
                 )
