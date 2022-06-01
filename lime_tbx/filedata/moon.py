@@ -24,6 +24,18 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
+def _calc_divisor_to_nm(units: str) -> float:
+    if units == "W m-2 m-1":
+        d_to_nm = 1000000000
+    elif units == "W m-2 mm-1":
+        d_to_nm = 1000000
+    elif units == "W m-2 um-1" or units == "W m-2 μm-1":
+        d_to_nm = 1000
+    else:  # units == 'W m-2 nm-1':
+        d_to_nm = 1
+    return d_to_nm
+
+
 def read_moon_obs(path: str):
     """
     Read a glod-formatted netcdf moon observations file and create a data object
@@ -54,7 +66,9 @@ def read_moon_obs(path: str):
     sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
     sat_pos = SatellitePosition(*list(map(float, ds["sat_pos"][:][:].data)))
     irr_obs = ds["irr_obs"][:]
+    irr_obs_units: str = ds["irr_obs"].units
+    d_to_nm = _calc_divisor_to_nm(irr_obs_units)
     for i, ch_irr in enumerate(irr_obs):
         if not isinstance(ch_irr, np.ma.core.MaskedConstant):
-            ch_irrs[ch_names[i]] = float(ch_irr)
+            ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
     return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)

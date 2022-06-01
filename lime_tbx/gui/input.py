@@ -28,6 +28,8 @@ __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
+MAX_PATH_LEN = 35
+
 
 class CustomInputWidget(QtWidgets.QWidget):
     """
@@ -286,6 +288,9 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     def load_datetimes(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         self.loaded_datetimes = csv.read_datetimes(path)
+        shown_path = path
+        if len(shown_path) > MAX_PATH_LEN:
+            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
         self.loaded_datetimes_label.setText(path)
 
     def get_satellite(self) -> str:
@@ -352,14 +357,14 @@ class ComparisonInput(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.loaded_srf = None
-        self.loaded_moon = None
+        self.loaded_moons = []
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # MOON Observation data filepath
         self.moon_obs_layout = QtWidgets.QFormLayout()
-        self.moon_obs_label = QtWidgets.QLabel("Moon Observation file:")
+        self.moon_obs_label = QtWidgets.QLabel("Lunar Observation files:")
         self.moon_obs_feedback = QtWidgets.QLabel("")
         self.moon_obs_feedback.setWordWrap(True)
         self.moon_obs_button = QtWidgets.QPushButton(" Load file ")
@@ -391,16 +396,23 @@ class ComparisonInput(QtWidgets.QWidget):
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         self.loaded_srf = srf.read_srf(path)
-        self.srf_feedback.setText(path)
+        shown_path = path
+        if len(shown_path) > MAX_PATH_LEN:
+            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+        self.srf_feedback.setText(shown_path)
 
     @QtCore.Slot()
     def load_obs_file(self):
-        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        self.loaded_moon = moon.read_moon_obs(path)
-        self.moon_obs_feedback.setText(path)
+        paths = QtWidgets.QFileDialog().getOpenFileNames(self)[0]
+        for path in paths:
+            self.loaded_moons.append(moon.read_moon_obs(path))
+        shown_path = "loaded"  # path
+        if len(shown_path) > MAX_PATH_LEN:
+            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+        self.moon_obs_feedback.setText(shown_path)
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.loaded_srf
 
     def get_moon_obs(self) -> List[LunarObservation]:
-        return [self.loaded_moon]  # change this
+        return self.loaded_moons  # change this
