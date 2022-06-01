@@ -112,9 +112,9 @@ def _ln_moon_disk_reflectance(
 
 
 def measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value):
-    d1_value = d_coeffs[0]*math.exp(-gd_value/p_coeffs[0])
-    d2_value = d_coeffs[1]*math.exp(-gd_value/p_coeffs[1])
-    d3_value = d_coeffs[2]*math.cos((gd_value-p_coeffs[2])/p_coeffs[3])
+    d1_value = d_coeffs[0]*np.exp(-gd_value/p_coeffs[0])
+    d2_value = d_coeffs[1]*np.exp(-gd_value/p_coeffs[1])
+    d3_value = d_coeffs[2]*np.cos((gd_value-p_coeffs[2])/p_coeffs[3])
 
     sum_a: float = np.sum([a_coeffs[i]*gr_value**i for i in range(len(a_coeffs))])
     sum_b: float = np.sum([b_coeffs[j]*phi**(2*(j+1)-1) for j in range(len(b_coeffs))])
