@@ -137,8 +137,8 @@ class GraphWidget(QtWidgets.QWidget):
         else:
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
 
-        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, marker="o",label="CIMEL data points")
-        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, ls='none',label="errorbars * 10")
+        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
+        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
 
         self.canvas.axes.legend()
 
