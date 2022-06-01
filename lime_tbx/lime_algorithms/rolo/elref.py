@@ -44,11 +44,7 @@ def _summatory_a(
     float
         Result of the computation of the first summatory
     """
-    count: float = 0.0
-    a_coeffs: List[float] = coeffs.get_coefficients_a(wavelength_nm)
-    for i, a_value in enumerate(a_coeffs):
-        count = count + a_value * gr_value**i
-    return count
+
 
 
 def _summatory_b(
@@ -108,29 +104,31 @@ def _ln_moon_disk_reflectance(
     gd_value = absolute_mpa_degrees
     gr_value = math.radians(gd_value)
     phi = moon_data.long_sun_radians
+    a_coeffs: List[float] = coeffs.get_coefficients_a()
+    b_coeffs: List[float] = coeffs.get_coefficients_b()
     c_coeffs: List[float] = coeffs.get_coefficients_c()
     d_coeffs: List[float] = coeffs.get_coefficients_d(wavelength_nm)
     p_coeffs: List[float] = coeffs.get_coefficients_p()
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
-    sum_a = _summatory_a(wavelength_nm, gr_value, coeffs)
-    sum_b = _summatory_b(wavelength_nm, phi, coeffs)
-    d1_value = d_coeffs[0] * math.exp(-gd_value / p_coeffs[0])
-    d2_value = d_coeffs[1] * math.exp(-gd_value / p_coeffs[1])
-    d3_value = d_coeffs[2] * math.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
-    result = (
-        sum_a
-        + sum_b
-        + c_coeffs[0] * l_phi
-        + c_coeffs[1] * l_theta
-        + c_coeffs[2] * phi * l_phi
-        + c_coeffs[3] * phi * l_theta
-        + d1_value
-        + d2_value
-        + d3_value
-    )
+
+    result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
     return result
 
+
+def measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value):
+    d1_value = d_coeffs[0]*math.exp(-gd_value/p_coeffs[0])
+    d2_value = d_coeffs[1]*math.exp(-gd_value/p_coeffs[1])
+    d3_value = d_coeffs[2]*math.cos((gd_value-p_coeffs[2])/p_coeffs[3])
+    sum_a: float = 0.0
+    for i,a_value in enumerate(a_coeffs):
+        sum_a = sum_a+a_value*gr_value**i
+    sum_b: float = 0.0
+    for j,b_value in enumerate(b_coeffs):
+        sum_b = sum_b+b_value*phi**(2*(j+1)-1)
+    result = (sum_a+sum_b+c_coeffs[0]*l_phi+c_coeffs[1]*l_theta+c_coeffs[2]*phi*l_phi+
+              c_coeffs[3]*phi*l_theta+d1_value+d2_value+d3_value)
+    return result
 
 def interpolated_moon_disk_reflectance(
     absolute_mpa_degrees: float,

@@ -58,9 +58,10 @@ def calculate_eli(
     dom = moon_data.distance_observer_moon
     distance_earth_moon_km: int = 384400
 
-    lunar_irr = (
-        ((a_l * omega * esk) / math.pi)
-        * ((1 / dsm) ** 2)
-        * (distance_earth_moon_km / dom) ** 2
-    )
+    lunar_irr = measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom)
+    return lunar_irr
+
+def measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom):
+
+    lunar_irr = (((a_l*omega*esk)/math.pi)*((1/dsm)**2)*(distance_earth_moon_km/dom)**2)
     return lunar_irr
