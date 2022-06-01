@@ -61,7 +61,7 @@ def _ln_moon_disk_reflectance(
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
-    gd_value = moon_data.absolute_mpa_degrees,
+    gd_value = moon_data.absolute_mpa_degrees
     gr_value = math.radians(gd_value)
 
     result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
