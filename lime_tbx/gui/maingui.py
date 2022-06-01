@@ -321,10 +321,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             Union[List[float], List[List[float]]],
             SpectralResponseFunction,
+            List[float],
+            Union[List[float],List[List[float]]],
+            Union[List[float],List[List[float]]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -356,10 +359,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
+            List[float],
+            Union[List[float],List[List[float]]],
+            Union[List[float],List[List[float]]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[0], data[1], data[2], data[3], data[4], data[5])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -391,10 +397,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
+            List[float],
+            Union[List[float], List[List[float]]],
+            Union[List[float], List[List[float]]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[0], data[1], data[2], data[3], data[4], data[5])
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
