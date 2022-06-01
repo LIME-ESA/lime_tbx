@@ -119,6 +119,7 @@ def eli_callback(
     ch_irrs = rs.integrate_elis(srf, elis_srf)
 
     wlen_cimel=cimel_data.wavelength.values
+    print(wlen_cimel)
     coeff_cimel=cimel_data.coeff.values
     u_coeff_cimel=cimel_data.u_coeff.values
     elis_cimel=eli.calculate_eli_band(wlen_cimel, md, coeff_cimel)
