@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import Union, List
+from typing import Union, List, Tuple
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -46,6 +46,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.ylabel = ylabel
         self.x_data = []
         self.y_data = []
+        self.legend = []
         self._build_layout()
 
     def _build_layout(self):
@@ -86,7 +87,10 @@ class GraphWidget(QtWidgets.QWidget):
         self,
         x_data: Union[List[float], List[List[float]]],
         y_data: Union[List[float], List[List[float]]],
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        point: Tuple[
+            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            List[Union[SurfacePoint, CustomPoint, SatellitePoint]],
+        ],
     ):
         self.x_data = x_data
         self.y_data = y_data
@@ -101,6 +105,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
+        self._redraw()
+
+    def update_legend(self, legend: List[str]):
+        self.legend = legend
         self._redraw()
 
     def update_size(self):
@@ -128,6 +136,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
+        if len(self.legend) > 0:
+            self.canvas.axes.legend(self.legend)
         try:
             self.canvas.fig.tight_layout()
         except:
@@ -170,9 +180,24 @@ class GraphWidget(QtWidgets.QWidget):
         self.disable_buttons(True)
         if name is not None and name != "":
             try:
-                csv.export_csv(
-                    self.x_data, self.y_data, self.xlabel, self.ylabel, self.point, name
-                )
+                if isinstance(self.point, list):
+                    csv.export_csv_comparation(
+                        self.x_data,
+                        self.y_data,
+                        self.xlabel,
+                        self.ylabel,
+                        self.point,
+                        name,
+                    )
+                else:
+                    csv.export_csv(
+                        self.x_data,
+                        self.y_data,
+                        self.xlabel,
+                        self.ylabel,
+                        self.point,
+                        name,
+                    )
             except Exception as e:
                 self.show_error(str(e))
         self.disable_buttons(False)
@@ -353,8 +378,11 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.channels.pop(index)
                 self.ch_names.pop(index)
 
-    def update_plot(self, index, x_data, y_data):
-        self.channels[index].update_plot(x_data, y_data, None)
+    def update_plot(self, index: int, x_data: list, y_data: list, points: list):
+        self.channels[index].update_plot(x_data, y_data, points)
 
-    def update_labels(self, index, title, xlabel, ylabel):
+    def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
         self.channels[index].update_labels(title, xlabel, ylabel)
+
+    def update_legends(self, index: int, legends: List[str]):
+        self.channels[index].update_legend(legends)
