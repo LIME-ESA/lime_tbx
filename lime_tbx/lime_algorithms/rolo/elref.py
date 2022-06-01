@@ -104,8 +104,8 @@ def _ln_moon_disk_reflectance(
     gd_value = absolute_mpa_degrees
     gr_value = math.radians(gd_value)
     phi = moon_data.long_sun_radians
-    a_coeffs: List[float] = coeffs.get_coefficients_a()
-    b_coeffs: List[float] = coeffs.get_coefficients_b()
+    a_coeffs: List[float] = coeffs.get_coefficients_a(wavelength_nm)
+    b_coeffs: List[float] = coeffs.get_coefficients_b(wavelength_nm)
     c_coeffs: List[float] = coeffs.get_coefficients_c()
     d_coeffs: List[float] = coeffs.get_coefficients_d(wavelength_nm)
     p_coeffs: List[float] = coeffs.get_coefficients_p()
