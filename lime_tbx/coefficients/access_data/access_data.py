@@ -146,7 +146,7 @@ def _get_coefficients_data() -> Dict[float, IrradianceCoefficients.CoefficientsW
 
 def _get_default_cimel_data() -> xarray.Dataset:
     # define dim_size_dict to specify size of arrays
-    dim_sizes = {"wavelength":6,"y":18,}
+    dim_sizes = {"wavelength":6,"i_coeff":18,}
     # create dataset
     ds_cimel = obsarray.create_ds(template_cimel,dim_sizes)
 
