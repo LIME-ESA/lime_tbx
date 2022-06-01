@@ -123,7 +123,7 @@ def eli_callback(
     coeff_cimel=cimel_data.coeff.values
     u_coeff_cimel=cimel_data.u_coeff.values
     elis_cimel=eli.calculate_eli_band(wlen_cimel, md, coeff_cimel)
-    u_elis_cimel=elis_cimel/20.
+    u_elis_cimel=eli.calculate_eli_band_unc(wlen_cimel, md, coeff_cimel, u_coeff_cimel)
     return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
 
 
@@ -157,7 +157,9 @@ def elref_callback(
     elrefs_cimel = elref.band_moon_disk_reflectance(
                     wlen_cimel,md,coeff_cimel
                 )
-    u_elrefs_cimel = elrefs_cimel/20.
+    u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(
+                    wlen_cimel,md,coeff_cimel,u_coeff_cimel
+                )
     return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel
 
 

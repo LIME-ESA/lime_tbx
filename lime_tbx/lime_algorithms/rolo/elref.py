@@ -13,6 +13,7 @@ from typing import List
 
 """___Third-Party Modules___"""
 import numpy as np
+import punpy
 
 """___LIME Modules___"""
 from ...datatypes.datatypes import MoonData, IrradianceCoefficients
@@ -62,12 +63,64 @@ def band_moon_disk_reflectance(
     gd_value = moon_data.absolute_mpa_degrees
     gr_value = math.radians(gd_value)
 
-    result = np.exp(measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value))
-    print(result)
+    result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
 
     return result
 
-def _ln_moon_disk_reflectance(
+def band_moon_disk_reflectance_unc(
+    wavelength_nm: float,
+    moon_data: MoonData,
+    coeffs: np.ndarray,
+    u_coeffs: np.ndarray,
+) -> np.ndarray:
+    """The calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
+    Roman et al., 2020
+
+    If the wavelength has no associated ROLO coefficients, it uses some linearly interpolated
+    ones.
+
+    Parameters
+    ----------
+    wavelength_nm : float
+        Wavelength in nanometers from which one wants to obtain the MDR.
+    moon_data : MoonData
+        Moon data needed to calculate Moon's irradiance
+    coeffs : IrradianceCoefficients
+        Needed coefficients for the simulation.
+
+    Returns
+    -------
+    float
+        The ln of the reflectance of the Moon's disk for the inputed data
+    """
+
+    a_coeffs = coeffs[0:4,:]
+    b_coeffs = coeffs[4:7,:]
+    c_coeffs = coeffs[7:11,:]
+    d_coeffs = coeffs[11:14,:]
+    p_coeffs = coeffs[14::,:]
+
+    u_a_coeffs = u_coeffs[0:4,:]
+    u_b_coeffs = u_coeffs[4:7,:]
+    u_c_coeffs = u_coeffs[7:11,:]
+    u_d_coeffs = u_coeffs[11:14,:]
+    u_p_coeffs = u_coeffs[14::,:]
+
+    phi = moon_data.long_sun_radians
+    l_theta = moon_data.lat_obs
+    l_phi = moon_data.long_obs
+    gd_value = moon_data.absolute_mpa_degrees
+    gr_value = math.radians(gd_value)
+
+    prop=punpy.MCPropagation(1000)
+
+    unc = prop.propagate_random(measurement_func_elref,
+                                   [a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value],
+                                   [u_a_coeffs,u_b_coeffs,u_c_coeffs,u_d_coeffs,u_p_coeffs,None,None,None,None,None])
+
+    return unc
+
+def _moon_disk_reflectance(
     wavelength_nm: float,
     moon_data: MoonData,
     coeffs: IrradianceCoefficients,
@@ -119,7 +172,7 @@ def measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_ph
     sum_b: float = np.sum([b_coeffs[j]*phi**(2*(j+1)-1) for j in range(len(b_coeffs))],axis=0)
     result = (sum_a+sum_b+c_coeffs[0]*l_phi+c_coeffs[1]*l_theta+c_coeffs[2]*phi*l_phi+
               c_coeffs[3]*phi*l_theta+d1_value+d2_value+d3_value)
-    return result
+    return np.exp(result)
 
 def interpolated_moon_disk_reflectance(
     wavelength_nm: float,
@@ -161,11 +214,9 @@ def interpolated_moon_disk_reflectance(
     if wavelength_nm in wvlens:
         apollo_i = wvlens.index(wavelength_nm)
         return (
-            math.exp(
-                _ln_moon_disk_reflectance(
+                _moon_disk_reflectance(
                     wavelength_nm, moon_data, coeffs
                 )
-            )
             * apollo_coeffs[apollo_i]
         )
     near_left = -math.inf
@@ -180,18 +231,18 @@ def interpolated_moon_disk_reflectance(
     right_index = wvlens.index(x_values[1])
     y_values = []
     y_values.append(
-        math.exp(
-            _ln_moon_disk_reflectance(
+
+            _moon_disk_reflectance(
                 x_values[0], moon_data, coeffs
-            )
+
         )
         * apollo_coeffs[left_index]
     )
     y_values.append(
-        math.exp(
-            _ln_moon_disk_reflectance(
+
+            _moon_disk_reflectance(
                 x_values[1], moon_data, coeffs
-            )
+
         )
         * apollo_coeffs[right_index]
     )
