@@ -25,6 +25,7 @@ from ..datatypes.datatypes import (
 )
 from ..eocfi_adapter import eocfi_adapter
 import lime_tbx.lime_algorithms.rolo.eli as eli
+import xarray
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
