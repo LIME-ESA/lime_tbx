@@ -37,8 +37,6 @@ def _ln_moon_disk_reflectance(
 
     Parameters
     ----------
-    absolute_mpa_degrees : float
-        Absolute Moon phase angle (in degrees)
     wavelength_nm : float
         Wavelength in nanometers from which one wants to obtain the MDR.
     moon_data : MoonData
@@ -142,7 +140,7 @@ def interpolated_moon_disk_reflectance(
     y_values.append(
         math.exp(
             _ln_moon_disk_reflectance(
-                absolute_mpa_degrees, x_values[0], moon_data, coeffs
+                x_values[0], moon_data, coeffs
             )
         )
         * apollo_coeffs[left_index]
@@ -150,7 +148,7 @@ def interpolated_moon_disk_reflectance(
     y_values.append(
         math.exp(
             _ln_moon_disk_reflectance(
-                absolute_mpa_degrees, x_values[1], moon_data, coeffs
+                x_values[1], moon_data, coeffs
             )
         )
         * apollo_coeffs[right_index]
