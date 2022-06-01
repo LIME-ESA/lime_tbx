@@ -12,6 +12,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
 from ..simulation.regular_simulation import regular_simulation
+from ..simulation.common.common import CommonSimulation
 from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
@@ -23,6 +24,7 @@ from ..datatypes.datatypes import (
     CustomPoint,
 )
 from ..eocfi_adapter import eocfi_adapter
+import lime_tbx.lime_algorithms.rolo.eli as eli
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -54,6 +56,7 @@ def eli_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
+    cimel_data: xarray,
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[
@@ -96,11 +99,13 @@ def eli_callback(
     elis: Union[List[float], List[List[float]]] = []
     elis_srf: Union[List[float], List[List[float]]] = []
     if isinstance(point, SurfacePoint):
-        elis = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path)
-        elis_srf = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
+        md=rs.get_md_from_surface(point, kernels_path)
+        elis = CommonSimulation.get_eli_from_md(def_srf, md, coeffs)
+        elis_srf = CommonSimulation.get_eli_from_md(srf, md, coeffs)
     elif isinstance(point, CustomPoint):
-        elis = rs.get_eli_from_custom(def_srf, point, coeffs)
-        elis_srf = rs.get_eli_from_custom(srf, point, coeffs)
+        md = rs.get_md_from_custom(point)
+        elis = CommonSimulation.get_eli_from_md(def_srf,md,coeffs)
+        elis_srf = CommonSimulation.get_eli_from_md(srf,md,coeffs)
     else:
         elis = es.get_eli_from_satellite(
             def_srf, point, coeffs, kernels_path, eocfi_path
@@ -111,8 +116,11 @@ def eli_callback(
     wlens = def_srf.get_wavelengths()
     ch_irrs = rs.integrate_elis(srf, elis_srf)
 
-    wlen_cimel
-
+    wlen_cimel=cimel_data.wavelength.values
+    coeff_cimel=cimel_data.coeff.values
+    u_coeff_cimel=cimel_data.u_coeff.values
+    elis_cimel=eli.calculate_eli(wlen_cimel, md, coeff_cimel)
+    u_elis_cimel=elis_cimel/20.
     return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
 
 
