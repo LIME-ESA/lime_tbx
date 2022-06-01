@@ -25,7 +25,6 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 def _ln_moon_disk_reflectance(
-    absolute_mpa_degrees: float,
     wavelength_nm: float,
     moon_data: MoonData,
     coeffs: IrradianceCoefficients,
@@ -62,8 +61,7 @@ def _ln_moon_disk_reflectance(
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
-
-    gd_value = absolute_mpa_degrees
+    gd_value = moon_data.absolute_mpa_degrees,
     gr_value = math.radians(gd_value)
 
     result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
@@ -84,7 +82,6 @@ def measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_ph
     return result
 
 def interpolated_moon_disk_reflectance(
-    absolute_mpa_degrees: float,
     wavelength_nm: float,
     moon_data: "MoonData",
     coeffs: IrradianceCoefficients,
@@ -97,8 +94,6 @@ def interpolated_moon_disk_reflectance(
 
     Parameters
     ----------
-    absolute_mpa_degrees : float
-        Absolute Moon phase angle (in degrees)
     wavelength_nm : float
         Wavelength in nanometers from which one wants to obtain the MDR.
     moon_data : 'MoonData'
@@ -115,12 +110,12 @@ def interpolated_moon_disk_reflectance(
     if wavelength_nm < wvlens[0]:
         # The extrapolation done is "nearest"
         return interpolated_moon_disk_reflectance(
-            absolute_mpa_degrees, wvlens[0], moon_data, coeffs
+            wvlens[0], moon_data, coeffs
         )
     if wavelength_nm > wvlens[-1]:
         # The extrapolation done is "nearest"
         return interpolated_moon_disk_reflectance(
-            absolute_mpa_degrees, wvlens[-1], moon_data, coeffs
+            wvlens[-1], moon_data, coeffs
         )
     apollo_coeffs = coeffs.get_apollo_coefficients()
     if wavelength_nm in wvlens:
@@ -128,7 +123,7 @@ def interpolated_moon_disk_reflectance(
         return (
             math.exp(
                 _ln_moon_disk_reflectance(
-                    absolute_mpa_degrees, wavelength_nm, moon_data, coeffs
+                    wavelength_nm, moon_data, coeffs
                 )
             )
             * apollo_coeffs[apollo_i]
@@ -186,5 +181,6 @@ def calculate_elref(
         The extraterrestrial lunar reflectance calculated, in fraction of unity.
     """
     return interpolated_moon_disk_reflectance(
-        moon_data.absolute_mpa_degrees, wavelength_nm, moon_data, coefficients
+        wavelength_nm, moon_data, coefficients
     )
+

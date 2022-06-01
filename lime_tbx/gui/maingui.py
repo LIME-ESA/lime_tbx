@@ -110,7 +110,10 @@ def eli_callback(
         )
     wlens = def_srf.get_wavelengths()
     ch_irrs = rs.integrate_elis(srf, elis_srf)
-    return wlens, elis, point, ch_irrs, srf
+
+    wlen_cimel
+
+    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
 
 
 def elref_callback(
@@ -133,7 +136,7 @@ def elref_callback(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = srf.get_wavelengths()
-    return wlens, elrefs, point
+    return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel
 
 
 def polar_callback(
