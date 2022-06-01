@@ -24,55 +24,6 @@ __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
-
-def _summatory_a(
-    wavelength_nm: float, gr_value: float, coeffs: IrradianceCoefficients
-) -> float:
-    """The first summatory of Eq. 2 in Roman et al., 2020
-
-    Parameters
-    ----------
-    wavelength_nm : float
-        Wavelength in nanometers from which the moon's disk reflectance is being calculated
-    gr_value : float
-        Absolute value of MPA in radians
-    coeffs : IrradianceCoefficients
-        Needed coefficients for the simulation.
-
-    Returns
-    -------
-    float
-        Result of the computation of the first summatory
-    """
-
-
-
-def _summatory_b(
-    wavelength_nm: float, phi: float, coeffs: IrradianceCoefficients
-) -> float:
-    """The second summatory of Eq. 2 in Roman et al., 2020, without the erratum
-
-    Parameters
-    ----------
-    wavelength_nm : float
-        Wavelength from which the moon's disk reflectance is being calculated
-    phi : float
-        Selenographic longitude of the Sun (in radians)
-    coeffs : IrradianceCoefficients
-        Needed coefficients for the simulation.
-
-    Returns
-    -------
-    float
-        Result of the computation of the second summatory
-    """
-    count: float = 0.0
-    b_coeffs: List[float] = coeffs.get_coefficients_b(wavelength_nm)
-    for j, b_value in enumerate(b_coeffs):
-        count = count + b_value * phi ** (2 * (j + 1) - 1)
-    return count
-
-
 def _ln_moon_disk_reflectance(
     absolute_mpa_degrees: float,
     wavelength_nm: float,
@@ -101,18 +52,22 @@ def _ln_moon_disk_reflectance(
     float
         The ln of the reflectance of the Moon's disk for the inputed data
     """
-    gd_value = absolute_mpa_degrees
-    gr_value = math.radians(gd_value)
-    phi = moon_data.long_sun_radians
+
     a_coeffs: List[float] = coeffs.get_coefficients_a(wavelength_nm)
     b_coeffs: List[float] = coeffs.get_coefficients_b(wavelength_nm)
     c_coeffs: List[float] = coeffs.get_coefficients_c()
     d_coeffs: List[float] = coeffs.get_coefficients_d(wavelength_nm)
     p_coeffs: List[float] = coeffs.get_coefficients_p()
+
+    phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
 
+    gd_value = absolute_mpa_degrees
+    gr_value = math.radians(gd_value)
+
     result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
+
     return result
 
 
@@ -120,12 +75,10 @@ def measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_ph
     d1_value = d_coeffs[0]*math.exp(-gd_value/p_coeffs[0])
     d2_value = d_coeffs[1]*math.exp(-gd_value/p_coeffs[1])
     d3_value = d_coeffs[2]*math.cos((gd_value-p_coeffs[2])/p_coeffs[3])
-    sum_a: float = 0.0
-    for i,a_value in enumerate(a_coeffs):
-        sum_a = sum_a+a_value*gr_value**i
-    sum_b: float = 0.0
-    for j,b_value in enumerate(b_coeffs):
-        sum_b = sum_b+b_value*phi**(2*(j+1)-1)
+
+    sum_a: float = np.sum([a_coeffs[i]*gr_value**i for i in range(len(a_coeffs))])
+    sum_b: float = np.sum([b_coeffs[j]*phi**(2*(j+1)-1) for j in range(len(b_coeffs))])
+
     result = (sum_a+sum_b+c_coeffs[0]*l_phi+c_coeffs[1]*l_theta+c_coeffs[2]*phi*l_phi+
               c_coeffs[3]*phi*l_theta+d1_value+d2_value+d3_value)
     return result

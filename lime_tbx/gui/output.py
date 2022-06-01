@@ -45,7 +45,11 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.x_data = []
+        self.x_data_CIMEL = []
         self.y_data = []
+        self.y_data_CIMEL = []
+        self.u_y_data = []
+        self.u_y_data_CIMEL = []
         self._build_layout()
 
     def _build_layout(self):
@@ -125,6 +129,10 @@ class GraphWidget(QtWidgets.QWidget):
                 self.canvas.axes.plot(self.x_data, yd, marker=marker)
         else:
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
+
+        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, marker="o")
+        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL)
+
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
