@@ -322,7 +322,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, self.kernels_path, self.eocfi_path],
+            [def_srf, srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -361,8 +361,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         point = self.input_widget.get_point()
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
+        cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            elref_callback, [def_srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
