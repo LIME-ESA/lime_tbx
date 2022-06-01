@@ -25,6 +25,7 @@ from ..datatypes.datatypes import (
 )
 from ..eocfi_adapter import eocfi_adapter
 import lime_tbx.lime_algorithms.rolo.eli as eli
+import lime_tbx.lime_algorithms.rolo.elref as elref
 import xarray
 
 """___Authorship___"""
@@ -129,22 +130,33 @@ def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
+    cimel_data: xarray.Dataset,
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
     if isinstance(point, SurfacePoint):
+        md=rs.get_md_from_surface(point, kernels_path)
         elrefs: List[float] = rs.get_elref_from_surface(
             srf, point, coeffs, kernels_path
         )
     elif isinstance(point, CustomPoint):
+        md = rs.get_md_from_custom(point)
         elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
     else:
         elrefs: List[float] = es.get_elref_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = srf.get_wavelengths()
+
+    wlen_cimel = cimel_data.wavelength.values
+    coeff_cimel = cimel_data.coeff.values
+    u_coeff_cimel = cimel_data.u_coeff.values
+    elrefs_cimel = elref.band_moon_disk_reflectance(
+                    wlen_cimel,md,coeff_cimel
+                )
+    u_elrefs_cimel = elrefs_cimel/20.
     return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel
 
 
@@ -417,7 +429,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[3], data[4], data[5])
+        self.graph.update_plot(data[0], data[1], data[2], data[3])
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",

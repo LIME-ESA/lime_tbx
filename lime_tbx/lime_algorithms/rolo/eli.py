@@ -85,11 +85,10 @@ def calculate_eli_band(
     float
         The extraterrestrial lunar irradiance calculated
     """
-    a_l = np.exp(
-                elref.band_moon_disk_reflectance(
+    a_l = elref.band_moon_disk_reflectance(
                     wavelength_nm, moon_data, coefficients
                 )
-            )
+
 
     solid_angle_moon: float = 6.4177e-05
     omega = solid_angle_moon
