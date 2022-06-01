@@ -133,12 +133,14 @@ class GraphWidget(QtWidgets.QWidget):
             and not isinstance(self.x_data[0], list)
         ):
             for yd in self.y_data:
-                self.canvas.axes.plot(self.x_data, yd, marker=marker)
+                self.canvas.axes.plot(self.x_data, yd, marker=marker, label="Kieffer and Stone 2005")
         else:
-            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
+            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
 
-        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, marker="o")
-        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL)
+        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, marker="o",label="CIMEL data points")
+        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, ls='none',label="errorbars * 10")
+
+        self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
