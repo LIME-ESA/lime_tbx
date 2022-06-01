@@ -344,6 +344,15 @@ class ComparisonOutput(QtWidgets.QWidget):
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
 
+    def remove_channels(self, channels: List[str]):
+        for ch_name in channels:
+            if ch_name in self.ch_names:
+                index = self.ch_names.index(ch_name)
+                self.channel_tabs.removeTab(index)
+                self.channels[index].setParent(None)
+                self.channels.pop(index)
+                self.ch_names.pop(index)
+
     def update_plot(self, index, x_data, y_data):
         self.channels[index].update_plot(x_data, y_data, None)
 

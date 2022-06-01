@@ -11,8 +11,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
-    MoonCapture,
-    MoonObservation,
+    LunarObservation,
     SatellitePosition,
 )
 from ..datatypes import constants
@@ -43,7 +42,7 @@ def read_moon_obs(path: str):
     ds = nc.Dataset(path)
     n_channels = len(ds["channel_name"])
     ch_names = []
-    ch_irrs = []
+    ch_irrs = {}
     for i in range(n_channels):
         is_full = isinstance(ds["channel_name"][i].mask, np.bool_)
         ch_name = str(ds["channel_name"][i].data, "utf-8")
@@ -51,24 +50,11 @@ def read_moon_obs(path: str):
             end = list(ds["channel_name"][i].mask).index(True)
             ch_name = ch_name[:end]
         ch_names.append(ch_name)
-        ch_irrs.append([])
-    n_dates = len(ds["date"])
-    dates: List[datetime] = []
-    for i in range(n_dates):
-        dates.append(datetime.fromtimestamp(float(ds["date"][i].data)))
+    dt = datetime.fromtimestamp(float(ds["date"][0].data))
     sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
-    sat_positions = ds["sat_pos"][:]
-    if len(ds["sat_pos"].shape) == 1:
-        sat_positions = [sat_positions]
+    sat_pos = SatellitePosition(*list(map(float, ds["sat_pos"][:][:].data)))
     irr_obs = ds["irr_obs"][:]
-    if n_dates == 1:
-        irr_obs = [irr_obs]
-    positions = []
-    for i, dt_irrs in enumerate(irr_obs):
-        satpos = SatellitePosition(*list(map(float, sat_positions[i][:].data)))
-        positions.append(satpos)
-        dt = dates[i]
-        for j, ch_irr in enumerate(dt_irrs):
-            if not isinstance(ch_irr, np.ma.core.MaskedConstant):
-                ch_irrs[j].append(MoonCapture(float(ch_irr), dt, satpos))
-    return MoonObservation(ch_names, sat_pos_ref, ch_irrs, dates, positions)
+    for i, ch_irr in enumerate(irr_obs):
+        if not isinstance(ch_irr, np.ma.core.MaskedConstant):
+            ch_irrs[ch_names[i]] = float(ch_irr)
+    return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)

@@ -12,7 +12,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
-    MoonObservation,
+    LunarObservation,
     Satellite,
     SpectralResponseFunction,
     SurfacePoint,
@@ -402,5 +402,5 @@ class ComparisonInput(QtWidgets.QWidget):
     def get_srf(self) -> SpectralResponseFunction:
         return self.loaded_srf
 
-    def get_moon_obs(self) -> MoonObservation:
-        return self.loaded_moon
+    def get_moon_obs(self) -> List[LunarObservation]:
+        return [self.loaded_moon]  # change this

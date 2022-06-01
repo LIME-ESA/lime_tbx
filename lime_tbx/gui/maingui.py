@@ -186,18 +186,28 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def compare(self):
         co = comparison.Comparison()
-        mo = self.input.get_moon_obs()
+        mos = self.input.get_moon_obs()
         srf = self.input.get_srf()
-        if not mo.check_valid_srf(srf):
-            raise Exception("SRF file not valid for the chosen Moon observations file.")
+        for mo in mos:
+            if not mo.check_valid_srf(srf):
+                raise Exception(
+                    "SRF file not valid for the chosen Moon observations file."
+                )
         coeffs = self.settings_manager.get_irr_coeffs()
-        irrs = co.get_simulations(mo, srf, coeffs, self.kernels_path)
-        self.output.set_channels(mo.ch_names)
-        for i, ch in enumerate(mo.ch_names):
-            obs_irrs = [v.irradiance for v in mo.ch_irrs[i]]
-            ch_dates = [v.dt for v in mo.ch_irrs[i]]
-            if len(obs_irrs) > 0:
-                self.output.update_plot(i, ch_dates, [obs_irrs, irrs[i]])
+        irrs, dts = co.get_simulations(mos, srf, coeffs, self.kernels_path)
+        ch_names = srf.get_channels_names()
+        self.output.set_channels(ch_names)
+        to_remove = []
+        for i, ch in enumerate(ch_names):
+            obs_irrs = []
+            for mo in mos:
+                if mo.has_ch_value(ch):
+                    obs_irrs.append(mo.ch_irrs[ch])
+            if len(dts[i]) > 0:
+                self.output.update_plot(i, dts[i], [obs_irrs, irrs[i]])
+            else:
+                to_remove.append(ch)
+        self.output.remove_channels(to_remove)
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):
