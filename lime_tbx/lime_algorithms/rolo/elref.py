@@ -62,6 +62,7 @@ def band_moon_disk_reflectance(
     gd_value = moon_data.absolute_mpa_degrees
     gr_value = math.radians(gd_value)
 
+    print(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
     result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
     print(result)
 
