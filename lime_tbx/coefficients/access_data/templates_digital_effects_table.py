@@ -4,7 +4,7 @@ import numpy as np
 template_cimel = {
     "coeff": {
         "dtype": np.float32,
-        "dim": ["wavelength","i_coeff"],
+        "dim": ["i_coeff","wavelength"],
         "attrs": {
             "units": [],
             "u_components": ["u_coeff"]
@@ -12,7 +12,7 @@ template_cimel = {
     },
     "u_coeff": {
         "dtype": np.int16,
-        "dim": ["wavelength","i_coeff"],
+        "dim": ["i_coeff","wavelength"],
         "attrs": {"units": "%"},
         "err_corr": [
             {

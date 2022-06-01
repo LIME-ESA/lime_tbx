@@ -157,7 +157,7 @@ def _get_default_cimel_data() -> xarray.Dataset:
     data=np.genfromtxt(os.path.join(current_dir,"assets/coefficients_cimel.csv"),delimiter=",")
     u_data=np.genfromtxt(os.path.join(current_dir,"assets/u_coefficients_cimel.csv"),delimiter=",")
     print(data)
-    ds_cimel.coeff.values=data
-    ds_cimel.u_coeff.values=u_data
+    ds_cimel.coeff.values=data.T
+    ds_cimel.u_coeff.values=u_data.T
     return ds_cimel
 
