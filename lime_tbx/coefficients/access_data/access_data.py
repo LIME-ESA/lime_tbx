@@ -9,12 +9,17 @@ from io import StringIO
 
 """___Third-Party Modules___"""
 # import here
+import xarray
+import obsarray
+import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
     IrradianceCoefficients,
     PolarizationCoefficients,
 )
+
+from lime_tbx.coefficients.access_data.templates_digital_effects_table import template_cimel
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -138,3 +143,19 @@ def _get_coefficients_data() -> Dict[float, IrradianceCoefficients.CoefficientsW
         data[float(row[0])] = IrradianceCoefficients.CoefficientsWln(coeffs)
     file.close()
     return data
+
+def _get_default_cimel_data() -> xarray.Dataset:
+    # define dim_size_dict to specify size of arrays
+    dim_sizes = {"wavelength":6,"y":18,}
+    # create dataset
+    ds_cimel = obsarray.create_ds(template_cimel,dim_sizes)
+
+    ds_cimel.assign_coords(wavelength=[440,500,675,870,1020,1640])
+
+    data=np.genfromtxt("assets/coefficients_cimel.csv",delimiter=",")
+    u_data=np.genfromtxt("assets/u_coefficients_cimel.csv",delimiter=",")
+    print(data)
+    ds_cimel.coeff.values=data
+    ds_cimel.u_coeff.values=u_data
+    return ds_cimel
+

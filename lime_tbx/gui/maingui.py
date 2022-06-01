@@ -319,6 +319,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
+        cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
             eli_callback,
             [def_srf, srf, point, coeffs, self.kernels_path, self.eocfi_path],
