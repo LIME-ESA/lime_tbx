@@ -6,6 +6,7 @@ from typing import Dict
 import pkgutil
 import csv
 from io import StringIO
+import os
 
 """___Third-Party Modules___"""
 # import here
@@ -152,8 +153,9 @@ def _get_default_cimel_data() -> xarray.Dataset:
 
     ds_cimel.assign_coords(wavelength=[440,500,675,870,1020,1640])
 
-    data=np.genfromtxt("assets/coefficients_cimel.csv",delimiter=",")
-    u_data=np.genfromtxt("assets/u_coefficients_cimel.csv",delimiter=",")
+    current_dir=os.path.dirname(os.path.abspath(__file__))
+    data=np.genfromtxt(os.path.join(current_dir,"assets/coefficients_cimel.csv"),delimiter=",")
+    u_data=np.genfromtxt(os.path.join(current_dir,"assets/u_coefficients_cimel.csv"),delimiter=",")
     print(data)
     ds_cimel.coeff.values=data
     ds_cimel.u_coeff.values=u_data
