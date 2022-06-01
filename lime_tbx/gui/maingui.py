@@ -430,7 +430,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[3])
+        self.graph.update_plot(data[0], data[1], data[2])
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
