@@ -151,7 +151,7 @@ def _get_default_cimel_data() -> xarray.Dataset:
     # create dataset
     ds_cimel = obsarray.create_ds(template_cimel,dim_sizes)
 
-    ds_cimel.assign_coords(wavelength=[440,500,675,870,1020,1640])
+    ds_cimel=ds_cimel.assign_coords(wavelength=[440,500,675,870,1020,1640])
 
     current_dir=os.path.dirname(os.path.abspath(__file__))
     data=np.genfromtxt(os.path.join(current_dir,"assets/coefficients_cimel.csv"),delimiter=",")
