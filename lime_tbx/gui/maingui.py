@@ -16,6 +16,7 @@ from ..simulation.common.common import CommonSimulation
 from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
+    LunarObservation,
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
@@ -186,6 +187,38 @@ def polar_callback(
     return wlens, polars, point
 
 
+def compare_callback(
+    mos: List[LunarObservation],
+    srf: SpectralResponseFunction,
+    coeffs: IrradianceCoefficients,
+    kernels_path: str,
+):
+    co = comparison.Comparison()
+    for mo in mos:
+        if not mo.check_valid_srf(srf):
+            raise ("SRF file not valid for the chosen Moon observations file.")
+    irrs, dts, sps = co.get_simulations(mos, srf, coeffs, kernels_path)
+    return irrs, dts, sps, mos, srf
+
+
+def _start_thread(
+    worker: CallbackWorker,
+    worker_th: QtCore.QThread,
+    finished: Callable,
+    error: Callable,
+):
+    worker.moveToThread(worker_th)
+    worker_th.started.connect(worker.run)
+    worker.finished.connect(worker_th.quit)
+    worker.finished.connect(worker.deleteLater)
+    worker.finished.connect(finished)
+    worker.exception.connect(worker_th.quit)
+    worker.exception.connect(worker.deleteLater)
+    worker.exception.connect(error)
+    worker_th.finished.connect(worker_th.deleteLater)
+    worker_th.start()
+
+
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
@@ -201,27 +234,61 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.input = input.ComparisonInput()
+        self.input = input.ComparisonInput(self._callback_compare_input_changed)
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
+        self.compare_button.setDisabled(True)
         self.output = output.ComparisonOutput()
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
         self.main_layout.addWidget(self.output)
 
+    def _callback_compare_input_changed(self):
+        obss = self.input.get_moon_obs()
+        srf = self.input.get_srf()
+        if len(obss) == 0 or srf == None:
+            self.compare_button.setDisabled(True)
+        else:
+            self.compare_button.setDisabled(False)
+
+    def _start_thread(self, finished: Callable, error: Callable):
+        self.worker_th = QtCore.QThread()
+        _start_thread(self.worker, self.worker_th, finished, error)
+
+    def _unblock_gui(self):
+        self.parentWidget().setDisabled(False)
+
+    def _block_gui_loading(self):
+        self.parentWidget().setDisabled(True)
+
     @QtCore.Slot()
     def compare(self):
-        co = comparison.Comparison()
+        self._block_gui_loading()
         mos = self.input.get_moon_obs()
         srf = self.input.get_srf()
-        for mo in mos:
-            if not mo.check_valid_srf(srf):
-                raise Exception(
-                    "SRF file not valid for the chosen Moon observations file."
-                )
         coeffs = self.settings_manager.get_irr_coeffs()
-        irrs, dts = co.get_simulations(mos, srf, coeffs, self.kernels_path)
+        self.worker = CallbackWorker(
+            compare_callback,
+            [mos, srf, coeffs, self.kernels_path],
+        )
+        self._start_thread(self.compare_finished, self.compare_error)
+
+    def compare_finished(
+        self,
+        data: Tuple[
+            List[List[float]],
+            List[List[datetime]],
+            List[List[SurfacePoint]],
+            List[LunarObservation],
+            SpectralResponseFunction,
+        ],
+    ):
+        irrs = data[0]
+        dts = data[1]
+        sps = data[2]
+        mos = data[3]
+        srf = data[4]
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         to_remove = []
@@ -231,10 +298,23 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 if mo.has_ch_value(ch):
                     obs_irrs.append(mo.ch_irrs[ch])
             if len(dts[i]) > 0:
-                self.output.update_plot(i, dts[i], [obs_irrs, irrs[i]])
+                self.output.update_plot(i, dts[i], [obs_irrs, irrs[i]], sps[i])
+                self.output.update_labels(
+                    i,
+                    "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
+                    "datetimes",
+                    "Signal (Wm⁻²nm⁻¹)",
+                )
+                self.output.update_legends(i, ["Observed Signal", "Simulated Signal"])
             else:
                 to_remove.append(ch)
         self.output.remove_channels(to_remove)
+        self._unblock_gui()
+
+    def compare_error(self, error: Exception):
+        self._unblock_gui()
+        error_dialog = QtWidgets.QErrorMessage(self)
+        error_dialog.showMessage(str(error))
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):
@@ -306,16 +386,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
-        self.worker.moveToThread(self.worker_th)
-        self.worker_th.started.connect(self.worker.run)
-        self.worker.finished.connect(self.worker_th.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.worker.finished.connect(finished)
-        self.worker.exception.connect(self.worker_th.quit)
-        self.worker.exception.connect(self.worker.deleteLater)
-        self.worker.exception.connect(error)
-        self.worker_th.finished.connect(self.worker_th.deleteLater)
-        self.worker_th.start()
+        _start_thread(self.worker, self.worker_th, finished, error)
 
     @QtCore.Slot()
     def lower_tabs_changed(self, i: int):

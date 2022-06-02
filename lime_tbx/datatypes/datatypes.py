@@ -136,6 +136,9 @@ class SpectralResponseFunction:
     def get_channels_names(self) -> List[str]:
         return [ch.id for ch in self.channels]
 
+    def get_channel_from_name(self, name: str) -> SRFChannel:
+        return [ch for ch in self.channels if ch.id == name][0]
+
 
 @dataclass
 class SurfacePoint:
