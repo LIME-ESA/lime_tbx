@@ -7,6 +7,7 @@ from typing import List
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 import numpy as np
+import xarray
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
@@ -66,6 +67,11 @@ class ISettingsManager(ABC):
         """Obtain a list with all the SRFS the user can choose"""
         pass
 
+    @abstractmethod
+    def get_cimel_data(self) -> xarray.Dataset:
+        """Obtain an xarray DataSet with the CIMEL coefficients and uncertainties"""
+        pass
+
 class MockSettingsManager(ISettingsManager):
     def __init__(self):
         # generate an arbitrary default srf
@@ -99,3 +105,6 @@ class MockSettingsManager(ISettingsManager):
 
     def get_available_srfs(self) -> List[SpectralResponseFunction]:
         return self.srfs
+
+    def get_cimel_data(self) -> xarray.Dataset:
+        return access_data._get_default_cimel_data()

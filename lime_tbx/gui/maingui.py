@@ -12,6 +12,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
 from ..simulation.regular_simulation import regular_simulation
+from ..simulation.common.common import CommonSimulation
 from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
@@ -24,6 +25,9 @@ from ..datatypes.datatypes import (
     CustomPoint,
 )
 from ..eocfi_adapter import eocfi_adapter
+import lime_tbx.lime_algorithms.rolo.eli as eli
+import lime_tbx.lime_algorithms.rolo.elref as elref
+import xarray
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -55,6 +59,7 @@ def eli_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
+    cimel_data: xarray,
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[
@@ -97,11 +102,13 @@ def eli_callback(
     elis: Union[List[float], List[List[float]]] = []
     elis_srf: Union[List[float], List[List[float]]] = []
     if isinstance(point, SurfacePoint):
-        elis = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path)
-        elis_srf = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
+        md=rs.get_md_from_surface(point, kernels_path)
+        elis = CommonSimulation.get_eli_from_md(def_srf, md, coeffs)
+        elis_srf = CommonSimulation.get_eli_from_md(srf, md, coeffs)
     elif isinstance(point, CustomPoint):
-        elis = rs.get_eli_from_custom(def_srf, point, coeffs)
-        elis_srf = rs.get_eli_from_custom(srf, point, coeffs)
+        md = rs.get_md_from_custom(point)
+        elis = CommonSimulation.get_eli_from_md(def_srf,md,coeffs)
+        elis_srf = CommonSimulation.get_eli_from_md(srf,md,coeffs)
     else:
         elis = es.get_eli_from_satellite(
             def_srf, point, coeffs, kernels_path, eocfi_path
@@ -111,30 +118,50 @@ def eli_callback(
         )
     wlens = def_srf.get_wavelengths()
     ch_irrs = rs.integrate_elis(srf, elis_srf)
-    return wlens, elis, point, ch_irrs, srf
+
+    wlen_cimel=cimel_data.wavelength.values
+    print(wlen_cimel)
+    coeff_cimel=cimel_data.coeff.values
+    u_coeff_cimel=cimel_data.u_coeff.values
+    elis_cimel=eli.calculate_eli_band(wlen_cimel, md, coeff_cimel)
+    u_elis_cimel=eli.calculate_eli_band_unc(wlen_cimel, md, coeff_cimel, u_coeff_cimel)
+    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
 
 
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
+    cimel_data: xarray.Dataset,
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
     if isinstance(point, SurfacePoint):
+        md=rs.get_md_from_surface(point, kernels_path)
         elrefs: List[float] = rs.get_elref_from_surface(
             srf, point, coeffs, kernels_path
         )
     elif isinstance(point, CustomPoint):
+        md = rs.get_md_from_custom(point)
         elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
     else:
         elrefs: List[float] = es.get_elref_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = srf.get_wavelengths()
-    return wlens, elrefs, point
+
+    wlen_cimel = cimel_data.wavelength.values
+    coeff_cimel = cimel_data.coeff.values
+    u_coeff_cimel = cimel_data.u_coeff.values
+    elrefs_cimel = elref.band_moon_disk_reflectance(
+                    wlen_cimel,md,coeff_cimel
+                )
+    u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(
+                    wlen_cimel,md,coeff_cimel,u_coeff_cimel
+                )
+    return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel
 
 
 def polar_callback(
@@ -378,9 +405,10 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
+        cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, self.kernels_path, self.eocfi_path],
+            [def_srf, srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -392,10 +420,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             Union[List[float], List[List[float]]],
             SpectralResponseFunction,
+            List[float],
+            Union[List[float],List[List[float]]],
+            Union[List[float],List[List[float]]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -416,8 +447,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         point = self.input_widget.get_point()
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
+        cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            elref_callback, [def_srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -427,10 +459,13 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
+            List[float],
+            Union[List[float],List[List[float]]],
+            Union[List[float],List[List[float]]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[0], data[1], data[2], data[3], data[4], data[5])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -462,6 +497,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
+            List[float],
+            Union[List[float], List[List[float]]],
+            Union[List[float], List[List[float]]],
         ],
     ):
         self._unblock_gui()

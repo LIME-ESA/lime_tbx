@@ -45,8 +45,12 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.x_data = []
+        self.x_data_CIMEL = []
         self.y_data = []
         self.legend = []
+        self.y_data_CIMEL = []
+        self.u_y_data = []
+        self.u_y_data_CIMEL = []
         self._build_layout()
 
     def _build_layout(self):
@@ -91,10 +95,16 @@ class GraphWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             List[Union[SurfacePoint, CustomPoint, SatellitePoint]],
         ],
+        x_data_CIMEL: Union[List[float],List[List[float]]]=[],
+        y_data_CIMEL: Union[List[float],List[List[float]]]=[],
+        u_y_data_CIMEL: Union[List[float],List[List[float]]]=[],
     ):
         self.x_data = x_data
         self.y_data = y_data
         self.point = point
+        self.x_data_CIMEL = x_data_CIMEL
+        self.y_data_CIMEL = y_data_CIMEL
+        self.u_y_data_CIMEL = u_y_data_CIMEL
         if len(x_data) > 0 and len(y_data) > 0:
             self.disable_buttons(False)
         else:
@@ -130,9 +140,15 @@ class GraphWidget(QtWidgets.QWidget):
             and not isinstance(self.x_data[0], list)
         ):
             for yd in self.y_data:
-                self.canvas.axes.plot(self.x_data, yd, marker=marker)
+                self.canvas.axes.plot(self.x_data, yd, marker=marker, label="Kieffer and Stone 2005")
         else:
-            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
+            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
+
+        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
+        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
+
+        self.canvas.axes.legend()
+
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)

@@ -28,6 +28,26 @@ __status__ = "Development"
 
 
 class IRegularSimulation(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def get_md_from_surface(sp: SurfacePoint,
+            kernels_path: str,) -> Union[
+        List[float],List[List[float]]]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def get_md_from_custom(cp: CustomPoint,) -> MoonData:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def get_eli_from_surface(srf: SpectralResponseFunction,sp: SurfacePoint,
+            coefficients: IrradianceCoefficients,kernels_path: str,) -> Union[
+        List[float],List[List[float]]]:
+        pass
+
     @staticmethod
     @abstractmethod
     def get_eli_from_surface(
@@ -240,6 +260,32 @@ class IRegularSimulation(ABC):
 
 class RegularSimulation(IRegularSimulation):
     @staticmethod
+    def get_md_from_surface(
+        sp: SurfacePoint,
+        kernels_path: str,
+    ) -> MoonData:
+        md = SPICEAdapter().get_moon_data_from_earth(sp.latitude,sp.longitude,
+            sp.altitude,sp.dt,kernels_path)
+        return md
+
+    @staticmethod
+    def get_md_from_custom(
+        cp: CustomPoint,
+    ) -> MoonData:
+        md = MoonData(
+            cp.distance_sun_moon,
+            cp.distance_observer_moon,
+            cp.selen_sun_lon,
+            cp.selen_obs_lat,
+            cp.selen_obs_lon,
+            cp.abs_moon_phase_angle,
+            cp.moon_phase_angle,
+        )
+        return md
+
+
+
+    @staticmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
         sp: SurfacePoint,
@@ -281,15 +327,7 @@ class RegularSimulation(IRegularSimulation):
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
     ) -> List[float]:
-        md = MoonData(
-            cp.distance_sun_moon,
-            cp.distance_observer_moon,
-            cp.selen_sun_lon,
-            cp.selen_obs_lat,
-            cp.selen_obs_lon,
-            cp.abs_moon_phase_angle,
-            cp.moon_phase_angle,
-        )
+        md = RegularSimulation.get_md_from_custom(cp)
         return CommonSimulation.get_eli_from_md(srf, md, coefficients)
 
     @staticmethod
@@ -298,15 +336,7 @@ class RegularSimulation(IRegularSimulation):
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
     ) -> List[float]:
-        md = MoonData(
-            cp.distance_sun_moon,
-            cp.distance_observer_moon,
-            cp.selen_sun_lon,
-            cp.selen_obs_lat,
-            cp.selen_obs_lon,
-            cp.abs_moon_phase_angle,
-            cp.moon_phase_angle,
-        )
+        md = RegularSimulation.get_md_from_custom(cp)
         return CommonSimulation.get_elref_from_md(srf, md, coefficients)
 
     @staticmethod
@@ -315,15 +345,7 @@ class RegularSimulation(IRegularSimulation):
         cp: CustomPoint,
         coefficients: PolarizationCoefficients,
     ) -> List[float]:
-        md = MoonData(
-            cp.distance_sun_moon,
-            cp.distance_observer_moon,
-            cp.selen_sun_lon,
-            cp.selen_obs_lat,
-            cp.selen_obs_lon,
-            cp.abs_moon_phase_angle,
-            cp.moon_phase_angle,
-        )
+        md = RegularSimulation.get_md_from_custom(cp)
         return CommonSimulation.get_polar_from_md(srf, md, coefficients)
 
     @staticmethod

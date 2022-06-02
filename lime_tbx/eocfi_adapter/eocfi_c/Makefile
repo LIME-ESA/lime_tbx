@@ -72,7 +72,7 @@ shared:
 	echo "--------------------"
 	echo "$(CFI): ... creating shared library"
 	echo "--------------------"
-	cc -fPIC -shared $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions.so
+	$(CC) -fPIC -shared $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions.so
 
 spice:
 	echo "--------------------"
