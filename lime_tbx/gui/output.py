@@ -56,8 +56,6 @@ class GraphWidget(QtWidgets.QWidget):
         self.u_y_data_intp = []
         self._build_layout()
 
-    wlens,elrefs,point,wlen_cimel,elrefs_cimel,u_elrefs_cimel,wlen_asd,elrefs_asd,elrefs_intp,u_elrefs_intp
-
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # canvas
