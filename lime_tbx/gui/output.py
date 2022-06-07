@@ -149,7 +149,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
 
         #if (self._is_filled() and isinstance(self.y_data[0],list) and not isinstance(
-        self.x_data[0],list)):
+        #self.x_data[0],list)):
         self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")
 
         self.canvas.axes.plot(self.x_data, self.y_data_intp,"b",label="interpolated data points")
