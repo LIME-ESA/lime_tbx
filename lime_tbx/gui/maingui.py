@@ -170,13 +170,12 @@ def elref_callback(
 
     asd_ref=intp.get_best_asd_reference(md)
     wlen_asd = asd_ref.wavelength.values
-    elrefs_asd = asd_ref.reflecance.values
-    u_elrefs_asd = asd_ref.unc["reflecance"].total.values
+    elrefs_asd = asd_ref.reflectance.values
+    u_elrefs_asd = asd_ref.unc["reflectance"].total.values
 
     elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens)
     u_elrefs_intp = intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
-    print(elrefs_intp)
-    stop
+
     return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel, wlen_asd, elrefs_asd, elrefs_intp, u_elrefs_intp
 
 
