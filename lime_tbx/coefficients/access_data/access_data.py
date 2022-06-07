@@ -20,7 +20,7 @@ from lime_tbx.datatypes.datatypes import (
     PolarizationCoefficients,
 )
 
-from lime_tbx.coefficients.access_data.templates_digital_effects_table import template_cimel
+from lime_tbx.datatypes.templates_digital_effects_table import template_cimel
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"

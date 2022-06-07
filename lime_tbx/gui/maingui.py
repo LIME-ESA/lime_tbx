@@ -26,7 +26,9 @@ from ..datatypes.datatypes import (
 from ..eocfi_adapter import eocfi_adapter
 import lime_tbx.lime_algorithms.rolo.eli as eli
 import lime_tbx.lime_algorithms.rolo.elref as elref
+from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import SpectralInterpolation
 import xarray
+import obsarray
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -124,6 +126,9 @@ def eli_callback(
     u_coeff_cimel=cimel_data.u_coeff.values
     elis_cimel=eli.calculate_eli_band(wlen_cimel, md, coeff_cimel)
     u_elis_cimel=eli.calculate_eli_band_unc(wlen_cimel, md, coeff_cimel, u_coeff_cimel)
+
+
+
     return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
 
 
@@ -160,7 +165,18 @@ def elref_callback(
     u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(
                     wlen_cimel,md,coeff_cimel,u_coeff_cimel
                 )
-    return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel
+
+    intp=SpectralInterpolation()
+
+    asd_ref=intp.get_best_asd_reference(md)
+    wlen_asd = asd_ref.wavelength.values
+    elrefs_asd = asd_ref.reflecance.values
+    u_elrefs_asd = asd_ref.unc["reflecance"].total.values
+
+    elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens)
+    u_elrefs_intp = intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
+
+    return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel, wlen_asd, elrefs_asd, elrefs_intp, u_elrefs_intp
 
 
 def polar_callback(
@@ -355,7 +371,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7])
+        self.graph.update_plot(*data)
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -394,7 +410,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[3], data[4], data[5])
+        self.graph.update_plot(*data)
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",

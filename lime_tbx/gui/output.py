@@ -94,7 +94,10 @@ class GraphWidget(QtWidgets.QWidget):
         x_data_CIMEL: Union[List[float],List[List[float]]]=[],
         y_data_CIMEL: Union[List[float],List[List[float]]]=[],
         u_y_data_CIMEL: Union[List[float],List[List[float]]]=[],
-
+        x_data_ASD: Union[List[float],List[List[float]]]=[],
+        y_data_ASD: Union[List[float],List[List[float]]] = [],
+        y_data_intp: Union[List[float],List[List[float]]] = [],
+        u_y_data_intp: Union[List[float],List[List[float]]] = [],
     ):
         self.x_data = x_data
         self.y_data = y_data
@@ -102,6 +105,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.x_data_CIMEL = x_data_CIMEL
         self.y_data_CIMEL = y_data_CIMEL
         self.u_y_data_CIMEL = u_y_data_CIMEL
+        self.x_data_ASD = x_data_ASD
+        self.y_data_ASD = y_data_ASD
+        self.y_data_intp = y_data_intp
+        self.u_y_data_intp = u_y_data_intp
         if len(x_data) > 0 and len(y_data) > 0:
             self.disable_buttons(False)
         else:
@@ -136,6 +143,11 @@ class GraphWidget(QtWidgets.QWidget):
                 self.canvas.axes.plot(self.x_data, yd, marker=marker, label="Kieffer and Stone 2005")
         else:
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
+
+        self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")
+
+        self.canvas.axes.plot(self.x_data, self.y_data_intp,"b",label="interpolated data points")
+        self.canvas.axes.fill_between(self.x_data, self.y_data_intp-self.u_y_data_intp,self.y_data_intp+self.u_y_data_intp,"b",alpha=0.3)
 
         self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
         self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
