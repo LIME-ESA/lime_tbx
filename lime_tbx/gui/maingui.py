@@ -143,8 +143,8 @@ def eli_callback(
     elis_cimel = eli.calculate_eli_from_elref(wlen_cimel,md,elrefs_cimel)
     u_elis_cimel = eli.calculate_eli_band_unc(wlen_cimel,md,coeff_cimel,u_coeff_cimel)
 
-    elis_intp = eli.calculate_eli_from_elref(wlen_cimel,md,elrefs_intp)
-    u_elis_intp = eli.calculate_eli_band_unc(wlen_cimel,md,elrefs_intp,u_elrefs_intp)
+    elis_intp = eli.calculate_eli_from_elref(wlens,md,elrefs_intp)
+    u_elis_intp = eli.calculate_eli_band_unc(wlens,md,elrefs_intp,u_elrefs_intp)
 
     return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel, elis_intp, u_elis_intp
 
