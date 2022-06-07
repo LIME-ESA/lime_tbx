@@ -175,7 +175,8 @@ def elref_callback(
 
     elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens)
     u_elrefs_intp = intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
-
+    print(elrefs_intp)
+    stop
     return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel, wlen_asd, elrefs_asd, elrefs_intp, u_elrefs_intp
 
 
