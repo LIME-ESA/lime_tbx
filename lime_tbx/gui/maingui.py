@@ -121,15 +121,32 @@ def eli_callback(
     ch_irrs = rs.integrate_elis(srf, elis_srf)
 
     wlen_cimel=cimel_data.wavelength.values
-    print(wlen_cimel)
     coeff_cimel=cimel_data.coeff.values
     u_coeff_cimel=cimel_data.u_coeff.values
-    elis_cimel=eli.calculate_eli_band(wlen_cimel, md, coeff_cimel)
-    u_elis_cimel=eli.calculate_eli_band_unc(wlen_cimel, md, coeff_cimel, u_coeff_cimel)
 
+    if True:  ## avoid this part by using elref calculated elsewhere and stored in class attribute
+        elrefs_cimel = elref.band_moon_disk_reflectance(wlen_cimel,md,coeff_cimel)
+        u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(wlen_cimel,md,coeff_cimel,
+            u_coeff_cimel)
 
+        intp = SpectralInterpolation()
 
-    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
+        asd_ref = intp.get_best_asd_reference(md)
+        wlen_asd = asd_ref.wavelength.values
+        elrefs_asd = asd_ref.reflectance.values
+        u_elrefs_asd = asd_ref.unc["reflectance"].total
+
+        elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,
+                                                 elrefs_asd,wlens)
+        u_elrefs_intp = elrefs_intp*0.01  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
+
+    elis_cimel = eli.calculate_eli_from_elref(wlen_cimel,md,elrefs_cimel)
+    u_elis_cimel = eli.calculate_eli_band_unc(wlen_cimel,md,coeff_cimel,u_coeff_cimel)
+
+    elis_intp = eli.calculate_eli_from_elref(wlen_cimel,md,elrefs_intp)
+    u_elis_intp = eli.calculate_eli_band_unc(wlen_cimel,md,elrefs_intp,u_elrefs_intp)
+
+    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel, elis_intp, u_elis_intp
 
 
 def elref_callback(
@@ -371,7 +388,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(*data)
+        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7], data[8], data[9])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
