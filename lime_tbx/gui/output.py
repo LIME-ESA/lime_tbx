@@ -149,7 +149,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
 
         if len(self.x_data_ASD)>0:
-            self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")
+            self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")/10.
 
             self.canvas.axes.plot(self.x_data, self.y_data_intp,"b",label="interpolated data points")
             print(self.y_data_intp)
