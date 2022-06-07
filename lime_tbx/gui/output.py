@@ -103,16 +103,16 @@ class GraphWidget(QtWidgets.QWidget):
         y_data_intp: Union[List[float],List[List[float]]] = [],
         u_y_data_intp: Union[List[float],List[List[float]]] = [],
     ):
-        self.x_data = x_data
-        self.y_data = y_data
+        self.x_data = np.array(x_data)
+        self.y_data = np.array(y_data)
         self.point = point
-        self.x_data_CIMEL = x_data_CIMEL
-        self.y_data_CIMEL = y_data_CIMEL
-        self.u_y_data_CIMEL = u_y_data_CIMEL
-        self.x_data_ASD = x_data_ASD
-        self.y_data_ASD = y_data_ASD
-        self.y_data_intp = y_data_intp
-        self.u_y_data_intp = u_y_data_intp
+        self.x_data_CIMEL = np.array(x_data_CIMEL)
+        self.y_data_CIMEL = np.array(y_data_CIMEL)
+        self.u_y_data_CIMEL = np.array(u_y_data_CIMEL)
+        self.x_data_ASD = np.array(x_data_ASD)
+        self.y_data_ASD = np.array(y_data_ASD)
+        self.y_data_intp = np.array(y_data_intp)
+        self.u_y_data_intp = np.array(u_y_data_intp)
         if len(x_data) > 0 and len(y_data) > 0:
             self.disable_buttons(False)
         else:
@@ -152,7 +152,9 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD/10.,label="ASD data points")
 
             self.canvas.axes.plot(self.x_data, self.y_data_intp,"g",label="interpolated data points")
-            self.canvas.axes.fill_between(self.x_data, [self.y_data_intp[i]-self.u_y_data_intp[i] for i in range(len(self.y_data_intp))],[self.y_data_intp[i]+self.u_y_data_intp[i] for i in range(len(self.y_data_intp))],"b",alpha=0.3)
+            print(self.y_data_intp.shape)
+            print(self.u_y_data_intp.shape)
+            self.canvas.axes.fill_between(self.x_data, self.y_data_intp-self.u_y_data_intp,self.y_data_intp+self.u_y_data_intp,"b",alpha=0.3)
 
             self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
             self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
