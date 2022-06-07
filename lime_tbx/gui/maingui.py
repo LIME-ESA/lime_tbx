@@ -143,10 +143,12 @@ def eli_callback(
     elis_cimel = eli.calculate_eli_from_elref(wlen_cimel,md,elrefs_cimel)
     u_elis_cimel = eli.calculate_eli_band_unc(wlen_cimel,md,coeff_cimel,u_coeff_cimel)
 
+    elis_asd = eli.calculate_eli_from_elref(wlen_asd,md,elrefs_asd)
+
     elis_intp = eli.calculate_eli_from_elref(wlens,md,elrefs_intp)
     u_elis_intp = eli.calculate_eli_unc_from_elref(wlens,md,elrefs_intp,u_elrefs_intp)
 
-    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel, elis_intp, u_elis_intp
+    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel, wlen_asd, elis_asd, elis_intp, u_elis_intp
 
 
 def elref_callback(
@@ -388,7 +390,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7], data[8], data[9])
+        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7], data[8], data[9], data[10], data[11])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
