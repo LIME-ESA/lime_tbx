@@ -7,7 +7,7 @@ from lime_tbx.interpolation.access_data.access_data import _get_default_asd_data
 
 """___NPL Modules___"""
 import punpy
-from comet_maths import Interpolator
+from comet_maths.interpolation.interpolation import Interpolator
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
