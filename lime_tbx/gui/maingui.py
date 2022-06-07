@@ -174,7 +174,7 @@ def elref_callback(
     u_elrefs_asd = asd_ref.unc["reflectance"].total
 
     elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens)
-    u_elrefs_intp = intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
+    u_elrefs_intp = elrefs_intp*0.01# intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
     return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel, wlen_asd, elrefs_asd, elrefs_intp, u_elrefs_intp
 
