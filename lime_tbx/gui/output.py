@@ -46,11 +46,17 @@ class GraphWidget(QtWidgets.QWidget):
         self.ylabel = ylabel
         self.x_data = []
         self.x_data_CIMEL = []
+        self.x_data_ASD = []
         self.y_data = []
         self.y_data_CIMEL = []
+        self.y_data_ASD = []
+        self.y_data_intp = []
         self.u_y_data = []
         self.u_y_data_CIMEL = []
+        self.u_y_data_intp = []
         self._build_layout()
+
+    wlens,elrefs,point,wlen_cimel,elrefs_cimel,u_elrefs_cimel,wlen_asd,elrefs_asd,elrefs_intp,u_elrefs_intp
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
