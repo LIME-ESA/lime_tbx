@@ -148,17 +148,16 @@ class GraphWidget(QtWidgets.QWidget):
         else:
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
 
-        #if (self._is_filled() and isinstance(self.y_data[0],list) and not isinstance(
-        #self.x_data[0],list)):
-        self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")
+        if self._is_filled():
+            self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")
 
-        self.canvas.axes.plot(self.x_data, self.y_data_intp,"b",label="interpolated data points")
-        print(self.y_data_intp)
-        print(self.u_y_data_intp)
-        #self.canvas.axes.fill_between(self.x_data, [self.y_data_intp[i]-self.u_y_data_intp[i] for i in range(len(self.y_data_intp))],[self.y_data_intp[i]+self.u_y_data_intp[i] for i in range(len(self.y_data_intp))],"b",alpha=0.3)
+            self.canvas.axes.plot(self.x_data, self.y_data_intp,"b",label="interpolated data points")
+            print(self.y_data_intp)
+            print(self.u_y_data_intp)
+            #self.canvas.axes.fill_between(self.x_data, [self.y_data_intp[i]-self.u_y_data_intp[i] for i in range(len(self.y_data_intp))],[self.y_data_intp[i]+self.u_y_data_intp[i] for i in range(len(self.y_data_intp))],"b",alpha=0.3)
 
-        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
-        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
+            self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
+            self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
 
         self.canvas.axes.legend()
 
