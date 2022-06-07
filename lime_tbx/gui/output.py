@@ -151,7 +151,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD,label="ASD data points")
 
         self.canvas.axes.plot(self.x_data, self.y_data_intp,"b",label="interpolated data points")
-        self.canvas.axes.fill_between(self.x_data, self.y_data_intp-self.u_y_data_intp,self.y_data_intp+self.u_y_data_intp,"b",alpha=0.3)
+        self.canvas.axes.fill_between(self.x_data, np.array(self.y_data_intp)-np.array(self.u_y_data_intp),np.array(self.y_data_intp)+np.array(self.u_y_data_intp),"b",alpha=0.3)
 
         self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
         self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
