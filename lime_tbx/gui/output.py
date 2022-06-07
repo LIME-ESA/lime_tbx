@@ -152,12 +152,10 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD/10.,label="ASD data points")
 
             self.canvas.axes.plot(self.x_data, self.y_data_intp,"g",label="interpolated data points")
-            print(self.y_data_intp.shape)
-            print(self.u_y_data_intp.shape)
-            self.canvas.axes.fill_between(self.x_data, self.y_data_intp-self.u_y_data_intp,self.y_data_intp+self.u_y_data_intp,color="green",alpha=0.3)
+            self.canvas.axes.fill_between(self.x_data, self.y_data_intp-2*self.u_y_data_intp,self.y_data_intp+2*self.u_y_data_intp,color="green",alpha=0.3)
 
             self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
-            self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
+            self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*2, capsize=3, ls='none',label="uncertainties (k=2)")
 
         self.canvas.axes.legend()
 
