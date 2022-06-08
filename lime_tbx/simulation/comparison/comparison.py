@@ -112,7 +112,7 @@ class Comparison(IComparison):
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            elis = RegularSimulation.get_eli_from_surface(
+            elis, _ = RegularSimulation.get_eli_from_surface(
                 srf, sp, coefficients, kernels_path
             )
             integrated_irrs = RegularSimulation.integrate_elis(srf, elis)

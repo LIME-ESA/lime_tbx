@@ -2,7 +2,7 @@
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
 # import here
@@ -10,12 +10,14 @@ from typing import List, Union
 """___NPL Modules___"""
 from ...spice_adapter.spice_adapter import SPICEAdapter
 from ...datatypes.datatypes import (
+    CimelData,
     IrradianceCoefficients,
     MoonData,
     PolarizationCoefficients,
     SpectralResponseFunction,
     SurfacePoint,
     CustomPoint,
+    UncertaintyData,
 )
 from ..common.common import CommonSimulation
 
@@ -31,31 +33,14 @@ class IRegularSimulation(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_md_from_surface(sp: SurfacePoint,
-            kernels_path: str,) -> Union[
-        List[float],List[List[float]]]:
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_md_from_custom(cp: CustomPoint,) -> MoonData:
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_eli_from_surface(srf: SpectralResponseFunction,sp: SurfacePoint,
-            coefficients: IrradianceCoefficients,kernels_path: str,) -> Union[
-        List[float],List[List[float]]]:
-        pass
-
-    @staticmethod
-    @abstractmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
         sp: SurfacePoint,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+        calc_uncertainty: bool = False,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         """
         Simulate the extraterrestrial lunar irradiance for a geographic point.
 
@@ -72,6 +57,11 @@ class IRegularSimulation(ABC):
         kernels_path: str
             Path where the needed SPICE kernels are located.
             The user must have write access to that directory.
+        cimel_data: CimelData
+            Cimel uncertainty data that will be used to calculate the uncertainties
+        calc_uncertainty: bool
+            Flag that if False, the uncertainties wont be calculated, and will return a None
+            instead of a UncertaintyData.
 
         Returns
         -------
@@ -79,6 +69,8 @@ class IRegularSimulation(ABC):
             Extraterrestrial lunar irradiances for the given srf at the specified point.
             It will be a list of lists of float if the parameter dt is a list. Otherwise it
             will only be a list of float.
+        uncertainty_data: UncertaintyData
+            Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
 
@@ -89,7 +81,8 @@ class IRegularSimulation(ABC):
         sp: SurfacePoint,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         """
         Simulate the extraterrestrial lunar reflectance for a geographic point.
 
@@ -106,6 +99,8 @@ class IRegularSimulation(ABC):
         kernels_path: str
             Path where the needed SPICE kernels are located.
             The user must have write access to that directory.
+        cimel_data: CimelData
+            Cimel uncertainty data that will be used to calculate the uncertainties
 
         Returns
         -------
@@ -113,6 +108,8 @@ class IRegularSimulation(ABC):
             Extraterrestrial lunar reflectances for the given srf at the specified point.
             It will be a list of lists of float if the parameter dt is a list. Otherwise it
             will only be a list of float.
+        uncertainty_data: UncertaintyData
+            Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
 
@@ -154,7 +151,9 @@ class IRegularSimulation(ABC):
         srf: SpectralResponseFunction,
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
-    ) -> List[float]:
+        cimel_data: CimelData = None,
+        calc_uncertainty: bool = False,
+    ) -> Tuple[List[float], UncertaintyData]:
         """
         Simulate the extraterrestrial lunar irradiance for custom lunar parameters.
 
@@ -168,11 +167,18 @@ class IRegularSimulation(ABC):
             Custom point with custom lunar data for which the simulation will be computed for.
         coefficients: IrradianceCoefficients
             Values of the chosen coefficients for the ROLO algorithm.
+        cimel_data: CimelData
+            Cimel uncertainty data that will be used to calculate the uncertainties
+        calc_uncertainty: bool
+            Flag that if False, the uncertainties wont be calculated, and will return a None
+            instead of a UncertaintyData.
 
         Returns
         -------
         elis: list of float
             Extraterrestrial lunar irradiances for the given srf and the specified parameters.
+        uncertainty_data: UncertaintyData
+            Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
 
@@ -182,7 +188,8 @@ class IRegularSimulation(ABC):
         srf: SpectralResponseFunction,
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
-    ) -> List[float]:
+        cimel_data: CimelData = None,
+    ) -> Tuple[List[float], UncertaintyData]:
         """
         Simulate the extraterrestrial lunar reflectance for custom lunar parameters.
 
@@ -196,11 +203,15 @@ class IRegularSimulation(ABC):
             Custom point with custom lunar data for which the simulation will be computed for.
         coefficients: IrradianceCoefficients
             Values of the chosen coefficients for the ROLO algorithm.
+        cimel_data: CimelData
+            Cimel uncertainty data that will be used to calculate the uncertainties
 
         Returns
         -------
         elrefs: list of float
             Extraterrestrial lunar reflectances for the given srf and the specified parameters.
+        uncertainty_data: UncertaintyData
+            Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
 
@@ -283,19 +294,19 @@ class RegularSimulation(IRegularSimulation):
         )
         return md
 
-
-
     @staticmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
         sp: SurfacePoint,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+        calc_uncertainty: bool = False,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
-        return CommonSimulation.get_eli_from_md(srf, md, coefficients)
+        return CommonSimulation.get_eli_from_md(srf, md, coefficients, cimel_data, calc_uncertainty)
 
     @staticmethod
     def get_elref_from_surface(
@@ -303,11 +314,12 @@ class RegularSimulation(IRegularSimulation):
         sp: SurfacePoint,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
-        return CommonSimulation.get_elref_from_md(srf, md, coefficients)
+        return CommonSimulation.get_elref_from_md(srf, md, coefficients, cimel_data)
 
     @staticmethod
     def get_polarized_from_surface(
@@ -326,18 +338,21 @@ class RegularSimulation(IRegularSimulation):
         srf: SpectralResponseFunction,
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
-    ) -> List[float]:
+        cimel_data: CimelData = None,
+        calc_uncertainty: bool = False,
+    ) -> Tuple[List[float], UncertaintyData]:
         md = RegularSimulation.get_md_from_custom(cp)
-        return CommonSimulation.get_eli_from_md(srf, md, coefficients)
+        return CommonSimulation.get_eli_from_md(srf, md, coefficients, cimel_data, calc_uncertainty)
 
     @staticmethod
     def get_elref_from_custom(
         srf: SpectralResponseFunction,
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
-    ) -> List[float]:
+        cimel_data: CimelData = None,
+    ) -> Tuple[List[float], UncertaintyData]:
         md = RegularSimulation.get_md_from_custom(cp)
-        return CommonSimulation.get_elref_from_md(srf, md, coefficients)
+        return CommonSimulation.get_elref_from_md(srf, md, coefficients, cimel_data)
 
     @staticmethod
     def get_polarized_from_custom(

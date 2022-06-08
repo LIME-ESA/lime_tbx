@@ -16,7 +16,11 @@ import numpy as np
 import punpy
 
 """___LIME Modules___"""
-from ...datatypes.datatypes import MoonData, IrradianceCoefficients
+from ...datatypes.datatypes import (
+    CimelData,
+    MoonData,
+    IrradianceCoefficients,
+)
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -26,97 +30,75 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 def band_moon_disk_reflectance(
-    wavelength_nm: float,
+    cimel_data: CimelData,
     moon_data: MoonData,
-    coeffs: np.ndarray,
 ) -> np.ndarray:
-    """The calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
-    Roman et al., 2020
+    """
+    Simulates a lunar observation for a wavelength for any observer/solar selenographic
+    latitude and longitude. The reflectance is calculated in fractions of unity.
 
-    If the wavelength has no associated ROLO coefficients, it uses some linearly interpolated
-    ones.
+    This simulation is for the empirical CIMEL data.
 
     Parameters
     ----------
-    wavelength_nm : float
-        Wavelength in nanometers from which one wants to obtain the MDR.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
-    coeffs : IrradianceCoefficients
-        Needed coefficients for the simulation.
 
     Returns
     -------
-    float
-        The ln of the reflectance of the Moon's disk for the inputed data
+    np.ndarray of float
+        The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
-
-    a_coeffs = coeffs[0:4,:]
-    b_coeffs = coeffs[4:7,:]
-    c_coeffs = coeffs[7:11,:]
-    d_coeffs = coeffs[11:14,:]
-    p_coeffs = coeffs[14::,:]
+    cfs = cimel_data.coeffs
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
     gd_value = moon_data.absolute_mpa_degrees
-    gr_value = math.radians(gd_value)
 
-    result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
+    result = _measurement_func_elref(cfs.a_coeffs, cfs.b_coeffs, cfs.c_coeffs, cfs.d_coeffs,
+        cfs.p_coeffs, phi, l_phi, l_theta, gd_value)
 
     return result
 
 def band_moon_disk_reflectance_unc(
-    wavelength_nm: float,
+    cimel_data: CimelData,
     moon_data: MoonData,
-    coeffs: np.ndarray,
-    u_coeffs: np.ndarray,
 ) -> np.ndarray:
-    """The calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
-    Roman et al., 2020
+    """
+    Calculates the uncertainty for the reflectance calculations of empirical data points.
 
-    If the wavelength has no associated ROLO coefficients, it uses some linearly interpolated
-    ones.
+    This uncertainties is for the empirical CIMEL data.
 
     Parameters
     ----------
-    wavelength_nm : float
-        Wavelength in nanometers from which one wants to obtain the MDR.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
-    coeffs : IrradianceCoefficients
-        Needed coefficients for the simulation.
 
     Returns
     -------
-    float
-        The ln of the reflectance of the Moon's disk for the inputed data
+    np.ndarray of float
+        The uncertainties calculated
     """
 
-    a_coeffs = coeffs[0:4,:]
-    b_coeffs = coeffs[4:7,:]
-    c_coeffs = coeffs[7:11,:]
-    d_coeffs = coeffs[11:14,:]
-    p_coeffs = coeffs[14::,:]
-
-    u_a_coeffs = u_coeffs[0:4,:]
-    u_b_coeffs = u_coeffs[4:7,:]
-    u_c_coeffs = u_coeffs[7:11,:]
-    u_d_coeffs = u_coeffs[11:14,:]
-    u_p_coeffs = u_coeffs[14::,:]
+    cfs = cimel_data.coeffs
+    ucfs = cimel_data.unc_coeffs
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
     gd_value = moon_data.absolute_mpa_degrees
-    gr_value = math.radians(gd_value)
 
     prop=punpy.MCPropagation(1000)
 
-    unc = prop.propagate_random(measurement_func_elref,
-                                   [a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value],
-                                   [u_a_coeffs,u_b_coeffs,u_c_coeffs,u_d_coeffs,u_p_coeffs,None,None,None,None,None])
+    unc = prop.propagate_random(_measurement_func_elref, [cfs.a_coeffs, cfs.b_coeffs,
+        cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value],
+        [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
+        None, None, None])
 
     return unc
 
@@ -156,14 +138,28 @@ def _moon_disk_reflectance(
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
     gd_value = moon_data.absolute_mpa_degrees
-    gr_value = math.radians(gd_value)
 
-    result = measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value)
+    result = _measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value)
 
     return result
 
 
-def measurement_func_elref(a_coeffs,b_coeffs,c_coeffs,d_coeffs,p_coeffs,phi,l_phi,l_theta,gd_value,gr_value):
+def _measurement_func_elref(a_coeffs: List[float], b_coeffs: List[float], c_coeffs: List[float],
+        d_coeffs: List[float], p_coeffs: List[float], phi: float, l_phi: float, l_theta: float,
+        gd_value: float) -> float:
+    """
+    Final computation of the calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
+    Roman et al., 2020
+
+    Parameters
+    ----------
+    a_coeffs
+    b_coeffs
+    """
+    if isinstance(gd_value, float):
+        gr_value = math.radians(gd_value)
+    else:
+        gr_value = gd_value
     d1_value = d_coeffs[0]*np.exp(-gd_value/p_coeffs[0])
     d2_value = d_coeffs[1]*np.exp(-gd_value/p_coeffs[1])
     d3_value = d_coeffs[2]*np.cos((gd_value-p_coeffs[2])/p_coeffs[3])
@@ -254,7 +250,7 @@ def calculate_elref(
 ) -> float:
     """
     The calculation of the reflectance of the Moon's disk, following Eq.2 in Roman et al., 2020
-    and performin interpolation.
+    and performing interpolation.
 
     Parameters
     ----------

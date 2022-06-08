@@ -1,7 +1,7 @@
 import numpy as np
 
 # define ds variables
-template_cimel = {
+TEMPLATE_CIMEL = {
     "coeff": {
         "dtype": np.float32,
         "dim": ["i_coeff","wavelength"],

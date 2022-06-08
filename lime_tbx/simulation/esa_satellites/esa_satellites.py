@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import List, Union
+from typing import List, Union, Tuple
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
@@ -9,11 +9,13 @@ from abc import ABC, abstractmethod
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
+    CimelData,
     IrradianceCoefficients,
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
     SurfacePoint,
+    UncertaintyData,
 )
 from ...eocfi_adapter.eocfi_adapter import EOCFIConverter
 from ..regular_simulation.regular_simulation import RegularSimulation
@@ -35,7 +37,9 @@ class IESASatellites(ABC):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+        calc_uncertainty: bool = False,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         """
         Simulate the extraterrestrial lunar irradiance for a satellite point.
 
@@ -59,6 +63,8 @@ class IESASatellites(ABC):
         -------
         elis: list of float
             Extraterrestrial lunar irradiances for the given srf at the specified point.
+        uncerts: UncertaintyData or list of UncertaintyData
+            The uncertaintie/s related to the elis
         """
         pass
 
@@ -70,7 +76,8 @@ class IESASatellites(ABC):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         """
         Simulate the extraterrestrial lunar reflectance for a satellite point.
 
@@ -94,6 +101,8 @@ class IESASatellites(ABC):
         -------
         elrefs: list of float
             Extraterrestrial lunar reflectanes for the given srf at the specified point.
+        uncerts: UncertaintyData or list of UncertaintyData
+            The uncertaintie/s related to the elis
         """
         pass
 
@@ -141,7 +150,9 @@ class ESASatellites(IESASatellites):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+        calc_uncertainty: bool = False,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         wasnt_list = False
@@ -149,17 +160,18 @@ class ESASatellites(IESASatellites):
             wasnt_list = True
             dts = [dts]
         elis = []
+        uncerts = []
         for dt in dts:
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
-            elis.append(
-                RegularSimulation.get_eli_from_surface(
-                    srf, srp, coefficients, kernels_path
-                )
-            )
+            new_eli, uncert = RegularSimulation.get_eli_from_surface(
+                    srf, srp, coefficients, kernels_path, cimel_data, calc_uncertainty)
+            elis.append(new_eli)
+            uncerts.append(uncert)
         if wasnt_list:
             elis = elis[0]
-        return elis
+            uncerts = uncerts[0]
+        return elis, uncerts
 
     @staticmethod
     def get_elref_from_satellite(
@@ -168,7 +180,8 @@ class ESASatellites(IESASatellites):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         eocfi_path: str,
-    ) -> Union[List[float], List[List[float]]]:
+        cimel_data: CimelData = None,
+    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         wasnt_list = False
@@ -176,17 +189,18 @@ class ESASatellites(IESASatellites):
             wasnt_list = True
             dts = [dts]
         elrefs = []
+        uncerts = []
         for dt in dts:
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
-            elrefs.append(
-                RegularSimulation.get_elref_from_surface(
-                    srf, srp, coefficients, kernels_path
-                )
-            )
+            new_elref, uncert = RegularSimulation.get_elref_from_surface(
+                srf, srp, coefficients, kernels_path, cimel_data)
+            elrefs.append(new_elref)
+            uncerts.append(uncert)
         if wasnt_list:
             elrefs = elrefs[0]
-        return elrefs
+            uncerts = uncerts[0]
+        return elrefs, uncerts
 
     @staticmethod
     def get_polarized_from_satellite(

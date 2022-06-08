@@ -36,6 +36,7 @@ setup(
         "pyyaml",
         "pyproj",
         "netCDF4",
+        "obsarray",
     ],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[

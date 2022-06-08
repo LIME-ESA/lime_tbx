@@ -8,6 +8,7 @@ import time
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
@@ -23,11 +24,10 @@ from ..datatypes.datatypes import (
     IrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
+    CimelData,
+    UncertaintyData,
 )
 from ..eocfi_adapter import eocfi_adapter
-import lime_tbx.lime_algorithms.rolo.eli as eli
-import lime_tbx.lime_algorithms.rolo.elref as elref
-import xarray
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -59,7 +59,7 @@ def eli_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_data: xarray,
+    cimel_data: CimelData,
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[
@@ -67,6 +67,9 @@ def eli_callback(
     List[float],
     List[float],
     Union[SurfacePoint, CustomPoint, SatellitePoint],
+    List[float],
+    SpectralResponseFunction,
+    Union[UncertaintyData, List[UncertaintyData]]
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -80,8 +83,13 @@ def eli_callback(
     point: Union[SurfacePoint, CustomPoint, SatellitePoint]
         Point used
     coeffs: IrradianceCoefficients
+        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
     kernels_path: str
+        Path where the directory with the SPICE kernels is located.
     eocfi_path: str
+        Path where the directory with the needed EOCFI data files is located.
 
     Returns
     -------
@@ -95,6 +103,8 @@ def eli_callback(
         Integrated irradiance signals for each srf channel
     srf: SpectralResponseFunction
         SRF used for the integrated irradiance signal calculation.
+    uncertainty_data: UncertaintyData or list of UncertaintyData
+        Calculated uncertainty data.
     """
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
@@ -102,66 +112,80 @@ def eli_callback(
     elis: Union[List[float], List[List[float]]] = []
     elis_srf: Union[List[float], List[List[float]]] = []
     if isinstance(point, SurfacePoint):
-        md=rs.get_md_from_surface(point, kernels_path)
-        elis = CommonSimulation.get_eli_from_md(def_srf, md, coeffs)
-        elis_srf = CommonSimulation.get_eli_from_md(srf, md, coeffs)
+        elis, uncertainty_data = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path, cimel_data, True)
+        elis_srf, _ = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
     elif isinstance(point, CustomPoint):
-        md = rs.get_md_from_custom(point)
-        elis = CommonSimulation.get_eli_from_md(def_srf,md,coeffs)
-        elis_srf = CommonSimulation.get_eli_from_md(srf,md,coeffs)
+        elis, uncertainty_data = rs.get_eli_from_custom(def_srf, point, coeffs, cimel_data, True)
+        elis_srf, _ = rs.get_eli_from_custom(srf, point, coeffs)
     else:
-        elis = es.get_eli_from_satellite(
-            def_srf, point, coeffs, kernels_path, eocfi_path
+        elis, uncertainty_data = es.get_eli_from_satellite(
+            def_srf, point, coeffs, kernels_path, eocfi_path, cimel_data, True
         )
-        elis_srf = es.get_eli_from_satellite(
+        elis_srf, _ = es.get_eli_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = def_srf.get_wavelengths()
     ch_irrs = rs.integrate_elis(srf, elis_srf)
 
-    wlen_cimel=cimel_data.wavelength.values
-    print(wlen_cimel)
-    coeff_cimel=cimel_data.coeff.values
-    u_coeff_cimel=cimel_data.u_coeff.values
-    elis_cimel=eli.calculate_eli_band(wlen_cimel, md, coeff_cimel)
-    u_elis_cimel=eli.calculate_eli_band_unc(wlen_cimel, md, coeff_cimel, u_coeff_cimel)
-    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel
+    return wlens, elis, point, ch_irrs, srf, uncertainty_data
 
 
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_data: xarray.Dataset,
+    cimel_data: CimelData,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
+) -> Tuple[
+    List[float],
+    List[float],
+    Union[SurfacePoint, CustomPoint, SatellitePoint],
+    Union[UncertaintyData, List[UncertaintyData]],
+]:
+    """Callback that performs the Reflectance operations.
+
+    Parameters
+    ----------
+    srf: SpectralResponseFunction
+        SRF that will be used to calculate the graph
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+        Point used
+    coeffs: IrradianceCoefficients
+        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
+    kernels_path: str
+        Path where the directory with the SPICE kernels is located.
+    eocfi_path: str
+        Path where the directory with the needed EOCFI data files is located.
+
+    Returns
+    -------
+    wlens: list of float
+        Wavelengths of def_srf
+    elrefs: list of float
+        Reflectances related to srf
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+        Point that was used in the calculations.
+    uncertainty_data: UncertaintyData or list of UncertaintyData
+        Calculated uncertainty data.
+    """
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
+    elrefs: List[float] = []
     if isinstance(point, SurfacePoint):
-        md=rs.get_md_from_surface(point, kernels_path)
-        elrefs: List[float] = rs.get_elref_from_surface(
-            srf, point, coeffs, kernels_path
+        elrefs, unc_data = rs.get_elref_from_surface(
+            srf, point, coeffs, kernels_path, cimel_data
         )
     elif isinstance(point, CustomPoint):
-        md = rs.get_md_from_custom(point)
-        elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
+        elrefs, unc_data = rs.get_elref_from_custom(srf, point, coeffs, cimel_data)
     else:
-        elrefs: List[float] = es.get_elref_from_satellite(
-            srf, point, coeffs, kernels_path, eocfi_path
+        elrefs, unc_data = es.get_elref_from_satellite(
+            srf, point, coeffs, kernels_path, eocfi_path, cimel_data
         )
     wlens = srf.get_wavelengths()
-
-    wlen_cimel = cimel_data.wavelength.values
-    coeff_cimel = cimel_data.coeff.values
-    u_coeff_cimel = cimel_data.u_coeff.values
-    elrefs_cimel = elref.band_moon_disk_reflectance(
-                    wlen_cimel,md,coeff_cimel
-                )
-    u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(
-                    wlen_cimel,md,coeff_cimel,u_coeff_cimel
-                )
-    return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel
+    return wlens, elrefs, point, unc_data
 
 
 def polar_callback(
@@ -315,6 +339,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._unblock_gui()
         error_dialog = QtWidgets.QErrorMessage(self)
         error_dialog.showMessage(str(error))
+        raise error
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):
@@ -418,15 +443,22 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            Union[List[float], List[List[float]]],
-            SpectralResponseFunction,
             List[float],
-            Union[List[float],List[List[float]]],
-            Union[List[float],List[List[float]]],
+            SpectralResponseFunction,
+            Union[UncertaintyData, List[UncertaintyData]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7])
+        unc = data[5]
+        if isinstance(unc, list):
+            wlen = [u.wlen_cimel for u in unc]
+            cimel_data = [u.data for u in unc]
+            uncert = [u.uncertainties for u in unc]
+        else:
+            wlen = unc.wlen_cimel
+            cimel_data = unc.data
+            uncert = unc.uncertainties
+        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -459,13 +491,20 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[float],
-            Union[List[float],List[List[float]]],
-            Union[List[float],List[List[float]]],
+            Union[UncertaintyData, List[UncertaintyData]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2], data[3], data[4], data[5])
+        unc = data[3]
+        if isinstance(unc, list):
+            wlen = [u.wlen_cimel for u in unc]
+            cimel_data = [u.data for u in unc]
+            uncert = [u.uncertainties for u in unc]
+        else:
+            wlen = unc.wlen_cimel
+            cimel_data = unc.data
+            uncert = unc.uncertainties
+        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -536,15 +575,14 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.settings_manager = settings.MockSettingsManager()
-        self.page = MainSimulationsWidget(
+        self.comparison_page = ComparisonPageWidget(
             self.kernels_path, self.eocfi_path, self.settings_manager
         )
-        self.main_layout.addWidget(self.page)
-
-    def _change_page(self, pageWidget: QtWidgets.QWidget):
-        self.main_layout.removeWidget(self.page)
-        self.page.setParent(None)
-        self.page = pageWidget
+        self.comparison_page.hide()
+        self.main_page = MainSimulationsWidget(
+            self.kernels_path, self.eocfi_path, self.settings_manager
+        )
+        self.page = self.main_page
         self.main_layout.addWidget(self.page)
 
     def setDisabled(self, arg__1: bool) -> None:
@@ -554,16 +592,16 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def propagate_close_event(self):
         pass
 
-    def change_page(self, page: LimePagesEnum):
-        if page == LimePagesEnum.COMPARISON:
-            page = ComparisonPageWidget(
-                self.kernels_path, self.eocfi_path, self.settings_manager
-            )
+    def change_page(self, pageEnum: LimePagesEnum):
+        self.main_layout.removeWidget(self.page)
+        self.page.hide()
+        self.page.setParent(None)
+        if pageEnum == LimePagesEnum.COMPARISON:
+            self.page = self.comparison_page
         else:
-            page = MainSimulationsWidget(
-                self.kernels_path, self.eocfi_path, self.settings_manager
-            )
-        self._change_page(page)
+            self.page = self.main_page
+        self.main_layout.addWidget(self.page)
+        self.page.show()
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):

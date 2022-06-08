@@ -45,12 +45,12 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.x_data = []
-        self.x_data_CIMEL = []
+        self.x_data_cimel = []
         self.y_data = []
         self.legend = []
-        self.y_data_CIMEL = []
+        self.y_data_cimel = []
         self.u_y_data = []
-        self.u_y_data_CIMEL = []
+        self.u_y_data_cimel = []
         self._build_layout()
 
     def _build_layout(self):
@@ -73,15 +73,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.disable_buttons(True)
         self.buttons_layout.addWidget(self.export_button)
         self.buttons_layout.addWidget(self.csv_button)
-        # error message
-        self.error_message = QtWidgets.QLabel("")
-        self.error_message.setWordWrap(True)
-        self.error_message.hide()
         # finish main
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.canvas, 1)
         self.main_layout.addLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.error_message)
 
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
@@ -95,16 +90,16 @@ class GraphWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             List[Union[SurfacePoint, CustomPoint, SatellitePoint]],
         ],
-        x_data_CIMEL: Union[List[float],List[List[float]]]=[],
-        y_data_CIMEL: Union[List[float],List[List[float]]]=[],
-        u_y_data_CIMEL: Union[List[float],List[List[float]]]=[],
+        x_data_cimel: Union[List[float],List[List[float]]]=[],
+        y_data_cimel: Union[List[float],List[List[float]]]=[],
+        u_y_data_cimel: Union[List[float],List[List[float]]]=[],
     ):
         self.x_data = x_data
         self.y_data = y_data
         self.point = point
-        self.x_data_CIMEL = x_data_CIMEL
-        self.y_data_CIMEL = y_data_CIMEL
-        self.u_y_data_CIMEL = u_y_data_CIMEL
+        self.x_data_cimel = x_data_cimel
+        self.y_data_cimel = y_data_cimel
+        self.u_y_data_cimel = u_y_data_cimel
         if len(x_data) > 0 and len(y_data) > 0:
             self.disable_buttons(False)
         else:
@@ -139,15 +134,19 @@ class GraphWidget(QtWidgets.QWidget):
             and isinstance(self.y_data[0], list)
             and not isinstance(self.x_data[0], list)
         ):
-            for yd in self.y_data:
-                self.canvas.axes.plot(self.x_data, yd, marker=marker, label="Kieffer and Stone 2005")
+            for i, yd in enumerate(self.y_data):
+                self.canvas.axes.plot(self.x_data, yd, marker=marker)
+                if len(self.x_data_cimel) > i and len(self.x_data_cimel[i]) > 0:
+                    self.canvas.axes.plot(self.x_data_cimel[i], self.y_data_cimel[i], ls='none', marker="o",label="CIMEL data points")
+                    self.canvas.axes.errorbar(self.x_data_cimel[i], self.y_data_cimel[i], yerr=self.u_y_data_cimel[i]*10, capsize=3, ls='none',label="errorbars * 10")
+                    if i == 0:
+                        self.canvas.axes.legend()
         else:
-            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
-
-        self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL, ls='none', marker="o",label="CIMEL data points")
-        self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*10, capsize=3, ls='none',label="errorbars * 10")
-
-        self.canvas.axes.legend()
+            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
+            if len(self.x_data_cimel) > 0:
+                self.canvas.axes.plot(self.x_data_cimel, self.y_data_cimel, ls='none', marker="o",label="CIMEL data points")
+                self.canvas.axes.errorbar(self.x_data_cimel, self.y_data_cimel, yerr=self.u_y_data_cimel*10, capsize=3, ls='none',label="errorbars * 10")
+                self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
@@ -160,19 +159,12 @@ class GraphWidget(QtWidgets.QWidget):
             pass
         self.canvas.draw()
 
-    def clear_error(self):
-        self.error_message.hide()
-
     def show_error(self, msg: str):
-        color_red = "#c70000"
-        self.error_message.setText(msg)
-        self.error_message.setStyleSheet("background-color: {}".format(color_red))
-        self.error_message.repaint()
-        self.error_message.show()
+        error_dialog = QtWidgets.QErrorMessage(self)
+        error_dialog.showMessage(str(msg))
 
     @QtCore.Slot()
     def export_graph(self):
-        self.clear_error()
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
         )[0]
@@ -188,7 +180,6 @@ class GraphWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def export_csv(self):
-        self.clear_error()
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export CSV", "{}.csv".format(self.title)
         )[0]
@@ -216,6 +207,7 @@ class GraphWidget(QtWidgets.QWidget):
                     )
             except Exception as e:
                 self.show_error(str(e))
+                raise e
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
 

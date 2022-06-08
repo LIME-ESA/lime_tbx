@@ -86,12 +86,18 @@ def export_csv(
         writer = csv.writer(file)
         _write_point(writer, point)
         ylabels = []
-        for dt in point.dt:
-            ylabels.append("{} {}".format(str(dt), ylabel))
+        if not isinstance(point, CustomPoint) and point != None:
+            dts = point.dt
+            if not isinstance(dts, list):
+                dts = [dts]
+            for dt in dts:
+                ylabels.append("{} {}".format(str(dt), ylabel))
+        else:
+            ylabels.append(ylabel)
         writer.writerow([xlabel, *ylabels])
         if isinstance(y_data[0], list):
             for i in range(len(x_data)):
-                yd = map(str, y_data[i])
+                yd = [str(val[i]) for val in y_data]
                 writer.writerow([x_data[i], *yd])
         else:
             for i in range(len(x_data)):
