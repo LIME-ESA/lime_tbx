@@ -354,10 +354,11 @@ class InputWidget(QtWidgets.QWidget):
 
 
 class ComparisonInput(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, callback_change: Callable):
         super().__init__()
-        self.loaded_srf = None
-        self.loaded_moons = []
+        self.callback_change = callback_change
+        self.loaded_srf: SpectralResponseFunction = None
+        self.loaded_moons: List[LunarObservation] = []
         self._build_layout()
 
     def _build_layout(self):
@@ -365,20 +366,26 @@ class ComparisonInput(QtWidgets.QWidget):
         # MOON Observation data filepath
         self.moon_obs_layout = QtWidgets.QFormLayout()
         self.moon_obs_label = QtWidgets.QLabel("Lunar Observation files:")
-        self.moon_obs_feedback = QtWidgets.QLabel("")
+        self.moon_obs_feedback = QtWidgets.QLabel("No files loaded")
         self.moon_obs_feedback.setWordWrap(True)
-        self.moon_obs_button = QtWidgets.QPushButton(" Load file ")
+        self.clear_moon_obs_button = QtWidgets.QPushButton(" Unload files ")
+        self.clear_moon_obs_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.clear_moon_obs_button.clicked.connect(self.clear_obs_files)
+        self.moon_obs_button = QtWidgets.QPushButton(" Load files ")
         self.moon_obs_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.moon_obs_button.clicked.connect(self.load_obs_file)
+        self.moon_obs_button.clicked.connect(self.load_obs_files)
         self.moon_obs_layout.addRow(self.moon_obs_label, self.moon_obs_feedback)
         obs_but_layout = QtWidgets.QHBoxLayout()
         obs_but_layout.addWidget(QtWidgets.QLabel(), 1)
         obs_but_layout.addWidget(self.moon_obs_button)
+        obs_but_layout.addWidget(self.clear_moon_obs_button)
         self.moon_obs_layout.addRow(QtWidgets.QLabel(), obs_but_layout)
         # SRF filepath
         self.srf_layout = QtWidgets.QFormLayout()
         self.srf_label = QtWidgets.QLabel("SRF file:")
-        self.srf_feedback = QtWidgets.QLabel("")
+        self.srf_feedback = QtWidgets.QLabel("No file loaded")
         self.srf_feedback.setWordWrap(True)
         self.srf_button = QtWidgets.QPushButton(" Load file ")
         self.srf_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -400,19 +407,32 @@ class ComparisonInput(QtWidgets.QWidget):
         if len(shown_path) > MAX_PATH_LEN:
             shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
         self.srf_feedback.setText(shown_path)
+        self.callback_change()
 
     @QtCore.Slot()
-    def load_obs_file(self):
+    def load_obs_files(self):
         paths = QtWidgets.QFileDialog().getOpenFileNames(self)[0]
         for path in paths:
-            self.loaded_moons.append(moon.read_moon_obs(path))
-        shown_path = "loaded"  # path
-        if len(shown_path) > MAX_PATH_LEN:
-            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+            self._add_observation(moon.read_moon_obs(path))
+        shown_path = "Loaded {} files".format(len(self.loaded_moons))
         self.moon_obs_feedback.setText(shown_path)
+        self.callback_change()
 
-    def get_srf(self) -> SpectralResponseFunction:
+    def _add_observation(self, obs: LunarObservation):
+        for i, pob in enumerate(self.loaded_moons):
+            if obs.dt < pob.dt:
+                self.loaded_moons.insert(i, obs)
+                return
+        self.loaded_moons.append(obs)
+
+    @QtCore.Slot()
+    def clear_obs_files(self):
+        self.loaded_moons = []
+        self.moon_obs_feedback.setText("No files loaded")
+        self.callback_change()
+
+    def get_srf(self) -> Union[SpectralResponseFunction, None]:
         return self.loaded_srf
 
     def get_moon_obs(self) -> List[LunarObservation]:
-        return self.loaded_moons  # change this
+        return self.loaded_moons

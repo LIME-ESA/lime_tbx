@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import Union, List
+from typing import Union, List, Tuple
 from datetime import datetime
 import csv
 
@@ -25,7 +25,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint]):
+def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint, None]):
     if point is not None:
         if isinstance(point, SurfacePoint):
             writer.writerow(["latitude", point.latitude])
@@ -61,7 +61,7 @@ def export_csv(
     y_data: Union[List[float], List[List[float]]],
     xlabel: str,
     ylabel: str,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint, None],
     name: str,
 ):
     """
@@ -86,16 +86,75 @@ def export_csv(
         writer = csv.writer(file)
         _write_point(writer, point)
         ylabels = []
-        for dt in point.dt:
-            ylabels.append("{} {}".format(str(dt), ylabel))
+        if not isinstance(point, CustomPoint) and point != None:
+            dts = point.dt
+            if not isinstance(dts, list):
+                dts = [dts]
+            for dt in dts:
+                ylabels.append("{} {}".format(str(dt), ylabel))
+        else:
+            ylabels.append(ylabel)
         writer.writerow([xlabel, *ylabels])
         if isinstance(y_data[0], list):
             for i in range(len(x_data)):
-                yd = map(str, y_data[i])
+                yd = [str(val[i]) for val in y_data]
                 writer.writerow([x_data[i], *yd])
         else:
             for i in range(len(x_data)):
                 writer.writerow([x_data[i], y_data[i]])
+
+
+def export_csv_comparation(
+    x_data: List[float],
+    y_data: Tuple[List[float], List[float]],
+    xlabel: str,
+    ylabel: str,
+    points: List[SurfacePoint],
+    name: str,
+):
+    """
+    Export the given data to a csv file
+
+    Parameters
+    ----------
+    x_data: list of float
+        Data from the x axis, which would correspond to the key, of the key-value pair
+    y_data: tuple of two list of float
+        Data from the y axis, which would correspond to the value, of the key-value pair.
+        In the comparation it is the observed irradiance and the simulated one, in that exact order.
+    xlabel: str
+        Label of the x_data
+    ylabel: str
+        Label of the y_data
+    points: list of SurfacePoint | CustomPoint | SatellitePoint
+        Points from which the data is generated. In case it's None, no metadata will be printed.
+    name: str
+        CSV file path
+    """
+    with open(name, "w") as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            [
+                "UTC datetime",
+                "latitude",
+                "longitude",
+                "altitude(m)",
+                "Observed {}".format(ylabel),
+                "Simulated {}".format(ylabel),
+            ]
+        )
+        for i in range(len(x_data)):
+            pt = points[i]
+            writer.writerow(
+                [
+                    pt.dt.strftime("%Y-%m-%d %H:%M:%S"),
+                    pt.latitude,
+                    pt.longitude,
+                    pt.altitude,
+                    y_data[0][i],
+                    y_data[1][i],
+                ]
+            )
 
 
 def export_csv_integrated_irradiance(
@@ -104,13 +163,33 @@ def export_csv_integrated_irradiance(
     name: str,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
 ):
+    """
+    Export the given integrated signal data to a csv file
+
+    Parameters
+    ----------
+    srf: SpectralResponseFunction
+        Spectral response function that contains the channels of the integrated signal data.
+    irrs: list of float
+        List of irradiances of each channel, in order.
+    name: str
+        CSV file path
+    points: SurfacePoint | CustomPoint | SatellitePoint
+        Point from which the data is generated. In case it's None, no metadata will be printed.
+    """
     with open(name, "w") as file:
         writer = csv.writer(file)
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
         irr_titles = []
-        for dt in point.dt:
-            irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+        if not isinstance(point, CustomPoint) and point != None:
+            dts = point.dt
+            if not isinstance(dts, list):
+                dts = [dts]
+            for dt in dts:
+                irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+        else:
+            irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
         writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
         for i, ch in enumerate(srf.channels):
             if ch.valid_spectre == SpectralValidity.VALID:

@@ -8,6 +8,7 @@ import time
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
@@ -16,12 +17,15 @@ from ..simulation.common.common import CommonSimulation
 from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
+    LunarObservation,
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
     IrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
+    CimelData,
+    UncertaintyData,
 )
 from ..eocfi_adapter import eocfi_adapter
 import lime_tbx.lime_algorithms.rolo.eli as eli
@@ -60,7 +64,7 @@ def eli_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_data: xarray,
+    cimel_data: CimelData,
     kernels_path: str,
     eocfi_path: str,
 ) -> Tuple[
@@ -68,6 +72,9 @@ def eli_callback(
     List[float],
     List[float],
     Union[SurfacePoint, CustomPoint, SatellitePoint],
+    List[float],
+    SpectralResponseFunction,
+    Union[UncertaintyData, List[UncertaintyData]]
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -81,8 +88,13 @@ def eli_callback(
     point: Union[SurfacePoint, CustomPoint, SatellitePoint]
         Point used
     coeffs: IrradianceCoefficients
+        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
     kernels_path: str
+        Path where the directory with the SPICE kernels is located.
     eocfi_path: str
+        Path where the directory with the needed EOCFI data files is located.
 
     Returns
     -------
@@ -96,6 +108,8 @@ def eli_callback(
         Integrated irradiance signals for each srf channel
     srf: SpectralResponseFunction
         SRF used for the integrated irradiance signal calculation.
+    uncertainty_data: UncertaintyData or list of UncertaintyData
+        Calculated uncertainty data.
     """
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
@@ -103,23 +117,22 @@ def eli_callback(
     elis: Union[List[float], List[List[float]]] = []
     elis_srf: Union[List[float], List[List[float]]] = []
     if isinstance(point, SurfacePoint):
-        md=rs.get_md_from_surface(point, kernels_path)
-        elis = CommonSimulation.get_eli_from_md(def_srf, md, coeffs)
-        elis_srf = CommonSimulation.get_eli_from_md(srf, md, coeffs)
+        elis, uncertainty_data = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path, cimel_data, True)
+        elis_srf, _ = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
     elif isinstance(point, CustomPoint):
-        md = rs.get_md_from_custom(point)
-        elis = CommonSimulation.get_eli_from_md(def_srf,md,coeffs)
-        elis_srf = CommonSimulation.get_eli_from_md(srf,md,coeffs)
+        elis, uncertainty_data = rs.get_eli_from_custom(def_srf, point, coeffs, cimel_data, True)
+        elis_srf, _ = rs.get_eli_from_custom(srf, point, coeffs)
     else:
-        elis = es.get_eli_from_satellite(
-            def_srf, point, coeffs, kernels_path, eocfi_path
+        elis, uncertainty_data = es.get_eli_from_satellite(
+            def_srf, point, coeffs, kernels_path, eocfi_path, cimel_data, True
         )
-        elis_srf = es.get_eli_from_satellite(
+        elis_srf, _ = es.get_eli_from_satellite(
             srf, point, coeffs, kernels_path, eocfi_path
         )
     wlens = def_srf.get_wavelengths()
     ch_irrs = rs.integrate_elis(srf, elis_srf)
 
+    return wlens, elis, point, ch_irrs, srf, uncertainty_data
     wlen_cimel=cimel_data.wavelength.values
     coeff_cimel=cimel_data.coeff.values
     u_coeff_cimel=cimel_data.u_coeff.values
@@ -155,23 +168,55 @@ def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_data: xarray.Dataset,
+    cimel_data: CimelData,
     kernels_path: str,
     eocfi_path: str,
-) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
+) -> Tuple[
+    List[float],
+    List[float],
+    Union[SurfacePoint, CustomPoint, SatellitePoint],
+    Union[UncertaintyData, List[UncertaintyData]],
+]:
+    """Callback that performs the Reflectance operations.
+
+    Parameters
+    ----------
+    srf: SpectralResponseFunction
+        SRF that will be used to calculate the graph
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+        Point used
+    coeffs: IrradianceCoefficients
+        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
+    kernels_path: str
+        Path where the directory with the SPICE kernels is located.
+    eocfi_path: str
+        Path where the directory with the needed EOCFI data files is located.
+
+    Returns
+    -------
+    wlens: list of float
+        Wavelengths of def_srf
+    elrefs: list of float
+        Reflectances related to srf
+    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+        Point that was used in the calculations.
+    uncertainty_data: UncertaintyData or list of UncertaintyData
+        Calculated uncertainty data.
+    """
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
+    elrefs: List[float] = []
     if isinstance(point, SurfacePoint):
-        md=rs.get_md_from_surface(point, kernels_path)
-        elrefs: List[float] = rs.get_elref_from_surface(
-            srf, point, coeffs, kernels_path
+        elrefs, unc_data = rs.get_elref_from_surface(
+            srf, point, coeffs, kernels_path, cimel_data
         )
     elif isinstance(point, CustomPoint):
-        md = rs.get_md_from_custom(point)
-        elrefs: List[float] = rs.get_elref_from_custom(srf, point, coeffs)
+        elrefs, unc_data = rs.get_elref_from_custom(srf, point, coeffs, cimel_data)
     else:
-        elrefs: List[float] = es.get_elref_from_satellite(
-            srf, point, coeffs, kernels_path, eocfi_path
+        elrefs, unc_data = es.get_elref_from_satellite(
+            srf, point, coeffs, kernels_path, eocfi_path, cimel_data
         )
     wlens = srf.get_wavelengths()
 
@@ -196,6 +241,7 @@ def elref_callback(
     u_elrefs_intp = elrefs_intp*0.01# intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
     return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel, wlen_asd, elrefs_asd, elrefs_intp, u_elrefs_intp
+    return wlens, elrefs, point, unc_data
 
 
 def polar_callback(
@@ -221,6 +267,38 @@ def polar_callback(
     return wlens, polars, point
 
 
+def compare_callback(
+    mos: List[LunarObservation],
+    srf: SpectralResponseFunction,
+    coeffs: IrradianceCoefficients,
+    kernels_path: str,
+):
+    co = comparison.Comparison()
+    for mo in mos:
+        if not mo.check_valid_srf(srf):
+            raise ("SRF file not valid for the chosen Moon observations file.")
+    irrs, dts, sps = co.get_simulations(mos, srf, coeffs, kernels_path)
+    return irrs, dts, sps, mos, srf
+
+
+def _start_thread(
+    worker: CallbackWorker,
+    worker_th: QtCore.QThread,
+    finished: Callable,
+    error: Callable,
+):
+    worker.moveToThread(worker_th)
+    worker_th.started.connect(worker.run)
+    worker.finished.connect(worker_th.quit)
+    worker.finished.connect(worker.deleteLater)
+    worker.finished.connect(finished)
+    worker.exception.connect(worker_th.quit)
+    worker.exception.connect(worker.deleteLater)
+    worker.exception.connect(error)
+    worker_th.finished.connect(worker_th.deleteLater)
+    worker_th.start()
+
+
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
@@ -236,27 +314,61 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.input = input.ComparisonInput()
+        self.input = input.ComparisonInput(self._callback_compare_input_changed)
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
+        self.compare_button.setDisabled(True)
         self.output = output.ComparisonOutput()
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
         self.main_layout.addWidget(self.output)
 
+    def _callback_compare_input_changed(self):
+        obss = self.input.get_moon_obs()
+        srf = self.input.get_srf()
+        if len(obss) == 0 or srf == None:
+            self.compare_button.setDisabled(True)
+        else:
+            self.compare_button.setDisabled(False)
+
+    def _start_thread(self, finished: Callable, error: Callable):
+        self.worker_th = QtCore.QThread()
+        _start_thread(self.worker, self.worker_th, finished, error)
+
+    def _unblock_gui(self):
+        self.parentWidget().setDisabled(False)
+
+    def _block_gui_loading(self):
+        self.parentWidget().setDisabled(True)
+
     @QtCore.Slot()
     def compare(self):
-        co = comparison.Comparison()
+        self._block_gui_loading()
         mos = self.input.get_moon_obs()
         srf = self.input.get_srf()
-        for mo in mos:
-            if not mo.check_valid_srf(srf):
-                raise Exception(
-                    "SRF file not valid for the chosen Moon observations file."
-                )
         coeffs = self.settings_manager.get_irr_coeffs()
-        irrs, dts = co.get_simulations(mos, srf, coeffs, self.kernels_path)
+        self.worker = CallbackWorker(
+            compare_callback,
+            [mos, srf, coeffs, self.kernels_path],
+        )
+        self._start_thread(self.compare_finished, self.compare_error)
+
+    def compare_finished(
+        self,
+        data: Tuple[
+            List[List[float]],
+            List[List[datetime]],
+            List[List[SurfacePoint]],
+            List[LunarObservation],
+            SpectralResponseFunction,
+        ],
+    ):
+        irrs = data[0]
+        dts = data[1]
+        sps = data[2]
+        mos = data[3]
+        srf = data[4]
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         to_remove = []
@@ -266,10 +378,24 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 if mo.has_ch_value(ch):
                     obs_irrs.append(mo.ch_irrs[ch])
             if len(dts[i]) > 0:
-                self.output.update_plot(i, dts[i], [obs_irrs, irrs[i]])
+                self.output.update_plot(i, dts[i], [obs_irrs, irrs[i]], sps[i])
+                self.output.update_labels(
+                    i,
+                    "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
+                    "datetimes",
+                    "Signal (Wm⁻²nm⁻¹)",
+                )
+                self.output.update_legends(i, ["Observed Signal", "Simulated Signal"])
             else:
                 to_remove.append(ch)
         self.output.remove_channels(to_remove)
+        self._unblock_gui()
+
+    def compare_error(self, error: Exception):
+        self._unblock_gui()
+        error_dialog = QtWidgets.QErrorMessage(self)
+        error_dialog.showMessage(str(error))
+        raise error
 
 
 class MainSimulationsWidget(QtWidgets.QWidget):
@@ -341,16 +467,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
-        self.worker.moveToThread(self.worker_th)
-        self.worker_th.started.connect(self.worker.run)
-        self.worker.finished.connect(self.worker_th.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.worker.finished.connect(finished)
-        self.worker.exception.connect(self.worker_th.quit)
-        self.worker.exception.connect(self.worker.deleteLater)
-        self.worker.exception.connect(error)
-        self.worker_th.finished.connect(self.worker_th.deleteLater)
-        self.worker_th.start()
+        _start_thread(self.worker, self.worker_th, finished, error)
 
     @QtCore.Slot()
     def lower_tabs_changed(self, i: int):
@@ -382,14 +499,22 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            Union[List[float], List[List[float]]],
-            SpectralResponseFunction,
             List[float],
-            Union[List[float],List[List[float]]],
-            Union[List[float],List[List[float]]],
+            SpectralResponseFunction,
+            Union[UncertaintyData, List[UncertaintyData]],
         ],
     ):
         self._unblock_gui()
+        unc = data[5]
+        if isinstance(unc, list):
+            wlen = [u.wlen_cimel for u in unc]
+            cimel_data = [u.data for u in unc]
+            uncert = [u.uncertainties for u in unc]
+        else:
+            wlen = unc.wlen_cimel
+            cimel_data = unc.data
+            uncert = unc.uncertainties
+        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
         self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7], data[8], data[9], data[10], data[11])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
@@ -423,13 +548,20 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[float],
-            Union[List[float],List[List[float]]],
-            Union[List[float],List[List[float]]],
+            Union[UncertaintyData, List[UncertaintyData]],
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(*data)
+        unc = data[3]
+        if isinstance(unc, list):
+            wlen = [u.wlen_cimel for u in unc]
+            cimel_data = [u.data for u in unc]
+            uncert = [u.uncertainties for u in unc]
+        else:
+            wlen = unc.wlen_cimel
+            cimel_data = unc.data
+            uncert = unc.uncertainties
+        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -500,15 +632,14 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.settings_manager = settings.MockSettingsManager()
-        self.page = MainSimulationsWidget(
+        self.comparison_page = ComparisonPageWidget(
             self.kernels_path, self.eocfi_path, self.settings_manager
         )
-        self.main_layout.addWidget(self.page)
-
-    def _change_page(self, pageWidget: QtWidgets.QWidget):
-        self.main_layout.removeWidget(self.page)
-        self.page.setParent(None)
-        self.page = pageWidget
+        self.comparison_page.hide()
+        self.main_page = MainSimulationsWidget(
+            self.kernels_path, self.eocfi_path, self.settings_manager
+        )
+        self.page = self.main_page
         self.main_layout.addWidget(self.page)
 
     def setDisabled(self, arg__1: bool) -> None:
@@ -518,16 +649,16 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def propagate_close_event(self):
         pass
 
-    def change_page(self, page: LimePagesEnum):
-        if page == LimePagesEnum.COMPARISON:
-            page = ComparisonPageWidget(
-                self.kernels_path, self.eocfi_path, self.settings_manager
-            )
+    def change_page(self, pageEnum: LimePagesEnum):
+        self.main_layout.removeWidget(self.page)
+        self.page.hide()
+        self.page.setParent(None)
+        if pageEnum == LimePagesEnum.COMPARISON:
+            self.page = self.comparison_page
         else:
-            page = MainSimulationsWidget(
-                self.kernels_path, self.eocfi_path, self.settings_manager
-            )
-        self._change_page(page)
+            self.page = self.main_page
+        self.main_layout.addWidget(self.page)
+        self.page.show()
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):

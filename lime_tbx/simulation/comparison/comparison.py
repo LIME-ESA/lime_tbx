@@ -65,7 +65,7 @@ class IComparison(ABC):
         srf: SpectralResponseFunction,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> Tuple[List[List[float]], List[List[datetime]]]:
+    ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         """
         Simulate the moon irradiance for the given scenarios.
 
@@ -88,6 +88,9 @@ class IComparison(ABC):
         dts: list of list of datetime
             List containing one list per SRF channel, containing the corresponding datetimes
             for every irradiance measure.
+        sps: list of list of SurfacePoint
+            List containing one list per SRF channel, containing the corresponding SurfacePoint
+            for every irradiance measure.
         """
         pass
 
@@ -99,16 +102,17 @@ class Comparison(IComparison):
         srf: SpectralResponseFunction,
         coefficients: IrradianceCoefficients,
         kernels_path: str,
-    ) -> Tuple[List[List[float]], List[List[datetime]]]:
+    ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         ch_names = srf.get_channels_names()
         irrs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
+        sps = [[] for _ in ch_names]
         for obs in observations:
             sat_pos = obs.sat_pos
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            elis = RegularSimulation.get_eli_from_surface(
+            elis, _ = RegularSimulation.get_eli_from_surface(
                 srf, sp, coefficients, kernels_path
             )
             integrated_irrs = RegularSimulation.integrate_elis(srf, elis)
@@ -116,4 +120,5 @@ class Comparison(IComparison):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)
                     irrs[j].append(integrated_irrs[j])
-        return irrs, ch_dates
+                    sps[j].append(sp)
+        return irrs, ch_dates, sps

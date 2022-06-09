@@ -15,6 +15,7 @@ from enum import Enum
 
 """___Third-Party Modules___"""
 import numpy as np
+import xarray
 
 """___LIME Modules___"""
 from . import constants
@@ -135,6 +136,9 @@ class SpectralResponseFunction:
 
     def get_channels_names(self) -> List[str]:
         return [ch.id for ch in self.channels]
+
+    def get_channel_from_name(self, name: str) -> SRFChannel:
+        return [ch for ch in self.channels if ch.id == name][0]
 
 
 @dataclass
@@ -544,3 +548,35 @@ class LunarObservation:
             if not found:
                 return False
         return True
+
+@dataclass
+class CimelData:
+    __slots__ = ["_ds_cimel", "wavelengths", "coeffs", "unc_coeffs"]
+    # _ds_cimel : xarray DataSet with the CIMEL coefficients and uncertainties
+
+
+    @dataclass
+    class _CimelCoeffs:
+        __slots__ = ["_coeffs", "a_coeffs", "b_coeffs", "c_coeffs", "d_coeffs", "p_coeffs"]
+
+        def __init__(self, coeffs: np.ndarray):
+            self._coeffs = coeffs
+            self.a_coeffs = coeffs[0:4,:]
+            self.b_coeffs = coeffs[4:7,:]
+            self.c_coeffs = coeffs[7:11,:]
+            self.d_coeffs = coeffs[11:14,:]
+            self.p_coeffs = coeffs[14::,:]
+
+    def __init__(self, ds_cimel: xarray.Dataset):
+        self._ds_cimel = ds_cimel
+        self.wavelengths: np.ndarray = ds_cimel.wavelength.values
+        coeffs: np.ndarray = ds_cimel.coeff.values
+        self.coeffs = CimelData._CimelCoeffs(coeffs)
+        u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values
+        self.unc_coeffs = CimelData._CimelCoeffs(u_coeff_cimel)
+
+@dataclass
+class UncertaintyData:
+    wlen_cimel: np.ndarray
+    data: np.ndarray
+    uncertainties: np.ndarray

@@ -8,6 +8,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 import math
+from typing import List, Union
 
 """___Third-Party Modules___"""
 # import here
@@ -16,7 +17,11 @@ import punpy
 
 """___LIME Modules___"""
 from . import esi, elref
-from ...datatypes.datatypes import MoonData, IrradianceCoefficients
+from ...datatypes.datatypes import (
+    MoonData,
+    IrradianceCoefficients,
+    CimelData,
+)
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -53,54 +58,46 @@ def calculate_eli(
         wavelength_nm, moon_data, coefficients
     )
 
-    solid_angle_moon: float = 6.4177e-05
-    omega = solid_angle_moon
     esk = esi.get_esi_per_nm(wavelength_nm)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
-    distance_earth_moon_km: int = 384400
 
-    lunar_irr = measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom)
-
+    lunar_irr = measurement_func_eli(a_l, esk, dsm, dom)
 
     return lunar_irr
 
 def calculate_eli_band(
-    wavelength_nm: float, moon_data: MoonData, coefficients: IrradianceCoefficients
+    cimel_data: CimelData, moon_data: MoonData
 ) -> np.ndarray:
     """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
+    for a concrete set of empirical data points.
 
     Simulates a lunar observation for a wavelength for any observer/solar selenographic
     latitude and longitude. The irradiance is calculated in Wm⁻²/nm.
 
+    This simulation is for the empirical CIMEL data.
+
     Parameters
     ----------
-    wavelength_nm : float
-        Wavelength (in nanometers) of which the extraterrestrial lunar irradiance will be
-        calculated.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
-    coefficients : IrradianceCoefficients
-        Needed coefficients for the simulation.
 
     Returns
     -------
-    float
-        The extraterrestrial lunar irradiance calculated
+    np.ndarray of float
+        The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
     a_l = elref.band_moon_disk_reflectance(
-                    wavelength_nm, moon_data, coefficients
-                )
+        cimel_data, moon_data
+    )
 
-
-    solid_angle_moon: float = 6.4177e-05
-    omega = solid_angle_moon
-    esk = [esi.get_esi_per_nm(wav) for wav in wavelength_nm]
+    esk = [esi.get_esi_per_nm(wav) for wav in cimel_data.wavelengths]
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
-    distance_earth_moon_km: int = 384400
 
-    lunar_irr = measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom)
+    lunar_irr = measurement_func_eli(a_l, esk, dsm, dom)
     return lunar_irr
 
 def calculate_eli_from_elref(
@@ -137,42 +134,34 @@ def calculate_eli_from_elref(
     return lunar_irr
 
 def calculate_eli_band_unc(
-    wavelength_nm: float, moon_data: MoonData, coefficients: np.ndarray, u_coefficients: np.ndarray
+    cimel_data: CimelData, moon_data: MoonData,
 ) -> np.ndarray:
-    """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
+    """
+    Calculates the uncertainty for the ELI calculations of empirical data points.
 
-    Simulates a lunar observation for a wavelength for any observer/solar selenographic
-    latitude and longitude. The irradiance is calculated in Wm⁻²/nm.
+    This uncertainties is for the empirical CIMEL data.
 
     Parameters
     ----------
-    wavelength_nm : float
-        Wavelength (in nanometers) of which the extraterrestrial lunar irradiance will be
-        calculated.
+    cimel_data: CimelData
+        CimelData with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
-    coefficients : IrradianceCoefficients
-        Needed coefficients for the simulation.
 
     Returns
     -------
-    float
-        The extraterrestrial lunar irradiance calculated
+    np.ndarray of float
+        The uncertainties calculated
     """
-    a_l = elref.band_moon_disk_reflectance(wavelength_nm,moon_data,coefficients)
-    u_a_l = elref.band_moon_disk_reflectance_unc(
-                    wavelength_nm, moon_data, coefficients, u_coefficients
-                )
+    wlen = cimel_data.wavelengths
+    a_l = elref.band_moon_disk_reflectance(cimel_data, moon_data)
+    u_a_l = elref.band_moon_disk_reflectance_unc(cimel_data, moon_data)
 
-
-    solid_angle_moon: float = 6.4177e-05
-    omega = solid_angle_moon
-    esk = [esi.get_esi_per_nm(wav) for wav in wavelength_nm]
+    esk = [esi.get_esi_per_nm(wav) for wav in wlen]
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
-    distance_earth_moon_km: int = 384400
 
-    lunar_irr = measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom)
+    lunar_irr = measurement_func_eli(a_l, esk, dsm, dom)
 
     # prop = punpy.MCPropagation(1000)
     #
@@ -226,7 +215,13 @@ def calculate_eli_unc_from_elref(
 
     return unc
 
-def measurement_func_eli(a_l,omega,esk,dsm,distance_earth_moon_km,dom):
-
+def measurement_func_eli(a_l: Union[float, np.ndarray], esk: Union[float, List[float]], dsm: float,
+    dom: float) -> Union[float, np.ndarray]:
+    """
+    Final computation of the Eq 3 in Roman et al., 2020
+    """
+    solid_angle_moon: float = 6.4177e-05
+    omega = solid_angle_moon
+    distance_earth_moon_km: int = 384400
     lunar_irr = (((a_l*omega*esk)/math.pi)*((1/dsm)**2)*(distance_earth_moon_km/dom)**2)
     return lunar_irr
