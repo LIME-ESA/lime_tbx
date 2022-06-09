@@ -20,6 +20,7 @@ from ..datatypes.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
+    SpectralData
 )
 from ..filedata import csv
 
@@ -44,16 +45,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
-        self.x_data = []
-        self.x_data_CIMEL = []
-        self.x_data_ASD = []
-        self.y_data = []
-        self.y_data_CIMEL = []
-        self.y_data_ASD = []
-        self.y_data_intp = []
-        self.u_y_data = []
-        self.u_y_data_CIMEL = []
-        self.u_y_data_intp = []
+        self.data = []
+        self.cimel_data = []
+        self.asd_data = []
+        self.intp_data = []
         self._build_layout()
 
     def _build_layout(self):
@@ -87,38 +82,16 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_plot(
         self,
-        x_data: Union[List[float], List[List[float]]],
-        y_data: Union[List[float], List[List[float]]],
-        point: Tuple[
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[Union[SurfacePoint, CustomPoint, SatellitePoint]],
-        ],
-        x_data_cimel: Union[List[float], List[List[float]]] = [],
-        y_data_cimel: Union[List[float], List[List[float]]] = [],
-        u_y_data_cimel: Union[List[float], List[List[float]]] = [],
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
-        x_data_CIMEL: Union[List[float],List[List[float]]]=[],
-        y_data_CIMEL: Union[List[float],List[List[float]]]=[],
-        u_y_data_CIMEL: Union[List[float],List[List[float]]]=[],
-        x_data_ASD: Union[List[float],List[List[float]]]=[],
-        y_data_ASD: Union[List[float],List[List[float]]] = [],
-        y_data_intp: Union[List[float],List[List[float]]] = [],
-        u_y_data_intp: Union[List[float],List[List[float]]] = [],
-    ):
-        self.x_data = np.array(x_data)
-        self.y_data = np.array(y_data)
-        self.point = point
-        self.x_data_CIMEL = np.array(x_data_CIMEL)
-        self.y_data_CIMEL = np.array(y_data_CIMEL)
-        self.u_y_data_CIMEL = np.array(u_y_data_CIMEL)
-        self.x_data_ASD = np.array(x_data_ASD)
-        self.y_data_ASD = np.array(y_data_ASD)
-        self.y_data_intp = np.array(y_data_intp)
-        self.u_y_data_intp = np.array(u_y_data_intp)
-        self.x_data_cimel = x_data_cimel
-        self.y_data_cimel = y_data_cimel
-        self.u_y_data_cimel = u_y_data_cimel
-        if len(x_data) > 0 and len(y_data) > 0:
+        data: Union[SpectralData,List[SpectralData]] = [],
+        data_cimel: Union[SpectralData,List[SpectralData]] = [],
+        data_asd: Union[SpectralData,List[SpectralData]] = [],
+        data_intp: Union[SpectralData,List[SpectralData]] = [],
+        ):
+        self.data = data
+        self.cimel_data = data_cimel
+        self.asd_data = data_asd
+        self.intp_data = data_intp
+        if len(data.wlen) > 0:
             self.disable_buttons(False)
         else:
             self.disable_buttons(True)
@@ -173,36 +146,36 @@ class GraphWidget(QtWidgets.QWidget):
                     if i == 0:
                         self.canvas.axes.legend()
         else:
-            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
+            self.canvas.axes.plot(self.data.wlen, self.data.data, marker=marker, label="Kieffer and Stone 2005")
 
-        if len(self.x_data_ASD)>0:
-            self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD/5.,label="ASD data points")
+        if len(self.data.wlen)>0:
+            self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
 
-            self.canvas.axes.plot(self.x_data, self.y_data_intp,"g",label="interpolated data points")
-            self.canvas.axes.fill_between(self.x_data, self.y_data_intp-2*self.u_y_data_intp,self.y_data_intp+2*self.u_y_data_intp,color="green",alpha=0.3)
+            self.canvas.axes.plot(self.intp_data.wlen, self.intp_data.data,"g",label="interpolated data points")
+            self.canvas.axes.fill_between(self.intp_data.wlen, self.intp_data.data-2*self.intp_data.uncertainties,self.intp_data.data+2*self.intp_data.uncertainties,color="green",alpha=0.3)
 
-            self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL,color="orange", ls='none', marker="o",label="CIMEL data points")
-            self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
+            self.canvas.axes.plot(self.cimel_data.wlen, self.cimel_data.data,color="orange", ls='none', marker="o",label="CIMEL data points")
+            self.canvas.axes.errorbar(self.cimel_data.wlen, self.cimel_data.data, yerr=self.cimel_data.uncertainties*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
 
         self.canvas.axes.legend()
-            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
-            if len(self.x_data_cimel) > 0:
-                self.canvas.axes.plot(
-                    self.x_data_cimel,
-                    self.y_data_cimel,
-                    ls="none",
-                    marker="o",
-                    label="CIMEL data points",
-                )
-                self.canvas.axes.errorbar(
-                    self.x_data_cimel,
-                    self.y_data_cimel,
-                    yerr=self.u_y_data_cimel * 10,
-                    capsize=3,
-                    ls="none",
-                    label="errorbars * 10",
-                )
-                self.canvas.axes.legend()
+        self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
+        if len(self.x_data_cimel) > 0:
+            self.canvas.axes.plot(
+                self.x_data_cimel,
+                self.y_data_cimel,
+                ls="none",
+                marker="o",
+                label="CIMEL data points",
+            )
+            self.canvas.axes.errorbar(
+                self.x_data_cimel,
+                self.y_data_cimel,
+                yerr=self.u_y_data_cimel * 10,
+                capsize=3,
+                ls="none",
+                label="errorbars * 10",
+            )
+            self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)

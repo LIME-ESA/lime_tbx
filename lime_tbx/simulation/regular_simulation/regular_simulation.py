@@ -271,30 +271,6 @@ class IRegularSimulation(ABC):
 
 class RegularSimulation(IRegularSimulation):
     @staticmethod
-    def get_md_from_surface(
-        sp: SurfacePoint,
-        kernels_path: str,
-    ) -> MoonData:
-        md = SPICEAdapter().get_moon_data_from_earth(sp.latitude,sp.longitude,
-            sp.altitude,sp.dt,kernels_path)
-        return md
-
-    @staticmethod
-    def get_md_from_custom(
-        cp: CustomPoint,
-    ) -> MoonData:
-        md = MoonData(
-            cp.distance_sun_moon,
-            cp.distance_observer_moon,
-            cp.selen_sun_lon,
-            cp.selen_obs_lat,
-            cp.selen_obs_lon,
-            cp.abs_moon_phase_angle,
-            cp.moon_phase_angle,
-        )
-        return md
-
-    @staticmethod
     def get_eli_from_surface(
         srf: SpectralResponseFunction,
         sp: SurfacePoint,

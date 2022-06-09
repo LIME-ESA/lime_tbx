@@ -12,9 +12,9 @@ import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
-from ..simulation.regular_simulation import regular_simulation
-from ..simulation.common.common import CommonSimulation
-from ..simulation.esa_satellites import esa_satellites
+# from ..simulation.regular_simulation import regular_simulation
+# from ..simulation.common.common import CommonSimulation
+# from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     LunarObservation,
@@ -24,15 +24,11 @@ from ..datatypes.datatypes import (
     IrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
-    CimelData,
-    UncertaintyData,
+    CimelCoef,
+    SpectralData,
 )
 from ..eocfi_adapter import eocfi_adapter
-import lime_tbx.lime_algorithms.rolo.eli as eli
-import lime_tbx.lime_algorithms.rolo.elref as elref
-from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import SpectralInterpolation
-import xarray
-import obsarray
+from lime_tbx.simulation.lime_simulation import LimeSimulation
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -64,9 +60,8 @@ def eli_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_data: CimelData,
-    kernels_path: str,
-    eocfi_path: str,
+    cimel_coef: CimelCoef,
+    lime_simulation: LimeSimulation,
 ) -> Tuple[
     List[float],
     List[float],
@@ -74,7 +69,7 @@ def eli_callback(
     Union[SurfacePoint, CustomPoint, SatellitePoint],
     List[float],
     SpectralResponseFunction,
-    Union[UncertaintyData, List[UncertaintyData]]
+    Union[SpectralData, List[SpectralData]]
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -108,74 +103,23 @@ def eli_callback(
         Integrated irradiance signals for each srf channel
     srf: SpectralResponseFunction
         SRF used for the integrated irradiance signal calculation.
-    uncertainty_data: UncertaintyData or list of UncertaintyData
+    uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    rs = regular_simulation.RegularSimulation
-    es = esa_satellites.ESASatellites
-    time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
-    elis: Union[List[float], List[List[float]]] = []
-    elis_srf: Union[List[float], List[List[float]]] = []
-    if isinstance(point, SurfacePoint):
-        elis, uncertainty_data = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path, cimel_data, True)
-        elis_srf, _ = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
-    elif isinstance(point, CustomPoint):
-        elis, uncertainty_data = rs.get_eli_from_custom(def_srf, point, coeffs, cimel_data, True)
-        elis_srf, _ = rs.get_eli_from_custom(srf, point, coeffs)
-    else:
-        elis, uncertainty_data = es.get_eli_from_satellite(
-            def_srf, point, coeffs, kernels_path, eocfi_path, cimel_data, True
-        )
-        elis_srf, _ = es.get_eli_from_satellite(
-            srf, point, coeffs, kernels_path, eocfi_path
-        )
-    wlens = def_srf.get_wavelengths()
-    ch_irrs = rs.integrate_elis(srf, elis_srf)
-
-    return wlens, elis, point, ch_irrs, srf, uncertainty_data
-    wlen_cimel=cimel_data.wavelength.values
-    coeff_cimel=cimel_data.coeff.values
-    u_coeff_cimel=cimel_data.u_coeff.values
-
-    if True:  ## avoid this part by using elref calculated elsewhere and stored in class attribute
-        elrefs_cimel = elref.band_moon_disk_reflectance(wlen_cimel,md,coeff_cimel)
-        u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(wlen_cimel,md,coeff_cimel,
-            u_coeff_cimel)
-
-        intp = SpectralInterpolation()
-
-        asd_ref = intp.get_best_asd_reference(md)
-        wlen_asd = asd_ref.wavelength.values
-        elrefs_asd = asd_ref.reflectance.values
-        u_elrefs_asd = asd_ref.unc["reflectance"].total
-
-        elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,
-                                                 elrefs_asd,wlens)
-        u_elrefs_intp = elrefs_intp*0.01  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
-
-    elis_cimel = eli.calculate_eli_from_elref(wlen_cimel,md,elrefs_cimel)
-    u_elis_cimel = eli.calculate_eli_band_unc(wlen_cimel,md,coeff_cimel,u_coeff_cimel)
-
-    elis_asd = eli.calculate_eli_from_elref(wlen_asd,md,elrefs_asd)
-
-    elis_intp = eli.calculate_eli_from_elref(wlens,md,elrefs_intp)
-    u_elis_intp = eli.calculate_eli_unc_from_elref(wlens,md,elrefs_intp,u_elrefs_intp)
-
-    return wlens, elis, point, ch_irrs, srf, wlen_cimel, elis_cimel, u_elis_cimel, wlen_asd, elis_asd, elis_intp, u_elis_intp
-
+    lime_simulation.update_model()
+    return lime_simulation.wlens,lime_simulation.elis,point,srf,lime_simulation.unc_data
 
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
     cimel_data: CimelData,
-    kernels_path: str,
-    eocfi_path: str,
+    lime_simulation: LimeSimulation,
 ) -> Tuple[
     List[float],
     List[float],
     Union[SurfacePoint, CustomPoint, SatellitePoint],
-    Union[UncertaintyData, List[UncertaintyData]],
+    Union[SpectralData, List[SpectralData]],
 ]:
     """Callback that performs the Reflectance operations.
 
@@ -202,69 +146,22 @@ def elref_callback(
         Reflectances related to srf
     point: Union[SurfacePoint, CustomPoint, SatellitePoint]
         Point that was used in the calculations.
-    uncertainty_data: UncertaintyData or list of UncertaintyData
+    uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    rs = regular_simulation.RegularSimulation
-    es = esa_satellites.ESASatellites
-    elrefs: List[float] = []
-    if isinstance(point, SurfacePoint):
-        elrefs, unc_data = rs.get_elref_from_surface(
-            srf, point, coeffs, kernels_path, cimel_data
-        )
-    elif isinstance(point, CustomPoint):
-        elrefs, unc_data = rs.get_elref_from_custom(srf, point, coeffs, cimel_data)
-    else:
-        elrefs, unc_data = es.get_elref_from_satellite(
-            srf, point, coeffs, kernels_path, eocfi_path, cimel_data
-        )
-    wlens = srf.get_wavelengths()
-
-    wlen_cimel = cimel_data.wavelength.values
-    coeff_cimel = cimel_data.coeff.values
-    u_coeff_cimel = cimel_data.u_coeff.values
-    elrefs_cimel = elref.band_moon_disk_reflectance(
-                    wlen_cimel,md,coeff_cimel
-                )
-    u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(
-                    wlen_cimel,md,coeff_cimel,u_coeff_cimel
-                )
-
-    intp=SpectralInterpolation()
-
-    asd_ref=intp.get_best_asd_reference(md)
-    wlen_asd = asd_ref.wavelength.values
-    elrefs_asd = asd_ref.reflectance.values
-    u_elrefs_asd = asd_ref.unc["reflectance"].total
-
-    elrefs_intp = intp.get_interpolated_refl(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens)
-    u_elrefs_intp = elrefs_intp*0.01# intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
-
-    return wlens, elrefs, point, wlen_cimel, elrefs_cimel, u_elrefs_cimel, wlen_asd, elrefs_asd, elrefs_intp, u_elrefs_intp
-    return wlens, elrefs, point, unc_data
+    lime_simulation.update_model()
+    return lime_simulation.wlens, lime_simulation.elrefs, point, lime_simulation.unc_data
 
 
 def polar_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: PolarizationCoefficients,
-    kernels_path: str,
-    eocfi_path: str,
+    lime_simulation: LimeSimulation,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
-    rs = regular_simulation.RegularSimulation
-    es = esa_satellites.ESASatellites
-    if isinstance(point, SurfacePoint):
-        polars: List[float] = rs.get_polarized_from_surface(
-            srf, point, coeffs, kernels_path
-        )
-    elif isinstance(point, CustomPoint):
-        polars: List[float] = rs.get_polarized_from_custom(srf, point, coeffs)
-    else:
-        polars: List[float] = es.get_polarized_from_satellite(
-            srf, point, coeffs, kernels_path, eocfi_path
-        )
-    wlens = srf.get_wavelengths()
-    return wlens, polars, point
+
+    lime_simulation.update_model()
+    return lime_simulation.wlens,lime_simulation.polars,point
 
 
 def compare_callback(
@@ -302,13 +199,9 @@ def _start_thread(
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
-        kernels_path: str,
-        eocfi_path: str,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
-        self.kernels_path = kernels_path
-        self.eocfi_path = eocfi_path
         self.settings_manager = settings_manager
         self._build_layout()
 
@@ -411,10 +304,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
-        self.kernels_path = kernels_path
-        self.eocfi_path = eocfi_path
+        self.lime_simulation = LimeSimulation(eocfi_path,kernels_path)
         self.settings_manager = settings_manager
-        self.eocfi = eocfi_adapter.EOCFIConverter(self.eocfi_path)
+        self.eocfi = eocfi_adapter.EOCFIConverter(eocfi_path)
         self.satellites = self.eocfi.get_sat_list()
         self._build_layout()
 
@@ -489,7 +381,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path],
+            [def_srf, srf, point, coeffs, cimel_data,self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -501,7 +393,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             List[float],
             SpectralResponseFunction,
-            Union[UncertaintyData, List[UncertaintyData]],
+            Union[SpectralData, List[SpectralData]],
         ],
     ):
         self._unblock_gui()
@@ -538,7 +430,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path]
+            elref_callback, [def_srf, point, coeffs, cimel_data,self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -548,7 +440,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             List[float],
             Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            Union[UncertaintyData, List[UncertaintyData]],
+            Union[SpectralData, List[SpectralData]],
         ],
     ):
         self._unblock_gui()
@@ -583,7 +475,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            polar_callback, [def_srf, point, coeffs, self.kernels_path, self.eocfi_path]
+            polar_callback, [def_srf, point, coeffs,self.lime_simulation]
         )
         self._start_thread(self.polar_finished, self.polar_error)
 

@@ -16,10 +16,12 @@ from enum import Enum
 """___Third-Party Modules___"""
 import numpy as np
 import xarray
+import obsarray
+
 
 """___LIME Modules___"""
 from . import constants
-
+from lime_tbx.datatypes.templates_digital_effects_table import template_refl
 
 @dataclass
 class MoonData:
@@ -550,7 +552,7 @@ class LunarObservation:
         return True
 
 @dataclass
-class CimelData:
+class CimelCoef:
     __slots__ = ["_ds_cimel", "wavelengths", "coeffs", "unc_coeffs"]
     # _ds_cimel : xarray DataSet with the CIMEL coefficients and uncertainties
 
@@ -571,12 +573,70 @@ class CimelData:
         self._ds_cimel = ds_cimel
         self.wavelengths: np.ndarray = ds_cimel.wavelength.values
         coeffs: np.ndarray = ds_cimel.coeff.values
-        self.coeffs = CimelData._CimelCoeffs(coeffs)
+        self.coeffs = CimelCoef._CimelCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values
-        self.unc_coeffs = CimelData._CimelCoeffs(u_coeff_cimel)
+        self.unc_coeffs = CimelCoef._CimelCoeffs(u_coeff_cimel)
 
 @dataclass
-class UncertaintyData:
-    wlen_cimel: np.ndarray
+class SpectralData:
+    wlen: np.ndarray
     data: np.ndarray
     uncertainties: np.ndarray
+    ds: xarray.Dataset
+
+    @staticmethod
+    def make_reflectance_ds(wavs,refl,unc=None):
+        dim_sizes = {"wavelength":len(wavs)}
+        # create dataset
+        ds_refl = obsarray.create_ds(template_refl,dim_sizes)
+
+        ds_refl = ds_refl.assign_coords(wavelength=wavs)
+
+        ds_refl.reflectance.values = refl
+
+        if unc:
+            ds_refl.u_ran_reflectance.values = unc[0]
+            ds_refl.u_sys_reflectance.values = unc[1]
+        else:
+            ds_refl.u_ran_reflectance.values = refl*0.01
+            ds_refl.u_sys_reflectance.values = refl*0.05
+
+        return ds_refl
+
+    @staticmethod
+    def make_irradiance_ds(wavs,refl,unc=None):
+        dim_sizes = {"wavelength":len(wavs)}
+        # create dataset
+        ds_irr = obsarray.create_ds(template_refl,dim_sizes)
+
+        ds_irr = ds_irr.assign_coords(wavelength=wavs)
+
+        ds_irr.reflectance.values = refl
+
+        if unc:
+            ds_irr.u_ran_reflectance.values = unc[0]
+            ds_irr.u_sys_reflectance.values = unc[1]
+        else:
+            ds_irr.u_ran_reflectance.values = refl*0.01
+            ds_irr.u_sys_reflectance.values = refl*0.05
+
+        return ds_irr
+
+    @staticmethod
+    def make_polarization_ds(wavs,refl,unc=None):
+        dim_sizes = {"wavelength":len(wavs)}
+        # create dataset
+        ds_pol = obsarray.create_ds(template_refl,dim_sizes)
+
+        ds_pol = ds_pol.assign_coords(wavelength=wavs)
+
+        ds_pol.reflectance.values = refl
+
+        if unc:
+            ds_pol.u_ran_reflectance.values = unc[0]
+            ds_pol.u_sys_reflectance.values = unc[1]
+        else:
+            ds_pol.u_ran_reflectance.values = refl*0.01
+            ds_pol.u_sys_reflectance.values = refl*0.05
+
+        return ds_pol
