@@ -168,7 +168,10 @@ def export_csv_integrated_irradiance(
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
         irr_titles = []
-        for dt in point.dt:
+        dts = point.dt
+        if not isinstance(dts, list):
+            dts = [dts]
+        for dt in dts:
             irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
         writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
         for i, ch in enumerate(srf.channels):
