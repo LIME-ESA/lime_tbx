@@ -149,13 +149,13 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker, label="Kieffer and Stone 2005")
 
         if len(self.x_data_ASD)>0:
-            self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD/10.,label="ASD data points")
+            self.canvas.axes.plot(self.x_data_ASD, self.y_data_ASD/5.,label="ASD data points")
 
             self.canvas.axes.plot(self.x_data, self.y_data_intp,"g",label="interpolated data points")
             self.canvas.axes.fill_between(self.x_data, self.y_data_intp-2*self.u_y_data_intp,self.y_data_intp+2*self.u_y_data_intp,color="green",alpha=0.3)
 
             self.canvas.axes.plot(self.x_data_CIMEL, self.y_data_CIMEL,color="orange", ls='none', marker="o",label="CIMEL data points")
-            self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*2, color="orange", capsize=3, ls='none',label="uncertainties (k=2)")
+            self.canvas.axes.errorbar(self.x_data_CIMEL, self.y_data_CIMEL, yerr=self.u_y_data_CIMEL*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
 
         self.canvas.axes.legend()
 
