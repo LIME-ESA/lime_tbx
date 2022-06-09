@@ -90,9 +90,9 @@ class GraphWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             List[Union[SurfacePoint, CustomPoint, SatellitePoint]],
         ],
-        x_data_cimel: Union[List[float],List[List[float]]]=[],
-        y_data_cimel: Union[List[float],List[List[float]]]=[],
-        u_y_data_cimel: Union[List[float],List[List[float]]]=[],
+        x_data_cimel: Union[List[float], List[List[float]]] = [],
+        y_data_cimel: Union[List[float], List[List[float]]] = [],
+        u_y_data_cimel: Union[List[float], List[List[float]]] = [],
     ):
         self.x_data = x_data
         self.y_data = y_data
@@ -137,15 +137,41 @@ class GraphWidget(QtWidgets.QWidget):
             for i, yd in enumerate(self.y_data):
                 self.canvas.axes.plot(self.x_data, yd, marker=marker)
                 if len(self.x_data_cimel) > i and len(self.x_data_cimel[i]) > 0:
-                    self.canvas.axes.plot(self.x_data_cimel[i], self.y_data_cimel[i], ls='none', marker="o",label="CIMEL data points")
-                    self.canvas.axes.errorbar(self.x_data_cimel[i], self.y_data_cimel[i], yerr=self.u_y_data_cimel[i]*10, capsize=3, ls='none',label="errorbars * 10")
+                    self.canvas.axes.plot(
+                        self.x_data_cimel[i],
+                        self.y_data_cimel[i],
+                        ls="none",
+                        marker="o",
+                        label="CIMEL data points",
+                    )
+                    self.canvas.axes.errorbar(
+                        self.x_data_cimel[i],
+                        self.y_data_cimel[i],
+                        yerr=self.u_y_data_cimel[i] * 10,
+                        capsize=3,
+                        ls="none",
+                        label="errorbars * 10",
+                    )
                     if i == 0:
                         self.canvas.axes.legend()
         else:
             self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
             if len(self.x_data_cimel) > 0:
-                self.canvas.axes.plot(self.x_data_cimel, self.y_data_cimel, ls='none', marker="o",label="CIMEL data points")
-                self.canvas.axes.errorbar(self.x_data_cimel, self.y_data_cimel, yerr=self.u_y_data_cimel*10, capsize=3, ls='none',label="errorbars * 10")
+                self.canvas.axes.plot(
+                    self.x_data_cimel,
+                    self.y_data_cimel,
+                    ls="none",
+                    marker="o",
+                    label="CIMEL data points",
+                )
+                self.canvas.axes.errorbar(
+                    self.x_data_cimel,
+                    self.y_data_cimel,
+                    yerr=self.u_y_data_cimel * 10,
+                    capsize=3,
+                    ls="none",
+                    label="errorbars * 10",
+                )
                 self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
@@ -159,9 +185,10 @@ class GraphWidget(QtWidgets.QWidget):
             pass
         self.canvas.draw()
 
-    def show_error(self, msg: str):
+    def show_error(self, error: Exception):
         error_dialog = QtWidgets.QErrorMessage(self)
-        error_dialog.showMessage(str(msg))
+        error_dialog.showMessage(str(error))
+        raise error
 
     @QtCore.Slot()
     def export_graph(self):
@@ -174,7 +201,7 @@ class GraphWidget(QtWidgets.QWidget):
             try:
                 self.canvas.print_figure(name)
             except Exception as e:
-                self.show_error(str(e))
+                self.show_error(e)
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
 
@@ -206,8 +233,7 @@ class GraphWidget(QtWidgets.QWidget):
                         name,
                     )
             except Exception as e:
-                self.show_error(str(e))
-                raise e
+                self.show_error(e)
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
 
@@ -226,10 +252,6 @@ class SignalWidget(QtWidgets.QWidget):
         self.range_warning = None
         # table
         self.table = QtWidgets.QTableWidget()
-        # error message
-        self.error_message = QtWidgets.QLabel("")
-        self.error_message.setWordWrap(True)
-        self.error_message.hide()
         # csv button
         self.button_csv = QtWidgets.QPushButton("Export CSV")
         self.button_csv.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -238,7 +260,6 @@ class SignalWidget(QtWidgets.QWidget):
         self.container_layout.addLayout(self.data_layout, 1)
         self.data_layout.addWidget(self.table)
         self.container_layout.addStretch()
-        self.container_layout.addWidget(self.error_message)
         self.container_layout.addWidget(self.button_csv)
 
         self.scroll_area = QtWidgets.QScrollArea()
@@ -322,19 +343,13 @@ for wavelengths between 350 and 2500 nm"
     def disable_buttons(self, disable: bool):
         self.button_csv.setDisabled(disable)
 
-    def clear_error(self):
-        self.error_message.hide()
-
-    def show_error(self, msg: str):
-        color_red = "#c70000"
-        self.error_message.setText(msg)
-        self.error_message.setStyleSheet("background-color: {}".format(color_red))
-        self.error_message.repaint()
-        self.error_message.show()
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QErrorMessage(self)
+        error_dialog.showMessage(str(error))
+        raise error
 
     @QtCore.Slot()
     def export_csv(self):
-        self.clear_error()
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export CSV", "{}.csv".format("Signal")
         )[0]
@@ -346,7 +361,7 @@ for wavelengths between 350 and 2500 nm"
                     self.srf, self.irrs, name, self.point
                 )
             except Exception as e:
-                self.show_error(str(e))
+                self.show_error(e)
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
 
