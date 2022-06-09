@@ -163,16 +163,33 @@ def export_csv_integrated_irradiance(
     name: str,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
 ):
+    """
+    Export the given integrated signal data to a csv file
+
+    Parameters
+    ----------
+    srf: SpectralResponseFunction
+        Spectral response function that contains the channels of the integrated signal data.
+    irrs: list of float
+        List of irradiances of each channel, in order.
+    name: str
+        CSV file path
+    points: SurfacePoint | CustomPoint | SatellitePoint
+        Point from which the data is generated. In case it's None, no metadata will be printed.
+    """
     with open(name, "w") as file:
         writer = csv.writer(file)
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
         irr_titles = []
-        dts = point.dt
-        if not isinstance(dts, list):
-            dts = [dts]
-        for dt in dts:
-            irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+        if not isinstance(point, CustomPoint) and point != None:
+            dts = point.dt
+            if not isinstance(dts, list):
+                dts = [dts]
+            for dt in dts:
+                irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+        else:
+            irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
         writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
         for i, ch in enumerate(srf.channels):
             if ch.valid_spectre == SpectralValidity.VALID:
