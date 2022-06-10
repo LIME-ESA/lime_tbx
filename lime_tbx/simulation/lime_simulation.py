@@ -115,14 +115,13 @@ class LimeSimulation():
         
         elrefs_intp = self.intp.get_interpolated_refl(cimel_coeff.wlen,cimel_coeff.data,
                                                  asd_data.wlen,asd_data.data,self.wlen)
-        print("here3",elrefs_intp,self.wlen)
         u_elrefs_intp = None
         if calc_uncertainty:
             u_elrefs_intp = elrefs_intp*0.01  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
         ds_intp = SpectralData.make_reflectance_ds(self.wlen,elrefs_intp,u_elrefs_intp)
 
-        spectral_data = SpectralData(cimel_coeff.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
+        spectral_data = SpectralData(self.wlen.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
         return spectral_data
 
     def calculate_eli_from_elref(self, moon_data: MoonData,
