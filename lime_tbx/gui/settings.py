@@ -68,7 +68,7 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_cimel_data(self) -> CimelCoef:
+    def get_cimel_coef(self) -> CimelCoef:
         """Obtain the CimelCoef the CIMEL coefficients and uncertainties"""
         pass
 
@@ -106,5 +106,5 @@ class MockSettingsManager(ISettingsManager):
     def get_available_srfs(self) -> List[SpectralResponseFunction]:
         return self.srfs
 
-    def get_cimel_data(self) -> CimelCoef:
+    def get_cimel_coef(self) -> CimelCoef:
         return access_data._get_default_cimel_coef()

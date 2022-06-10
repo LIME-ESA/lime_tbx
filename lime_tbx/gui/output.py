@@ -48,7 +48,6 @@ class GraphWidget(QtWidgets.QWidget):
         self.data = None
         self.cimel_data = None
         self.asd_data = None
-        self.intp_data = None
         self._build_layout()
 
     def _build_layout(self):
@@ -85,12 +84,10 @@ class GraphWidget(QtWidgets.QWidget):
         data: Union[SpectralData,List[SpectralData]] = None,
         data_cimel: Union[SpectralData,List[SpectralData]] = None,
         data_asd: Union[SpectralData,List[SpectralData]] = None,
-        data_intp: Union[SpectralData,List[SpectralData]] = None,
         ):
         self.data = data
         self.cimel_data = data_cimel
         self.asd_data = data_asd
-        self.intp_data = data_intp
         if data:
             self.disable_buttons(False)
         else:
@@ -140,13 +137,16 @@ class GraphWidget(QtWidgets.QWidget):
                         if i == 0:
                             self.canvas.axes.legend()
             else:
-                self.canvas.axes.plot(self.data.wlen, self.data.data, marker="", label="Kieffer and Stone 2005")
+                self.canvas.axes.plot(self.data.wlen,self.data.data,"g",
+                                      label="interpolated data points")
+                self.canvas.axes.fill_between(self.data.wlen,
+                                              self.data.data-2*self.data.uncertainties,
+                                              self.data.data+2*self.data.uncertainties,
+                                              color="green",alpha=0.3)
 
             if self.asd_data:
                 self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
 
-                self.canvas.axes.plot(self.intp_data.wlen, self.intp_data.data,"g",label="interpolated data points")
-                self.canvas.axes.fill_between(self.intp_data.wlen, self.intp_data.data-2*self.intp_data.uncertainties,self.intp_data.data+2*self.intp_data.uncertainties,color="green",alpha=0.3)
 
             if self.cimel_data:
                 self.canvas.axes.plot(self.cimel_data.wlen, self.cimel_data.data,color="orange", ls='none', marker="o",label="CIMEL data points")
@@ -256,18 +256,18 @@ class SignalWidget(QtWidgets.QWidget):
 
     def update_signals(
         self,
-        signals: List[float],
-        srf: SpectralResponseFunction,
         point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        srf: SpectralResponseFunction,
+        signals: SpectralData,
     ):
         self._clear_layout()
         show_range_info = False
         self.srf = srf
-        self.irrs = signals
+        self.irrs = signals.data
         self.point = point
         head_id_item = QtWidgets.QTableWidgetItem("ID")
         head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")
-        self.table.setRowCount(1 + len(signals))
+        self.table.setRowCount(1 + len(signals.data))
         if isinstance(point, CustomPoint):
             self.table.setColumnCount(2 + 1)
             self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Signal (Wm⁻²nm⁻¹)"))

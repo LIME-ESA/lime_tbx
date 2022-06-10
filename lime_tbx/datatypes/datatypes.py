@@ -566,7 +566,7 @@ class CimelCoef:
 
     def __init__(self, ds_cimel: xarray.Dataset):
         self._ds_cimel = ds_cimel
-        self.wavelengths: np.ndarray = ds_cimel.wavelength.values
+        self.wlen: np.ndarray = ds_cimel.wavelength.values
         coeffs: np.ndarray = ds_cimel.coeff.values
         self.coeffs = CimelCoef._CimelCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values

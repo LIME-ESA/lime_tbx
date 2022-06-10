@@ -131,7 +131,7 @@ def elref_callback(
         Point used
     coeffs: IrradianceCoefficients
         Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
-    cimel_data: CimelCoef
+    cimel_coef: CimelCoef
         CimelCoef with the CIMEL coefficients and uncertainties.
     kernels_path: str
         Path where the directory with the SPICE kernels is located.
@@ -380,42 +380,41 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
-        cimel_data = self.settings_manager.get_cimel_data()
+        cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, cimel_data,self.lime_simulation],
+            [def_srf, srf, point, coeffs, cimel_coef,self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
     def eli_finished(
         self,
         data: Tuple[
-            List[float],
-            Union[List[float], List[List[float]]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[float],
             SpectralResponseFunction,
             Union[SpectralData, List[SpectralData]],
+            Union[SpectralData,List[SpectralData]],
+            Union[SpectralData,List[SpectralData]],
         ],
     ):
         self._unblock_gui()
-        unc = data[5]
-        if isinstance(unc, list):
-            wlen = [u.wlen_cimel for u in unc]
-            cimel_data = [u.data for u in unc]
-            uncert = [u.uncertainties for u in unc]
-        else:
-            wlen = unc.wlen_cimel
-            cimel_data = unc.data
-            uncert = unc.uncertainties
-        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
-        self.graph.update_plot(data[0], data[1], data[2], data[5], data[6], data[7], data[8], data[9], data[10], data[11])
+        # unc = data[5]
+        # if isinstance(unc, list):
+        #     wlen = [u.wlen_cimel for u in unc]
+        #     cimel_data = [u.data for u in unc]
+        #     uncert = [u.uncertainties for u in unc]
+        # else:
+        #     wlen = unc.wlen_cimel
+        #     cimel_data = unc.data
+        #     uncert = unc.uncertainties
+        # self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
+        self.graph.update_plot(data[2], data[3], data[4])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²/nm)",
         )
-        self.signal_widget.update_signals(data[3], data[4], data[2])
+        self.signal_widget.update_signals(data[0], data[1], data[2])
 
     def eli_error(self, error: Exception):
         self._unblock_gui()
@@ -439,23 +438,22 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def elref_finished(
         self,
         data: Tuple[
-            List[float],
-            Union[List[float], List[List[float]]],
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
-            Union[SpectralData, List[SpectralData]],
-        ],
-    ):
+                Union[SurfacePoint,CustomPoint,SatellitePoint],
+                Union[SpectralData,List[SpectralData]],
+                Union[SpectralData,List[SpectralData]],
+                Union[SpectralData,List[SpectralData]]],):
         self._unblock_gui()
-        unc = data[3]
-        if isinstance(unc, list):
-            wlen = [u.wlen_cimel for u in unc]
-            cimel_data = [u.data for u in unc]
-            uncert = [u.uncertainties for u in unc]
-        else:
-            wlen = unc.wlen_cimel
-            cimel_data = unc.data
-            uncert = unc.uncertainties
-        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
+        # unc = data[3]
+        # if isinstance(unc, list):
+        #     wlen = [u.wlen_cimel for u in unc]
+        #     cimel_data = [u.data for u in unc]
+        #     uncert = [u.uncertainties for u in unc]
+        # else:
+        #     wlen = unc.wlen_cimel
+        #     cimel_data = unc.data
+        #     uncert = unc.uncertainties
+
+        self.graph.update_plot(data[1], data[2], data[3])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -482,18 +480,11 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self._start_thread(self.polar_finished, self.polar_error)
 
     def polar_finished(
-        self,
-        data: Tuple[
-            List[float],
-            Union[List[float], List[List[float]]],
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[float],
-            Union[List[float], List[List[float]]],
-            Union[List[float], List[List[float]]],
-        ],
-    ):
+        self,data: Tuple[
+                Union[SurfacePoint,CustomPoint,SatellitePoint],
+                Union[SpectralData,List[SpectralData]]],):
         self._unblock_gui()
-        self.graph.update_plot(data[0], data[1], data[2])
+        self.graph.update_plot(data[1])
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
