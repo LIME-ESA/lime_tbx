@@ -65,9 +65,13 @@ class LimeSimulation():
         self.pol_uptodate = False
         self.intp = SpectralInterpolation()
 
+    def set_simulation_changed(self):
+        self.refl_uptodate = False
+        self.irr_uptodate = False
+        self.pol_uptodate = False
 
     def update_model_refl(self,srf,point,cimel_coeff):
-        # if not self.refl_uptodate:
+        if not self.refl_uptodate:
             md=MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
             self.wlen = srf.get_wavelengths()
 
@@ -81,10 +85,10 @@ class LimeSimulation():
             self.refl_uptodate=True
 
     def update_model_irr(self,srf,point,cimel_coeff):
-        md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
-        if True:
-            #if not self.refl_uptodate:
+        if not self.refl_uptodate:
+            md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
             self.wlen=srf.get_wavelengths()
+
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
             asd_data = self.intp.get_best_asd_reference(md)
             intp_data = self.interpolate_refl(asd_data,cimel_data)
@@ -94,7 +98,9 @@ class LimeSimulation():
             self.elref_asd = asd_data
             self.refl_uptodate=True
 
-        # if not self.irr_uptodate:
+        if not self.irr_uptodate:
+            md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
+
             self.elis = self.calculate_eli_from_elref(md,self.elref)
             self.elis_cimel = self.calculate_eli_from_elref(md, self.elref_cimel )
             self.elis_asd = self.calculate_eli_from_elref(md,self.elref_asd )
@@ -102,9 +108,9 @@ class LimeSimulation():
 
     def update_model_pol(self,srf,point,polar_coeff):
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
-        # if not self.pol_uptodate:
-        if True:
+        if not self.pol_uptodate:
             self.polars = self.calculate_polar(md,polar_coeff)
+            self.pol_uptodate=True
 
     def interpolate_refl(self,
             asd_data: SpectralData,

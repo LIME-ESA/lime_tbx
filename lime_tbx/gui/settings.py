@@ -108,5 +108,4 @@ class MockSettingsManager(ISettingsManager):
 
     def get_cimel_coef(self) -> CimelCoef:
         cimel_coef = access_data._get_default_cimel_coef()
-        print(cimel_coef.coeffs)
         return cimel_coef

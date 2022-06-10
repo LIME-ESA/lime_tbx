@@ -115,7 +115,6 @@ class GraphWidget(QtWidgets.QWidget):
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
         if self._is_filled():
-            print(self.data.data)
             if isinstance(self.data.data[0], list):
                 for i, yd in enumerate(self.data.data):
                     self.canvas.axes.plot(self.data.wlen, yd, marker="")

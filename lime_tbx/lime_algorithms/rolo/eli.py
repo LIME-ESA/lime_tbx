@@ -37,9 +37,6 @@ def measurement_func_eli(a_l: Union[float, np.ndarray], omega: float, esk: Union
     """
     Final computation of the Eq 3 in Roman et al., 2020
     """
-    print(a_l.shape)
-    print(esk.shape)
-    print(dsm,omega,dom,distance_earth_moon_km)
     lunar_irr = (((a_l*omega*esk)/math.pi)*((1/dsm)**2)*(distance_earth_moon_km/dom)**2)
     return lunar_irr
 
