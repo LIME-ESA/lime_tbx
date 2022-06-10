@@ -151,6 +151,8 @@ def elref_callback(
     """
     lime_simulation.update_model_refl(point,cimel_coef)
     print(lime_simulation.elref)
+    print(lime_simulation.elref_cimel)
+    print(lime_simulation.elis_asd)
     return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elis_asd
 
 

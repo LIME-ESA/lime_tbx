@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 from typing import List, Union
 
 """___Third-Party Modules___"""
-# import here
 import punpy
+import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -208,10 +208,10 @@ class LimeSimulation():
             ) -> SpectralData:
         dl = dolp.DOLP()
         if not isinstance(md,list):
-            polarizations = dl.get_polarized(self.wlens,md.mpa_degrees,polar_coeff)
+            polarizations = np.array(dl.get_polarized(self.wlens,md.mpa_degrees,polar_coeff))
 
         else:
-            polarizations = [dl.get_polarized(self.wlens,m.mpa_degrees,polar_coeff) for m in md]
+            polarizations = np.array([dl.get_polarized(self.wlens,m.mpa_degrees,polar_coeff) for m in md])
 
         ds_intp = SpectralData.make_polarization_ds(self.wlens,polarizations,
                                                     None)
