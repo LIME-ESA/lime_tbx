@@ -107,7 +107,7 @@ def eli_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_irr(srf,point,cimel_coef)
-    return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd
+    return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd, lime_simulation.signals
 
 def elref_callback(
     srf: SpectralResponseFunction,
@@ -396,7 +396,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData,List[SpectralData]],
             Union[SpectralData,List[SpectralData]],
-        ],
+            Union[SpectralData,List[SpectralData]],],
     ):
         self._unblock_gui()
         # unc = data[5]
@@ -416,7 +416,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²/nm)",
         )
-        self.signal_widget.update_signals(data[0], data[1], data[2])
+        self.signal_widget.update_signals(data[0], data[1], data[5])
 
     def eli_error(self, error: Exception):
         self._unblock_gui()

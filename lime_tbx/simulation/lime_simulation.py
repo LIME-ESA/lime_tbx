@@ -25,6 +25,7 @@ from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import SpectralInterpolation
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.moon_data import MoonDataFactory
+from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -55,6 +56,7 @@ class LimeSimulation():
         self.wlen = []
         self.elref = None
         self.elis = None
+        self.signals = None
         self.elref_cimel = None
         self.elref_asd = None
         self.elis_cimel = None
@@ -63,12 +65,14 @@ class LimeSimulation():
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
+        self.signals_uptodate = False
         self.intp = SpectralInterpolation()
 
     def set_simulation_changed(self):
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
+        self.signals_uptodate = False
 
     def update_model_refl(self,srf,point,cimel_coeff):
         if not self.refl_uptodate:
@@ -105,6 +109,11 @@ class LimeSimulation():
             self.elis_cimel = self.calculate_eli_from_elref(md, self.elref_cimel )
             self.elis_asd = self.calculate_eli_from_elref(md,self.elref_asd )
             self.irr_uptodate=True
+
+        if not self.signals_uptodate:
+            self.signals = self.calculate_signals(srf)
+            self.signals_uptodate = True
+
 
     def update_model_pol(self,srf,point,polar_coeff):
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
@@ -185,7 +194,6 @@ class LimeSimulation():
         else:
             polarizations = np.array([dl.get_polarized(self.wlen,m.mpa_degrees,polar_coeff) for m in md])
 
-        print(polarizations)
         ds_pol = SpectralData.make_polarization_ds(self.wlen,polarizations,
                                                     None)
 
@@ -194,6 +202,15 @@ class LimeSimulation():
 
         return spectral_data
 
+
+    def calculate_signals(self,srf):
+        signal = SpectralIntegration.integrate_elis(srf,self.elis.data)
+
+        ds_pol = SpectralData.make_polarization_ds(srf.wlen,signal,None)
+
+        spectral_data = SpectralData(srf.wlen,signal,None,ds_pol)
+
+        return spectral_data
 
     @staticmethod
     def _get_data_eli_cimel(md: MoonData,cimel_coeff: CimelCoef,
