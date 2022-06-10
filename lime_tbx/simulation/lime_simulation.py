@@ -166,7 +166,7 @@ class LimeSimulation():
 
         spectral_data = SpectralData(elref.wlen,lunar_irr,unc,ds_eli)
 
-        return lunar_irr
+        return spectral_data
 
     def calculate_polar(self,
             md: MoonData,
