@@ -52,6 +52,8 @@ def band_moon_disk_reflectance(
         The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
     cfs = cimel_coef.coeffs
+    print(cfs)
+    print(cimel_coef)
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
