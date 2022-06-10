@@ -150,6 +150,7 @@ def elref_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_refl(point,cimel_coef)
+    print(lime_simulation.elref)
     return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elis_asd
 
 
@@ -160,7 +161,7 @@ def polar_callback(
     lime_simulation: LimeSimulation,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
 
-    lime_simulation.update_model(point,coeffs)
+    lime_simulation.update_model_pol(point,coeffs)
     return point,lime_simulation.polars
 
 

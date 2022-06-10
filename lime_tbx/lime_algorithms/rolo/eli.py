@@ -32,14 +32,11 @@ __status__ = "Development"
 
 
 
-def measurement_func_eli(a_l: Union[float, np.ndarray], esk: Union[float, List[float]], dsm: float,
-    dom: float) -> Union[float, np.ndarray]:
+def measurement_func_eli(a_l: Union[float, np.ndarray], omega: float, esk: Union[float, List[float]], dsm: float,
+    distance_earth_moon_km: float, dom: float) -> Union[float, np.ndarray]:
     """
     Final computation of the Eq 3 in Roman et al., 2020
     """
-    solid_angle_moon: float = 6.4177e-05
-    omega = solid_angle_moon
-    distance_earth_moon_km: int = 384400
     lunar_irr = (((a_l*omega*esk)/math.pi)*((1/dsm)**2)*(distance_earth_moon_km/dom)**2)
     return lunar_irr
 
