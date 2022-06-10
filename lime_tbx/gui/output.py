@@ -117,16 +117,13 @@ class GraphWidget(QtWidgets.QWidget):
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        marker = ""
-        if len(self.data.wlen) == 1:
-            marker = "o"
         if (
             self._is_filled()
             and isinstance(self.y_data[0], list)
             and not isinstance(self.x_data[0], list)
         ):
             for i, yd in enumerate(self.y_data):
-                self.canvas.axes.plot(self.x_data, yd, marker=marker)
+                self.canvas.axes.plot(self.x_data, yd, marker="")
                 if len(self.x_data_cimel) > i and len(self.x_data_cimel[i]) > 0:
                     self.canvas.axes.plot(
                         self.cimel_data.wlen[i],
@@ -146,7 +143,7 @@ class GraphWidget(QtWidgets.QWidget):
                     if i == 0:
                         self.canvas.axes.legend()
         else:
-            self.canvas.axes.plot(self.data.wlen, self.data.data, marker=marker, label="Kieffer and Stone 2005")
+            self.canvas.axes.plot(self.data.wlen, self.data.data, marker="", label="Kieffer and Stone 2005")
 
         if len(self.data.wlen)>0:
             self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
@@ -158,7 +155,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.axes.errorbar(self.cimel_data.wlen, self.cimel_data.data, yerr=self.cimel_data.uncertainties*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
 
         self.canvas.axes.legend()
-        self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
+        self.canvas.axes.plot(self.x_data, self.y_data, marker="")
         if len(self.x_data_cimel) > 0:
             self.canvas.axes.plot(
                 self.cimel_data.wlen,
