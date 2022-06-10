@@ -101,7 +101,7 @@ def band_moon_disk_reflectance_unc(
         cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value],
         [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
         None, None, None])
-
+    print(unc)
     return unc
 
 def _moon_disk_reflectance(

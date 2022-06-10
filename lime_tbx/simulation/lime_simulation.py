@@ -223,5 +223,5 @@ class LimeSimulation():
         ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wlen,elrefs_cimel,unc_rand=u_elrefs_cimel)
 
         spectral_data = SpectralData(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel,ds_cimel)
-        print("here2",spectral_data.data)
+        print("here2",u_elrefs_cimel)
         return spectral_data
