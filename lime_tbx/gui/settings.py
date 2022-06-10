@@ -14,7 +14,7 @@ from ..datatypes.datatypes import (
     SRFChannel,
     SpectralResponseFunction,
     IrradianceCoefficients,
-    CimelData,
+    CimelCoef,
 )
 from ..datatypes import constants
 from ..coefficients.access_data import access_data
@@ -68,8 +68,8 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_cimel_data(self) -> CimelData:
-        """Obtain the CimelData the CIMEL coefficients and uncertainties"""
+    def get_cimel_data(self) -> CimelCoef:
+        """Obtain the CimelCoef the CIMEL coefficients and uncertainties"""
         pass
 
 class MockSettingsManager(ISettingsManager):
@@ -106,5 +106,5 @@ class MockSettingsManager(ISettingsManager):
     def get_available_srfs(self) -> List[SpectralResponseFunction]:
         return self.srfs
 
-    def get_cimel_data(self) -> CimelData:
-        return access_data._get_default_cimel_data()
+    def get_cimel_data(self) -> CimelCoef:
+        return access_data._get_default_cimel_coef()
