@@ -1,9 +1,12 @@
-"""describe class"""
+"""
+This module contains the functionality that read moon observations file from GLOD format files.
+
+It exports the following functions:
+    * read_moon_obs - Read a glod-formatted netcdf moon observations file.
+"""
 
 """___Built-In Modules___"""
-import os
 from datetime import datetime
-from typing import List
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -14,7 +17,6 @@ from ..datatypes.datatypes import (
     LunarObservation,
     SatellitePosition,
 )
-from ..datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

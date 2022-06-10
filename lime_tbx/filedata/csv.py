@@ -1,4 +1,12 @@
-"""describe class"""
+"""
+This module contains the functionality that lets read and write LIME data from/to a CSV file.
+
+It exports the following functions:
+    * export_csv - Export a graph to a csv file.
+    * export_csv_comparation - Export a channel comparison to a CSV file.
+    * export_csv_integrated_irradiance - Export a integrated irradiance table to a CSV file.
+    * read_datetimes - Read a time-series CSV file.
+"""
 
 """___Built-In Modules___"""
 from typing import Union, List, Tuple
@@ -206,6 +214,19 @@ def export_csv_integrated_irradiance(
 
 
 def read_datetimes(path: str) -> List[datetime]:
+    """
+    Read a time-series CSV file.
+
+    Parameters
+    ----------
+    path: str
+        Path where the file is stored.
+
+    Returns
+    -------
+    dts: list of datetime
+        Datetimes that where stored in that file.
+    """
     with open(path, "r") as file:
         reader = csv.reader(file)
         datetimes = []

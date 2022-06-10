@@ -1,4 +1,6 @@
-"""describe class"""
+"""
+This module contains the functionality that access to local coefficients data and other.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
@@ -19,8 +21,9 @@ from lime_tbx.datatypes.datatypes import (
     PolarizationCoefficients,
     CimelData,
 )
-
-from lime_tbx.coefficients.access_data.templates_digital_effects_table import TEMPLATE_CIMEL
+from lime_tbx.coefficients.access_data.templates_digital_effects_table import (
+    TEMPLATE_CIMEL,
+)
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -145,17 +148,25 @@ def _get_coefficients_data() -> Dict[float, IrradianceCoefficients.CoefficientsW
     file.close()
     return data
 
+
 def _get_default_cimel_data() -> CimelData:
     # define dim_size_dict to specify size of arrays
-    dim_sizes = {"wavelength":6,"i_coeff":18,}
+    dim_sizes = {
+        "wavelength": 6,
+        "i_coeff": 18,
+    }
     # create dataset
     ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
 
-    ds_cimel = ds_cimel.assign_coords(wavelength=[440,500,675,870,1020,1640])
+    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
 
-    current_dir=os.path.dirname(os.path.abspath(__file__))
-    data=np.genfromtxt(os.path.join(current_dir,"assets/coefficients_cimel.csv"),delimiter=",")
-    u_data=np.genfromtxt(os.path.join(current_dir,"assets/u_coefficients_cimel.csv"),delimiter=",")
-    ds_cimel.coeff.values=data.T
-    ds_cimel.u_coeff.values=u_data.T
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data = np.genfromtxt(
+        os.path.join(current_dir, "assets/coefficients_cimel.csv"), delimiter=","
+    )
+    u_data = np.genfromtxt(
+        os.path.join(current_dir, "assets/u_coefficients_cimel.csv"), delimiter=","
+    )
+    ds_cimel.coeff.values = data.T
+    ds_cimel.u_coeff.values = u_data.T
     return CimelData(ds_cimel)

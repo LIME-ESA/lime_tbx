@@ -1,4 +1,12 @@
-"""describe class"""
+"""
+This module abstracts and encapsulates use-cases related to simulations from surface or
+from a custom position, and performs the actions and calculations that are related to
+each of them.
+
+It exports the following classes:
+    * IRegularSimulation - Interface that contains the methods of this module.
+    * RegularSimulation - Class that implements the methods exported by this module.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
@@ -22,10 +30,10 @@ from ...datatypes.datatypes import (
 from ..common.common import CommonSimulation
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "01/03/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 

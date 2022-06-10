@@ -1,4 +1,11 @@
-"""describe class"""
+"""
+This module abstracts and encapsulates use-cases related to simulations from esa satellites,
+and performs the actions and calculations that are related to each of them.
+
+It exports the following classes:
+    * IESASatellites - Interface that contains the methods of this module.
+    * ESASatellites - Class that implements the methods exported by this module.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
@@ -19,14 +26,26 @@ from ...datatypes.datatypes import (
 from ...simulation.regular_simulation.regular_simulation import RegularSimulation
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "01/03/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
 def to_llh(x: float, y: float, z: float):
+    """
+    Changes from coordinates to latitude longitude and height
+
+    Returns
+    -------
+    lat: float
+        Latitude
+    lon: float
+        Longitude
+    h: float
+        Height (in meters)
+    """
     a = 6378137.0  # in meters
     b = 6356752.314245  # in meters
 

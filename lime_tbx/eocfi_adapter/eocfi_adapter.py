@@ -1,4 +1,10 @@
-"""describe class"""
+"""
+This module contains the abstractions and interfaces that call EOCFI and perform satellite functions.
+
+It exports the following classes:
+    * IEOCFIConverter - Interface that contains the methods of this module.
+    * EOCFIConverter - Class that implements the methods exported by this module.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod

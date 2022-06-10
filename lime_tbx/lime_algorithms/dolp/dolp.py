@@ -1,14 +1,24 @@
-"""describe class"""
+"""
+This module calculates the extra-terrestrial lunar disk degree of polarization.
+
+It exports the following classes:
+    * IDOLP - Interface that contains the methods of this module.
+    * DOLP - Class that implements the methods exported by this module.
+
+It follows equations described in the following documents:
+- Lunar irradiance model algorithm and theoretical basis document D7.
+"""
 
 """___Built-In Modules___"""
 from typing import List
 import math
+from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 import numpy as np
 
 """___NPL Modules___"""
-from ...datatypes.datatypes import MoonData, PolarizationCoefficients
+from ...datatypes.datatypes import PolarizationCoefficients
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -16,8 +26,6 @@ __created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
-
-from abc import ABC, abstractmethod
 
 
 class IDOLP(ABC):

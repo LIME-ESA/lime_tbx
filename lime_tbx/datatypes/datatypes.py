@@ -4,7 +4,22 @@ of data between modules of the package lime-tbx.
 
 It exports the following classes:
     * MoonData - Moon data used in the calculations of the Moon's irradiance.
+    * SRFChannel - Spectral responses and metadata for a SRF Channel
+    * SpectralResponseFunction - The spectral response function, a set of channels with their data.
+    * SurfacePoint - Point on Earth's surface
+    * CustomPoint - Point with custom Moon data.
+    * SatellitePoint - Point of a Satellite in a concrete datetime
+    * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
     * IrradianceCoefficients - Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
+    * OrbitFile - Satellite orbit file.
+    * Satellite - ESA Satellite
+    * SatellitePosition - A satellite's position
+    * LunarObservation - GLOD lunar observation
+    * CimelData
+    * UncertaintyData
+
+It exports the following Enums:
+    * SpectralValidity - Enum that represents if a channel is inside LIME's spectral range.
 """
 
 """___Built-In Modules___"""
@@ -549,23 +564,30 @@ class LunarObservation:
                 return False
         return True
 
+
 @dataclass
 class CimelData:
     __slots__ = ["_ds_cimel", "wavelengths", "coeffs", "unc_coeffs"]
     # _ds_cimel : xarray DataSet with the CIMEL coefficients and uncertainties
 
-
     @dataclass
     class _CimelCoeffs:
-        __slots__ = ["_coeffs", "a_coeffs", "b_coeffs", "c_coeffs", "d_coeffs", "p_coeffs"]
+        __slots__ = [
+            "_coeffs",
+            "a_coeffs",
+            "b_coeffs",
+            "c_coeffs",
+            "d_coeffs",
+            "p_coeffs",
+        ]
 
         def __init__(self, coeffs: np.ndarray):
             self._coeffs = coeffs
-            self.a_coeffs = coeffs[0:4,:]
-            self.b_coeffs = coeffs[4:7,:]
-            self.c_coeffs = coeffs[7:11,:]
-            self.d_coeffs = coeffs[11:14,:]
-            self.p_coeffs = coeffs[14::,:]
+            self.a_coeffs = coeffs[0:4, :]
+            self.b_coeffs = coeffs[4:7, :]
+            self.c_coeffs = coeffs[7:11, :]
+            self.d_coeffs = coeffs[11:14, :]
+            self.p_coeffs = coeffs[14::, :]
 
     def __init__(self, ds_cimel: xarray.Dataset):
         self._ds_cimel = ds_cimel
@@ -574,6 +596,7 @@ class CimelData:
         self.coeffs = CimelData._CimelCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values
         self.unc_coeffs = CimelData._CimelCoeffs(u_coeff_cimel)
+
 
 @dataclass
 class UncertaintyData:
