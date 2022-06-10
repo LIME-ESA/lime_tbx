@@ -118,7 +118,7 @@ class GraphWidget(QtWidgets.QWidget):
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
         marker = ""
-        if len(self.x_data) == 1:
+        if len(self.data.wlen) == 1:
             marker = "o"
         if (
             self._is_filled()
@@ -129,19 +129,19 @@ class GraphWidget(QtWidgets.QWidget):
                 self.canvas.axes.plot(self.x_data, yd, marker=marker)
                 if len(self.x_data_cimel) > i and len(self.x_data_cimel[i]) > 0:
                     self.canvas.axes.plot(
-                        self.x_data_cimel[i],
-                        self.y_data_cimel[i],
+                        self.cimel_data.wlen[i],
+                        self.cimel_data.data[i],
                         ls="none",
                         marker="o",
                         label="CIMEL data points",
                     )
                     self.canvas.axes.errorbar(
-                        self.x_data_cimel[i],
-                        self.y_data_cimel[i],
-                        yerr=self.u_y_data_cimel[i] * 10,
+                        self.cimel_data.wlen[i],
+                        self.cimel_data.data[i],
+                        yerr=self.self.cimel_data.data[i] * 2.,
                         capsize=3,
                         ls="none",
-                        label="errorbars * 10",
+                        label="errorbars (k=2)",
                     )
                     if i == 0:
                         self.canvas.axes.legend()
@@ -161,19 +161,19 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
         if len(self.x_data_cimel) > 0:
             self.canvas.axes.plot(
-                self.x_data_cimel,
-                self.y_data_cimel,
+                self.cimel_data.wlen,
+                self.cimel_data.data,
                 ls="none",
                 marker="o",
                 label="CIMEL data points",
             )
             self.canvas.axes.errorbar(
-                self.x_data_cimel,
-                self.y_data_cimel,
-                yerr=self.u_y_data_cimel * 10,
+                self.cimel_data.wlen,
+                self.cimel_data.data,
+                yerr=self.self.cimel_data.uncertainties * 2,
                 capsize=3,
                 ls="none",
-                label="errorbars * 10",
+                label="errorbars (k=2))",
             )
             self.canvas.axes.legend()
 
