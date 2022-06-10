@@ -179,11 +179,12 @@ class LimeSimulation():
         else:
             polarizations = np.array([dl.get_polarized(self.wlen,m.mpa_degrees,polar_coeff) for m in md])
 
-        ds_intp = SpectralData.make_polarization_ds(self.wlen,polarizations,
+        print(polarizations)
+        ds_pol = SpectralData.make_polarization_ds(self.wlen,polarizations,
                                                     None)
 
-        spectral_data = SpectralData(polar_coeff.wlen,polarizations,
-                                     None,ds_intp)
+        spectral_data = SpectralData(self.wlen,polarizations,
+                                     None,ds_pol)
 
         return spectral_data
 
