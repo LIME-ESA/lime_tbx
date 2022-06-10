@@ -111,7 +111,7 @@ class GraphWidget(QtWidgets.QWidget):
         self._redraw()
 
     def _is_filled(self) -> bool:
-        if len(self.x_data) > 0 and len(self.y_data) > 0:
+        if len(self.data.wlen) > 0 and len(self.data.data) > 0:
             return True
         return False
 
