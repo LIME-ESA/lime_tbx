@@ -82,10 +82,10 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_plot(
         self,
-        data: Union[SpectralData,List[SpectralData]] = [],
-        data_cimel: Union[SpectralData,List[SpectralData]] = [],
-        data_asd: Union[SpectralData,List[SpectralData]] = [],
-        data_intp: Union[SpectralData,List[SpectralData]] = [],
+        data: Union[SpectralData,List[SpectralData]] = None,
+        data_cimel: Union[SpectralData,List[SpectralData]] = None,
+        data_asd: Union[SpectralData,List[SpectralData]] = None,
+        data_intp: Union[SpectralData,List[SpectralData]] = None,
         ):
         self.data = data
         self.cimel_data = data_cimel
