@@ -101,7 +101,7 @@ def band_moon_disk_reflectance_unc(
         None, None, None], return_samples=True)
 
     print("here6", samples_y)
-    stop
+
     return unc
 
 def _moon_disk_reflectance(
