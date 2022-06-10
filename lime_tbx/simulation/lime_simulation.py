@@ -115,6 +115,7 @@ class LimeSimulation():
         
         elrefs_intp = self.intp.get_interpolated_refl(cimel_coeff.wlen,cimel_coeff.data,
                                                  asd_data.wlen,asd_data.data,self.wlens)
+        print("here3",elrefs_intp)
         u_elrefs_intp = None
         if calc_uncertainty:
             u_elrefs_intp = elrefs_intp*0.01  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
