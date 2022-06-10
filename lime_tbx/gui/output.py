@@ -45,10 +45,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
-        self.data = []
-        self.cimel_data = []
-        self.asd_data = []
-        self.intp_data = []
+        self.data = None
+        self.cimel_data = None
+        self.asd_data = None
+        self.intp_data = None
         self._build_layout()
 
     def _build_layout(self):
@@ -111,68 +111,65 @@ class GraphWidget(QtWidgets.QWidget):
         self._redraw()
 
     def _is_filled(self) -> bool:
-        if len(self.data.wlen) > 0 and len(self.data.data) > 0:
+        if self.data:
             return True
         return False
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        if (
-            self._is_filled()
-            and isinstance(self.data.wlen[0], list)
-            and not isinstance(self.data.data[0], list)
-        ):
-            for i, yd in enumerate(self.data.data):
-                self.canvas.axes.plot(self.data.wlen, yd, marker="")
-                if len(self.cimel_data.wlen) > i and len(self.cimel_data.wlen[i]) > 0:
-                    self.canvas.axes.plot(
-                        self.cimel_data.wlen[i],
-                        self.cimel_data.data[i],
-                        ls="none",
-                        marker="o",
-                        label="CIMEL data points",
-                    )
-                    self.canvas.axes.errorbar(
-                        self.cimel_data.wlen[i],
-                        self.cimel_data.data[i],
-                        yerr=self.self.cimel_data.data[i] * 2.,
-                        capsize=3,
-                        ls="none",
-                        label="errorbars (k=2)",
-                    )
-                    if i == 0:
-                        self.canvas.axes.legend()
-        else:
-            self.canvas.axes.plot(self.data.wlen, self.data.data, marker="", label="Kieffer and Stone 2005")
+        if self._is_filled():
+            if not isinstance(self.data.data[0], list):
+                for i, yd in enumerate(self.data.data):
+                    self.canvas.axes.plot(self.data.wlen, yd, marker="")
+                    if len(self.cimel_data.wlen) > i and len(self.cimel_data.wlen[i]) > 0:
+                        self.canvas.axes.plot(
+                            self.cimel_data.wlen[i],
+                            self.cimel_data.data[i],
+                            ls="none",
+                            marker="o",
+                            label="CIMEL data points",
+                        )
+                        self.canvas.axes.errorbar(
+                            self.cimel_data.wlen[i],
+                            self.cimel_data.data[i],
+                            yerr=self.self.cimel_data.data[i] * 2.,
+                            capsize=3,
+                            ls="none",
+                            label="errorbars (k=2)",
+                        )
+                        if i == 0:
+                            self.canvas.axes.legend()
+            else:
+                self.canvas.axes.plot(self.data.wlen, self.data.data, marker="", label="Kieffer and Stone 2005")
 
-        if len(self.data.wlen)>0:
-            self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
+            if len(self.data.wlen)>0:
+                self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
 
-            self.canvas.axes.plot(self.intp_data.wlen, self.intp_data.data,"g",label="interpolated data points")
-            self.canvas.axes.fill_between(self.intp_data.wlen, self.intp_data.data-2*self.intp_data.uncertainties,self.intp_data.data+2*self.intp_data.uncertainties,color="green",alpha=0.3)
+                self.canvas.axes.plot(self.intp_data.wlen, self.intp_data.data,"g",label="interpolated data points")
+                self.canvas.axes.fill_between(self.intp_data.wlen, self.intp_data.data-2*self.intp_data.uncertainties,self.intp_data.data+2*self.intp_data.uncertainties,color="green",alpha=0.3)
 
-            self.canvas.axes.plot(self.cimel_data.wlen, self.cimel_data.data,color="orange", ls='none', marker="o",label="CIMEL data points")
-            self.canvas.axes.errorbar(self.cimel_data.wlen, self.cimel_data.data, yerr=self.cimel_data.uncertainties*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
+                self.canvas.axes.plot(self.cimel_data.wlen, self.cimel_data.data,color="orange", ls='none', marker="o",label="CIMEL data points")
+                self.canvas.axes.errorbar(self.cimel_data.wlen, self.cimel_data.data, yerr=self.cimel_data.uncertainties*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
 
-        self.canvas.axes.legend()
-        self.canvas.axes.plot(self.data.wlen, self.data.data, marker="")
-        if len(self.cimel_data.wlen) > 0:
-            self.canvas.axes.plot(
-                self.cimel_data.wlen,
-                self.cimel_data.data,
-                ls="none",
-                marker="o",
-                label="CIMEL data points",
-            )
-            self.canvas.axes.errorbar(
-                self.cimel_data.wlen,
-                self.cimel_data.data,
-                yerr=self.self.cimel_data.uncertainties * 2,
-                capsize=3,
-                ls="none",
-                label="errorbars (k=2))",
-            )
             self.canvas.axes.legend()
+            self.canvas.axes.plot(self.data.wlen, self.data.data, marker="")
+            if len(self.cimel_data.wlen) > 0:
+                self.canvas.axes.plot(
+                    self.cimel_data.wlen,
+                    self.cimel_data.data,
+                    ls="none",
+                    marker="o",
+                    label="CIMEL data points",
+                )
+                self.canvas.axes.errorbar(
+                    self.cimel_data.wlen,
+                    self.cimel_data.data,
+                    yerr=self.self.cimel_data.uncertainties * 2,
+                    capsize=3,
+                    ls="none",
+                    label="errorbars (k=2))",
+                )
+                self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
