@@ -13,6 +13,7 @@ from ..filedata import srf as file_srf
 from ..datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
+    SpectralData
 )
 from . import settings, output
 
@@ -63,7 +64,8 @@ class SRFEditWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         x_data = list(srf.get_wavelengths())
         y_data = list(srf.get_values())
-        self.graph.update_plot(x_data, y_data, None)
+        srf_data=SpectralData(x_data,y_data,None,None)
+        self.graph.update_plot(srf_data)
 
     def update_combo_srf(self):
         self.combobox_listen = False
