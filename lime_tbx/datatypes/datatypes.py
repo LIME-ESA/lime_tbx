@@ -574,10 +574,16 @@ class CimelCoef:
 
 @dataclass
 class SpectralData:
-    wlen: np.ndarray
-    data: np.ndarray
-    uncertainties: np.ndarray
-    ds: xarray.Dataset
+
+    def __init__(self,
+    wlen: np.ndarray,
+    data: np.ndarray,
+    uncertainties: np.ndarray,
+    ds: xarray.Dataset,):
+        self.wlen=wlen
+        self.data=data
+        self.uncertainties=uncertainties
+        self.ds=ds
 
     @staticmethod
     def make_reflectance_ds(wavs,refl,unc_rand=None,unc_syst=None):
