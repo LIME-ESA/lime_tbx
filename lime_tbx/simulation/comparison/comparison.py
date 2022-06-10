@@ -17,7 +17,7 @@ from ...datatypes.datatypes import (
     SurfacePoint,
 )
 from ...simulation.regular_simulation.regular_simulation import RegularSimulation
-
+from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 """___Authorship___"""
 __author__ = "Pieter De Vis"
 __created__ = "01/02/2022"
@@ -115,7 +115,7 @@ class Comparison(IComparison):
             elis, _ = RegularSimulation.get_eli_from_surface(
                 srf, sp, coefficients, kernels_path
             )
-            integrated_irrs = RegularSimulation.integrate_elis(srf, elis)
+            integrated_irrs = SpectralIntegration.integrate_elis(srf, elis)
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)

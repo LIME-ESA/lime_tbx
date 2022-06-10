@@ -199,9 +199,11 @@ def _start_thread(
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
+        lime_simulation: LimeSimulation,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
+        self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self._build_layout()
 
@@ -243,7 +245,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         coeffs = self.settings_manager.get_irr_coeffs()
         self.worker = CallbackWorker(
             compare_callback,
-            [mos, srf, coeffs, self.kernels_path],
+            [mos, srf, coeffs, self.lime_simulation],
         )
         self._start_thread(self.compare_finished, self.compare_error)
 
@@ -299,12 +301,12 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def __init__(
         self,
-        kernels_path: str,
+        lime_simulation: LimeSimulation,
         eocfi_path: str,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
-        self.lime_simulation = LimeSimulation(eocfi_path,kernels_path)
+        self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.eocfi = eocfi_adapter.EOCFIConverter(eocfi_path)
         self.satellites = self.eocfi.get_sat_list()
@@ -519,17 +521,18 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.setLocale("English")
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
+        self.lime_simulation = LimeSimulation(eocfi_path,kernels_path)
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.settings_manager = settings.MockSettingsManager()
         self.comparison_page = ComparisonPageWidget(
-            self.kernels_path, self.eocfi_path, self.settings_manager
+            self.lime_simulation, self.settings_manager
         )
         self.comparison_page.hide()
         self.main_page = MainSimulationsWidget(
-            self.kernels_path, self.eocfi_path, self.settings_manager
+            self.lime_simulation, self.eocfi_path, self.settings_manager
         )
         self.page = self.main_page
         self.main_layout.addWidget(self.page)
