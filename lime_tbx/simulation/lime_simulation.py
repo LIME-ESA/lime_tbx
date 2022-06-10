@@ -24,7 +24,7 @@ from lime_tbx.lime_algorithms.rolo import eli, elref, esi
 from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import SpectralInterpolation
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-from lime_tbx.simulation.moon_data import Moondata
+from lime_tbx.simulation.moon_data import MoonDataFactory
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -68,7 +68,7 @@ class LimeSimulation():
 
     def update_model_refl(self,point,cimel_coeff):
         if not self.refl_uptodate:
-            md=Moondata.get_md(point,self.eocfi_path,self.kernels_path)
+            md=MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
 
             cimel_data,asd_data,elref_data = self.calculate_elref(md,cimel_coeff)
 
@@ -83,7 +83,7 @@ class LimeSimulation():
 
     def update_model_irr(self,point,cimel_coeff):
 
-        md = Moondata.get_md(point,self.eocfi_path,self.kernels_path)
+        md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if not self.refl_uptodate:
             cimel_data,asd_data,elref_data = self.calculate_elref(md,cimel_coeff)
 
@@ -103,7 +103,7 @@ class LimeSimulation():
             self.irr_uptodate=True
 
     def update_model_pol(self,point,polar_coeff):
-        md = Moondata.get_md(point,self.eocfi_path,self.kernels_path)
+        md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if not self.pol_uptodate:
             self.polars = self.calculate_polar(md,polar_coeff)
 
