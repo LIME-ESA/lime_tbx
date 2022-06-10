@@ -470,7 +470,11 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             wlen = unc.wlen_cimel
             cimel_data = unc.data
             uncert = unc.uncertainties
-        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
+        elis = data[1]
+        if isinstance(elis, list):
+            for i in range(len(elis)):
+                elis[i] = list(elis[i])
+        self.graph.update_plot(data[0], elis, data[2], wlen, cimel_data, uncert)
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -517,7 +521,11 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             wlen = unc.wlen_cimel
             cimel_data = unc.data
             uncert = unc.uncertainties
-        self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
+        elrefs = data[1]
+        if isinstance(elrefs, list):
+            for i in range(len(elrefs)):
+                elrefs[i] = list(elrefs[i])
+        self.graph.update_plot(data[0], elrefs, data[2], wlen, cimel_data, uncert)
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",

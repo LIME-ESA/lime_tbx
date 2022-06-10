@@ -381,14 +381,14 @@ class RegularSimulation(IRegularSimulation):
 
     @staticmethod
     def integrate_elis(
-        srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+        srf: SpectralResponseFunction, elis: Union[np.ndarray, List[np.ndarray]]
     ) -> Union[List[float], List[List[float]]]:
         signals = []
         wlens = srf.get_wavelengths()
         if len(elis) == 0:
             return []
         wasnt_lists = False
-        if not isinstance(elis[0], list):
+        if not isinstance(elis, list):
             wasnt_lists = True
             elis = [elis]
         for ch in srf.channels:
