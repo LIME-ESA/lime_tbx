@@ -67,7 +67,7 @@ class LimeSimulation():
 
 
     def update_model_refl(self,point,cimel_coeff):
-        if not self.refl_uptodate:
+        # if not self.refl_uptodate:
             md=MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
 
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
@@ -81,7 +81,8 @@ class LimeSimulation():
 
     def update_model_irr(self,point,cimel_coeff):
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
-        if not self.refl_uptodate:
+        if True:
+            #if not self.refl_uptodate:
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
             print("here",cimel_data)
             asd_data = self.intp.get_best_asd_reference(md)
@@ -93,7 +94,7 @@ class LimeSimulation():
             self.elref_asd = asd_data
             self.refl_uptodate=True
 
-        if not self.irr_uptodate:
+        # if not self.irr_uptodate:
             self.elis = self.calculate_eli_from_elref(md,self.elref)
             self.elis_cimel = self.calculate_eli_from_elref(md, self.elref_cimel )
             self.elis_asd = self.calculate_eli_from_elref(md,self.elref_asd )
@@ -101,7 +102,8 @@ class LimeSimulation():
 
     def update_model_pol(self,point,polar_coeff):
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
-        if not self.pol_uptodate:
+        # if not self.pol_uptodate:
+        if True:
             self.polars = self.calculate_polar(md,polar_coeff)
 
     def interpolate_refl(self,
