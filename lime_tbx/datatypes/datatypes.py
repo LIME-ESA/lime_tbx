@@ -594,7 +594,7 @@ class SpectralData:
 
         ds_refl.reflectance.values = refl
 
-        if unc:
+        if unc is not None:
             ds_refl.u_ran_reflectance.values = unc[0]
             ds_refl.u_sys_reflectance.values = unc[1]
         else:
@@ -613,7 +613,7 @@ class SpectralData:
 
         ds_irr.reflectance.values = refl
 
-        if unc:
+        if unc is not None:
             ds_irr.u_ran_reflectance.values = unc[0]
             ds_irr.u_sys_reflectance.values = unc[1]
         else:
@@ -632,7 +632,7 @@ class SpectralData:
 
         ds_pol.reflectance.values = refl
 
-        if unc:
+        if unc is not None:
             ds_pol.u_ran_reflectance.values = unc[0]
             ds_pol.u_sys_reflectance.values = unc[1]
         else:

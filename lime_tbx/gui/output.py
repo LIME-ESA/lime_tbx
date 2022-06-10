@@ -111,7 +111,7 @@ class GraphWidget(QtWidgets.QWidget):
         self._redraw()
 
     def _is_filled(self) -> bool:
-        if self.data:
+        if self.data is not None:
             return True
         return False
 
