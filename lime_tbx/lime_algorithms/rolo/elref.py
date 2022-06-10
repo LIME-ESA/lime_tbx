@@ -89,6 +89,7 @@ def band_moon_disk_reflectance_unc(
 
     cfs = cimel_coef.coeffs
     ucfs = cimel_coef.unc_coeffs
+    print(ucfs)
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
@@ -101,7 +102,8 @@ def band_moon_disk_reflectance_unc(
         cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value],
         [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
         None, None, None])
-    print(unc)
+    print(_measurement_func_elref(cfs.a_coeffs, cfs.b_coeffs,
+        cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value))
     return unc
 
 def _moon_disk_reflectance(
