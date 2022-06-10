@@ -145,7 +145,6 @@ class GraphWidget(QtWidgets.QWidget):
                                               self.data.data+2*self.data.uncertainties,
                                               color="green",alpha=0.3)
 
-            print(self.asd_data)
             if self.asd_data:
                 self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
 
@@ -287,7 +286,7 @@ class SignalWidget(QtWidgets.QWidget):
                 self.table.setItem(0, i + 2, item_title_value)
         self.table.setItem(0, 0, head_id_item)
         self.table.setItem(0, 1, head_center_item)
-        print(len(srf),len(signals))
+        print(len(srf.channels),len(signals))
         for i, ch_signals in enumerate(signals.data):
             ch = srf.channels[i]
             if not isinstance(ch_signals, list):
