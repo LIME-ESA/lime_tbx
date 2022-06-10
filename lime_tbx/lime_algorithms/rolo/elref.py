@@ -171,7 +171,8 @@ def _measurement_func_elref(a_coeffs: List[float], b_coeffs: List[float], c_coef
     sum_b: float = np.sum([b_coeffs[j]*phi**(2*(j+1)-1) for j in range(len(b_coeffs))],axis=0)
     result = (sum_a+sum_b+c_coeffs[0]*l_phi+c_coeffs[1]*l_theta+c_coeffs[2]*phi*l_phi+
               c_coeffs[3]*phi*l_theta+d1_value+d2_value+d3_value)
-    print(result.shape)
+    print(a_coeffs)
+    print(result)
     return np.exp(result)
 
 def interpolated_moon_disk_reflectance(
