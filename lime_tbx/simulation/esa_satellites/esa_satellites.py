@@ -81,7 +81,7 @@ class IESASatellites(ABC):
         eocfi_path: str,
         cimel_data: CimelData = None,
     ) -> Tuple[
-        Union[List[float], List[List[float]]],
+        Union[np.ndarray, List[np.ndarray]],
         Union[UncertaintyData, List[UncertaintyData]],
     ]:
         """
@@ -105,7 +105,7 @@ class IESASatellites(ABC):
 
         Returns
         -------
-        elrefs: list of float
+        elrefs: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar reflectanes for the given srf at the specified point.
         uncerts: UncertaintyData or list of UncertaintyData
             The uncertaintie/s related to the elis
@@ -192,7 +192,7 @@ class ESASatellites(IESASatellites):
         eocfi_path: str,
         cimel_data: CimelData = None,
     ) -> Tuple[
-        Union[List[float], List[List[float]]],
+        Union[np.ndarray, List[np.ndarray]],
         Union[UncertaintyData, List[UncertaintyData]],
     ]:
         eocfi = EOCFIConverter(eocfi_path)

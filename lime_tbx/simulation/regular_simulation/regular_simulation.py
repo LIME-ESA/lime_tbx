@@ -85,7 +85,7 @@ class IRegularSimulation(ABC):
         kernels_path: str,
         cimel_data: CimelData = None,
     ) -> Tuple[
-        Union[List[float], List[List[float]]],
+        Union[np.ndarray, List[np.ndarray]],
         Union[UncertaintyData, List[UncertaintyData]],
     ]:
         """
@@ -109,7 +109,7 @@ class IRegularSimulation(ABC):
 
         Returns
         -------
-        elrefs: list of float | list of list of float
+        elrefs: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar reflectances for the given srf at the specified point.
             It will be a list of lists of float if the parameter dt is a list. Otherwise it
             will only be a list of float.
@@ -194,7 +194,7 @@ class IRegularSimulation(ABC):
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
-    ) -> Tuple[List[float], UncertaintyData]:
+    ) -> Tuple[np.ndarray, UncertaintyData]:
         """
         Simulate the extraterrestrial lunar reflectance for custom lunar parameters.
 
@@ -213,7 +213,7 @@ class IRegularSimulation(ABC):
 
         Returns
         -------
-        elrefs: list of float
+        elrefs: np.ndarray of float
             Extraterrestrial lunar reflectances for the given srf and the specified parameters.
         uncertainty_data: UncertaintyData
             Uncertainty data calculated, in case that calc_uncertainty was True
@@ -327,7 +327,7 @@ class RegularSimulation(IRegularSimulation):
         kernels_path: str,
         cimel_data: CimelData = None,
     ) -> Tuple[
-        Union[List[float], List[List[float]]],
+        Union[np.ndarray, List[np.ndarray]],
         Union[UncertaintyData, List[UncertaintyData]],
     ]:
         md = SPICEAdapter().get_moon_data_from_earth(
@@ -366,7 +366,7 @@ class RegularSimulation(IRegularSimulation):
         cp: CustomPoint,
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
-    ) -> Tuple[List[float], UncertaintyData]:
+    ) -> Tuple[np.ndarray, UncertaintyData]:
         md = RegularSimulation.get_md_from_custom(cp)
         return CommonSimulation.get_elref_from_md(srf, md, coefficients, cimel_data)
 

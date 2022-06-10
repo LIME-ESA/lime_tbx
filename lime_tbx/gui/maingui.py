@@ -64,7 +64,7 @@ def eli_callback(
     eocfi_path: str,
 ) -> Tuple[
     List[float],
-    List[float],
+    Union[np.ndarray, List[np.ndarray]],
     List[float],
     Union[SurfacePoint, CustomPoint, SatellitePoint],
     List[float],
@@ -95,7 +95,7 @@ def eli_callback(
     -------
     wlens: list of float
         Wavelengths of def_srf
-    elis: list of float
+    elis: np.ndarray of float | list of np.ndarray of float
         Irradiances related to def_srf
     point: Union[SurfacePoint, CustomPoint, SatellitePoint]
         Point that was used in the calculations.
@@ -143,7 +143,7 @@ def elref_callback(
     eocfi_path: str,
 ) -> Tuple[
     List[float],
-    List[float],
+    Union[np.ndarray, List[np.ndarray]],
     Union[SurfacePoint, CustomPoint, SatellitePoint],
     Union[UncertaintyData, List[UncertaintyData]],
 ]:
@@ -168,16 +168,16 @@ def elref_callback(
     -------
     wlens: list of float
         Wavelengths of def_srf
-    elrefs: list of float
+    elrefs: np.ndarray of float | list of np.ndarray of float
         Reflectances related to srf
     point: Union[SurfacePoint, CustomPoint, SatellitePoint]
         Point that was used in the calculations.
-    uncertainty_data: UncertaintyData or list of UncertaintyData
+    uncertainty_data: UncertaintyData | list of UncertaintyData
         Calculated uncertainty data.
     """
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
-    elrefs: List[float] = []
+    elrefs: Union[np.ndarray, List[np.ndarray]] = []
     if isinstance(point, SurfacePoint):
         elrefs, unc_data = rs.get_elref_from_surface(
             srf, point, coeffs, kernels_path, cimel_data
@@ -453,7 +453,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self,
         data: Tuple[
             List[float],
-            Union[List[float], List[List[float]]],
+            Union[np.ndarray, List[np.ndarray]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             List[float],
             SpectralResponseFunction,
@@ -502,7 +502,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self,
         data: Tuple[
             List[float],
-            Union[List[float], List[List[float]]],
+            Union[np.ndarray, List[np.ndarray]],
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             Union[UncertaintyData, List[UncertaintyData]],
         ],

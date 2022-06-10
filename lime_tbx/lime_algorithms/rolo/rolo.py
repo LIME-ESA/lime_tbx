@@ -79,7 +79,7 @@ class IROLO(ABC):
         wavelengths: Union[float, List[float]],
         moon_data: MoonData,
         coefficients: IrradianceCoefficients,
-    ) -> Union[float, List[float]]:
+    ) -> np.ndarray:
         """Calculation of Extraterrestrial Lunar Reflectance following Eq 3 in Roman et al., 2020
         for the calculation of the irradiance.
 
@@ -100,9 +100,8 @@ class IROLO(ABC):
 
         Returns
         -------
-        float | list of float
-            The extraterrestrial lunar reflectance/s calculated. It will be a list if parameter
-            "wavelengths" was a list.
+        np.ndarray of float
+            The extraterrestrial lunar reflectances calculated.
         """
         pass
 
@@ -152,7 +151,7 @@ class ROLO(IROLO):
         wavelengths: Union[float, List[float]],
         moon_data: MoonData,
         coefficients: IrradianceCoefficients,
-    ) -> Union[float, List[float]]:
+    ) -> np.ndarray:
         """Calculation of Extraterrestrial Lunar Reflectance following Eq 3 in Roman et al., 2020
         for the calculation of the irradiance.
 
@@ -173,13 +172,9 @@ class ROLO(IROLO):
 
         Returns
         -------
-        float | list of float
-            The extraterrestrial lunar reflectance/s calculated. It will be a list if parameter
-            "wavelengths" was a list.
+        np.ndarray of float
+            The extraterrestrial lunar reflectances calculated.
         """
-        if isinstance(wavelengths, list):
-            elrefs = []
-            for wlen in wavelengths:
-                elrefs.append(elref.calculate_elref(wlen, moon_data, coefficients))
-            return elrefs
+        if not isinstance(wavelengths, list):
+            wavelengths = [wavelengths]
         return elref.calculate_elref(wavelengths, moon_data, coefficients)

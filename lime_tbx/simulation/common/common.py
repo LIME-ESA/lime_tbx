@@ -62,8 +62,8 @@ class ICommonSimulation(ABC):
         -------
         irradiances: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar irradiances for the given srf at the specified point.
-            It will be a list of lists of float if the parameter md is a list. Otherwise it
-            will only be a list of float.
+            It will be a list of np.ndarray of float if the parameter md is a list. Otherwise it
+            will only be a np.ndarray of float.
         uncertainties: UncertaintyData | list of UncertaintyData
             Uncertainty data calculated, in case that calc_uncertainty was True
         """
@@ -77,7 +77,10 @@ class ICommonSimulation(ABC):
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], UncertaintyData]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         """
         Obtain the reflectance from the MoonData data structure.
 
@@ -98,11 +101,11 @@ class ICommonSimulation(ABC):
 
         Returns
         -------
-        reflectances: list of float | list of list of float
+        reflectances: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar reflectances for the given srf at the specified point.
-            It will be a list of lists of float if the parameter md is a list. Otherwise it
-            will only be a list of float.
-        uncertainty_data: UncertaintyData
+            It will be a list of np.ndarray of float if the parameter md is a list. Otherwise it
+            will only be a np.ndarray of float.
+        uncertainty_data: UncertaintyData | list of UncertaintyData
             Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
@@ -196,7 +199,10 @@ class CommonSimulation(ICommonSimulation):
         md: Union[MoonData, List[MoonData]],
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
-    ) -> Tuple[Union[List[float], List[List[float]]], UncertaintyData]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         rl = rolo.ROLO()
         wlens = srf.get_wavelengths()
         if not isinstance(md, list):

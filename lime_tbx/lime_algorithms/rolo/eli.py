@@ -56,12 +56,7 @@ def calculate_elis(
     np.ndarray of float
         The extraterrestrial lunar irradiances calculated
     """
-    a_l = np.array(
-        [
-            elref.interpolated_moon_disk_reflectance(wlen, moon_data, coefficients)
-            for wlen in wavelengths_nm
-        ]
-    )
+    a_l = elref.calculate_elref(wavelengths_nm, moon_data, coefficients)
 
     esk = list(esi.get_esi_per_nms(wavelengths_nm))
     dsm = moon_data.distance_sun_moon
