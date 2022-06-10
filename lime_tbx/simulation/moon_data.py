@@ -33,7 +33,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class Moondata():
+class MoonDataFactory():
     """
         Class for running the main lime-tbx functionality
         """
@@ -42,12 +42,12 @@ class Moondata():
     def get_md(point: Union[SurfacePoint, CustomPoint, SatellitePoint], eocfi_path: str,
                kernels_path: str,) -> MoonData:
         if isinstance(point, SurfacePoint):
-            md=Moondata.get_md_from_surface(point,kernels_path)
+            md=MoonDataFactory.get_md_from_surface(point,kernels_path)
 
         elif isinstance(point, CustomPoint):
-            md=Moondata.get_md_from_custom(point)
+            md=MoonDataFactory.get_md_from_custom(point)
         else:
-            md= Moondata.get_md_from_satellite(
+            md= MoonDataFactory.get_md_from_satellite(
                 point, eocfi_path, kernels_path
             )
         return md
@@ -91,6 +91,6 @@ class Moondata():
         for dt in dts:
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
-            mds.append(Moondata.get_md_from_surface(srp, kernels_path))
+            mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
 
         return mds
