@@ -69,10 +69,11 @@ class LimeSimulation():
     def update_model_refl(self,srf,point,cimel_coeff):
         # if not self.refl_uptodate:
             md=MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
+            self.wlen = srf.get_wavelengths()
 
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
             asd_data = self.intp.get_best_asd_reference(md)
-            intp_data = self.interpolate_refl(asd_data,cimel_data,srf.get_wavelengths())
+            intp_data = self.interpolate_refl(asd_data,cimel_data)
 
             self.elref = intp_data
             self.elref_cimel = cimel_data
@@ -83,11 +84,10 @@ class LimeSimulation():
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if True:
             #if not self.refl_uptodate:
+            self.wlen=srf.get_wavelengths()
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
-            print("here",cimel_data)
             asd_data = self.intp.get_best_asd_reference(md)
-            print("here",asd_data)
-            intp_data = self.interpolate_refl(asd_data,cimel_data,srf.get_wavelengths())
+            intp_data = self.interpolate_refl(asd_data,cimel_data)
 
             self.elref = intp_data
             self.elref_cimel = cimel_data
