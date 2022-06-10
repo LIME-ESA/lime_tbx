@@ -52,8 +52,6 @@ def band_moon_disk_reflectance(
         The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
     cfs = cimel_coef.coeffs
-    print(cfs)
-    print(cimel_coef)
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
@@ -97,12 +95,12 @@ def band_moon_disk_reflectance_unc(
 
     prop=punpy.MCPropagation(1000,dtype=np.float64)
 
-    unc = prop.propagate_random(_measurement_func_elref, [cfs.a_coeffs, cfs.b_coeffs,
+    unc, samples = prop.propagate_random(_measurement_func_elref, [cfs.a_coeffs, cfs.b_coeffs,
         cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value],
         [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
-        None, None, None])
+        None, None, None], return_samples=True)
 
-    print("here6", unc)
+    print("here6", samples)
     return unc
 
 def _moon_disk_reflectance(

@@ -106,7 +106,7 @@ def eli_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_model_irr(point,cimel_coef)
+    lime_simulation.update_model_irr(srf,point,cimel_coef)
     return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd
 
 def elref_callback(
@@ -149,7 +149,7 @@ def elref_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_model_refl(point,cimel_coef)
+    lime_simulation.update_model_refl(srf,point,cimel_coef)
     print(lime_simulation.elref)
     print(lime_simulation.elref_cimel)
     print(lime_simulation.elis_asd)
@@ -163,7 +163,7 @@ def polar_callback(
     lime_simulation: LimeSimulation,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
 
-    lime_simulation.update_model_pol(point,coeffs)
+    lime_simulation.update_model_pol(srf,point,coeffs)
     return point,lime_simulation.polars
 
 
