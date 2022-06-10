@@ -150,7 +150,7 @@ def elref_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_refl(srf,point,cimel_coef)
-    return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elis_asd
+    return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elref_asd
 
 
 def polar_callback(
