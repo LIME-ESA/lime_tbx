@@ -107,7 +107,6 @@ def eli_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_irr(srf,point,cimel_coef)
-    print(lime_simulation.elis)
     return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd
 
 def elref_callback(
@@ -151,9 +150,6 @@ def elref_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_refl(srf,point,cimel_coef)
-    print("this",lime_simulation.elref)
-    print(lime_simulation.elref_cimel)
-    print(lime_simulation.elis_asd)
     return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elis_asd
 
 
@@ -412,9 +408,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         #     cimel_data = unc.data
         #     uncert = unc.uncertainties
         # self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
-        print(data[2])
-        print(data[3])
-        print(data[4])
+
         self.graph.update_plot(data[2], data[3], data[4])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
