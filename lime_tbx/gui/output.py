@@ -174,8 +174,6 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
-        if len(self.legend) > 0:
-            self.canvas.axes.legend(self.legend)
         try:
             self.canvas.fig.tight_layout()
         except:
