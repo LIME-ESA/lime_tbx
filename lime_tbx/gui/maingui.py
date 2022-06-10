@@ -84,7 +84,7 @@ def eli_callback(
         Point used
     coeffs: IrradianceCoefficients
         Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
-    cimel_data: CimelCoef
+    cimel_coef: CimelCoef
         CimelCoef with the CIMEL coefficients and uncertainties.
     kernels_path: str
         Path where the directory with the SPICE kernels is located.
@@ -429,9 +429,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         point = self.input_widget.get_point()
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
-        cimel_data = self.settings_manager.get_cimel_data()
+        cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, cimel_data,self.lime_simulation]
+            elref_callback, [def_srf, point, coeffs, cimel_coef,self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
