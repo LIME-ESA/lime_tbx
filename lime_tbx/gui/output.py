@@ -142,34 +142,17 @@ class GraphWidget(QtWidgets.QWidget):
             else:
                 self.canvas.axes.plot(self.data.wlen, self.data.data, marker="", label="Kieffer and Stone 2005")
 
-            if len(self.data.wlen)>0:
+            if self.asd_data:
                 self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
 
                 self.canvas.axes.plot(self.intp_data.wlen, self.intp_data.data,"g",label="interpolated data points")
                 self.canvas.axes.fill_between(self.intp_data.wlen, self.intp_data.data-2*self.intp_data.uncertainties,self.intp_data.data+2*self.intp_data.uncertainties,color="green",alpha=0.3)
 
+            if self.cimel_data:
                 self.canvas.axes.plot(self.cimel_data.wlen, self.cimel_data.data,color="orange", ls='none', marker="o",label="CIMEL data points")
                 self.canvas.axes.errorbar(self.cimel_data.wlen, self.cimel_data.data, yerr=self.cimel_data.uncertainties*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
 
             self.canvas.axes.legend()
-            self.canvas.axes.plot(self.data.wlen, self.data.data, marker="")
-            if len(self.cimel_data.wlen) > 0:
-                self.canvas.axes.plot(
-                    self.cimel_data.wlen,
-                    self.cimel_data.data,
-                    ls="none",
-                    marker="o",
-                    label="CIMEL data points",
-                )
-                self.canvas.axes.errorbar(
-                    self.cimel_data.wlen,
-                    self.cimel_data.data,
-                    yerr=self.self.cimel_data.uncertainties * 2,
-                    capsize=3,
-                    ls="none",
-                    label="errorbars (k=2))",
-                )
-                self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
