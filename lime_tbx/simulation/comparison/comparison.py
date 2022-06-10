@@ -16,7 +16,7 @@ from ...datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
 )
-# from ...simulation.regular_simulation.regular_simulation import RegularSimulation
+from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
 """___Authorship___"""

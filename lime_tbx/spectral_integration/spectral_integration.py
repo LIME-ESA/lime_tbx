@@ -1,13 +1,22 @@
 """describe class"""
 
 """___Built-In Modules___"""
-#import here
+from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
 #import here
 
 """___NPL Modules___"""
-#import here
+from lime_tbx.datatypes.datatypes import (
+    CimelCoef,
+    IrradianceCoefficients,
+    MoonData,
+    PolarizationCoefficients,
+    SpectralResponseFunction,
+    SurfacePoint,
+    CustomPoint,
+    SpectralData,
+)
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
