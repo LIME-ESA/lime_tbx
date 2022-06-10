@@ -100,7 +100,7 @@ def band_moon_disk_reflectance_unc(
         [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
         None, None, None], return_samples=True)
 
-    print("here6", samples_y)
+    # print("here6", samples_y)
 
     return unc
 

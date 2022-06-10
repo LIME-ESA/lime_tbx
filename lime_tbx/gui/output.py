@@ -286,7 +286,7 @@ class SignalWidget(QtWidgets.QWidget):
                 self.table.setItem(0, i + 2, item_title_value)
         self.table.setItem(0, 0, head_id_item)
         self.table.setItem(0, 1, head_center_item)
-        print(len(srf.channels),len(signals))
+        print(len(srf.channels),len(signals.data))
         for i, ch_signals in enumerate(signals.data):
             ch = srf.channels[i]
             if not isinstance(ch_signals, list):
