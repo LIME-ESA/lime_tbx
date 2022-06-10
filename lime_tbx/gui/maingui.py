@@ -69,7 +69,7 @@ def eli_callback(
     Union[SurfacePoint, CustomPoint, SatellitePoint],
     List[float],
     SpectralResponseFunction,
-    Union[UncertaintyData, List[UncertaintyData]]
+    Union[UncertaintyData, List[UncertaintyData]],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -109,13 +109,17 @@ def eli_callback(
     rs = regular_simulation.RegularSimulation
     es = esa_satellites.ESASatellites
     time.sleep(0.01)  # For some reason without this the GUI doesn't get disabled.
-    elis: Union[List[float], List[List[float]]] = []
-    elis_srf: Union[List[float], List[List[float]]] = []
+    elis: Union[np.ndarray, List[np.ndarray]] = []
+    elis_srf: Union[np.ndarray, List[np.ndarray]] = []
     if isinstance(point, SurfacePoint):
-        elis, uncertainty_data = rs.get_eli_from_surface(def_srf, point, coeffs, kernels_path, cimel_data, True)
+        elis, uncertainty_data = rs.get_eli_from_surface(
+            def_srf, point, coeffs, kernels_path, cimel_data, True
+        )
         elis_srf, _ = rs.get_eli_from_surface(srf, point, coeffs, kernels_path)
     elif isinstance(point, CustomPoint):
-        elis, uncertainty_data = rs.get_eli_from_custom(def_srf, point, coeffs, cimel_data, True)
+        elis, uncertainty_data = rs.get_eli_from_custom(
+            def_srf, point, coeffs, cimel_data, True
+        )
         elis_srf, _ = rs.get_eli_from_custom(srf, point, coeffs)
     else:
         elis, uncertainty_data = es.get_eli_from_satellite(
@@ -433,7 +437,15 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path],
+            [
+                def_srf,
+                srf,
+                point,
+                coeffs,
+                cimel_data,
+                self.kernels_path,
+                self.eocfi_path,
+            ],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -481,7 +493,8 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_data = self.settings_manager.get_cimel_data()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path]
+            elref_callback,
+            [def_srf, point, coeffs, cimel_data, self.kernels_path, self.eocfi_path],
         )
         self._start_thread(self.elref_finished, self.elref_error)
 

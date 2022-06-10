@@ -5,7 +5,7 @@ from typing import List, Union, Tuple
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
@@ -39,7 +39,10 @@ class IESASatellites(ABC):
         eocfi_path: str,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         """
         Simulate the extraterrestrial lunar irradiance for a satellite point.
 
@@ -61,7 +64,7 @@ class IESASatellites(ABC):
 
         Returns
         -------
-        elis: list of float
+        elis: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar irradiances for the given srf at the specified point.
         uncerts: UncertaintyData or list of UncertaintyData
             The uncertaintie/s related to the elis
@@ -77,7 +80,10 @@ class IESASatellites(ABC):
         kernels_path: str,
         eocfi_path: str,
         cimel_data: CimelData = None,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[List[float], List[List[float]]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         """
         Simulate the extraterrestrial lunar reflectance for a satellite point.
 
@@ -152,7 +158,10 @@ class ESASatellites(IESASatellites):
         eocfi_path: str,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         wasnt_list = False
@@ -165,7 +174,8 @@ class ESASatellites(IESASatellites):
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
             new_eli, uncert = RegularSimulation.get_eli_from_surface(
-                    srf, srp, coefficients, kernels_path, cimel_data, calc_uncertainty)
+                srf, srp, coefficients, kernels_path, cimel_data, calc_uncertainty
+            )
             elis.append(new_eli)
             uncerts.append(uncert)
         if wasnt_list:
@@ -181,7 +191,10 @@ class ESASatellites(IESASatellites):
         kernels_path: str,
         eocfi_path: str,
         cimel_data: CimelData = None,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[List[float], List[List[float]]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         wasnt_list = False
@@ -194,7 +207,8 @@ class ESASatellites(IESASatellites):
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
             new_elref, uncert = RegularSimulation.get_elref_from_surface(
-                srf, srp, coefficients, kernels_path, cimel_data)
+                srf, srp, coefficients, kernels_path, cimel_data
+            )
             elrefs.append(new_elref)
             uncerts.append(uncert)
         if wasnt_list:

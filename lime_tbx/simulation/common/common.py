@@ -5,7 +5,7 @@ from typing import Union, List, Tuple
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
@@ -36,7 +36,10 @@ class ICommonSimulation(ABC):
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], UncertaintyData]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         """
         Obtain the irradiance from the MoonData data structure.
 
@@ -57,11 +60,11 @@ class ICommonSimulation(ABC):
 
         Returns
         -------
-        irradiances: list of float | list of list of float
+        irradiances: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar irradiances for the given srf at the specified point.
             It will be a list of lists of float if the parameter md is a list. Otherwise it
             will only be a list of float.
-        uncertainty_data: UncertaintyData
+        uncertainties: UncertaintyData | list of UncertaintyData
             Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
@@ -135,23 +138,28 @@ class ICommonSimulation(ABC):
 
 
 class CommonSimulation(ICommonSimulation):
-
     @staticmethod
-    def _get_uncertainty_eli(md: MoonData, cimel_data: CimelData, calc_uncertainty: bool):
+    def _get_uncertainty_eli(
+        md: MoonData, cimel_data: CimelData, calc_uncertainty: bool
+    ):
         uncertainty_data = None
         if calc_uncertainty:
             elis_cimel = eli.calculate_eli_band(cimel_data, md)
             u_elis_cimel = eli.calculate_eli_band_unc(cimel_data, md)
-            uncertainty_data = UncertaintyData(cimel_data.wavelengths, elis_cimel, u_elis_cimel)
+            uncertainty_data = UncertaintyData(
+                cimel_data.wavelengths, elis_cimel, u_elis_cimel
+            )
         return uncertainty_data
-    
+
     @staticmethod
     def _get_uncertainty_elref(md: MoonData, cimel_data: CimelData):
         uncertainty_data = None
         if cimel_data:
             elrefs_cimel = elref.band_moon_disk_reflectance(cimel_data, md)
             u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(cimel_data, md)
-            uncertainty_data = UncertaintyData(cimel_data.wavelengths, elrefs_cimel, u_elrefs_cimel)
+            uncertainty_data = UncertaintyData(
+                cimel_data.wavelengths, elrefs_cimel, u_elrefs_cimel
+            )
         return uncertainty_data
 
     @staticmethod
@@ -161,21 +169,24 @@ class CommonSimulation(ICommonSimulation):
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], UncertaintyData]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         rl = rolo.ROLO()
         wlens = srf.get_wavelengths()
         if not isinstance(md, list):
             irradiances = rl.get_eli(wlens, md, coefficients)
-            for i, w in enumerate(wlens):
-                irradiances[i] = irradiances[i]
-            return irradiances, CommonSimulation._get_uncertainty_eli(md, cimel_data, calc_uncertainty)
+            return irradiances, CommonSimulation._get_uncertainty_eli(
+                md, cimel_data, calc_uncertainty
+            )
         times_irr = []
         uncertainties = []
         for m in md:
             irradiances = rl.get_eli(wlens, m, coefficients)
-            for i, w in enumerate(wlens):
-                irradiances[i] = irradiances[i]
-            uncertainties.append(CommonSimulation._get_uncertainty_eli(m, cimel_data, calc_uncertainty))
+            uncertainties.append(
+                CommonSimulation._get_uncertainty_eli(m, cimel_data, calc_uncertainty)
+            )
             times_irr.append(irradiances)
         return times_irr, uncertainties
 

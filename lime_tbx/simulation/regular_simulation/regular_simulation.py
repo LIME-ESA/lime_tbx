@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from ...spice_adapter.spice_adapter import SPICEAdapter
@@ -30,7 +30,6 @@ __status__ = "Development"
 
 
 class IRegularSimulation(ABC):
-
     @staticmethod
     @abstractmethod
     def get_eli_from_surface(
@@ -40,7 +39,10 @@ class IRegularSimulation(ABC):
         kernels_path: str,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         """
         Simulate the extraterrestrial lunar irradiance for a geographic point.
 
@@ -65,11 +67,11 @@ class IRegularSimulation(ABC):
 
         Returns
         -------
-        elis: list of float | list of list of float
+        elis: np.ndarray of float | list of np.ndarray of float
             Extraterrestrial lunar irradiances for the given srf at the specified point.
             It will be a list of lists of float if the parameter dt is a list. Otherwise it
             will only be a list of float.
-        uncertainty_data: UncertaintyData
+        uncertainty_data: UncertaintyData | list of UncertaintyData
             Uncertainty data calculated, in case that calc_uncertainty was True
         """
         pass
@@ -82,7 +84,10 @@ class IRegularSimulation(ABC):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         cimel_data: CimelData = None,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[List[float], List[List[float]]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         """
         Simulate the extraterrestrial lunar reflectance for a geographic point.
 
@@ -153,7 +158,7 @@ class IRegularSimulation(ABC):
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[List[float], UncertaintyData]:
+    ) -> Tuple[np.ndarray, UncertaintyData]:
         """
         Simulate the extraterrestrial lunar irradiance for custom lunar parameters.
 
@@ -175,7 +180,7 @@ class IRegularSimulation(ABC):
 
         Returns
         -------
-        elis: list of float
+        elis: np.ndarray of float
             Extraterrestrial lunar irradiances for the given srf and the specified parameters.
         uncertainty_data: UncertaintyData
             Uncertainty data calculated, in case that calc_uncertainty was True
@@ -275,8 +280,9 @@ class RegularSimulation(IRegularSimulation):
         sp: SurfacePoint,
         kernels_path: str,
     ) -> MoonData:
-        md = SPICEAdapter().get_moon_data_from_earth(sp.latitude,sp.longitude,
-            sp.altitude,sp.dt,kernels_path)
+        md = SPICEAdapter().get_moon_data_from_earth(
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
+        )
         return md
 
     @staticmethod
@@ -302,11 +308,16 @@ class RegularSimulation(IRegularSimulation):
         kernels_path: str,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[np.ndarray, List[np.ndarray]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
-        return CommonSimulation.get_eli_from_md(srf, md, coefficients, cimel_data, calc_uncertainty)
+        return CommonSimulation.get_eli_from_md(
+            srf, md, coefficients, cimel_data, calc_uncertainty
+        )
 
     @staticmethod
     def get_elref_from_surface(
@@ -315,7 +326,10 @@ class RegularSimulation(IRegularSimulation):
         coefficients: IrradianceCoefficients,
         kernels_path: str,
         cimel_data: CimelData = None,
-    ) -> Tuple[Union[List[float], List[List[float]]], Union[UncertaintyData, List[UncertaintyData]]]:
+    ) -> Tuple[
+        Union[List[float], List[List[float]]],
+        Union[UncertaintyData, List[UncertaintyData]],
+    ]:
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
@@ -340,9 +354,11 @@ class RegularSimulation(IRegularSimulation):
         coefficients: IrradianceCoefficients,
         cimel_data: CimelData = None,
         calc_uncertainty: bool = False,
-    ) -> Tuple[List[float], UncertaintyData]:
+    ) -> Tuple[np.ndarray, UncertaintyData]:
         md = RegularSimulation.get_md_from_custom(cp)
-        return CommonSimulation.get_eli_from_md(srf, md, coefficients, cimel_data, calc_uncertainty)
+        return CommonSimulation.get_eli_from_md(
+            srf, md, coefficients, cimel_data, calc_uncertainty
+        )
 
     @staticmethod
     def get_elref_from_custom(

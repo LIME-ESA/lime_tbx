@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from typing import List, Union
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___LIME Modules___"""
 from . import eli, elref
@@ -48,7 +48,7 @@ class IROLO(ABC):
         wavelengths: Union[float, List[float]],
         moon_data: MoonData,
         coefficients: IrradianceCoefficients,
-    ) -> Union[float, List[float]]:
+    ) -> np.ndarray:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
         Allow users to simulate lunar observation for any observer/solar selenographic
@@ -68,9 +68,8 @@ class IROLO(ABC):
 
         Returns
         -------
-        float | list of float
-            The extraterrestrial lunar irradiance/s calculated. It will be a list if parameter
-            "wavelengths" was a list.
+        np.ndarray of float
+            The extraterrestrial lunar irradiances calculated.
         """
         pass
 
@@ -121,7 +120,7 @@ class ROLO(IROLO):
         wavelengths: Union[float, List[float]],
         moon_data: MoonData,
         coefficients: IrradianceCoefficients,
-    ) -> Union[float, List[float]]:
+    ) -> np.ndarray:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
         Allow users to simulate lunar observation for any observer/solar selenographic
@@ -141,16 +140,12 @@ class ROLO(IROLO):
 
         Returns
         -------
-        float | list of float
-            The extraterrestrial lunar irradiance/s calculated. It will be a list if parameter
-            "wavelengths" was a list.
+        np.ndarray of float
+            The extraterrestrial lunar irradiances calculated.
         """
-        if isinstance(wavelengths, list):
-            elis = []
-            for wlen in wavelengths:
-                elis.append(eli.calculate_eli(wlen, moon_data, coefficients))
-            return elis
-        return eli.calculate_eli(wavelengths, moon_data, coefficients)
+        if not isinstance(wavelengths, list):
+            wavelengths = [wavelengths]
+        return eli.calculate_elis(wavelengths, moon_data, coefficients)
 
     @staticmethod
     def get_elref(
