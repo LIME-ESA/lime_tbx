@@ -57,7 +57,7 @@ class CallbackWorker(QtCore.QObject):
 
 def eli_callback(
     def_srf: SpectralResponseFunction,
-    srf: Sp ectralResponseFunction,
+    srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
     cimel_coef: CimelCoef,
