@@ -57,7 +57,7 @@ class CallbackWorker(QtCore.QObject):
 
 def eli_callback(
     def_srf: SpectralResponseFunction,
-    srf: SpectralResponseFunction,
+    srf: Sp ectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
     cimel_coef: CimelCoef,
@@ -150,7 +150,7 @@ def elref_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_refl(srf,point,cimel_coef)
-    print(lime_simulation.elref)
+    print("this",lime_simulation.elref)
     print(lime_simulation.elref_cimel)
     print(lime_simulation.elis_asd)
     return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elis_asd

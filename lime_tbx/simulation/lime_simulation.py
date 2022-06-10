@@ -52,7 +52,7 @@ class LimeSimulation():
         self.eocfi_path = eocfi_path
 
         self.moondata = []
-        self.wlens = []
+        self.wlen = []
         self.elref = None
         self.elis = None
         self.elref_cimel = None
@@ -114,13 +114,13 @@ class LimeSimulation():
         
         
         elrefs_intp = self.intp.get_interpolated_refl(cimel_coeff.wlen,cimel_coeff.data,
-                                                 asd_data.wlen,asd_data.data,self.wlens)
-        print("here3",elrefs_intp)
+                                                 asd_data.wlen,asd_data.data,self.wlen)
+        print("here3",elrefs_intp,self.wlen)
         u_elrefs_intp = None
         if calc_uncertainty:
             u_elrefs_intp = elrefs_intp*0.01  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
-        ds_intp = SpectralData.make_reflectance_ds(self.wlens,elrefs_intp,u_elrefs_intp)
+        ds_intp = SpectralData.make_reflectance_ds(self.wlen,elrefs_intp,u_elrefs_intp)
 
         spectral_data = SpectralData(cimel_coeff.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
         return spectral_data
@@ -170,12 +170,12 @@ class LimeSimulation():
             ) -> SpectralData:
         dl = dolp.DOLP()
         if not isinstance(md,list):
-            polarizations = np.array(dl.get_polarized(self.wlens,md.mpa_degrees,polar_coeff))
+            polarizations = np.array(dl.get_polarized(self.wlen,md.mpa_degrees,polar_coeff))
 
         else:
-            polarizations = np.array([dl.get_polarized(self.wlens,m.mpa_degrees,polar_coeff) for m in md])
+            polarizations = np.array([dl.get_polarized(self.wlen,m.mpa_degrees,polar_coeff) for m in md])
 
-        ds_intp = SpectralData.make_polarization_ds(self.wlens,polarizations,
+        ds_intp = SpectralData.make_polarization_ds(self.wlen,polarizations,
                                                     None)
 
         spectral_data = SpectralData(polar_coeff.wlen,polarizations,
