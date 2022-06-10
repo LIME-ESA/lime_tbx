@@ -95,12 +95,12 @@ def band_moon_disk_reflectance_unc(
 
     prop=punpy.MCPropagation(1000,dtype=np.float64)
 
-    unc, samples = prop.propagate_random(_measurement_func_elref, [cfs.a_coeffs, cfs.b_coeffs,
+    unc, samples_x, samples_y = prop.propagate_random(_measurement_func_elref, [cfs.a_coeffs, cfs.b_coeffs,
         cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value],
         [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
         None, None, None], return_samples=True)
 
-    print("here6", samples)
+    print("here6", samples_y)
     return unc
 
 def _moon_disk_reflectance(
