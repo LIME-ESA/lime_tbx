@@ -88,7 +88,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.data = data
         self.cimel_data = data_cimel
         self.asd_data = data_asd
-        if data:
+        if data is not None:
             self.disable_buttons(False)
         else:
             self.disable_buttons(True)
