@@ -106,7 +106,7 @@ def eli_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_model_irr(point,CimelCoef)
+    lime_simulation.update_model_irr(point,cimel_coef)
     return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd
 
 def elref_callback(
