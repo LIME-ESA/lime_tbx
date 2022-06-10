@@ -79,7 +79,7 @@ def calculate_eli(
     return lunar_irr
 
 def calculate_eli_band(
-    cimel_data: CimelData, moon_data: MoonData
+    cimel_coef: CimelCoef, moon_data: MoonData
 ) -> np.ndarray:
     """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
     for a concrete set of empirical data points.
@@ -91,8 +91,8 @@ def calculate_eli_band(
 
     Parameters
     ----------
-    cimel_data: CimelData
-        CimelData with the CIMEL coefficients and uncertainties.
+    cimel_coef: CimelCoef
+        CimelCoef with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
 
@@ -102,10 +102,10 @@ def calculate_eli_band(
         The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
     a_l = elref.band_moon_disk_reflectance(
-        cimel_data, moon_data
+        cimel_coef, moon_data
     )
 
-    esk = [esi.get_esi_per_nm(wav) for wav in cimel_data.wavelengths]
+    esk = [esi.get_esi_per_nm(wav) for wav in cimel_coef.wavelengths]
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
