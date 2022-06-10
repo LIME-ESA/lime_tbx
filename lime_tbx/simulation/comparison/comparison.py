@@ -16,8 +16,9 @@ from ...datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
 )
-from ...simulation.regular_simulation.regular_simulation import RegularSimulation
+# from ...simulation.regular_simulation.regular_simulation import RegularSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
+
 """___Authorship___"""
 __author__ = "Pieter De Vis"
 __created__ = "01/02/2022"
@@ -101,7 +102,7 @@ class Comparison(IComparison):
         observations: List[LunarObservation],
         srf: SpectralResponseFunction,
         coefficients: IrradianceCoefficients,
-        kernels_path: str,
+        lime_simulation: LimeSimulation,
     ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         ch_names = srf.get_channels_names()
         irrs = [[] for _ in ch_names]
@@ -112,9 +113,7 @@ class Comparison(IComparison):
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            elis, _ = RegularSimulation.get_eli_from_surface(
-                srf, sp, coefficients, kernels_path
-            )
+            elis, _ = lime_simulation.elref
             integrated_irrs = SpectralIntegration.integrate_elis(srf, elis)
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
