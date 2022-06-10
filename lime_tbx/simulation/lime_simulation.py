@@ -121,7 +121,7 @@ class LimeSimulation():
 
         ds_intp = SpectralData.make_reflectance_ds(self.wlen,elrefs_intp,u_elrefs_intp)
 
-        spectral_data = SpectralData(self.wlen.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
+        spectral_data = SpectralData(self.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
         return spectral_data
 
     def calculate_eli_from_elref(self, moon_data: MoonData,
