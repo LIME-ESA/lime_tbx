@@ -411,6 +411,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         #     cimel_data = unc.data
         #     uncert = unc.uncertainties
         # self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
+        print(data[2])
+        print(data[3])
+        print(data[4])
         self.graph.update_plot(data[2], data[3], data[4])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
