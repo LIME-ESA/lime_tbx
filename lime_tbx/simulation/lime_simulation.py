@@ -206,9 +206,10 @@ class LimeSimulation():
     def calculate_signals(self,srf):
         signal = SpectralIntegration.integrate_elis(srf,self.elis.data)
 
-        ds_pol = SpectralData.make_polarization_ds(srf.get_wavelengths(),signal,None)
+        channel_ids=[srf.channels[i].id for i in range(len(srf.channels))]
+        ds_pol = SpectralData.make_irradiance_ds(channel_ids,signal,None)
 
-        spectral_data = SpectralData(srf.get_wavelengths(),signal,None,ds_pol)
+        spectral_data = SpectralData(channel_ids,signal,None,ds_pol)
 
         return spectral_data
 
