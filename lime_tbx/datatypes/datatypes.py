@@ -551,10 +551,11 @@ class LunarObservation:
                 return False
         return True
 
-@dataclass
 class CimelCoef:
     @dataclass
     class _CimelCoeffs:
+        __slots__ = ["_coeffs","a_coeffs","b_coeffs","c_coeffs","d_coeffs","p_coeffs"]
+
         def __init__(self, coeffs: np.ndarray):
             self._coeffs = coeffs
             self.a_coeffs = coeffs[0:4,:]
@@ -590,9 +591,12 @@ class SpectralData:
 
         if unc_rand is not None:
             ds_refl.u_ran_reflectance.values = unc_rand
-            ds_refl.u_sys_reflectance.values = unc_syst
         else:
             ds_refl.u_ran_reflectance.values = refl*0.01
+
+        if unc_syst is not None:
+            ds_refl.u_sys_reflectance.values = unc_syst
+        else:
             ds_refl.u_sys_reflectance.values = refl*0.05
 
         return ds_refl
@@ -609,9 +613,12 @@ class SpectralData:
 
         if unc_rand is not None:
             ds_irr.u_ran_reflectance.values = unc_rand
-            ds_irr.u_sys_reflectance.values = unc_syst
         else:
             ds_irr.u_ran_reflectance.values = refl*0.01
+
+        if unc_syst is not None:
+            ds_irr.u_sys_reflectance.values = unc_syst
+        else:
             ds_irr.u_sys_reflectance.values = refl*0.05
 
         return ds_irr
@@ -628,9 +635,12 @@ class SpectralData:
 
         if unc_rand is not None:
             ds_pol.u_ran_reflectance.values = unc_rand
-            ds_pol.u_sys_reflectance.values = unc_syst
         else:
             ds_pol.u_ran_reflectance.values = refl*0.01
+
+        if unc_syst is not None:
+            ds_pol.u_sys_reflectance.values = unc_syst
+        else:
             ds_pol.u_sys_reflectance.values = refl*0.05
 
         return ds_pol
