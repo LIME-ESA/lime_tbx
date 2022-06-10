@@ -19,13 +19,10 @@ from lime_tbx.datatypes.datatypes import (
     SpectralData,
     CimelCoef
 )
-from lime_tbx.simulation.common.common import CommonSimulation
 
 from lime_tbx.lime_algorithms.rolo import eli, elref, esi
 from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import SpectralInterpolation
-from lime_tbx.simulation.common.common import CommonSimulation
-from lime_tbx.simulation.regular_simulation.regular_simulation import RegularSimulation
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.moon_data import Moondata
 
