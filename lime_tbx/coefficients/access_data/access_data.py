@@ -158,4 +158,5 @@ def _get_default_cimel_coef() -> CimelCoef:
     u_data=np.genfromtxt(os.path.join(current_dir,"assets/u_coefficients_cimel.csv"),delimiter=",")
     ds_cimel.coeff.values=data.T
     ds_cimel.u_coeff.values=u_data.T
+
     return CimelCoef(ds_cimel)

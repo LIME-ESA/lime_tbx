@@ -220,6 +220,8 @@ class LimeSimulation():
             if calc_uncertainty:
                 u_elrefs_cimel = [elref.band_moon_disk_reflectance_unc(cimel_coeff,m) for m in md]
 
+        print("here",elrefs_cimel)
+
         ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wlen,elrefs_cimel,unc_rand=u_elrefs_cimel)
 
         spectral_data = SpectralData(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel,ds_cimel)

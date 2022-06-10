@@ -581,6 +581,7 @@ class SpectralData:
 
     @staticmethod
     def make_reflectance_ds(wavs,refl,unc_rand=None,unc_syst=None):
+
         dim_sizes = {"wavelength":len(wavs)}
         # create dataset
         ds_refl = obsarray.create_ds(template_refl,dim_sizes)
