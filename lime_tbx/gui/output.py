@@ -139,7 +139,8 @@ class GraphWidget(QtWidgets.QWidget):
             else:
                 self.canvas.axes.plot(self.data.wlen,self.data.data,"g",
                                       label="interpolated data points")
-                self.canvas.axes.fill_between(self.data.wlen,
+                if self.data.uncertainties is not None:
+                    self.canvas.axes.fill_between(self.data.wlen,
                                               self.data.data-2*self.data.uncertainties,
                                               self.data.data+2*self.data.uncertainties,
                                               color="green",alpha=0.3)
