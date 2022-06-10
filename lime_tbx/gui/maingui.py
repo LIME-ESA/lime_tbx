@@ -107,6 +107,7 @@ def eli_callback(
         Calculated uncertainty data.
     """
     lime_simulation.update_model_irr(srf,point,cimel_coef)
+    print(lime_simulation.elis)
     return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd
 
 def elref_callback(

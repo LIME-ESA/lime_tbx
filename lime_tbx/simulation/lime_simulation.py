@@ -161,6 +161,11 @@ class LimeSimulation():
                                     [elref.data,omega,esk,dsm,distance_earth_moon_km,dom],
                                     [elref.uncertainties,None,None,None,None,None])
 
+        ds_eli = SpectralData.make_irradiance_ds(elref.wlen,lunar_irr,
+                                                    unc_rand=unc)
+
+        spectral_data = SpectralData(elref.wlen,lunar_irr,unc,ds_eli)
+
         return lunar_irr
 
     def calculate_polar(self,
@@ -223,5 +228,4 @@ class LimeSimulation():
         ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wlen,elrefs_cimel,unc_rand=u_elrefs_cimel)
 
         spectral_data = SpectralData(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel,ds_cimel)
-        print("here2",u_elrefs_cimel)
         return spectral_data
