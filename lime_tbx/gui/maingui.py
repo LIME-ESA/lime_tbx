@@ -220,6 +220,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.output)
 
     def _callback_compare_input_changed(self):
+        self.lime_simulation.set_simulation_changed()
         obss = self.input.get_moon_obs()
         srf = self.input.get_srf()
         if len(obss) == 0 or srf == None:

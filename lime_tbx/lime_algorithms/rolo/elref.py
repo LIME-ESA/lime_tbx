@@ -148,7 +148,7 @@ def _moon_disk_reflectance(
 
 def _measurement_func_elref(a_coeffs: List[float], b_coeffs: List[float], c_coeffs: List[float],
         d_coeffs: List[float], p_coeffs: List[float], phi: float, l_phi: float, l_theta: float,
-        gd_value: float) -> float:
+        gd_value: float) -> List[float]:
     """
     Final computation of the calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
     Roman et al., 2020
