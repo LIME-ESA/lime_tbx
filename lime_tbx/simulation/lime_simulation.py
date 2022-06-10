@@ -83,7 +83,9 @@ class LimeSimulation():
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if not self.refl_uptodate:
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
+            print("here",cimel_data)
             asd_data = self.intp.get_best_asd_reference(md)
+            print("here",asd_data)
             intp_data = self.interpolate_refl(asd_data,cimel_data)
 
             self.elref = intp_data
