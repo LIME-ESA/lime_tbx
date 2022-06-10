@@ -38,7 +38,7 @@ class SpectralInterpolation(ISpectralInterpolation):
 
     def get_interpolated_refl(self,cimel_wav,cimel_refl,asd_wav,asd_refl,final_wav):
         yy = self.intp.interpolate_1d_along_example(cimel_wav,cimel_refl,asd_wav,asd_refl,final_wav)
-        print("here4",yy)
+        print("here4",cimel_wav,cimel_refl,asd_wav,asd_refl,final_wav)
         return yy
 
     def get_interpolated_refl_unc(self,cimel_wav,cimel_refl,asd_wav,asd_refl,final_wav,u_cimel_refl,u_asd_refl,corr_cimel_refl=None,corr_asd_refl=None):

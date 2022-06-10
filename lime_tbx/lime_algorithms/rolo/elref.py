@@ -89,20 +89,20 @@ def band_moon_disk_reflectance_unc(
 
     cfs = cimel_coef.coeffs
     ucfs = cimel_coef.unc_coeffs
-    print(ucfs.a_coeffs)
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
     gd_value = moon_data.absolute_mpa_degrees
 
-    prop=punpy.MCPropagation(1000)
+    prop=punpy.MCPropagation(1000,dtype=np.float64)
 
     unc = prop.propagate_random(_measurement_func_elref, [cfs.a_coeffs, cfs.b_coeffs,
         cfs.c_coeffs, cfs.d_coeffs, cfs.p_coeffs, phi, l_phi, l_theta, gd_value],
         [ucfs.a_coeffs, ucfs.b_coeffs, ucfs.c_coeffs, ucfs.d_coeffs, ucfs.p_coeffs, None,
         None, None, None])
 
+    print("here6", unc)
     return unc
 
 def _moon_disk_reflectance(
@@ -171,8 +171,6 @@ def _measurement_func_elref(a_coeffs: List[float], b_coeffs: List[float], c_coef
     sum_b: float = np.sum([b_coeffs[j]*phi**(2*(j+1)-1) for j in range(len(b_coeffs))],axis=0)
     result = (sum_a+sum_b+c_coeffs[0]*l_phi+c_coeffs[1]*l_theta+c_coeffs[2]*phi*l_phi+
               c_coeffs[3]*phi*l_theta+d1_value+d2_value+d3_value)
-    print(a_coeffs)
-    print(result)
     return np.exp(result)
 
 def interpolated_moon_disk_reflectance(
