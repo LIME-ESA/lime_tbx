@@ -82,7 +82,6 @@ class LimeSimulation():
             self.refl_uptodate=True
 
     def update_model_irr(self,point,cimel_coeff):
-
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if not self.refl_uptodate:
             cimel_data,asd_data,elref_data = self.calculate_elref(md,cimel_coeff)
