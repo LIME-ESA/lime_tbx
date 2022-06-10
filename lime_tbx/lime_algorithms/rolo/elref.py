@@ -17,7 +17,7 @@ import punpy
 
 """___LIME Modules___"""
 from ...datatypes.datatypes import (
-    CimelData,
+    CimelCoef,
     MoonData,
     IrradianceCoefficients,
 )
@@ -30,7 +30,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 def band_moon_disk_reflectance(
-    cimel_data: CimelData,
+    cimel_coef: CimelCoef,
     moon_data: MoonData,
 ) -> np.ndarray:
     """
@@ -41,8 +41,8 @@ def band_moon_disk_reflectance(
 
     Parameters
     ----------
-    cimel_data: CimelData
-        CimelData with the CIMEL coefficients and uncertainties.
+    cimel_coef: CimelCoef
+        CimelCoef with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
 
@@ -51,7 +51,7 @@ def band_moon_disk_reflectance(
     np.ndarray of float
         The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
-    cfs = cimel_data.coeffs
+    cfs = cimel_coef.coeffs
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
@@ -64,7 +64,7 @@ def band_moon_disk_reflectance(
     return result
 
 def band_moon_disk_reflectance_unc(
-    cimel_data: CimelData,
+    cimel_coef: CimelCoef,
     moon_data: MoonData,
 ) -> np.ndarray:
     """
@@ -74,8 +74,8 @@ def band_moon_disk_reflectance_unc(
 
     Parameters
     ----------
-    cimel_data: CimelData
-        CimelData with the CIMEL coefficients and uncertainties.
+    cimel_coef: CimelCoef
+        CimelCoef with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
 
@@ -85,8 +85,8 @@ def band_moon_disk_reflectance_unc(
         The uncertainties calculated
     """
 
-    cfs = cimel_data.coeffs
-    ucfs = cimel_data.unc_coeffs
+    cfs = cimel_coef.coeffs
+    ucfs = cimel_coef.unc_coeffs
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs

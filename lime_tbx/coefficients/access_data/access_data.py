@@ -17,7 +17,7 @@ import numpy as np
 from lime_tbx.datatypes.datatypes import (
     IrradianceCoefficients,
     PolarizationCoefficients,
-    CimelData,
+    CimelCoef,
 )
 
 from lime_tbx.datatypes.templates_digital_effects_table import template_cimel
@@ -145,11 +145,11 @@ def _get_coefficients_data() -> Dict[float, IrradianceCoefficients.CoefficientsW
     file.close()
     return data
 
-def _get_default_cimel_data() -> CimelData:
+def _get_default_cimel_coef() -> CimelCoef:
     # define dim_size_dict to specify size of arrays
     dim_sizes = {"wavelength":6,"i_coeff":18,}
     # create dataset
-    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
+    ds_cimel: xarray.Dataset = obsarray.create_ds(template_cimel, dim_sizes)
 
     ds_cimel = ds_cimel.assign_coords(wavelength=[440,500,675,870,1020,1640])
 
@@ -158,4 +158,4 @@ def _get_default_cimel_data() -> CimelData:
     u_data=np.genfromtxt(os.path.join(current_dir,"assets/u_coefficients_cimel.csv"),delimiter=",")
     ds_cimel.coeff.values=data.T
     ds_cimel.u_coeff.values=u_data.T
-    return CimelData(ds_cimel)
+    return CimelCoef(ds_cimel)

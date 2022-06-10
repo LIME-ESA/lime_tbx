@@ -84,8 +84,8 @@ def eli_callback(
         Point used
     coeffs: IrradianceCoefficients
         Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
-    cimel_data: CimelData
-        CimelData with the CIMEL coefficients and uncertainties.
+    cimel_data: CimelCoef
+        CimelCoef with the CIMEL coefficients and uncertainties.
     kernels_path: str
         Path where the directory with the SPICE kernels is located.
     eocfi_path: str
@@ -113,7 +113,7 @@ def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_data: CimelData,
+    cimel_data: CimelCoef,
     lime_simulation: LimeSimulation,
 ) -> Tuple[
     List[float],
@@ -131,8 +131,8 @@ def elref_callback(
         Point used
     coeffs: IrradianceCoefficients
         Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
-    cimel_data: CimelData
-        CimelData with the CIMEL coefficients and uncertainties.
+    cimel_data: CimelCoef
+        CimelCoef with the CIMEL coefficients and uncertainties.
     kernels_path: str
         Path where the directory with the SPICE kernels is located.
     eocfi_path: str
