@@ -160,7 +160,7 @@ class LimeSimulation():
 
         ds_intp = SpectralData.make_reflectance_ds(self.wlens,elrefs_intp,u_elrefs_intp)
 
-        spectral_data = SpectralData(cimel_coeff.wavelengths,elrefs_intp,u_elrefs_intp,ds_intp)
+        spectral_data = SpectralData(cimel_coeff.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
         return spectral_data
 
     def calculate_eli_from_elref(moon_data: MoonData,
@@ -216,7 +216,7 @@ class LimeSimulation():
         ds_intp = SpectralData.make_polarization_ds(self.wlens,polarizations,
                                                     None)
 
-        spectral_data = SpectralData(polar_coeff.wavelengths,polarizations,
+        spectral_data = SpectralData(polar_coeff.wlen,polarizations,
                                      None,ds_intp)
 
         return spectral_data
@@ -229,7 +229,7 @@ class LimeSimulation():
         u_elis_cimel = None
         if calc_uncertainty:
             u_elis_cimel = eli.calculate_eli_band_unc(cimel_coeff,md)
-        spectral_data = SpectralData(cimel_coeff.wavelengths,elis_cimel,u_elis_cimel)
+        spectral_data = SpectralData(cimel_coeff.wlen,elis_cimel,u_elis_cimel)
         return spectral_data
 
 
@@ -259,8 +259,8 @@ class LimeSimulation():
             if calc_uncertainty:
                 u_elrefs_cimel = [elref.band_moon_disk_reflectance_unc(cimel_coeff,m) for m in md]
 
-        ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wavelengths,elrefs_cimel,u_elrefs_cimel)
+        ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel)
 
-        spectral_data = SpectralData(cimel_coeff.wavelengths,elrefs_cimel,u_elrefs_cimel,ds_cimel)
+        spectral_data = SpectralData(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel,ds_cimel)
 
         return spectral_data

@@ -571,6 +571,8 @@ class CimelCoef:
         self.coeffs = CimelCoef._CimelCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values
         self.unc_coeffs = CimelCoef._CimelCoeffs(u_coeff_cimel)
+        print("init")
+        print(self.coeffs)
 
 @dataclass
 class SpectralData:
