@@ -53,13 +53,13 @@ class LimeSimulation():
 
         self.moondata = []
         self.wlens = []
-        self.elref = []
-        self.elis = []
-        self.elref_cimel = []
-        self.elref_asd = []
-        self.elis_cimel = []
-        self.elis_asd = []
-        self.polars = []
+        self.elref = None
+        self.elis = None
+        self.elref_cimel = None
+        self.elref_asd = None
+        self.elis_cimel = None
+        self.elis_asd = None
+        self.polars = None
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
@@ -163,7 +163,7 @@ class LimeSimulation():
         spectral_data = SpectralData(cimel_coeff.wlen,elrefs_intp,u_elrefs_intp,ds_intp)
         return spectral_data
 
-    def calculate_eli_from_elref(moon_data: MoonData,
+    def calculate_eli_from_elref(self, moon_data: MoonData,
             elref: SpectralData) -> SpectralData:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
