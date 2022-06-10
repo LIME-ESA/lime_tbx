@@ -70,8 +70,6 @@ class LimeSimulation():
         if not self.refl_uptodate:
             md=MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
 
-            cimel_data,asd_data,elref_data = self.calculate_elref(md,cimel_coeff)
-
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
             asd_data = self.intp.get_best_asd_reference(md)
             intp_data = self.interpolate_refl(asd_data,cimel_data)
@@ -84,8 +82,6 @@ class LimeSimulation():
     def update_model_irr(self,point,cimel_coeff):
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if not self.refl_uptodate:
-            cimel_data,asd_data,elref_data = self.calculate_elref(md,cimel_coeff)
-
             cimel_data = self._get_data_elref_cimel(md,cimel_coeff,True)
             asd_data = self.intp.get_best_asd_reference(md)
             intp_data = self.interpolate_refl(asd_data,cimel_data)
@@ -105,45 +101,6 @@ class LimeSimulation():
         md = MoonDataFactory.get_md(point,self.eocfi_path,self.kernels_path)
         if not self.pol_uptodate:
             self.polars = self.calculate_polar(md,polar_coeff)
-
-    def calculate_elref(self,
-            md: MoonData,
-            cimel_coeff: CimelCoef,
-            ) -> SpectralData:
-        """Callback that performs the Reflectance operations.
-
-        Parameters
-        ----------
-        srf: SpectralResponseFunction
-            SRF that will be used to calculate the graph
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint]
-            Point used
-        coeffs: IrradianceCoefficients
-            Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
-        cimel_coeff: CimelCoef
-            CimelCoef with the CIMEL coefficients and uncertainties.
-        kernels_path: str
-            Path where the directory with the SPICE kernels is located.
-        eocfi_path: str
-            Path where the directory with the needed EOCFI data files is located.
-
-        Returns
-        -------
-        wlens: list of float
-            Wavelengths of def_srf
-        elrefs: list of float
-            Reflectances related to srf
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint]
-            Point that was used in the calculations.
-        uncertainty_data: UncertaintyData or list of UncertaintyData
-            Calculated uncertainty data.
-        """
-
-        cimel_data = self._get_data_elref_cimel(md, cimel_coeff, True)
-        asd_data = self.intp.get_best_asd_reference(md)
-        intp_data = self.interpolate_refl(asd_data,cimel_data)
-
-        return cimel_data, asd_data, intp_data
 
     def interpolate_refl(self,
             asd_data: SpectralData,
@@ -187,7 +144,7 @@ class LimeSimulation():
         """
         solid_angle_moon: float = 6.4177e-05
         omega = solid_angle_moon
-        esk = [esi.get_esi_per_nm(wav) for wav in elref.wlen]
+        esk = np.array([esi.get_esi_per_nm(wav) for wav in elref.wlen])
         dsm = moon_data.distance_sun_moon
         dom = moon_data.distance_observer_moon
         distance_earth_moon_km: int = 384400
@@ -259,7 +216,7 @@ class LimeSimulation():
             if calc_uncertainty:
                 u_elrefs_cimel = [elref.band_moon_disk_reflectance_unc(cimel_coeff,m) for m in md]
 
-        ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel)
+        ds_cimel = SpectralData.make_reflectance_ds(cimel_coeff.wlen,elrefs_cimel,unc_rand=u_elrefs_cimel)
 
         spectral_data = SpectralData(cimel_coeff.wlen,elrefs_cimel,u_elrefs_cimel,ds_cimel)
 

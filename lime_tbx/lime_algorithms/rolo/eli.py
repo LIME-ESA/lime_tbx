@@ -137,7 +137,7 @@ def calculate_eli_from_elref(
     """
     solid_angle_moon: float = 6.4177e-05
     omega = solid_angle_moon
-    esk = [esi.get_esi_per_nm(wav) for wav in wavelength_nm]
+    esk = np.array([esi.get_esi_per_nm(wav) for wav in wavelength_nm])
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
     distance_earth_moon_km: int = 384400

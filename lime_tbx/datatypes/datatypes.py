@@ -240,7 +240,7 @@ class PolarizationCoefficients:
         neg_coeffs: list of tuples of 4 floats
             Negative phase angles related to the given wavelengths
         """
-        self.wavelengths = wavelengths
+        self.wlen = wavelengths
         self.pos_coeffs = pos_coeffs
         self.neg_coeffs = neg_coeffs
 
@@ -252,7 +252,7 @@ class PolarizationCoefficients:
         list of float
             A list of floats that are the wavelengths in nanometers, in order
         """
-        return self.wavelengths
+        return self.wlen
 
     def get_coefficients_positive(
         self, wavelength_nm: float
@@ -335,7 +335,7 @@ class IrradianceCoefficients:
         p_coeffs: List[float],
         apollo_coeffs: List[float],
     ):
-        self.wavelengths = wavelengths
+        self.wlen = wavelengths
         self.wlen_coeffs = wlen_coeffs
         self.c_coeffs = c_coeffs
         self.p_coeffs = p_coeffs
@@ -349,7 +349,7 @@ class IrradianceCoefficients:
         list of float
             A list of floats that are the wavelengths in nanometers, in order
         """
-        return self.wavelengths
+        return self.wlen
 
     def get_coefficients_a(self, wavelength_nm: float) -> List[float]:
         """Gets all 'a' coefficients for a concrete wavelength
