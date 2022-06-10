@@ -534,7 +534,7 @@ class LunarObservation:
 
     def get_ch_irradiance(self, name: str) -> float:
         if name not in self.ch_irrs:
-            raise "Channel name not in data structure"
+            raise ValueError("Channel name not in data structure")
         return self.ch_irrs[name]
 
     def has_ch_value(self, name: str) -> bool:
@@ -553,14 +553,8 @@ class LunarObservation:
 
 @dataclass
 class CimelCoef:
-    __slots__ = ["_ds_cimel", "wavelengths", "coeffs", "unc_coeffs"]
-    # _ds_cimel : xarray DataSet with the CIMEL coefficients and uncertainties
-
-
     @dataclass
     class _CimelCoeffs:
-        __slots__ = ["_coeffs", "a_coeffs", "b_coeffs", "c_coeffs", "d_coeffs", "p_coeffs"]
-
         def __init__(self, coeffs: np.ndarray):
             self._coeffs = coeffs
             self.a_coeffs = coeffs[0:4,:]
@@ -585,7 +579,7 @@ class SpectralData:
     ds: xarray.Dataset
 
     @staticmethod
-    def make_reflectance_ds(wavs,refl,unc=None):
+    def make_reflectance_ds(wavs,refl,unc_rand=None,unc_syst=None):
         dim_sizes = {"wavelength":len(wavs)}
         # create dataset
         ds_refl = obsarray.create_ds(template_refl,dim_sizes)
@@ -594,9 +588,9 @@ class SpectralData:
 
         ds_refl.reflectance.values = refl
 
-        if unc is not None:
-            ds_refl.u_ran_reflectance.values = unc[0]
-            ds_refl.u_sys_reflectance.values = unc[1]
+        if unc_rand is not None:
+            ds_refl.u_ran_reflectance.values = unc_rand
+            ds_refl.u_sys_reflectance.values = unc_syst
         else:
             ds_refl.u_ran_reflectance.values = refl*0.01
             ds_refl.u_sys_reflectance.values = refl*0.05
@@ -604,7 +598,7 @@ class SpectralData:
         return ds_refl
 
     @staticmethod
-    def make_irradiance_ds(wavs,refl,unc=None):
+    def make_irradiance_ds(wavs,refl,unc_rand=None,unc_syst=None):
         dim_sizes = {"wavelength":len(wavs)}
         # create dataset
         ds_irr = obsarray.create_ds(template_refl,dim_sizes)
@@ -613,9 +607,9 @@ class SpectralData:
 
         ds_irr.reflectance.values = refl
 
-        if unc is not None:
-            ds_irr.u_ran_reflectance.values = unc[0]
-            ds_irr.u_sys_reflectance.values = unc[1]
+        if unc_rand is not None:
+            ds_irr.u_ran_reflectance.values = unc_rand
+            ds_irr.u_sys_reflectance.values = unc_syst
         else:
             ds_irr.u_ran_reflectance.values = refl*0.01
             ds_irr.u_sys_reflectance.values = refl*0.05
@@ -623,7 +617,7 @@ class SpectralData:
         return ds_irr
 
     @staticmethod
-    def make_polarization_ds(wavs,refl,unc=None):
+    def make_polarization_ds(wavs,refl,unc_rand=None,unc_syst=None):
         dim_sizes = {"wavelength":len(wavs)}
         # create dataset
         ds_pol = obsarray.create_ds(template_refl,dim_sizes)
@@ -632,9 +626,9 @@ class SpectralData:
 
         ds_pol.reflectance.values = refl
 
-        if unc is not None:
-            ds_pol.u_ran_reflectance.values = unc[0]
-            ds_pol.u_sys_reflectance.values = unc[1]
+        if unc_rand is not None:
+            ds_pol.u_ran_reflectance.values = unc_rand
+            ds_pol.u_sys_reflectance.values = unc_syst
         else:
             ds_pol.u_ran_reflectance.values = refl*0.01
             ds_pol.u_sys_reflectance.values = refl*0.05
