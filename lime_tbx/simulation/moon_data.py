@@ -18,7 +18,7 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
     SpectralData,
-    CimelCoef
+    CimelReflectanceCoeffs,
 )
 
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -33,23 +33,24 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class MoonDataFactory():
+class MoonDataFactory:
     """
-        Class for running the main lime-tbx functionality
-        """
+    Class for running the main lime-tbx functionality
+    """
 
     @staticmethod
-    def get_md(point: Union[SurfacePoint, CustomPoint, SatellitePoint], eocfi_path: str,
-               kernels_path: str,) -> MoonData:
+    def get_md(
+        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        eocfi_path: str,
+        kernels_path: str,
+    ) -> MoonData:
         if isinstance(point, SurfacePoint):
-            md=MoonDataFactory.get_md_from_surface(point,kernels_path)
+            md = MoonDataFactory.get_md_from_surface(point, kernels_path)
 
         elif isinstance(point, CustomPoint):
-            md=MoonDataFactory.get_md_from_custom(point)
+            md = MoonDataFactory.get_md_from_custom(point)
         else:
-            md= MoonDataFactory.get_md_from_satellite(
-                point, eocfi_path, kernels_path
-            )
+            md = MoonDataFactory.get_md_from_satellite(point, eocfi_path, kernels_path)
         return md
 
     @staticmethod
@@ -57,8 +58,9 @@ class MoonDataFactory():
         sp: SurfacePoint,
         kernels_path: str,
     ) -> MoonData:
-        md = SPICEAdapter().get_moon_data_from_earth(sp.latitude,sp.longitude,
-            sp.altitude,sp.dt,kernels_path)
+        md = SPICEAdapter().get_moon_data_from_earth(
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
+        )
         return md
 
     @staticmethod
@@ -78,16 +80,17 @@ class MoonDataFactory():
 
     @staticmethod
     def get_md_from_satellite(
-            sp: SatellitePoint,
-            eocfi_path: str,
-            kernels_path: str,)-> MoonData:
+        sp: SatellitePoint,
+        eocfi_path: str,
+        kernels_path: str,
+    ) -> MoonData:
 
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]
 
-        mds=[]
+        mds = []
         for dt in dts:
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)

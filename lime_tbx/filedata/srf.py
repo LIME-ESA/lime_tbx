@@ -1,4 +1,10 @@
-"""describe class"""
+"""
+This module contains the functionality that read Spectral Response Function files
+from GLOD format files.
+
+It exports the following functions:
+    * read_srf - Read a glod-formatted netcdf srf file.
+"""
 
 """___Built-In Modules___"""
 import os

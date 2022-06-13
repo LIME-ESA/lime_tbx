@@ -20,7 +20,7 @@ from . import esi, elref
 from ...datatypes.datatypes import (
     MoonData,
     IrradianceCoefficients,
-    CimelCoef,
+    CimelReflectanceCoeffs,
 )
 
 """___Authorship___"""
@@ -31,14 +31,24 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-
-def measurement_func_eli(a_l: Union[float, np.ndarray], omega: float, esk: Union[float, List[float]], dsm: float,
-    distance_earth_moon_km: float, dom: float) -> Union[float, np.ndarray]:
+def measurement_func_eli(
+    a_l: Union[float, np.ndarray],
+    omega: float,
+    esk: Union[float, List[float]],
+    dsm: float,
+    distance_earth_moon_km: float,
+    dom: float,
+) -> Union[float, np.ndarray]:
     """
     Final computation of the Eq 3 in Roman et al., 2020
     """
-    lunar_irr = (((a_l*omega*esk)/math.pi)*((1/dsm)**2)*(distance_earth_moon_km/dom)**2)
+    lunar_irr = (
+        ((a_l * omega * esk) / math.pi)
+        * ((1 / dsm) ** 2)
+        * (distance_earth_moon_km / dom) ** 2
+    )
     return lunar_irr
+
 
 def calculate_eli(
     wavelength_nm: float, moon_data: MoonData, coefficients: IrradianceCoefficients
@@ -75,8 +85,9 @@ def calculate_eli(
 
     return lunar_irr
 
+
 def calculate_eli_band(
-    cimel_coef: CimelCoef, moon_data: MoonData
+    cimel_coef: CimelReflectanceCoeffs, moon_data: MoonData
 ) -> np.ndarray:
     """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
     for a concrete set of empirical data points.
@@ -98,9 +109,7 @@ def calculate_eli_band(
     np.ndarray of float
         The extraterrestrial lunar irradiance calculated for the uncertainty points
     """
-    a_l = elref.band_moon_disk_reflectance(
-        cimel_coef, moon_data
-    )
+    a_l = elref.band_moon_disk_reflectance(cimel_coef, moon_data)
 
     esk = [esi.get_esi_per_nm(wav) for wav in cimel_coef.wavelengths]
     dsm = moon_data.distance_sun_moon
@@ -108,6 +117,7 @@ def calculate_eli_band(
 
     lunar_irr = measurement_func_eli(a_l, esk, dsm, dom)
     return lunar_irr
+
 
 def calculate_eli_from_elref(
     wavelength_nm: float, moon_data: MoonData, elref: np.ndarray
@@ -139,6 +149,7 @@ def calculate_eli_from_elref(
     dom = moon_data.distance_observer_moon
     distance_earth_moon_km: int = 384400
 
-    lunar_irr = measurement_func_eli(elref,omega,esk,dsm,distance_earth_moon_km,dom)
+    lunar_irr = measurement_func_eli(
+        elref, omega, esk, dsm, distance_earth_moon_km, dom
+    )
     return lunar_irr
-

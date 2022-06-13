@@ -12,6 +12,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
+
 # from ..simulation.regular_simulation import regular_simulation
 # from ..simulation.common.common import CommonSimulation
 # from ..simulation.esa_satellites import esa_satellites
@@ -24,7 +25,7 @@ from ..datatypes.datatypes import (
     IrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
-    CimelCoef,
+    CimelReflectanceCoeffs,
     SpectralData,
 )
 from ..eocfi_adapter import eocfi_adapter
@@ -60,7 +61,7 @@ def eli_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_coef: CimelCoef,
+    cimel_coef: CimelReflectanceCoeffs,
     lime_simulation: LimeSimulation,
 ) -> Tuple[
     List[float],
@@ -69,7 +70,7 @@ def eli_callback(
     Union[SurfacePoint, CustomPoint, SatellitePoint],
     List[float],
     SpectralResponseFunction,
-    Union[SpectralData, List[SpectralData]]
+    Union[SpectralData, List[SpectralData]],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -106,14 +107,22 @@ def eli_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_model_irr(srf,point,cimel_coef)
-    return point,srf,lime_simulation.elis,lime_simulation.elis_cimel, lime_simulation.elis_asd, lime_simulation.signals
+    lime_simulation.update_model_irr(srf, point, cimel_coef)
+    return (
+        point,
+        srf,
+        lime_simulation.elis,
+        lime_simulation.elis_cimel,
+        lime_simulation.elis_asd,
+        lime_simulation.signals,
+    )
+
 
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Union[SurfacePoint, CustomPoint, SatellitePoint],
     coeffs: IrradianceCoefficients,
-    cimel_coef: CimelCoef,
+    cimel_coef: CimelReflectanceCoeffs,
     lime_simulation: LimeSimulation,
 ) -> Tuple[
     List[float],
@@ -149,8 +158,13 @@ def elref_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_model_refl(srf,point,cimel_coef)
-    return point, lime_simulation.elref, lime_simulation.elref_cimel, lime_simulation.elref_asd
+    lime_simulation.update_model_refl(srf, point, cimel_coef)
+    return (
+        point,
+        lime_simulation.elref,
+        lime_simulation.elref_cimel,
+        lime_simulation.elref_asd,
+    )
 
 
 def polar_callback(
@@ -160,8 +174,8 @@ def polar_callback(
     lime_simulation: LimeSimulation,
 ) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
 
-    lime_simulation.update_model_pol(srf,point,coeffs)
-    return point,lime_simulation.polars
+    lime_simulation.update_model_pol(srf, point, coeffs)
+    return point, lime_simulation.polars
 
 
 def compare_callback(
@@ -384,7 +398,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, cimel_coef,self.lime_simulation],
+            [def_srf, srf, point, coeffs, cimel_coef, self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -394,9 +408,10 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             Union[SurfacePoint, CustomPoint, SatellitePoint],
             SpectralResponseFunction,
             Union[SpectralData, List[SpectralData]],
-            Union[SpectralData,List[SpectralData]],
-            Union[SpectralData,List[SpectralData]],
-            Union[SpectralData,List[SpectralData]],],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+        ],
     ):
         self._unblock_gui()
         # unc = data[5]
@@ -433,17 +448,19 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, cimel_coef,self.lime_simulation]
+            elref_callback, [def_srf, point, coeffs, cimel_coef, self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
     def elref_finished(
         self,
         data: Tuple[
-                Union[SurfacePoint,CustomPoint,SatellitePoint],
-                Union[SpectralData,List[SpectralData]],
-                Union[SpectralData,List[SpectralData]],
-                Union[SpectralData,List[SpectralData]]],):
+            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+        ],
+    ):
         self._unblock_gui()
         # unc = data[3]
         # if isinstance(unc, list):
@@ -477,14 +494,17 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            polar_callback, [def_srf, point, coeffs,self.lime_simulation]
+            polar_callback, [def_srf, point, coeffs, self.lime_simulation]
         )
         self._start_thread(self.polar_finished, self.polar_error)
 
     def polar_finished(
-        self,data: Tuple[
-                Union[SurfacePoint,CustomPoint,SatellitePoint],
-                Union[SpectralData,List[SpectralData]]],):
+        self,
+        data: Tuple[
+            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            Union[SpectralData, List[SpectralData]],
+        ],
+    ):
         self._unblock_gui()
         self.graph.update_plot(data[1])
         self.graph.update_labels(
@@ -514,7 +534,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.setLocale("English")
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.lime_simulation = LimeSimulation(eocfi_path,kernels_path)
+        self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
         self._build_layout()
 
     def _build_layout(self):

@@ -20,7 +20,7 @@ from ..datatypes.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
-    SpectralData
+    SpectralData,
 )
 from ..filedata import csv
 
@@ -81,10 +81,10 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_plot(
         self,
-        data: Union[SpectralData,List[SpectralData]] = None,
-        data_cimel: Union[SpectralData,List[SpectralData]] = None,
-        data_asd: Union[SpectralData,List[SpectralData]] = None,
-        ):
+        data: Union[SpectralData, List[SpectralData]] = None,
+        data_cimel: Union[SpectralData, List[SpectralData]] = None,
+        data_asd: Union[SpectralData, List[SpectralData]] = None,
+    ):
         self.data = data
         self.cimel_data = data_cimel
         self.asd_data = data_asd
@@ -107,51 +107,83 @@ class GraphWidget(QtWidgets.QWidget):
     def update_size(self):
         self._redraw()
 
-    def _is_filled(self) -> bool:
-        if self.data is not None:
-            return True
-        return False
-
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        if self._is_filled():
-            if isinstance(self.data.data[0], list):
-                for i, yd in enumerate(self.data.data):
-                    self.canvas.axes.plot(self.data.wlen, yd, marker="")
-                    if len(self.cimel_data.wlen) > i and len(self.cimel_data.wlen[i]) > 0:
-                        self.canvas.axes.plot(
-                            self.cimel_data.wlen[i],
-                            self.cimel_data.data[i],
-                            ls="none",
-                            marker="o",
-                            label="CIMEL data points",
+        if self.data is not None:
+            if not isinstance(self.data, list):
+                if isinstance(self.data.data[0], list):
+                    for i, yd in enumerate(self.data.data):
+                        self.canvas.axes.plot(self.data.wlens, yd, marker="")
+                        if (
+                            len(self.cimel_data.wlens) > i
+                            and len(self.cimel_data.wlens[i]) > 0
+                        ):
+                            self.canvas.axes.plot(
+                                self.cimel_data.wlens[i],
+                                self.cimel_data.data[i],
+                                ls="none",
+                                marker="o",
+                                label="CIMEL data points",
+                            )
+                            self.canvas.axes.errorbar(
+                                self.cimel_data.wlens[i],
+                                self.cimel_data.data[i],
+                                yerr=self.self.cimel_data.data[i] * 2.0,
+                                capsize=3,
+                                ls="none",
+                                label="errorbars (k=2)",
+                            )
+                            if i == 0:
+                                self.canvas.axes.legend()
+                else:
+                    self.canvas.axes.plot(
+                        self.data.wlens,
+                        self.data.data,
+                        "g",
+                        label="interpolated data points",
+                    )
+                    if self.data.uncertainties is not None:
+                        self.canvas.axes.fill_between(
+                            self.data.wlens,
+                            self.data.data - 2 * self.data.uncertainties,
+                            self.data.data + 2 * self.data.uncertainties,
+                            color="green",
+                            alpha=0.3,
                         )
-                        self.canvas.axes.errorbar(
-                            self.cimel_data.wlen[i],
-                            self.cimel_data.data[i],
-                            yerr=self.self.cimel_data.data[i] * 2.,
-                            capsize=3,
-                            ls="none",
-                            label="errorbars (k=2)",
-                        )
-                        if i == 0:
-                            self.canvas.axes.legend()
             else:
-                self.canvas.axes.plot(self.data.wlen,self.data.data,"g",
-                                      label="interpolated data points")
-                if self.data.uncertainties is not None:
-                    self.canvas.axes.fill_between(self.data.wlen,
-                                              self.data.data-2*self.data.uncertainties,
-                                              self.data.data+2*self.data.uncertainties,
-                                              color="green",alpha=0.3)
+                raise Exception("Missing hit part of the code")
 
             if self.asd_data:
-                self.canvas.axes.plot(self.asd_data.wlen, self.asd_data.data/5.,label="ASD data points / 5")
-
+                if not isinstance(self.asd_data, list):
+                    self.canvas.axes.plot(
+                        self.asd_data.wlens,
+                        self.asd_data.data / 5.0,
+                        label="ASD data points / 5",
+                    )
+                else:
+                    raise Exception("Missing hit part of the code")
 
             if self.cimel_data:
-                self.canvas.axes.plot(self.cimel_data.wlen, self.cimel_data.data,color="orange", ls='none', marker="o",label="CIMEL data points")
-                self.canvas.axes.errorbar(self.cimel_data.wlen, self.cimel_data.data, yerr=self.cimel_data.uncertainties*2, color="black", capsize=3, ls='none',label="uncertainties (k=2)")
+                if not isinstance(self.cimel_data, list):
+                    self.canvas.axes.plot(
+                        self.cimel_data.wlens,
+                        self.cimel_data.data,
+                        color="orange",
+                        ls="none",
+                        marker="o",
+                        label="CIMEL data points",
+                    )
+                    self.canvas.axes.errorbar(
+                        self.cimel_data.wlens,
+                        self.cimel_data.data,
+                        yerr=self.cimel_data.uncertainties * 2,
+                        color="black",
+                        capsize=3,
+                        ls="none",
+                        label="uncertainties (k=2)",
+                    )
+                else:
+                    raise Exception("Missing hit part of the code")
 
             self.canvas.axes.legend()
 
@@ -286,7 +318,7 @@ class SignalWidget(QtWidgets.QWidget):
                 self.table.setItem(0, i + 2, item_title_value)
         self.table.setItem(0, 0, head_id_item)
         self.table.setItem(0, 1, head_center_item)
-        print(len(srf.channels),len(signals.data))
+        print(len(srf.channels), len(signals.data))
         for i, ch_signals in enumerate(signals.data):
             ch = srf.channels[i]
             if not isinstance(ch_signals, list):
