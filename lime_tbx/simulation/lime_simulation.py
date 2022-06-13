@@ -175,7 +175,7 @@ class LimeSimulation:
         """
         solid_angle_moon: float = 6.4177e-05
         omega = solid_angle_moon
-        esk = np.array([esi.get_esi_per_nm(wav) for wav in elref.wlens])
+        esk = esi.get_esi_per_nms(elref.wlens)
         dsm = moon_data.distance_sun_moon
         dom = moon_data.distance_observer_moon
         distance_earth_moon_km: int = 384400

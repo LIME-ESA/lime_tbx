@@ -10,11 +10,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from ..filedata import srf as file_srf
-from ..datatypes.datatypes import (
-    SurfacePoint,
-    CustomPoint,
-    SpectralData
-)
+from ..datatypes.datatypes import SurfacePoint, CustomPoint, SpectralData
 from . import settings, output
 
 """___Authorship___"""
@@ -64,7 +60,7 @@ class SRFEditWidget(QtWidgets.QWidget):
         srf = self.settings_manager.get_srf()
         x_data = list(srf.get_wavelengths())
         y_data = list(srf.get_values())
-        srf_data=SpectralData(x_data,y_data,None,None)
+        srf_data = SpectralData(x_data, y_data, None, None)
         self.graph.update_plot(srf_data)
 
     def update_combo_srf(self):
