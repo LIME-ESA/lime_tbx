@@ -1,8 +1,7 @@
-"""describe class"""
+"""Module containing the class that contains the state of the simulation."""
 
 """___Built-In Modules___"""
-from abc import ABC, abstractmethod
-from typing import List, Union
+# import here
 
 """___Third-Party Modules___"""
 import punpy
@@ -12,6 +11,7 @@ import numpy as np
 from lime_tbx.datatypes.datatypes import (
     IrradianceCoefficients,
     MoonData,
+    Point,
     PolarizationCoefficients,
     SpectralResponseFunction,
     SurfacePoint,
@@ -31,7 +31,7 @@ from lime_tbx.spectral_integration.spectral_integration import SpectralIntegrati
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
+__created__ = "01/06/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
@@ -41,7 +41,7 @@ class LimeSimulation:
     """
     Class for running the main lime-tbx functionality
 
-
+    Contains the state of the simulation, so it can be implemented efficiently.
     """
 
     def __init__(
@@ -50,7 +50,12 @@ class LimeSimulation:
         kernels_path: str,
     ):
         """
-        Constructor method
+        Parameters
+        ----------
+        eocfi_path: str
+            Path where the folder with the needed EOCFI data files is located.
+        kernels_path: str
+            Path where the folder with the needed SPICE kernel files is located.
         """
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
@@ -72,33 +77,41 @@ class LimeSimulation:
         self.intp = SpectralInterpolation()
 
     def set_simulation_changed(self):
+        """
+        Marks the current data as not valid. It should be updated.
+        """
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
         self.signals_uptodate = False
 
-    def update_model_refl(self, srf, point, cimel_coeff):
+    def update_reflectance(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        cimel_coeff: CimelReflectanceCoeffs,
+    ):
         if not self.refl_uptodate:
             md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
             self.wlen = srf.get_wavelengths()
 
             cimel_data = self._get_data_elref_cimel(md, cimel_coeff, True)
             asd_data = self.intp.get_best_asd_reference(md)
-            intp_data = self.interpolate_refl(asd_data, cimel_data)
+            intp_data = self._interpolate_refl(asd_data, cimel_data)
 
             self.elref = intp_data
             self.elref_cimel = cimel_data
             self.elref_asd = asd_data
             self.refl_uptodate = True
 
-    def update_model_irr(self, srf, point, cimel_coeff):
+    def update_irradiance(self, srf, point, cimel_coeff):
         if not self.refl_uptodate:
             md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
             self.wlen = srf.get_wavelengths()
 
             cimel_data = self._get_data_elref_cimel(md, cimel_coeff, True)
             asd_data = self.intp.get_best_asd_reference(md)
-            intp_data = self.interpolate_refl(asd_data, cimel_data)
+            intp_data = self._interpolate_refl(asd_data, cimel_data)
 
             self.elref = intp_data
             self.elref_cimel = cimel_data
@@ -108,22 +121,22 @@ class LimeSimulation:
         if not self.irr_uptodate:
             md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
 
-            self.elis = self.calculate_eli_from_elref(md, self.elref)
-            self.elis_cimel = self.calculate_eli_from_elref(md, self.elref_cimel)
-            self.elis_asd = self.calculate_eli_from_elref(md, self.elref_asd)
+            self.elis = self._calculate_eli_from_elref(md, self.elref)
+            self.elis_cimel = self._calculate_eli_from_elref(md, self.elref_cimel)
+            self.elis_asd = self._calculate_eli_from_elref(md, self.elref_asd)
             self.irr_uptodate = True
 
         if not self.signals_uptodate:
-            self.signals = self.calculate_signals(srf)
+            self.signals = self._calculate_signals(srf)
             self.signals_uptodate = True
 
-    def update_model_pol(self, srf, point, polar_coeff):
+    def update_polarization(self, srf, point, polar_coeff):
         md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
         if not self.pol_uptodate:
-            self.polars = self.calculate_polar(md, polar_coeff)
+            self.polars = self._calculate_polar(md, polar_coeff)
             self.pol_uptodate = True
 
-    def interpolate_refl(
+    def _interpolate_refl(
         self,
         asd_data: SpectralData,
         cimel_coeff: SpectralData,
@@ -150,7 +163,7 @@ class LimeSimulation:
         spectral_data = SpectralData(self.wlen, elrefs_intp, u_elrefs_intp, ds_intp)
         return spectral_data
 
-    def calculate_eli_from_elref(
+    def _calculate_eli_from_elref(
         self, moon_data: MoonData, elref: SpectralData
     ) -> SpectralData:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
@@ -198,7 +211,7 @@ class LimeSimulation:
 
         return spectral_data
 
-    def calculate_polar(
+    def _calculate_polar(
         self,
         md: MoonData,
         polar_coeff: CimelReflectanceCoeffs,
@@ -220,7 +233,7 @@ class LimeSimulation:
 
         return spectral_data
 
-    def calculate_signals(self, srf):
+    def _calculate_signals(self, srf):
         signal = np.array(SpectralIntegration.integrate_elis(srf, self.elis.data))
 
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]

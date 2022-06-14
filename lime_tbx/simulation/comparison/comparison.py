@@ -18,22 +18,32 @@ from ...datatypes.datatypes import (
 )
 from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
-from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "01/03/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
 def to_llh(x: float, y: float, z: float):
+    """
+    Changes from coordinates to latitude longitude and height
+
+    Returns
+    -------
+    lat: float
+        Latitude
+    lon: float
+        Longitude
+    h: float
+        Height (in meters)
+    """
     a = 6378137.0  # in meters
     b = 6356752.314245  # in meters
 
     f = (a - b) / a
-    f_inv = 1.0 / f
 
     e_sq = f * (2 - f)
     eps = e_sq / (1.0 - e_sq)
@@ -114,7 +124,7 @@ class Comparison(IComparison):
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            lime_simulation.update_model_irr(sp, coefficients)
+            lime_simulation.update_irradiance(sp, coefficients)
             elis = lime_simulation.elis
             integrated_irrs = SpectralIntegration.integrate_elis(srf, elis)
             for j, ch in enumerate(ch_names):
