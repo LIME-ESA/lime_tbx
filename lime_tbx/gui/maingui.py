@@ -19,6 +19,7 @@ from . import settings, output, input, srf, help
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     LunarObservation,
+    Point,
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
@@ -59,7 +60,7 @@ class CallbackWorker(QtCore.QObject):
 def eli_callback(
     def_srf: SpectralResponseFunction,
     srf: SpectralResponseFunction,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    point: Point,
     coeffs: IrradianceCoefficients,
     cimel_coef: CimelReflectanceCoeffs,
     lime_simulation: LimeSimulation,
@@ -67,7 +68,7 @@ def eli_callback(
     List[float],
     List[float],
     List[float],
-    Union[SurfacePoint, CustomPoint, SatellitePoint],
+    Point,
     List[float],
     SpectralResponseFunction,
     Union[SpectralData, List[SpectralData]],
@@ -81,7 +82,7 @@ def eli_callback(
         SRF that will be used to calculate the first graph
     srf: SpectralResponseFunction
         SRF that will be used to calculate the integrated irradiance
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+    point: Point
         Point used
     coeffs: IrradianceCoefficients
         Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
@@ -98,7 +99,7 @@ def eli_callback(
         Wavelengths of def_srf
     elis: list of float
         Irradiances related to def_srf
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+    point: Point
         Point that was used in the calculations.
     ch_irrs: list of float
         Integrated irradiance signals for each srf channel
@@ -120,23 +121,18 @@ def eli_callback(
 
 def elref_callback(
     srf: SpectralResponseFunction,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    point: Point,
     coeffs: IrradianceCoefficients,
     cimel_coef: CimelReflectanceCoeffs,
     lime_simulation: LimeSimulation,
-) -> Tuple[
-    List[float],
-    List[float],
-    Union[SurfacePoint, CustomPoint, SatellitePoint],
-    Union[SpectralData, List[SpectralData]],
-]:
+) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
     """Callback that performs the Reflectance operations.
 
     Parameters
     ----------
     srf: SpectralResponseFunction
         SRF that will be used to calculate the graph
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+    point: Point
         Point used
     coeffs: IrradianceCoefficients
         Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
@@ -153,7 +149,7 @@ def elref_callback(
         Wavelengths of def_srf
     elrefs: list of float
         Reflectances related to srf
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint]
+    point: Point
         Point that was used in the calculations.
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
@@ -169,10 +165,10 @@ def elref_callback(
 
 def polar_callback(
     srf: SpectralResponseFunction,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    point: Point,
     coeffs: PolarizationCoefficients,
     lime_simulation: LimeSimulation,
-) -> Tuple[List[float], List[float], Union[SurfacePoint, CustomPoint, SatellitePoint]]:
+) -> Tuple[List[float], List[float], Point]:
 
     lime_simulation.update_model_pol(srf, point, coeffs)
     return point, lime_simulation.polars
@@ -405,7 +401,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def eli_finished(
         self,
         data: Tuple[
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            Point,
             SpectralResponseFunction,
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
@@ -455,7 +451,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def elref_finished(
         self,
         data: Tuple[
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            Point,
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
@@ -501,7 +497,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def polar_finished(
         self,
         data: Tuple[
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
+            Point,
             Union[SpectralData, List[SpectralData]],
         ],
     ):

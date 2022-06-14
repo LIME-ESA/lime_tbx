@@ -18,7 +18,8 @@ from ...datatypes.datatypes import (
 )
 from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
-from lime_tbx.simulation.moon_data import MoonDataFactory
+from lime_tbx.simulation.moon_data_factory import MoonDataFactory
+
 """___Authorship___"""
 __author__ = "Pieter De Vis"
 __created__ = "01/02/2022"
@@ -113,7 +114,7 @@ class Comparison(IComparison):
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            lime_simulation.update_model_irr(sp,coefficients)
+            lime_simulation.update_model_irr(sp, coefficients)
             elis = lime_simulation.elis
             integrated_irrs = SpectralIntegration.integrate_elis(srf, elis)
             for j, ch in enumerate(ch_names):

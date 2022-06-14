@@ -13,6 +13,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     LunarObservation,
+    Point,
     Satellite,
     SpectralResponseFunction,
     SurfacePoint,
@@ -330,7 +331,7 @@ class InputWidget(QtWidgets.QWidget):
         self.tabs.addTab(self.satellite, "Satellite")
         self.main_layout.addWidget(self.tabs)
 
-    def get_point(self) -> Union[SurfacePoint, CustomPoint, SatellitePoint]:
+    def get_point(self) -> Point:
         tab = self.tabs.currentWidget()
         if isinstance(tab, SurfaceInputWidget):
             lat = self.surface.get_latitude()

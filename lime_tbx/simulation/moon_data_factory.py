@@ -1,26 +1,22 @@
-"""describe class"""
+"""Module containing the factory class for MoonData."""
 
 """___Built-In Modules___"""
-from abc import ABC, abstractmethod
-from typing import List, Union
+# import here
 
 """___Third-Party Modules___"""
 # import here
-import punpy
 
 """___NPL Modules___"""
+import punpy
+
+"""___LIME Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    IrradianceCoefficients,
     MoonData,
-    PolarizationCoefficients,
-    SpectralResponseFunction,
+    Point,
     SurfacePoint,
     CustomPoint,
     SatellitePoint,
-    SpectralData,
-    CimelReflectanceCoeffs,
 )
-
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 
@@ -35,15 +31,32 @@ __status__ = "Development"
 
 class MoonDataFactory:
     """
-    Class for running the main lime-tbx functionality
+    Class for creating MoonData objects from points.
     """
 
     @staticmethod
     def get_md(
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        point: Point,
         eocfi_path: str,
         kernels_path: str,
     ) -> MoonData:
+        """
+        Create a MoonData from a generic point, whatever subclass it is.
+
+        Parameters
+        ----------
+        point: Point
+            Point from which to create the MoonData.
+        eocfi_path: str
+            Path to the folder with the needed eocfi data files.
+        kernels_path: str
+            Path to the folder with the needed SPICE kernel files.
+
+        Returns
+        -------
+        md: MoonData
+            MoonData generated from the given data.
+        """
         if isinstance(point, SurfacePoint):
             md = MoonDataFactory.get_md_from_surface(point, kernels_path)
 
@@ -58,6 +71,21 @@ class MoonDataFactory:
         sp: SurfacePoint,
         kernels_path: str,
     ) -> MoonData:
+        """
+        Create a MoonData from a surface point.
+
+        Parameters
+        ----------
+        sp: SurfacePoint
+            SurfacePoint from which to create the MoonData.
+        kernels_path: str
+            Path to the folder with the needed SPICE kernel files.
+
+        Returns
+        -------
+        md: MoonData
+            MoonData generated from the given data.
+        """
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
         )
@@ -67,6 +95,19 @@ class MoonDataFactory:
     def get_md_from_custom(
         cp: CustomPoint,
     ) -> MoonData:
+        """
+        Create a MoonData from a custom point.
+
+        Parameters
+        ----------
+        cp: CustomPoint
+            CustomPoint from which to create the MoonData.
+
+        Returns
+        -------
+        md: MoonData
+            MoonData generated from the given data.
+        """
         md = MoonData(
             cp.distance_sun_moon,
             cp.distance_observer_moon,
@@ -84,7 +125,23 @@ class MoonDataFactory:
         eocfi_path: str,
         kernels_path: str,
     ) -> MoonData:
+        """
+        Create a MoonData from a satellite point.
 
+        Parameters
+        ----------
+        sp: SatellitePoint
+            SatellitePoint from which to create the MoonData.
+        eocfi_path: str
+            Path to the folder with the needed eocfi data files.
+        kernels_path: str
+            Path to the folder with the needed SPICE kernel files.
+
+        Returns
+        -------
+        md: MoonData
+            MoonData generated from the given data.
+        """
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         if not isinstance(dts, list):

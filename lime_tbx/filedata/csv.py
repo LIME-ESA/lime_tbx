@@ -18,6 +18,7 @@ import csv
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    Point,
     SatellitePoint,
     SpectralResponseFunction,
     SpectralValidity,
@@ -33,7 +34,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint, None]):
+def _write_point(writer, point: Union[Point, None]):
     if point is not None:
         if isinstance(point, SurfacePoint):
             writer.writerow(["latitude", point.latitude])
@@ -69,7 +70,7 @@ def export_csv(
     y_data: Union[List[float], List[List[float]]],
     xlabel: str,
     ylabel: str,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint, None],
+    point: Union[Point, None],
     name: str,
 ):
     """
@@ -85,7 +86,7 @@ def export_csv(
         Label of the x_data
     ylabel: str
         Label of the y_data
-    point: SurfacePoint | CustomPoint | SatellitePoint
+    point: Point
         Point from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
@@ -134,7 +135,7 @@ def export_csv_comparation(
         Label of the x_data
     ylabel: str
         Label of the y_data
-    points: list of SurfacePoint | CustomPoint | SatellitePoint
+    points: list of SurfacePoint
         Points from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
@@ -169,7 +170,7 @@ def export_csv_integrated_irradiance(
     srf: SpectralResponseFunction,
     irrs: List[float],
     name: str,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    point: Point,
 ):
     """
     Export the given integrated signal data to a csv file
@@ -182,7 +183,7 @@ def export_csv_integrated_irradiance(
         List of irradiances of each channel, in order.
     name: str
         CSV file path
-    points: SurfacePoint | CustomPoint | SatellitePoint
+    point: Point
         Point from which the data is generated. In case it's None, no metadata will be printed.
     """
     with open(name, "w") as file:

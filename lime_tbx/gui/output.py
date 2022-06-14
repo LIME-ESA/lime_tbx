@@ -15,6 +15,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    Point,
     SatellitePoint,
     SpectralResponseFunction,
     SpectralValidity,
@@ -289,7 +290,7 @@ class SignalWidget(QtWidgets.QWidget):
 
     def update_signals(
         self,
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        point: Point,
         srf: SpectralResponseFunction,
         signals: SpectralData,
     ):

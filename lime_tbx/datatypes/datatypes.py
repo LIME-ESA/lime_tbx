@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Union, Tuple
 from datetime import datetime
 from enum import Enum
+from abc import ABC
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -160,8 +161,14 @@ class SpectralResponseFunction:
         return [ch for ch in self.channels if ch.id == name][0]
 
 
+class Point(ABC):
+    """Abstract class representing a point which can be used to generate a MoonData"""
+
+    pass
+
+
 @dataclass
-class SurfacePoint:
+class SurfacePoint(Point):
     """
     Dataclass representing a point on Earth's surface.
 
@@ -186,7 +193,7 @@ class SurfacePoint:
 
 
 @dataclass
-class CustomPoint:
+class CustomPoint(Point):
     """
     Dataclass representing a point with custom Moon data.
 
@@ -220,7 +227,7 @@ class CustomPoint:
 
 
 @dataclass
-class SatellitePoint:
+class SatellitePoint(Point):
     """
     Dataclass representing a Satellite in a concrete datetime
 
