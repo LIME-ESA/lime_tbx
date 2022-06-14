@@ -147,12 +147,11 @@ def calculate_eli_from_elref_unc(
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
-    prop = punpy.MCPropagation(1000)
-    print(elref_spectrum.uncertainties)
+    prop = punpy.MCPropagation(1000, dtype=np.float64)
     unc = prop.propagate_random(
         measurement_func_eli,
         [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
-        [elref_spectrum.uncertainties, None, None, None, None, None],
+        [elref_spectrum.uncertainties, None, None, None, None, None]
     )
 
     return unc

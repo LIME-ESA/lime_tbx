@@ -326,7 +326,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
-        self.input_widget = input.InputWidget(self.satellites)
+        self.input_widget = input.InputWidget(self.satellites, self._callback_regular_input_changed)
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
         # buttons
@@ -369,6 +369,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def _block_gui_loading(self):
         self.parentWidget().setDisabled(True)
+
+    def _callback_regular_input_changed(self):
+        self.lime_simulation.set_simulation_changed()
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
