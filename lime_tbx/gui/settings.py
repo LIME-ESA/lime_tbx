@@ -13,8 +13,8 @@ from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SRFChannel,
     SpectralResponseFunction,
-    IrradianceCoefficients,
-    CimelReflectanceCoeffs,
+    ApolloIrradianceCoefficients,
+    ReflectanceCoefficients,
 )
 from ..datatypes import constants
 from ..coefficients.access_data import access_data
@@ -43,7 +43,7 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_irr_coeffs(self) -> IrradianceCoefficients:
+    def get_irr_coeffs(self) -> ApolloIrradianceCoefficients:
         """Obtain the current IrradianceCoefficients chosen by the user."""
         pass
 
@@ -68,7 +68,7 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_cimel_coef(self) -> CimelReflectanceCoeffs:
+    def get_cimel_coef(self) -> ReflectanceCoefficients:
         """Obtain the CimelCoef the CIMEL coefficients and uncertainties"""
         pass
 
@@ -92,7 +92,7 @@ class MockSettingsManager(ISettingsManager):
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
 
-    def get_irr_coeffs(self) -> IrradianceCoefficients:
+    def get_irr_coeffs(self) -> ApolloIrradianceCoefficients:
         return access_data._get_default_irradiance_coefficients()
 
     def get_polar_coeffs(self) -> PolarizationCoefficients:
@@ -107,6 +107,6 @@ class MockSettingsManager(ISettingsManager):
     def get_available_srfs(self) -> List[SpectralResponseFunction]:
         return self.srfs
 
-    def get_cimel_coef(self) -> CimelReflectanceCoeffs:
+    def get_cimel_coef(self) -> ReflectanceCoefficients:
         cimel_coef = access_data.get_default_cimel_coeffs()
         return cimel_coef

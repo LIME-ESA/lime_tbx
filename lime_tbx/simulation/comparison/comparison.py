@@ -11,7 +11,7 @@ from datetime import datetime
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     LunarObservation,
     SpectralResponseFunction,
     SurfacePoint,
@@ -75,7 +75,7 @@ class IComparison(ABC):
         self,
         observations: LunarObservation,
         srf: SpectralResponseFunction,
-        coefficients: IrradianceCoefficients,
+        coefficients: ApolloIrradianceCoefficients,
         kernels_path: str,
     ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         """
@@ -112,7 +112,7 @@ class Comparison(IComparison):
         self,
         observations: List[LunarObservation],
         srf: SpectralResponseFunction,
-        coefficients: IrradianceCoefficients,
+        coefficients: ApolloIrradianceCoefficients,
         lime_simulation: LimeSimulation,
     ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         ch_names = srf.get_channels_names()

@@ -23,10 +23,10 @@ from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
-    CimelReflectanceCoeffs,
+    ReflectanceCoefficients,
     SpectralData,
 )
 from ..eocfi_adapter import eocfi_adapter
@@ -61,8 +61,8 @@ def eli_callback(
     def_srf: SpectralResponseFunction,
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: IrradianceCoefficients,
-    cimel_coef: CimelReflectanceCoeffs,
+    coeffs: ApolloIrradianceCoefficients,
+    cimel_coef: ReflectanceCoefficients,
     lime_simulation: LimeSimulation,
 ) -> Tuple[
     List[float],
@@ -122,8 +122,8 @@ def eli_callback(
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: IrradianceCoefficients,
-    cimel_coef: CimelReflectanceCoeffs,
+    coeffs: ApolloIrradianceCoefficients,
+    cimel_coef: ReflectanceCoefficients,
     lime_simulation: LimeSimulation,
 ) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
     """Callback that performs the Reflectance operations.
@@ -177,7 +177,7 @@ def polar_callback(
 def compare_callback(
     mos: List[LunarObservation],
     srf: SpectralResponseFunction,
-    coeffs: IrradianceCoefficients,
+    coeffs: ApolloIrradianceCoefficients,
     kernels_path: str,
 ):
     co = comparison.Comparison()

@@ -8,8 +8,8 @@ from typing import List, Union, Tuple
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    CimelReflectanceCoeffs,
-    IrradianceCoefficients,
+    ReflectanceCoefficients,
+    ApolloIrradianceCoefficients,
     MoonData,
     PolarizationCoefficients,
     SpectralResponseFunction,

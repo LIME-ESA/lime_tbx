@@ -1,7 +1,7 @@
 """Module containing the class that contains the state of the simulation."""
 
 """___Built-In Modules___"""
-# import here
+from typing import List, Union
 
 """___Third-Party Modules___"""
 import punpy
@@ -9,7 +9,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     MoonData,
     Point,
     PolarizationCoefficients,
@@ -17,10 +17,10 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
     SpectralData,
-    CimelReflectanceCoeffs,
+    ReflectanceCoefficients,
 )
 
-from lime_tbx.lime_algorithms.rolo import eli, elref, esi
+from lime_tbx.lime_algorithms.rolo import eli, elref, rolo
 from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
@@ -60,20 +60,23 @@ class LimeSimulation:
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
 
-        self.moondata = []
-        self.wlen = []
-        self.elref = None
-        self.elis = None
-        self.signals = None
-        self.elref_cimel = None
-        self.elref_asd = None
-        self.elis_cimel = None
-        self.elis_asd = None
-        self.polars = None
+        self.mds: Union[MoonData, List[MoonData]] = []
+        self.wlens: List[float] = []
+        self.elref: SpectralData = None
+        self.elis: SpectralData = None
+        self.signals: SpectralData = None
+        self.elref_cimel: SpectralData = None
+        self.elref_asd: SpectralData = None
+        self.elis_cimel: SpectralData = None
+        self.elis_asd: SpectralData = None
+        self.polars: SpectralData = None
+        self.srf: SpectralResponseFunction = None
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
         self.signals_uptodate = False
+        self.srf_updtodate = False
+        self.mds_uptodate = False
         self.intp = SpectralInterpolation()
 
     def set_simulation_changed(self):
@@ -84,63 +87,66 @@ class LimeSimulation:
         self.irr_uptodate = False
         self.pol_uptodate = False
         self.signals_uptodate = False
+        self.srf_updtodate = False
+        self.mds_uptodate = False
+
+    def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
+        if not self.mds_uptodate:
+            self.mds = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
+            self.mds_uptodate = True
+        if not self.srf_updtodate:
+            self.srf = srf
+            self.wlens = srf.get_wavelengths()
+            self.srf_updtodate = True
 
     def update_reflectance(
         self,
         srf: SpectralResponseFunction,
         point: Point,
-        cimel_coeff: CimelReflectanceCoeffs,
+        cimel_coeff: ReflectanceCoefficients,
     ):
+        self._save_parameters(srf, point)
         if not self.refl_uptodate:
-            md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
-            self.wlen = srf.get_wavelengths()
-
-            cimel_data = self._get_data_elref_cimel(md, cimel_coeff, True)
-            asd_data = self.intp.get_best_asd_reference(md)
-            intp_data = self._interpolate_refl(asd_data, cimel_data)
-
-            self.elref = intp_data
-            self.elref_cimel = cimel_data
-            self.elref_asd = asd_data
+            self.elref_cimel = self._calculate_elref(cimel_coeff)
+            self.elref_asd = self.intp.get_best_asd_reference(self.mds)
+            self.elref = self._interpolate_refl(self.elref_asd, self.elref_cimel)
             self.refl_uptodate = True
 
-    def update_irradiance(self, srf, point, cimel_coeff):
+    def update_irradiance(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        cimel_coeff: ReflectanceCoefficients,
+    ):
+        self._save_parameters(srf, point)
         if not self.refl_uptodate:
-            md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
-            self.wlen = srf.get_wavelengths()
-
-            cimel_data = self._get_data_elref_cimel(md, cimel_coeff, True)
-            asd_data = self.intp.get_best_asd_reference(md)
-            intp_data = self._interpolate_refl(asd_data, cimel_data)
-
-            self.elref = intp_data
-            self.elref_cimel = cimel_data
-            self.elref_asd = asd_data
-            self.refl_uptodate = True
+            self.update_reflectance(self.srf, point, cimel_coeff)
 
         if not self.irr_uptodate:
-            md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
-
-            self.elis = self._calculate_eli_from_elref(md, self.elref)
-            self.elis_cimel = self._calculate_eli_from_elref(md, self.elref_cimel)
-            self.elis_asd = self._calculate_eli_from_elref(md, self.elref_asd)
+            self.elis = self._calculate_eli_from_elref(self.elref)
+            self.elis_cimel = self._calculate_eli_from_elref(self.elref_cimel)
+            self.elis_asd = self._calculate_eli_from_elref(self.elref_asd)
             self.irr_uptodate = True
 
         if not self.signals_uptodate:
-            self.signals = self._calculate_signals(srf)
+            self.signals = self._calculate_signals(self.srf)
             self.signals_uptodate = True
 
-    def update_polarization(self, srf, point, polar_coeff):
-        md = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
+    def update_polarization(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        polar_coeff: PolarizationCoefficients,
+    ):
+        self._save_parameters(srf, point)
         if not self.pol_uptodate:
-            self.polars = self._calculate_polar(md, polar_coeff)
+            self.polars = self._calculate_polar(polar_coeff)
             self.pol_uptodate = True
 
     def _interpolate_refl(
         self,
         asd_data: SpectralData,
         cimel_coeff: SpectralData,
-        calc_uncertainty: bool = True,
     ) -> SpectralData:
 
         elrefs_intp = self.intp.get_interpolated_refl(
@@ -148,24 +154,35 @@ class LimeSimulation:
             cimel_coeff.data,
             asd_data.wlens,
             asd_data.data,
-            self.wlen,
+            self.wlens,
         )
         u_elrefs_intp = None
-        if calc_uncertainty:
-            u_elrefs_intp = (
-                elrefs_intp * 0.01
-            )  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
+        u_elrefs_intp = (
+            elrefs_intp * 0.01
+        )  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
         ds_intp = SpectralData.make_reflectance_ds(
-            self.wlen, elrefs_intp, u_elrefs_intp
+            self.wlens, elrefs_intp, u_elrefs_intp
         )
 
-        spectral_data = SpectralData(self.wlen, elrefs_intp, u_elrefs_intp, ds_intp)
+        spectral_data = SpectralData(self.wlens, elrefs_intp, u_elrefs_intp, ds_intp)
         return spectral_data
 
+    def _calculate_elref(
+        self, cimel_coeff: ReflectanceCoefficients
+    ) -> Union[SpectralData, List[SpectralData]]:
+        """ """
+        rl = rolo.ROLO()
+        if not isinstance(self.mds, list):
+            return rl.get_elrefs(cimel_coeff, self.mds)
+        specs = []
+        for m in self.mds:
+            specs.append(rl.get_elrefs(cimel_coeff, m))
+        return specs
+
     def _calculate_eli_from_elref(
-        self, moon_data: MoonData, elref: SpectralData
-    ) -> SpectralData:
+        self, elref: SpectralData
+    ) -> Union[SpectralData, List[SpectralData]]:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
         Simulates a lunar observation for a wavelength for any observer/solar selenographic
@@ -176,62 +193,43 @@ class LimeSimulation:
         wavelength_nm : float
             Wavelength (in nanometers) of which the extraterrestrial lunar irradiance will be
             calculated.
-        moon_data : MoonData
-            Moon data needed to calculate Moon's irradiance
         coefficients : IrradianceCoefficients
             Needed coefficients for the simulation.
 
         Returns
         -------
-        float
-            The extraterrestrial lunar irradiance calculated
+        elis: SpectralData | list of SpectralData
+            The extraterrestrial lunar irradiance calculated, a list if moon_data is a list
         """
-        solid_angle_moon: float = 6.4177e-05
-        omega = solid_angle_moon
-        esk = esi.get_esi_per_nms(elref.wlens)
-        dsm = moon_data.distance_sun_moon
-        dom = moon_data.distance_observer_moon
-        distance_earth_moon_km: int = 384400
-
-        lunar_irr = eli.measurement_func_eli(
-            elref.data, omega, esk, dsm, distance_earth_moon_km, dom
-        )
-
-        prop = punpy.MCPropagation(1000)
-
-        unc = prop.propagate_random(
-            eli.measurement_func_eli,
-            [elref.data, omega, esk, dsm, distance_earth_moon_km, dom],
-            [elref.uncertainties, None, None, None, None, None],
-        )
-
-        ds_eli = SpectralData.make_irradiance_ds(elref.wlens, lunar_irr, unc_rand=unc)
-
-        spectral_data = SpectralData(elref.wlens, lunar_irr, unc, ds_eli)
-
-        return spectral_data
+        rl = rolo.ROLO()
+        if not isinstance(self.mds, list):
+            return rl.get_elis_from_elrefs(elref, self.mds)
+        specs = []
+        for m in self.mds:
+            specs.append(rl.get_elis_from_elrefs(elref, m))
+        return specs
 
     def _calculate_polar(
         self,
-        md: MoonData,
-        polar_coeff: CimelReflectanceCoeffs,
-    ) -> SpectralData:
+        polar_coeff: PolarizationCoefficients,
+    ) -> Union[SpectralData, List[SpectralData]]:
         dl = dolp.DOLP()
-        if not isinstance(md, list):
+        if not isinstance(self.mds, list):
             polarizations = np.array(
-                dl.get_polarized(self.wlen, md.mpa_degrees, polar_coeff)
+                dl.get_polarized(self.wlens, self.mds.mpa_degrees, polar_coeff)
             )
-
+            ds_pol = SpectralData.make_polarization_ds(self.wlens, polarizations, None)
+            return SpectralData(self.wlens, polarizations, None, ds_pol)
         else:
-            polarizations = np.array(
-                [dl.get_polarized(self.wlen, m.mpa_degrees, polar_coeff) for m in md]
-            )
-
-        ds_pol = SpectralData.make_polarization_ds(self.wlen, polarizations, None)
-
-        spectral_data = SpectralData(self.wlen, polarizations, None, ds_pol)
-
-        return spectral_data
+            specs = []
+            for m in self.mds:
+                pol = dl.get_polarized(self.wlens, m.mpa_degrees, polar_coeff)
+                ds_pol = SpectralData.make_polarization_ds(
+                    self.wlens, polarizations, None
+                )
+                spectral_data = SpectralData(self.wlens, pol, None, ds_pol)
+                specs.append(spectral_data)
+        return specs
 
     def _calculate_signals(self, srf):
         signal = np.array(SpectralIntegration.integrate_elis(srf, self.elis.data))
@@ -241,55 +239,4 @@ class LimeSimulation:
 
         spectral_data = SpectralData(channel_ids, signal, None, ds_pol)
 
-        return spectral_data
-
-    @staticmethod
-    def _get_data_eli_cimel(
-        md: MoonData, cimel_coeff: CimelReflectanceCoeffs, calc_uncertainty: bool = True
-    ):
-        elis_cimel = eli.calculate_eli_band(cimel_coeff, md)
-        u_elis_cimel = None
-        if calc_uncertainty:
-            u_elis_cimel = eli.calculate_eli_band_unc(cimel_coeff, md)
-        spectral_data = SpectralData(cimel_coeff.wlens, elis_cimel, u_elis_cimel)
-        return spectral_data
-
-    @staticmethod
-    def _get_data_elref_cimel(
-        md: MoonData, cimel_coeff: CimelReflectanceCoeffs, calc_uncertainty: bool = True
-    ):
-        """
-
-        :param md:
-        :type md:
-        :param cimel_coeff:
-        :type cimel_coeff:
-        :param calc_uncertainty:
-        :type calc_uncertainty:
-        :return:
-        :rtype:
-        """
-
-        if not isinstance(md, list):
-            elrefs_cimel = elref.band_moon_disk_reflectance(cimel_coeff, md)
-            u_elrefs_cimel = None
-            if calc_uncertainty:
-                u_elrefs_cimel = elref.band_moon_disk_reflectance_unc(cimel_coeff, md)
-        else:
-            elrefs_cimel = [
-                elref.band_moon_disk_reflectance(cimel_coeff, m) for m in md
-            ]
-            u_elrefs_cimel = None
-            if calc_uncertainty:
-                u_elrefs_cimel = [
-                    elref.band_moon_disk_reflectance_unc(cimel_coeff, m) for m in md
-                ]
-
-        ds_cimel = SpectralData.make_reflectance_ds(
-            cimel_coeff.wlens, elrefs_cimel, unc_rand=u_elrefs_cimel
-        )
-
-        spectral_data = SpectralData(
-            cimel_coeff.wlens, elrefs_cimel, u_elrefs_cimel, ds_cimel
-        )
         return spectral_data

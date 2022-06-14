@@ -16,7 +16,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     PolarizationCoefficients,
 )
 from lime_tbx.datatypes.datatypes import SpectralData

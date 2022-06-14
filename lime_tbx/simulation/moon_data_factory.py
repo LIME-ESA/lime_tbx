@@ -1,7 +1,7 @@
 """Module containing the factory class for MoonData."""
 
 """___Built-In Modules___"""
-# import here
+from typing import List, Union
 
 """___Third-Party Modules___"""
 # import here
@@ -39,7 +39,7 @@ class MoonDataFactory:
         point: Point,
         eocfi_path: str,
         kernels_path: str,
-    ) -> MoonData:
+    ) -> Union[MoonData, List[MoonData]]:
         """
         Create a MoonData from a generic point, whatever subclass it is.
 
@@ -54,8 +54,9 @@ class MoonDataFactory:
 
         Returns
         -------
-        md: MoonData
-            MoonData generated from the given data.
+        md: MoonData | list of MoonData
+            MoonData generated from the given data. If parameter point.dt exists and it is a list,
+            it will be a list. Otherwise not.
         """
         if isinstance(point, SurfacePoint):
             md = MoonDataFactory.get_md_from_surface(point, kernels_path)
@@ -70,7 +71,7 @@ class MoonDataFactory:
     def get_md_from_surface(
         sp: SurfacePoint,
         kernels_path: str,
-    ) -> MoonData:
+    ) -> Union[MoonData, List[MoonData]]:
         """
         Create a MoonData from a surface point.
 
@@ -83,8 +84,9 @@ class MoonDataFactory:
 
         Returns
         -------
-        md: MoonData
-            MoonData generated from the given data.
+        md: MoonData | list of MoonData
+            MoonData generated from the given data. If the parameter dt was a list,
+            this will be a list. Otherwise not.
         """
         md = SPICEAdapter().get_moon_data_from_earth(
             sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
@@ -124,7 +126,7 @@ class MoonDataFactory:
         sp: SatellitePoint,
         eocfi_path: str,
         kernels_path: str,
-    ) -> MoonData:
+    ) -> Union[MoonData, List[MoonData]]:
         """
         Create a MoonData from a satellite point.
 
@@ -139,18 +141,21 @@ class MoonDataFactory:
 
         Returns
         -------
-        md: MoonData
-            MoonData generated from the given data.
+        md: MoonData | list of MoonData
+            MoonData generated from the given data. It will be a list if sp.dt is a list.
         """
         eocfi = EOCFIConverter(eocfi_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]
 
-        mds = []
+        mds: List[MoonData] = []
         for dt in dts:
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
             mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
+
+        if not isinstance(sp.dt, list):
+            return mds[0]
 
         return mds

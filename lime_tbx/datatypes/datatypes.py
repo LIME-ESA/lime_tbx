@@ -315,7 +315,7 @@ class PolarizationCoefficients:
         return self.neg_coeffs[index]
 
 
-class IrradianceCoefficients:
+class ApolloIrradianceCoefficients:
     """
     Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
     """
@@ -608,27 +608,27 @@ class LunarObservation:
         return True
 
 
-class CimelReflectanceCoeffs:
+class ReflectanceCoefficients:
     """
     Set of coefficients from the same version. Used in order to calculate the reflectance
-    from CIMEL data.
+    from mainly CIMEL data.
 
     Attributes
     ----------
-    _ds_cimel: xarray.DataSet
+    _ds: xarray.DataSet
         Original source dataset
     wlens: np.ndarray
         Wavelengths present in this coefficient version. Each one of them
-    coeffs: _CimelCoeffs
-        Cimel Coefficients, with an attribute for every coefficient group, a matrix each.
-    unc_coeffs: _CimelCoeffs
-        Cimel Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
+    coeffs: _WlenReflCoeffs
+        Reflectance Coefficients, with an attribute for every coefficient group, a matrix each.
+    unc_coeffs: _WlenReflCoeffs
+        Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
     """
 
-    __slots__ = ["_ds_cimel", "wlens", "coeffs", "unc_coeffs"]
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
 
     @dataclass
-    class _CimelCoeffs:
+    class _WlenReflCoeffs:
         __slots__ = [
             "_coeffs",
             "a_coeffs",
@@ -646,13 +646,13 @@ class CimelReflectanceCoeffs:
             self.d_coeffs = coeffs[11:14, :]
             self.p_coeffs = coeffs[14::, :]
 
-    def __init__(self, ds_cimel: xarray.Dataset):
-        self._ds_cimel = ds_cimel
-        self.wlens: np.ndarray = ds_cimel.wavelength.values
-        coeffs: np.ndarray = ds_cimel.coeff.values
-        self.coeffs = CimelReflectanceCoeffs._CimelCoeffs(coeffs)
-        u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values
-        self.unc_coeffs = CimelReflectanceCoeffs._CimelCoeffs(u_coeff_cimel)
+    def __init__(self, _ds: xarray.Dataset):
+        self._ds = _ds
+        self.wlens: np.ndarray = _ds.wavelength.values
+        coeffs: np.ndarray = _ds.coeff.values
+        self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
+        u_coeff_cimel: np.ndarray = _ds.u_coeff.values
+        self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
 
 
 @dataclass
