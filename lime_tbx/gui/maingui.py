@@ -350,6 +350,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.graph = output.GraphWidget(
             "Simulation output", "Wavelengths (nm)", "Units"
         )
+        self.graph.update_legend(["interpolated data points", "CIMEL data points", "errorbars (k=2)"])
         # srf widget
         self.srf_widget = srf.SRFEditWidget(self.settings_manager)
         # signal widget

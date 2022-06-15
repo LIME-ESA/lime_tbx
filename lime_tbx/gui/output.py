@@ -46,6 +46,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
+        self.legend = []
         self.data = None
         self.cimel_data = None
         self.asd_data = None
@@ -111,82 +112,68 @@ class GraphWidget(QtWidgets.QWidget):
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
         if self.data is not None:
-            if not isinstance(self.data, list):
-                if isinstance(self.data.data[0], list):
-                    for i, yd in enumerate(self.data.data):
-                        self.canvas.axes.plot(self.data.wlens, yd, marker="")
-                        if (
-                            len(self.cimel_data.wlens) > i
-                            and len(self.cimel_data.wlens[i]) > 0
-                        ):
-                            self.canvas.axes.plot(
-                                self.cimel_data.wlens[i],
-                                self.cimel_data.data[i],
-                                ls="none",
-                                marker="o",
-                                label="CIMEL data points",
-                            )
-                            self.canvas.axes.errorbar(
-                                self.cimel_data.wlens[i],
-                                self.cimel_data.data[i],
-                                yerr=self.self.cimel_data.data[i] * 2.0,
-                                capsize=3,
-                                ls="none",
-                                label="errorbars (k=2)",
-                            )
-                            if i == 0:
-                                self.canvas.axes.legend()
-                else:
-                    self.canvas.axes.plot(
-                        self.data.wlens,
-                        self.data.data,
-                        "g",
-                        label="interpolated data points",
+            iter_data = self.data
+            if not isinstance(iter_data, list):
+                iter_data = [iter_data]
+            for i, data in enumerate(iter_data):
+                label = ""
+                if i == 0 and len(self.legend) > 0:
+                    label = self.legend[0]
+                self.canvas.axes.plot(
+                    data.wlens,
+                    data.data,
+                    "g",
+                    label=label,
+                )
+                if data.uncertainties is not None:
+                    self.canvas.axes.fill_between(
+                        data.wlens,
+                        data.data - 2 * data.uncertainties,
+                        data.data + 2 * data.uncertainties,
+                        color="green",
+                        alpha=0.3,
                     )
-                    if self.data.uncertainties is not None:
-                        self.canvas.axes.fill_between(
-                            self.data.wlens,
-                            self.data.data - 2 * self.data.uncertainties,
-                            self.data.data + 2 * self.data.uncertainties,
-                            color="green",
-                            alpha=0.3,
-                        )
-            else:
-                raise Exception("Missing hit part of the code")
 
             if self.asd_data:
-                if not isinstance(self.asd_data, list):
-                    self.canvas.axes.plot(
-                        self.asd_data.wlens,
-                        self.asd_data.data / 5.0,
-                        label="ASD data points / 5",
-                    )
+                if isinstance(self.asd_data, list):
+                    asd_data = self.asd_data[0]
                 else:
-                    raise Exception("Missing hit part of the code")
+                    asd_data = self.asd_data
+                self.canvas.axes.plot(
+                    asd_data.wlens,
+                    asd_data.data / 5.0,
+                    label="ASD data points / 5",
+                )
 
             if self.cimel_data:
-                if not isinstance(self.cimel_data, list):
+                iter_data = self.cimel_data
+                if not isinstance(iter_data, list):
+                    iter_data = [iter_data]
+                for i, cimel_data in enumerate(iter_data):
+                    label0 = ""
+                    label1 = ""
+                    if i == 0 and len(self.legend) >= 3:
+                        label0 = self.legend[1]
+                        label1 = self.legend[2]
                     self.canvas.axes.plot(
-                        self.cimel_data.wlens,
-                        self.cimel_data.data,
+                        cimel_data.wlens,
+                        cimel_data.data,
                         color="orange",
                         ls="none",
                         marker="o",
-                        label="CIMEL data points",
+                        label=label0,
                     )
                     self.canvas.axes.errorbar(
-                        self.cimel_data.wlens,
-                        self.cimel_data.data,
-                        yerr=self.cimel_data.uncertainties * 2,
+                        cimel_data.wlens,
+                        cimel_data.data,
+                        yerr=cimel_data.uncertainties * 2,
                         color="black",
                         capsize=3,
                         ls="none",
-                        label="uncertainties (k=2)",
+                        label=label1,
                     )
-                else:
-                    raise Exception("Missing hit part of the code")
-
-            self.canvas.axes.legend()
+            if len(self.legend) > 0:
+                self.canvas.axes.legend()
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
@@ -292,12 +279,13 @@ class SignalWidget(QtWidgets.QWidget):
         self,
         point: Point,
         srf: SpectralResponseFunction,
-        signals: SpectralData,
+        signals: Union[SpectralData, List[SpectralData]],
     ):
         self._clear_layout()
         show_range_info = False
         self.srf = srf
         self.irrs = signals.data
+
         self.point = point
         head_id_item = QtWidgets.QTableWidgetItem("ID")
         head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")

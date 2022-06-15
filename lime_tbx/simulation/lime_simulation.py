@@ -62,13 +62,13 @@ class LimeSimulation:
 
         self.mds: Union[MoonData, List[MoonData]] = []
         self.wlens: List[float] = []
-        self.elref: SpectralData = None
-        self.elis: SpectralData = None
-        self.signals: SpectralData = None
-        self.elref_cimel: SpectralData = None
-        self.elref_asd: SpectralData = None
-        self.elis_cimel: SpectralData = None
-        self.elis_asd: SpectralData = None
+        self.elref: Union[SpectralData, List[SpectralData]] = None
+        self.elis: Union[SpectralData, List[SpectralData]] = None
+        self.signals: Union[SpectralData, List[SpectralData]] = None
+        self.elref_cimel: Union[SpectralData, List[SpectralData]] = None
+        self.elref_asd: Union[SpectralData, List[SpectralData]] = None
+        self.elis_cimel: Union[SpectralData, List[SpectralData]] = None
+        self.elis_asd: Union[SpectralData, List[SpectralData]] = None
         self.polars: SpectralData = None
         self.srf: SpectralResponseFunction = None
         self.refl_uptodate = False
@@ -108,7 +108,10 @@ class LimeSimulation:
         self._save_parameters(srf, point)
         if not self.refl_uptodate:
             self.elref_cimel = self._calculate_elref(cimel_coeff)
-            self.elref_asd = self.intp.get_best_asd_reference(self.mds)
+            if isinstance(self.mds, list):
+                self.elref_asd = [self.intp.get_best_asd_reference(md) for md in self.mds]
+            else:
+                self.elref_asd = self.intp.get_best_asd_reference(self.mds)
             self.elref = self._interpolate_refl(self.elref_asd, self.elref_cimel)
             self.refl_uptodate = True
 
@@ -145,28 +148,36 @@ class LimeSimulation:
 
     def _interpolate_refl(
         self,
-        asd_data: SpectralData,
-        cimel_coeff: SpectralData,
-    ) -> SpectralData:
+        asd_data: Union[SpectralData, List[SpectralData]],
+        cimel_coeff: Union[SpectralData, List[SpectralData]],
+    ) -> Union[SpectralData, List[SpectralData]]:
 
-        elrefs_intp = self.intp.get_interpolated_refl(
-            cimel_coeff.wlens,
-            cimel_coeff.data,
-            asd_data.wlens,
-            asd_data.data,
-            self.wlens,
-        )
-        u_elrefs_intp = None
-        u_elrefs_intp = (
-            elrefs_intp * 0.01
-        )  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
+        is_list = isinstance(cimel_coeff, list)
+        if not is_list:
+            cimel_coeff = [cimel_coeff]
+            asd_data = [asd_data] # both same length
+        specs: Union[SpectralData, List[SpectralData]] = []
+        for i, cf in enumerate(cimel_coeff):
+            elrefs_intp = self.intp.get_interpolated_refl(
+                cf.wlens,
+                cf.data,
+                asd_data[i].wlens,
+                asd_data[i].data,
+                self.wlens,
+            )
+            u_elrefs_intp = None
+            u_elrefs_intp = (
+                elrefs_intp * 0.01
+            )  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
-        ds_intp = SpectralData.make_reflectance_ds(
-            self.wlens, elrefs_intp, u_elrefs_intp
-        )
+            ds_intp = SpectralData.make_reflectance_ds(
+                self.wlens, elrefs_intp, u_elrefs_intp
+            )
 
-        spectral_data = SpectralData(self.wlens, elrefs_intp, u_elrefs_intp, ds_intp)
-        return spectral_data
+            specs.append(SpectralData(self.wlens, elrefs_intp, u_elrefs_intp, ds_intp))
+        if not is_list:
+            specs = specs[0]
+        return specs
 
     def _calculate_elref(
         self, cimel_coeff: ReflectanceCoefficients
@@ -181,7 +192,7 @@ class LimeSimulation:
         return specs
 
     def _calculate_eli_from_elref(
-        self, elref: SpectralData
+        self, elrefs: Union[SpectralData, List[SpectralData]],
     ) -> Union[SpectralData, List[SpectralData]]:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
@@ -190,23 +201,20 @@ class LimeSimulation:
 
         Parameters
         ----------
-        wavelength_nm : float
-            Wavelength (in nanometers) of which the extraterrestrial lunar irradiance will be
-            calculated.
-        coefficients : IrradianceCoefficients
-            Needed coefficients for the simulation.
+        elrefs: SpectralData | list of SpectralData
+            elrefs previously calculated
 
         Returns
         -------
         elis: SpectralData | list of SpectralData
-            The extraterrestrial lunar irradiance calculated, a list if moon_data is a list
+            The extraterrestrial lunar irradiance calculated, a list if self.mds is a list
         """
         rl = rolo.ROLO()
         if not isinstance(self.mds, list):
-            return rl.get_elis_from_elrefs(elref, self.mds)
+            return rl.get_elis_from_elrefs(elrefs, self.mds)
         specs = []
-        for m in self.mds:
-            specs.append(rl.get_elis_from_elrefs(elref, m))
+        for i, m in enumerate(self.mds):
+            specs.append(rl.get_elis_from_elrefs(elrefs[i], m))
         return specs
 
     def _calculate_polar(
@@ -231,12 +239,16 @@ class LimeSimulation:
                 specs.append(spectral_data)
         return specs
 
-    def _calculate_signals(self, srf):
-        signal = np.array(SpectralIntegration.integrate_elis(srf, self.elis.data))
-
+    def _calculate_signals(self, srf: SpectralResponseFunction) -> Union[SpectralData, List[SpectralData]]:
+        elis = self.elis
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]
-        ds_pol = SpectralData.make_irradiance_ds(channel_ids, signal, None)
-
-        spectral_data = SpectralData(channel_ids, signal, None, ds_pol)
-
-        return spectral_data
+        specs = []
+        if not isinstance(elis, list):
+            elis = [elis]
+        for irr in elis:
+            signal = np.array(SpectralIntegration.integrate_elis(srf, irr.data))
+            ds_pol = SpectralData.make_irradiance_ds(channel_ids, signal, None)
+            specs.append(SpectralData(channel_ids, signal, None, ds_pol))
+        if not isinstance(self.elis, list):
+            specs = specs[0]
+        return specs
