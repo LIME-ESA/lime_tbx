@@ -126,10 +126,14 @@ class GraphWidget(QtWidgets.QWidget):
                         label = self.legend[0][i]
                     if len(self.legend[0]) > 1:
                         color = []
+                marker = ""
+                if len(data.data) == 1:
+                    marker = "o"
                 self.canvas.axes.plot(
                     data.wlens,
                     data.data,
                     *color,
+                    marker=marker,
                     label=label,
                 )
                 if data.uncertainties is not None:
@@ -218,6 +222,7 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
+        print(self.data)
         if isinstance(self.data, np.ndarray) or isinstance(self.data, list):
             x_data = self.data[0].wlens
             y_data = [d.data for d in self.data]

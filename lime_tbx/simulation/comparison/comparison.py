@@ -133,6 +133,6 @@ class Comparison(IComparison):
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)
-                    irrs[j].append(integrated_irrs[j])
+                    irrs[j].append(integrated_irrs[j][0])
                     sps[j].append(sp)
         return irrs, ch_dates, sps
