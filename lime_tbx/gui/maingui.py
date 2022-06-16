@@ -410,7 +410,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
-            Union[SpectralData, List[SpectralData]],
+            SpectralData,
         ],
     ):
         self._unblock_gui()

@@ -38,7 +38,7 @@ import obsarray
 
 """___LIME Modules___"""
 from . import constants
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_REFL
+from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_REFL, TEMPLATE_SIGNALS
 
 
 @dataclass
@@ -742,3 +742,26 @@ class SpectralData:
             ds_pol.u_sys_reflectance.values = refl * 0.05
 
         return ds_pol
+
+    @staticmethod
+    def make_signals_ds(channel_ids, refl, unc_rand=None, unc_syst=None):
+        dim_sizes = {"channels": len(channel_ids), "dts": len(refl[0])}
+        print(dim_sizes)
+        # create dataset
+        ds_refl = obsarray.create_ds(TEMPLATE_SIGNALS, dim_sizes)
+
+        ds_refl = ds_refl.assign_coords(wavelength=channel_ids)
+
+        ds_refl.signals.values = refl
+
+        if unc_rand is not None:
+            ds_refl.u_ran_signals.values = unc_rand
+        else:
+            ds_refl.u_ran_signals.values = refl * 0.01
+
+        if unc_syst is not None:
+            ds_refl.u_sys_signals.values = unc_syst
+        else:
+            ds_refl.u_sys_signals.values = refl * 0.05
+
+        return ds_refl

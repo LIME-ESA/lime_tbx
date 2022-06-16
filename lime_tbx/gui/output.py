@@ -279,7 +279,7 @@ class SignalWidget(QtWidgets.QWidget):
         self,
         point: Point,
         srf: SpectralResponseFunction,
-        signals: Union[SpectralData, List[SpectralData]],
+        signals: SpectralData,
     ):
         self._clear_layout()
         show_range_info = False
@@ -310,7 +310,7 @@ class SignalWidget(QtWidgets.QWidget):
         print(len(srf.channels), len(signals.data))
         for i, ch_signals in enumerate(signals.data):
             ch = srf.channels[i]
-            if not isinstance(ch_signals, list):
+            if not (isinstance(ch_signals, np.ndarray) or isinstance(ch_signals, list)):
                 ch_signals = [ch_signals]
             id_item = QtWidgets.QTableWidgetItem(str(ch.id))
             center_item = QtWidgets.QTableWidgetItem(str(ch.center))

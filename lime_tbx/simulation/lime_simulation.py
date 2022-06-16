@@ -64,7 +64,7 @@ class LimeSimulation:
         self.wlens: List[float] = []
         self.elref: Union[SpectralData, List[SpectralData]] = None
         self.elis: Union[SpectralData, List[SpectralData]] = None
-        self.signals: Union[SpectralData, List[SpectralData]] = None
+        self.signals: SpectralData = None
         self.elref_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elref_asd: Union[SpectralData, List[SpectralData]] = None
         self.elis_cimel: Union[SpectralData, List[SpectralData]] = None
@@ -227,28 +227,29 @@ class LimeSimulation:
                 dl.get_polarized(self.wlens, self.mds.mpa_degrees, polar_coeff)
             )
             ds_pol = SpectralData.make_polarization_ds(self.wlens, polarizations, None)
+            print(polarizations)
             return SpectralData(self.wlens, polarizations, None, ds_pol)
         else:
             specs = []
             for m in self.mds:
-                pol = dl.get_polarized(self.wlens, m.mpa_degrees, polar_coeff)
+                polarizations = np.array(dl.get_polarized(self.wlens, m.mpa_degrees, polar_coeff))
                 ds_pol = SpectralData.make_polarization_ds(
                     self.wlens, polarizations, None
                 )
-                spectral_data = SpectralData(self.wlens, pol, None, ds_pol)
+                spectral_data = SpectralData(self.wlens, polarizations, None, ds_pol)
                 specs.append(spectral_data)
         return specs
 
-    def _calculate_signals(self, srf: SpectralResponseFunction) -> Union[SpectralData, List[SpectralData]]:
+    def _calculate_signals(self, srf: SpectralResponseFunction) -> SpectralData:
         elis = self.elis
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]
-        specs = []
         if not isinstance(elis, list):
             elis = [elis]
+        signals_list = []
         for irr in elis:
-            signal = np.array(SpectralIntegration.integrate_elis(srf, irr.data))
-            ds_pol = SpectralData.make_irradiance_ds(channel_ids, signal, None)
-            specs.append(SpectralData(channel_ids, signal, None, ds_pol))
-        if not isinstance(self.elis, list):
-            specs = specs[0]
-        return specs
+            signals_list.append(SpectralIntegration.integrate_elis(srf, irr.data))
+        signals = np.array(signals_list).T
+        print(channel_ids)
+        ds_pol = SpectralData.make_signals_ds(channel_ids, signals, None)
+        sp_d = SpectralData(channel_ids, signals, None, ds_pol)
+        return sp_d
