@@ -14,7 +14,7 @@ from datetime import datetime
 import csv
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
@@ -104,7 +104,7 @@ def export_csv(
         else:
             ylabels.append(ylabel)
         writer.writerow([xlabel, *ylabels])
-        if isinstance(y_data[0], list):
+        if isinstance(y_data[0], list) or isinstance(y_data[0], np.ndarray):
             for i in range(len(x_data)):
                 yd = [str(val[i]) for val in y_data]
                 writer.writerow([x_data[i], *yd])
@@ -168,7 +168,7 @@ def export_csv_comparation(
 
 def export_csv_integrated_irradiance(
     srf: SpectralResponseFunction,
-    irrs: List[float],
+    irrs: List[List[float]],
     name: str,
     point: Point,
 ):
@@ -207,10 +207,7 @@ def export_csv_integrated_irradiance(
                 validity = "Partially"
             else:
                 validity = "Out"
-            if isinstance(irrs[i], list):
-                irrs_str = map(str, irrs[i])
-            else:
-                irrs_str = [str(irrs[i])]
+            irrs_str = map(str, irrs[i])
             writer.writerow([ch.id, ch.center, validity, *irrs_str])
 
 

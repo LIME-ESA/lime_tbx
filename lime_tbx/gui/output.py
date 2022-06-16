@@ -50,6 +50,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.data = None
         self.cimel_data = None
         self.asd_data = None
+        self.point = None
         self._build_layout()
 
     def _build_layout(self):
@@ -86,7 +87,9 @@ class GraphWidget(QtWidgets.QWidget):
         data: Union[SpectralData, List[SpectralData]] = None,
         data_cimel: Union[SpectralData, List[SpectralData]] = None,
         data_asd: Union[SpectralData, List[SpectralData]] = None,
+        point: Union[Point, List[Point]] = None,
     ):
+        self.point = point
         self.data = data
         self.cimel_data = data_cimel
         self.asd_data = data_asd
@@ -211,12 +214,18 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
+        if isinstance(self.data, np.ndarray) or isinstance(self.data, list):
+            x_data = self.data[0].wlens
+            y_data = [d.data for d in self.data]
+        else:
+            x_data = self.data.wlens
+            y_data = self.data.data
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
                     csv.export_csv_comparation(
-                        self.x_data,
-                        self.y_data,
+                        x_data,
+                        y_data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
@@ -224,8 +233,8 @@ class GraphWidget(QtWidgets.QWidget):
                     )
                 else:
                     csv.export_csv(
-                        self.x_data,
-                        self.y_data,
+                        x_data,
+                        y_data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
@@ -403,7 +412,8 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.ch_names.pop(index)
 
     def update_plot(self, index: int, x_data: list, y_data: list, points: list):
-        self.channels[index].update_plot(x_data, y_data, points)
+        data = SpectralData(x_data, y_data, None, None)
+        self.channels[index].update_plot(data, point=points)
 
     def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
         self.channels[index].update_labels(title, xlabel, ylabel)

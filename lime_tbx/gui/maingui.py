@@ -326,7 +326,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
-        self.input_widget = input.InputWidget(self.satellites, self._callback_regular_input_changed)
+        self.input_widget = input.InputWidget(
+            self.satellites, self._callback_regular_input_changed
+        )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
         # buttons
@@ -350,7 +352,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.graph = output.GraphWidget(
             "Simulation output", "Wavelengths (nm)", "Units"
         )
-        self.graph.update_legend(["interpolated data points", "CIMEL data points", "errorbars (k=2)"])
+        self.graph.update_legend(
+            ["interpolated data points", "CIMEL data points", "errorbars (k=2)"]
+        )
         # srf widget
         self.srf_widget = srf.SRFEditWidget(self.settings_manager)
         # signal widget
@@ -425,7 +429,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         #     uncert = unc.uncertainties
         # self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
 
-        self.graph.update_plot(data[2], data[3], data[4])
+        self.graph.update_plot(data[2], data[3], data[4], data[0])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -472,7 +476,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         #     cimel_data = unc.data
         #     uncert = unc.uncertainties
 
-        self.graph.update_plot(data[1], data[2], data[3])
+        self.graph.update_plot(data[1], data[2], data[3], data[0])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -506,7 +510,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[1])
+        self.graph.update_plot(data[1], point=data[0])
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
