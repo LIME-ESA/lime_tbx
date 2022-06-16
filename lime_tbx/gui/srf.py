@@ -22,11 +22,14 @@ __status__ = "Development"
 
 
 class SRFEditWidget(QtWidgets.QWidget):
-    def __init__(self, settings_manager: settings.ISettingsManager):
+    def __init__(
+        self, settings_manager: settings.ISettingsManager, changed_callback: Callable
+    ):
         super().__init__()
         self.combobox_listen = False
         self.settings_manager = settings_manager
         self.loaded_srf = None
+        self.changed_callback = changed_callback
         self._build_layout()
         self.update_output_data()
         self.combobox_listen = True
@@ -62,6 +65,7 @@ class SRFEditWidget(QtWidgets.QWidget):
         y_data = list(srf.get_values())
         srf_data = SpectralData(x_data, y_data, None, None)
         self.graph.update_plot(srf_data)
+        self.changed_callback()
 
     def update_combo_srf(self):
         self.combobox_listen = False

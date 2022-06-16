@@ -13,6 +13,7 @@ from datetime import datetime
 from ...datatypes.datatypes import (
     ApolloIrradianceCoefficients,
     LunarObservation,
+    ReflectanceCoefficients,
     SpectralResponseFunction,
     SurfacePoint,
 )
@@ -75,7 +76,7 @@ class IComparison(ABC):
         self,
         observations: LunarObservation,
         srf: SpectralResponseFunction,
-        coefficients: ApolloIrradianceCoefficients,
+        coefficients: ReflectanceCoefficients,
         kernels_path: str,
     ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         """
@@ -87,8 +88,8 @@ class IComparison(ABC):
             MoonObservationn read from a GLOD datafile.
         srf: SpectralResponseFunction
             SpectralResponseFunction that corresponds to the observations file
-        coefficients: IrradianceCoefficients
-            Irradiance Coefficients to be used
+        coefficients: ReflectanceCoefficients
+            Coefficients to be used
         kernels_path: str
             Path where the needed SPICE kernels are located.
 
@@ -112,7 +113,7 @@ class Comparison(IComparison):
         self,
         observations: List[LunarObservation],
         srf: SpectralResponseFunction,
-        coefficients: ApolloIrradianceCoefficients,
+        coefficients: ReflectanceCoefficients,
         lime_simulation: LimeSimulation,
     ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
         ch_names = srf.get_channels_names()
@@ -124,7 +125,7 @@ class Comparison(IComparison):
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            lime_simulation.update_irradiance(sp, coefficients)
+            lime_simulation.update_irradiance(srf, sp, coefficients)
             elis = lime_simulation.elis
             integrated_irrs = SpectralIntegration.integrate_elis(srf, elis)
             for j, ch in enumerate(ch_names):

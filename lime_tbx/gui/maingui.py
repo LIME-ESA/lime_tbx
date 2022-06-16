@@ -108,7 +108,7 @@ def eli_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_irradiance(srf, point, cimel_coef)
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     return (
         point,
         srf,
@@ -178,13 +178,14 @@ def compare_callback(
     mos: List[LunarObservation],
     srf: SpectralResponseFunction,
     coeffs: ApolloIrradianceCoefficients,
+    cimel_coef: ReflectanceCoefficients,
     kernels_path: str,
 ):
     co = comparison.Comparison()
     for mo in mos:
         if not mo.check_valid_srf(srf):
             raise ("SRF file not valid for the chosen Moon observations file.")
-    irrs, dts, sps = co.get_simulations(mos, srf, coeffs, kernels_path)
+    irrs, dts, sps = co.get_simulations(mos, srf, cimel_coef, kernels_path)
     return irrs, dts, sps, mos, srf
 
 
@@ -254,9 +255,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         mos = self.input.get_moon_obs()
         srf = self.input.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
+        cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             compare_callback,
-            [mos, srf, coeffs, self.lime_simulation],
+            [mos, srf, coeffs, cimel_coef, self.lime_simulation],
         )
         self._start_thread(self.compare_finished, self.compare_error)
 
@@ -356,7 +358,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             ["interpolated data points", "CIMEL data points", "errorbars (k=2)"]
         )
         # srf widget
-        self.srf_widget = srf.SRFEditWidget(self.settings_manager)
+        self.srf_widget = srf.SRFEditWidget(
+            self.settings_manager, self._callback_regular_input_changed
+        )
         # signal widget
         self.signal_widget = output.SignalWidget()
         # finish tab

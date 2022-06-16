@@ -4,7 +4,7 @@
 from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -47,7 +47,7 @@ class SpectralIntegration(ISpectralIntegration):
         if len(elis) == 0:
             return []
         wasnt_lists = False
-        if not isinstance(elis[0], list):
+        if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
             wasnt_lists = True
             elis = [elis]
         for ch in srf.channels:
