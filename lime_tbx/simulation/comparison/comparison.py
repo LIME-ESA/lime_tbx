@@ -125,9 +125,11 @@ class Comparison(IComparison):
             dt = obs.dt
             lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
             sp = SurfacePoint(lat, lon, h, dt)
-            lime_simulation.update_irradiance(srf, sp, coefficients)
-            elis = lime_simulation.elis
-            integrated_irrs = SpectralIntegration.integrate_elis(srf, elis)
+            lime_simulation.set_simulation_changed()
+            lime_simulation.update_irradiance(
+                SpectralResponseFunction("empty", []), srf, sp, coefficients
+            )
+            integrated_irrs = lime_simulation.signals.data
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)

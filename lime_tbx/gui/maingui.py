@@ -179,13 +179,13 @@ def compare_callback(
     srf: SpectralResponseFunction,
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
-    kernels_path: str,
+    lime_simulation: LimeSimulation,
 ):
     co = comparison.Comparison()
     for mo in mos:
         if not mo.check_valid_srf(srf):
             raise ("SRF file not valid for the chosen Moon observations file.")
-    irrs, dts, sps = co.get_simulations(mos, srf, cimel_coef, kernels_path)
+    irrs, dts, sps = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
     return irrs, dts, sps, mos, srf
 
 
@@ -286,14 +286,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 if mo.has_ch_value(ch):
                     obs_irrs.append(mo.ch_irrs[ch])
             if len(dts[i]) > 0:
-                self.output.update_plot(i, dts[i], [obs_irrs, irrs[i]], sps[i])
+                data = [
+                    SpectralData(dts[i], obs_irrs, None, None),
+                    SpectralData(dts[i], irrs[i], None, None),
+                ]
+                self.output.update_plot(i, data, sps[i])
                 self.output.update_labels(
                     i,
                     "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                     "datetimes",
                     "Signal (Wm⁻²nm⁻¹)",
                 )
-                self.output.update_legends(i, ["Observed Signal", "Simulated Signal"])
+                self.output.update_legends(i, [["Observed Signal", "Simulated Signal"]])
             else:
                 to_remove.append(ch)
         self.output.remove_channels(to_remove)
@@ -355,7 +359,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
             "Simulation output", "Wavelengths (nm)", "Units"
         )
         self.graph.update_legend(
-            ["interpolated data points", "CIMEL data points", "errorbars (k=2)"]
+            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
         )
         # srf widget
         self.srf_widget = srf.SRFEditWidget(
@@ -631,6 +635,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.comparison_action.setText("Perform &simulations")
         self.comparison_action.triggered.connect(self.simulations)
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w.lime_simulation.set_simulation_changed()
         lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
 
     def simulations(self):
@@ -639,6 +644,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         )
         self.comparison_action.triggered.connect(self.comparison)
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w.lime_simulation.set_simulation_changed()
         lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
 
     def exit(self):

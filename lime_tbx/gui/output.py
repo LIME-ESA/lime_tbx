@@ -105,7 +105,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.ylabel = ylabel
         self._redraw()
 
-    def update_legend(self, legend: List[str]):
+    def update_legend(self, legend: List[List[str]]):
         self.legend = legend
         self._redraw()
 
@@ -120,12 +120,16 @@ class GraphWidget(QtWidgets.QWidget):
                 iter_data = [iter_data]
             for i, data in enumerate(iter_data):
                 label = ""
-                if i == 0 and len(self.legend) > 0:
-                    label = self.legend[0]
+                color = ["g"]
+                if len(self.legend) > 0:
+                    if len(self.legend[0]) > i:
+                        label = self.legend[0][i]
+                    if len(self.legend[0]) > 1:
+                        color = []
                 self.canvas.axes.plot(
                     data.wlens,
                     data.data,
-                    "g",
+                    *color,
                     label=label,
                 )
                 if data.uncertainties is not None:
@@ -156,8 +160,8 @@ class GraphWidget(QtWidgets.QWidget):
                     label0 = ""
                     label1 = ""
                     if i == 0 and len(self.legend) >= 3:
-                        label0 = self.legend[1]
-                        label1 = self.legend[2]
+                        label0 = self.legend[1][0]
+                        label1 = self.legend[2][0]
                     self.canvas.axes.plot(
                         cimel_data.wlens,
                         cimel_data.data,
@@ -411,12 +415,13 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.channels.pop(index)
                 self.ch_names.pop(index)
 
-    def update_plot(self, index: int, x_data: list, y_data: list, points: list):
-        data = SpectralData(x_data, y_data, None, None)
+    def update_plot(
+        self, index: int, data: Union[SpectralData, List[SpectralData]], points: list
+    ):
         self.channels[index].update_plot(data, point=points)
 
     def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
         self.channels[index].update_labels(title, xlabel, ylabel)
 
-    def update_legends(self, index: int, legends: List[str]):
+    def update_legends(self, index: int, legends: List[List[str]]):
         self.channels[index].update_legend(legends)
