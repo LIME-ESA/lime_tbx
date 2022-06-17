@@ -284,7 +284,9 @@ class LimeSimulation:
                 dl.get_polarized(self.wlens, self.mds.mpa_degrees, polar_coeff)
             )
             ds_pol = SpectralData.make_polarization_ds(self.wlens, polarizations, None)
-            return SpectralData(self.wlens, polarizations, None, ds_pol)
+            return SpectralData(
+                self.wlens, polarizations, ds_pol.u_ran_reflectance.values, ds_pol
+            )
         else:
             specs = []
             for m in self.mds:
@@ -294,7 +296,9 @@ class LimeSimulation:
                 ds_pol = SpectralData.make_polarization_ds(
                     self.wlens, polarizations, None
                 )
-                spectral_data = SpectralData(self.wlens, polarizations, None, ds_pol)
+                spectral_data = SpectralData(
+                    self.wlens, polarizations, ds_pol.u_ran_reflectance.values, ds_pol
+                )
                 specs.append(spectral_data)
         return specs
 
@@ -312,9 +316,12 @@ class LimeSimulation:
         if not isinstance(elis_signals, list):
             elis_signals = [elis_signals]
         signals_list = []
+        uncs_list = []
         for irr in elis_signals:
             signals_list.append(SpectralIntegration.integrate_elis(srf, irr.data))
+            uncs_list.append(SpectralIntegration.integrate_elis(srf, irr.uncertainties))
         signals = np.array(signals_list).T
-        ds_pol = SpectralData.make_signals_ds(channel_ids, signals, None)
-        sp_d = SpectralData(channel_ids, signals, None, ds_pol)
+        uncs = np.array(uncs_list).T
+        ds_pol = SpectralData.make_signals_ds(channel_ids, signals, uncs)
+        sp_d = SpectralData(channel_ids, signals, uncs, ds_pol)
         return sp_d

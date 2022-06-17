@@ -14,6 +14,7 @@ from ...datatypes.datatypes import (
     ApolloIrradianceCoefficients,
     LunarObservation,
     ReflectanceCoefficients,
+    SpectralData,
     SpectralResponseFunction,
     SurfacePoint,
 )
@@ -78,7 +79,9 @@ class IComparison(ABC):
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         kernels_path: str,
-    ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
+    ) -> Tuple[
+        List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
+    ]:
         """
         Simulate the moon irradiance for the given scenarios.
 
@@ -95,9 +98,10 @@ class IComparison(ABC):
 
         Returns
         -------
-        irrs: list of list of float
+        sigs: list of list of tuple of float, float
             List containing one list per SRF channel, containing all the simulated measures
-            that have a counterpart in the observations data object.
+            that have a counterpart in the observations data object. The tuple contains the signal
+            and its uncertainty.
         dts: list of list of datetime
             List containing one list per SRF channel, containing the corresponding datetimes
             for every irradiance measure.
@@ -115,9 +119,11 @@ class Comparison(IComparison):
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: LimeSimulation,
-    ) -> Tuple[List[List[float]], List[List[datetime]], List[List[SurfacePoint]]]:
+    ) -> Tuple[
+        List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
+    ]:
         ch_names = srf.get_channels_names()
-        irrs = [[] for _ in ch_names]
+        sigs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
         sps = [[] for _ in ch_names]
         for obs in observations:
@@ -129,10 +135,11 @@ class Comparison(IComparison):
             lime_simulation.update_irradiance(
                 SpectralResponseFunction("empty", []), srf, sp, coefficients
             )
-            integrated_irrs = lime_simulation.signals.data
+            signals = lime_simulation.signals
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)
-                    irrs[j].append(integrated_irrs[j][0])
+                    sigs[j].append((signals.data[j][0], signals.uncertainties[j][0]))
+                    # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
-        return irrs, ch_dates, sps
+        return sigs, ch_dates, sps

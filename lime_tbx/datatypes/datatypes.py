@@ -38,7 +38,10 @@ import obsarray
 
 """___LIME Modules___"""
 from . import constants
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_REFL, TEMPLATE_SIGNALS
+from lime_tbx.datatypes.templates_digital_effects_table import (
+    TEMPLATE_REFL,
+    TEMPLATE_SIGNALS,
+)
 
 
 @dataclass
@@ -746,7 +749,6 @@ class SpectralData:
     @staticmethod
     def make_signals_ds(channel_ids, refl, unc_rand=None, unc_syst=None):
         dim_sizes = {"channels": len(channel_ids), "dts": len(refl[0])}
-        print(dim_sizes)
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_SIGNALS, dim_sizes)
 

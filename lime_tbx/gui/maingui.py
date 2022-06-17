@@ -180,13 +180,19 @@ def compare_callback(
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: LimeSimulation,
-):
+) -> Tuple[
+    List[List[Tuple[float, float]]],
+    List[List[datetime]],
+    List[List[SurfacePoint]],
+    List[LunarObservation],
+    SpectralResponseFunction,
+]:
     co = comparison.Comparison()
     for mo in mos:
         if not mo.check_valid_srf(srf):
             raise ("SRF file not valid for the chosen Moon observations file.")
-    irrs, dts, sps = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
-    return irrs, dts, sps, mos, srf
+    signals, dts, sps = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
+    return signals, dts, sps, mos, srf
 
 
 def _start_thread(
@@ -265,14 +271,14 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def compare_finished(
         self,
         data: Tuple[
-            List[List[float]],
+            List[List[Tuple[float, float]]],
             List[List[datetime]],
             List[List[SurfacePoint]],
             List[LunarObservation],
             SpectralResponseFunction,
         ],
     ):
-        irrs = data[0]
+        signals = data[0]
         dts = data[1]
         sps = data[2]
         mos = data[3]
@@ -286,11 +292,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 if mo.has_ch_value(ch):
                     obs_irrs.append(mo.ch_irrs[ch])
             if len(dts[i]) > 0:
-                data = [
+                irrs = np.array([s[0] for s in signals[i]])
+                uncs = np.array([s[1] for s in signals[i]])
+                specs = [
                     SpectralData(dts[i], obs_irrs, None, None),
-                    SpectralData(dts[i], irrs[i], None, None),
+                    SpectralData(dts[i], irrs, uncs, None),
                 ]
-                self.output.update_plot(i, data, sps[i])
+                self.output.update_plot(i, specs, sps[i])
                 self.output.update_labels(
                     i,
                     "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),

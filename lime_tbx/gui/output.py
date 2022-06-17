@@ -222,19 +222,11 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        print(self.data)
-        if isinstance(self.data, np.ndarray) or isinstance(self.data, list):
-            x_data = self.data[0].wlens
-            y_data = [d.data for d in self.data]
-        else:
-            x_data = self.data.wlens
-            y_data = self.data.data
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
                     csv.export_csv_comparation(
-                        x_data,
-                        y_data,
+                        self.data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
@@ -242,8 +234,7 @@ class GraphWidget(QtWidgets.QWidget):
                     )
                 else:
                     csv.export_csv(
-                        x_data,
-                        y_data,
+                        self.data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
@@ -302,34 +293,39 @@ class SignalWidget(QtWidgets.QWidget):
         self._clear_layout()
         show_range_info = False
         self.srf = srf
-        self.irrs = signals.data
+        self.signals = signals
 
         self.point = point
         head_id_item = QtWidgets.QTableWidgetItem("ID")
         head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")
         self.table.setRowCount(1 + len(signals.data))
         if isinstance(point, CustomPoint):
-            self.table.setColumnCount(2 + 1)
+            self.table.setColumnCount(2 + 2)
             self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Signal (Wm⁻²nm⁻¹)"))
+            self.table.setItem(0, 3, QtWidgets.QTableWidgetItem("Uncertainties"))
         else:
             dts = point.dt
             if not isinstance(dts, list):
                 dts = [dts]
-            self.table.setColumnCount(len(dts) + 2)
+            self.table.setColumnCount(len(dts) * 2 + 2)
             for i, dt in enumerate(dts):
                 item_title_value = QtWidgets.QTableWidgetItem(
                     "Signal (Wm⁻²nm⁻¹) on {}".format(
                         dt.strftime("%Y-%m-%d %H:%M:%S UTC")
                     )
                 )
-                self.table.setItem(0, i + 2, item_title_value)
+                item_title_uncert = QtWidgets.QTableWidgetItem("Uncertainties")
+                self.table.setItem(0, i * 2 + 2, item_title_value)
+                self.table.setItem(0, i * 2 + 3, item_title_uncert)
         self.table.setItem(0, 0, head_id_item)
         self.table.setItem(0, 1, head_center_item)
         print(len(srf.channels), len(signals.data))
         for i, ch_signals in enumerate(signals.data):
             ch = srf.channels[i]
+            ch_uncs = signals.uncertainties[i]
             if not (isinstance(ch_signals, np.ndarray) or isinstance(ch_signals, list)):
                 ch_signals = [ch_signals]
+                ch_uncs = [ch_uncs]
             id_item = QtWidgets.QTableWidgetItem(str(ch.id))
             center_item = QtWidgets.QTableWidgetItem(str(ch.center))
             self.table.setItem(i + 1, 0, id_item)
@@ -337,14 +333,19 @@ class SignalWidget(QtWidgets.QWidget):
             for j, signal in enumerate(ch_signals):
                 if ch.valid_spectre == SpectralValidity.VALID:
                     value = "{}".format(str(signal))
+                    unc = "{}".format(str(ch_uncs[j]))
                 elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
                     value = "{} *".format(str(signal))
+                    unc = "{} *".format(str(ch_uncs[j]))
                     show_range_info = True
                 else:
                     value = "Not available *"
+                    unc = "Not available *"
                     show_range_info = True
                 value_item = QtWidgets.QTableWidgetItem(value)
-                self.table.setItem(i + 1, j + 2, value_item)
+                unc_item = QtWidgets.QTableWidgetItem(unc)
+                self.table.setItem(i + 1, j * 2 + 2, value_item)
+                self.table.setItem(i + 1, j * 2 + 3, unc_item)
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
         if show_range_info:
@@ -377,7 +378,7 @@ for wavelengths between 350 and 2500 nm"
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(
-                    self.srf, self.irrs, name, self.point
+                    self.srf, self.signals, name, self.point
                 )
             except Exception as e:
                 self.show_error(e)
