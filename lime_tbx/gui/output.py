@@ -11,6 +11,7 @@ from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
 import numpy as np
 
 """___NPL Modules___"""
@@ -51,6 +52,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.cimel_data = None
         self.asd_data = None
         self.point = None
+        self.data_compare = None
         self._build_layout()
 
     def _build_layout(self):
@@ -88,11 +90,13 @@ class GraphWidget(QtWidgets.QWidget):
         data_cimel: Union[SpectralData, List[SpectralData]] = None,
         data_asd: Union[SpectralData, List[SpectralData]] = None,
         point: Union[Point, List[Point]] = None,
+        data_compare: Union[SpectralData, List[SpectralData]] = None,
     ):
         self.point = point
         self.data = data
         self.cimel_data = data_cimel
         self.asd_data = data_asd
+        self.data_compare = data_compare
         if data is not None:
             self.disable_buttons(False)
         else:
@@ -114,6 +118,7 @@ class GraphWidget(QtWidgets.QWidget):
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
+        lines = []
         if self.data is not None:
             iter_data = self.data
             if not isinstance(iter_data, list):
@@ -129,7 +134,7 @@ class GraphWidget(QtWidgets.QWidget):
                 marker = ""
                 if len(data.data) == 1:
                     marker = "o"
-                self.canvas.axes.plot(
+                lines += self.canvas.axes.plot(
                     data.wlens,
                     data.data,
                     *color,
@@ -150,7 +155,7 @@ class GraphWidget(QtWidgets.QWidget):
                     asd_data = self.asd_data[0]
                 else:
                     asd_data = self.asd_data
-                self.canvas.axes.plot(
+                lines += self.canvas.axes.plot(
                     asd_data.wlens,
                     asd_data.data / 5.0,
                     label="ASD data points / 5",
@@ -166,7 +171,7 @@ class GraphWidget(QtWidgets.QWidget):
                     if i == 0 and len(self.legend) >= 3:
                         label0 = self.legend[1][0]
                         label1 = self.legend[2][0]
-                    self.canvas.axes.plot(
+                    lines += self.canvas.axes.plot(
                         cimel_data.wlens,
                         cimel_data.data,
                         color="orange",
@@ -174,17 +179,62 @@ class GraphWidget(QtWidgets.QWidget):
                         marker="o",
                         label=label0,
                     )
-                    self.canvas.axes.errorbar(
-                        cimel_data.wlens,
-                        cimel_data.data,
-                        yerr=cimel_data.uncertainties * 2,
-                        color="black",
-                        capsize=3,
-                        ls="none",
-                        label=label1,
+                    lines += [
+                        self.canvas.axes.errorbar(
+                            cimel_data.wlens,
+                            cimel_data.data,
+                            yerr=cimel_data.uncertainties * 2,
+                            color="black",
+                            capsize=3,
+                            ls="none",
+                            label=label1,
+                        )
+                    ]
+            if self.data_compare:
+                iter_data = self.data_compare
+                if not isinstance(iter_data, list):
+                    iter_data = [iter_data]
+                ax2 = self.canvas.axes.twinx()
+                for i, data_comp in enumerate(iter_data):
+                    label = "Ratio"
+                    if len(self.legend) > 0 and len(self.legend[0]) > 1:
+                        label = "1 - {}/{}".format(
+                            self.legend[0][0].split()[0], self.legend[0][1].split()[0]
+                        )
+                    marker = ""
+                    if len(data_comp.data) == 1:
+                        marker = "o"
+                    lines += ax2.plot(
+                        data_comp.wlens,
+                        data_comp.data,
+                        color="pink",
+                        marker=marker,
+                        label=label,
                     )
+                    if data_comp.uncertainties is not None:
+                        ax2.fill_between(
+                            data_comp.wlens,
+                            data_comp.data - 2 * data_comp.uncertainties,
+                            data_comp.data + 2 * data_comp.uncertainties,
+                            color="pink",
+                            alpha=0.3,
+                        )
+                    ax2.set_ylim(
+                        (
+                            min(-0.05, min(data_comp.data) - 0.05),
+                            max(0.05, max(data_comp.data) + 0.05),
+                        )
+                    )
+                ax2.set_ylabel("Relative difference (Fraction of unity)")
+                plt.setp(
+                    self.canvas.axes.get_xticklabels(),
+                    rotation=30,
+                    horizontalalignment="right",
+                )
             if len(self.legend) > 0:
-                self.canvas.axes.legend()
+                # added these three lines
+                labels = [l.get_label() for l in lines]
+                self.canvas.axes.legend(lines, labels, loc=0)
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
@@ -422,9 +472,27 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.ch_names.pop(index)
 
     def update_plot(
-        self, index: int, data: Union[SpectralData, List[SpectralData]], points: list
+        self, index: int, data: Tuple[SpectralData, SpectralData], points: List[Point]
     ):
-        self.channels[index].update_plot(data, point=points)
+        """Update the <index> plot with the given data
+
+        Parameters
+        ----------
+        index: int
+            Plot index (SRF)
+        data: Tuple of two SpectralData
+            The first spectral data is the observed signal, the second one the simulated one
+        points: List of point
+            List of the points related to the measures
+        """
+        ratio = []
+        uncs = []
+        for i in range(len(data[0].wlens)):
+            ratio.append(1 - data[0].data[i] / data[1].data[i])
+            uncs.append(data[0].uncertainties[i] + data[1].uncertainties[i])
+        ratio_spec = SpectralData(data[0].wlens, np.array(ratio), np.array(uncs), None)
+        data = [data[0], data[1]]
+        self.channels[index].update_plot(data, point=points, data_compare=ratio_spec)
 
     def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
         self.channels[index].update_labels(title, xlabel, ylabel)

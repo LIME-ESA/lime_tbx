@@ -294,10 +294,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             if len(dts[i]) > 0:
                 irrs = np.array([s[0] for s in signals[i]])
                 uncs = np.array([s[1] for s in signals[i]])
-                specs = [
-                    SpectralData(dts[i], obs_irrs, None, None),
+                specs = (
+                    SpectralData(dts[i], obs_irrs, np.zeros(len(dts[i])), None),
                     SpectralData(dts[i], irrs, uncs, None),
-                ]
+                )
                 self.output.update_plot(i, specs, sps[i])
                 self.output.update_labels(
                     i,
