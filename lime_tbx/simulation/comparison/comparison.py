@@ -7,11 +7,12 @@ from typing import List, Tuple
 from datetime import datetime
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
     ApolloIrradianceCoefficients,
+    ComparisonData,
     LunarObservation,
     ReflectanceCoefficients,
     SpectralData,
@@ -123,9 +124,11 @@ class Comparison(IComparison):
         List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
     ]:
         ch_names = srf.get_channels_names()
+        comparisons = []
         sigs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
         sps = [[] for _ in ch_names]
+        obs_irrs = [[] for _ in ch_names]
         for obs in observations:
             sat_pos = obs.sat_pos
             dt = obs.dt
@@ -142,4 +145,53 @@ class Comparison(IComparison):
                     sigs[j].append((signals.data[j][0], signals.uncertainties[j][0]))
                     # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
-        return sigs, ch_dates, sps
+                    obs_irrs[j].append(obs.ch_irrs[ch])
+        for i, ch in enumerate(ch_names):
+            if len(ch_dates[i]) > 0:
+                irrs = np.array([s[0] for s in sigs[i]])
+                uncs = np.array([s[1] for s in sigs[i]])
+                # Observed and Simulated
+                specs = (
+                    SpectralData(
+                        ch_dates[i], obs_irrs[i], np.zeros(len(ch_dates[i])), None
+                    ),
+                    SpectralData(ch_dates[i], irrs, uncs, None),
+                )
+                # Relative Differences
+                rel_diffs = []
+                uncs_r = []
+                tot_rel_diff = 0
+                num_samples = len(specs[0].wlens)
+                for j in range(num_samples):
+                    sim = specs[1].data[j]
+                    ref = specs[0].data[j]
+                    rel_dif = (sim - ref) / ref
+                    tot_rel_diff += rel_dif
+                    rel_diffs.append(rel_dif)
+                    unc_sim = specs[1].uncertainties[j]
+                    unc_ref = specs[0].uncertainties[j]
+                    uncs_r.append(
+                        (unc_sim + unc_ref) + unc_ref
+                    )  # i dont know if this is the correct way of propagating the uncertainty
+                mean_rel_diff = tot_rel_diff / num_samples
+                std = np.std(rel_diffs)
+                ratio_spec = SpectralData(
+                    specs[0].wlens, np.array(rel_diffs), np.array(uncs_r), None
+                )
+                cp = ComparisonData(
+                    specs[0],
+                    specs[1],
+                    ratio_spec,
+                    mean_rel_diff,
+                    std,
+                    None,
+                    num_samples,
+                    ch_dates[i],
+                    sps[i],
+                )
+                comparisons.append(cp)
+            else:
+                comparisons.append(
+                    ComparisonData(None, None, None, None, None, None, None, [], [])
+                )
+        return comparisons

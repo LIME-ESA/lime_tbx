@@ -16,6 +16,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    ComparisonData,
     Point,
     SatellitePoint,
     SpectralResponseFunction,
@@ -90,7 +91,7 @@ class GraphWidget(QtWidgets.QWidget):
         data_cimel: Union[SpectralData, List[SpectralData]] = None,
         data_asd: Union[SpectralData, List[SpectralData]] = None,
         point: Union[Point, List[Point]] = None,
-        data_compare: Union[SpectralData, List[SpectralData]] = None,
+        data_compare: ComparisonData = None,
     ):
         self.point = point
         self.data = data
@@ -110,6 +111,17 @@ class GraphWidget(QtWidgets.QWidget):
         self._redraw()
 
     def update_legend(self, legend: List[List[str]]):
+        """
+        Parameters
+        ----------
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: data
+            1: cimel_data
+            2: cimel_data errorbars
+            3: comparison
+        """
         self.legend = legend
         self._redraw()
 
@@ -191,16 +203,14 @@ class GraphWidget(QtWidgets.QWidget):
                         )
                     ]
             if self.data_compare:
-                iter_data = self.data_compare
+                iter_data = self.data_compare.diffs_signal
                 if not isinstance(iter_data, list):
                     iter_data = [iter_data]
                 ax2 = self.canvas.axes.twinx()
                 for i, data_comp in enumerate(iter_data):
-                    label = "Ratio"
-                    if len(self.legend) > 0 and len(self.legend[0]) > 1:
-                        label = "1 - {}/{}".format(
-                            self.legend[0][0].split()[0], self.legend[0][1].split()[0]
-                        )
+                    label = ""
+                    if len(self.legend) > 3 and len(self.legend[3]) > 0:
+                        label = self.legend[3][0]
                     marker = ""
                     if len(data_comp.data) == 1:
                         marker = "o"
@@ -224,6 +234,17 @@ class GraphWidget(QtWidgets.QWidget):
                             min(-0.05, min(data_comp.data) - 0.05),
                             max(0.05, max(data_comp.data) + 0.05),
                         )
+                    )
+                    ax2.text(
+                        0.85,
+                        0.85,
+                        "MRD: {:.4f}\nσ: {:.4f}".format(
+                            self.data_compare.mean_relative_difference,
+                            self.data_compare.standard_deviation_mrd,
+                        ),
+                        horizontalalignment="center",
+                        verticalalignment="center",
+                        transform=ax2.transAxes,
                     )
                 ax2.set_ylabel("Relative difference (Fraction of unity)")
                 plt.setp(
@@ -471,31 +492,35 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.channels.pop(index)
                 self.ch_names.pop(index)
 
-    def update_plot(
-        self, index: int, data: Tuple[SpectralData, SpectralData], points: List[Point]
-    ):
+    def update_plot(self, index: int, comparison: ComparisonData):
         """Update the <index> plot with the given data
 
         Parameters
         ----------
         index: int
             Plot index (SRF)
-        data: Tuple of two SpectralData
-            The first spectral data is the observed signal, the second one the simulated one
-        points: List of point
-            List of the points related to the measures
+        comparison: ComparisonData
         """
-        ratio = []
-        uncs = []
-        for i in range(len(data[0].wlens)):
-            ratio.append(1 - data[0].data[i] / data[1].data[i])
-            uncs.append(data[0].uncertainties[i] + data[1].uncertainties[i])
-        ratio_spec = SpectralData(data[0].wlens, np.array(ratio), np.array(uncs), None)
-        data = [data[0], data[1]]
-        self.channels[index].update_plot(data, point=points, data_compare=ratio_spec)
+        data = [comparison.observed_signal, comparison.simulated_signal]
+        self.channels[index].update_plot(
+            data, point=comparison.points, data_compare=comparison
+        )
 
     def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
         self.channels[index].update_labels(title, xlabel, ylabel)
 
     def update_legends(self, index: int, legends: List[List[str]]):
+        """
+        Parameters
+        ----------
+        index: int
+            Plot index (SRF)
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: data
+            1: cimel_data
+            2: cimel_data errorbars
+            3: comparison
+        """
         self.channels[index].update_legend(legends)

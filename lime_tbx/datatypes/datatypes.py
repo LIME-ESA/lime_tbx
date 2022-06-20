@@ -767,3 +767,16 @@ class SpectralData:
             ds_refl.u_sys_signals.values = refl * 0.05
 
         return ds_refl
+
+
+@dataclass
+class ComparisonData:
+    observed_signal: SpectralData
+    simulated_signal: SpectralData
+    diffs_signal: SpectralData
+    mean_relative_difference: float
+    standard_deviation_mrd: float
+    temporal_trend: Union[float, None]
+    number_samples: int
+    dts: List[datetime]
+    points: List[Point]

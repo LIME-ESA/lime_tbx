@@ -18,6 +18,7 @@ from . import settings, output, input, srf, help
 # from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
+    ComparisonData,
     LunarObservation,
     Point,
     PolarizationCoefficients,
@@ -180,19 +181,13 @@ def compare_callback(
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: LimeSimulation,
-) -> Tuple[
-    List[List[Tuple[float, float]]],
-    List[List[datetime]],
-    List[List[SurfacePoint]],
-    List[LunarObservation],
-    SpectralResponseFunction,
-]:
+) -> Tuple[List[ComparisonData], List[LunarObservation], SpectralResponseFunction,]:
     co = comparison.Comparison()
     for mo in mos:
         if not mo.check_valid_srf(srf):
             raise ("SRF file not valid for the chosen Moon observations file.")
-    signals, dts, sps = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
-    return signals, dts, sps, mos, srf
+    comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
+    return comparisons, mos, srf
 
 
 def _start_thread(
@@ -271,18 +266,14 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def compare_finished(
         self,
         data: Tuple[
-            List[List[Tuple[float, float]]],
-            List[List[datetime]],
-            List[List[SurfacePoint]],
+            List[ComparisonData],
             List[LunarObservation],
             SpectralResponseFunction,
         ],
     ):
-        signals = data[0]
-        dts = data[1]
-        sps = data[2]
-        mos = data[3]
-        srf = data[4]
+        comps = data[0]
+        mos = data[1]
+        srf = data[2]
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         to_remove = []
@@ -291,21 +282,23 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             for mo in mos:
                 if mo.has_ch_value(ch):
                     obs_irrs.append(mo.ch_irrs[ch])
-            if len(dts[i]) > 0:
-                irrs = np.array([s[0] for s in signals[i]])
-                uncs = np.array([s[1] for s in signals[i]])
-                specs = (
-                    SpectralData(dts[i], obs_irrs, np.zeros(len(dts[i])), None),
-                    SpectralData(dts[i], irrs, uncs, None),
-                )
-                self.output.update_plot(i, specs, sps[i])
+            if len(comps[i].dts) > 0:
+                self.output.update_plot(i, comps[i])
                 self.output.update_labels(
                     i,
                     "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                     "datetimes",
                     "Signal (Wm⁻²nm⁻¹)",
                 )
-                self.output.update_legends(i, [["Observed Signal", "Simulated Signal"]])
+                self.output.update_legends(
+                    i,
+                    [
+                        ["Observed Signal", "Simulated Signal"],
+                        [],
+                        [],
+                        ["Relative Differences"],
+                    ],
+                )
             else:
                 to_remove.append(ch)
         self.output.remove_channels(to_remove)
