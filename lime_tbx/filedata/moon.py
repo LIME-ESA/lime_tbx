@@ -41,7 +41,7 @@ def _calc_divisor_to_nm(units: str) -> float:
     return d_to_nm
 
 
-def read_moon_obs(path: str):
+def read_moon_obs(path: str) -> LunarObservation:
     """
     Read a glod-formatted netcdf moon observations file and create a data object
     from it.
@@ -77,3 +77,26 @@ def read_moon_obs(path: str):
         if not isinstance(ch_irr, np.ma.core.MaskedConstant):
             ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
     return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)
+
+
+def write_obs(obs: List[LunarObservation], path: str):
+    ds = nc.Dataset(path, "w", format="NETCDF4")
+    # Conventions
+    # Metadata_Conventions
+    # standard_name_vocabulary
+    # project
+    # title
+    # summary
+    # keywords
+    # references
+    # institution
+    # licence (or license?)
+    # creator_name
+    # creator_email
+    # creator_url
+    # instrument
+
+    # TODO do this method
+    time = ds.createDimension("time", None)
+    times = ds.createVariable("time", "f4", ("time",))
+    pass
