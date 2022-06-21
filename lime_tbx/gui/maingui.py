@@ -6,6 +6,8 @@ from typing import List, Callable, Union, Tuple
 from datetime import datetime
 import time
 
+from lime_tbx.filedata import moon
+
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 import numpy as np
@@ -20,6 +22,7 @@ from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
     LunarObservation,
+    LunarObservationWrite,
     Point,
     PolarizationCoefficients,
     SatellitePoint,
@@ -188,6 +191,21 @@ def compare_callback(
             raise ("SRF file not valid for the chosen Moon observations file.")
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
     return comparisons, mos, srf
+
+
+def calculate_all_callback(
+    srf: SpectralResponseFunction,
+    signals_srf: SpectralResponseFunction,
+    point: Point,
+    coeffs: ApolloIrradianceCoefficients,
+    cimel_coef: ReflectanceCoefficients,
+    p_coeffs: PolarizationCoefficients,
+    lime_simulation: LimeSimulation,
+):
+    lime_simulation.update_reflectance(srf, point, cimel_coef)
+    lime_simulation.update_irradiance(srf, signals_srf, point, cimel_coef)
+    lime_simulation.update_polarization(srf, point, p_coeffs)
+    return
 
 
 def _start_thread(
@@ -538,8 +556,6 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def export_glod(self):
-        pass
-        """
         self._block_gui_loading()
         point = self.input_widget.get_point()
         def_srf = self.settings_manager.get_default_srf()
@@ -547,9 +563,53 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            calculate_all_callback, [def_srf, point, coeffs, self.lime_simulation]
+            calculate_all_callback,
+            [def_srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
         )
-        self._start_thread(self.polar_finished, self.polar_error)"""
+        self._start_thread(self.calculate_all_finished, self.calculate_all_error)
+
+    def calculate_all_finished(self, data):
+        self._unblock_gui()
+        return
+        point: Point = data[0]
+        srf: SpectralResponseFunction = data[1]
+        obs = []
+        ch_names = srf.get_channels_names()
+        sat_pos_ref = "ITRF93"
+        if isinstance(point, SurfacePoint):
+            sat_pos = comparison.to_xyz(point.latitude, point.longitude, point.altitude)
+            dts = point.dt
+            if not isinstance(dts, list):
+                dts = [dts]
+            for dt in dts:
+                ob = LunarObservationWrite(
+                    ch_names,
+                    sat_pos_ref,
+                    ch_irrs,
+                    dt,
+                    sat_pos,
+                    ch_irrs_uncs,
+                    wlens,
+                    irrs,
+                    irr_uncs,
+                    refls,
+                    ref_uncs,
+                    polars,
+                    pol_uncs,
+                )
+                obs.append(ob)
+            name = QtWidgets.QFileDialog().getSaveFileName(
+                self, "Export LGLOD", "{}.nc".format("lglog")
+            )[0]
+            if name is not None and name != "":
+                try:
+                    moon.write_obs(obs, name, datetime.now())
+                except Exception as e:
+                    raise e
+
+    def calculate_all_error(self, error: Exception):
+        self._unblock_gui()
+        raise error
 
 
 class LimePagesEnum(Enum):
