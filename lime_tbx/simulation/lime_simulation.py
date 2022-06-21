@@ -64,12 +64,12 @@ class LimeSimulation:
         self.wlens: List[float] = []
         self.elref: Union[SpectralData, List[SpectralData]] = None
         self.elis: Union[SpectralData, List[SpectralData]] = None
-        self.signals: SpectralData = None
+        self.signals: Union[SpectralData, List[SpectralData]] = None
         self.elref_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elref_asd: Union[SpectralData, List[SpectralData]] = None
         self.elis_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elis_asd: Union[SpectralData, List[SpectralData]] = None
-        self.polars: SpectralData = None
+        self.polars: Union[SpectralData, List[SpectralData]] = None
         self.srf: SpectralResponseFunction = None
         self.refl_uptodate = False
         self.irr_uptodate = False

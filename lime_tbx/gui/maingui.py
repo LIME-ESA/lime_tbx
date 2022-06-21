@@ -26,6 +26,7 @@ from ..datatypes.datatypes import (
     Point,
     PolarizationCoefficients,
     SatellitePoint,
+    SatellitePosition,
     SpectralResponseFunction,
     ApolloIrradianceCoefficients,
     SurfacePoint,
@@ -205,7 +206,7 @@ def calculate_all_callback(
     lime_simulation.update_reflectance(srf, point, cimel_coef)
     lime_simulation.update_irradiance(srf, signals_srf, point, cimel_coef)
     lime_simulation.update_polarization(srf, point, p_coeffs)
-    return
+    return (point, signals_srf)
 
 
 def _start_thread(
@@ -559,43 +560,54 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self._block_gui_loading()
         point = self.input_widget.get_point()
         def_srf = self.settings_manager.get_default_srf()
+        srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
             calculate_all_callback,
-            [def_srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
+            [def_srf, srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
         )
         self._start_thread(self.calculate_all_finished, self.calculate_all_error)
 
     def calculate_all_finished(self, data):
         self._unblock_gui()
-        return
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
         obs = []
         ch_names = srf.get_channels_names()
         sat_pos_ref = "ITRF93"
         if isinstance(point, SurfacePoint):
-            sat_pos = comparison.to_xyz(point.latitude, point.longitude, point.altitude)
+            sat_pos = SatellitePosition(
+                *comparison.to_xyz(point.latitude, point.longitude, point.altitude)
+            )
+            elis = self.lime_simulation.elis
+            elrefs = self.lime_simulation.elref
+            polars = self.lime_simulation.polars
+            signals = self.lime_simulation.signals
             dts = point.dt
             if not isinstance(dts, list):
                 dts = [dts]
-            for dt in dts:
+            if not isinstance(elis, list):
+                elis = [elis]
+            if not isinstance(elrefs, list):
+                elrefs = [elrefs]
+            if not isinstance(polars, list):
+                polars = [polars]
+            if not isinstance(signals, list):
+                signals = [signals]
+            for i, dt in enumerate(dts):
+                ch_irrs = dict(zip(ch_names, signals[i].data))
                 ob = LunarObservationWrite(
                     ch_names,
                     sat_pos_ref,
                     ch_irrs,
                     dt,
                     sat_pos,
-                    ch_irrs_uncs,
-                    wlens,
-                    irrs,
-                    irr_uncs,
-                    refls,
-                    ref_uncs,
-                    polars,
-                    pol_uncs,
+                    signals[i].uncertainties,
+                    elis[i],
+                    elrefs[i],
+                    polars[i],
                 )
                 obs.append(ob)
             name = QtWidgets.QFileDialog().getSaveFileName(

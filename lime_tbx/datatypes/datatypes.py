@@ -614,13 +614,9 @@ class LunarObservation:
 @dataclass
 class LunarObservationWrite(LunarObservation):
     signals_uncs: np.ndarray
-    wlens: np.ndarray
-    w_irrs: np.ndarray
-    irr_uncs: np.ndarray
-    w_refls: np.ndarray
-    refl_uncs: np.ndarray
-    w_polars: np.ndarray
-    pol_uncs: np.ndarray
+    irrs: "SpectralData"
+    refls: "SpectralData"
+    polars: "SpectralData"
 
 
 class ReflectanceCoefficients:
