@@ -17,6 +17,7 @@ import numpy as np
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     LunarObservation,
+    LunarObservationWrite,
     SatellitePosition,
 )
 from ..datatypes import constants
@@ -76,27 +77,90 @@ def read_moon_obs(path: str) -> LunarObservation:
     for i, ch_irr in enumerate(irr_obs):
         if not isinstance(ch_irr, np.ma.core.MaskedConstant):
             ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
+    ds.close()
     return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)
 
 
-def write_obs(obs: List[LunarObservation], path: str):
-    ds = nc.Dataset(path, "w", format="NETCDF4")
-    # Conventions
-    # Metadata_Conventions
-    # standard_name_vocabulary
-    # project
-    # title
-    # summary
-    # keywords
-    # references
-    # institution
-    # licence (or license?)
-    # creator_name
-    # creator_email
-    # creator_url
-    # instrument
+_DT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
-    # TODO do this method
-    time = ds.createDimension("time", None)
-    times = ds.createVariable("time", "f4", ("time",))
-    pass
+
+def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
+    ds = nc.Dataset(path, "w", format="NETCDF4")
+    ds.Conventions = "CF-1.6"
+    ds.Metadata_Conventions = "Unidata Dataset Discovery v1.0"
+    ds.standard_name_vocabulary = "CF Standard Name Table (Version 21, 12 January 2013)"
+    ds.project = "LIME 2"
+    ds.title = "LIME simulation lunar observation file"
+    ds.summary = "Lunar observation file"
+    ds.keywords = "GSICS, satellites, lunar, moon, observation, visible, LIME"
+    ds.references = "TBD"
+    ds.institution = "ESA"
+    ds.licence = ""
+    ds.creator_name = ""
+    ds.creator_email = ""
+    ds.creator_url = ""
+    ds.instrument = "LIME TBX"
+    ds.instrument_wmo_code = "N/A"
+    ds.data_source = "N/A"
+    dt_str = dt.strftime(_DT_FORMAT)
+    ds.date_created = dt_str
+    ds.date_modified = dt_str
+    ds.history = "TBD"
+    ds.id = os.path.basename(path)
+    ds.wmo_data_category = 101
+    ds.wmo_international_data_subcategory = 0
+    ds.processing_level = "v1.0.0"
+    ds.doc_url = "N/A"
+    ds.doc_doi = "N/A"
+    ds.time_coverage_start = min(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
+    ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
+    ds.reference_model = "LIME2 coefficients v0"  # TODO add coefficients version
+    # DIMENSIONS
+    chan = ds.createDimension("chan", 4)
+    chan_strlen = ds.createDimension("chan_strlen", 6)
+    date = ds.createDimension("date", len(obs))
+    sat_ref_strlen = ds.createDimension("sat_ref_strlen", 6)
+    col = ds.createDimension("col", 0)
+    row = ds.createDimension("row", 0)
+    sat_xyz = ds.createDimension("sat_xyz", 3)
+    # VARIABLES
+    dates = ds.createVariable("date", "f4", ("date",))
+    dates.standard_name = "time"
+    dates.long_name = "time of lunar observation"
+    dates.units = "seconds since 1970-01-01T00:00:00Z"
+    dates.calendar = "gregorian"
+    dates[:] = np.array([o.dt.timestamp() for o in obs])
+    channel_name = ds.createVariable("channel_name", "f4", ("chan", "chan_strlen"))
+    channel_name.standard_name = "sensor_band_identifier"
+    channel_name.long_name = "channel identifier"
+    channel_name[:] = np.array([ch for ch in obs[0].ch_names])
+    sat_pos = ds.createVariable("sat_pos", "f4", ("date", "sat_xyz"))
+    sat_pos.long_name = "satellite position x y z in sat_pos_ref"
+    sat_pos.units = "km"
+    sat_pos.valid_min = 0.0
+    sat_pos.valid_max = 999999995904.0
+    sat_pos[:] = np.array(
+        [np.array([o.sat_pos.x, o.sat_pos.y, o.sat_pos.z]) for o in obs]
+    )
+    sat_pos_ref = ds.createVariable("sat_pos_ref", "f4", ("sat_ref_strlen",))
+    sat_pos_ref.long_name = "reference frame of satellite position"
+    sat_pos_ref[:] = obs[0].sat_pos_ref
+    irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
+    irr_obs.units = "W m-2 nm-1"
+    irr_obs.long_name = "observed lunar irradiance"
+    irr_obs.valid_min = 0.0
+    irr_obs.valid_max = 1000000.0
+    irr_obs[:] = np.array([o.ch_irrs[ch] for ch in obs[0].ch_names for o in obs])
+    refl_obs = ds.createVariable("refl_obs", "f4", ("date", "chan"))
+    refl_obs.units = "Fractions of unity"
+    refl_obs.long_name = "observed lunar degree of reflectance"
+    refl_obs.valid_min = 0.0
+    refl_obs.valid_max = 1.0
+    refl_obs[:] = np.array([o.ch_refls[ch] for ch in obs[0].ch_names for o in obs])
+    polar_obs = ds.createVariable("polar_obs", "f4", ("date", "chan"))
+    polar_obs.units = "Fractions of unity"
+    polar_obs.long_name = "observed lunar degree of polarization"
+    polar_obs.valid_min = -1.0
+    polar_obs.valid_max = 1.0
+    polar_obs[:] = np.array([o.ch_polars[ch] for ch in obs[0].ch_names for o in obs])
+    ds.close()

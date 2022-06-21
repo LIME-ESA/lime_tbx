@@ -611,6 +611,12 @@ class LunarObservation:
         return True
 
 
+@dataclass
+class LunarObservationWrite(LunarObservation):
+    ch_refls: Dict[str, float]
+    ch_polars: Dict[str, float]
+
+
 class ReflectanceCoefficients:
     """
     Set of coefficients from the same version. Used in order to calculate the reflectance

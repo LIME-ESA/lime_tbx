@@ -373,10 +373,15 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.lower_tabs.addTab(self.srf_widget, "SRF")
         self.lower_tabs.addTab(self.signal_widget, "Signal")
         self.lower_tabs.currentChanged.connect(self.lower_tabs_changed)
+        # Export to LGLOD
+        self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
+        self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
+        self.export_lglod_button.clicked.connect(self.export_glod)
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
         self.main_layout.addWidget(self.lower_tabs, 1)
+        self.main_layout.addWidget(self.export_lglod_button)
 
     def _unblock_gui(self):
         self.parentWidget().setDisabled(False)
@@ -530,6 +535,21 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def polar_error(self, error: Exception):
         self._unblock_gui()
         raise error
+
+    @QtCore.Slot()
+    def export_glod(self):
+        pass
+        """
+        self._block_gui_loading()
+        point = self.input_widget.get_point()
+        def_srf = self.settings_manager.get_default_srf()
+        coeffs = self.settings_manager.get_irr_coeffs()
+        cimel_coef = self.settings_manager.get_cimel_coef()
+        p_coeffs = self.settings_manager.get_polar_coeffs()
+        self.worker = CallbackWorker(
+            calculate_all_callback, [def_srf, point, coeffs, self.lime_simulation]
+        )
+        self._start_thread(self.polar_finished, self.polar_error)"""
 
 
 class LimePagesEnum(Enum):
