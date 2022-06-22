@@ -183,7 +183,8 @@ class GraphWidget(QtWidgets.QWidget):
                     if i == 0 and len(self.legend) >= 3:
                         label0 = self.legend[1][0]
                         label1 = self.legend[2][0]
-                    lines += self.canvas.axes.plot(
+                    extra_lines = []
+                    extra_lines += self.canvas.axes.plot(
                         cimel_data.wlens,
                         cimel_data.data,
                         color="orange",
@@ -191,7 +192,7 @@ class GraphWidget(QtWidgets.QWidget):
                         marker="o",
                         label=label0,
                     )
-                    lines += [
+                    extra_lines += [
                         self.canvas.axes.errorbar(
                             cimel_data.wlens,
                             cimel_data.data,
@@ -202,6 +203,8 @@ class GraphWidget(QtWidgets.QWidget):
                             label=label1,
                         )
                     ]
+                    if i == 0:
+                        lines += extra_lines
             if self.data_compare:
                 iter_data = self.data_compare.diffs_signal
                 if not isinstance(iter_data, list):

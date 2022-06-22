@@ -116,7 +116,7 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
     ds.reference_model = "LIME2 coefficients v0"  # TODO add coefficients version
     # DIMENSIONS
-    chan = ds.createDimension("chan", 4)
+    chan = ds.createDimension("chan", len(obs[0].ch_names))
     chan_strlen = ds.createDimension("chan_strlen", 6)
     date = ds.createDimension("date", len(obs))
     sat_ref_strlen = ds.createDimension("sat_ref_strlen", 6)
@@ -134,7 +134,7 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
     channel_name.standard_name = "sensor_band_identifier"
     channel_name.long_name = "channel identifier"
-    chn = np.array([ch for ch in obs[0].ch_names])
+    chn = np.array([np.array([ch], "S4") for ch in obs[0].ch_names])
     channel_name[:] = chn
     sat_pos = ds.createVariable("sat_pos", "f4", ("date", "sat_xyz"))
     sat_pos.long_name = "satellite position x y z in sat_pos_ref"
@@ -153,6 +153,14 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     irr_obs.valid_min = 0.0
     irr_obs.valid_max = 1000000.0
     irr_obs[:] = np.array([o.ch_irrs[ch] for ch in obs[0].ch_names for o in obs])
+    irr_obs_unc = ds.createVariable("irr_obs_unc", "f4", ("date", "chan"))
+    irr_obs_unc.units = "W m-2 nm-1"
+    irr_obs_unc.long_name = "uncertainties of the observed lunar irradiance"
+    irr_obs_unc.valid_min = 0.0
+    irr_obs_unc.valid_max = 1000000.0
+    irr_obs_unc[:] = np.array(
+        [np.array([o.signals_uncs[i] for i in range(len(o.signals_uncs))]) for o in obs]
+    )
     # Spectral irr refl and obs
     wlens = ds.createVariable("wlens", "f4", ("wlens",))
     wlens.units = "nm"
@@ -162,11 +170,24 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     wlens[:] = obs[0].irrs.wlens
     irr_spectrum = ds.createVariable("irr_spectrum", "f4", ("date", "wlens"))
     irr_spectrum.units = "W m-2 nm-1"
-    irr_spectrum.long_name = "simulated lunar degree of irradiance per wavelength"
+    irr_spectrum.long_name = "simulated lunar irradiance per wavelength"
     irr_spectrum.valid_min = 0.0
     irr_spectrum.valid_max = 1000000.0
     irr_spectrum[:] = np.array(
         [np.array([o.irrs.data[i] for i in range(len(obs[0].irrs.wlens))]) for o in obs]
+    )
+    irr_spectrum_unc = ds.createVariable("irr_spectrum_unc", "f4", ("date", "wlens"))
+    irr_spectrum_unc.units = "W m-2 nm-1"
+    irr_spectrum_unc.long_name = (
+        "uncertainties of the simulated lunar irradiance per wavelength"
+    )
+    irr_spectrum_unc.valid_min = 0.0
+    irr_spectrum_unc.valid_max = 1000000.0
+    irr_spectrum_unc[:] = np.array(
+        [
+            np.array([o.irrs.uncertainties[i] for i in range(len(obs[0].irrs.wlens))])
+            for o in obs
+        ]
     )
     refl_spectrum = ds.createVariable("refl_spectrum", "f4", ("date", "wlens"))
     refl_spectrum.units = "Fractions of unity"
@@ -179,16 +200,46 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
             for o in obs
         ]
     )
-    polar_spectrum = ds.createVariable("polar_spectrum", "f4", ("date", "chan"))
+    refl_spectrum_unc = ds.createVariable("refl_spectrum_unc", "f4", ("date", "wlens"))
+    refl_spectrum_unc.units = "Fractions of unity"
+    refl_spectrum_unc.long_name = (
+        "uncertainties of the simulated lunar degree of reflectance per wavelength"
+    )
+    refl_spectrum_unc.valid_min = 0.0
+    refl_spectrum_unc.valid_max = 1.0
+    refl_spectrum_unc[:] = np.array(
+        [
+            np.array([o.refls.uncertainties[i] for i in range(len(obs[0].refls.wlens))])
+            for o in obs
+        ]
+    )
+    polar_spectrum = ds.createVariable("polar_spectrum", "f4", ("date", "wlens"))
     polar_spectrum.units = "Fractions of unity"
     polar_spectrum.long_name = "simulated lunar degree of polarization per wavelength"
     polar_spectrum.valid_min = -1.0
     polar_spectrum.valid_max = 1.0
-    polar_spectrum[:] = np.array(
+    polar_vals = np.array(
         [
             np.array([o.polars.data[i] for i in range(len(obs[0].polars.wlens))])
             for o in obs
         ]
     )
-    # TODO MISSING UNCERTAINTIES
+    polar_spectrum[:] = polar_vals
+    polar_spectrum_unc = ds.createVariable(
+        "polar_spectrum_unc", "f4", ("date", "wlens")
+    )
+    polar_spectrum_unc.units = "Fractions of unity"
+    polar_spectrum_unc.long_name = (
+        "uncertainties of the simulated lunar degree of polarization per wavelength"
+    )
+    polar_spectrum_unc.valid_min = -1.0
+    polar_spectrum_unc.valid_max = 1.0
+    polar_spectrum_unc[:] = np.array(
+        [
+            np.array(
+                [o.polars.uncertainties[i] for i in range(len(obs[0].polars.wlens))]
+            )
+            for o in obs
+        ]
+    )
     ds.close()
