@@ -13,6 +13,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     LunarObservation,
+    Point,
     Satellite,
     SpectralResponseFunction,
     SurfacePoint,
@@ -313,9 +314,11 @@ class SatelliteInputWidget(QtWidgets.QWidget):
 
 
 class InputWidget(QtWidgets.QWidget):
-    def __init__(self, satellites: List[Satellite]):
+    def __init__(self, satellites: List[Satellite], change_callback: Callable):
         super().__init__()
         self.satellites = satellites
+        self.change_callback = change_callback
+        self.last_point: Point = None
         self._build_layout()
 
     def _build_layout(self):
@@ -329,15 +332,32 @@ class InputWidget(QtWidgets.QWidget):
         self.satellite = SatelliteInputWidget(self.satellites)
         self.tabs.addTab(self.satellite, "Satellite")
         self.main_layout.addWidget(self.tabs)
+    
+    @staticmethod
+    def _are_different_points(point_a: Point, point_b: Point) -> bool:
+        if type(point_a) != type(point_b):
+            return True
+        for att in dir(point_a):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(point_a, att)
+                a1 = getattr(point_b, att)
+                if a0 != a1:
+                    return True
+        return False
 
-    def get_point(self) -> Union[SurfacePoint, CustomPoint, SatellitePoint]:
+    def _check_last_point(self, point: Point):
+        if InputWidget._are_different_points(point, self.last_point):
+            self.change_callback()
+        self.last_point = point
+
+    def get_point(self) -> Point:
         tab = self.tabs.currentWidget()
         if isinstance(tab, SurfaceInputWidget):
             lat = self.surface.get_latitude()
             lon = self.surface.get_longitude()
             alt = self.surface.get_altitude()
             dts = self.surface.get_datetimes()
-            return SurfacePoint(lat, lon, alt, dts)
+            point = SurfacePoint(lat, lon, alt, dts)
         elif isinstance(tab, CustomInputWidget):
             dsm = self.custom.get_dist_sun_moon()
             dom = self.custom.get_dist_obs_moon()
@@ -346,11 +366,13 @@ class InputWidget(QtWidgets.QWidget):
             slon = self.custom.get_selen_sun_lon()
             mpa = self.custom.get_moon_phase_angle()
             ampa = abs(mpa)
-            return CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
+            point = CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
         else:
             sat = self.satellite.get_satellite()
             dts = self.satellite.get_datetimes()
-            return SatellitePoint(sat, dts)
+            point = SatellitePoint(sat, dts)
+        self._check_last_point(point)
+        return point
 
 
 class ComparisonInput(QtWidgets.QWidget):

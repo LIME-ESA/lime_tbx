@@ -2,8 +2,8 @@
 This module calculates the extra-terrestrial solar irradiance.
 
 It exports the following functions:
-    * get_esi_per_nm - Calculates the expected solar extra-terrestrial irradiance
-    for a given wavelength in nanometers. Based on Wehrli 1985 data, passed through
+    * get_esi_per_nms - Calculates the expected solar extra-terrestrial irradiance
+    for a given wavelengths in nanometers. Based on Wehrli 1985 data, passed through
     some filters.
 """
 
@@ -11,7 +11,7 @@ It exports the following functions:
 import pkgutil
 import csv
 from io import StringIO
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union, List
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -55,8 +55,8 @@ def _get_wehrli_data() -> Dict[float, Tuple[float, float]]:
     return _loaded_data
 
 
-def get_esi_per_nm(wavelength_nm: float) -> float:
-    """Gets the expected extraterrestrial solar irradiance at a concrete wavelength
+def get_esi_per_nms(wavelengths_nm: List[float]) -> np.ndarray:
+    """Gets the expected extraterrestrial solar irradiance at some concrete wavelengths
     Returns the data in Wm⁻²/nm.
 
     It uses Wehrli 1985 data passed through different filters, the same data used in
@@ -64,22 +64,16 @@ def get_esi_per_nm(wavelength_nm: float) -> float:
 
     Parameters
     ----------
-    wavelength_nm : float
-        Wavelength (in nanometers) of which the extraterrestrial solar irradiance will be
+    wavelengths_nm : list of float
+        Wavelengths (in nanometers) of which the extraterrestrial solar irradiance will be
         obtained
 
     Returns
     -------
-    float
+    np.ndarray of float
         The expected extraterrestrial solar irradiance in Wm⁻²/nm
     """
     wehrli_data = _get_wehrli_data()
     wehrli_x = list(wehrli_data.keys())
-    if wavelength_nm in wehrli_x:
-        return wehrli_data[wavelength_nm][0]
-    if wavelength_nm < wehrli_x[0]:
-        return wehrli_data[wehrli_x[0]][0]
-    if wavelength_nm > wehrli_x[-1]:
-        return wehrli_data[wehrli_x[-1]][0]
     wehrli_y = list(map(lambda x: x[0], wehrli_data.values()))
-    return np.interp(wavelength_nm, wehrli_x, wehrli_y)
+    return np.interp(wavelengths_nm, wehrli_x, wehrli_y)

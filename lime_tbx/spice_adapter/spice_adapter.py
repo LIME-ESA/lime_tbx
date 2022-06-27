@@ -1,4 +1,10 @@
-"""describe class"""
+"""
+This module calculates acts as an interface/adapter with NASA's SPICE software
+
+It exports the following classes:
+    * ISPICEAdapter - Interface that contains the methods of this module.
+    * SPICEAdapter - Class that implements the methods exported by this module.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
@@ -12,10 +18,10 @@ import spicedmoon
 from ..datatypes import datatypes
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "01/03/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 

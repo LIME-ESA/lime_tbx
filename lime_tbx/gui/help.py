@@ -15,7 +15,7 @@ from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SpectralResponseFunction,
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
 )
