@@ -68,8 +68,8 @@ class SpectralIntegration(ISpectralIntegration):
             wasnt_lists = True
             elis = [elis]
         for ch in srf.channels:
-            ch_wlens = ch.spectral_response.keys()
-            ch_srf = ch.spectral_response.values()
+            ch_wlens = list(ch.spectral_response.keys())
+            ch_srf = list(ch.spectral_response.values())
             ch_signal=self.convolve_srf(ch_wlens,ch_srf, wlens, elis)
             signals.append(ch_signal)
         if wasnt_lists:
@@ -90,8 +90,8 @@ class SpectralIntegration(ISpectralIntegration):
             wasnt_lists = True
             elis = [elis]
         for ch in srf.channels:
-            ch_wlens = ch.spectral_response.keys()
-            ch_srf = ch.spectral_response.values()
+            ch_wlens = list(ch.spectral_response.keys())
+            ch_srf = list(ch.spectral_response.values())
 
             u_ch_signal = self.prop.propagate_random(
                     self.convolve_srf,
