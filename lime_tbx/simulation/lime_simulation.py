@@ -316,7 +316,6 @@ class LimeSimulation:
         cimel_coeff: Union[SpectralData, List[SpectralData]],
     ) -> SpectralData:
         rl = rolo.ROLO()
-        _, _, elrefs = self.elref
         elis_signals = self.elis
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]
         if not isinstance(elis_signals, list):
