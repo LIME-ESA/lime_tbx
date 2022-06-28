@@ -67,15 +67,12 @@ class SpectralIntegration(ISpectralIntegration):
         wasnt_lists = False
         if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
             wasnt_lists = True
-            elis = [elis]
+            elis = np.array([elis])
         for ch in srf.channels:
             ch_wlens = np.array(list(ch.spectral_response.keys()))
             ch_srf = np.array(list(ch.spectral_response.values()))
-            print(ch_wlens)
-            print(ch_srf)
             ch_signal = self.convolve_srf(ch_wlens, ch_srf, wlens, elis)
             signals.append(ch_signal)
-        print(signals)
         if wasnt_lists:
             signals = [s[0] for s in signals]
         return signals
@@ -92,17 +89,17 @@ class SpectralIntegration(ISpectralIntegration):
         wasnt_lists = False
         if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
             wasnt_lists = True
-            elis = [elis]
+            elis = np.array([elis])
         for ch in srf.channels:
             ch_wlens = np.array(list(ch.spectral_response.keys()))
             ch_srf = np.array(list(ch.spectral_response.values()))
+            print(ch_srf.shape,wlens.shape,elis.shape)
             u_ch_signal = self.prop.propagate_random(
                 self.convolve_srf,
                 [ch_wlens, ch_srf, wlens, elis],
                 [None, None, None, u_elis],
                 corr_x=[None, None, None, None],
             )
-
             u_signals.append(u_ch_signal)
         if wasnt_lists:
             u_signals = [s[0] for s in u_signals]
