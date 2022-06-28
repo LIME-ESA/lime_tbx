@@ -44,7 +44,7 @@ class LimeSimulation:
     Contains the state of the simulation, so it can be implemented efficiently.
     """
 
-    def __init__(self, eocfi_path: str, kernels_path: str, MCsteps: int = 100, verbose: bool = False):
+    def __init__(self, eocfi_path: str, kernels_path: str, MCsteps: int = 100, verbose: bool = True):
         """
         Parameters
         ----------
