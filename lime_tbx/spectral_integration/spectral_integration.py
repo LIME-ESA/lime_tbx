@@ -101,8 +101,6 @@ class SpectralIntegration(ISpectralIntegration):
             u_ch_signals = []
             for subelis in elis:
                 ch_elis = subelis[elis_ids]
-                print(ch_srf.shape)
-                print(ch_elis.shape)
                 u_ch_signals.append(self.prop.propagate_random(
                     self.convolve_srf,
                     [ch_wlens, ch_srf, ch_elis],

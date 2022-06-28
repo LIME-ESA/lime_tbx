@@ -44,7 +44,7 @@ class LimeSimulation:
     Contains the state of the simulation, so it can be implemented efficiently.
     """
 
-    def __init__(self, eocfi_path: str, kernels_path: str, MCsteps: int = 100):
+    def __init__(self, eocfi_path: str, kernels_path: str, MCsteps: int = 100, verbose: bool = False):
         """
         Parameters
         ----------
@@ -75,6 +75,7 @@ class LimeSimulation:
         self.mds_uptodate = False
         self.intp = SpectralInterpolation(MCsteps=MCsteps)
         self.int = SpectralIntegration(MCsteps=MCsteps)
+        self.verbose = verbose
 
     def set_simulation_changed(self):
         """
@@ -123,6 +124,8 @@ class LimeSimulation:
     ):
         self._save_parameters(srf, point)
         if not self.refl_uptodate:
+            if self.verbose: print("starting reflectance update")
+
             (
                 self.elref_cimel,
                 self.elref_asd,
@@ -131,6 +134,7 @@ class LimeSimulation:
                 cimel_coeff, self.mds, self.intp, self.wlens
             )
             self.refl_uptodate = True
+            if self.verbose: print("reflectance update done")
 
     @staticmethod
     def _get_irradiances_values(
@@ -147,12 +151,13 @@ class LimeSimulation:
         signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
-    ):
+        ):
         self._save_parameters(srf, point)
         if not self.refl_uptodate:
             self.update_reflectance(self.srf, point, cimel_coeff)
 
         if not self.irr_uptodate:
+            if self.verbose: print("starting irradiance update")
             (
                 self.elis,
                 self.elis_cimel,
@@ -161,10 +166,14 @@ class LimeSimulation:
                 self.mds, self.elref, self.elref_cimel, self.elref_asd
             )
             self.irr_uptodate = True
+            if self.verbose: print("irradiance update done")
 
         if not self.signals_uptodate:
             self.signals = self._calculate_signals(signals_srf, cimel_coeff)
             self.signals_uptodate = True
+            if self.verbose: print("signals update done")
+
+
 
     def update_polarization(
         self,
@@ -174,8 +183,10 @@ class LimeSimulation:
     ):
         self._save_parameters(srf, point)
         if not self.pol_uptodate:
+            if self.verbose: print("starting polarisation update")
             self.polars = self._calculate_polar(polar_coeff)
             self.pol_uptodate = True
+            if self.verbose: print("polarisation update done")
 
     @staticmethod
     def _interpolate_refl(
