@@ -34,14 +34,14 @@ class ISpectralInterpolation(ABC):
 
 
 class SpectralInterpolation(ISpectralInterpolation):
-    def __init__(self, relative=True, method_main="cubic", method_hr="cubic"):
+    def __init__(self, relative=True, method_main="cubic", method_hr="cubic", MCsteps=1000):
         self.intp = Interpolator(
             relative=relative,
             method_main=method_main,
             method_hr=method_hr,
             min_scale=0.3,
         )
-        self.prop = punpy.MCPropagation(1000)
+        self.prop = punpy.MCPropagation(MCsteps)
 
     def get_best_asd_reference(self, moon_data: MoonData):
         return _get_asd_data(moon_data.absolute_mpa_degrees)

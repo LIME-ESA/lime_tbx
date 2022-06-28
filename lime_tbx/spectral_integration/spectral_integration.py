@@ -5,6 +5,7 @@ from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
+import punpy
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -30,17 +31,76 @@ from abc import ABC, abstractmethod
 
 class ISpectralIntegration(ABC):
     @abstractmethod
-    def convolve_srf(srf, asd_irradiances):
-        pass
-
-
-class SpectralIntegration(ISpectralIntegration):
-    def convolve_srf(srf, asd_irradiances):
+    def convolve_srf(ch_wlens, ch_srf, wlens, elis):
         pass
 
     @staticmethod
     def integrate_elis(
-        srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+    ) -> Union[List[float], List[List[float]]]:
+        pass
+
+    @staticmethod
+    def u_integrate_elis(
+            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]], u_elis: Union[List[float], List[List[float]]]
+    ) -> Union[List[float], List[List[float]]]:
+        pass
+
+class SpectralIntegration(ISpectralIntegration):
+    def __init__(self, MCsteps=1000):
+        self.prop = punpy.MCPropagation(MCsteps)
+
+    def convolve_srf(self, ch_wlens, ch_srf, wlens, elis):
+        elis_ids=[wlens.index(wl) for wl in ch_wlens]
+        ch_signal=[np.trapz(ch_wlens,ch_srf*subelis[elis_ids]) for subelis in elis]
+
+    def integrate_elis(self,
+            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+    ) -> Union[List[float], List[List[float]]]:
+        signals = []
+        wlens = srf.get_wavelengths()
+        if len(elis) == 0:
+            return []
+        wasnt_lists = False
+        if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
+            wasnt_lists = True
+            elis = [elis]
+        for ch in srf.channels:
+            ch_wlens = list(ch.spectral_response.keys())
+            ch_signal=self.convolve_srf(ch_wlens,ch.spectral_response,wlens, elis)
+            signals.append(ch_signal)
+        if wasnt_lists:
+            signals = [s[0] for s in signals]
+        return signals
+
+    def u_integrate_elis(self,
+            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]], u_elis: Union[List[float], List[List[float]]]
+    ) -> Union[List[float], List[List[float]]]:
+        u_signals = []
+        wlens = srf.get_wavelengths()
+        if len(elis) == 0:
+            return []
+        wasnt_lists = False
+        if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
+            wasnt_lists = True
+            elis = [elis]
+        for ch in srf.channels:
+            ch_wlens = list(ch.spectral_response.keys())
+            u_ch_signal = self.prop.propagate_random(
+                self.convolve_srf,
+                [ch_wlens, ch.spectral_response, wlens, elis],
+                [None, None, None, u_elis],
+                corr_x=[None, None, None, None],
+            )
+
+            u_signals.append(u_ch_signal)
+        if wasnt_lists:
+            u_signals = [s[0] for s in u_signals]
+        return u_signals
+
+    @staticmethod
+    def integrate_elis_old(
+            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
     ) -> Union[List[float], List[List[float]]]:
         signals = []
         wlens = srf.get_wavelengths()

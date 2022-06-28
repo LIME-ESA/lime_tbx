@@ -169,8 +169,8 @@ class GraphWidget(QtWidgets.QWidget):
                     asd_data = self.asd_data
                 lines += self.canvas.axes.plot(
                     asd_data.wlens,
-                    asd_data.data / 5.0,
-                    label="ASD data points / 5",
+                    asd_data.data,
+                    label="ASD data points",
                 )
 
             if self.cimel_data:
