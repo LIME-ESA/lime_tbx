@@ -52,7 +52,6 @@ class SpectralIntegration(ISpectralIntegration):
 
     def convolve_srf(self, ch_wlens, ch_srf, wlens, elis):
         elis_ids=[wlens.index(wl) for wl in ch_wlens]
-        print(ch_srf,elis[0])
         ch_signal=[np.trapz(ch_wlens,ch_srf*subelis[elis_ids]) for subelis in elis]
 
     def integrate_elis(self,
@@ -72,6 +71,7 @@ class SpectralIntegration(ISpectralIntegration):
             ch_srf = list(ch.spectral_response.values())
             ch_signal=self.convolve_srf(ch_wlens,ch_srf, wlens, elis)
             signals.append(ch_signal)
+        print(signals)
         if wasnt_lists:
             signals = [s[0] for s in signals]
         return signals
