@@ -81,7 +81,7 @@ class SpectralIntegration(ISpectralIntegration):
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         u_signals = []
-        wlens = elis_lime.wlens
+        wlens = np.array(elis_lime.wlens)
         elis = elis_lime.data
         u_elis = elis_lime.uncertainties
         if len(elis) == 0:
