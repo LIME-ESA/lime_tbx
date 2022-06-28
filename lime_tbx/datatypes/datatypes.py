@@ -148,7 +148,7 @@ class SpectralResponseFunction:
     def get_wavelengths(self) -> List[float]:
         wlens = []
         for ch in self.channels:
-            wlens += list(ch.spectral_response.keys())
+            wlens.append(list(ch.spectral_response.keys()))
         return wlens
 
     def get_values(self) -> List[float]:
