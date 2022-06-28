@@ -97,25 +97,6 @@ class LimeSimulation:
             self.wlens = srf.get_wavelengths()
             self.srf_updtodate = True
 
-    @staticmethod
-    def _get_reflectances_values(
-        cimel_coeff: ReflectanceCoefficients,
-        mds: Union[MoonData, List[MoonData]],
-        intp: SpectralInterpolation,
-        wlens: List[float],
-    ) -> Tuple[
-        Union[SpectralData, List[SpectralData]],
-        Union[SpectralData, List[SpectralData]],
-        Union[SpectralData, List[SpectralData]],
-    ]:
-        elref_cimel = LimeSimulation._calculate_elref(mds, cimel_coeff)
-        if isinstance(mds, list):
-            elref_asd = [intp.get_best_asd_reference(md) for md in mds]
-        else:
-            elref_asd = intp.get_best_asd_reference(mds)
-        elref = LimeSimulation._interpolate_refl(elref_asd, elref_cimel, intp, wlens)
-        return elref_cimel, elref_asd, elref
-
     def update_reflectance(
         self,
         srf: SpectralResponseFunction,
@@ -130,14 +111,33 @@ class LimeSimulation:
                 self.elref_cimel,
                 self.elref_asd,
                 self.elref,
-            ) = LimeSimulation._get_reflectances_values(
+            ) = LimeSimulation._calculate_reflectances_values(
                 cimel_coeff, self.mds, self.intp, self.wlens
             )
             self.refl_uptodate = True
             if self.verbose: print("reflectance update done")
 
     @staticmethod
-    def _get_irradiances_values(
+    def _calculate_reflectances_values(
+            cimel_coeff: ReflectanceCoefficients,
+            mds: Union[MoonData, List[MoonData]],
+            intp: SpectralInterpolation,
+            wlens: List[float],
+    ) -> Tuple[
+        Union[SpectralData, List[SpectralData]],
+        Union[SpectralData, List[SpectralData]],
+        Union[SpectralData, List[SpectralData]],
+    ]:
+        elref_cimel = LimeSimulation._calculate_elref(mds, cimel_coeff)
+        if isinstance(mds, list):
+            elref_asd = [intp.get_best_asd_reference(md) for md in mds]
+        else:
+            elref_asd = intp.get_best_asd_reference(mds)
+        elref = LimeSimulation._interpolate_refl(elref_asd, elref_cimel, intp, wlens)
+        return elref_cimel, elref_asd, elref
+
+    @staticmethod
+    def _calculate_irradiances_values(
         mds: Union[MoonData, List[MoonData]], elrefs, elref_cimel, elref_asd
     ):
         elis = LimeSimulation._calculate_eli_from_elref(mds, elrefs)
@@ -162,7 +162,7 @@ class LimeSimulation:
                 self.elis,
                 self.elis_cimel,
                 self.elis_asd,
-            ) = LimeSimulation._get_irradiances_values(
+            ) = LimeSimulation._calculate_irradiances_values(
                 self.mds, self.elref, self.elref_cimel, self.elref_asd
             )
             self.irr_uptodate = True
@@ -316,10 +316,8 @@ class LimeSimulation:
         cimel_coeff: Union[SpectralData, List[SpectralData]],
     ) -> SpectralData:
         rl = rolo.ROLO()
-        _, _, elrefs = LimeSimulation._get_reflectances_values(
-            cimel_coeff, self.mds, self.intp, srf.get_wavelengths()
-        )
-        elis_signals = LimeSimulation._calculate_eli_from_elref(self.mds, elrefs)
+        _, _, elrefs = self.elref
+        elis_signals = self.elis
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]
         if not isinstance(elis_signals, list):
             elis_signals = [elis_signals]

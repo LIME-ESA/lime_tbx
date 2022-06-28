@@ -76,7 +76,7 @@ class SpectralIntegration(ISpectralIntegration):
                 ch_elis = subelis[elis_ids]
                 ch_signals.append(self.convolve_srf(ch_wlens, ch_srf, ch_elis))
                 print(ch_wlens)
-                print(ch_srf*ch_elis)
+                print(np.sum(ch_srf*ch_elis))
                 print(ch_signals)
             signals.append(ch_signals)
         if wasnt_lists:
