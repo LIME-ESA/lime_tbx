@@ -246,7 +246,7 @@ double * get_moon_position(
 }
 
 
-double *  get_satellite_position(
+__declspec(dllexport) double *  get_satellite_position(
         long sat_id,
         int y,
         int m,
