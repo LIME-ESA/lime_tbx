@@ -202,28 +202,28 @@ class LimeSimulation:
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
         for i, cf in enumerate(cimel_coeff):
-            wlens_valid = [
-                wlen
-                for wlen in wlens
-                if wlen >= min(cf.wlens) and wlen <= max(cf.wlens)
-            ]
-            inf_wlens = [wlen for wlen in wlens if wlen < min(cf.wlens)]
-            sup_wlens = [wlen for wlen in wlens if wlen > max(cf.wlens)]
+            # wlens_valid = [
+            #     wlen
+            #     for wlen in wlens
+            #     if wlen >= min(cf.wlens) and wlen <= max(cf.wlens)
+            # ]
+            # inf_wlens = [wlen for wlen in wlens if wlen < min(cf.wlens)]
+            # sup_wlens = [wlen for wlen in wlens if wlen > max(cf.wlens)]
             elrefs_intp = intp.get_interpolated_refl(
                 cf.wlens,
                 cf.data,
                 asd_data[i].wlens,
                 asd_data[i].data,
-                wlens_valid,
+                wlens,
             )
-            # 0s when the points cant be interpolated
-            elrefs_intp = np.concatenate(
-                [
-                    np.zeros(len(inf_wlens), np.float64),
-                    elrefs_intp,
-                    np.zeros(len(sup_wlens), np.float64),
-                ]
-            )
+            # # 0s when the points cant be interpolated
+            # elrefs_intp = np.concatenate(
+            #     [
+            #         np.zeros(len(inf_wlens), np.float64),
+            #         elrefs_intp,
+            #         np.zeros(len(sup_wlens), np.float64),
+            #     ]
+            # )
 
             u_elrefs_intp = None
             u_elrefs_intp = (
