@@ -48,6 +48,7 @@ class LimeSimulation:
         self,
         eocfi_path: str,
         kernels_path: str,
+        MCsteps: int=100
     ):
         """
         Parameters
@@ -77,8 +78,8 @@ class LimeSimulation:
         self.signals_uptodate = False
         self.srf_updtodate = False
         self.mds_uptodate = False
-        self.intp = SpectralInterpolation()
-        self.int = SpectralIntegration()
+        self.intp = SpectralInterpolation(MCsteps=MCsteps)
+        self.int = SpectralIntegration(MCsteps=MCsteps)
 
     def set_simulation_changed(self):
         """

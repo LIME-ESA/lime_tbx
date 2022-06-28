@@ -53,6 +53,7 @@ class SpectralIntegration(ISpectralIntegration):
     def convolve_srf(self, ch_wlens, ch_srf, wlens, elis):
         elis_ids=[wlens.index(wl) for wl in ch_wlens]
         ch_signal=[np.trapz(ch_wlens,ch_srf*subelis[elis_ids]) for subelis in elis]
+        return ch_signal
 
     def integrate_elis(self,
             srf: SpectralResponseFunction, elis_lime: SpectralData
