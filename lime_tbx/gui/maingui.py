@@ -15,9 +15,6 @@ import numpy as np
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
 
-# from ..simulation.regular_simulation import regular_simulation
-# from ..simulation.common.common import CommonSimulation
-# from ..simulation.esa_satellites import esa_satellites
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
