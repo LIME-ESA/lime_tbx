@@ -81,7 +81,7 @@ class SpectralIntegration(ISpectralIntegration):
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         u_signals = []
-        wlens = srf.get_wavelengths()
+        wlens = elis_lime.wlens
         elis = elis_lime.data
         u_elis = elis_lime.uncertainties
         if len(elis) == 0:
@@ -93,7 +93,9 @@ class SpectralIntegration(ISpectralIntegration):
         for ch in srf.channels:
             ch_wlens = np.array(list(ch.spectral_response.keys()))
             ch_srf = np.array(list(ch.spectral_response.values()))
-            print(ch_srf.shape,wlens.shape,elis.shape)
+            print(ch_srf.shape)
+            print(wlens.shape)
+            print(elis.shape)
             u_ch_signal = self.prop.propagate_random(
                 self.convolve_srf,
                 [ch_wlens, ch_srf, wlens, elis],
