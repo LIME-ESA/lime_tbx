@@ -93,7 +93,8 @@ class SpectralIntegration(ISpectralIntegration):
         for ch in srf.channels:
             ch_wlens = np.array(ch.spectral_response.keys())
             ch_srf = np.array(ch.spectral_response.values())
-
+            print(ch_wlens)
+            print(ch_srf)
             u_ch_signal = self.prop.propagate_random(
                     self.convolve_srf,
                     [ch_wlens, ch_srf, wlens, elis],
