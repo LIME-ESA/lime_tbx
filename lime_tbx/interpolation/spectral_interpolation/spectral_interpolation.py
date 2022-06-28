@@ -1,7 +1,10 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from lime_tbx.interpolation.access_data.access_data import _get_default_asd_data, _get_asd_data
+from lime_tbx.interpolation.access_data.access_data import (
+    _get_default_asd_data,
+    _get_asd_data,
+)
 
 """___Third-Party Modules___"""
 
@@ -34,7 +37,9 @@ class ISpectralInterpolation(ABC):
 
 
 class SpectralInterpolation(ISpectralInterpolation):
-    def __init__(self, relative=True, method_main="cubic", method_hr="cubic", MCsteps=1000):
+    def __init__(
+        self, relative=True, method_main="cubic", method_hr="cubic", MCsteps=1000
+    ):
         self.intp = Interpolator(
             relative=relative,
             method_main=method_main,

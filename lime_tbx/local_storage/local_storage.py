@@ -1,13 +1,13 @@
 """describe class"""
 
 """___Built-In Modules___"""
-#import here
+# import here
 
 """___Third-Party Modules___"""
-#import here
+# import here
 
 """___NPL Modules___"""
-#import here
+# import here
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -18,12 +18,8 @@ __status__ = "Development"
 
 
 class Comparison:
-    def __init__(
-        self,
-        something
-    ):
+    def __init__(self, something):
         self.something = something
 
     def function1(self, argument1, argument2):
-        return argument1+argument2
-        
+        return argument1 + argument2

@@ -151,7 +151,7 @@ def calculate_eli_from_elref_unc(
     unc = prop.propagate_random(
         measurement_func_eli,
         [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
-        [elref_spectrum.uncertainties, None, None, None, None, None]
+        [elref_spectrum.uncertainties, None, None, None, None, None],
     )
 
     return unc

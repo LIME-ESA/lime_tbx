@@ -99,9 +99,7 @@ TEMPLATE_SIGNALS = {
         "dtype": np.float32,
         "dim": ["channels", "dts"],
         "attrs": {"units": "%"},
-        "err_corr": [
-            {"dim": "channels", "form": "random", "params": [], "units": []}
-        ],
+        "err_corr": [{"dim": "channels", "form": "random", "params": [], "units": []}],
     },
     "u_sys_signals": {
         "dtype": np.float32,

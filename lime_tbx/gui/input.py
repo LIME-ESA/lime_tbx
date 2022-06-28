@@ -332,7 +332,7 @@ class InputWidget(QtWidgets.QWidget):
         self.satellite = SatelliteInputWidget(self.satellites)
         self.tabs.addTab(self.satellite, "Satellite")
         self.main_layout.addWidget(self.tabs)
-    
+
     @staticmethod
     def _are_different_points(point_a: Point, point_b: Point) -> bool:
         if type(point_a) != type(point_b):

@@ -80,7 +80,7 @@ def _measurement_func_elref(
     d3_value = d_coeffs[2] * np.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
 
     sum_a: float = np.sum(
-        [a_coeffs[i] * gr_value**i for i in range(len(a_coeffs))], axis=0
+        [a_coeffs[i] * gr_value ** i for i in range(len(a_coeffs))], axis=0
     )
     sum_b: float = np.sum(
         [b_coeffs[j] * phi ** (2 * (j + 1) - 1) for j in range(len(b_coeffs))], axis=0
