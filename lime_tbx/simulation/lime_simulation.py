@@ -318,8 +318,8 @@ class LimeSimulation:
         signals_list = []
         uncs_list = []
         for irr in elis_signals:
-            signals_list.append(SpectralIntegration.integrate_elis(srf, irr.data))
-            uncs_list.append(SpectralIntegration.u_integrate_elis(srf, irr.uncertainties))
+            signals_list.append(SpectralIntegration.integrate_elis(srf, irr))
+            uncs_list.append(SpectralIntegration.u_integrate_elis(srf, irr))
         signals = np.array(signals_list).T
         uncs = np.array(uncs_list).T
         ds_pol = SpectralData.make_signals_ds(channel_ids, signals, uncs)

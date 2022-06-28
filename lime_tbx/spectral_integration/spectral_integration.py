@@ -36,13 +36,13 @@ class ISpectralIntegration(ABC):
 
     @staticmethod
     def integrate_elis(
-            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+            srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         pass
 
     @staticmethod
     def u_integrate_elis(
-            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]], u_elis: Union[List[float], List[List[float]]]
+            srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         pass
 
@@ -55,10 +55,11 @@ class SpectralIntegration(ISpectralIntegration):
         ch_signal=[np.trapz(ch_wlens,ch_srf*subelis[elis_ids]) for subelis in elis]
 
     def integrate_elis(self,
-            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]
+            srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         signals = []
         wlens = srf.get_wavelengths()
+        elis=elis_lime.data
         if len(elis) == 0:
             return []
         wasnt_lists = False
@@ -74,10 +75,12 @@ class SpectralIntegration(ISpectralIntegration):
         return signals
 
     def u_integrate_elis(self,
-            srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]], u_elis: Union[List[float], List[List[float]]]
-    ) -> Union[List[float], List[List[float]]]:
+            srf: SpectralResponseFunction, elis_lime: SpectralData
+        ) -> Union[List[float], List[List[float]]]:
         u_signals = []
         wlens = srf.get_wavelengths()
+        elis=elis_lime.data
+        u_elis=elis_lime.uncertainties
         if len(elis) == 0:
             return []
         wasnt_lists = False
