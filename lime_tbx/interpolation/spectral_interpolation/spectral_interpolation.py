@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from lime_tbx.interpolation.access_data.access_data import _get_default_asd_data
+from lime_tbx.interpolation.access_data.access_data import _get_default_asd_data, _get_asd_data
 
 """___Third-Party Modules___"""
 
@@ -44,7 +44,7 @@ class SpectralInterpolation(ISpectralInterpolation):
         self.prop = punpy.MCPropagation(1000)
 
     def get_best_asd_reference(self, moon_data: MoonData):
-        return _get_default_asd_data()
+        return _get_asd_data(moon_data.absolute_mpa_degrees)
 
     def get_interpolated_refl(
         self, cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav
