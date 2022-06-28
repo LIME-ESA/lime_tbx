@@ -38,6 +38,8 @@ def _get_asd_data(abs_phase_angle: float) -> SpectralData:
     best_id=np.argmin(np.abs(np.abs(phase_angles)-abs_phase_angle))
     refl = data[best_id,4:]
 
+    print(best_id,phase_angles,abs_phase_angle)
+
     wavs=wavs[np.where(np.isfinite(refl))]
     refl=refl[np.where(np.isfinite(refl))]
 
