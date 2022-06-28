@@ -33,8 +33,8 @@ __status__ = "Development"
 def _get_default_asd_data() -> SpectralData:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(os.path.join(current_dir,"assets/SomeMoonReflectances.txt"),delimiter=",")
-    wavs = np.arange(350,2500,1)
-    refl = data[4:,5]
+    wavs = np.arange(350,2501,1)
+    refl = data[5,4:]
     print(wavs,refl)
 
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
