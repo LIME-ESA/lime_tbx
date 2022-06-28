@@ -51,9 +51,8 @@ class SpectralIntegration(ISpectralIntegration):
     def __init__(self, MCsteps=1000):
         self.prop = punpy.MCPropagation(MCsteps)
 
-    def convolve_srf(self, ch_wlens, ch_srf, wlens, elis):
-        elis_ids = [wlens.index(wl) for wl in ch_wlens]
-        ch_signal = [np.trapz(ch_wlens, ch_srf * subelis[elis_ids]) for subelis in elis]
+    def convolve_srf(self, ch_wlens, ch_srf, ch_elis):
+        ch_signal = np.trapz(ch_wlens, ch_srf * ch_elis)
         return ch_signal
 
     def integrate_elis(
@@ -71,8 +70,12 @@ class SpectralIntegration(ISpectralIntegration):
         for ch in srf.channels:
             ch_wlens = np.array(list(ch.spectral_response.keys()))
             ch_srf = np.array(list(ch.spectral_response.values()))
-            ch_signal = self.convolve_srf(ch_wlens, ch_srf, wlens, elis)
-            signals.append(ch_signal)
+            elis_ids = [wlens.index(wl) for wl in ch_wlens]
+            ch_signals = []
+            for subelis in elis:
+                ch_elis = subelis[elis_ids]
+                ch_signals.append(self.convolve_srf(ch_wlens, ch_srf, ch_elis))
+            signals.append(ch_signals)
         if wasnt_lists:
             signals = [s[0] for s in signals]
         return signals
@@ -81,7 +84,7 @@ class SpectralIntegration(ISpectralIntegration):
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         u_signals = []
-        wlens = np.array(elis_lime.wlens)
+        wlens = elis_lime.wlens
         elis = elis_lime.data
         u_elis = elis_lime.uncertainties
         if len(elis) == 0:
@@ -93,16 +96,20 @@ class SpectralIntegration(ISpectralIntegration):
         for ch in srf.channels:
             ch_wlens = np.array(list(ch.spectral_response.keys()))
             ch_srf = np.array(list(ch.spectral_response.values()))
-            print(ch_srf.shape)
-            print(wlens.shape)
-            print(elis.shape)
-            u_ch_signal = self.prop.propagate_random(
-                self.convolve_srf,
-                [ch_wlens, ch_srf, wlens, elis],
-                [None, None, None, u_elis],
-                corr_x=[None, None, None, None],
-            )
-            u_signals.append(u_ch_signal)
+            elis_ids = [wlens.index(wl) for wl in ch_wlens]
+
+            u_ch_signals = []
+            for subelis in elis:
+                ch_elis = subelis[elis_ids]
+                print(ch_srf.shape)
+                print(ch_elis.shape)
+                u_ch_signals.append(self.prop.propagate_random(
+                    self.convolve_srf,
+                    [ch_wlens, ch_srf, ch_elis],
+                    [None, None, u_elis],
+                    corr_x=[None, None, None],
+                ))
+                u_signals.append(u_ch_signals)
         if wasnt_lists:
             u_signals = [s[0] for s in u_signals]
         return u_signals
