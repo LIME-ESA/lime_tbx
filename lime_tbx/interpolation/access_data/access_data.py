@@ -31,10 +31,26 @@ __status__ = "Development"
 
 
 def _get_default_asd_data() -> SpectralData:
-    # define dim_size_dict to specify size of arrays
-
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data = np.genfromtxt(os.path.join(current_dir, "assets/ASD_refl_lunar.txt"))
+    data = np.genfromtxt(os.path.join(current_dir,"assets/SomeMoonReflectances.txt"),delimiter=",")
+    wavs = np.arange(350,2500,1)
+    refl = data[4:,5]
+    print(wavs,refl)
+
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    unc_tot = (
+            ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
+    )
+
+    spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
+
+    return spectral_data
+
+
+
+def _get_apollo_data() -> SpectralData:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data = np.genfromtxt(os.path.join(current_dir,"assets/Apollo_refl_lunar.txt"))
     wavs = data[:, 0]
     refl = data[:, 1]
 
