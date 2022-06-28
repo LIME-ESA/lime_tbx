@@ -30,12 +30,13 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-def _get_asd_data(phase_angle: float) -> SpectralData:
+def _get_asd_data(abs_phase_angle: float) -> SpectralData:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(os.path.join(current_dir,"assets/SomeMoonReflectances.txt"),delimiter=",")
     wavs = np.arange(350,2501,1)
     phase_angles=data[:,3]
-    refl = data[np.where(phase_angles=np.min(np.abs(np.abs(phase_angles)-phase_angle))),4:]
+    best_id=np.argmin(np.abs(np.abs(phase_angles)-abs_phase_angle))
+    refl = data[best_id,4:]
 
     wavs=wavs[np.where(np.isfinite(refl))]
     refl=refl[np.where(np.isfinite(refl))]
