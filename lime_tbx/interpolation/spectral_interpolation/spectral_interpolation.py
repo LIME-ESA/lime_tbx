@@ -38,7 +38,7 @@ class ISpectralInterpolation(ABC):
 
 class SpectralInterpolation(ISpectralInterpolation):
     def __init__(
-        self, relative=True, method_main="cubic", method_hr="cubic", MCsteps=1000
+        self, relative=True, method_main="quadratic", method_hr="quadratic", MCsteps=1000
     ):
         self.intp = Interpolator(
             relative=relative,
