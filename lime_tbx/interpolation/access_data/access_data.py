@@ -37,6 +37,9 @@ def _get_default_asd_data() -> SpectralData:
     refl = data[5,4:]
     print(wavs,refl)
 
+    wavs=wavs[np.where(np.isfinite(refl))]
+    refl=refl[np.where(np.isfinite(refl))]
+
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
     unc_tot = (
             ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
