@@ -52,7 +52,7 @@ class SpectralIntegration(ISpectralIntegration):
         self.prop = punpy.MCPropagation(MCsteps)
 
     def convolve_srf(self, ch_wlens, ch_srf, ch_elis):
-        ch_signal = np.trapz(ch_wlens, ch_srf * ch_elis)
+        ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens)
         return ch_signal
 
     def integrate_elis(
@@ -75,9 +75,6 @@ class SpectralIntegration(ISpectralIntegration):
             for subelis in elis:
                 ch_elis = subelis[elis_ids]
                 ch_signals.append(self.convolve_srf(ch_wlens, ch_srf, ch_elis))
-                print(np.min(ch_wlens[1:]-ch_wlens[:-1]),np.max(ch_wlens[1:]-ch_wlens[:-1]))
-                print(np.sum(ch_srf*ch_elis))
-                print(ch_signals)
             signals.append(ch_signals)
         if wasnt_lists:
             signals = [s[0] for s in signals]
