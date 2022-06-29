@@ -205,7 +205,7 @@ class GraphWidget(QtWidgets.QWidget):
                 lines += self.canvas.axes.plot(
                     asd_data.wlens,
                     asd_data.data/scaling_factor,
-                    label="ASD data points, scaled to CIMEL at 500nm",
+                    label="ASD data points, scaled to LIME at 500nm",
                 )
 
             if self.data_compare:
