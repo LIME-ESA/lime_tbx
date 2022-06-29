@@ -7,6 +7,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 from datetime import datetime
+import os
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -81,7 +82,7 @@ def read_moon_obs(path: str) -> LunarObservation:
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
+def write_obs(obs: list[LunarObservationWrite], path: str, dt: datetime):
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
     ds.Metadata_Conventions = "Unidata Dataset Discovery v1.0"
