@@ -162,17 +162,6 @@ class GraphWidget(QtWidgets.QWidget):
                         alpha=0.3,
                     )
 
-            if self.asd_data:
-                if isinstance(self.asd_data, list):
-                    asd_data = self.asd_data[0]
-                else:
-                    asd_data = self.asd_data
-                lines += self.canvas.axes.plot(
-                    asd_data.wlens,
-                    asd_data.data,
-                    label="ASD data points",
-                )
-
             if self.cimel_data:
                 iter_data = self.cimel_data
                 if not isinstance(iter_data, list):
@@ -205,6 +194,20 @@ class GraphWidget(QtWidgets.QWidget):
                     ]
                     if i == 0:
                         lines += extra_lines
+
+            if self.asd_data:
+                if isinstance(self.asd_data, list):
+                    asd_data = self.asd_data[0]
+                else:
+                    asd_data = self.asd_data
+
+                scaling_factor=asd_data.data[np.where(asd_data.wlens==500)]/cimel_data.data[np.where(cimel_data.wlens==500)]
+                lines += self.canvas.axes.plot(
+                    asd_data.wlens,
+                    asd_data.data/scaling_factor,
+                    label="ASD data points, scaled to CIMEL at 500nm",
+                )
+
             if self.data_compare:
                 iter_data = self.data_compare.diffs_signal
                 if not isinstance(iter_data, list):
