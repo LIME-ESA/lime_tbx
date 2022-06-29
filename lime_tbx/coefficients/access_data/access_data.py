@@ -158,9 +158,7 @@ def get_default_cimel_coeffs() -> ReflectanceCoefficients:
     ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
 
     # TODO FIX THE EXTRAPOLATION
-    ds_cimel = ds_cimel.assign_coords(
-        wavelength=[440, 500, 675, 870, 1020, 1640]
-    )
+    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(

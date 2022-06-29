@@ -45,6 +45,7 @@ class SpectralInterpolation(ISpectralInterpolation):
             method_main=method_main,
             method_hr=method_hr,
             min_scale=0.3,
+            plot_residuals=True,
         )
         self.prop = punpy.MCPropagation(MCsteps)
 

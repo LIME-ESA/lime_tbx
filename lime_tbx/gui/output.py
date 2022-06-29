@@ -201,10 +201,13 @@ class GraphWidget(QtWidgets.QWidget):
                 else:
                     asd_data = self.asd_data
 
-                scaling_factor=asd_data.data[np.where(asd_data.wlens==500)]/cimel_data.data[np.where(cimel_data.wlens==500)]
+                scaling_factor = (
+                    asd_data.data[np.where(asd_data.wlens == 500)]
+                    / cimel_data.data[np.where(cimel_data.wlens == 500)]
+                )
                 lines += self.canvas.axes.plot(
                     asd_data.wlens,
-                    asd_data.data/scaling_factor,
+                    asd_data.data / scaling_factor,
                     label="ASD data points, scaled to LIME at 500nm",
                 )
 
