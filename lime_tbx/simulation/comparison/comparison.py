@@ -1,4 +1,11 @@
-"""describe class"""
+"""
+This module abstracts and encapsulates use-cases related to simulations from esa satellites,
+and performs the actions and calculations that are related to each of them.
+
+It exports the following classes:
+    * IESASatellites - Interface that contains the methods of this module.
+    * ESASatellites - Class that implements the methods exported by this module.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod

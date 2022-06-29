@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 """___NPL Modules___"""
-from ...datatypes.datatypes import MoonData, PolarizationCoefficients
+from ...datatypes.datatypes import PolarizationCoefficients
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"

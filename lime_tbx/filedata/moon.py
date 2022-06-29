@@ -6,9 +6,7 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-import os
 from datetime import datetime
-from typing import List
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -20,7 +18,6 @@ from ..datatypes.datatypes import (
     LunarObservationWrite,
     SatellitePosition,
 )
-from ..datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

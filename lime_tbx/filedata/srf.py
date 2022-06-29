@@ -18,7 +18,6 @@ from ..datatypes.datatypes import (
     SRFChannel,
     SpectralResponseFunction,
 )
-from ..datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
