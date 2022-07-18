@@ -14,11 +14,13 @@ from datetime import datetime
 import csv
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    Point,
     SatellitePoint,
+    SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
     SurfacePoint,
@@ -33,7 +35,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint, None]):
+def _write_point(writer, point: Union[Point, None]):
     if point is not None:
         if isinstance(point, SurfacePoint):
             writer.writerow(["latitude", point.latitude])
@@ -65,11 +67,10 @@ def _write_point(writer, point: Union[SurfacePoint, CustomPoint, SatellitePoint,
 
 
 def export_csv(
-    x_data: List[float],
-    y_data: Union[List[float], List[List[float]]],
+    data: Union[SpectralData, List[SpectralData]],
     xlabel: str,
     ylabel: str,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint, None],
+    point: Union[Point, None],
     name: str,
 ):
     """
@@ -77,15 +78,13 @@ def export_csv(
 
     Parameters
     ----------
-    x_data: list of float
-        Data from the x axis, which would correspond to the key, of the key-value pair
-    y_data: list of float | list of list of float
-        Data from the y axis, which would correspond to the value, of the key-value pair
+    data: SpectralData | list of SpectralData
+        Data that will be exported
     xlabel: str
         Label of the x_data
     ylabel: str
         Label of the y_data
-    point: SurfacePoint | CustomPoint | SatellitePoint
+    point: Point
         Point from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
@@ -100,21 +99,26 @@ def export_csv(
                 dts = [dts]
             for dt in dts:
                 ylabels.append("{} {}".format(str(dt), ylabel))
+                ylabels.append("{} uncertainties".format(str(dt)))
         else:
             ylabels.append(ylabel)
         writer.writerow([xlabel, *ylabels])
-        if isinstance(y_data[0], list):
-            for i in range(len(x_data)):
-                yd = [str(val[i]) for val in y_data]
-                writer.writerow([x_data[i], *yd])
-        else:
-            for i in range(len(x_data)):
-                writer.writerow([x_data[i], y_data[i]])
+        if not isinstance(data, list) and not isinstance(data, np.ndarray):
+            data = [data]
+        x_data = data[0].wlens
+        y_data = []
+        for i in range(len(x_data)):
+            yd = []
+            for datum in data:
+                yd.append(datum.data[i])
+                yd.append(datum.uncertainties[i])
+            y_data.append(yd)
+        for i in range(len(x_data)):
+            writer.writerow([x_data[i], *y_data[i]])
 
 
 def export_csv_comparation(
-    x_data: List[float],
-    y_data: Tuple[List[float], List[float]],
+    data: Union[SpectralData, List[SpectralData]],
     xlabel: str,
     ylabel: str,
     points: List[SurfacePoint],
@@ -134,11 +138,12 @@ def export_csv_comparation(
         Label of the x_data
     ylabel: str
         Label of the y_data
-    points: list of SurfacePoint | CustomPoint | SatellitePoint
+    points: list of SurfacePoint
         Points from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
     """
+
     with open(name, "w") as file:
         writer = csv.writer(file)
         writer.writerow(
@@ -149,8 +154,10 @@ def export_csv_comparation(
                 "altitude(m)",
                 "Observed {}".format(ylabel),
                 "Simulated {}".format(ylabel),
+                "Uncertainties",
             ]
         )
+        x_data = data[0].wlens
         for i in range(len(x_data)):
             pt = points[i]
             writer.writerow(
@@ -159,17 +166,18 @@ def export_csv_comparation(
                     pt.latitude,
                     pt.longitude,
                     pt.altitude,
-                    y_data[0][i],
-                    y_data[1][i],
+                    data[0].data[i],
+                    data[1].data[i],
+                    data[1].uncertainties[i],
                 ]
             )
 
 
 def export_csv_integrated_irradiance(
     srf: SpectralResponseFunction,
-    irrs: List[float],
+    signals: SpectralData,
     name: str,
-    point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+    point: Point,
 ):
     """
     Export the given integrated signal data to a csv file
@@ -178,11 +186,11 @@ def export_csv_integrated_irradiance(
     ----------
     srf: SpectralResponseFunction
         Spectral response function that contains the channels of the integrated signal data.
-    irrs: list of float
+    signals: list of SpectralData
         List of irradiances of each channel, in order.
     name: str
         CSV file path
-    points: SurfacePoint | CustomPoint | SatellitePoint
+    point: Point
         Point from which the data is generated. In case it's None, no metadata will be printed.
     """
     with open(name, "w") as file:
@@ -196,8 +204,10 @@ def export_csv_integrated_irradiance(
                 dts = [dts]
             for dt in dts:
                 irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+                irr_titles.append("{} uncertainties".format(str(dt)))
         else:
             irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
+            irr_titles.append("uncertainties")
         writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
         for i, ch in enumerate(srf.channels):
             if ch.valid_spectre == SpectralValidity.VALID:
@@ -206,11 +216,12 @@ def export_csv_integrated_irradiance(
                 validity = "Partially"
             else:
                 validity = "Out"
-            if isinstance(irrs[i], list):
-                irrs_str = map(str, irrs[i])
-            else:
-                irrs_str = [str(irrs[i])]
-            writer.writerow([ch.id, ch.center, validity, *irrs_str])
+            print_data = []
+            for j in range(len(signals.data[i])):
+                print_data.append(signals.data[i][j])
+                print_data.append(signals.uncertainties[i][j])
+
+            writer.writerow([ch.id, ch.center, validity, *print_data])
 
 
 def read_datetimes(path: str) -> List[datetime]:

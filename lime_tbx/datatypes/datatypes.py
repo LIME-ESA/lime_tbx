@@ -15,8 +15,9 @@ It exports the following classes:
     * Satellite - ESA Satellite
     * SatellitePosition - A satellite's position
     * LunarObservation - GLOD lunar observation
-    * CimelData
-    * UncertaintyData
+    * CimelReflectanceCoeffs - Dataclass containing the cimel coefficients that will be used in the
+        reflectance simulation algorithm.
+    * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
 
 It exports the following Enums:
     * SpectralValidity - Enum that represents if a channel is inside LIME's spectral range.
@@ -27,13 +28,20 @@ from dataclasses import dataclass
 from typing import Dict, List, Union, Tuple
 from datetime import datetime
 from enum import Enum
+from abc import ABC
 
 """___Third-Party Modules___"""
 import numpy as np
 import xarray
+import obsarray
+
 
 """___LIME Modules___"""
 from . import constants
+from lime_tbx.datatypes.templates_digital_effects_table import (
+    TEMPLATE_REFL,
+    TEMPLATE_SIGNALS,
+)
 
 
 @dataclass
@@ -156,8 +164,14 @@ class SpectralResponseFunction:
         return [ch for ch in self.channels if ch.id == name][0]
 
 
+class Point(ABC):
+    """Abstract class representing a point which can be used to generate a MoonData"""
+
+    pass
+
+
 @dataclass
-class SurfacePoint:
+class SurfacePoint(Point):
     """
     Dataclass representing a point on Earth's surface.
 
@@ -182,7 +196,7 @@ class SurfacePoint:
 
 
 @dataclass
-class CustomPoint:
+class CustomPoint(Point):
     """
     Dataclass representing a point with custom Moon data.
 
@@ -216,7 +230,7 @@ class CustomPoint:
 
 
 @dataclass
-class SatellitePoint:
+class SatellitePoint(Point):
     """
     Dataclass representing a Satellite in a concrete datetime
 
@@ -253,7 +267,7 @@ class PolarizationCoefficients:
         neg_coeffs: list of tuples of 4 floats
             Negative phase angles related to the given wavelengths
         """
-        self.wavelengths = wavelengths
+        self.wlens = wavelengths
         self.pos_coeffs = pos_coeffs
         self.neg_coeffs = neg_coeffs
 
@@ -265,7 +279,7 @@ class PolarizationCoefficients:
         list of float
             A list of floats that are the wavelengths in nanometers, in order
         """
-        return self.wavelengths
+        return self.wlens
 
     def get_coefficients_positive(
         self, wavelength_nm: float
@@ -304,7 +318,7 @@ class PolarizationCoefficients:
         return self.neg_coeffs[index]
 
 
-class IrradianceCoefficients:
+class ApolloIrradianceCoefficients:
     """
     Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
     """
@@ -348,7 +362,7 @@ class IrradianceCoefficients:
         p_coeffs: List[float],
         apollo_coeffs: List[float],
     ):
-        self.wavelengths = wavelengths
+        self.wlens = wavelengths
         self.wlen_coeffs = wlen_coeffs
         self.c_coeffs = c_coeffs
         self.p_coeffs = p_coeffs
@@ -362,7 +376,7 @@ class IrradianceCoefficients:
         list of float
             A list of floats that are the wavelengths in nanometers, in order
         """
-        return self.wavelengths
+        return self.wlens
 
     def get_coefficients_a(self, wavelength_nm: float) -> List[float]:
         """Gets all 'a' coefficients for a concrete wavelength
@@ -532,6 +546,20 @@ class Satellite:
 
 @dataclass
 class SatellitePosition:
+    """
+    Dataclass containing the information of the position of a SatellitePoint,
+    for a specific reference system (usually ITRF93)
+
+    Attributes
+    ----------
+    x: float
+        The x coordinate
+    y: float
+        The y coordinate
+    z: float
+        The z coordinate
+    """
+
     x: float
     y: float
     z: float
@@ -539,6 +567,24 @@ class SatellitePosition:
 
 @dataclass
 class LunarObservation:
+    """
+    Dataclass containing the information for one GLOD-like lunar observation instant.
+
+    Attributes
+    ----------
+    ch_names: list of str
+        Names of the channels present
+    sat_pos_ref: str
+        Name of the reference system (usually ITRF93)
+    ch_irrs: dict of str and float
+        Irradiances relative to each channel. The key is the channel name, and the irradiance
+        is given in Wm⁻²nm⁻¹.
+    dt: datetime
+        Datetime of the observation.
+    sat_pos: SatellitePosition
+        Satellite position at that moment.
+    """
+
     ch_names: List[str]
     sat_pos_ref: str
     ch_irrs: Dict[str, float]
@@ -547,7 +593,7 @@ class LunarObservation:
 
     def get_ch_irradiance(self, name: str) -> float:
         if name not in self.ch_irrs:
-            raise "Channel name not in data structure"
+            raise ValueError("Channel name not in data structure")
         return self.ch_irrs[name]
 
     def has_ch_value(self, name: str) -> bool:
@@ -566,12 +612,34 @@ class LunarObservation:
 
 
 @dataclass
-class CimelData:
-    __slots__ = ["_ds_cimel", "wavelengths", "coeffs", "unc_coeffs"]
-    # _ds_cimel : xarray DataSet with the CIMEL coefficients and uncertainties
+class LunarObservationWrite(LunarObservation):
+    signals_uncs: np.ndarray
+    irrs: "SpectralData"
+    refls: "SpectralData"
+    polars: "SpectralData"
+
+
+class ReflectanceCoefficients:
+    """
+    Set of coefficients from the same version. Used in order to calculate the reflectance
+    from mainly CIMEL data.
+
+    Attributes
+    ----------
+    _ds: xarray.DataSet
+        Original source dataset
+    wlens: np.ndarray
+        Wavelengths present in this coefficient version. Each one of them
+    coeffs: _WlenReflCoeffs
+        Reflectance Coefficients, with an attribute for every coefficient group, a matrix each.
+    unc_coeffs: _WlenReflCoeffs
+        Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
+    """
+
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
 
     @dataclass
-    class _CimelCoeffs:
+    class _WlenReflCoeffs:
         __slots__ = [
             "_coeffs",
             "a_coeffs",
@@ -589,17 +657,134 @@ class CimelData:
             self.d_coeffs = coeffs[11:14, :]
             self.p_coeffs = coeffs[14::, :]
 
-    def __init__(self, ds_cimel: xarray.Dataset):
-        self._ds_cimel = ds_cimel
-        self.wavelengths: np.ndarray = ds_cimel.wavelength.values
-        coeffs: np.ndarray = ds_cimel.coeff.values
-        self.coeffs = CimelData._CimelCoeffs(coeffs)
-        u_coeff_cimel: np.ndarray = ds_cimel.u_coeff.values
-        self.unc_coeffs = CimelData._CimelCoeffs(u_coeff_cimel)
+    def __init__(self, _ds: xarray.Dataset):
+        self._ds = _ds
+        self.wlens: np.ndarray = _ds.wavelength.values
+        coeffs: np.ndarray = _ds.coeff.values
+        self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
+        u_coeff_cimel: np.ndarray = _ds.u_coeff.values
+        self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
 
 
 @dataclass
-class UncertaintyData:
-    wlen_cimel: np.ndarray
+class SpectralData:
+    """
+    Data for a spectrum of wavelengths, with an associated uncertainty each.
+
+    Attributes
+    ----------
+    wlens: np.ndarray
+        Spectrum of wavelengths
+    data: np.ndarray
+        Data associated to the wavelengths (irradiance, reflectance, etc)
+    uncertainties: np.ndarray
+        Uncertainties associated to the data
+    ds: xarray.Dataset
+        Dataset used in data generation
+    """
+
+    wlens: np.ndarray
     data: np.ndarray
     uncertainties: np.ndarray
+    ds: xarray.Dataset
+
+    @staticmethod
+    def make_reflectance_ds(wavs, refl, unc_rand=None, unc_syst=None):
+        dim_sizes = {"wavelength": len(wavs)}
+        # create dataset
+        ds_refl = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+
+        ds_refl = ds_refl.assign_coords(wavelength=wavs)
+
+        ds_refl.reflectance.values = refl
+
+        if unc_rand is not None:
+            ds_refl.u_ran_reflectance.values = unc_rand
+        else:
+            ds_refl.u_ran_reflectance.values = refl * 0.01
+
+        if unc_syst is not None:
+            ds_refl.u_sys_reflectance.values = unc_syst
+        else:
+            ds_refl.u_sys_reflectance.values = refl * 0.05
+
+        return ds_refl
+
+    @staticmethod
+    def make_irradiance_ds(wavs, refl, unc_rand=None, unc_syst=None):
+        dim_sizes = {"wavelength": len(wavs)}
+        # create dataset
+        ds_irr = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+
+        ds_irr = ds_irr.assign_coords(wavelength=wavs)
+
+        ds_irr.reflectance.values = refl
+
+        if unc_rand is not None:
+            ds_irr.u_ran_reflectance.values = unc_rand
+        else:
+            ds_irr.u_ran_reflectance.values = refl * 0.01
+
+        if unc_syst is not None:
+            ds_irr.u_sys_reflectance.values = unc_syst
+        else:
+            ds_irr.u_sys_reflectance.values = refl * 0.05
+
+        return ds_irr
+
+    @staticmethod
+    def make_polarization_ds(wavs, refl, unc_rand=None, unc_syst=None):
+        dim_sizes = {"wavelength": len(wavs)}
+        # create dataset
+        ds_pol = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+
+        ds_pol = ds_pol.assign_coords(wavelength=wavs)
+
+        ds_pol.reflectance.values = refl
+
+        if unc_rand is not None:
+            ds_pol.u_ran_reflectance.values = unc_rand
+        else:
+            ds_pol.u_ran_reflectance.values = refl * 0.01
+
+        if unc_syst is not None:
+            ds_pol.u_sys_reflectance.values = unc_syst
+        else:
+            ds_pol.u_sys_reflectance.values = refl * 0.05
+
+        return ds_pol
+
+    @staticmethod
+    def make_signals_ds(channel_ids, refl, unc_rand=None, unc_syst=None):
+        dim_sizes = {"channels": len(channel_ids), "dts": len(refl[0])}
+        # create dataset
+        ds_refl = obsarray.create_ds(TEMPLATE_SIGNALS, dim_sizes)
+
+        ds_refl = ds_refl.assign_coords(wavelength=channel_ids)
+
+        ds_refl.signals.values = refl
+
+        if unc_rand is not None:
+            ds_refl.u_ran_signals.values = unc_rand
+        else:
+            ds_refl.u_ran_signals.values = refl * 0.01
+
+        if unc_syst is not None:
+            ds_refl.u_sys_signals.values = unc_syst
+        else:
+            ds_refl.u_sys_signals.values = refl * 0.05
+
+        return ds_refl
+
+
+@dataclass
+class ComparisonData:
+    observed_signal: SpectralData
+    simulated_signal: SpectralData
+    diffs_signal: SpectralData
+    mean_relative_difference: float
+    standard_deviation_mrd: float
+    temporal_trend: Union[float, None]
+    number_samples: int
+    dts: List[datetime]
+    points: List[Point]

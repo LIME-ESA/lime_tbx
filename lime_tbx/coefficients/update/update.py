@@ -1,13 +1,13 @@
 """describe class"""
 
 """___Built-In Modules___"""
-#import here
+# import here
 
 """___Third-Party Modules___"""
-#import here
+# import here
 
 """___NPL Modules___"""
-#import here
+# import here
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -18,16 +18,18 @@ __status__ = "Development"
 
 from abc import ABC, abstractmethod
 
+
 class IUpdate(ABC):
     @abstractmethod
     def check_for_updates() -> bool:
         pass
+
     @abstractmethod
     def download_coefficients() -> bool:
         pass
 
-class Update(IUpdate):
 
+class Update(IUpdate):
     def check_for_updates() -> bool:
         pass
 

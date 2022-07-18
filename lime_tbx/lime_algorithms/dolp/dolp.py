@@ -77,9 +77,9 @@ class DOLP(IDOLP):
             a_coeffs = coefficients.get_coefficients_negative(wlen)
         result = (
             a_coeffs[0] * mpa
-            + a_coeffs[1] * mpa**2
-            + a_coeffs[2] * mpa**3
-            + a_coeffs[3] * mpa**4
+            + a_coeffs[1] * mpa ** 2
+            + a_coeffs[2] * mpa ** 3
+            + a_coeffs[3] * mpa ** 4
         )
         return result
 

@@ -11,11 +11,10 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, constants
-from ..simulation.regular_simulation import regular_simulation
 from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SpectralResponseFunction,
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     SurfacePoint,
     CustomPoint,
 )

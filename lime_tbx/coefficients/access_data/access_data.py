@@ -17,13 +17,11 @@ import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    IrradianceCoefficients,
+    ApolloIrradianceCoefficients,
     PolarizationCoefficients,
-    CimelData,
+    ReflectanceCoefficients,
 )
-from lime_tbx.coefficients.access_data.templates_digital_effects_table import (
-    TEMPLATE_CIMEL,
-)
+from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -107,18 +105,17 @@ _DEFAULT_NEG_POLAR_COEFFS = [
 ]
 
 
-def _get_default_irradiance_coefficients() -> IrradianceCoefficients:
+def _get_default_irradiance_coefficients() -> ApolloIrradianceCoefficients:
     data = _get_coefficients_data()
     wlens = list(data.keys())
     w_coeffs = list(data.values())
-    coeffs = IrradianceCoefficients(
+    coeffs = ApolloIrradianceCoefficients(
         wlens, w_coeffs, _DEFAULT_C_COEFFS, _DEFAULT_P_COEFFS, _DEFAULT_APOLLO_COEFFS
     )
     return coeffs
 
 
 def _get_default_polarization_coefficients() -> PolarizationCoefficients:
-    data = _get_coefficients_data()
     wlens = _POLARIZATION_WLENS
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
@@ -126,7 +123,9 @@ def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     return coeffs
 
 
-def _get_coefficients_data() -> Dict[float, IrradianceCoefficients.CoefficientsWln]:
+def _get_coefficients_data() -> Dict[
+    float, ApolloIrradianceCoefficients.CoefficientsWln
+]:
     """Returns all variable coefficients (a, b and d) for all wavelengths
 
     Returns
@@ -144,12 +143,12 @@ def _get_coefficients_data() -> Dict[float, IrradianceCoefficients.CoefficientsW
         coeffs = []
         for i in range(1, 11):
             coeffs.append(float(row[i]))
-        data[float(row[0])] = IrradianceCoefficients.CoefficientsWln(coeffs)
+        data[float(row[0])] = ApolloIrradianceCoefficients.CoefficientsWln(coeffs)
     file.close()
     return data
 
 
-def _get_default_cimel_data() -> CimelData:
+def get_default_cimel_coeffs() -> ReflectanceCoefficients:
     # define dim_size_dict to specify size of arrays
     dim_sizes = {
         "wavelength": 6,
@@ -158,6 +157,7 @@ def _get_default_cimel_data() -> CimelData:
     # create dataset
     ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
 
+    # TODO FIX THE EXTRAPOLATION
     ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -167,6 +167,8 @@ def _get_default_cimel_data() -> CimelData:
     u_data = np.genfromtxt(
         os.path.join(current_dir, "assets/u_coefficients_cimel.csv"), delimiter=","
     )
+
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
-    return CimelData(ds_cimel)
+
+    return ReflectanceCoefficients(ds_cimel)

@@ -11,15 +11,19 @@ from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
 import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    ComparisonData,
+    Point,
     SatellitePoint,
     SpectralResponseFunction,
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
+    SpectralData,
 )
 from ..filedata import csv
 
@@ -44,13 +48,12 @@ class GraphWidget(QtWidgets.QWidget):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
-        self.x_data = []
-        self.x_data_cimel = []
-        self.y_data = []
         self.legend = []
-        self.y_data_cimel = []
-        self.u_y_data = []
-        self.u_y_data_cimel = []
+        self.data = None
+        self.cimel_data = None
+        self.asd_data = None
+        self.point = None
+        self.data_compare = None
         self._build_layout()
 
     def _build_layout(self):
@@ -84,23 +87,18 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_plot(
         self,
-        x_data: Union[List[float], List[List[float]]],
-        y_data: Union[List[float], List[List[float]]],
-        point: Tuple[
-            Union[SurfacePoint, CustomPoint, SatellitePoint],
-            List[Union[SurfacePoint, CustomPoint, SatellitePoint]],
-        ],
-        x_data_cimel: Union[List[float], List[List[float]]] = [],
-        y_data_cimel: Union[List[float], List[List[float]]] = [],
-        u_y_data_cimel: Union[List[float], List[List[float]]] = [],
+        data: Union[SpectralData, List[SpectralData]] = None,
+        data_cimel: Union[SpectralData, List[SpectralData]] = None,
+        data_asd: Union[SpectralData, List[SpectralData]] = None,
+        point: Union[Point, List[Point]] = None,
+        data_compare: ComparisonData = None,
     ):
-        self.x_data = x_data
-        self.y_data = y_data
         self.point = point
-        self.x_data_cimel = x_data_cimel
-        self.y_data_cimel = y_data_cimel
-        self.u_y_data_cimel = u_y_data_cimel
-        if len(x_data) > 0 and len(y_data) > 0:
+        self.data = data
+        self.cimel_data = data_cimel
+        self.asd_data = data_asd
+        self.data_compare = data_compare
+        if data is not None:
             self.disable_buttons(False)
         else:
             self.disable_buttons(True)
@@ -112,73 +110,165 @@ class GraphWidget(QtWidgets.QWidget):
         self.ylabel = ylabel
         self._redraw()
 
-    def update_legend(self, legend: List[str]):
+    def update_legend(self, legend: List[List[str]]):
+        """
+        Parameters
+        ----------
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: data
+            1: cimel_data
+            2: cimel_data errorbars
+            3: comparison
+        """
         self.legend = legend
         self._redraw()
 
     def update_size(self):
         self._redraw()
 
-    def _is_filled(self) -> bool:
-        if len(self.x_data) > 0 and len(self.y_data) > 0:
-            return True
-        return False
-
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        marker = ""
-        if len(self.x_data) == 1:
-            marker = "o"
-        if (
-            self._is_filled()
-            and isinstance(self.y_data[0], list)
-            and not isinstance(self.x_data[0], list)
-        ):
-            for i, yd in enumerate(self.y_data):
-                self.canvas.axes.plot(self.x_data, yd, marker=marker)
-                if len(self.x_data_cimel) > i and len(self.x_data_cimel[i]) > 0:
-                    self.canvas.axes.plot(
-                        self.x_data_cimel[i],
-                        self.y_data_cimel[i],
+        lines = []
+        if self.data is not None:
+            iter_data = self.data
+            if not isinstance(iter_data, list):
+                iter_data = [iter_data]
+            for i, data in enumerate(iter_data):
+                label = ""
+                color = ["g"]
+                if len(self.legend) > 0:
+                    if len(self.legend[0]) > i:
+                        label = self.legend[0][i]
+                    if len(self.legend[0]) > 1:
+                        color = []
+                marker = ""
+                if len(data.data) == 1:
+                    marker = "o"
+                lines += self.canvas.axes.plot(
+                    data.wlens,
+                    data.data,
+                    *color,
+                    marker=marker,
+                    label=label,
+                )
+                if data.uncertainties is not None:
+                    self.canvas.axes.fill_between(
+                        data.wlens,
+                        data.data - 2 * data.uncertainties,
+                        data.data + 2 * data.uncertainties,
+                        color="green",
+                        alpha=0.3,
+                    )
+
+            if self.cimel_data:
+                iter_data = self.cimel_data
+                if not isinstance(iter_data, list):
+                    iter_data = [iter_data]
+                for i, cimel_data in enumerate(iter_data):
+                    label0 = ""
+                    label1 = ""
+                    if i == 0 and len(self.legend) >= 3:
+                        label0 = self.legend[1][0]
+                        label1 = self.legend[2][0]
+                    extra_lines = []
+                    extra_lines += self.canvas.axes.plot(
+                        cimel_data.wlens,
+                        cimel_data.data,
+                        color="orange",
                         ls="none",
                         marker="o",
-                        label="CIMEL data points",
+                        label=label0,
                     )
-                    self.canvas.axes.errorbar(
-                        self.x_data_cimel[i],
-                        self.y_data_cimel[i],
-                        yerr=self.u_y_data_cimel[i] * 10,
-                        capsize=3,
-                        ls="none",
-                        label="errorbars * 10",
-                    )
+                    extra_lines += [
+                        self.canvas.axes.errorbar(
+                            cimel_data.wlens,
+                            cimel_data.data,
+                            yerr=cimel_data.uncertainties * 2,
+                            color="black",
+                            capsize=3,
+                            ls="none",
+                            label=label1,
+                        )
+                    ]
                     if i == 0:
-                        self.canvas.axes.legend()
-        else:
-            self.canvas.axes.plot(self.x_data, self.y_data, marker=marker)
-            if len(self.x_data_cimel) > 0:
-                self.canvas.axes.plot(
-                    self.x_data_cimel,
-                    self.y_data_cimel,
-                    ls="none",
-                    marker="o",
-                    label="CIMEL data points",
+                        lines += extra_lines
+
+            if self.asd_data:
+                if isinstance(self.asd_data, list):
+                    asd_data = self.asd_data[0]
+                else:
+                    asd_data = self.asd_data
+
+                scaling_factor = (
+                    asd_data.data[np.where(asd_data.wlens == 500)]
+                    / cimel_data.data[np.where(cimel_data.wlens == 500)]
                 )
-                self.canvas.axes.errorbar(
-                    self.x_data_cimel,
-                    self.y_data_cimel,
-                    yerr=self.u_y_data_cimel * 10,
-                    capsize=3,
-                    ls="none",
-                    label="errorbars * 10",
+                lines += self.canvas.axes.plot(
+                    asd_data.wlens,
+                    asd_data.data / scaling_factor,
+                    label="ASD data points, scaled to LIME at 500nm",
                 )
-                self.canvas.axes.legend()
+
+            if self.data_compare:
+                iter_data = self.data_compare.diffs_signal
+                if not isinstance(iter_data, list):
+                    iter_data = [iter_data]
+                ax2 = self.canvas.axes.twinx()
+                for i, data_comp in enumerate(iter_data):
+                    label = ""
+                    if len(self.legend) > 3 and len(self.legend[3]) > 0:
+                        label = self.legend[3][0]
+                    marker = ""
+                    if len(data_comp.data) == 1:
+                        marker = "o"
+                    lines += ax2.plot(
+                        data_comp.wlens,
+                        data_comp.data,
+                        color="pink",
+                        marker=marker,
+                        label=label,
+                    )
+                    if data_comp.uncertainties is not None:
+                        ax2.fill_between(
+                            data_comp.wlens,
+                            data_comp.data - 2 * data_comp.uncertainties,
+                            data_comp.data + 2 * data_comp.uncertainties,
+                            color="pink",
+                            alpha=0.3,
+                        )
+                    ax2.set_ylim(
+                        (
+                            min(-0.05, min(data_comp.data) - 0.05),
+                            max(0.05, max(data_comp.data) + 0.05),
+                        )
+                    )
+                    ax2.text(
+                        0.85,
+                        0.85,
+                        "MRD: {:.4f}\nσ: {:.4f}".format(
+                            self.data_compare.mean_relative_difference,
+                            self.data_compare.standard_deviation_mrd,
+                        ),
+                        horizontalalignment="center",
+                        verticalalignment="center",
+                        transform=ax2.transAxes,
+                    )
+                ax2.set_ylabel("Relative difference (Fraction of unity)")
+                plt.setp(
+                    self.canvas.axes.get_xticklabels(),
+                    rotation=30,
+                    horizontalalignment="right",
+                )
+            if len(self.legend) > 0:
+                # added these three lines
+                labels = [l.get_label() for l in lines]
+                self.canvas.axes.legend(lines, labels, loc=0)
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
         self.canvas.axes.set_ylabel(self.ylabel)
-        if len(self.legend) > 0:
-            self.canvas.axes.legend(self.legend)
         try:
             self.canvas.fig.tight_layout()
         except:
@@ -216,8 +306,7 @@ class GraphWidget(QtWidgets.QWidget):
             try:
                 if isinstance(self.point, list):
                     csv.export_csv_comparation(
-                        self.x_data,
-                        self.y_data,
+                        self.data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
@@ -225,8 +314,7 @@ class GraphWidget(QtWidgets.QWidget):
                     )
                 else:
                     csv.export_csv(
-                        self.x_data,
-                        self.y_data,
+                        self.data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
@@ -278,39 +366,45 @@ class SignalWidget(QtWidgets.QWidget):
 
     def update_signals(
         self,
-        signals: List[float],
+        point: Point,
         srf: SpectralResponseFunction,
-        point: Union[SurfacePoint, CustomPoint, SatellitePoint],
+        signals: SpectralData,
     ):
         self._clear_layout()
         show_range_info = False
         self.srf = srf
-        self.irrs = signals
+        self.signals = signals
+
         self.point = point
         head_id_item = QtWidgets.QTableWidgetItem("ID")
         head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")
-        self.table.setRowCount(1 + len(signals))
+        self.table.setRowCount(1 + len(signals.data))
         if isinstance(point, CustomPoint):
-            self.table.setColumnCount(2 + 1)
+            self.table.setColumnCount(2 + 2)
             self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Signal (Wm⁻²nm⁻¹)"))
+            self.table.setItem(0, 3, QtWidgets.QTableWidgetItem("Uncertainties"))
         else:
             dts = point.dt
             if not isinstance(dts, list):
                 dts = [dts]
-            self.table.setColumnCount(len(dts) + 2)
+            self.table.setColumnCount(len(dts) * 2 + 2)
             for i, dt in enumerate(dts):
                 item_title_value = QtWidgets.QTableWidgetItem(
                     "Signal (Wm⁻²nm⁻¹) on {}".format(
                         dt.strftime("%Y-%m-%d %H:%M:%S UTC")
                     )
                 )
-                self.table.setItem(0, i + 2, item_title_value)
+                item_title_uncert = QtWidgets.QTableWidgetItem("Uncertainties")
+                self.table.setItem(0, i * 2 + 2, item_title_value)
+                self.table.setItem(0, i * 2 + 3, item_title_uncert)
         self.table.setItem(0, 0, head_id_item)
         self.table.setItem(0, 1, head_center_item)
-        for i, ch_signals in enumerate(signals):
+        for i, ch_signals in enumerate(signals.data):
             ch = srf.channels[i]
-            if not isinstance(ch_signals, list):
+            ch_uncs = signals.uncertainties[i]
+            if not (isinstance(ch_signals, np.ndarray) or isinstance(ch_signals, list)):
                 ch_signals = [ch_signals]
+                ch_uncs = [ch_uncs]
             id_item = QtWidgets.QTableWidgetItem(str(ch.id))
             center_item = QtWidgets.QTableWidgetItem(str(ch.center))
             self.table.setItem(i + 1, 0, id_item)
@@ -318,14 +412,19 @@ class SignalWidget(QtWidgets.QWidget):
             for j, signal in enumerate(ch_signals):
                 if ch.valid_spectre == SpectralValidity.VALID:
                     value = "{}".format(str(signal))
+                    unc = "{}".format(str(ch_uncs[j]))
                 elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
                     value = "{} *".format(str(signal))
+                    unc = "{} *".format(str(ch_uncs[j]))
                     show_range_info = True
                 else:
                     value = "Not available *"
+                    unc = "Not available *"
                     show_range_info = True
                 value_item = QtWidgets.QTableWidgetItem(value)
-                self.table.setItem(i + 1, j + 2, value_item)
+                unc_item = QtWidgets.QTableWidgetItem(unc)
+                self.table.setItem(i + 1, j * 2 + 2, value_item)
+                self.table.setItem(i + 1, j * 2 + 3, unc_item)
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
         if show_range_info:
@@ -358,7 +457,7 @@ for wavelengths between 350 and 2500 nm"
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(
-                    self.srf, self.irrs, name, self.point
+                    self.srf, self.signals, name, self.point
                 )
             except Exception as e:
                 self.show_error(e)
@@ -401,11 +500,35 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.channels.pop(index)
                 self.ch_names.pop(index)
 
-    def update_plot(self, index: int, x_data: list, y_data: list, points: list):
-        self.channels[index].update_plot(x_data, y_data, points)
+    def update_plot(self, index: int, comparison: ComparisonData):
+        """Update the <index> plot with the given data
+
+        Parameters
+        ----------
+        index: int
+            Plot index (SRF)
+        comparison: ComparisonData
+        """
+        data = [comparison.observed_signal, comparison.simulated_signal]
+        self.channels[index].update_plot(
+            data, point=comparison.points, data_compare=comparison
+        )
 
     def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
         self.channels[index].update_labels(title, xlabel, ylabel)
 
-    def update_legends(self, index: int, legends: List[str]):
+    def update_legends(self, index: int, legends: List[List[str]]):
+        """
+        Parameters
+        ----------
+        index: int
+            Plot index (SRF)
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: data
+            1: cimel_data
+            2: cimel_data errorbars
+            3: comparison
+        """
         self.channels[index].update_legend(legends)
