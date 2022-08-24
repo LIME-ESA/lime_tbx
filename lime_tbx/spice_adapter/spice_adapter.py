@@ -34,7 +34,7 @@ class ISPICEAdapter(ABC):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: str,
-    ) -> Union[spicedmoon.MoonData, List[spicedmoon.MoonData]]:
+    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         """
         Calculate lunar data for a position on earth surface at a concrete datetime.
 
@@ -69,7 +69,7 @@ class SPICEAdapter(ISPICEAdapter):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: str,
-    ) -> Union[spicedmoon.MoonData, List[spicedmoon.MoonData]]:
+    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         if isinstance(dt, list):
             mds = spicedmoon.get_moon_datas(
                 latitude, longitude, altitude, dt, kernels_path
