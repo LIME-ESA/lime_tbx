@@ -1,5 +1,5 @@
 """
-This module calculates acts as an interface/adapter with NASA's SPICE software
+This module acts as an interface/adapter with NASA's SPICE software.
 
 It exports the following classes:
     * ISPICEAdapter - Interface that contains the methods of this module.
@@ -14,7 +14,7 @@ from typing import List, Union
 """___Third-Party Modules___"""
 import spicedmoon
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from ..datatypes import datatypes
 
 """___Authorship___"""
