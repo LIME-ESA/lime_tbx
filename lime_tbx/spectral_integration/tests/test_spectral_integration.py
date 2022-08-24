@@ -9,6 +9,7 @@ import numpy as np
 
 """___LIME_TBX Modules___"""
 from ..spectral_integration import ISpectralIntegration, SpectralIntegration
+from ...datatypes.datatypes import SRFChannel, SpectralResponseFunction
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -26,6 +27,12 @@ def get_spectral_integrator() -> ISpectralIntegration:
     return SpectralIntegration()
 
 
+def get_srf() -> SpectralResponseFunction:
+    spectral_response = {CH_SRF[i]: CH_WLENS[i] for i in range(len(CH_SRF))}
+    ch = SRFChannel((CH_WLENS[-1] - CH_WLENS[0]) / 2, "Default", spectral_response)
+    return SpectralResponseFunction("default", [ch])
+
+
 class TestSpectralIntegration(unittest.TestCase):
 
     # Function _convolve_srf
@@ -37,7 +44,9 @@ class TestSpectralIntegration(unittest.TestCase):
 
     # Function integrate_elis
     def test_integrate_elis_ok(self):
-        pass
+        si = get_spectral_integrator()
+        signals = si.integrate_elis(get_srf(), CH_ELIS)
+        self.assertTrue(isinstance(signals, list))
 
 
 if __name__ == "__main__":
