@@ -2,30 +2,26 @@
 
 """___Built-In Modules___"""
 from typing import List, Union, Tuple
+from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
-import punpy
 import numpy as np
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    ApolloIrradianceCoefficients,
     MoonData,
     Point,
     PolarizationCoefficients,
     SpectralResponseFunction,
-    SurfacePoint,
-    CustomPoint,
     SpectralData,
     ReflectanceCoefficients,
 )
 
-from lime_tbx.lime_algorithms.rolo import eli, elref, rolo
+from lime_tbx.lime_algorithms.rolo import rolo
 from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
@@ -37,7 +33,185 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class LimeSimulation:
+class ILimeSimulation(ABC):
+    """
+    Interface for running the main lime-tbx functionality
+
+    Should contain the state of the simulation, so it can be implemented efficiently.
+    """
+
+    @abstractmethod
+    def set_simulation_changed(self):
+        """
+        Marks the current data as not valid. It should be updated.
+        If it is marked as valid, it might not be updated even when instructed to.
+        """
+        pass
+
+    @abstractmethod
+    def update_reflectance(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        cimel_coeff: ReflectanceCoefficients,
+    ):
+        """
+        Updates the reflectance values if the stored values are not valid, using the given parameters.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            SRF for which the reflectance will be calculated.
+        point: Point
+            Point (location) for which the reflectance will be calculated.
+        cimel_coeff: ReflectanceCoefficients
+            Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance.
+        """
+        pass
+
+    @abstractmethod
+    def update_irradiance(
+        self,
+        srf: SpectralResponseFunction,
+        signals_srf: SpectralResponseFunction,
+        point: Point,
+        cimel_coeff: ReflectanceCoefficients,
+    ):
+        """
+        Updates the irradiance values if the stored value are not valid, using the given parameters.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            SRF for which the reflectance and irradiance will be calculated.
+        signals_srf: SpectralResponseFunction
+            SRF for which the integrated signal will be calculated.
+        point: Point
+            Point (location) for which the irradiance will be calculated.
+        cimel_coeff: ReflectanceCoefficients
+            Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance (needed for irradiance).
+        """
+        pass
+
+    @abstractmethod
+    def update_polarization(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        polar_coeff: PolarizationCoefficients,
+    ):
+        """
+        Updates the polarization values if the stored values are not valid, using the given parameters.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            SRF for which the polarization will be calculated.
+        point: Point
+            Point (location) for which the polarization will be calculated.
+        polar_coeff: PolarizationCoefficients
+            Coefficients used for the calculation of polarization.
+        """
+        pass
+
+    @abstractmethod
+    def get_elrefs(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for extraterrestrial lunar reflectance
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated reflectance/s
+        """
+        pass
+
+    @abstractmethod
+    def get_elis(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for extraterrestrial lunar irradiance
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated irradiance/s
+        """
+        pass
+
+    @abstractmethod
+    def get_signals(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for integrated signals
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated integrated signal/s
+        """
+        pass
+
+    @abstractmethod
+    def get_elrefs_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for extraterrestrial lunar reflectance for the cimel wavelengths.
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated reflectance/s
+        """
+        pass
+
+    @abstractmethod
+    def get_elis_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for extraterrestrial lunar irradiance for the cimel wavelengths.
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated irradiance/s
+        """
+        pass
+
+    @abstractmethod
+    def get_elrefs_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for extraterrestrial lunar reflectance for the asd spectrum.
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated reflectance/s
+        """
+        pass
+
+    @abstractmethod
+    def get_elis_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for extraterrestrial lunar irradiance for the asd spectrum.
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated irradiance/s
+        """
+        pass
+
+    @abstractmethod
+    def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for lunar polarization degree
+
+        Returns
+        -------
+        elrefs: SpectralData | list of SpectralData
+            Previously calculated polarization/s
+        """
+        pass
+
+
+class LimeSimulation(ILimeSimulation):
     """
     Class for running the main lime-tbx functionality
 
@@ -84,9 +258,6 @@ class LimeSimulation:
         self.verbose = verbose
 
     def set_simulation_changed(self):
-        """
-        Marks the current data as not valid. It should be updated.
-        """
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
@@ -202,17 +373,17 @@ class LimeSimulation:
     @staticmethod
     def _interpolate_refl(
         asd_data: Union[SpectralData, List[SpectralData]],
-        cimel_coeff: Union[SpectralData, List[SpectralData]],
+        cimel_data: Union[SpectralData, List[SpectralData]],
         intp: SpectralInterpolation,
         wlens: List[float],
     ) -> Union[SpectralData, List[SpectralData]]:
 
-        is_list = isinstance(cimel_coeff, list)
+        is_list = isinstance(cimel_data, list)
         if not is_list:
-            cimel_coeff = [cimel_coeff]
+            cimel_data = [cimel_data]
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
-        for i, cf in enumerate(cimel_coeff):
+        for i, cf in enumerate(cimel_data):
             # wlens_valid = [
             #     wlen
             #     for wlen in wlens
@@ -341,3 +512,27 @@ class LimeSimulation:
         ds_pol = SpectralData.make_signals_ds(channel_ids, signals, uncs)
         sp_d = SpectralData(channel_ids, signals, uncs, ds_pol)
         return sp_d
+
+    def get_elrefs(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.elref
+
+    def get_elis(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.elis
+
+    def get_signals(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.signals
+
+    def get_elrefs_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.elref_cimel
+
+    def get_elis_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.elis_cimel
+
+    def get_elrefs_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.elref_asd
+
+    def get_elis_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.elis_asd
+
+    def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.polars

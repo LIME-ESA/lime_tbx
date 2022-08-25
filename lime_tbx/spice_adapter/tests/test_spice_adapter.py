@@ -49,6 +49,10 @@ def get_spice_adapter() -> ISPICEAdapter:
     return SPICEAdapter()
 
 
+# spicedmoon is a GOA library, which has been tested and used, so we are certain
+# that is quite robust, so extremely intense testing is not needed.
+
+
 class TestSPICEAdapter(unittest.TestCase):
 
     #### Function: get_moon_data_from_earth

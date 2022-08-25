@@ -48,6 +48,12 @@ class TestSpectralIntegration(unittest.TestCase):
         signals = si.integrate_elis(get_srf(), CH_ELIS)
         self.assertTrue(isinstance(signals, list))
 
+    # Function u_integrate_elis
+    def test_u_integrate_elis_ok(self):
+        si = get_spectral_integrator()
+        uncertainties = si.u_integrate_elis(get_srf(), CH_ELIS)
+        self.assertTrue(isinstance(uncertainties, list))
+
 
 if __name__ == "__main__":
     unittest.main()

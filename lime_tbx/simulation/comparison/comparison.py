@@ -26,7 +26,7 @@ from ...datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
 )
-from lime_tbx.simulation.lime_simulation import LimeSimulation
+from lime_tbx.simulation.lime_simulation import ILimeSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
 """___Authorship___"""
@@ -149,7 +149,7 @@ class Comparison(IComparison):
         observations: List[LunarObservation],
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
-        lime_simulation: LimeSimulation,
+        lime_simulation: ILimeSimulation,
     ) -> Tuple[
         List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
     ]:
@@ -168,7 +168,7 @@ class Comparison(IComparison):
             lime_simulation.update_irradiance(
                 SpectralResponseFunction("empty", []), srf, sp, coefficients
             )
-            signals = lime_simulation.signals
+            signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)
