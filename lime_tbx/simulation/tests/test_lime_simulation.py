@@ -60,7 +60,7 @@ def get_polar_coeffs() -> PolarizationCoefficients:
 
 
 def get_lime_simulation() -> ILimeSimulation:
-    return LimeSimulation(EOCFI_PATH, KERNELS_PATH)
+    return LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=False)
 
 
 class TestLimeSimulation(unittest.TestCase):
@@ -81,7 +81,7 @@ class TestLimeSimulation(unittest.TestCase):
         ls.update_reflectance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         self.assertIsNotNone(elrefs)
-        self.assertTrue(isinstance(elrefs, list))
+        self.assertIsInstance(elrefs, list)
 
     # Function update_irradiance
     def test_update_irradiance(self):
@@ -89,10 +89,10 @@ class TestLimeSimulation(unittest.TestCase):
         ls.update_irradiance(get_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs())
         elis = ls.get_elis()
         self.assertIsNotNone(elis)
-        self.assertTrue(isinstance(elis, list))
+        self.assertIsInstance(elis, list)
         signals = ls.get_signals()
         self.assertIsNotNone(signals)
-        self.assertTrue(isinstance(signals, SpectralData))
+        self.assertIsInstance(signals, SpectralData)
 
     # Function update_polarization
     def test_update_reflectance(self):
@@ -100,7 +100,7 @@ class TestLimeSimulation(unittest.TestCase):
         ls.update_polarization(get_srf(), SURFACE_POINT, get_polar_coeffs())
         polars = ls.get_polars()
         self.assertIsNotNone(polars)
-        self.assertTrue(isinstance(polars, list))
+        self.assertIsInstance(polars, list)
 
 
 if __name__ == "__main__":
