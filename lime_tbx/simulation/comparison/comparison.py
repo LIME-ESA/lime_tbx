@@ -18,7 +18,6 @@ import numpy as np
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
-    ApolloIrradianceCoefficients,
     ComparisonData,
     LunarObservation,
     ReflectanceCoefficients,
