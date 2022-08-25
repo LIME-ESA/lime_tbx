@@ -147,9 +147,10 @@ class EOCFIConverter(IEOCFIConverter):
         sat_list: dict
             Dictionary containing the sat list yaml.
         """
-        return yaml.load(
-            open(os.path.join(self.eocfi_path, ESA_SAT_LIST)), Loader=yaml.FullLoader
-        )
+        fl = open(os.path.join(self.eocfi_path, ESA_SAT_LIST))
+        y = yaml.load(fl, Loader=yaml.FullLoader)
+        fl.close()
+        return y
 
     def get_sat_list(self) -> List[Satellite]:
         """
@@ -214,9 +215,9 @@ class EOCFIConverter(IEOCFIConverter):
             )
         ]
 
-        metadata = yaml.load(
-            open(os.path.join(self.eocfi_path, METADATA_FILE)), Loader=yaml.FullLoader
-        )
+        fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
+        metadata = yaml.load(fl, Loader=yaml.FullLoader)
+        fl.close()
 
         bulletin = os.path.join(self.eocfi_path, metadata.get("BULLETIN_IERS")["file"])
 
