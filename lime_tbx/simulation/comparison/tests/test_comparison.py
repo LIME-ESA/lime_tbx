@@ -90,7 +90,6 @@ class TestComparison(unittest.TestCase):
         lime = get_lime_simulation()
         srf = get_srf()
         coeffs = get_cimel_coeffs()
-        lime.update_irradiance(srf, srf, SATELLITE_POINT, coeffs)
         comparisons = co.get_simulations([OBS1], srf, coeffs, lime)
         print(comparisons)
 

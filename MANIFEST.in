@@ -2,6 +2,9 @@ include versioneer.py
 include lime_tbx/_version.py
 include lime_tbx/lime_algorithms/rolo/assets/wehrli_asc.csv
 include lime_tbx/coefficients/access_data/assets/coefficients.csv
+include lime_tbx/coefficients/access_data/assets/coefficients_cimel.csv
+include lime_tbx/coefficients/access_data/assets/u_coefficients_cimel.csv
 include lime_tbx/gui/assets/style.qss
 include lime_tbx/gui/assets/lime_logo.png
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_linux.so
+include lime_tbx/interpolation/access_data/assets/SomeMoonReflectances.txt

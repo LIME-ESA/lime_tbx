@@ -66,7 +66,7 @@ class SpectralIntegration(ISpectralIntegration):
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         signals = []
-        wlens = srf.get_wavelengths()
+        wlens = elis_lime.wlens
         elis = elis_lime.data
         if len(elis) == 0:
             return []
@@ -75,8 +75,8 @@ class SpectralIntegration(ISpectralIntegration):
             wasnt_lists = True
             elis = np.array([elis])
         for ch in srf.channels:
-            ch_wlens = np.array(list(ch.spectral_response.keys()))
-            ch_srf = np.array(list(ch.spectral_response.values()))
+            ch_wlens = np.array([w for w in ch.spectral_response.keys() if w in wlens])
+            ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
             elis_ids = [wlens.index(wl) for wl in ch_wlens]
             ch_signals = []
             for subelis in elis:
@@ -100,19 +100,19 @@ class SpectralIntegration(ISpectralIntegration):
         if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
             wasnt_lists = True
             elis = np.array([elis])
+            u_elis = np.array([u_elis])
         for ch in srf.channels:
-            ch_wlens = np.array(list(ch.spectral_response.keys()))
-            ch_srf = np.array(list(ch.spectral_response.values()))
+            ch_wlens = np.array([w for w in ch.spectral_response.keys() if w in wlens])
+            ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
             elis_ids = [wlens.index(wl) for wl in ch_wlens]
-
             u_ch_signals = []
-            for subelis in elis:
+            for i, subelis in enumerate(elis):
                 ch_elis = subelis[elis_ids]
                 u_ch_signals.append(
                     self.prop.propagate_random(
                         self._convolve_srf,
                         [ch_wlens, ch_srf, ch_elis],
-                        [None, None, u_elis],
+                        [None, None, u_elis[i]],
                         corr_x=[None, None, None],
                     )
                 )

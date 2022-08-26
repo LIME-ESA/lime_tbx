@@ -186,7 +186,7 @@ def compare_callback(
     co = comparison.Comparison()
     for mo in mos:
         if not mo.check_valid_srf(srf):
-            raise ("SRF file not valid for the chosen Moon observations file.")
+            raise Exception("SRF file not valid for the chosen Moon observations file.")
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
     return comparisons, mos, srf
 

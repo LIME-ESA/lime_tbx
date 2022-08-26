@@ -24,9 +24,11 @@ from ...datatypes.datatypes import (
     SpectralData,
     SpectralResponseFunction,
     SurfacePoint,
+    SRFChannel,
 )
 from lime_tbx.simulation.lime_simulation import ILimeSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
+from ...datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -106,6 +108,7 @@ class IComparison(ABC):
     def get_simulations(
         self,
         observations: List[LunarObservation],
+        def_srf: SpectralResponseFunction,
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
@@ -119,6 +122,8 @@ class IComparison(ABC):
         ----------
         observations: list of MoonObservation
             MoonObservations read from a GLOD datafile.
+        def_srf: SpectralResponseFunction
+            SpectralResponseFunction that corresponds to the default spectrum.
         srf: SpectralResponseFunction
             SpectralResponseFunction that corresponds to the observations file
         coefficients: ReflectanceCoefficients
@@ -143,6 +148,16 @@ class IComparison(ABC):
 
 
 class Comparison(IComparison):
+    def _get_full_srf(self) -> SpectralResponseFunction:
+        spectral_response = {
+            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN)
+        }
+        ch = SRFChannel(
+            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Full", spectral_response
+        )
+        srf = SpectralResponseFunction("Full", [ch])
+        return srf
+
     def get_simulations(
         self,
         observations: List[LunarObservation],
@@ -165,7 +180,7 @@ class Comparison(IComparison):
             sp = SurfacePoint(lat, lon, h, dt)
             lime_simulation.set_simulation_changed()
             lime_simulation.update_irradiance(
-                SpectralResponseFunction("empty", []), srf, sp, coefficients
+                self._get_full_srf(), srf, sp, coefficients
             )
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
