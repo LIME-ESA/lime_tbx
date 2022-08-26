@@ -17,7 +17,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class TestClassName(unittest.TestCase):
+class TestLocalStorage(unittest.TestCase):
     def test_function1(self):
         pass
 

@@ -105,10 +105,10 @@ class IComparison(ABC):
     @abstractmethod
     def get_simulations(
         self,
-        observations: LunarObservation,
+        observations: List[LunarObservation],
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
-        kernels_path: str,
+        lime_simulation: ILimeSimulation,
     ) -> Tuple[
         List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
     ]:
@@ -117,14 +117,14 @@ class IComparison(ABC):
 
         Parameters
         ----------
-        observations: MoonObservation
-            MoonObservationn read from a GLOD datafile.
+        observations: list of MoonObservation
+            MoonObservations read from a GLOD datafile.
         srf: SpectralResponseFunction
             SpectralResponseFunction that corresponds to the observations file
         coefficients: ReflectanceCoefficients
             Coefficients to be used
-        kernels_path: str
-            Path where the needed SPICE kernels are located.
+        lime_simulation: ILimeSimulation
+            Lime simulation instance, storing the current state of the simulation.
 
         Returns
         -------
