@@ -9,7 +9,7 @@ import numpy as np
 
 """___LIME_TBX Modules___"""
 from ..spectral_integration import ISpectralIntegration, SpectralIntegration
-from ...datatypes.datatypes import SRFChannel, SpectralResponseFunction
+from ...datatypes.datatypes import SRFChannel, SpectralData, SpectralResponseFunction
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -21,6 +21,8 @@ __status__ = "Development"
 CH_WLENS = np.array([350, 400, 450, 500])
 CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
 CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
+
+ELIS_LIME = SpectralData(CH_WLENS, CH_ELIS, CH_ELIS * 0.01, None)
 
 
 def get_spectral_integrator() -> ISpectralIntegration:
@@ -45,13 +47,13 @@ class TestSpectralIntegration(unittest.TestCase):
     # Function integrate_elis
     def test_integrate_elis_ok(self):
         si = get_spectral_integrator()
-        signals = si.integrate_elis(get_srf(), CH_ELIS)
+        signals = si.integrate_elis(get_srf(), ELIS_LIME)
         self.assertIsInstance(signals, list)
 
     # Function u_integrate_elis
     def test_u_integrate_elis_ok(self):
         si = get_spectral_integrator()
-        uncertainties = si.u_integrate_elis(get_srf(), CH_ELIS)
+        uncertainties = si.u_integrate_elis(get_srf(), ELIS_LIME)
         self.assertIsInstance(uncertainties, list)
 
 
