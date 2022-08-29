@@ -244,6 +244,4 @@ class EOCFIConverter(IEOCFIConverter):
         lat, lon, hhh = transformer.transform(
             sat_position[0], sat_position[1], sat_position[2], radians=False
         )
-        print(lat, lon, hhh)
         return lat, lon, hhh
-        # print("Geocentric: ", 360+lat, lon, hhh)
