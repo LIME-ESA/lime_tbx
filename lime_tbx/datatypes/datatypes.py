@@ -647,6 +647,14 @@ class ReflectanceCoefficients:
 
     @dataclass
     class _WlenReflCoeffs:
+        """
+        Subdataclass where coefficients are stored
+
+        x_coeffs structure: [[x0_w0, x0_w1, x0_w2, ...], [x1_w0, x1_w2, x1_w2, ...], ...]
+        It's that way so "vector-wise" operations can be performed over every xn parameter without
+        having to perform them over every wavelength too.
+        """
+
         __slots__ = [
             "_coeffs",
             "a_coeffs",

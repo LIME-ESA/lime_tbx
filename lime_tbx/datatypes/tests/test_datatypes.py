@@ -226,11 +226,12 @@ class TestReflectanceCoefficients(unittest.TestCase):
         ds_cimel.coeff.values = data.T
         ds_cimel.u_coeff.values = u_data.T
         coeffs = ReflectanceCoefficients(ds_cimel)
-        print(data)
-        a_coeffs = coeffs.coeffs.a_coeffs[0]
-        print(a_coeffs)
-        for i, a in enumerate(a_coeffs):
-            self.assertEqual(a, COEFF_LINE[i])
+        self.assertEqual(len(coeffs.coeffs.a_coeffs), 4)
+        for i in range(4):  # a coeffs are 4 coefficients
+            a_coeffs = coeffs.coeffs.a_coeffs[i]
+            a_coeffs_check = [d[i] for d in data]
+            for j, a in enumerate(a_coeffs):
+                self.assertEqual(a, a_coeffs_check[j])
 
 
 class TestSpectralData(unittest.TestCase):
