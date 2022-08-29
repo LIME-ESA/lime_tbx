@@ -1,4 +1,4 @@
-"""Tests for classname module"""
+"""Tests for update module"""
 
 """___Built-In Modules___"""
 # import here
@@ -10,14 +10,14 @@ import unittest
 # import here
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__author__ = "Javier Gatón Herguedas"
+__created__ = "29/08/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-class TestClassName(unittest.TestCase):
+class TestUpdate(unittest.TestCase):
     def test_function1(self):
         pass
 

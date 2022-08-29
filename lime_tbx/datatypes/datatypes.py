@@ -6,18 +6,21 @@ It exports the following classes:
     * MoonData - Moon data used in the calculations of the Moon's irradiance.
     * SRFChannel - Spectral responses and metadata for a SRF Channel
     * SpectralResponseFunction - The spectral response function, a set of channels with their data.
+    * Point - Superclass for all point classes.
     * SurfacePoint - Point on Earth's surface
     * CustomPoint - Point with custom Moon data.
     * SatellitePoint - Point of a Satellite in a concrete datetime
     * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
-    * IrradianceCoefficients - Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
+    * ApolloIrradianceCoefficients - Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
     * OrbitFile - Satellite orbit file.
     * Satellite - ESA Satellite
     * SatellitePosition - A satellite's position
     * LunarObservation - GLOD lunar observation
-    * CimelReflectanceCoeffs - Dataclass containing the cimel coefficients that will be used in the
+    * LunarObservationWrite - Dataclass containing the needed information to create a GLOD file.
+    * ReflectanceCoefficients - Dataclass containing the cimel coefficients that will be used in the
         reflectance simulation algorithm.
     * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
+    * ComparisonData - Dataclass containing the data outputed from a comparison.
 
 It exports the following Enums:
     * SpectralValidity - Enum that represents if a channel is inside LIME's spectral range.
@@ -161,7 +164,10 @@ class SpectralResponseFunction:
         return [ch.id for ch in self.channels]
 
     def get_channel_from_name(self, name: str) -> SRFChannel:
-        return [ch for ch in self.channels if ch.id == name][0]
+        chs = [ch for ch in self.channels if ch.id == name]
+        if len(chs) == 0:
+            return None
+        return chs[0]
 
 
 class Point(ABC):
@@ -613,6 +619,7 @@ class LunarObservation:
 
 @dataclass
 class LunarObservationWrite(LunarObservation):
+    "Dataclass containing the needed information to create a GLOD file."
     signals_uncs: np.ndarray
     irrs: "SpectralData"
     refls: "SpectralData"
@@ -779,6 +786,8 @@ class SpectralData:
 
 @dataclass
 class ComparisonData:
+    """Dataclass containing the data outputed from a comparison."""
+
     observed_signal: SpectralData
     simulated_signal: SpectralData
     diffs_signal: SpectralData
