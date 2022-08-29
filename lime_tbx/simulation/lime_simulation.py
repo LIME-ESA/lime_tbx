@@ -350,7 +350,7 @@ class LimeSimulation(ILimeSimulation):
                 print("irradiance update done")
 
         if not self.signals_uptodate:
-            self.signals = self._calculate_signals(signals_srf, cimel_coeff)
+            self.signals = self._calculate_signals(signals_srf)
             self.signals_uptodate = True
             if self.verbose:
                 print("signals update done")
@@ -495,9 +495,7 @@ class LimeSimulation(ILimeSimulation):
     def _calculate_signals(
         self,
         srf: SpectralResponseFunction,
-        cimel_coeff: Union[SpectralData, List[SpectralData]],
     ) -> SpectralData:
-        rl = rolo.ROLO()
         elis_signals = self.elis
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]
         if not isinstance(elis_signals, list):

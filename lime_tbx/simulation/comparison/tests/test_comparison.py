@@ -35,7 +35,7 @@ CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
 CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 SP = SatellitePosition(3753240, -196698.975, 5138362)
 DT1 = datetime(2022, 1, 17, 2)
-OBS1 = LunarObservation(["Default"], "ITRF93", {"default": 0.000001}, DT1, SP)
+OBS1 = LunarObservation(["default"], "ITRF93", {"Default": 0.000001}, DT1, SP)
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 
 
@@ -90,8 +90,10 @@ class TestComparison(unittest.TestCase):
         lime = get_lime_simulation()
         srf = get_srf()
         coeffs = get_cimel_coeffs()
-        comparisons = co.get_simulations([OBS1], srf, coeffs, lime)
-        print(comparisons)
+        comps = co.get_simulations([OBS1], srf, coeffs, lime)
+        self.assertEqual(len(comps), 1)
+        self.assertEqual(len(comps[0].dts), 1)
+        self.assertEqual(comps[0].dts[0], OBS1.dt)
 
 
 if __name__ == "__main__":

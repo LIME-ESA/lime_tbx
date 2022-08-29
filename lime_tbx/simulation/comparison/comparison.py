@@ -112,9 +112,7 @@ class IComparison(ABC):
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
-    ) -> Tuple[
-        List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
-    ]:
+    ) -> List[ComparisonData]:
         """
         Simulate the moon irradiance for the given scenarios.
 
@@ -133,16 +131,8 @@ class IComparison(ABC):
 
         Returns
         -------
-        sigs: list of list of tuple of float, float
-            List containing one list per SRF channel, containing all the simulated measures
-            that have a counterpart in the observations data object. The tuple contains the signal
-            and its uncertainty.
-        dts: list of list of datetime
-            List containing one list per SRF channel, containing the corresponding datetimes
-            for every irradiance measure.
-        sps: list of list of SurfacePoint
-            List containing one list per SRF channel, containing the corresponding SurfacePoint
-            for every irradiance measure.
+        comparisons: list of ComparisonData
+            List containing all comparisons of all channels
         """
         pass
 
@@ -164,9 +154,7 @@ class Comparison(IComparison):
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
-    ) -> Tuple[
-        List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
-    ]:
+    ) -> List[ComparisonData]:
         ch_names = srf.get_channels_names()
         comparisons = []
         sigs = [[] for _ in ch_names]
