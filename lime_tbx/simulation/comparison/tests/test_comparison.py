@@ -10,6 +10,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from .. import comparison
 from ....datatypes.datatypes import (
+    ComparisonData,
     LunarObservation,
     SatellitePosition,
     SpectralResponseFunction,
@@ -92,8 +93,11 @@ class TestComparison(unittest.TestCase):
         coeffs = get_cimel_coeffs()
         comps = co.get_simulations([OBS1], srf, coeffs, lime)
         self.assertEqual(len(comps), 1)
-        self.assertEqual(len(comps[0].dts), 1)
-        self.assertEqual(comps[0].dts[0], OBS1.dt)
+        comp: ComparisonData = comps[0]
+        self.assertEqual(len(comp.dts), 1)
+        self.assertEqual(comp.dts[0], OBS1.dt)
+        self.assertEqual(comp.number_samples, 1)
+        self.assertEqual(comp.observed_signal.data[0], OBS1.ch_irrs["Default"])
 
 
 if __name__ == "__main__":
