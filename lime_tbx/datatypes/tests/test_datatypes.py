@@ -148,7 +148,7 @@ CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 
 
 def get_srf() -> SpectralResponseFunction:
-    spectral_response = {CH_SRF[i]: CH_WLENS[i] for i in range(len(CH_SRF))}
+    spectral_response = {CH_WLENS[i]: CH_SRF[i] for i in range(len(CH_SRF))}
     ch = SRFChannel((CH_WLENS[-1] - CH_WLENS[0]) / 2, "default", spectral_response)
     return SpectralResponseFunction("Default", [ch])
 

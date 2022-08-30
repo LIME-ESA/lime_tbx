@@ -7,12 +7,15 @@ import filecmp
 
 """___Third-Party Modules___"""
 import unittest
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from ...datatypes.datatypes import (
     CustomPoint,
+    SRFChannel,
     SatellitePoint,
     SpectralData,
+    SpectralResponseFunction,
     SurfacePoint,
 )
 from ..csv import (
@@ -58,6 +61,18 @@ DTS = [
 ]
 
 
+def get_srf() -> SpectralResponseFunction:
+    spectral_response = {WLENS[i]: DATA[i] for i in range(len(DATA))}
+    ch = SRFChannel(
+        WLENS[0] + ((WLENS[-1] - WLENS[0]) / 2), "Default", spectral_response
+    )
+    ch2 = SRFChannel(
+        WLENS[1] + ((WLENS[-1] - WLENS[1]) / 2), "Secpnd", spectral_response
+    )
+    ch3 = SRFChannel(WLENS[2] + ((WLENS[-1] - WLENS[2]) / 2), "Drai", spectral_response)
+    return SpectralResponseFunction("default", [ch, ch2, ch3])
+
+
 class TestCSV(unittest.TestCase):
     def test_export_csv_1(self):
         path = "./test_files/csv/export_1.test.csv"
@@ -96,8 +111,17 @@ class TestCSV(unittest.TestCase):
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 
     def test_export_csv_integrated_irradiance(self):
+        srf = get_srf()
+        signals = np.array(
+            [np.array(DATA)[0:2] * (i + 1) for i in range(len(srf.channels))]
+        )
+        uncs = np.array(
+            [np.array(UNCS)[0:2] * (i + 1) for i in range(len(srf.channels))]
+        )
+        data = SpectralData(WLENS, signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
-        export_csv_integrated_irradiance(srf, signals, path, SPOINT)
+        export_csv_integrated_irradiance(srf, data, path, SPOINT2)
+        self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
 
     def test_read_datetimes(self):
         dts = read_datetimes("./test_files/csv/timeseries.csv")

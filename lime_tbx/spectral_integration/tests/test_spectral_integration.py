@@ -30,7 +30,7 @@ def get_spectral_integrator() -> ISpectralIntegration:
 
 
 def get_srf() -> SpectralResponseFunction:
-    spectral_response = {CH_SRF[i]: CH_WLENS[i] for i in range(len(CH_SRF))}
+    spectral_response = {CH_WLENS[i]: CH_SRF[i] for i in range(len(CH_SRF))}
     ch = SRFChannel((CH_WLENS[-1] - CH_WLENS[0]) / 2, "Default", spectral_response)
     return SpectralResponseFunction("default", [ch])
 
