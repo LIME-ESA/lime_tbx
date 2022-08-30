@@ -225,7 +225,7 @@ class CustomPoint(Point):
     abs_moon_phase_angle : float
         Absolute Moon phase angle (in degrees)
     moon_phase_angle : float
-        Absolute Moon phase angle (in degrees)
+        Moon phase angle (in degrees)
     """
 
     distance_sun_moon: float

@@ -5,6 +5,7 @@ from datetime import datetime
 
 """___Third-Party Modules___"""
 import unittest
+import pyproj
 
 """___LIME_TBX Modules___"""
 from ..eocfi_adapter import EOCFIConverter, IEOCFIConverter, _get_file_datetimes
@@ -71,9 +72,21 @@ class TestEOCFIConverter(unittest.TestCase):
         self.assertEqual(h, 791026.5592273567)
 
     def test_get_satellite_position_true_data(self):
-        # data obtained with their tool
+        # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
         eo = get_eocfi_converter()
-        # TODO
+        lat, lon, hhh = eo.get_satellite_position(
+            "SENTINEL-5P", datetime(2022, 1, 2, 0, 0, 0)
+        )
+        transformer = pyproj.Transformer.from_crs(
+            {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
+            {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
+        )
+        lat2, lon2, hh2 = transformer.transform(
+            -3496004.37772468, -404044.1700419, 6279426.45463165, radians=False
+        )
+        self.assertAlmostEqual(lat, lat2)
+        self.assertAlmostEqual(lon, lon2)
+        self.assertAlmostEqual(hhh, hh2)
 
 
 if __name__ == "__main__":

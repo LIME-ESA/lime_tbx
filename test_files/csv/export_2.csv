@@ -1,0 +1,13 @@
+absolute moon phase angle,11.2
+distance observer moon,450000
+distance sun moon,0.9
+selenographic latitude of observer,30
+selenographic longitude of observer,30
+selenographic longitude of sun,1
+Wavelength,Irradiance
+350,0.0001,0
+370,0.0002,0
+390,0.0001,0
+410,0.0002,1e-10
+430,0.0001,0
+450,0.0003,0

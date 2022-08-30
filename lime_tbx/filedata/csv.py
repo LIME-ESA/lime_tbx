@@ -19,7 +19,6 @@ import numpy as np
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
     Point,
-    SatellitePoint,
     SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
@@ -118,8 +117,7 @@ def export_csv(
 
 
 def export_csv_comparation(
-    data: Union[SpectralData, List[SpectralData]],
-    xlabel: str,
+    data: List[SpectralData],
     ylabel: str,
     points: List[SurfacePoint],
     name: str,
@@ -134,8 +132,6 @@ def export_csv_comparation(
     y_data: tuple of two list of float
         Data from the y axis, which would correspond to the value, of the key-value pair.
         In the comparation it is the observed irradiance and the simulated one, in that exact order.
-    xlabel: str
-        Label of the x_data
     ylabel: str
         Label of the y_data
     points: list of SurfacePoint
@@ -154,7 +150,8 @@ def export_csv_comparation(
                 "altitude(m)",
                 "Observed {}".format(ylabel),
                 "Simulated {}".format(ylabel),
-                "Uncertainties",
+                "Observation uncertainties",
+                "Simulation uncertainties",
             ]
         )
         x_data = data[0].wlens
@@ -168,6 +165,7 @@ def export_csv_comparation(
                     pt.altitude,
                     data[0].data[i],
                     data[1].data[i],
+                    data[0].uncertainties[i],
                     data[1].uncertainties[i],
                 ]
             )

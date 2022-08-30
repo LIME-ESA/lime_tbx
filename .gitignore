@@ -122,5 +122,8 @@ kernels/custom.bsp
 # Temp generated files
 residuals.png
 
+# Test files
+*.test.*
+
 # Exceptions
 !**/eocfi_c/**
