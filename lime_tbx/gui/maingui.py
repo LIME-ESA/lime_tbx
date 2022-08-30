@@ -342,7 +342,9 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         super().__init__()
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
-        self.eocfi = eocfi_adapter.EOCFIConverter(eocfi_path)
+        self.eocfi: eocfi_adapter.IEOCFIConverter = eocfi_adapter.EOCFIConverter(
+            eocfi_path
+        )
         self.satellites = self.eocfi.get_sat_list()
         self._build_layout()
 

@@ -73,14 +73,6 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     return date0, date1
 
 
-def _filter_orbit_files_datetime(sat_orbit_files: List[str], dt: datetime) -> List[str]:
-    for file in sat_orbit_files:
-        dt0, dt1 = _get_file_datetimes(file)
-        if dt >= dt0 and dt <= dt1:
-            return [file]
-    return []
-
-
 class IEOCFIConverter(ABC):
     @abstractmethod
     def get_sat_names(self) -> List[str]:
@@ -92,6 +84,18 @@ class IEOCFIConverter(ABC):
         -------
         sat_names: list of str
             List of the satellite names
+        """
+        pass
+
+    @abstractmethod
+    def get_sat_list(self) -> List[Satellite]:
+        """
+        Obtain a list of the satellite data objects that are available in LIME TBX.
+
+        Returns
+        -------
+        sat_list: list of Satellite
+            List of Satellites available in LIME TBX.
         """
         pass
 

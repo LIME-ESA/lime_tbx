@@ -18,7 +18,7 @@ from lime_tbx.datatypes.datatypes import (
     SatellitePoint,
 )
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
+from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter, IEOCFIConverter
 
 
 """___Authorship___"""
@@ -144,7 +144,7 @@ class MoonDataFactory:
         md: MoonData | list of MoonData
             MoonData generated from the given data. It will be a list if sp.dt is a list.
         """
-        eocfi = EOCFIConverter(eocfi_path)
+        eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]
