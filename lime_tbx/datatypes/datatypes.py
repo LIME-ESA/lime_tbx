@@ -42,6 +42,8 @@ import obsarray
 """___LIME Modules___"""
 from . import constants
 from lime_tbx.datatypes.templates_digital_effects_table import (
+    TEMPLATE_IRR,
+    TEMPLATE_POL,
     TEMPLATE_REFL,
     TEMPLATE_SIGNALS,
 )
@@ -704,7 +706,9 @@ class SpectralData:
     ds: xarray.Dataset
 
     @staticmethod
-    def make_reflectance_ds(wavs, refl, unc_rand=None, unc_syst=None):
+    def make_reflectance_ds(
+        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
@@ -726,68 +730,74 @@ class SpectralData:
         return ds_refl
 
     @staticmethod
-    def make_irradiance_ds(wavs, refl, unc_rand=None, unc_syst=None):
+    def make_irradiance_ds(
+        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
-        ds_irr = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+        ds_irr = obsarray.create_ds(TEMPLATE_IRR, dim_sizes)
 
         ds_irr = ds_irr.assign_coords(wavelength=wavs)
 
-        ds_irr.reflectance.values = refl
+        ds_irr.irradiance.values = refl
 
         if unc_rand is not None:
-            ds_irr.u_ran_reflectance.values = unc_rand
+            ds_irr.u_ran_irradiance.values = unc_rand
         else:
-            ds_irr.u_ran_reflectance.values = refl * 0.01
+            ds_irr.u_ran_irradiance.values = refl * 0.01
 
         if unc_syst is not None:
-            ds_irr.u_sys_reflectance.values = unc_syst
+            ds_irr.u_sys_irradiance.values = unc_syst
         else:
-            ds_irr.u_sys_reflectance.values = refl * 0.05
+            ds_irr.u_sys_irradiance.values = refl * 0.05
 
         return ds_irr
 
     @staticmethod
-    def make_polarization_ds(wavs, refl, unc_rand=None, unc_syst=None):
+    def make_polarization_ds(
+        wavs: np.ndarray, polarization: np.ndarray, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
-        ds_pol = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+        ds_pol = obsarray.create_ds(TEMPLATE_POL, dim_sizes)
 
         ds_pol = ds_pol.assign_coords(wavelength=wavs)
 
-        ds_pol.reflectance.values = refl
+        ds_pol.polarization.values = polarization
 
         if unc_rand is not None:
-            ds_pol.u_ran_reflectance.values = unc_rand
+            ds_pol.u_ran_polarization.values = unc_rand
         else:
-            ds_pol.u_ran_reflectance.values = refl * 0.01
+            ds_pol.u_ran_polarization.values = polarization * 0.01
 
         if unc_syst is not None:
-            ds_pol.u_sys_reflectance.values = unc_syst
+            ds_pol.u_sys_polarization.values = unc_syst
         else:
-            ds_pol.u_sys_reflectance.values = refl * 0.05
+            ds_pol.u_sys_polarization.values = polarization * 0.05
 
         return ds_pol
 
     @staticmethod
-    def make_signals_ds(channel_ids, refl, unc_rand=None, unc_syst=None):
-        dim_sizes = {"channels": len(channel_ids), "dts": len(refl[0])}
+    def make_signals_ds(
+        channel_ids, signals, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
+        dim_sizes = {"channels": len(channel_ids), "dts": len(signals[0])}
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_SIGNALS, dim_sizes)
 
         ds_refl = ds_refl.assign_coords(wavelength=channel_ids)
 
-        ds_refl.signals.values = refl
+        ds_refl.signals.values = signals
 
         if unc_rand is not None:
             ds_refl.u_ran_signals.values = unc_rand
         else:
-            ds_refl.u_ran_signals.values = refl * 0.01
+            ds_refl.u_ran_signals.values = signals * 0.01
 
         if unc_syst is not None:
             ds_refl.u_sys_signals.values = unc_syst
         else:
-            ds_refl.u_sys_signals.values = refl * 0.05
+            ds_refl.u_sys_signals.values = signals * 0.05
 
         return ds_refl
 

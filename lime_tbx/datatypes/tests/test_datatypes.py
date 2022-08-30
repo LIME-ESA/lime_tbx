@@ -20,6 +20,7 @@ from ..datatypes import (
     SRFChannel,
     Satellite,
     SatellitePosition,
+    SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
 )
@@ -122,6 +123,7 @@ class TestPolarizationCoefficients(unittest.TestCase):
 
 
 class TestApolloIrradianceCoefficients(unittest.TestCase):
+    # This class is not deleted for legacy purposes, but it's not used. If it were to be used in the future, these tests should be developed.
     pass
 
 
@@ -234,8 +236,63 @@ class TestReflectanceCoefficients(unittest.TestCase):
                 self.assertEqual(a, a_coeffs_check[j])
 
 
+SPD_WAVS = np.array([350, 380, 400, 430, 450, 500, 600, 750, 800])
+SPD_VALS = np.array([0.002, 0.0048, 0.0043, 0.004, 0.0007, 0.0067, 0.0001, 0.7, 0.08])
+CH_IDS = np.array(["a", "b", "c", "d", "e"])
+SIGNALS_DATA = np.array(
+    [[0, 0.01], [0.01, 0.01], [0.01, 0.02], [0.04, 0.004], [0.06, 0.01]]
+)
+
+
 class TestSpectralData(unittest.TestCase):
-    pass
+    def test_make_reflectance_ds_ok(self):
+        ds = SpectralData.make_reflectance_ds(SPD_WAVS, SPD_VALS)
+        for i, val in enumerate(ds.reflectance.values):
+            self.assertEqual(val, SPD_VALS[i])
+        self.assertIsNotNone(ds.u_ran_reflectance.values)
+        self.assertIsNotNone(ds.u_sys_reflectance.values)
+
+    def test_make_reflectance_ds_list_err(self):
+        self.assertRaises(
+            TypeError, SpectralData.make_reflectance_ds, list(SPD_WAVS), list(SPD_VALS)
+        )
+
+    def test_make_reflectance_ds_Spectral_Data(self):
+        ds = SpectralData.make_reflectance_ds(SPD_WAVS, SPD_VALS)
+        uncs = ds.u_ran_reflectance.values**2 + ds.u_sys_reflectance.values**2
+        _ = SpectralData(SPD_WAVS, SPD_VALS, uncs, ds)
+
+    def test_make_irradiance_ds_ok(self):
+        ds = SpectralData.make_irradiance_ds(SPD_WAVS, SPD_VALS)
+        for i, val in enumerate(ds.irradiance.values):
+            self.assertEqual(val, SPD_VALS[i])
+        self.assertIsNotNone(ds.u_ran_irradiance.values)
+        self.assertIsNotNone(ds.u_sys_irradiance.values)
+
+    def test_make_polarization_ds_ok(self):
+        ds = SpectralData.make_polarization_ds(SPD_WAVS, SPD_VALS)
+        for i, val in enumerate(ds.polarization.values):
+            self.assertEqual(val, SPD_VALS[i])
+        self.assertIsNotNone(ds.u_ran_polarization.values)
+        self.assertIsNotNone(ds.u_sys_polarization.values)
+
+    def test_make_signals_ds_ok(self):
+        ds = SpectralData.make_signals_ds(CH_IDS, SIGNALS_DATA)
+        for i, arr in enumerate(ds.signals.values):
+            for j, val in enumerate(arr):
+                self.assertEqual(val, SIGNALS_DATA[i][j])
+        self.assertIsNotNone(ds.u_ran_signals.values)
+        self.assertIsNotNone(ds.u_sys_signals.values)
+
+    def test_make_signals_ds_invalid_signals_transposed(self):
+        self.assertRaises(
+            ValueError, SpectralData.make_signals_ds, CH_IDS, SIGNALS_DATA.T
+        )
+
+    def test_make_signals_ds_invalid_signals_unnested(self):
+        self.assertRaises(
+            TypeError, SpectralData.make_signals_ds, CH_IDS, SIGNALS_DATA.flatten()
+        )
 
 
 if __name__ == "__main__":

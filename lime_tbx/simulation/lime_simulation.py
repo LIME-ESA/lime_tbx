@@ -475,7 +475,7 @@ class LimeSimulation(ILimeSimulation):
             )
             ds_pol = SpectralData.make_polarization_ds(self.wlens, polarizations, None)
             return SpectralData(
-                self.wlens, polarizations, ds_pol.u_ran_reflectance.values, ds_pol
+                self.wlens, polarizations, ds_pol.u_ran_polarization.values, ds_pol
             )
         else:
             specs = []
@@ -487,7 +487,7 @@ class LimeSimulation(ILimeSimulation):
                     self.wlens, polarizations, None
                 )
                 spectral_data = SpectralData(
-                    self.wlens, polarizations, ds_pol.u_ran_reflectance.values, ds_pol
+                    self.wlens, polarizations, ds_pol.u_ran_polarization.values, ds_pol
                 )
                 specs.append(spectral_data)
         return specs
