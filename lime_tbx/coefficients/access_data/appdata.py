@@ -20,6 +20,14 @@ __status__ = "Development"
 APPNAME = "LimeTBX"
 
 
+def _is_valid_appdata(appdata: str) -> bool:
+    if path.exists(path.join(appdata, "kernels")) and path.exists(
+        path.join(appdata, "eocfi_data")
+    ):
+        return True
+    return False
+
+
 def get_appdata_folder() -> str:
     if sys.platform == "darwin":
         from AppKit import NSSearchPathForDirectoriesInDomains
@@ -30,5 +38,9 @@ def get_appdata_folder() -> str:
     elif sys.platform == "win32":
         appdata = path.join(environ["APPDATA"], APPNAME)
     else:
-        appdata = path.expanduser(path.join("~", "." + APPNAME))
+        appdata = path.join("/opt/esa", APPNAME)
+        if not _is_valid_appdata(appdata):
+            appdata = path.expanduser(path.join("~", "." + APPNAME))
+    if not _is_valid_appdata(appdata):
+        appdata = "."
     return appdata

@@ -33,7 +33,7 @@ class GUI:
 
         qss_bytes = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH)
         window.setStyleSheet(qss_bytes.decode())
-        package = pkgutil.get_loader(__name__)
-        logo_path = os.path.join(os.path.dirname(package.path), constants.LOGO_PATH)
+        _current_dir = os.path.dirname(os.path.abspath(__file__))
+        logo_path = os.path.join(_current_dir, constants.LOGO_PATH)
         window.setWindowIcon(QtGui.QIcon(logo_path))
         sys.exit(app.exec_())

@@ -40,8 +40,8 @@ if platform.system() == "Linux":
 else:
     so_file_satellite = SO_FILE_SATELLITE_WINDOWS
 
-_package = pkgutil.get_loader(__name__)
-_so_path = os.path.join(os.path.dirname(_package.path), so_file_satellite)
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+_so_path = os.path.join(_current_dir, so_file_satellite)
 eocfi_sat = CDLL(_so_path)
 
 
