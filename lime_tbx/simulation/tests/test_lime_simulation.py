@@ -16,6 +16,7 @@ from ...datatypes.datatypes import (
     SpectralResponseFunction,
     SRFChannel,
     SurfacePoint,
+    KernelsPath,
 )
 from ...coefficients.access_data.access_data import (
     _get_default_polarization_coefficients,
@@ -29,7 +30,7 @@ __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
-KERNELS_PATH = "./kernels"
+KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 EOCFI_PATH = "./eocfi_data"
 
 CH_WLENS = np.array([350, 400, 450, 500])

@@ -5,8 +5,12 @@ import os
 # import here
 
 """___LIME_TBX Modules___"""
-from lime_tbx.coefficients.access_data.appdata import get_appdata_folder
+from lime_tbx.coefficients.access_data.appdata import (
+    get_appdata_folder,
+    get_local_appdata_folder,
+)
 from lime_tbx.gui.gui import GUI
+from lime_tbx.datatypes.datatypes import KernelsPath
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -18,7 +22,11 @@ __status__ = "Development"
 
 def main():
     appdata = get_appdata_folder()
-    gui = GUI(os.path.join(appdata, "kernels"), os.path.join(appdata, "eocfi_data"))
+    local_appdata = get_local_appdata_folder()
+    kernels_path = KernelsPath(
+        os.path.join(appdata, "kernels"), os.path.join(local_appdata, "kernels")
+    )
+    gui = GUI(kernels_path, os.path.join(appdata, "eocfi_data"))
 
 
 if __name__ == "__main__":

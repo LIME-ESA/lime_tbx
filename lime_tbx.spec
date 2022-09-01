@@ -67,7 +67,7 @@ if sys.platform == 'win32' or sys.platform == 'win64' or sys.platform == 'linux'
             a.zipfiles,
             a.datas,  
             [],
-            name='LIME TBX',
+            name='LIME_TBX',
             debug=False,
             bootloader_ignore_signals=False,
             strip=False,

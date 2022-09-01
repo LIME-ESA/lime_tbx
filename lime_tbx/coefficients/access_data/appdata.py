@@ -40,7 +40,17 @@ def get_appdata_folder() -> str:
     else:
         appdata = path.join("/opt/esa", APPNAME)
         if not _is_valid_appdata(appdata):
-            appdata = path.expanduser(path.join("~", "." + APPNAME))
+            appdata = get_local_appdata_folder()
+    if not _is_valid_appdata(appdata):
+        appdata = "."
+    return appdata
+
+
+def get_local_appdata_folder() -> str:
+    if sys.platform == "linux":
+        appdata = path.expanduser(path.join("~", "." + APPNAME))
+    else:
+        appdata = get_appdata_folder()
     if not _is_valid_appdata(appdata):
         appdata = "."
     return appdata

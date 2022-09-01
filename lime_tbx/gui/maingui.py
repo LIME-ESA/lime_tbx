@@ -18,6 +18,7 @@ from . import settings, output, input, srf, help
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
+    KernelsPath,
     LunarObservation,
     LunarObservationWrite,
     Point,
@@ -633,7 +634,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     Main widget of the lime toolbox desktop app.
     """
 
-    def __init__(self, kernels_path: str, eocfi_path: str):
+    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
         super().__init__()
         self.setLocale("English")
         self.kernels_path = kernels_path

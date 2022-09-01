@@ -8,8 +8,9 @@ import os
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from . import constants, maingui
+from lime_tbx.datatypes.datatypes import KernelsPath
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -20,7 +21,7 @@ __status__ = "Development"
 
 
 class GUI:
-    def __init__(self, kernels_path: str, eocfi_path: str):
+    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])

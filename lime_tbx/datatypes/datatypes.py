@@ -815,3 +815,11 @@ class ComparisonData:
     number_samples: int
     dts: List[datetime]
     points: List[Point]
+
+
+@dataclass
+class KernelsPath:
+    """Dataclass containing the needed information in order to find all SPICE kernels."""
+
+    main_kernels_path: str
+    custom_kernel_path: str

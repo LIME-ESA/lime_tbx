@@ -16,6 +16,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
     SatellitePoint,
+    KernelsPath,
 )
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter, IEOCFIConverter
@@ -38,7 +39,7 @@ class MoonDataFactory:
     def get_md(
         point: Point,
         eocfi_path: str,
-        kernels_path: str,
+        kernels_path: KernelsPath,
     ) -> Union[MoonData, List[MoonData]]:
         """
         Create a MoonData from a generic point, whatever subclass it is.
@@ -49,7 +50,7 @@ class MoonDataFactory:
             Point from which to create the MoonData.
         eocfi_path: str
             Path to the folder with the needed eocfi data files.
-        kernels_path: str
+        kernels_path: KernelsPath
             Path to the folder with the needed SPICE kernel files.
 
         Returns
@@ -70,7 +71,7 @@ class MoonDataFactory:
     @staticmethod
     def get_md_from_surface(
         sp: SurfacePoint,
-        kernels_path: str,
+        kernels_path: KernelsPath,
     ) -> Union[MoonData, List[MoonData]]:
         """
         Create a MoonData from a surface point.
@@ -79,7 +80,7 @@ class MoonDataFactory:
         ----------
         sp: SurfacePoint
             SurfacePoint from which to create the MoonData.
-        kernels_path: str
+        kernels_path: KernelsPath
             Path to the folder with the needed SPICE kernel files.
 
         Returns
@@ -125,7 +126,7 @@ class MoonDataFactory:
     def get_md_from_satellite(
         sp: SatellitePoint,
         eocfi_path: str,
-        kernels_path: str,
+        kernels_path: KernelsPath,
     ) -> Union[MoonData, List[MoonData]]:
         """
         Create a MoonData from a satellite point.
@@ -136,7 +137,7 @@ class MoonDataFactory:
             SatellitePoint from which to create the MoonData.
         eocfi_path: str
             Path to the folder with the needed eocfi data files.
-        kernels_path: str
+        kernels_path: KernelsPath
             Path to the folder with the needed SPICE kernel files.
 
         Returns

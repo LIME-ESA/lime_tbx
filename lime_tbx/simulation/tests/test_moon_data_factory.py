@@ -13,6 +13,7 @@ from ...datatypes.datatypes import (
     MoonData,
     SatellitePoint,
     SurfacePoint,
+    KernelsPath,
 )
 
 """___Authorship___"""
@@ -22,7 +23,7 @@ __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
-KERNELS_PATH = "./kernels"
+KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 EOCFI_PATH = "./eocfi_data"
 
 LAT = 21

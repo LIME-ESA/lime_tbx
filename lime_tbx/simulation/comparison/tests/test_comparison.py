@@ -17,6 +17,7 @@ from ....datatypes.datatypes import (
     SRFChannel,
     ReflectanceCoefficients,
     SatellitePoint,
+    KernelsPath,
 )
 from ....coefficients.access_data.access_data import get_default_cimel_coeffs
 from ...lime_simulation import LimeSimulation, ILimeSimulation
@@ -28,7 +29,7 @@ __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
-KERNELS_PATH = "./kernels"
+KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 EOCFI_PATH = "./eocfi_data"
 
 CH_WLENS = np.array([350, 400, 450, 500])

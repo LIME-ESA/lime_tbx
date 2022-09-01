@@ -15,6 +15,7 @@ from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     SpectralData,
     ReflectanceCoefficients,
+    KernelsPath,
 )
 
 from lime_tbx.lime_algorithms.rolo import rolo
@@ -221,7 +222,7 @@ class LimeSimulation(ILimeSimulation):
     def __init__(
         self,
         eocfi_path: str,
-        kernels_path: str,
+        kernels_path: KernelsPath,
         MCsteps: int = 100,
         verbose: bool = True,
     ):
@@ -230,7 +231,7 @@ class LimeSimulation(ILimeSimulation):
         ----------
         eocfi_path: str
             Path where the folder with the needed EOCFI data files is located.
-        kernels_path: str
+        kernels_path: KernelsPath
             Path where the folder with the needed SPICE kernel files is located.
         """
         self.kernels_path = kernels_path
