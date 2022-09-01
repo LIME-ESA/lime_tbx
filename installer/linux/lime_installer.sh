@@ -1,9 +1,8 @@
+#!/bin/bash
 assets="installer_files"
 dst="/opt/esa/LimeTBX"
-user_home=$(bash -c "cd ~$(printf "%q" $SUDO_USER) && pwd")
+user_home=$(bash -c "cd ~$(printf %q $SUDO_USER) && pwd")
 local_appdata="$user_home/.LimeTBX"
-echo $local_appdata
-exit
 executable="LIME_TBX"
 bin_path="/usr/bin"
 command_name="lime"
