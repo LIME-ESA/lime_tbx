@@ -7,7 +7,7 @@ import os
 """___LIME_TBX Modules___"""
 from lime_tbx.coefficients.access_data.appdata import (
     get_appdata_folder,
-    get_local_appdata_folder,
+    get_programfiles_folder,
 )
 from lime_tbx.gui.gui import GUI
 from lime_tbx.datatypes.datatypes import KernelsPath
@@ -21,12 +21,12 @@ __status__ = "Development"
 
 
 def main():
+    programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
-    local_appdata = get_local_appdata_folder()
     kernels_path = KernelsPath(
-        os.path.join(appdata, "kernels"), os.path.join(local_appdata, "kernels")
+        os.path.join(programfiles, "kernels"), os.path.join(appdata, "kernels")
     )
-    gui = GUI(kernels_path, os.path.join(appdata, "eocfi_data"))
+    gui = GUI(kernels_path, os.path.join(programfiles, "eocfi_data"))
 
 
 if __name__ == "__main__":
