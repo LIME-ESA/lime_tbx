@@ -8,6 +8,7 @@ block_cipher = None
 a_pathex = []
 a_binaries = []
 a_datas = []
+a_icon = ''
 
 if sys.platform == 'linux':
     src_path = 'lime_tbx/'
@@ -25,6 +26,7 @@ if sys.platform == 'linux':
         (src_path + 'interpolation/access_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/access_data/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
+    a_icon = src_path + 'gui/assets/lime_logo.ico'
 elif sys.platform == 'win32' or sys.platform == 'win64':
     src_path = 'lime_tbx\\'
     a_pathex = ['.\\.venv\\Lib\\site-packages\\']
@@ -43,6 +45,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'interpolation\\access_data\\assets\\SomeMoonReflectances.txt', '.\\lime_tbx\\interpolation\\access_data\\assets'),
         (src_path + 'lime_algorithms\\rolo\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
     ]
+    a_icon = src_path + 'gui\\assets\\lime_logo.ico'
 runner_file = src_path + 'main.py'
 
 a = Analysis([runner_file],
@@ -76,8 +79,8 @@ if sys.platform == 'win32' or sys.platform == 'win64' or sys.platform == 'linux'
             upx=True,
             upx_exclude=[],
             runtime_tmpdir=None,
-            console=True,
-            icon=None,
+            console=False,
+            icon=a_icon,
             disable_windowed_traceback=False,
             target_arch=None,
             codesign_identity=None,

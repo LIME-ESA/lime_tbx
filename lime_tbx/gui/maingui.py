@@ -611,7 +611,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
                 )
                 obs.append(ob)
             name = QtWidgets.QFileDialog().getSaveFileName(
-                self, "Export LGLOD", "{}.nc".format("lglog")
+                self, "Export LGLOD", "{}.nc".format("lglod")
             )[0]
             if name is not None and name != "":
                 try:

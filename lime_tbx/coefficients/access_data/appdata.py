@@ -2,7 +2,7 @@
 
 """___Built-In Modules___"""
 import sys
-from os import path, environ
+from os import path, environ, makedirs
 
 """___Third-Party Modules___"""
 # import here
@@ -21,7 +21,14 @@ APPNAME = "LimeTBX"
 
 
 def _is_valid_appdata(appdata: str) -> bool:
-    return path.exists(path.join(appdata, "kernels"))
+    kpath = path.join(appdata, "kernels")
+    if not path.exists(kpath):
+        try:
+            makedirs(kpath)
+        except Exception as e:
+            print(e)
+            return False
+    return True
 
 def _is_valid_programfiles(programdata: str) -> bool:
     if path.exists(path.join(programdata, "kernels")) and path.exists(

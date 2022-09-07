@@ -37,4 +37,8 @@ class GUI:
         _current_dir = os.path.dirname(os.path.abspath(__file__))
         logo_path = os.path.join(_current_dir, constants.LOGO_PATH)
         window.setWindowIcon(QtGui.QIcon(logo_path))
+        if sys.platform == 'win32':
+            import ctypes
+            myappid = u'esa.lime.limetbx'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         sys.exit(app.exec_())
