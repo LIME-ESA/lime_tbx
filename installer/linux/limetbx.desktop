@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=LimeTBX
+GenericName=LimeTBX
+Comment=Lunar Irradiance Model of ESA Toolbox
+Exec=lime
+Icon=/opt/esa/LimeTBX/lime_logo.png
+Terminal=false
+Categories=Development;
+StartupNotify=true
