@@ -49,6 +49,10 @@ def get_spice_adapter() -> ISPICEAdapter:
     return SPICEAdapter()
 
 
+# spicedmoon is a GOA library, which has been tested and used, so we are certain
+# that is quite robust, so extremely intense testing is not needed.
+
+
 class TestSPICEAdapter(unittest.TestCase):
 
     #### Function: get_moon_data_from_earth
@@ -57,7 +61,7 @@ class TestSPICEAdapter(unittest.TestCase):
     def test_gmdfe_ok(self):
         sp = get_spice_adapter()
         md: MoonData = sp.get_moon_data_from_earth(LAT, LON, ALT, DT1, KERNELS_PATH)
-        self.assertTrue(isinstance(md, MoonData))
+        self.assertIsInstance(md, MoonData)
         self.assertEqual(md.absolute_mpa_degrees, MD1.absolute_mpa_degrees)
         self.assertEqual(md.distance_observer_moon, MD1.distance_observer_moon)
         self.assertEqual(md.distance_sun_moon, MD1.distance_sun_moon)
@@ -72,9 +76,9 @@ class TestSPICEAdapter(unittest.TestCase):
         mds: List[MoonData] = sp.get_moon_data_from_earth(
             LAT, LON, ALT, [DT1, DT2], KERNELS_PATH
         )
-        self.assertTrue(isinstance(mds, list))
+        self.assertIsInstance(mds, list)
         md1 = mds[0]
-        self.assertTrue(isinstance(md1, MoonData))
+        self.assertIsInstance(md1, MoonData)
         self.assertEqual(md1.absolute_mpa_degrees, MD1.absolute_mpa_degrees)
         self.assertEqual(md1.distance_observer_moon, MD1.distance_observer_moon)
         self.assertEqual(md1.distance_sun_moon, MD1.distance_sun_moon)
@@ -83,7 +87,7 @@ class TestSPICEAdapter(unittest.TestCase):
         self.assertEqual(md1.long_sun_radians, MD1.long_sun_radians)
         self.assertEqual(md1.mpa_degrees, MD1.mpa_degrees)
         md2 = mds[1]
-        self.assertTrue(isinstance(md2, MoonData))
+        self.assertIsInstance(md2, MoonData)
         self.assertEqual(md2.absolute_mpa_degrees, MD2.absolute_mpa_degrees)
         self.assertEqual(md2.distance_observer_moon, MD2.distance_observer_moon)
         self.assertEqual(md2.distance_sun_moon, MD2.distance_sun_moon)
@@ -96,7 +100,7 @@ class TestSPICEAdapter(unittest.TestCase):
     def test_gmdfe_empty_list_dt(self):
         sp = get_spice_adapter()
         mds = sp.get_moon_data_from_earth(LAT, LON, ALT, [], KERNELS_PATH)
-        self.assertTrue(isinstance(mds, list))
+        self.assertIsInstance(mds, list)
         self.assertEqual(len(mds), 0)
 
 

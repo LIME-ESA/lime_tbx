@@ -1,5 +1,5 @@
 """
-This module calculates acts as an interface/adapter with NASA's SPICE software
+This module acts as an interface/adapter with NASA's SPICE software.
 
 It exports the following classes:
     * ISPICEAdapter - Interface that contains the methods of this module.
@@ -14,7 +14,7 @@ from typing import List, Union
 """___Third-Party Modules___"""
 import spicedmoon
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from ..datatypes import datatypes
 
 """___Authorship___"""
@@ -33,7 +33,7 @@ class ISPICEAdapter(ABC):
         longitude: float,
         altitude: float,
         dt: Union[datetime, List[datetime]],
-        kernels_path: str,
+        kernels_path: datatypes.KernelsPath,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         """
         Calculate lunar data for a position on earth surface at a concrete datetime.
@@ -68,11 +68,16 @@ class SPICEAdapter(ISPICEAdapter):
         longitude: float,
         altitude: float,
         dt: Union[datetime, List[datetime]],
-        kernels_path: str,
+        kernels_path: datatypes.KernelsPath,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         if isinstance(dt, list):
             mds = spicedmoon.get_moon_datas(
-                latitude, longitude, altitude, dt, kernels_path
+                latitude,
+                longitude,
+                altitude,
+                dt,
+                kernels_path.main_kernels_path,
+                custom_kernel_path=kernels_path.custom_kernel_path,
             )
             mds2 = []
             for md in mds:
@@ -88,7 +93,12 @@ class SPICEAdapter(ISPICEAdapter):
                 mds2.append(md2)
             return mds2
         md = spicedmoon.get_moon_datas(
-            latitude, longitude, altitude, [dt], kernels_path
+            latitude,
+            longitude,
+            altitude,
+            [dt],
+            kernels_path.main_kernels_path,
+            custom_kernel_path=kernels_path.custom_kernel_path,
         )[0]
         return datatypes.MoonData(
             md.dist_sun_moon_au,

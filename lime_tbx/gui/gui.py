@@ -8,8 +8,9 @@ import os
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from . import constants, maingui
+from lime_tbx.datatypes.datatypes import KernelsPath
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -20,7 +21,7 @@ __status__ = "Development"
 
 
 class GUI:
-    def __init__(self, kernels_path: str, eocfi_path: str):
+    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
@@ -33,7 +34,11 @@ class GUI:
 
         qss_bytes = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH)
         window.setStyleSheet(qss_bytes.decode())
-        package = pkgutil.get_loader(__name__)
-        logo_path = os.path.join(os.path.dirname(package.path), constants.LOGO_PATH)
+        _current_dir = os.path.dirname(os.path.abspath(__file__))
+        logo_path = os.path.join(_current_dir, constants.LOGO_PATH)
         window.setWindowIcon(QtGui.QIcon(logo_path))
+        if sys.platform == 'win32':
+            import ctypes
+            myappid = u'esa.lime.limetbx'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         sys.exit(app.exec_())

@@ -33,15 +33,15 @@ __status__ = "Development"
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
 SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux.so"
-SO_FILE_SATELLITE_WINDOWS = "eocfi_c/bin/get_positions_win64.dll"
+SO_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.dll"
 
 if platform.system() == "Linux":
     so_file_satellite = SO_FILE_SATELLITE_LINUX
 else:
     so_file_satellite = SO_FILE_SATELLITE_WINDOWS
 
-_package = pkgutil.get_loader(__name__)
-_so_path = os.path.join(os.path.dirname(_package.path), so_file_satellite)
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+_so_path = os.path.join(_current_dir, so_file_satellite)
 eocfi_sat = CDLL(_so_path)
 
 
@@ -73,14 +73,6 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     return date0, date1
 
 
-def _filter_orbit_files_datetime(sat_orbit_files: List[str], dt: datetime) -> List[str]:
-    for file in sat_orbit_files:
-        dt0, dt1 = _get_file_datetimes(file)
-        if dt >= dt0 and dt <= dt1:
-            return [file]
-    return []
-
-
 class IEOCFIConverter(ABC):
     @abstractmethod
     def get_sat_names(self) -> List[str]:
@@ -92,6 +84,18 @@ class IEOCFIConverter(ABC):
         -------
         sat_names: list of str
             List of the satellite names
+        """
+        pass
+
+    @abstractmethod
+    def get_sat_list(self) -> List[Satellite]:
+        """
+        Obtain a list of the satellite data objects that are available in LIME TBX.
+
+        Returns
+        -------
+        sat_list: list of Satellite
+            List of Satellites available in LIME TBX.
         """
         pass
 
@@ -147,9 +151,10 @@ class EOCFIConverter(IEOCFIConverter):
         sat_list: dict
             Dictionary containing the sat list yaml.
         """
-        return yaml.load(
-            open(os.path.join(self.eocfi_path, ESA_SAT_LIST)), Loader=yaml.FullLoader
-        )
+        fl = open(os.path.join(self.eocfi_path, ESA_SAT_LIST))
+        y = yaml.load(fl, Loader=yaml.FullLoader)
+        fl.close()
+        return y
 
     def get_sat_list(self) -> List[Satellite]:
         """
@@ -214,9 +219,9 @@ class EOCFIConverter(IEOCFIConverter):
             )
         ]
 
-        metadata = yaml.load(
-            open(os.path.join(self.eocfi_path, METADATA_FILE)), Loader=yaml.FullLoader
-        )
+        fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
+        metadata = yaml.load(fl, Loader=yaml.FullLoader)
+        fl.close()
 
         bulletin = os.path.join(self.eocfi_path, metadata.get("BULLETIN_IERS")["file"])
 
@@ -243,6 +248,4 @@ class EOCFIConverter(IEOCFIConverter):
         lat, lon, hhh = transformer.transform(
             sat_position[0], sat_position[1], sat_position[2], radians=False
         )
-        print(lat, lon, hhh)
         return lat, lon, hhh
-        # print("Geocentric: ", 360+lat, lon, hhh)

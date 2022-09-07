@@ -18,6 +18,7 @@ from . import settings, output, input, srf, help
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
+    KernelsPath,
     LunarObservation,
     LunarObservationWrite,
     Point,
@@ -32,7 +33,7 @@ from ..datatypes.datatypes import (
     SpectralData,
 )
 from ..eocfi_adapter import eocfi_adapter
-from lime_tbx.simulation.lime_simulation import LimeSimulation
+from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -65,7 +66,7 @@ def eli_callback(
     point: Point,
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
-    lime_simulation: LimeSimulation,
+    lime_simulation: ILimeSimulation,
 ) -> Tuple[
     List[float],
     List[float],
@@ -114,10 +115,10 @@ def eli_callback(
     return (
         point,
         srf,
-        lime_simulation.elis,
-        lime_simulation.elis_cimel,
-        lime_simulation.elis_asd,
-        lime_simulation.signals,
+        lime_simulation.get_elis(),
+        lime_simulation.get_elis_cimel(),
+        lime_simulation.get_elis_asd(),
+        lime_simulation.get_signals(),
     )
 
 
@@ -126,7 +127,7 @@ def elref_callback(
     point: Point,
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
-    lime_simulation: LimeSimulation,
+    lime_simulation: ILimeSimulation,
 ) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
     """Callback that performs the Reflectance operations.
 
@@ -159,9 +160,9 @@ def elref_callback(
     lime_simulation.update_reflectance(srf, point, cimel_coef)
     return (
         point,
-        lime_simulation.elref,
-        lime_simulation.elref_cimel,
-        lime_simulation.elref_asd,
+        lime_simulation.get_elrefs(),
+        lime_simulation.get_elrefs_cimel(),
+        lime_simulation.get_elrefs_asd(),
     )
 
 
@@ -169,11 +170,11 @@ def polar_callback(
     srf: SpectralResponseFunction,
     point: Point,
     coeffs: PolarizationCoefficients,
-    lime_simulation: LimeSimulation,
+    lime_simulation: ILimeSimulation,
 ) -> Tuple[List[float], List[float], Point]:
 
     lime_simulation.update_polarization(srf, point, coeffs)
-    return point, lime_simulation.polars
+    return point, lime_simulation.get_polars()
 
 
 def compare_callback(
@@ -181,12 +182,12 @@ def compare_callback(
     srf: SpectralResponseFunction,
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
-    lime_simulation: LimeSimulation,
+    lime_simulation: ILimeSimulation,
 ) -> Tuple[List[ComparisonData], List[LunarObservation], SpectralResponseFunction,]:
     co = comparison.Comparison()
     for mo in mos:
         if not mo.check_valid_srf(srf):
-            raise ("SRF file not valid for the chosen Moon observations file.")
+            raise Exception("SRF file not valid for the chosen Moon observations file.")
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
     return comparisons, mos, srf
 
@@ -198,7 +199,7 @@ def calculate_all_callback(
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     p_coeffs: PolarizationCoefficients,
-    lime_simulation: LimeSimulation,
+    lime_simulation: ILimeSimulation,
 ):
     lime_simulation.update_reflectance(srf, point, cimel_coef)
     lime_simulation.update_irradiance(srf, signals_srf, point, cimel_coef)
@@ -227,7 +228,7 @@ def _start_thread(
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
-        lime_simulation: LimeSimulation,
+        lime_simulation: ILimeSimulation,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
@@ -335,14 +336,16 @@ class MainSimulationsWidget(QtWidgets.QWidget):
 
     def __init__(
         self,
-        lime_simulation: LimeSimulation,
+        lime_simulation: ILimeSimulation,
         eocfi_path: str,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
-        self.eocfi = eocfi_adapter.EOCFIConverter(eocfi_path)
+        self.eocfi: eocfi_adapter.IEOCFIConverter = eocfi_adapter.EOCFIConverter(
+            eocfi_path
+        )
         self.satellites = self.eocfi.get_sat_list()
         self._build_layout()
 
@@ -608,7 +611,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
                 )
                 obs.append(ob)
             name = QtWidgets.QFileDialog().getSaveFileName(
-                self, "Export LGLOD", "{}.nc".format("lglog")
+                self, "Export LGLOD", "{}.nc".format("lglod")
             )[0]
             if name is not None and name != "":
                 try:
@@ -631,7 +634,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     Main widget of the lime toolbox desktop app.
     """
 
-    def __init__(self, kernels_path: str, eocfi_path: str):
+    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
         super().__init__()
         self.setLocale("English")
         self.kernels_path = kernels_path

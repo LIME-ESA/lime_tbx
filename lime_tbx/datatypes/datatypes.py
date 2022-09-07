@@ -6,18 +6,21 @@ It exports the following classes:
     * MoonData - Moon data used in the calculations of the Moon's irradiance.
     * SRFChannel - Spectral responses and metadata for a SRF Channel
     * SpectralResponseFunction - The spectral response function, a set of channels with their data.
+    * Point - Superclass for all point classes.
     * SurfacePoint - Point on Earth's surface
     * CustomPoint - Point with custom Moon data.
     * SatellitePoint - Point of a Satellite in a concrete datetime
     * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
-    * IrradianceCoefficients - Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
+    * ApolloIrradianceCoefficients - Coefficients used in the ROLO algorithm. (ROLO's + Apollo's).
     * OrbitFile - Satellite orbit file.
     * Satellite - ESA Satellite
     * SatellitePosition - A satellite's position
     * LunarObservation - GLOD lunar observation
-    * CimelReflectanceCoeffs - Dataclass containing the cimel coefficients that will be used in the
+    * LunarObservationWrite - Dataclass containing the needed information to create a GLOD file.
+    * ReflectanceCoefficients - Dataclass containing the cimel coefficients that will be used in the
         reflectance simulation algorithm.
     * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
+    * ComparisonData - Dataclass containing the data outputed from a comparison.
 
 It exports the following Enums:
     * SpectralValidity - Enum that represents if a channel is inside LIME's spectral range.
@@ -39,6 +42,8 @@ import obsarray
 """___LIME Modules___"""
 from . import constants
 from lime_tbx.datatypes.templates_digital_effects_table import (
+    TEMPLATE_IRR,
+    TEMPLATE_POL,
     TEMPLATE_REFL,
     TEMPLATE_SIGNALS,
 )
@@ -161,7 +166,10 @@ class SpectralResponseFunction:
         return [ch.id for ch in self.channels]
 
     def get_channel_from_name(self, name: str) -> SRFChannel:
-        return [ch for ch in self.channels if ch.id == name][0]
+        chs = [ch for ch in self.channels if ch.id == name]
+        if len(chs) == 0:
+            return None
+        return chs[0]
 
 
 class Point(ABC):
@@ -217,7 +225,7 @@ class CustomPoint(Point):
     abs_moon_phase_angle : float
         Absolute Moon phase angle (in degrees)
     moon_phase_angle : float
-        Absolute Moon phase angle (in degrees)
+        Moon phase angle (in degrees)
     """
 
     distance_sun_moon: float
@@ -613,6 +621,7 @@ class LunarObservation:
 
 @dataclass
 class LunarObservationWrite(LunarObservation):
+    "Dataclass containing the needed information to create a GLOD file."
     signals_uncs: np.ndarray
     irrs: "SpectralData"
     refls: "SpectralData"
@@ -640,6 +649,14 @@ class ReflectanceCoefficients:
 
     @dataclass
     class _WlenReflCoeffs:
+        """
+        Subdataclass where coefficients are stored
+
+        x_coeffs structure: [[x0_w0, x0_w1, x0_w2, ...], [x1_w0, x1_w2, x1_w2, ...], ...]
+        It's that way so "vector-wise" operations can be performed over every xn parameter without
+        having to perform them over every wavelength too.
+        """
+
         __slots__ = [
             "_coeffs",
             "a_coeffs",
@@ -689,7 +706,9 @@ class SpectralData:
     ds: xarray.Dataset
 
     @staticmethod
-    def make_reflectance_ds(wavs, refl, unc_rand=None, unc_syst=None):
+    def make_reflectance_ds(
+        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
@@ -711,74 +730,82 @@ class SpectralData:
         return ds_refl
 
     @staticmethod
-    def make_irradiance_ds(wavs, refl, unc_rand=None, unc_syst=None):
+    def make_irradiance_ds(
+        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
-        ds_irr = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+        ds_irr = obsarray.create_ds(TEMPLATE_IRR, dim_sizes)
 
         ds_irr = ds_irr.assign_coords(wavelength=wavs)
 
-        ds_irr.reflectance.values = refl
+        ds_irr.irradiance.values = refl
 
         if unc_rand is not None:
-            ds_irr.u_ran_reflectance.values = unc_rand
+            ds_irr.u_ran_irradiance.values = unc_rand
         else:
-            ds_irr.u_ran_reflectance.values = refl * 0.01
+            ds_irr.u_ran_irradiance.values = refl * 0.01
 
         if unc_syst is not None:
-            ds_irr.u_sys_reflectance.values = unc_syst
+            ds_irr.u_sys_irradiance.values = unc_syst
         else:
-            ds_irr.u_sys_reflectance.values = refl * 0.05
+            ds_irr.u_sys_irradiance.values = refl * 0.05
 
         return ds_irr
 
     @staticmethod
-    def make_polarization_ds(wavs, refl, unc_rand=None, unc_syst=None):
+    def make_polarization_ds(
+        wavs: np.ndarray, polarization: np.ndarray, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
-        ds_pol = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
+        ds_pol = obsarray.create_ds(TEMPLATE_POL, dim_sizes)
 
         ds_pol = ds_pol.assign_coords(wavelength=wavs)
 
-        ds_pol.reflectance.values = refl
+        ds_pol.polarization.values = polarization
 
         if unc_rand is not None:
-            ds_pol.u_ran_reflectance.values = unc_rand
+            ds_pol.u_ran_polarization.values = unc_rand
         else:
-            ds_pol.u_ran_reflectance.values = refl * 0.01
+            ds_pol.u_ran_polarization.values = polarization * 0.01
 
         if unc_syst is not None:
-            ds_pol.u_sys_reflectance.values = unc_syst
+            ds_pol.u_sys_polarization.values = unc_syst
         else:
-            ds_pol.u_sys_reflectance.values = refl * 0.05
+            ds_pol.u_sys_polarization.values = polarization * 0.05
 
         return ds_pol
 
     @staticmethod
-    def make_signals_ds(channel_ids, refl, unc_rand=None, unc_syst=None):
-        dim_sizes = {"channels": len(channel_ids), "dts": len(refl[0])}
+    def make_signals_ds(
+        channel_ids, signals, unc_rand=None, unc_syst=None
+    ) -> xarray.Dataset:
+        dim_sizes = {"channels": len(channel_ids), "dts": len(signals[0])}
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_SIGNALS, dim_sizes)
 
         ds_refl = ds_refl.assign_coords(wavelength=channel_ids)
 
-        ds_refl.signals.values = refl
+        ds_refl.signals.values = signals
 
         if unc_rand is not None:
             ds_refl.u_ran_signals.values = unc_rand
         else:
-            ds_refl.u_ran_signals.values = refl * 0.01
+            ds_refl.u_ran_signals.values = signals * 0.01
 
         if unc_syst is not None:
             ds_refl.u_sys_signals.values = unc_syst
         else:
-            ds_refl.u_sys_signals.values = refl * 0.05
+            ds_refl.u_sys_signals.values = signals * 0.05
 
         return ds_refl
 
 
 @dataclass
 class ComparisonData:
+    """Dataclass containing the data outputed from a comparison."""
+
     observed_signal: SpectralData
     simulated_signal: SpectralData
     diffs_signal: SpectralData
@@ -788,3 +815,11 @@ class ComparisonData:
     number_samples: int
     dts: List[datetime]
     points: List[Point]
+
+
+@dataclass
+class KernelsPath:
+    """Dataclass containing the needed information in order to find all SPICE kernels."""
+
+    main_kernels_path: str
+    custom_kernel_path: str

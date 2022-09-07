@@ -307,7 +307,6 @@ class GraphWidget(QtWidgets.QWidget):
                 if isinstance(self.point, list):
                     csv.export_csv_comparation(
                         self.data,
-                        self.xlabel,
                         self.ylabel,
                         self.point,
                         name,

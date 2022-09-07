@@ -245,8 +245,11 @@ double * get_moon_position(
 
 }
 
-
+#ifdef _WIN32
 __declspec(dllexport) double *  get_satellite_position(
+#else
+    double *  get_satellite_position(
+#endif
         long sat_id,
         int y,
         int m,

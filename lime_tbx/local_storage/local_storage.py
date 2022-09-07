@@ -17,7 +17,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-class Comparison:
+class LocalStorage:
     def __init__(self, something):
         self.something = something
 

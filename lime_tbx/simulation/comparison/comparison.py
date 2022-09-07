@@ -11,23 +11,24 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 import math
 from typing import List, Tuple
-from datetime import datetime
 
 """___Third-Party Modules___"""
 import numpy as np
+import pyproj
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
-    ApolloIrradianceCoefficients,
     ComparisonData,
     LunarObservation,
     ReflectanceCoefficients,
     SpectralData,
     SpectralResponseFunction,
     SurfacePoint,
+    SRFChannel,
 )
-from lime_tbx.simulation.lime_simulation import LimeSimulation
+from lime_tbx.simulation.lime_simulation import ILimeSimulation
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
+from ...datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -106,53 +107,54 @@ class IComparison(ABC):
     @abstractmethod
     def get_simulations(
         self,
-        observations: LunarObservation,
+        observations: List[LunarObservation],
+        def_srf: SpectralResponseFunction,
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
-        kernels_path: str,
-    ) -> Tuple[
-        List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
-    ]:
+        lime_simulation: ILimeSimulation,
+    ) -> List[ComparisonData]:
         """
         Simulate the moon irradiance for the given scenarios.
 
         Parameters
         ----------
-        observations: MoonObservation
-            MoonObservationn read from a GLOD datafile.
+        observations: list of MoonObservation
+            MoonObservations read from a GLOD datafile.
+        def_srf: SpectralResponseFunction
+            SpectralResponseFunction that corresponds to the default spectrum.
         srf: SpectralResponseFunction
             SpectralResponseFunction that corresponds to the observations file
         coefficients: ReflectanceCoefficients
             Coefficients to be used
-        kernels_path: str
-            Path where the needed SPICE kernels are located.
+        lime_simulation: ILimeSimulation
+            Lime simulation instance, storing the current state of the simulation.
 
         Returns
         -------
-        sigs: list of list of tuple of float, float
-            List containing one list per SRF channel, containing all the simulated measures
-            that have a counterpart in the observations data object. The tuple contains the signal
-            and its uncertainty.
-        dts: list of list of datetime
-            List containing one list per SRF channel, containing the corresponding datetimes
-            for every irradiance measure.
-        sps: list of list of SurfacePoint
-            List containing one list per SRF channel, containing the corresponding SurfacePoint
-            for every irradiance measure.
+        comparisons: list of ComparisonData
+            List containing all comparisons of all channels
         """
         pass
 
 
 class Comparison(IComparison):
+    def _get_full_srf(self) -> SpectralResponseFunction:
+        spectral_response = {
+            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN)
+        }
+        ch = SRFChannel(
+            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Full", spectral_response
+        )
+        srf = SpectralResponseFunction("Full", [ch])
+        return srf
+
     def get_simulations(
         self,
         observations: List[LunarObservation],
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
-        lime_simulation: LimeSimulation,
-    ) -> Tuple[
-        List[List[Tuple[float, float]]], List[List[datetime]], List[List[SurfacePoint]]
-    ]:
+        lime_simulation: ILimeSimulation,
+    ) -> List[ComparisonData]:
         ch_names = srf.get_channels_names()
         comparisons = []
         sigs = [[] for _ in ch_names]
@@ -166,9 +168,9 @@ class Comparison(IComparison):
             sp = SurfacePoint(lat, lon, h, dt)
             lime_simulation.set_simulation_changed()
             lime_simulation.update_irradiance(
-                SpectralResponseFunction("empty", []), srf, sp, coefficients
+                self._get_full_srf(), srf, sp, coefficients
             )
-            signals = lime_simulation.signals
+            signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
                     ch_dates[j].append(dt)
