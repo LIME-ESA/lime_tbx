@@ -116,10 +116,14 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
     ds.reference_model = "LIME2 coefficients v0"  # TODO add coefficients version
     # DIMENSIONS
+    max_len_strlen = len(max(obs[0].ch_names, key=len))
+    chan_st_type = "S{}".format(max_len_strlen)
+    max_len_sat_pos_ref = len(max(obs[0].sat_pos_ref, key=len))
+    sat_pos_ref_st_type = "S{}".format(max_len_sat_pos_ref)
     chan = ds.createDimension("chan", len(obs[0].ch_names))
-    chan_strlen = ds.createDimension("chan_strlen", 6)
+    chan_strlen = ds.createDimension("chan_strlen", max_len_strlen)
     date = ds.createDimension("date", len(obs))
-    sat_ref_strlen = ds.createDimension("sat_ref_strlen", 6)
+    sat_ref_strlen = ds.createDimension("sat_ref_strlen", max_len_sat_pos_ref)
     col = ds.createDimension("col", 0)
     row = ds.createDimension("row", 0)
     sat_xyz = ds.createDimension("sat_xyz", 3)
@@ -134,8 +138,9 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
     channel_name.standard_name = "sensor_band_identifier"
     channel_name.long_name = "channel identifier"
-    chn = np.array([np.array([ch], "S4") for ch in obs[0].ch_names])
-    channel_name[:] = chn
+    channel_name[:] = np.array(
+        [nc.stringtochar(np.array([ch], chan_st_type)) for ch in obs[0].ch_names]
+    )
     sat_pos = ds.createVariable("sat_pos", "f4", ("date", "sat_xyz"))
     sat_pos.long_name = "satellite position x y z in sat_pos_ref"
     sat_pos.units = "km"
@@ -146,7 +151,9 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     )
     sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
     sat_pos_ref.long_name = "reference frame of satellite position"
-    sat_pos_ref[:] = obs[0].sat_pos_ref
+    sat_pos_ref[:] = nc.stringtochar(
+        np.array([obs[0].sat_pos_ref], sat_pos_ref_st_type)
+    )
     irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
     irr_obs.units = "W m-2 nm-1"
     irr_obs.long_name = "observed lunar irradiance"

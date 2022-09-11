@@ -121,3 +121,6 @@ residuals.png
 
 # Exceptions
 !**/eocfi_c/**
+
+# Dump ignore_folder
+ignore_folder
