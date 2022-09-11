@@ -26,6 +26,7 @@ from ..datatypes.datatypes import (
     SpectralData,
 )
 from ..filedata import csv
+from .ifaces import IMainSimulationsWidget
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -84,6 +85,9 @@ class GraphWidget(QtWidgets.QWidget):
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
         self.csv_button.setDisabled(disable)
+        parent = self.parentWidget()
+        if isinstance(parent, IMainSimulationsWidget):
+            parent.set_export_button_disabled(disable)
 
     def update_plot(
         self,

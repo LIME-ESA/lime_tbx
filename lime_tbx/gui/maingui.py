@@ -4,9 +4,6 @@
 from enum import Enum
 from typing import List, Callable, Union, Tuple
 from datetime import datetime
-import time
-
-from lime_tbx.filedata import moon
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -14,7 +11,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
-
+from lime_tbx.filedata import moon
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
@@ -34,6 +31,7 @@ from ..datatypes.datatypes import (
 )
 from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
+from .ifaces import IMainSimulationsWidget, noconflict_makecls
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -328,7 +326,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         raise error
 
 
-class MainSimulationsWidget(QtWidgets.QWidget):
+class MainSimulationsWidget(
+    QtWidgets.QWidget, IMainSimulationsWidget, metaclass=noconflict_makecls()
+):
     """
     Widget containing the landing gui, which lets the user calculate the eli, elref and polar
     of a surface point, custom input or satellite input at one moment.
@@ -396,6 +396,7 @@ class MainSimulationsWidget(QtWidgets.QWidget):
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.export_lglod_button.clicked.connect(self.export_glod)
+        self.export_lglod_button.setDisabled(True)
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
@@ -414,6 +415,12 @@ class MainSimulationsWidget(QtWidgets.QWidget):
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
         _start_thread(self.worker, self.worker_th, finished, error)
+
+    def set_export_button_disabled(self, disabled: bool):
+        if disabled:
+            self._unblock_gui()
+        else:
+            self._block_gui_loading()
 
     @QtCore.Slot()
     def lower_tabs_changed(self, i: int):

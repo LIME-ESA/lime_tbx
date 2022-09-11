@@ -20,6 +20,7 @@ from ..datatypes.datatypes import (
     LunarObservation,
     LunarObservationWrite,
     SatellitePosition,
+    SpectralData,
 )
 
 """___Authorship___"""
@@ -156,13 +157,15 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     )
     irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
     irr_obs.units = "W m-2 nm-1"
-    irr_obs.long_name = "observed lunar irradiance"
+    irr_obs.long_name = "observed lunar irradiance for each channel"
     irr_obs.valid_min = 0.0
     irr_obs.valid_max = 1000000.0
     irr_obs[:] = np.array([o.ch_irrs[ch] for ch in obs[0].ch_names for o in obs])
     irr_obs_unc = ds.createVariable("irr_obs_unc", "f4", ("date", "chan"))
     irr_obs_unc.units = "W m-2 nm-1"
-    irr_obs_unc.long_name = "uncertainties of the observed lunar irradiance"
+    irr_obs_unc.long_name = (
+        "uncertainties of the observed lunar irradiance for each channel"
+    )
     irr_obs_unc.valid_min = 0.0
     irr_obs_unc.valid_max = 1000000.0
     irr_obs_unc[:] = np.array(
@@ -250,3 +253,55 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
         ]
     )
     ds.close()
+
+
+def read_lime_glod(path: str) -> List[LunarObservationWrite]:
+    ds = nc.Dataset(path)
+    datetimes = list(map(datetime.fromtimestamp, map(int, ds.variables["date"][:])))
+    channel_names_0 = [
+        chn.tobytes().decode("utf-8") for chn in ds.variables["channel_name"][:].data
+    ]
+    lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
+    sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
+    sat_pos_ref_0 = ds.variables["sat_pos_ref"][:].data.tobytes().decode("utf-8")
+    ch_irrs = list(map(float, ds.variables["irr_obs"][:].data))
+    ch_irrs = dict(zip(channel_names_0, ch_irrs))
+    ch_irr_uncs = list(map(float, ds.variables["irr_obs_unc"][:].data))
+    wlens = list(map(float, ds.variables["wlens"][:].data))
+    irr_spectrum = [
+        list(map(float, data)) for data in ds.variables["irr_spectrum"][:].data
+    ]
+    irr_spectrum_unc = [
+        list(map(float, data)) for data in ds.variables["irr_spectrum_unc"][:].data
+    ]
+    refl_spectrum = [
+        list(map(float, data)) for data in ds.variables["refl_spectrum"][:].data
+    ]
+    refl_spectrum_unc = [
+        list(map(float, data)) for data in ds.variables["refl_spectrum_unc"][:].data
+    ]
+    polar_spectrum = [
+        list(map(float, data)) for data in ds.variables["polar_spectrum"][:].data
+    ]
+    polar_spectrum_unc = [
+        list(map(float, data)) for data in ds.variables["polar_spectrum_unc"][:].data
+    ]
+    ds.close()
+    obss = []
+    for i in range(len(sat_poss)):
+        irrs = SpectralData(wlens, irr_spectrum[i], irr_spectrum_unc[i], None)
+        refls = SpectralData(wlens, refl_spectrum[i], refl_spectrum_unc[i], None)
+        polars = SpectralData(wlens, polar_spectrum[i], polar_spectrum_unc[i], None)
+        obs = LunarObservationWrite(
+            channel_names_0,
+            sat_pos_ref_0,
+            ch_irrs,
+            datetimes[i],
+            sat_poss[i],
+            np.array(ch_irr_uncs[i]),
+            irrs,
+            refls,
+            polars,
+        )
+        obss.append(obs)
+    return obss
