@@ -44,8 +44,9 @@ class MplCanvas(FigureCanvas):
 
 
 class GraphWidget(QtWidgets.QWidget):
-    def __init__(self, title="", xlabel="", ylabel=""):
-        super().__init__()
+    def __init__(self, title="", xlabel="", ylabel="", parent=None):
+        super().__init__(parent)
+        self._init_parent = parent
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
@@ -85,9 +86,8 @@ class GraphWidget(QtWidgets.QWidget):
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
         self.csv_button.setDisabled(disable)
-        parent = self.parentWidget()
-        if isinstance(parent, IMainSimulationsWidget):
-            parent.set_export_button_disabled(disable)
+        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
+            self._init_parent.set_export_button_disabled(disable)
 
     def update_plot(
         self,

@@ -1,7 +1,7 @@
 """Module containing the factory class for MoonData."""
 
 """___Built-In Modules___"""
-from typing import List, Union
+from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
 # import here
@@ -145,18 +145,51 @@ class MoonDataFactory:
         md: MoonData | list of MoonData
             MoonData generated from the given data. It will be a list if sp.dt is a list.
         """
+        return MoonDataFactory.get_md_and_surfaces_from_satellite(
+            sp, eocfi_path, kernels_path
+        )[0]
+
+    @staticmethod
+    def get_md_and_surfaces_from_satellite(
+        sp: SatellitePoint,
+        eocfi_path: str,
+        kernels_path: KernelsPath,
+    ) -> Union[
+        Tuple[MoonData, SurfacePoint], Tuple[List[MoonData], List[SurfacePoint]]
+    ]:
+        """
+        Create a MoonData from a satellite point.
+
+        Parameters
+        ----------
+        sp: SatellitePoint
+            SatellitePoint from which to create the MoonData.
+        eocfi_path: str
+            Path to the folder with the needed eocfi data files.
+        kernels_path: KernelsPath
+            Path to the folder with the needed SPICE kernel files.
+
+        Returns
+        -------
+        md: MoonData | list of MoonData
+            MoonData generated from the given data. It will be a list if sp.dt is a list.
+        srp: SurfacePoint | list of SurfacePoint
+            SurfacePoint generated from the position of the SatellitePoint at the given datetimes.
+        """
         eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]
 
         mds: List[MoonData] = []
+        srps: List[SurfacePoint] = []
         for dt in dts:
             lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
             srp = SurfacePoint(lat, lon, height, dt)
+            srps.append(srp)
             mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
 
         if not isinstance(sp.dt, list):
-            return mds[0]
+            return mds[0], srps[0]
 
-        return mds
+        return mds, srps

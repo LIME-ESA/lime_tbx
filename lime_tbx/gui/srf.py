@@ -81,6 +81,10 @@ class SRFEditWidget(QtWidgets.QWidget):
     def load_srf(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         srf = file_srf.read_srf(path)
+        self.set_srf(srf)
+
+    @QtCore.Slot()
+    def set_srf(self, srf):
         self.loaded_srf = srf
         self.settings_manager.load_srf(srf)
         self.settings_manager.select_srf(-1)

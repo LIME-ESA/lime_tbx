@@ -121,10 +121,13 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     chan_st_type = "S{}".format(max_len_strlen)
     max_len_sat_pos_ref = len(max(obs[0].sat_pos_ref, key=len))
     sat_pos_ref_st_type = "S{}".format(max_len_sat_pos_ref)
+    max_len_sat_name = len(max([ob.sat_name for ob in obs], key=len))
+    sat_name_st_type = "S{}".format(max_len_sat_name)
     chan = ds.createDimension("chan", len(obs[0].ch_names))
     chan_strlen = ds.createDimension("chan_strlen", max_len_strlen)
     date = ds.createDimension("date", len(obs))
     sat_ref_strlen = ds.createDimension("sat_ref_strlen", max_len_sat_pos_ref)
+    sat_name_strlen = ds.createDimension("sat_name_strlen", max_len_sat_name)
     col = ds.createDimension("col", 0)
     row = ds.createDimension("row", 0)
     sat_xyz = ds.createDimension("sat_xyz", 3)
@@ -154,6 +157,11 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     sat_pos_ref.long_name = "reference frame of satellite position"
     sat_pos_ref[:] = nc.stringtochar(
         np.array([obs[0].sat_pos_ref], sat_pos_ref_st_type)
+    )
+    sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
+    sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
+    sat_name[:] = np.array(
+        [nc.stringtochar(np.array([ob.sat_name], sat_name_st_type)) for ob in obs]
     )
     irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
     irr_obs.units = "W m-2 nm-1"
@@ -268,6 +276,8 @@ def read_lime_glod(path: str) -> List[LunarObservationWrite]:
     ch_irrs = dict(zip(channel_names_0, ch_irrs))
     ch_irr_uncs = list(map(float, ds.variables["irr_obs_unc"][:].data))
     wlens = list(map(float, ds.variables["wlens"][:].data))
+    lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+    sat_name = list(map(lambda_to_satname, ds.variables["sat_name"][:].data))
     irr_spectrum = [
         list(map(float, data)) for data in ds.variables["irr_spectrum"][:].data
     ]
@@ -289,19 +299,35 @@ def read_lime_glod(path: str) -> List[LunarObservationWrite]:
     ds.close()
     obss = []
     for i in range(len(sat_poss)):
-        irrs = SpectralData(wlens, irr_spectrum[i], irr_spectrum_unc[i], None)
-        refls = SpectralData(wlens, refl_spectrum[i], refl_spectrum_unc[i], None)
-        polars = SpectralData(wlens, polar_spectrum[i], polar_spectrum_unc[i], None)
+        irrs = SpectralData(
+            np.array(wlens),
+            np.array(irr_spectrum[i]),
+            np.array(irr_spectrum_unc[i]),
+            None,
+        )
+        refls = SpectralData(
+            np.array(wlens),
+            np.array(refl_spectrum[i]),
+            np.array(refl_spectrum_unc[i]),
+            None,
+        )
+        polars = SpectralData(
+            np.array(wlens),
+            np.array(polar_spectrum[i]),
+            np.array(polar_spectrum_unc[i]),
+            None,
+        )
         obs = LunarObservationWrite(
             channel_names_0,
             sat_pos_ref_0,
             ch_irrs,
             datetimes[i],
             sat_poss[i],
-            np.array(ch_irr_uncs[i]),
+            np.array([ch_irr_uncs[i]]),
             irrs,
             refls,
             polars,
+            sat_name[i],
         )
         obss.append(obs)
     return obss

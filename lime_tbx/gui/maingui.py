@@ -11,7 +11,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
-from lime_tbx.filedata import moon
+from lime_tbx.filedata import moon, srf as srf_loader
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
@@ -341,6 +341,7 @@ class MainSimulationsWidget(
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
+        self._finished_building = False
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.eocfi: eocfi_adapter.IEOCFIConverter = eocfi_adapter.EOCFIConverter(
@@ -348,6 +349,7 @@ class MainSimulationsWidget(
         )
         self.satellites = self.eocfi.get_sat_list()
         self._build_layout()
+        self._finished_building = True
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -376,7 +378,7 @@ class MainSimulationsWidget(
         self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         # graph
         self.graph = output.GraphWidget(
-            "Simulation output", "Wavelengths (nm)", "Units"
+            "Simulation output", "Wavelengths (nm)", "Units", parent=self
         )
         self.graph.update_legend(
             [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
@@ -405,8 +407,10 @@ class MainSimulationsWidget(
 
     def _unblock_gui(self):
         self.parentWidget().setDisabled(False)
+        self.export_lglod_button.setDisabled(False)
 
     def _block_gui_loading(self):
+        self.export_lglod_button.setDisabled(True)
         self.parentWidget().setDisabled(True)
 
     def _callback_regular_input_changed(self):
@@ -417,10 +421,12 @@ class MainSimulationsWidget(
         _start_thread(self.worker, self.worker_th, finished, error)
 
     def set_export_button_disabled(self, disabled: bool):
+        if not self._finished_building:
+            return
         if disabled:
-            self._unblock_gui()
-        else:
             self._block_gui_loading()
+        else:
+            self._unblock_gui()
 
     @QtCore.Slot()
     def lower_tabs_changed(self, i: int):
@@ -562,6 +568,13 @@ class MainSimulationsWidget(
         self._unblock_gui()
         raise error
 
+    def load_observations_finished(
+        self,
+        srf: SpectralResponseFunction,
+    ):
+        self.srf_widget.set_srf(srf)
+        self.show_eli()
+
     @QtCore.Slot()
     def export_glod(self):
         self._block_gui_loading()
@@ -584,14 +597,11 @@ class MainSimulationsWidget(
         obs = []
         ch_names = srf.get_channels_names()
         sat_pos_ref = "ITRF93"
-        if isinstance(point, SurfacePoint):
-            sat_pos = SatellitePosition(
-                *comparison.to_xyz(point.latitude, point.longitude, point.altitude)
-            )
-            elis = self.lime_simulation.elis
-            elrefs = self.lime_simulation.elref
-            polars = self.lime_simulation.polars
-            signals = self.lime_simulation.signals
+        elis = self.lime_simulation.get_elis()
+        elrefs = self.lime_simulation.get_elrefs()
+        polars = self.lime_simulation.get_polars()
+        signals = self.lime_simulation.get_signals()
+        if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
             dts = point.dt
             if not isinstance(dts, list):
                 dts = [dts]
@@ -603,6 +613,27 @@ class MainSimulationsWidget(
                 polars = [polars]
             if not isinstance(signals, list):
                 signals = [signals]
+            if isinstance(point, SurfacePoint):
+                sat_pos = [
+                    SatellitePosition(
+                        *comparison.to_xyz(
+                            point.latitude, point.longitude, point.altitude
+                        )
+                    )
+                    for _ in dts
+                ]
+                sat_name = ""
+            else:
+                sur_points = self.lime_simulation.get_surfacepoints()
+                if isinstance(sur_points, SurfacePoint):
+                    sur_points = [sur_points]
+                sat_pos = [
+                    SatellitePosition(
+                        *comparison.to_xyz(sp.latitude, sp.longitude, sp.altitude)
+                    )
+                    for sp in sur_points
+                ]
+                sat_name = point.name
             for i, dt in enumerate(dts):
                 ch_irrs = dict(zip(ch_names, signals[i].data))
                 ob = LunarObservationWrite(
@@ -610,11 +641,12 @@ class MainSimulationsWidget(
                     sat_pos_ref,
                     ch_irrs,
                     dt,
-                    sat_pos,
+                    sat_pos[i],
                     signals[i].uncertainties,
                     elis[i],
                     elrefs[i],
                     polars[i],
+                    sat_name,
                 )
                 obs.append(ob)
             name = QtWidgets.QFileDialog().getSaveFileName(
@@ -680,6 +712,12 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.page)
         self.page.show()
 
+    def load_observations_finished(
+        self, obss: List[LunarObservationWrite], srf: SpectralResponseFunction
+    ):
+        self.lime_simulation.set_observations(obss, srf)
+        self.main_page.load_observations_finished(srf)
+
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -688,6 +726,11 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def _create_actions(self):
         # File actions
+        self.load_simulation_action = QtWidgets.QAction(self)
+        self.load_simulation_action.setText(
+            "&Load simulation file stored in a LIME GLOD format file."
+        )
+        self.load_simulation_action.triggered.connect(self.load_simulation)
         self.comparison_action = QtWidgets.QAction(self)
         self.comparison_action.setText(
             "Perform &comparisons from a remote sensing instrument"
@@ -712,6 +755,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._create_actions()
         self.menu_bar = self.menuBar()
         file_menu = QtWidgets.QMenu("&File", self)
+        file_menu.addAction(self.load_simulation_action)
         file_menu.addAction(self.comparison_action)
         file_menu.addSeparator()
         file_menu.addAction(self.exit_action)
@@ -730,6 +774,18 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         return super().closeEvent(event)
 
     # ACTIONS
+
+    def load_simulation(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self, "Select GLOD file")[0]
+        if path != "":
+            srf_path = QtWidgets.QFileDialog().getOpenFileName(
+                self, "Select SpectralResponseFunction file"
+            )[0]
+            if srf_path != "":
+                obss = moon.read_lime_glod(path)
+                srf = srf_loader.read_srf(srf_path)
+                lime_tbx_w: LimeTBXWidget = self.centralWidget()
+                lime_tbx_w.load_observations_finished(obss, srf)
 
     def comparison(self):
         self.comparison_action.setText("Perform &simulations")

@@ -9,13 +9,16 @@ import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
+    LunarObservationWrite,
     MoonData,
     Point,
     PolarizationCoefficients,
+    SatellitePoint,
     SpectralResponseFunction,
     SpectralData,
     ReflectanceCoefficients,
     KernelsPath,
+    SurfacePoint,
 )
 
 from lime_tbx.lime_algorithms.rolo import rolo
@@ -23,6 +26,7 @@ from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
+from lime_tbx.simulation.comparison import comparison
 from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
@@ -211,6 +215,19 @@ class ILimeSimulation(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
+        """
+        Returns the Satellites points converted to the equivalent of surface points.
+        In case they weren't Satellite Points, the behaviour is not defined.
+
+        Returns
+        -------
+        surface_points: SurfacePoint | list of SurfacePoint | None
+            Equivalent surface points
+        """
+        pass
+
 
 class LimeSimulation(ILimeSimulation):
     """
@@ -248,6 +265,7 @@ class LimeSimulation(ILimeSimulation):
         self.elis_asd: Union[SpectralData, List[SpectralData]] = None
         self.polars: Union[SpectralData, List[SpectralData]] = None
         self.srf: SpectralResponseFunction = None
+        self.surfaces_of_sat: Tuple[SurfacePoint, List[SurfacePoint], None] = None
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
@@ -268,7 +286,17 @@ class LimeSimulation(ILimeSimulation):
 
     def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
         if not self.mds_uptodate:
-            self.mds = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
+            if isinstance(point, SatellitePoint):
+                (
+                    self.mds,
+                    self.surfaces_of_sat,
+                ) = MoonDataFactory.get_md_and_surfaces_from_satellite(
+                    point, self.eocfi_path, self.kernels_path
+                )
+            else:
+                self.mds = MoonDataFactory.get_md(
+                    point, self.eocfi_path, self.kernels_path
+                )
             self.mds_uptodate = True
         if not self.srf_updtodate:
             self.srf = srf
@@ -512,6 +540,47 @@ class LimeSimulation(ILimeSimulation):
         sp_d = SpectralData(channel_ids, signals, uncs, ds_pol)
         return sp_d
 
+    def set_observations(
+        self, obss: List[LunarObservationWrite], srf: SpectralResponseFunction
+    ):
+        self.elref = [obs.refls for obs in obss]
+        self.elis = [obs.irrs for obs in obss]
+        self.polars = [obs.polars for obs in obss]
+        self.signals = []
+        dts = [obs.dt for obs in obss]
+        for obs in obss:
+            ds_sign = SpectralData.make_signals_ds(
+                np.array(obs.ch_names),
+                np.array([list(obs.ch_irrs.values())]),
+                np.array([obs.signals_uncs]),
+            )
+            self.signals.append(
+                SpectralData(
+                    np.array(obs.ch_names),
+                    np.array(list(obs.ch_irrs.values())),
+                    obs.signals_uncs,
+                    ds_sign,
+                )
+            )
+        if len(self.signals) == 1:
+            self.signals = self.signals[0]
+        if not obss[0].sat_name or obss[0].sat_name == "":
+            point = SurfacePoint(
+                *comparison.to_llh(
+                    obss[0].sat_pos.x, obss[0].sat_pos.y, obss[0].sat_pos.z
+                ),
+                dts
+            )
+        else:
+            point = SatellitePoint(obss[0].sat_name, dts)
+        self._save_parameters(srf, point)
+        self.refl_uptodate = True
+        self.irr_uptodate = True
+        self.pol_uptodate = True
+        self.signals_uptodate = True
+        if self.verbose:
+            print("observations loaded")
+
     def get_elrefs(self) -> Union[SpectralData, List[SpectralData]]:
         return self.elref
 
@@ -535,3 +604,6 @@ class LimeSimulation(ILimeSimulation):
 
     def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
         return self.polars
+
+    def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
+        return self.surfaces_of_sat

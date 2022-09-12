@@ -111,6 +111,53 @@ class CustomInputWidget(QtWidgets.QWidget):
         return self.moon_phase_angle_spinbox.value()
 
 
+class ShowDatetimeWidget(QtWidgets.QWidget):
+    def __init__(self, datetimes: List[datetime]):
+        super().__init__()
+        self.dts = datetimes
+        self._build_layout()
+        self._fill_table()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.groupbox = QtWidgets.QGroupBox()
+        self.container_layout = QtWidgets.QVBoxLayout()
+        self.data_layout = QtWidgets.QFormLayout()
+        self.groupbox.setLayout(self.container_layout)
+        # table
+        self.table = QtWidgets.QTableWidget()
+
+        self.container_layout.addLayout(self.data_layout, 1)
+        self.data_layout.addWidget(self.table)
+        self.container_layout.addStretch()
+
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.groupbox)
+        self.main_layout.addWidget(self.scroll_area)
+
+    def _fill_table(self):
+        self.table.setRowCount(1 + len(self.dts))
+        self.table.setColumnCount(6)
+        self.table.setItem(0, 0, QtWidgets.QTableWidgetItem("Year"))
+        self.table.setItem(0, 1, QtWidgets.QTableWidgetItem("Month"))
+        self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Day"))
+        self.table.setItem(0, 3, QtWidgets.QTableWidgetItem("Hour"))
+        self.table.setItem(0, 4, QtWidgets.QTableWidgetItem("Minute"))
+        self.table.setItem(0, 5, QtWidgets.QTableWidgetItem("Second"))
+        for i, dt in enumerate(self.dts):
+            self.table.setItem(1 + i, 0, QtWidgets.QTableWidgetItem(str(dt.year)))
+            self.table.setItem(1 + i, 1, QtWidgets.QTableWidgetItem(str(dt.month)))
+            self.table.setItem(1 + i, 2, QtWidgets.QTableWidgetItem(str(dt.day)))
+            self.table.setItem(1 + i, 3, QtWidgets.QTableWidgetItem(str(dt.hour)))
+            self.table.setItem(1 + i, 4, QtWidgets.QTableWidgetItem(str(dt.minute)))
+            self.table.setItem(
+                1 + i,
+                5,
+                QtWidgets.QTableWidgetItem(str(dt.second + dt.microsecond / 1000)),
+            )
+
+
 class SurfaceInputWidget(QtWidgets.QWidget):
     """
     Input widget that contains the GUI elements for the input of the needed parameters for
@@ -170,12 +217,18 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
         self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.show_datetimes_button = QtWidgets.QPushButton(" See datetimes ")
+        self.show_datetimes_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
         self.switch_layout = QtWidgets.QHBoxLayout()
+        self.switch_layout.addWidget(self.show_datetimes_button)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
         self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_single_datetime)
+        self.show_datetimes_button.clicked.connect(self.show_datetimes)
 
     def _clear_form_rows(self):
         self.main_layout.removeRow(4)
@@ -194,8 +247,17 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_datetimes(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        self.loaded_datetimes = csv.read_datetimes(path)
-        self.loaded_datetimes_label.setText(path)
+        if path != "":
+            self.loaded_datetimes = csv.read_datetimes(path)
+            shown_path = path
+            if len(shown_path) > MAX_PATH_LEN:
+                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+            self.loaded_datetimes_label.setText(shown_path)
+
+    @QtCore.Slot()
+    def show_datetimes(self):
+        self.datetimes_widget = ShowDatetimeWidget(self.loaded_datetimes)
+        self.datetimes_widget.show()
 
     def get_latitude(self) -> float:
         return self.latitude_spinbox.value()
@@ -264,12 +326,18 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
         self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.show_datetimes_button = QtWidgets.QPushButton(" See datetimes ")
+        self.show_datetimes_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
         self.switch_layout = QtWidgets.QHBoxLayout()
+        self.switch_layout.addWidget(self.show_datetimes_button)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
         self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_single_datetime)
+        self.show_datetimes_button.clicked.connect(self.show_datetimes)
 
     def _clear_form_rows(self):
         self.main_layout.removeRow(2)
@@ -288,11 +356,17 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_datetimes(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        self.loaded_datetimes = csv.read_datetimes(path)
-        shown_path = path
-        if len(shown_path) > MAX_PATH_LEN:
-            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-        self.loaded_datetimes_label.setText(path)
+        if path != "":
+            self.loaded_datetimes = csv.read_datetimes(path)
+            shown_path = path
+            if len(shown_path) > MAX_PATH_LEN:
+                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+            self.loaded_datetimes_label.setText(path)
+
+    @QtCore.Slot()
+    def show_datetimes(self):
+        self.datetimes_widget = ShowDatetimeWidget(self.loaded_datetimes)
+        self.datetimes_widget.show()
 
     def get_satellite(self) -> str:
         return self.sat_names[self.combo_sats.currentIndex()]

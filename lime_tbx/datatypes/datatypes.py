@@ -626,6 +626,7 @@ class LunarObservationWrite(LunarObservation):
     irrs: "SpectralData"
     refls: "SpectralData"
     polars: "SpectralData"
+    sat_name: str  # if None or empty: SurfacePoint
 
 
 class ReflectanceCoefficients:
