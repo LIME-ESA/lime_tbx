@@ -558,7 +558,11 @@ class LimeSimulation(ILimeSimulation):
     def set_observations(self, lglod: LGLODData, srf: SpectralResponseFunction):
         obss = lglod.observations
         self.elref = [obs.refls for obs in obss]
+        self.elref_cimel = lglod.elrefs_cimel
+        self.elref_asd = None
         self.elis = [obs.irrs for obs in obss]
+        self.elis_cimel = lglod.elis_cimel
+        self.elis_asd = None
         self.polars = [obs.polars for obs in obss]
         dts = [obs.dt for obs in obss]
         signals = lglod.signals

@@ -137,6 +137,7 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     row = ds.createDimension("row", 0)
     sat_xyz = ds.createDimension("sat_xyz", 3)
     wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
+    wlens_cimel = ds.createDimension("wlens_cimel", len(lglod.elis_cimel[0].wlens))
     # VARIABLES
     dates = ds.createVariable("date", "f4", ("date",))
     dates.standard_name = "time"
@@ -166,16 +167,12 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
     sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
     sat_name[:] = nc.stringtochar(np.array([obs[0].sat_name], sat_name_st_type))
-    # sat_name[:] = np.array(
-    #    [nc.stringtochar(np.array([ob.sat_name], sat_name_st_type)) for ob in obs]
-    # )
     irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
     irr_obs.units = "W m-2 nm-1"
     irr_obs.long_name = "observed lunar irradiance for each channel"
     irr_obs.valid_min = 0.0
     irr_obs.valid_max = 1000000.0
     irr_obs[:] = lglod.signals.data
-    # irr_obs[:] = np.array([o.ch_irrs[ch] for ch in obs[0].ch_names for o in obs])
     irr_obs_unc = ds.createVariable("irr_obs_unc", "f4", ("date", "chan"))
     irr_obs_unc.units = "W m-2 nm-1"
     irr_obs_unc.long_name = (
@@ -184,10 +181,6 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     irr_obs_unc.valid_min = 0.0
     irr_obs_unc.valid_max = 1000000.0
     irr_obs_unc[:] = lglod.signals.uncertainties
-    # irr_obs_unc[:] = np.array(
-    #    [np.array([o.signals_uncs[i] for i in range(len(o.signals_uncs))]) for o in obs]
-    # )
-    # Spectral irr refl and obs
     wlens = ds.createVariable("wlens", "f4", ("wlens",))
     wlens.units = "nm"
     wlens.long_name = "Wavelengths for irr_spectrum, refl_spectrum and polar_spectrum"
@@ -268,6 +261,30 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
             for o in obs
         ]
     )
+    cimel_wlens = ds.createVariable("cimel_wlens", "f4", ("wlens_cimel",))
+    cimel_wlens.units = "nm"
+    cimel_wlens.long_name = "Cimel wavelengths"
+    cimel_wlens[:] = lglod.elis_cimel[0].wlens
+    irr_cimel = ds.createVariable("irr_cimel", "f4", ("date", "wlens_cimel"))
+    irr_cimel.units = "W m-2 nm-1"
+    irr_cimel.long_name = "Simulated irradiance for the cimel wavelengths."
+    irr_cimel[:] = np.array([cimel.data for cimel in lglod.elis_cimel])
+    irr_cimel_unc = ds.createVariable("irr_cimel_unc", "f4", ("date", "wlens_cimel"))
+    irr_cimel_unc.units = "W m-2 nm-1"
+    irr_cimel_unc.long_name = (
+        "Uncertainties for the simulated irradiance for the cimel wavelengths."
+    )
+    irr_cimel_unc[:] = np.array([cimel.uncertainties for cimel in lglod.elis_cimel])
+    refl_cimel = ds.createVariable("refl_cimel", "f4", ("date", "wlens_cimel"))
+    refl_cimel.units = "Fractions of unity"
+    refl_cimel.long_name = "Simulated reflectance for the cimel wavelengths."
+    refl_cimel[:] = np.array([cimel.data for cimel in lglod.elrefs_cimel])
+    refl_cimel_unc = ds.createVariable("refl_cimel_unc", "f4", ("date", "wlens_cimel"))
+    refl_cimel_unc.units = "Fractions of unity"
+    refl_cimel_unc.long_name = (
+        "Uncertainties for the simulated reflectance for the cimel wavelengths."
+    )
+    refl_cimel_unc[:] = np.array([cimel.uncertainties for cimel in lglod.elrefs_cimel])
     ds.close()
 
 
@@ -308,6 +325,15 @@ def read_lime_glod(path: str) -> LGLODData:
     polar_spectrum_unc = [
         list(map(float, data)) for data in ds.variables["polar_spectrum_unc"][:].data
     ]
+    cimel_wlens = np.array(ds.variables["cimel_wlens"][:].data)
+    irr_cimel = [list(map(float, data)) for data in ds.variables["irr_cimel"][:].data]
+    irr_cimel_unc = [
+        list(map(float, data)) for data in ds.variables["irr_cimel_unc"][:].data
+    ]
+    refl_cimel = [list(map(float, data)) for data in ds.variables["refl_cimel"][:].data]
+    refl_cimel_unc = [
+        list(map(float, data)) for data in ds.variables["refl_cimel_unc"][:].data
+    ]
     ds.close()
     obss = []
     for i in range(len(sat_poss)):
@@ -340,4 +366,16 @@ def read_lime_glod(path: str) -> LGLODData:
             sat_name_0,
         )
         obss.append(obs)
-    return LGLODData(obss, signals, not_default_srf)
+    elis_cimel = [
+        SpectralData(
+            cimel_wlens, np.array(irr_cimel[i]), np.array(irr_cimel_unc[i]), None
+        )
+        for i in range(len(irr_cimel))
+    ]
+    elrefs_cimel = [
+        SpectralData(
+            cimel_wlens, np.array(refl_cimel[i]), np.array(refl_cimel_unc[i]), None
+        )
+        for i in range(len(refl_cimel))
+    ]
+    return LGLODData(obss, signals, not_default_srf, elis_cimel, elrefs_cimel)

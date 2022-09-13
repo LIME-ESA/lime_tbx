@@ -864,3 +864,5 @@ class LGLODData:
     observations: List[LunarObservationWrite]
     signals: "SpectralData"
     not_default_srf: bool
+    elis_cimel: List["SpectralData"]
+    elrefs_cimel: List["SpectralData"]

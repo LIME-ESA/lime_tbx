@@ -164,9 +164,10 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     the simulation of lunar values for a geographic position at a concrete time.
     """
 
-    def __init__(self):
+    def __init__(self, callback_check_calculable: Callable):
         super().__init__()
         self._build_layout()
+        self.callback_check_calculable = callback_check_calculable
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QFormLayout(self)
@@ -238,11 +239,13 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     def change_single_datetime(self):
         self._clear_form_rows()
         self._build_layout_single_datetime()
+        self.callback_check_calculable()
 
     @QtCore.Slot()
     def change_multiple_datetime(self):
         self._clear_form_rows()
         self._build_layout_multiple_datetime()
+        self.callback_check_calculable()
 
     @QtCore.Slot()
     def load_datetimes(self):
@@ -253,6 +256,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
             if len(shown_path) > MAX_PATH_LEN:
                 shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
             self.loaded_datetimes_label.setText(shown_path)
+            self.callback_check_calculable()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -290,6 +294,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
             if self.single_datetime:
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
+            self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
         else:
             if not self.single_datetime:
                 self.change_single_datetime()
@@ -298,15 +303,23 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
-            self.loaded_datetimes_label.setText("Loaded")
+
+    def is_calculable(self) -> bool:
+        if self.single_datetime:
+            return True
+        else:
+            return len(self.loaded_datetimes) > 0
 
 
 class SatelliteInputWidget(QtWidgets.QWidget):
-    def __init__(self, satellites: List[Satellite]) -> None:
+    def __init__(
+        self, satellites: List[Satellite], callback_check_calculable: Callable
+    ) -> None:
         super().__init__()
         self.satellites = satellites
         self.sat_names = [s.name for s in self.satellites]
         self._build_layout()
+        self.callback_check_calculable = callback_check_calculable
         self.update_from_combobox(0)
 
     def _build_layout(self):
@@ -373,11 +386,13 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     def change_single_datetime(self):
         self._clear_form_rows()
         self._build_layout_single_datetime()
+        self.callback_check_calculable()
 
     @QtCore.Slot()
     def change_multiple_datetime(self):
         self._clear_form_rows()
         self._build_layout_multiple_datetime()
+        self.callback_check_calculable()
 
     @QtCore.Slot()
     def load_datetimes(self):
@@ -388,6 +403,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
             if len(shown_path) > MAX_PATH_LEN:
                 shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
             self.loaded_datetimes_label.setText(path)
+            self.callback_check_calculable()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -413,6 +429,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
             if self.single_datetime:
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
+            self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
         else:
             if not self.single_datetime:
                 self.change_single_datetime()
@@ -421,7 +438,6 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
-            self.loaded_datetimes_label.setText("Loaded")
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
@@ -432,25 +448,40 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.datetime_edit.setMinimumDateTime(dt0)
         self.datetime_edit.setMaximumDateTime(dtf)
 
+    def is_calculable(self) -> bool:
+        if self.single_datetime:
+            return True
+        else:
+            return len(self.loaded_datetimes) > 0
+
 
 class InputWidget(QtWidgets.QWidget):
-    def __init__(self, satellites: List[Satellite], change_callback: Callable):
+    def __init__(
+        self,
+        satellites: List[Satellite],
+        change_callback: Callable,
+        callback_check_calculable: Callable,
+    ):
         super().__init__()
         self.satellites = satellites
         self.change_callback = change_callback
         self.last_point: Point = None
+        self.callback_check_calculable = callback_check_calculable
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
-        self.surface = SurfaceInputWidget()
+        self.surface = SurfaceInputWidget(self.callback_check_calculable)
         self.tabs.addTab(self.surface, "Geographic")
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Selenographic")
-        self.satellite = SatelliteInputWidget(self.satellites)
+        self.satellite = SatelliteInputWidget(
+            self.satellites, self.callback_check_calculable
+        )
         self.tabs.addTab(self.satellite, "Satellite")
+        self.tabs.currentChanged.connect(self.callback_check_calculable)
         self.main_layout.addWidget(self.tabs)
 
     @staticmethod
@@ -510,6 +541,14 @@ class InputWidget(QtWidgets.QWidget):
             dts = self.satellite.get_datetimes()
             point = SatellitePoint(sat, dts)
         return point
+
+    def is_calculable(self) -> bool:
+        tab = self.tabs.currentWidget()
+        if isinstance(tab, SurfaceInputWidget):
+            return self.surface.is_calculable()
+        elif isinstance(tab, SatelliteInputWidget):
+            return self.satellite.is_calculable()
+        return True
 
     def get_point(self) -> Point:
         point = self._get_point()

@@ -358,7 +358,9 @@ class MainSimulationsWidget(
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
         self.input_widget = input.InputWidget(
-            self.satellites, self._callback_regular_input_changed
+            self.satellites,
+            self._callback_regular_input_changed,
+            self._callback_check_calculable,
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
@@ -418,6 +420,11 @@ class MainSimulationsWidget(
 
     def _callback_regular_input_changed(self):
         self.lime_simulation.set_simulation_changed()
+
+    def _callback_check_calculable(self):
+        calculable = self.input_widget.is_calculable()
+        self.lower_tabs.setEnabled(calculable)
+        self.export_lglod_button.setDisabled(not calculable)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
@@ -602,7 +609,13 @@ class MainSimulationsWidget(
         ch_names = srf.get_channels_names()
         sat_pos_ref = "ITRF93"
         elis = self.lime_simulation.get_elis()
+        elis_cimel = self.lime_simulation.get_elis_cimel()
+        if not isinstance(elis_cimel, list):
+            elis_cimel = [elis_cimel]
         elrefs = self.lime_simulation.get_elrefs()
+        elrefs_cimel = self.lime_simulation.get_elrefs_cimel()
+        if not isinstance(elrefs_cimel, list):
+            elrefs_cimel = [elrefs_cimel]
         polars = self.lime_simulation.get_polars()
         signals = self.lime_simulation.get_signals()
         if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
@@ -655,7 +668,9 @@ class MainSimulationsWidget(
                 and srf.get_channels_names()[0] == constants.DEFAULT_SRF_NAME
             ):
                 is_not_default_srf = False
-            lglod = LGLODData(obs, signals, is_not_default_srf)
+            lglod = LGLODData(
+                obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel
+            )
             name = QtWidgets.QFileDialog().getSaveFileName(
                 self, "Export LGLOD", "{}.nc".format("lglod")
             )[0]
