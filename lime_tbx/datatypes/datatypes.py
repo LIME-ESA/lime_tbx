@@ -619,16 +619,6 @@ class LunarObservation:
         return True
 
 
-@dataclass
-class LunarObservationWrite(LunarObservation):
-    "Dataclass containing the needed information to create a GLOD file."
-    signals_uncs: np.ndarray
-    irrs: "SpectralData"
-    refls: "SpectralData"
-    polars: "SpectralData"
-    sat_name: str  # if None or empty: SurfacePoint
-
-
 class ReflectanceCoefficients:
     """
     Set of coefficients from the same version. Used in order to calculate the reflectance
@@ -824,3 +814,53 @@ class KernelsPath:
 
     main_kernels_path: str
     custom_kernel_path: str
+
+
+@dataclass
+class LunarObservationWrite:
+    """Dataclass containing the needed information to create a Lunar observation in a LGLOD file.
+
+    Attributes
+    ----------
+    ch_names: list of str
+        Names of the channels present
+    sat_pos_ref: str
+        Name of the reference system (usually ITRF93)
+    ch_irrs: dict of str and float
+        Irradiances relative to each channel. The key is the channel name, and the irradiance
+        is given in Wm⁻²nm⁻¹.
+    dt: datetime
+        Datetime of the observation.
+    sat_pos: SatellitePosition
+        Satellite position at that moment.
+    """
+
+    ch_names: List[str]
+    sat_pos_ref: str
+    dt: datetime
+    sat_pos: SatellitePosition
+    irrs: "SpectralData"
+    refls: "SpectralData"
+    polars: "SpectralData"
+    sat_name: str  # if None or empty: SurfacePoint
+
+    def has_ch_value(self, name: str) -> bool:
+        return name in self.ch_names
+
+    def check_valid_srf(self, srf: SpectralResponseFunction) -> bool:
+        for ch in self.ch_names:
+            found = False
+            for ch_srf in srf.channels:
+                if ch_srf.id == ch:
+                    found = True
+                    break
+            if not found:
+                return False
+        return True
+
+
+@dataclass
+class LGLODData:
+    observations: List[LunarObservationWrite]
+    signals: "SpectralData"
+    not_default_srf: bool

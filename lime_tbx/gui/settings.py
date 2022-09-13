@@ -84,9 +84,11 @@ class MockSettingsManager(ISettingsManager):
             i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
         }
         ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Default", spectral_response
+            (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
+            constants.DEFAULT_SRF_NAME,
+            spectral_response,
         )
-        srf = SpectralResponseFunction("Default", [ch])
+        srf = SpectralResponseFunction(constants.DEFAULT_SRF_NAME, [ch])
         return srf
 
     def get_srf(self) -> SpectralResponseFunction:

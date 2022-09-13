@@ -274,6 +274,32 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         else:
             return self.loaded_datetimes
 
+    def set_latitude(self, lat: float):
+        self.latitude_spinbox.setValue(lat)
+
+    def set_longitude(self, lon: float):
+        self.longitude_spinbox.setValue(lon)
+
+    def set_altitude(self, alt: float):
+        self.altitude_spinbox.setValue(alt)
+
+    def set_datetimes(self, dt: Union[List[datetime], datetime]):
+        if isinstance(dt, list) and len(dt) == 1:
+            dt = dt[0]
+        if isinstance(dt, list):
+            if self.single_datetime:
+                self.change_multiple_datetime()
+            self.loaded_datetimes = dt
+        else:
+            if not self.single_datetime:
+                self.change_single_datetime()
+            self.datetime_edit.setDateTime(
+                QtCore.QDateTime(
+                    dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
+                )
+            )
+            self.loaded_datetimes_label.setText("Loaded")
+
 
 class SatelliteInputWidget(QtWidgets.QWidget):
     def __init__(self, satellites: List[Satellite]) -> None:
@@ -377,6 +403,26 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         else:
             return self.loaded_datetimes
 
+    def set_satellite(self, name: str):
+        self.combo_sats.setCurrentIndex(self.sat_names.index(name))
+
+    def set_datetimes(self, dt: Union[datetime, List[datetime]]):
+        if isinstance(dt, list) and len(dt) == 1:
+            dt = dt[0]
+        if isinstance(dt, list):
+            if self.single_datetime:
+                self.change_multiple_datetime()
+            self.loaded_datetimes = dt
+        else:
+            if not self.single_datetime:
+                self.change_single_datetime()
+            self.datetime_edit.setDateTime(
+                QtCore.QDateTime(
+                    dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
+                )
+            )
+            self.loaded_datetimes_label.setText("Loaded")
+
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         sat = self.satellites[i]
@@ -424,7 +470,25 @@ class InputWidget(QtWidgets.QWidget):
             self.change_callback()
         self.last_point = point
 
-    def get_point(self) -> Point:
+    def set_last_point_to_point(self):
+        self.last_point = self._get_point()
+
+    def set_point(self, point: Point):
+        if isinstance(point, SurfacePoint):
+            self.tabs.setCurrentIndex(0)
+            self.surface.set_latitude(point.latitude)
+            self.surface.set_longitude(point.longitude)
+            self.surface.set_altitude(point.altitude)
+            self.surface.set_datetimes(point.dt)
+        elif isinstance(point, CustomPoint):
+            self.tabs.setCurrentIndex(1)
+            # TODO
+        elif isinstance(point, SatellitePoint):
+            self.tabs.setCurrentIndex(2)
+            self.satellite.set_satellite(point.name)
+            self.satellite.set_datetimes(point.dt)
+
+    def _get_point(self) -> Point:
         tab = self.tabs.currentWidget()
         if isinstance(tab, SurfaceInputWidget):
             lat = self.surface.get_latitude()
@@ -445,6 +509,10 @@ class InputWidget(QtWidgets.QWidget):
             sat = self.satellite.get_satellite()
             dts = self.satellite.get_datetimes()
             point = SatellitePoint(sat, dts)
+        return point
+
+    def get_point(self) -> Point:
+        point = self._get_point()
         self._check_last_point(point)
         return point
 

@@ -17,11 +17,14 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    LGLODData,
     LunarObservation,
     LunarObservationWrite,
     SatellitePosition,
     SpectralData,
+    SpectralResponseFunction,
 )
+from lime_tbx.datatypes import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -85,7 +88,8 @@ def read_moon_obs(path: str) -> LunarObservation:
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
+def write_obs(lglod: LGLODData, path: str, dt: datetime):
+    obs = lglod.observations
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
     ds.Metadata_Conventions = "Unidata Dataset Discovery v1.0"
@@ -116,6 +120,7 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     ds.time_coverage_start = min(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
     ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
     ds.reference_model = "LIME2 coefficients v0"  # TODO add coefficients version
+    ds.not_default_srf = int(lglod.not_default_srf)
     # DIMENSIONS
     max_len_strlen = len(max(obs[0].ch_names, key=len))
     chan_st_type = "S{}".format(max_len_strlen)
@@ -160,15 +165,17 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     )
     sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
     sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
-    sat_name[:] = np.array(
-        [nc.stringtochar(np.array([ob.sat_name], sat_name_st_type)) for ob in obs]
-    )
+    sat_name[:] = nc.stringtochar(np.array([obs[0].sat_name], sat_name_st_type))
+    # sat_name[:] = np.array(
+    #    [nc.stringtochar(np.array([ob.sat_name], sat_name_st_type)) for ob in obs]
+    # )
     irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
     irr_obs.units = "W m-2 nm-1"
     irr_obs.long_name = "observed lunar irradiance for each channel"
     irr_obs.valid_min = 0.0
     irr_obs.valid_max = 1000000.0
-    irr_obs[:] = np.array([o.ch_irrs[ch] for ch in obs[0].ch_names for o in obs])
+    irr_obs[:] = lglod.signals.data
+    # irr_obs[:] = np.array([o.ch_irrs[ch] for ch in obs[0].ch_names for o in obs])
     irr_obs_unc = ds.createVariable("irr_obs_unc", "f4", ("date", "chan"))
     irr_obs_unc.units = "W m-2 nm-1"
     irr_obs_unc.long_name = (
@@ -176,9 +183,10 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     )
     irr_obs_unc.valid_min = 0.0
     irr_obs_unc.valid_max = 1000000.0
-    irr_obs_unc[:] = np.array(
-        [np.array([o.signals_uncs[i] for i in range(len(o.signals_uncs))]) for o in obs]
-    )
+    irr_obs_unc[:] = lglod.signals.uncertainties
+    # irr_obs_unc[:] = np.array(
+    #    [np.array([o.signals_uncs[i] for i in range(len(o.signals_uncs))]) for o in obs]
+    # )
     # Spectral irr refl and obs
     wlens = ds.createVariable("wlens", "f4", ("wlens",))
     wlens.units = "nm"
@@ -263,8 +271,9 @@ def write_obs(obs: List[LunarObservationWrite], path: str, dt: datetime):
     ds.close()
 
 
-def read_lime_glod(path: str) -> List[LunarObservationWrite]:
+def read_lime_glod(path: str) -> LGLODData:
     ds = nc.Dataset(path)
+    not_default_srf = bool(ds.not_default_srf)
     datetimes = list(map(datetime.fromtimestamp, map(int, ds.variables["date"][:])))
     channel_names_0 = [
         chn.tobytes().decode("utf-8") for chn in ds.variables["channel_name"][:].data
@@ -272,12 +281,15 @@ def read_lime_glod(path: str) -> List[LunarObservationWrite]:
     lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
     sat_pos_ref_0 = ds.variables["sat_pos_ref"][:].data.tobytes().decode("utf-8")
-    ch_irrs = list(map(float, ds.variables["irr_obs"][:].data))
-    ch_irrs = dict(zip(channel_names_0, ch_irrs))
-    ch_irr_uncs = list(map(float, ds.variables["irr_obs_unc"][:].data))
+    signals_data = np.array(ds.variables["irr_obs"][:].data)
+    signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data)
+    signals = SpectralData(
+        np.array(channel_names_0), signals_data, np.array(signals_uncs), None
+    )
     wlens = list(map(float, ds.variables["wlens"][:].data))
     lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
-    sat_name = list(map(lambda_to_satname, ds.variables["sat_name"][:].data))
+    # sat_name = list(map(lambda_to_satname, ds.variables["sat_name"][:].data))
+    sat_name_0 = lambda_to_satname(ds.variables["sat_name"][:].data)
     irr_spectrum = [
         list(map(float, data)) for data in ds.variables["irr_spectrum"][:].data
     ]
@@ -320,14 +332,12 @@ def read_lime_glod(path: str) -> List[LunarObservationWrite]:
         obs = LunarObservationWrite(
             channel_names_0,
             sat_pos_ref_0,
-            ch_irrs,
             datetimes[i],
             sat_poss[i],
-            np.array([ch_irr_uncs[i]]),
             irrs,
             refls,
             polars,
-            sat_name[i],
+            sat_name_0,
         )
         obss.append(obs)
-    return obss
+    return LGLODData(obss, signals, not_default_srf)

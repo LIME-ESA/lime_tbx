@@ -5,6 +5,8 @@ from enum import Enum
 from typing import List, Callable, Union, Tuple
 from datetime import datetime
 
+from lime_tbx.datatypes import constants
+
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 import numpy as np
@@ -16,6 +18,7 @@ from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
     KernelsPath,
+    LGLODData,
     LunarObservation,
     LunarObservationWrite,
     Point,
@@ -570,9 +573,10 @@ class MainSimulationsWidget(
 
     def load_observations_finished(
         self,
-        srf: SpectralResponseFunction,
+        point: Point,
     ):
-        self.srf_widget.set_srf(srf)
+        self.input_widget.set_point(point)
+        self.input_widget.set_last_point_to_point()
         self.show_eli()
 
     @QtCore.Slot()
@@ -611,8 +615,6 @@ class MainSimulationsWidget(
                 elrefs = [elrefs]
             if not isinstance(polars, list):
                 polars = [polars]
-            if not isinstance(signals, list):
-                signals = [signals]
             if isinstance(point, SurfacePoint):
                 sat_pos = [
                     SatellitePosition(
@@ -635,26 +637,31 @@ class MainSimulationsWidget(
                 ]
                 sat_name = point.name
             for i, dt in enumerate(dts):
-                ch_irrs = dict(zip(ch_names, signals[i].data))
                 ob = LunarObservationWrite(
                     ch_names,
                     sat_pos_ref,
-                    ch_irrs,
                     dt,
                     sat_pos[i],
-                    signals[i].uncertainties,
                     elis[i],
                     elrefs[i],
                     polars[i],
                     sat_name,
                 )
                 obs.append(ob)
+            is_not_default_srf = True
+            if (
+                srf.name == constants.DEFAULT_SRF_NAME
+                and len(srf.get_channels_names()) == 1
+                and srf.get_channels_names()[0] == constants.DEFAULT_SRF_NAME
+            ):
+                is_not_default_srf = False
+            lglod = LGLODData(obs, signals, is_not_default_srf)
             name = QtWidgets.QFileDialog().getSaveFileName(
                 self, "Export LGLOD", "{}.nc".format("lglod")
             )[0]
             if name is not None and name != "":
                 try:
-                    moon.write_obs(obs, name, datetime.now())
+                    moon.write_obs(lglod, name, datetime.now())
                 except Exception as e:
                     raise e
 
@@ -713,10 +720,24 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.page.show()
 
     def load_observations_finished(
-        self, obss: List[LunarObservationWrite], srf: SpectralResponseFunction
+        self, lglod: LGLODData, srf: SpectralResponseFunction
     ):
-        self.lime_simulation.set_observations(obss, srf)
-        self.main_page.load_observations_finished(srf)
+        valid = True
+        if srf == None:
+            srf = self.settings_manager.get_default_srf()
+        for obs in lglod.observations:
+            if not obs.check_valid_srf(srf):
+                valid = False
+        if not valid:
+            error_msg = "SRF file not valid for the observation file."
+            error_dialog = QtWidgets.QErrorMessage(self)
+            error_dialog.showMessage(error_msg)
+            raise Exception(error_msg)
+        else:
+            self.main_page.srf_widget.set_srf(srf)
+            self.lime_simulation.set_observations(lglod, srf)
+            point = self.lime_simulation.get_point()
+            self.main_page.load_observations_finished(point)
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
@@ -778,14 +799,20 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def load_simulation(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self, "Select GLOD file")[0]
         if path != "":
-            srf_path = QtWidgets.QFileDialog().getOpenFileName(
-                self, "Select SpectralResponseFunction file"
-            )[0]
-            if srf_path != "":
-                obss = moon.read_lime_glod(path)
-                srf = srf_loader.read_srf(srf_path)
+            lglod = moon.read_lime_glod(path)
+            srf = None
+            cancel = False
+            if lglod.not_default_srf:
+                srf_path = QtWidgets.QFileDialog().getOpenFileName(
+                    self, "Select SpectralResponseFunction file"
+                )[0]
+                if srf_path != "":
+                    cancel = True
+                else:
+                    srf = srf_loader.read_srf(srf_path)
+            if not cancel:
                 lime_tbx_w: LimeTBXWidget = self.centralWidget()
-                lime_tbx_w.load_observations_finished(obss, srf)
+                lime_tbx_w.load_observations_finished(lglod, srf)
 
     def comparison(self):
         self.comparison_action.setText("Perform &simulations")
