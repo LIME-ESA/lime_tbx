@@ -4,11 +4,14 @@
 from typing import List, Union, Tuple
 from abc import ABC, abstractmethod
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 """___Third-Party Modules___"""
 import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
+    CustomPoint,
     LGLODData,
     LunarObservationWrite,
     MoonData,
@@ -564,7 +567,10 @@ class LimeSimulation(ILimeSimulation):
         self.elis_cimel = lglod.elis_cimel
         self.elis_asd = None
         self.polars = [obs.polars for obs in obss]
-        dts = [obs.dt for obs in obss]
+        if obss[0].dt == None:
+            dts = []
+        else:
+            dts = [obs.dt for obs in obss]
         signals = lglod.signals
         ds_sign = SpectralData.make_signals_ds(
             signals.wlens,
@@ -577,10 +583,32 @@ class LimeSimulation(ILimeSimulation):
             signals.uncertainties.T,
             ds_sign,
         )
-        if not obss[0].sat_name or obss[0].sat_name == "":
+        if not dts:
+            sel = obss[0].selenographic_data
+            lat, lon, alt = SPICEAdapter.to_planetographic(
+                obss[0].sat_pos.x,
+                obss[0].sat_pos.y,
+                obss[0].sat_pos.z,
+                "MOON",
+                self.kernels_path.main_kernels_path,
+            )
+            point = CustomPoint(
+                sel.distance_sun_moon,
+                alt / 1000,
+                lat,
+                lon,
+                sel.selen_sun_lon_rad,
+                abs(sel.mpa_degrees),
+                sel.mpa_degrees,
+            )
+        elif not obss[0].sat_name or obss[0].sat_name == "":
             point = SurfacePoint(
-                *comparison.to_llh(
-                    obss[0].sat_pos.x, obss[0].sat_pos.y, obss[0].sat_pos.z
+                *SPICEAdapter.to_planetographic(
+                    obss[0].sat_pos.x,
+                    obss[0].sat_pos.y,
+                    obss[0].sat_pos.z,
+                    "EARTH",
+                    self.kernels_path.main_kernels_path,
                 ),
                 dts
             )

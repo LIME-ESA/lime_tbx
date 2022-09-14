@@ -110,6 +110,24 @@ class CustomInputWidget(QtWidgets.QWidget):
     def get_moon_phase_angle(self) -> float:
         return self.moon_phase_angle_spinbox.value()
 
+    def set_moon_phase_angle(self, mpa: float) -> float:
+        self.moon_phase_angle_spinbox.setValue(mpa)
+
+    def set_dist_sun_moon(self, dist_sun_moon: float) -> float:
+        return self.dist_sun_moon_spinbox.setValue(dist_sun_moon)
+
+    def set_dist_obs_moon(self, dist_obs_moon: float) -> float:
+        return self.dist_obs_moon_spinbox.setValue(dist_obs_moon)
+
+    def set_selen_obs_lat(self, selen_obs_lat: float) -> float:
+        return self.selen_obs_lat_spinbox.setValue(selen_obs_lat)
+
+    def set_selen_obs_lon(self, selen_obs_lon: float) -> float:
+        return self.selen_obs_lon_spinbox.setValue(selen_obs_lon)
+
+    def set_selen_sun_lon(self, selen_sun_lon: float) -> float:
+        return self.selen_sun_lon_spinbox.setValue(selen_sun_lon)
+
 
 class ShowDatetimeWidget(QtWidgets.QWidget):
     def __init__(self, datetimes: List[datetime]):
@@ -260,8 +278,11 @@ class SurfaceInputWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def show_datetimes(self):
+        self.datetimes_window = QtWidgets.QMainWindow(self)
         self.datetimes_widget = ShowDatetimeWidget(self.loaded_datetimes)
-        self.datetimes_widget.show()
+        self.datetimes_window.setCentralWidget(self.datetimes_widget)
+        self.datetimes_window.show()
+        self.datetimes_window.resize(660, 230)
 
     def get_latitude(self) -> float:
         return self.latitude_spinbox.value()
@@ -513,7 +534,12 @@ class InputWidget(QtWidgets.QWidget):
             self.surface.set_datetimes(point.dt)
         elif isinstance(point, CustomPoint):
             self.tabs.setCurrentIndex(1)
-            # TODO
+            self.custom.set_dist_sun_moon(point.distance_sun_moon)
+            self.custom.set_dist_obs_moon(point.distance_observer_moon)
+            self.custom.set_selen_obs_lat(point.selen_obs_lat)
+            self.custom.set_selen_obs_lon(point.selen_obs_lon)
+            self.custom.set_selen_sun_lon(point.selen_sun_lon)
+            self.custom.set_moon_phase_angle(point.moon_phase_angle)
         elif isinstance(point, SatellitePoint):
             self.tabs.setCurrentIndex(2)
             self.satellite.set_satellite(point.name)

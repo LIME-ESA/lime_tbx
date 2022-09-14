@@ -12,6 +12,8 @@ from abc import ABC, abstractmethod
 import math
 from typing import List, Tuple
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 """___Third-Party Modules___"""
 import numpy as np
 import pyproj
@@ -19,6 +21,7 @@ import pyproj
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
     ComparisonData,
+    KernelsPath,
     LunarObservation,
     ReflectanceCoefficients,
     SpectralData,
@@ -41,6 +44,7 @@ __status__ = "Development"
 def to_llh(x: float, y: float, z: float):
     """
     Changes from coordinates to latitude longitude and height
+    UNUSED
 
     Returns
     -------
@@ -83,6 +87,7 @@ def to_llh(x: float, y: float, z: float):
 def to_xyz(latitude, longitude, altitude):
     # (lat, lon) in WSG-84 degrees
     # altitude in meters
+    # unused
     R = 6378137.0
     f_inv = 298.257224
     f = 1.0 / f_inv
@@ -148,6 +153,9 @@ class Comparison(IComparison):
         srf = SpectralResponseFunction("Full", [ch])
         return srf
 
+    def __init__(self, kernels_path: KernelsPath):
+        self.kernels_path = kernels_path
+
     def get_simulations(
         self,
         observations: List[LunarObservation],
@@ -164,7 +172,13 @@ class Comparison(IComparison):
         for obs in observations:
             sat_pos = obs.sat_pos
             dt = obs.dt
-            lat, lon, h = to_llh(sat_pos.x * 1000, sat_pos.y * 1000, sat_pos.z * 1000)
+            lat, lon, h = SPICEAdapter.to_planetographic(
+                sat_pos.x * 1000,
+                sat_pos.y * 1000,
+                sat_pos.z * 1000,
+                "EARTH",
+                self.kernels_path.main_kernels_path,
+            )
             sp = SurfacePoint(lat, lon, h, dt)
             lime_simulation.set_simulation_changed()
             lime_simulation.update_irradiance(

@@ -21,6 +21,7 @@ from ..datatypes.datatypes import (
     LunarObservation,
     LunarObservationWrite,
     SatellitePosition,
+    SelenographicDataWrite,
     SpectralData,
     SpectralResponseFunction,
 )
@@ -117,8 +118,15 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     ds.processing_level = "v1.0.0"
     ds.doc_url = "N/A"
     ds.doc_doi = "N/A"
-    ds.time_coverage_start = min(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
-    ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
+    quant_dates = len(obs)
+    if quant_dates == 1 and obs[0].dt == None:
+        quant_dates = 0
+    if quant_dates > 0:
+        ds.time_coverage_start = min(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
+        ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
+    else:
+        ds.time_coverage_start = ""
+        ds.time_coverage_end = ""
     ds.reference_model = "LIME2 coefficients v0"  # TODO add coefficients version
     ds.not_default_srf = int(lglod.not_default_srf)
     # DIMENSIONS
@@ -130,7 +138,8 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     sat_name_st_type = "S{}".format(max_len_sat_name)
     chan = ds.createDimension("chan", len(obs[0].ch_names))
     chan_strlen = ds.createDimension("chan_strlen", max_len_strlen)
-    date = ds.createDimension("date", len(obs))
+    date = ds.createDimension("date", quant_dates)
+    number_obs = ds.createDimension("number_obs", len(obs))
     sat_ref_strlen = ds.createDimension("sat_ref_strlen", max_len_sat_pos_ref)
     sat_name_strlen = ds.createDimension("sat_name_strlen", max_len_sat_name)
     col = ds.createDimension("col", 0)
@@ -144,14 +153,37 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     dates.long_name = "time of lunar observation"
     dates.units = "seconds since 1970-01-01T00:00:00Z"
     dates.calendar = "gregorian"
-    dates[:] = np.array([o.dt.timestamp() for o in obs])
+    if quant_dates > 0:
+        dates[:] = np.array([o.dt.timestamp() for o in obs])
+    else:
+        dates[:] = np.array([])
+        distance_sun_moon = ds.createVariable(
+            "distance_sun_moon", "f4", ("number_obs",)
+        )
+        distance_sun_moon.long_name = "Distance between the Sun and the Moon."
+        distance_sun_moon.units = "AU"
+        distance_sun_moon[:] = np.array(
+            [o.selenographic_data.distance_sun_moon for o in obs]
+        )
+        selen_sun_lon_rad = ds.createVariable(
+            "selen_sun_lon_rad", "f4", ("number_obs",)
+        )
+        selen_sun_lon_rad.long_name = "Selenographic longitude of the Sun"
+        selen_sun_lon_rad.units = "Radians"
+        selen_sun_lon_rad[:] = np.array(
+            [o.selenographic_data.selen_sun_lon_rad for o in obs]
+        )
+        mpa_degrees = ds.createVariable("mpa_degrees", "f4", ("number_obs",))
+        mpa_degrees.long_name = "Moon phase angle"
+        mpa_degrees.units = "Decimal degrees"
+        mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
     channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
     channel_name.standard_name = "sensor_band_identifier"
     channel_name.long_name = "channel identifier"
     channel_name[:] = np.array(
         [nc.stringtochar(np.array([ch], chan_st_type)) for ch in obs[0].ch_names]
     )
-    sat_pos = ds.createVariable("sat_pos", "f4", ("date", "sat_xyz"))
+    sat_pos = ds.createVariable("sat_pos", "f4", ("number_obs", "sat_xyz"))
     sat_pos.long_name = "satellite position x y z in sat_pos_ref"
     sat_pos.units = "km"
     sat_pos.valid_min = 0.0
@@ -167,13 +199,13 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
     sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
     sat_name[:] = nc.stringtochar(np.array([obs[0].sat_name], sat_name_st_type))
-    irr_obs = ds.createVariable("irr_obs", "f4", ("date", "chan"))
+    irr_obs = ds.createVariable("irr_obs", "f4", ("number_obs", "chan"))
     irr_obs.units = "W m-2 nm-1"
     irr_obs.long_name = "observed lunar irradiance for each channel"
     irr_obs.valid_min = 0.0
     irr_obs.valid_max = 1000000.0
     irr_obs[:] = lglod.signals.data
-    irr_obs_unc = ds.createVariable("irr_obs_unc", "f4", ("date", "chan"))
+    irr_obs_unc = ds.createVariable("irr_obs_unc", "f4", ("number_obs", "chan"))
     irr_obs_unc.units = "W m-2 nm-1"
     irr_obs_unc.long_name = (
         "uncertainties of the observed lunar irradiance for each channel"
@@ -187,7 +219,7 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     wlens.valid_min = 0.0
     wlens.valid_max = 1000000.0
     wlens[:] = obs[0].irrs.wlens
-    irr_spectrum = ds.createVariable("irr_spectrum", "f4", ("date", "wlens"))
+    irr_spectrum = ds.createVariable("irr_spectrum", "f4", ("number_obs", "wlens"))
     irr_spectrum.units = "W m-2 nm-1"
     irr_spectrum.long_name = "simulated lunar irradiance per wavelength"
     irr_spectrum.valid_min = 0.0
@@ -195,7 +227,9 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     irr_spectrum[:] = np.array(
         [np.array([o.irrs.data[i] for i in range(len(obs[0].irrs.wlens))]) for o in obs]
     )
-    irr_spectrum_unc = ds.createVariable("irr_spectrum_unc", "f4", ("date", "wlens"))
+    irr_spectrum_unc = ds.createVariable(
+        "irr_spectrum_unc", "f4", ("number_obs", "wlens")
+    )
     irr_spectrum_unc.units = "W m-2 nm-1"
     irr_spectrum_unc.long_name = (
         "uncertainties of the simulated lunar irradiance per wavelength"
@@ -208,7 +242,7 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
             for o in obs
         ]
     )
-    refl_spectrum = ds.createVariable("refl_spectrum", "f4", ("date", "wlens"))
+    refl_spectrum = ds.createVariable("refl_spectrum", "f4", ("number_obs", "wlens"))
     refl_spectrum.units = "Fractions of unity"
     refl_spectrum.long_name = "simulated lunar degree of reflectance per wavelength"
     refl_spectrum.valid_min = 0.0
@@ -219,7 +253,9 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
             for o in obs
         ]
     )
-    refl_spectrum_unc = ds.createVariable("refl_spectrum_unc", "f4", ("date", "wlens"))
+    refl_spectrum_unc = ds.createVariable(
+        "refl_spectrum_unc", "f4", ("number_obs", "wlens")
+    )
     refl_spectrum_unc.units = "Fractions of unity"
     refl_spectrum_unc.long_name = (
         "uncertainties of the simulated lunar degree of reflectance per wavelength"
@@ -232,7 +268,7 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
             for o in obs
         ]
     )
-    polar_spectrum = ds.createVariable("polar_spectrum", "f4", ("date", "wlens"))
+    polar_spectrum = ds.createVariable("polar_spectrum", "f4", ("number_obs", "wlens"))
     polar_spectrum.units = "Fractions of unity"
     polar_spectrum.long_name = "simulated lunar degree of polarization per wavelength"
     polar_spectrum.valid_min = -1.0
@@ -245,7 +281,7 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     )
     polar_spectrum[:] = polar_vals
     polar_spectrum_unc = ds.createVariable(
-        "polar_spectrum_unc", "f4", ("date", "wlens")
+        "polar_spectrum_unc", "f4", ("number_obs", "wlens")
     )
     polar_spectrum_unc.units = "Fractions of unity"
     polar_spectrum_unc.long_name = (
@@ -265,21 +301,25 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     cimel_wlens.units = "nm"
     cimel_wlens.long_name = "Cimel wavelengths"
     cimel_wlens[:] = lglod.elis_cimel[0].wlens
-    irr_cimel = ds.createVariable("irr_cimel", "f4", ("date", "wlens_cimel"))
+    irr_cimel = ds.createVariable("irr_cimel", "f4", ("number_obs", "wlens_cimel"))
     irr_cimel.units = "W m-2 nm-1"
     irr_cimel.long_name = "Simulated irradiance for the cimel wavelengths."
     irr_cimel[:] = np.array([cimel.data for cimel in lglod.elis_cimel])
-    irr_cimel_unc = ds.createVariable("irr_cimel_unc", "f4", ("date", "wlens_cimel"))
+    irr_cimel_unc = ds.createVariable(
+        "irr_cimel_unc", "f4", ("number_obs", "wlens_cimel")
+    )
     irr_cimel_unc.units = "W m-2 nm-1"
     irr_cimel_unc.long_name = (
         "Uncertainties for the simulated irradiance for the cimel wavelengths."
     )
     irr_cimel_unc[:] = np.array([cimel.uncertainties for cimel in lglod.elis_cimel])
-    refl_cimel = ds.createVariable("refl_cimel", "f4", ("date", "wlens_cimel"))
+    refl_cimel = ds.createVariable("refl_cimel", "f4", ("number_obs", "wlens_cimel"))
     refl_cimel.units = "Fractions of unity"
     refl_cimel.long_name = "Simulated reflectance for the cimel wavelengths."
     refl_cimel[:] = np.array([cimel.data for cimel in lglod.elrefs_cimel])
-    refl_cimel_unc = ds.createVariable("refl_cimel_unc", "f4", ("date", "wlens_cimel"))
+    refl_cimel_unc = ds.createVariable(
+        "refl_cimel_unc", "f4", ("number_obs", "wlens_cimel")
+    )
     refl_cimel_unc.units = "Fractions of unity"
     refl_cimel_unc.long_name = (
         "Uncertainties for the simulated reflectance for the cimel wavelengths."
@@ -305,7 +345,6 @@ def read_lime_glod(path: str) -> LGLODData:
     )
     wlens = list(map(float, ds.variables["wlens"][:].data))
     lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
-    # sat_name = list(map(lambda_to_satname, ds.variables["sat_name"][:].data))
     sat_name_0 = lambda_to_satname(ds.variables["sat_name"][:].data)
     irr_spectrum = [
         list(map(float, data)) for data in ds.variables["irr_spectrum"][:].data
@@ -334,8 +373,12 @@ def read_lime_glod(path: str) -> LGLODData:
     refl_cimel_unc = [
         list(map(float, data)) for data in ds.variables["refl_cimel_unc"][:].data
     ]
-    ds.close()
+    if len(datetimes) == 0:
+        mpa_degrees = ds.variables["mpa_degrees"][:].data
+        distance_sun_moon = ds.variables["distance_sun_moon"][:].data
+        selen_sun_lon_rad = ds.variables["selen_sun_lon_rad"][:].data
     obss = []
+    ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
             np.array(wlens),
@@ -355,15 +398,24 @@ def read_lime_glod(path: str) -> LGLODData:
             np.array(polar_spectrum_unc[i]),
             None,
         )
+        dt = None
+        selenographic_data = None
+        if len(datetimes) > 0:
+            dt = datetimes[i]
+        else:
+            selenographic_data = SelenographicDataWrite(
+                distance_sun_moon[i], selen_sun_lon_rad[i], mpa_degrees[i]
+            )
         obs = LunarObservationWrite(
             channel_names_0,
             sat_pos_ref_0,
-            datetimes[i],
+            dt,
             sat_poss[i],
             irrs,
             refls,
             polars,
             sat_name_0,
+            selenographic_data,
         )
         obss.append(obs)
     elis_cimel = [

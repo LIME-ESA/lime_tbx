@@ -817,6 +817,26 @@ class KernelsPath:
 
 
 @dataclass
+class SelenographicDataWrite:
+    """
+    Extra data that allowes to define CustomPoints in the GLOD data file.
+
+    Attributes
+    ----------
+    distance_sun_moon : float
+        Distance between the Sun and the Moon (in astronomical units)
+    selen_sun_lon_rad : float
+        Selenographic longitude of the Sun (in radians)
+    mpa_degrees : float
+        Moon phase angle (in degrees)
+    """
+
+    distance_sun_moon: float
+    selen_sun_lon_rad: float
+    mpa_degrees: float
+
+
+@dataclass
 class LunarObservationWrite:
     """Dataclass containing the needed information to create a Lunar observation in a LGLOD file.
 
@@ -843,6 +863,7 @@ class LunarObservationWrite:
     refls: "SpectralData"
     polars: "SpectralData"
     sat_name: str  # if None or empty: SurfacePoint
+    selenographic_data: SelenographicDataWrite  # if None: not selenographic
 
     def has_ch_value(self, name: str) -> bool:
         return name in self.ch_names

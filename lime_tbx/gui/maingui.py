@@ -6,6 +6,7 @@ from typing import List, Callable, Union, Tuple
 from datetime import datetime
 
 from lime_tbx.datatypes import constants
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -25,6 +26,7 @@ from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SatellitePoint,
     SatellitePosition,
+    SelenographicDataWrite,
     SpectralResponseFunction,
     ApolloIrradianceCoefficients,
     SurfacePoint,
@@ -184,12 +186,16 @@ def compare_callback(
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
+    kernels_path: KernelsPath,
 ) -> Tuple[List[ComparisonData], List[LunarObservation], SpectralResponseFunction,]:
-    co = comparison.Comparison()
+    co = comparison.Comparison(kernels_path)
     for mo in mos:
         if not mo.check_valid_srf(srf):
             raise Exception("SRF file not valid for the chosen Moon observations file.")
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
+    print(mos[0].ch_irrs.values())
+    print(comparisons[0].observed_signal)
+    print(comparisons[0].simulated_signal)
     return comparisons, mos, srf
 
 
@@ -231,10 +237,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self,
         lime_simulation: ILimeSimulation,
         settings_manager: settings.ISettingsManager,
+        kernels_path: KernelsPath,
     ):
         super().__init__()
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
+        self.kernels_path = kernels_path
         self._build_layout()
 
     def _build_layout(self):
@@ -277,7 +285,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             compare_callback,
-            [mos, srf, coeffs, cimel_coef, self.lime_simulation],
+            [mos, srf, coeffs, cimel_coef, self.lime_simulation, self.kernels_path],
         )
         self._start_thread(self.compare_finished, self.compare_error)
 
@@ -340,10 +348,12 @@ class MainSimulationsWidget(
     def __init__(
         self,
         lime_simulation: ILimeSimulation,
+        kernels_path: KernelsPath,
         eocfi_path: str,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
+        self.kernels_path = kernels_path
         self._finished_building = False
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
@@ -423,8 +433,9 @@ class MainSimulationsWidget(
 
     def _callback_check_calculable(self):
         calculable = self.input_widget.is_calculable()
-        self.lower_tabs.setEnabled(calculable)
-        self.export_lglod_button.setDisabled(not calculable)
+        self.eli_button.setEnabled(calculable)
+        self.elref_button.setEnabled(calculable)
+        self.polar_button.setEnabled(calculable)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
@@ -607,7 +618,7 @@ class MainSimulationsWidget(
         srf: SpectralResponseFunction = data[1]
         obs = []
         ch_names = srf.get_channels_names()
-        sat_pos_ref = "ITRF93"
+        sat_pos_ref = constants.EARTH_FRAME
         elis = self.lime_simulation.get_elis()
         elis_cimel = self.lime_simulation.get_elis_cimel()
         if not isinstance(elis_cimel, list):
@@ -617,22 +628,26 @@ class MainSimulationsWidget(
         if not isinstance(elrefs_cimel, list):
             elrefs_cimel = [elrefs_cimel]
         polars = self.lime_simulation.get_polars()
+        if not isinstance(elis, list):
+            elis = [elis]
+        if not isinstance(elrefs, list):
+            elrefs = [elrefs]
+        if not isinstance(polars, list):
+            polars = [polars]
         signals = self.lime_simulation.get_signals()
         if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
             dts = point.dt
             if not isinstance(dts, list):
                 dts = [dts]
-            if not isinstance(elis, list):
-                elis = [elis]
-            if not isinstance(elrefs, list):
-                elrefs = [elrefs]
-            if not isinstance(polars, list):
-                polars = [polars]
             if isinstance(point, SurfacePoint):
                 sat_pos = [
                     SatellitePosition(
-                        *comparison.to_xyz(
-                            point.latitude, point.longitude, point.altitude
+                        *SPICEAdapter.to_rectangular(
+                            point.latitude,
+                            point.longitude,
+                            point.altitude,
+                            "EARTH",
+                            self.kernels_path.main_kernels_path,
                         )
                     )
                     for _ in dts
@@ -644,7 +659,13 @@ class MainSimulationsWidget(
                     sur_points = [sur_points]
                 sat_pos = [
                     SatellitePosition(
-                        *comparison.to_xyz(sp.latitude, sp.longitude, sp.altitude)
+                        *SPICEAdapter.to_rectangular(
+                            sp.latitude,
+                            sp.longitude,
+                            sp.altitude,
+                            "EARTH",
+                            self.kernels_path.main_kernels_path,
+                        )
                     )
                     for sp in sur_points
                 ]
@@ -659,26 +680,54 @@ class MainSimulationsWidget(
                     elrefs[i],
                     polars[i],
                     sat_name,
+                    None,
                 )
                 obs.append(ob)
-            is_not_default_srf = True
-            if (
-                srf.name == constants.DEFAULT_SRF_NAME
-                and len(srf.get_channels_names()) == 1
-                and srf.get_channels_names()[0] == constants.DEFAULT_SRF_NAME
-            ):
-                is_not_default_srf = False
-            lglod = LGLODData(
-                obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel
+        elif isinstance(point, CustomPoint):
+            sat_pos = SatellitePosition(
+                *SPICEAdapter.to_rectangular(
+                    point.selen_obs_lat,
+                    point.selen_obs_lon,
+                    point.distance_observer_moon * 1000,
+                    "MOON",
+                    self.kernels_path.main_kernels_path,
+                )
             )
-            name = QtWidgets.QFileDialog().getSaveFileName(
-                self, "Export LGLOD", "{}.nc".format("lglod")
-            )[0]
-            if name is not None and name != "":
-                try:
-                    moon.write_obs(lglod, name, datetime.now())
-                except Exception as e:
-                    raise e
+            sat_name = ""
+            sat_pos_ref = constants.MOON_FRAME
+            obs = [
+                LunarObservationWrite(
+                    ch_names,
+                    sat_pos_ref,
+                    None,
+                    sat_pos,
+                    elis[0],
+                    elrefs[0],
+                    polars[0],
+                    sat_name,
+                    SelenographicDataWrite(
+                        point.distance_sun_moon,
+                        point.selen_sun_lon,
+                        point.moon_phase_angle,
+                    ),
+                )
+            ]
+        is_not_default_srf = True
+        if (
+            srf.name == constants.DEFAULT_SRF_NAME
+            and len(srf.get_channels_names()) == 1
+            and srf.get_channels_names()[0] == constants.DEFAULT_SRF_NAME
+        ):
+            is_not_default_srf = False
+        lglod = LGLODData(obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel)
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export LGLOD", "{}.nc".format("lglod")
+        )[0]
+        if name is not None and name != "":
+            try:
+                moon.write_obs(lglod, name, datetime.now())
+            except Exception as e:
+                raise e
 
     def calculate_all_error(self, error: Exception):
         self._unblock_gui()
@@ -707,11 +756,14 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.settings_manager = settings.MockSettingsManager()
         self.comparison_page = ComparisonPageWidget(
-            self.lime_simulation, self.settings_manager
+            self.lime_simulation, self.settings_manager, self.kernels_path
         )
         self.comparison_page.hide()
         self.main_page = MainSimulationsWidget(
-            self.lime_simulation, self.eocfi_path, self.settings_manager
+            self.lime_simulation,
+            self.kernels_path,
+            self.eocfi_path,
+            self.settings_manager,
         )
         self.page = self.main_page
         self.main_layout.addWidget(self.page)
