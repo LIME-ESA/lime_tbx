@@ -266,9 +266,11 @@ class GraphWidget(QtWidgets.QWidget):
                     horizontalalignment="right",
                 )
             if len(self.legend) > 0:
-                # added these three lines
-                labels = [l.get_label() for l in lines]
-                self.canvas.axes.legend(lines, labels, loc=0)
+                legend_lines = [
+                    l for l in lines if not l.get_label().startswith("_child")
+                ]
+                labels = [l.get_label() for l in legend_lines]
+                self.canvas.axes.legend(legend_lines, labels, loc=0)
 
         self.canvas.axes.set_title(self.title)
         self.canvas.axes.set_xlabel(self.xlabel)
