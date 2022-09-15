@@ -1,7 +1,7 @@
 """Tests for comparison module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Third-Party Modules___"""
 import unittest
@@ -36,13 +36,13 @@ CH_WLENS = np.array([350, 400, 450, 500])
 CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
 CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 SP = SatellitePosition(3753240, -196698.975, 5138362)
-DT1 = datetime(2022, 1, 17, 2)
+DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
 OBS1 = LunarObservation(["default"], "ITRF93", {"Default": 0.000001}, DT1, SP)
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 
 
 def get_comparison() -> comparison.IComparison:
-    return comparison.Comparison()
+    return comparison.Comparison(KERNELS_PATH)
 
 
 def get_srf() -> SpectralResponseFunction:

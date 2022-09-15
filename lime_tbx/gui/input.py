@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Union, Tuple
 
 from lime_tbx.filedata import moon
@@ -295,7 +295,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
 
     def get_datetimes(self) -> Union[datetime, List[datetime]]:
         if self.single_datetime:
-            return self.datetime_edit.dateTime().toPython()
+            return self.datetime_edit.dateTime().toPython().replace(tzinfo=timezone.utc)
         else:
             return self.loaded_datetimes
 
@@ -436,7 +436,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
 
     def get_datetimes(self) -> Union[datetime, List[datetime]]:
         if self.single_datetime:
-            return self.datetime_edit.dateTime().toPython()
+            return self.datetime_edit.dateTime().toPython().replace(tzinfo=timezone.utc)
         else:
             return self.loaded_datetimes
 

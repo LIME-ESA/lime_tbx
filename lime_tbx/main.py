@@ -9,7 +9,6 @@ from lime_tbx.coefficients.access_data.appdata import (
     get_appdata_folder,
     get_programfiles_folder,
 )
-from lime_tbx.gui.gui import GUI
 from lime_tbx.datatypes.datatypes import KernelsPath
 
 """___Authorship___"""
@@ -26,6 +25,8 @@ def main():
     kernels_path = KernelsPath(
         os.path.join(programfiles, "kernels"), os.path.join(appdata, "kernels")
     )
+    from lime_tbx.gui.gui import GUI
+
     gui = GUI(kernels_path, os.path.join(programfiles, "eocfi_data"))
 
 

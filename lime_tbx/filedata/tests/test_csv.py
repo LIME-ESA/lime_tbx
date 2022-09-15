@@ -1,7 +1,7 @@
 """Tests for csv module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 import filecmp
 
 
@@ -37,8 +37,8 @@ DATA = [0.0001, 0.0002, 0.0001, 0.0002, 0.0001, 0.0003]
 DATA2 = [0.0002, 0.0001, 0.0002, 0.0002, 0.0003, 0.0003]
 UNCS = [0, 0, 0, 0.0000000001, 0, 0]
 UNCS2 = [0.000002, 0, 0, 0.0000000001, 0, 0]
-DT1 = datetime(2018, 2, 27, 2)
-DT2 = datetime(2019, 2, 23, 2)
+DT1 = datetime(2018, 2, 27, 2, tzinfo=timezone.utc)
+DT2 = datetime(2019, 2, 23, 2, tzinfo=timezone.utc)
 SPOINT = SurfacePoint(43, 45, 4500, DT1)
 SPOINT2 = SurfacePoint(42, 45, 4500, [DT1, DT2])
 SPOINT3 = SurfacePoint(43, 45, 4500, DT2)
@@ -50,14 +50,14 @@ SD1 = SpectralData(WLENS, DATA, UNCS, None)
 SD2 = SpectralData(WLENS, DATA2, UNCS2, None)
 
 DTS = [
-    datetime(2022, 1, 17, 2, 30),
-    datetime(2022, 1, 26, 3, 25, 14),
-    datetime(2022, 1, 11, 3, 21, 4),
-    datetime(2022, 1, 13, 5, 29, 34),
-    datetime(2022, 1, 15, 7, 28, 14),
-    datetime(2022, 1, 16, 7, 23, 4),
-    datetime(2022, 1, 13, 3, 26, 34),
-    datetime(2022, 1, 14, 11, 22, 4),
+    datetime(2022, 1, 17, 2, 30, tzinfo=timezone.utc),
+    datetime(2022, 1, 26, 3, 25, 14, tzinfo=timezone.utc),
+    datetime(2022, 1, 11, 3, 21, 4, tzinfo=timezone.utc),
+    datetime(2022, 1, 13, 5, 29, 34, tzinfo=timezone.utc),
+    datetime(2022, 1, 15, 7, 28, 14, tzinfo=timezone.utc),
+    datetime(2022, 1, 16, 7, 23, 4, tzinfo=timezone.utc),
+    datetime(2022, 1, 13, 3, 26, 34, tzinfo=timezone.utc),
+    datetime(2022, 1, 14, 11, 22, 4, tzinfo=timezone.utc),
 ]
 
 

@@ -3,7 +3,7 @@
 """___Built-In Modules___"""
 from enum import Enum
 from typing import List, Callable, Union, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 
 from lime_tbx.datatypes import constants
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -725,7 +725,7 @@ class MainSimulationsWidget(
         )[0]
         if name is not None and name != "":
             try:
-                moon.write_obs(lglod, name, datetime.now())
+                moon.write_obs(lglod, name, datetime.now().astimezone(timezone.utc))
             except Exception as e:
                 raise e
 

@@ -1,7 +1,7 @@
 """Tests for lime_simulation module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Third-Party Modules___"""
 import unittest
@@ -40,8 +40,8 @@ CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 LAT = 21
 LON = 21
 ALT = 2400
-DT1 = datetime(2022, 1, 17, 2)
-DT2 = datetime(2022, 2, 16, 2)
+DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
+DT2 = datetime(2022, 2, 16, 2, tzinfo=timezone.utc)
 
 SURFACE_POINT = SurfacePoint(LAT, LON, ALT, [DT1, DT2])
 

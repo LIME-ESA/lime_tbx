@@ -10,7 +10,7 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 from ctypes import *
 from typing import Tuple, List
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import pkgutil
 import platform
@@ -65,11 +65,11 @@ def _make_clist(lst: List[str]):
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     splitted = filename.split("_")
-    date0 = datetime.strptime(splitted[-3], "%Y%m%dT%H%M%S")
+    date0 = datetime.strptime(splitted[-3] + "+00:00", "%Y%m%dT%H%M%S%z")
     if splitted[-2] == "99999999T999999":
-        date1 = datetime(9999, 12, 31, 23, 59, 59)
+        date1 = datetime(9999, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
     else:
-        date1 = datetime.strptime(splitted[-2], "%Y%m%dT%H%M%S")
+        date1 = datetime.strptime(splitted[-2] + "+00:00", "%Y%m%dT%H%M%S%z")
     return date0, date1
 
 

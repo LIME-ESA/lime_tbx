@@ -10,7 +10,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 from typing import Union, List, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 import csv
 
 """___Third-Party Modules___"""
@@ -241,6 +241,6 @@ def read_datetimes(path: str) -> List[datetime]:
         datetimes = []
         for row in reader:
             irow = map(int, row)
-            dt = datetime(*irow)
+            dt = datetime(*irow, tzinfo=timezone.utc)
             datetimes.append(dt)
         return datetimes

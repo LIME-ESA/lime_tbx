@@ -6,7 +6,7 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone, tzinfo
 import os
 from typing import List, Union, Tuple
 
@@ -73,7 +73,7 @@ def read_moon_obs(path: str) -> LunarObservation:
             end = list(ds["channel_name"][i].mask).index(True)
             ch_name = ch_name[:end]
         ch_names.append(ch_name)
-    dt = datetime.fromtimestamp(float(ds["date"][0].data))
+    dt = datetime.fromtimestamp(float(ds["date"][0].data), tz=timezone.utc)
     sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
     sat_pos = SatellitePosition(*list(map(float, ds["sat_pos"][:][:].data)))
     irr_obs = ds["irr_obs"][:]
@@ -331,7 +331,12 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
 def read_lime_glod(path: str) -> LGLODData:
     ds = nc.Dataset(path)
     not_default_srf = bool(ds.not_default_srf)
-    datetimes = list(map(datetime.fromtimestamp, map(int, ds.variables["date"][:])))
+    datetimes = list(
+        map(
+            lambda x: datetime.fromtimestamp(x, tz=timezone.utc),
+            map(int, ds.variables["date"][:]),
+        )
+    )
     channel_names_0 = [
         chn.tobytes().decode("utf-8") for chn in ds.variables["channel_name"][:].data
     ]
