@@ -831,6 +831,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.download_coefficients_action = QtWidgets.QAction(self)
         self.download_coefficients_action.setText("&Download updated coefficients")
         self.download_coefficients_action.triggered.connect(self.download_coefficients)
+        self.download_coefficients_action.setDisabled(True)
         self.select_coefficients_action = QtWidgets.QAction(self)
         self.select_coefficients_action.setText("&Select coefficients")
         self.select_coefficients_action.triggered.connect(self.select_coefficients)
