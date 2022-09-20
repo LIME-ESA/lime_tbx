@@ -1,4 +1,10 @@
 # https://eop-cfi.esa.int/Repo/PUBLIC/DOCUMENTATION/MISSION_DATA/ORBIT_SWATH_DATA/
+# https://eop-cfi.esa.int/Repo/PUBLIC/DOCUMENTATION/CFI/EOCFI/BRANCH_4X/latest/C-Docs/SUM/GeneralSUM_v4_23.pdf 7.2 General Enumerations
+ADM-AEOLUS:
+  id: 51
+  n_files: 1
+  orbit_files:
+    - AEOLUS/OSF/AE_OPER_MPL_ORBSCT_20180822T225352_99999999T999999_0017.EEF
 BIOMASS:
   id: 141
   n_files: 1
@@ -9,6 +15,16 @@ CHIME:
   n_files: 1
   orbit_files:
     - CHIME/OSF/CHM_TEST_MPL_ORBSCT_20280101T224501_99999999T999999_0001.EOF
+CIMR:
+  id: 147
+  n_files: 1
+  orbit_files:
+    - CIMR/OSF/CMR_TEST_MPL_ORBSCT_20280101T180001_99999999T999999_0001.EOF
+CO2M:
+  id: 151
+  n_files: 1
+  orbit_files:
+    - CO2M/OSF/CO2_TEST_MPL_ORBSCT_20280101T233001_99999999T999999_0001.EOF
 CRISTAL:
   id: 150
   n_files: 2
@@ -26,6 +42,10 @@ EARTHCARE:
   n_files: 1
   orbit_files:
     - EARTHCARE/OSF/ECA_TEST_MPL_ORBSCT_20180131T020001_99999999T999999_0001.EOF
+ENVISAT:
+  id: 21
+  n_files: 0
+  orbit_files:
 FLEX:
   id: 144
   n_files: 1
@@ -81,6 +101,10 @@ SENTINEL-1B:
   n_files: 1
   orbit_files:
     - SENTINEL1B/OSF/S1B_OPER_MPL_ORBSCT_20160425T224606_99999999T999999_0017.EOF
+SENTINEL-2:
+  id: 112
+  n_files: 0
+  orbit_files:
 SENTINEL-2A:
   id: 126
   n_files: 1
@@ -91,6 +115,10 @@ SENTINEL-2B:
   n_files: 1
   orbit_files:
     - SENTINEL2B/OSF/S2B_OPER_MPL_ORBSCT_20170309T104400_99999999T999999_0007.EOF
+SENTINEL-3:
+  id: 113
+  n_files: 0
+  orbit_files:
 SENTINEL-3A:
   id: 129
   n_files: 1
