@@ -495,17 +495,6 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        # unc = data[5]
-        # if isinstance(unc, list):
-        #     wlen = [u.wlen_cimel for u in unc]
-        #     cimel_data = [u.data for u in unc]
-        #     uncert = [u.uncertainties for u in unc]
-        # else:
-        #     wlen = unc.wlen_cimel
-        #     cimel_data = unc.data
-        #     uncert = unc.uncertainties
-        # self.graph.update_plot(data[0], data[1], data[2], wlen, cimel_data, uncert)
-
         self.graph.update_plot(data[2], data[3], data[4], data[0])
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
@@ -513,6 +502,8 @@ class MainSimulationsWidget(
             "Irradiances  (Wm⁻²/nm)",
         )
         self.signal_widget.update_signals(data[0], data[1], data[5])
+        self.lower_tabs.setCurrentIndex(0)
+        self.lower_tabs.setTabEnabled(2, True)
 
     def eli_error(self, error: Exception):
         self._unblock_gui()
@@ -533,6 +524,10 @@ class MainSimulationsWidget(
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
+    def clear_signals(self):
+        self.signal_widget.clear_signals()
+        self.lower_tabs.setTabEnabled(2, False)
+
     def elref_finished(
         self,
         data: Tuple[
@@ -543,23 +538,14 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        # unc = data[3]
-        # if isinstance(unc, list):
-        #     wlen = [u.wlen_cimel for u in unc]
-        #     cimel_data = [u.data for u in unc]
-        #     uncert = [u.uncertainties for u in unc]
-        # else:
-        #     wlen = unc.wlen_cimel
-        #     cimel_data = unc.data
-        #     uncert = unc.uncertainties
-
         self.graph.update_plot(data[1], data[2], data[3], data[0])
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
         )
-        self.signal_widget.clear_signals()
+        self.clear_signals()
+        self.lower_tabs.setCurrentIndex(0)
 
     def elref_error(self, error: Exception):
         self._unblock_gui()
@@ -593,7 +579,8 @@ class MainSimulationsWidget(
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
         )
-        self.signal_widget.clear_signals()
+        self.clear_signals()
+        self.lower_tabs.setCurrentIndex(0)
 
     def polar_error(self, error: Exception):
         self._unblock_gui()
