@@ -414,6 +414,7 @@ class MainSimulationsWidget(
         self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.export_lglod_button.clicked.connect(self.export_glod)
         self.export_lglod_button.setDisabled(True)
+        self._export_lglod_button_was_disabled = True
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
@@ -422,11 +423,18 @@ class MainSimulationsWidget(
 
     def _unblock_gui(self):
         self.parentWidget().setDisabled(False)
-        self.export_lglod_button.setDisabled(False)
+        self._disable_lglod_export(False)
+        self._export_lglod_button_was_disabled = False
 
     def _block_gui_loading(self):
         self.export_lglod_button.setDisabled(True)
-        self.parentWidget().setDisabled(True)
+        self._disable_lglod_export(True)
+        self._export_lglod_button_was_disabled = True
+
+    def _disable_lglod_export(self, disable: bool):
+        self.export_lglod_button.setDisabled(False)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.save_simulation_action.setDisabled(disable)
 
     def _callback_regular_input_changed(self):
         self.lime_simulation.set_simulation_changed()
@@ -436,6 +444,8 @@ class MainSimulationsWidget(
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
         self.polar_button.setEnabled(calculable)
+        if not self._export_lglod_button_was_disabled:
+            self._disable_lglod_export(not calculable)
 
     def _start_thread(self, finished: Callable, error: Callable):
         self.worker_th = QtCore.QThread()
@@ -810,10 +820,17 @@ class LimeTBXWidget(QtWidgets.QWidget):
 class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self._is_comparing = False
         self._create_menu_bar()
 
     def _create_actions(self):
         # File actions
+        self.save_simulation_action = QtWidgets.QAction(self)
+        self.save_simulation_action.setText(
+            "&Save simulation to LIME GLOD format file."
+        )
+        self.save_simulation_action.triggered.connect(self.save_simulation)
+        self.save_simulation_action.setDisabled(True)
         self.load_simulation_action = QtWidgets.QAction(self)
         self.load_simulation_action.setText(
             "&Load simulation file stored in a LIME GLOD format file."
@@ -844,6 +861,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._create_actions()
         self.menu_bar = self.menuBar()
         file_menu = QtWidgets.QMenu("&File", self)
+        file_menu.addAction(self.save_simulation_action)
         file_menu.addAction(self.load_simulation_action)
         file_menu.addAction(self.comparison_action)
         file_menu.addSeparator()
@@ -863,6 +881,13 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         return super().closeEvent(event)
 
     # ACTIONS
+
+    def save_simulation(self):
+        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        if self._is_comparing:
+            pass
+        else:
+            lime_tbx_w.main_page.export_glod()
 
     def load_simulation(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self, "Select GLOD file")[0]
@@ -888,6 +913,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
         lime_tbx_w.lime_simulation.set_simulation_changed()
         lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
+        self._is_comparing = True
 
     def simulations(self):
         self.comparison_action.setText(
@@ -897,6 +923,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
         lime_tbx_w.lime_simulation.set_simulation_changed()
         lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
+        self._is_comparing = False
 
     def exit(self):
         self.close()
