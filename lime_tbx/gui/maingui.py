@@ -368,6 +368,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def load_lglod_comparisons(
         self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
     ):
+        self.input.clear_input()
+        self.compare_button.setDisabled(True)
         comps = lglod.comparisons
         srf = srf
         self.comps = comps

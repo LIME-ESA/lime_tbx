@@ -671,3 +671,9 @@ class ComparisonInput(QtWidgets.QWidget):
 
     def get_moon_obs(self) -> List[LunarObservation]:
         return self.loaded_moons
+
+    def clear_input(self) -> None:
+        self.loaded_srf = None
+        self.loaded_moons = []
+        self.moon_obs_feedback.setText("No files loaded")
+        self.srf_feedback.setText("No file loaded")
