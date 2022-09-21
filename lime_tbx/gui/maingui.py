@@ -332,7 +332,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf = data[2]
         self.comps = comps
         self.srf = srf
-        self.mos = mos
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         to_remove = []
@@ -361,6 +360,37 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             else:
                 to_remove.append(ch)
         self.output.remove_channels(to_remove)
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+
+    def load_lglod_comparisons(
+        self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
+    ):
+        comps = lglod.comparisons
+        srf = srf
+        self.comps = comps
+        self.srf = srf
+        ch_names = lglod.ch_names
+        self.output.set_channels(lglod.ch_names)
+        for i, ch in enumerate(ch_names):
+            self.output.update_plot(i, comps[i])
+            self.output.update_labels(
+                i,
+                "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
+                "datetimes",
+                "Signal (Wm⁻²nm⁻¹)",
+            )
+            self.output.update_legends(
+                i,
+                [
+                    ["Observed Signal", "Simulated Signal"],
+                    [],
+                    [],
+                    ["Relative Differences"],
+                ],
+            )
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
@@ -845,13 +875,32 @@ class LimeTBXWidget(QtWidgets.QWidget):
             point = self.lime_simulation.get_point()
             self.main_page.load_observations_finished(point)
 
+    def load_comparisons_finished(
+        self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
+    ):
+        valid = True
+        if srf == None:
+            srf = self.settings_manager.get_default_srf()
+        srf_chans = srf.get_channels_names()
+        for ch_name in lglod.ch_names:
+            if ch_name not in srf_chans:
+                valid = False
+        if not valid:
+            error_msg = "SRF file not valid for the observation file."
+            error_dialog = QtWidgets.QErrorMessage(self)
+            error_dialog.showMessage(error_msg)
+            raise Exception(error_msg)
+        else:
+            self.comparison_page.load_lglod_comparisons(lglod, srf)
+
     def can_save_simulation(self) -> bool:
         return self.page.can_save_simulation()
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, kernels_path: KernelsPath):
         super().__init__()
+        self.kernels_path = kernels_path
         self._is_comparing = False
         self._create_menu_bar()
 
@@ -927,40 +976,58 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def load_simulation(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self, "Select GLOD file")[0]
         if path != "":
-            lglod = moon.read_lime_glod(path)
-            srf = None
-            cancel = False
-            if lglod.not_default_srf:
+            lglod = moon.read_glod_file(path, self.kernels_path)
+            if isinstance(lglod, LGLODData):
+                self.simulations()
+                srf = None
+                cancel = False
+                if lglod.not_default_srf:
+                    srf_path = QtWidgets.QFileDialog().getOpenFileName(
+                        self, "Select SpectralResponseFunction file"
+                    )[0]
+                    if srf_path == "":
+                        cancel = True
+                    else:
+                        srf = srf_loader.read_srf(srf_path)
+                if not cancel:
+                    lime_tbx_w: LimeTBXWidget = self.centralWidget()
+                    lime_tbx_w.load_observations_finished(lglod, srf)
+            else:
+                self.comparison()
+                srf = None
                 srf_path = QtWidgets.QFileDialog().getOpenFileName(
                     self, "Select SpectralResponseFunction file"
                 )[0]
                 if srf_path != "":
-                    cancel = True
-                else:
                     srf = srf_loader.read_srf(srf_path)
-            if not cancel:
-                lime_tbx_w: LimeTBXWidget = self.centralWidget()
-                lime_tbx_w.load_observations_finished(lglod, srf)
+                    lime_tbx_w: LimeTBXWidget = self.centralWidget()
+                    lime_tbx_w.load_comparisons_finished(lglod, srf)
 
     def comparison(self):
-        self.comparison_action.setText("Perform &simulations")
-        self.comparison_action.triggered.connect(self.simulations)
-        lime_tbx_w: LimeTBXWidget = self.centralWidget()
-        lime_tbx_w.lime_simulation.set_simulation_changed()
-        lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
-        self._is_comparing = True
-        self.set_save_simulation_action_disabled(not lime_tbx_w.can_save_simulation())
+        if not self._is_comparing:
+            self.comparison_action.setText("Perform &simulations")
+            self.comparison_action.triggered.connect(self.simulations)
+            lime_tbx_w: LimeTBXWidget = self.centralWidget()
+            lime_tbx_w.lime_simulation.set_simulation_changed()
+            lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
+            self._is_comparing = True
+            self.set_save_simulation_action_disabled(
+                not lime_tbx_w.can_save_simulation()
+            )
 
     def simulations(self):
-        self.comparison_action.setText(
-            "Perform &comparisons from a remote sensing instrument"
-        )
-        self.comparison_action.triggered.connect(self.comparison)
-        lime_tbx_w: LimeTBXWidget = self.centralWidget()
-        lime_tbx_w.lime_simulation.set_simulation_changed()
-        lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
-        self._is_comparing = False
-        self.set_save_simulation_action_disabled(not lime_tbx_w.can_save_simulation())
+        if self._is_comparing:
+            self.comparison_action.setText(
+                "Perform &comparisons from a remote sensing instrument"
+            )
+            self.comparison_action.triggered.connect(self.comparison)
+            lime_tbx_w: LimeTBXWidget = self.centralWidget()
+            lime_tbx_w.lime_simulation.set_simulation_changed()
+            lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
+            self._is_comparing = False
+            self.set_save_simulation_action_disabled(
+                not lime_tbx_w.can_save_simulation()
+            )
 
     def exit(self):
         self.close()

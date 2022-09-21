@@ -25,7 +25,7 @@ class GUI:
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
-        window = maingui.LimeTBXWindow()
+        window = maingui.LimeTBXWindow(kernels_path)
         main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path)
         window.resize(850, 850)
         window.setCentralWidget(main_widget)

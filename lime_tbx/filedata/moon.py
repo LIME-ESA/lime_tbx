@@ -20,6 +20,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    ComparisonData,
     KernelsPath,
     LGLODComparisonData,
     LGLODData,
@@ -252,6 +253,7 @@ def write_obs(
         [o.dt for o in obs],
     )
     ds = _write_normal_simulations(lglod, path, dt, sim_data)
+    ds.is_comparison = 0
     # dims
     wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
     wlens_cimel = ds.createDimension("wlens_cimel", len(lglod.elis_cimel[0].wlens))
@@ -406,8 +408,7 @@ def write_obs(
     ds.close()
 
 
-def read_lime_glod(path: str) -> LGLODData:
-    ds = nc.Dataset(path)
+def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     not_default_srf = bool(ds.not_default_srf)
     datetimes = list(
         map(
@@ -621,19 +622,20 @@ def write_comparison(
     )
     fill_value = -999
     ds = _write_normal_simulations(lglod, path, dt, sim_data)
+    ds.is_comparison = 1
     for c in lglod.comparisons:
         for i, dt in enumerate(dates):
-            if dt not in c.dts:
-                np.insert(irr_obs_data, i, fill_value, axis=0)
-                np.insert(irr_obs_data_unc, i, fill_value, axis=0)
-                np.insert(irr_comp_data, i, fill_value, axis=0)
-                np.insert(irr_comp_data_unc, i, fill_value, axis=0)
-                np.insert(irr_diff_data, i, fill_value, axis=0)
-                np.insert(irr_diff_data_unc, i, fill_value, axis=0)
-                np.insert(mrd_data, i, fill_value)
-                np.insert(number_samples_data, i, fill_value)
-                np.insert(std_mrd_data, i, fill_value)
-                np.insert(temporal_trend_data, i, fill_value)
+            if dt not in c.dts and c.dts != []:
+                irr_obs_data = np.insert(irr_obs_data, i, fill_value, axis=0)
+                irr_obs_data_unc = np.insert(irr_obs_data_unc, i, fill_value, axis=0)
+                irr_comp_data = np.insert(irr_comp_data, i, fill_value, axis=0)
+                irr_comp_data_unc = np.insert(irr_comp_data_unc, i, fill_value, axis=0)
+                irr_diff_data = np.insert(irr_diff_data, i, fill_value, axis=0)
+                irr_diff_data_unc = np.insert(irr_diff_data_unc, i, fill_value, axis=0)
+                mrd_data = np.insert(mrd_data, i, fill_value)
+                number_samples_data = np.insert(number_samples_data, i, fill_value)
+                std_mrd_data = np.insert(std_mrd_data, i, fill_value)
+                temporal_trend_data = np.insert(temporal_trend_data, i, fill_value)
     # DIMENSIONS
     # vals
     irr_obs = ds.createVariable(
@@ -643,7 +645,7 @@ def write_comparison(
     irr_obs.long_name = "observed lunar irradiance for each channel"
     irr_obs.valid_min = 0.0
     irr_obs.valid_max = 1000000.0
-    irr_obs[:] = irr_obs_data
+    irr_obs[:] = irr_obs_data.T
     irr_obs_unc = ds.createVariable(
         "irr_obs_unc", "f4", ("number_obs", "chan"), fill_value=fill_value
     )
@@ -653,7 +655,7 @@ def write_comparison(
     )
     irr_obs_unc.valid_min = 0.0
     irr_obs_unc.valid_max = 1000000.0
-    irr_obs_unc[:] = irr_obs_data_unc
+    irr_obs_unc[:] = irr_obs_data_unc.T
     irr_comp = ds.createVariable(
         "irr_comp", "f4", ("number_obs", "chan"), fill_value=fill_value
     )
@@ -663,7 +665,7 @@ def write_comparison(
     )
     irr_comp.valid_min = 0.0
     irr_comp.valid_max = 1000000.0
-    irr_comp[:] = irr_comp_data
+    irr_comp[:] = irr_comp_data.T
     irr_comp_unc = ds.createVariable(
         "irr_comp_unc", "f4", ("number_obs", "chan"), fill_value=fill_value
     )
@@ -671,7 +673,7 @@ def write_comparison(
     irr_comp_unc.long_name = "uncertainties of the lunar irradiance observed with the compared instrument for each channel"
     irr_comp_unc.valid_min = 0.0
     irr_comp_unc.valid_max = 1000000.0
-    irr_comp_unc[:] = irr_comp_data_unc
+    irr_comp_unc[:] = irr_comp_data_unc.T
     irr_diff = ds.createVariable(
         "irr_diff", "f4", ("number_obs", "chan"), fill_value=fill_value
     )
@@ -679,7 +681,7 @@ def write_comparison(
     irr_diff.long_name = "lunar irradiance comparison difference for each channel"
     irr_diff.valid_min = 0.0
     irr_diff.valid_max = 1000000.0
-    irr_diff[:] = irr_diff_data
+    irr_diff[:] = irr_diff_data.T
     irr_diff_unc = ds.createVariable(
         "irr_diff_unc", "f4", ("number_obs", "chan"), fill_value=fill_value
     )
@@ -689,7 +691,7 @@ def write_comparison(
     )
     irr_diff_unc.valid_min = 0.0
     irr_diff_unc.valid_max = 1000000.0
-    irr_diff_unc[:] = irr_diff_data_unc
+    irr_diff_unc[:] = irr_diff_data_unc.T
 
     mrd = ds.createVariable("mrd", "f4", ("chan",), fill_value=fill_value)
     mrd[:] = mrd_data
@@ -704,3 +706,89 @@ def write_comparison(
     )
     temporal_trend[:] = temporal_trend_data
     ds.close()
+
+
+def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparisonData:
+    datetimes = np.array(
+        list(
+            map(
+                lambda x: datetime.fromtimestamp(x, tz=timezone.utc),
+                map(int, ds.variables["date"][:]),
+            )
+        )
+    )
+    ch_names = [
+        chn.tobytes().decode("utf-8").replace("\x00", "")
+        for chn in ds.variables["channel_name"][:].data
+    ]
+    lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
+    fill_value = -999
+    sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
+    irr_obs_data = np.array(ds.variables["irr_obs"][:].data).T
+    irr_obs_uncs = np.array(ds.variables["irr_obs_unc"][:].data).T
+    irr_comp_data = np.array(ds.variables["irr_comp"][:].data).T
+    irr_comp_uncs = np.array(ds.variables["irr_comp_unc"][:].data).T
+    irr_diff_data = np.array(ds.variables["irr_diff"][:].data).T
+    irr_diff_uncs = np.array(ds.variables["irr_diff_unc"][:].data).T
+    mrd = np.array(ds.variables["mrd"][:].data)
+    std_mrd = np.array(ds.variables["std_mrd"][:].data)
+    temporal_trend = np.array(ds.variables["temporal_trend"][:].data)
+    number_samples = np.array(ds.variables["number_samples"][:].data)
+    lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+    sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
+    comps = []
+    points = []
+    ds.close()
+    mrd = mrd[mrd != fill_value]
+    std_mrd = std_mrd[std_mrd != fill_value]
+    temporal_trend = temporal_trend[temporal_trend != fill_value]
+    number_samples = number_samples[number_samples != fill_value]
+    for i, sp in enumerate(sat_poss):
+        points.append(
+            SurfacePoint(
+                *SPICEAdapter.to_planetographic(
+                    sp.x, sp.y, sp.z, "EARTH", kernels_path.main_kernels_path
+                ),
+                datetimes[i]
+            )
+        )
+
+    points = np.array(points)
+    for i in range(len(ch_names)):
+        indexes = irr_comp_data[i] != fill_value
+        irr_comp_data[i] = irr_comp_data[i][irr_comp_data[i] != fill_value]
+        irr_comp_uncs[i] = irr_comp_uncs[i][irr_comp_uncs[i] != fill_value]
+        irr_obs_data[i] = irr_obs_data[i][irr_obs_data[i] != fill_value]
+        irr_obs_uncs[i] = irr_obs_uncs[i][irr_obs_uncs[i] != fill_value]
+        irr_diff_data[i] = irr_diff_data[i][irr_diff_data[i] != fill_value]
+        irr_diff_uncs[i] = irr_diff_uncs[i][irr_diff_uncs[i] != fill_value]
+        dts = datetimes[indexes]
+        obs_signal = SpectralData(
+            np.array(dts), irr_comp_data[i], irr_comp_uncs[i], None
+        )
+        sim_signal = SpectralData(np.array(dts), irr_obs_data[i], irr_obs_uncs[i], None)
+        diffs_signal = SpectralData(
+            np.array(dts), irr_diff_data[i], irr_diff_uncs[i], None
+        )
+        comp = ComparisonData(
+            obs_signal,
+            sim_signal,
+            diffs_signal,
+            mrd[i],
+            std_mrd[i],
+            temporal_trend[i],
+            number_samples[i],
+            dts,
+            points[indexes],
+        )
+        comps.append(comp)
+    return LGLODComparisonData(comps, ch_names, sat_name)
+
+
+def read_glod_file(
+    path: str, kernels_path: KernelsPath
+) -> Union[LGLODData, LGLODComparisonData]:
+    ds = nc.Dataset(path)
+    if bool(ds.is_comparison):
+        return _read_comparison(ds, kernels_path)
+    return _read_lime_glod(ds)
