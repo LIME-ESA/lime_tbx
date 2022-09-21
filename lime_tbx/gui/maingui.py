@@ -969,7 +969,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def save_simulation(self):
         lime_tbx_w: LimeTBXWidget = self.centralWidget()
         if self._is_comparing:
-            pass
+            lime_tbx_w.comparison_page.export_to_lglod()
         else:
             lime_tbx_w.main_page.export_glod()
 
@@ -1005,6 +1005,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def comparison(self):
         if not self._is_comparing:
+            self.save_simulation_action.setText(
+                "&Save comparison to LIME GLOD format file."
+            )
             self.comparison_action.setText("Perform &simulations")
             self.comparison_action.triggered.connect(self.simulations)
             lime_tbx_w: LimeTBXWidget = self.centralWidget()
@@ -1017,6 +1020,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def simulations(self):
         if self._is_comparing:
+            self.save_simulation_action.setText(
+                "&Save simulation to LIME GLOD format file."
+            )
             self.comparison_action.setText(
                 "Perform &comparisons from a remote sensing instrument"
             )
