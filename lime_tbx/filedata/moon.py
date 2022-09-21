@@ -11,6 +11,8 @@ from datetime import datetime, timezone, tzinfo
 import os
 from typing import List, Union, Tuple
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -18,14 +20,17 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    KernelsPath,
     LGLODComparisonData,
     LGLODData,
     LunarObservation,
     LunarObservationWrite,
+    SatellitePoint,
     SatellitePosition,
     SelenographicDataWrite,
     SpectralData,
     SpectralResponseFunction,
+    SurfacePoint,
 )
 from lime_tbx.datatypes import constants
 
@@ -92,9 +97,13 @@ _DT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 def _write_start_dataset(
-    lglod: LGLODData, path: str, dt: datetime, coefficients_version: str
+    path: str,
+    dt: datetime,
+    coefficients_version: str,
+    not_default_srf: bool,
+    min_dt: datetime,
+    max_dt: datetime,
 ):
-    obs = lglod.observations
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
     ds.Metadata_Conventions = "Unidata Dataset Discovery v1.0"
@@ -122,19 +131,18 @@ def _write_start_dataset(
     ds.processing_level = "v1.0.0"
     ds.doc_url = "N/A"
     ds.doc_doi = "N/A"
-    quant_dates = len(obs)
-    if quant_dates == 1 and obs[0].dt == None:
-        quant_dates = 0
-    if quant_dates > 0:
-        ds.time_coverage_start = min(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
-        ds.time_coverage_end = max(obs, key=lambda o: o.dt).dt.strftime(_DT_FORMAT)
+    if min_dt != None:
+        ds.time_coverage_start = min_dt.strftime(_DT_FORMAT)
     else:
         ds.time_coverage_start = ""
+    if max_dt != None:
+        ds.time_coverage_end = max_dt.strftime(_DT_FORMAT)
+    else:
         ds.time_coverage_end = ""
     ds.reference_model = "LIME2 coefficients version {}".format(
         coefficients_version
     )  # TODO coefficients
-    ds.not_default_srf = int(lglod.not_default_srf)
+    ds.not_default_srf = int(not_default_srf)
     return ds
 
 
@@ -155,7 +163,23 @@ def _write_normal_simulations(
     dt: datetime,
     sim_data: _NormalSimulationData,
 ):
-    ds = _write_start_dataset(lglod, path, dt, sim_data.coefficients_version)
+    not_default_srf = True
+    if isinstance(lglod, LGLODData):
+        obs = lglod.observations
+        quant_dates = len(obs)
+        if quant_dates == 1 and obs[0].dt == None:
+            quant_dates = 0
+        if quant_dates > 0:
+            min_dt = min(obs, key=lambda o: o.dt).dt
+            max_dt = max(obs, key=lambda o: o.dt).dt
+        else:
+            min_dt = max_dt = None
+        not_default_srf = lglod.not_default_srf
+    else:
+        min_dt = max_dt = None
+    ds = _write_start_dataset(
+        path, dt, sim_data.coefficients_version, not_default_srf, min_dt, max_dt
+    )
     # DIMENSIONS
     max_len_strlen = len(max(sim_data.ch_names, key=len))
     chan_st_type = "S{}".format(max_len_strlen)
@@ -493,14 +517,99 @@ def read_lime_glod(path: str) -> LGLODData:
 
 
 def write_comparison(
-    lglod: LGLODComparisonData, path: str, dt: datetime, coefficients_version: str
+    lglod: LGLODComparisonData,
+    path: str,
+    dt: datetime,
+    coefficients_version: str,
+    kernels_path: KernelsPath,
 ):
-    quant_dates = len(lglod.comparisons)
-    ch_names = lglod.ch_names
-    sat_pos_ref = lglod.sat_pos_ref
+    dates_n_points = dict()
+    index_useful_channel = [
+        i for i, c in enumerate(lglod.comparisons) if c.simulated_signal is not None
+    ]
+    irr_obs_data = np.array(
+        [
+            c.simulated_signal.data
+            for c in lglod.comparisons
+            if c.simulated_signal is not None
+        ]
+    )
+    irr_obs_data_unc = np.array(
+        [
+            c.simulated_signal.uncertainties
+            for c in lglod.comparisons
+            if c.simulated_signal is not None
+        ]
+    )
+    irr_comp_data = np.array(
+        [
+            c.observed_signal.data
+            for c in lglod.comparisons
+            if c.observed_signal is not None
+        ]
+    )
+    irr_comp_data_unc = np.array(
+        [
+            c.observed_signal.uncertainties
+            for c in lglod.comparisons
+            if c.observed_signal is not None
+        ]
+    )
+    irr_diff_data = np.array(
+        [c.diffs_signal.data for c in lglod.comparisons if c.diffs_signal is not None]
+    )
+    irr_diff_data_unc = np.array(
+        [
+            c.diffs_signal.uncertainties
+            for c in lglod.comparisons
+            if c.diffs_signal is not None
+        ]
+    )
+    mrd_data = np.array(
+        [
+            c.mean_relative_difference
+            for c in lglod.comparisons
+            if c.mean_relative_difference is not None
+        ]
+    )
+    number_samples_data = np.array(
+        [c.number_samples for c in lglod.comparisons if c.number_samples is not None]
+    )
+    std_mrd_data = np.array(
+        [
+            c.standard_deviation_mrd
+            for c in lglod.comparisons
+            if c.standard_deviation_mrd is not None
+        ]
+    )
+    temporal_trend_data = np.array(
+        [c.temporal_trend for c in lglod.comparisons if c.temporal_trend is not None]
+    )
+    for c in lglod.comparisons:
+        for i, cdt in enumerate(c.dts):
+            if cdt not in dates_n_points:
+                dates_n_points[cdt] = c.points[i]
+    dates_n_points = dict(sorted(dates_n_points.items(), key=lambda item: item[0]))
+    dates = list(dates_n_points.keys())
+    points = list(dates_n_points.values())
+    quant_dates = len(dates)
+    ch_names = [lglod.ch_names[i] for i in index_useful_channel]
     sat_names = [lglod.sat_name for _ in range(quant_dates)]
-    sat_pos = lglod.sat_pos
-    dates = lglod.comparisons[0].dts
+    if not isinstance(points[0], SurfacePoint):
+        raise Exception("Can't write comparison points with selenographic point.")
+    sat_pos_ref = constants.EARTH_FRAME
+    sat_pos = [
+        SatellitePosition(
+            *SPICEAdapter.to_rectangular(
+                sp.latitude,
+                sp.longitude,
+                sp.altitude,
+                "EARTH",
+                kernels_path.main_kernels_path,
+            )
+        )
+        for sp in points
+    ]
     sim_data = _NormalSimulationData(
         quant_dates,
         coefficients_version,
@@ -510,5 +619,88 @@ def write_comparison(
         sat_pos,
         dates,
     )
+    fill_value = -999
     ds = _write_normal_simulations(lglod, path, dt, sim_data)
+    for c in lglod.comparisons:
+        for i, dt in enumerate(dates):
+            if dt not in c.dts:
+                np.insert(irr_obs_data, i, fill_value, axis=0)
+                np.insert(irr_obs_data_unc, i, fill_value, axis=0)
+                np.insert(irr_comp_data, i, fill_value, axis=0)
+                np.insert(irr_comp_data_unc, i, fill_value, axis=0)
+                np.insert(irr_diff_data, i, fill_value, axis=0)
+                np.insert(irr_diff_data_unc, i, fill_value, axis=0)
+                np.insert(mrd_data, i, fill_value)
+                np.insert(number_samples_data, i, fill_value)
+                np.insert(std_mrd_data, i, fill_value)
+                np.insert(temporal_trend_data, i, fill_value)
     # DIMENSIONS
+    # vals
+    irr_obs = ds.createVariable(
+        "irr_obs", "f4", ("number_obs", "chan"), fill_value=fill_value
+    )
+    irr_obs.units = "W m-2 nm-1"
+    irr_obs.long_name = "observed lunar irradiance for each channel"
+    irr_obs.valid_min = 0.0
+    irr_obs.valid_max = 1000000.0
+    irr_obs[:] = irr_obs_data
+    irr_obs_unc = ds.createVariable(
+        "irr_obs_unc", "f4", ("number_obs", "chan"), fill_value=fill_value
+    )
+    irr_obs_unc.units = "W m-2 nm-1"
+    irr_obs_unc.long_name = (
+        "uncertainties of the observed lunar irradiance for each channel"
+    )
+    irr_obs_unc.valid_min = 0.0
+    irr_obs_unc.valid_max = 1000000.0
+    irr_obs_unc[:] = irr_obs_data_unc
+    irr_comp = ds.createVariable(
+        "irr_comp", "f4", ("number_obs", "chan"), fill_value=fill_value
+    )
+    irr_comp.units = "W m-2 nm-1"
+    irr_comp.long_name = (
+        "lunar irradiance observed with the compared instrument for each channel"
+    )
+    irr_comp.valid_min = 0.0
+    irr_comp.valid_max = 1000000.0
+    irr_comp[:] = irr_comp_data
+    irr_comp_unc = ds.createVariable(
+        "irr_comp_unc", "f4", ("number_obs", "chan"), fill_value=fill_value
+    )
+    irr_comp_unc.units = "W m-2 nm-1"
+    irr_comp_unc.long_name = "uncertainties of the lunar irradiance observed with the compared instrument for each channel"
+    irr_comp_unc.valid_min = 0.0
+    irr_comp_unc.valid_max = 1000000.0
+    irr_comp_unc[:] = irr_comp_data_unc
+    irr_diff = ds.createVariable(
+        "irr_diff", "f4", ("number_obs", "chan"), fill_value=fill_value
+    )
+    irr_diff.units = "W m-2 nm-1"
+    irr_diff.long_name = "lunar irradiance comparison difference for each channel"
+    irr_diff.valid_min = 0.0
+    irr_diff.valid_max = 1000000.0
+    irr_diff[:] = irr_diff_data
+    irr_diff_unc = ds.createVariable(
+        "irr_diff_unc", "f4", ("number_obs", "chan"), fill_value=fill_value
+    )
+    irr_diff_unc.units = "W m-2 nm-1"
+    irr_diff_unc.long_name = (
+        "uncertainties of the lunar irradiance comparison difference for each channel"
+    )
+    irr_diff_unc.valid_min = 0.0
+    irr_diff_unc.valid_max = 1000000.0
+    irr_diff_unc[:] = irr_diff_data_unc
+
+    mrd = ds.createVariable("mrd", "f4", ("chan",), fill_value=fill_value)
+    mrd[:] = mrd_data
+    number_samples = ds.createVariable(
+        "number_samples", "f4", ("chan",), fill_value=fill_value
+    )
+    number_samples[:] = number_samples_data
+    std_mrd = ds.createVariable("std_mrd", "f4", ("chan",), fill_value=fill_value)
+    std_mrd[:] = std_mrd_data
+    temporal_trend = ds.createVariable(
+        "temporal_trend", "f4", ("chan",), fill_value=fill_value
+    )
+    temporal_trend[:] = temporal_trend_data
+    ds.close()

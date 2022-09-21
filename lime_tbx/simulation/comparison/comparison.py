@@ -230,7 +230,7 @@ class Comparison(IComparison):
                     ratio_spec,
                     mean_rel_diff,
                     std,
-                    None,
+                    0,  # TODO add real valid correct value
                     num_samples,
                     ch_dates[i],
                     sps[i],

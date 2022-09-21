@@ -288,17 +288,20 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         lglod = LGLODComparisonData(
             self.comps,
             self.srf.get_channels_names(),
-            self.mos[0].sat_pos_ref,
             "TODO",
-            [o.sat_pos for o in self.mos],
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
+        vers = self.settings_manager.get_cimel_coef().version
         if name is not None and name != "":
             try:
                 moon.write_comparison(
-                    lglod, name, datetime.now().astimezone(timezone.utc)
+                    lglod,
+                    name,
+                    datetime.now().astimezone(timezone.utc),
+                    vers,
+                    self.kernels_path,
                 )
             except Exception as e:
                 raise e

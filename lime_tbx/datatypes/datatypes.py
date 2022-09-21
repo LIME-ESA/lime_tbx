@@ -896,6 +896,4 @@ class LGLODData:
 class LGLODComparisonData:
     comparisons: List[ComparisonData]
     ch_names: List[str]
-    sat_pos_ref: str
     sat_name: str
-    sat_pos: List[SatellitePosition]
