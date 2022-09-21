@@ -6,6 +6,7 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
+from dataclasses import dataclass
 from datetime import datetime, timezone, tzinfo
 import os
 from typing import List, Union, Tuple
@@ -17,6 +18,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    LGLODComparisonData,
     LGLODData,
     LunarObservation,
     LunarObservationWrite,
@@ -89,7 +91,9 @@ def read_moon_obs(path: str) -> LunarObservation:
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def write_obs(lglod: LGLODData, path: str, dt: datetime):
+def _write_start_dataset(
+    lglod: LGLODData, path: str, dt: datetime, coefficients_version: str
+):
     obs = lglod.observations
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
@@ -127,36 +131,108 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
     else:
         ds.time_coverage_start = ""
         ds.time_coverage_end = ""
-    ds.reference_model = "LIME2 coefficients v0"  # TODO add coefficients version
+    ds.reference_model = "LIME2 coefficients version {}".format(
+        coefficients_version
+    )  # TODO coefficients
     ds.not_default_srf = int(lglod.not_default_srf)
+    return ds
+
+
+@dataclass
+class _NormalSimulationData:
+    quant_dates: int
+    coefficients_version: str
+    ch_names: List[str]
+    sat_pos_ref: str
+    sat_names: List[str]
+    sat_pos: List[SatellitePosition]
+    dates: List[datetime]
+
+
+def _write_normal_simulations(
+    lglod: Union[LGLODData, LGLODComparisonData],
+    path: str,
+    dt: datetime,
+    sim_data: _NormalSimulationData,
+):
+    ds = _write_start_dataset(lglod, path, dt, sim_data.coefficients_version)
     # DIMENSIONS
-    max_len_strlen = len(max(obs[0].ch_names, key=len))
+    max_len_strlen = len(max(sim_data.ch_names, key=len))
     chan_st_type = "S{}".format(max_len_strlen)
-    max_len_sat_pos_ref = len(max(obs[0].sat_pos_ref, key=len))
+    max_len_sat_pos_ref = len(max(sim_data.sat_pos_ref, key=len))
     sat_pos_ref_st_type = "S{}".format(max_len_sat_pos_ref)
-    max_len_sat_name = len(max([ob.sat_name for ob in obs], key=len))
+    max_len_sat_name = len(max(sim_data.sat_names, key=len))
     sat_name_st_type = "S{}".format(max_len_sat_name)
-    chan = ds.createDimension("chan", len(obs[0].ch_names))
+    chan = ds.createDimension("chan", len(sim_data.ch_names))
     chan_strlen = ds.createDimension("chan_strlen", max_len_strlen)
-    date = ds.createDimension("date", quant_dates)
-    number_obs = ds.createDimension("number_obs", len(obs))
+    date = ds.createDimension("date", sim_data.quant_dates)
+    number_obs = ds.createDimension("number_obs", len(sim_data.sat_pos))
     sat_ref_strlen = ds.createDimension("sat_ref_strlen", max_len_sat_pos_ref)
     sat_name_strlen = ds.createDimension("sat_name_strlen", max_len_sat_name)
     col = ds.createDimension("col", 0)
     row = ds.createDimension("row", 0)
     sat_xyz = ds.createDimension("sat_xyz", 3)
-    wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
-    wlens_cimel = ds.createDimension("wlens_cimel", len(lglod.elis_cimel[0].wlens))
     # VARIABLES
     dates = ds.createVariable("date", "f4", ("date",))
     dates.standard_name = "time"
     dates.long_name = "time of lunar observation"
     dates.units = "seconds since 1970-01-01T00:00:00Z"
     dates.calendar = "gregorian"
-    if quant_dates > 0:
-        dates[:] = np.array([o.dt.timestamp() for o in obs])
+    if sim_data.quant_dates > 0:
+        dates[:] = np.array([dt.timestamp() for dt in sim_data.dates])
     else:
         dates[:] = np.array([])
+    channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
+    channel_name.standard_name = "sensor_band_identifier"
+    channel_name.long_name = "channel identifier"
+    channel_name[:] = np.array(
+        [nc.stringtochar(np.array([ch], chan_st_type)) for ch in sim_data.ch_names]
+    )
+    sat_pos = ds.createVariable("sat_pos", "f4", ("number_obs", "sat_xyz"))
+    sat_pos.long_name = "satellite position x y z in sat_pos_ref"
+    sat_pos.units = "km"
+    sat_pos.valid_min = 0.0
+    sat_pos.valid_max = 999999995904.0
+    sat_pos[:] = np.array(
+        [np.array([sat_pos.x, sat_pos.y, sat_pos.z]) for sat_pos in sim_data.sat_pos]
+    )
+    sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
+    sat_pos_ref.long_name = "reference frame of satellite position"
+    sat_pos_ref[:] = nc.stringtochar(
+        np.array([sim_data.sat_pos_ref], sat_pos_ref_st_type)
+    )
+    sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
+    sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
+    sat_name[:] = nc.stringtochar(np.array([sim_data.sat_names[0]], sat_name_st_type))
+
+    return ds
+
+
+def write_obs(
+    lglod: LGLODData,
+    path: str,
+    dt: datetime,
+    coefficients_version: str = "Mock coefficients",
+):
+    obs = lglod.observations
+    quant_dates = len(obs)
+    if quant_dates == 1 and obs[0].dt == None:
+        quant_dates = 0
+    sim_data = _NormalSimulationData(
+        quant_dates,
+        coefficients_version,
+        obs[0].ch_names,
+        obs[0].sat_pos_ref,
+        [o.sat_name for o in obs],
+        [o.sat_pos for o in obs],
+        [o.dt for o in obs],
+    )
+    ds = _write_normal_simulations(lglod, path, dt, sim_data)
+    # dims
+    wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
+    wlens_cimel = ds.createDimension("wlens_cimel", len(lglod.elis_cimel[0].wlens))
+    # vals
+    if quant_dates == 0:
         distance_sun_moon = ds.createVariable(
             "distance_sun_moon", "f4", ("number_obs",)
         )
@@ -177,28 +253,6 @@ def write_obs(lglod: LGLODData, path: str, dt: datetime):
         mpa_degrees.long_name = "Moon phase angle"
         mpa_degrees.units = "Decimal degrees"
         mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
-    channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
-    channel_name.standard_name = "sensor_band_identifier"
-    channel_name.long_name = "channel identifier"
-    channel_name[:] = np.array(
-        [nc.stringtochar(np.array([ch], chan_st_type)) for ch in obs[0].ch_names]
-    )
-    sat_pos = ds.createVariable("sat_pos", "f4", ("number_obs", "sat_xyz"))
-    sat_pos.long_name = "satellite position x y z in sat_pos_ref"
-    sat_pos.units = "km"
-    sat_pos.valid_min = 0.0
-    sat_pos.valid_max = 999999995904.0
-    sat_pos[:] = np.array(
-        [np.array([o.sat_pos.x, o.sat_pos.y, o.sat_pos.z]) for o in obs]
-    )
-    sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
-    sat_pos_ref.long_name = "reference frame of satellite position"
-    sat_pos_ref[:] = nc.stringtochar(
-        np.array([obs[0].sat_pos_ref], sat_pos_ref_st_type)
-    )
-    sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
-    sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
-    sat_name[:] = nc.stringtochar(np.array([obs[0].sat_name], sat_name_st_type))
     irr_obs = ds.createVariable("irr_obs", "f4", ("number_obs", "chan"))
     irr_obs.units = "W m-2 nm-1"
     irr_obs.long_name = "observed lunar irradiance for each channel"
@@ -436,3 +490,25 @@ def read_lime_glod(path: str) -> LGLODData:
         for i in range(len(refl_cimel))
     ]
     return LGLODData(obss, signals, not_default_srf, elis_cimel, elrefs_cimel)
+
+
+def write_comparison(
+    lglod: LGLODComparisonData, path: str, dt: datetime, coefficients_version: str
+):
+    quant_dates = len(lglod.comparisons)
+    ch_names = lglod.ch_names
+    sat_pos_ref = lglod.sat_pos_ref
+    sat_names = [lglod.sat_name for _ in range(quant_dates)]
+    sat_pos = lglod.sat_pos
+    dates = lglod.comparisons[0].dts
+    sim_data = _NormalSimulationData(
+        quant_dates,
+        coefficients_version,
+        ch_names,
+        sat_pos_ref,
+        sat_names,
+        sat_pos,
+        dates,
+    )
+    ds = _write_normal_simulations(lglod, path, dt, sim_data)
+    # DIMENSIONS

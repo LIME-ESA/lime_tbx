@@ -20,6 +20,7 @@ from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
     ComparisonData,
     KernelsPath,
+    LGLODComparisonData,
     LGLODData,
     LunarObservation,
     LunarObservationWrite,
@@ -194,9 +195,6 @@ def compare_callback(
         if not mo.check_valid_srf(srf):
             raise Exception("SRF file not valid for the chosen Moon observations file.")
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
-    print(mos[0].ch_irrs.values())
-    print(comparisons[0].observed_signal)
-    print(comparisons[0].simulated_signal)
     return comparisons, mos, srf
 
 
@@ -254,9 +252,14 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
         self.output = output.ComparisonOutput()
+        self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
+        self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.export_lglod_button.clicked.connect(self.export_to_lglod)
+        self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
         self.main_layout.addWidget(self.output)
+        self.main_layout.addWidget(self.export_lglod_button)
 
     def _callback_compare_input_changed(self):
         self.lime_simulation.set_simulation_changed()
@@ -276,6 +279,29 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _block_gui_loading(self):
         self.parentWidget().setDisabled(True)
+
+    def can_save_simulation(self) -> bool:
+        return self.export_lglod_button.isEnabled()
+
+    @QtCore.Slot()
+    def export_to_lglod(self) -> None:
+        lglod = LGLODComparisonData(
+            self.comps,
+            self.srf.get_channels_names(),
+            self.mos[0].sat_pos_ref,
+            "TODO",
+            [o.sat_pos for o in self.mos],
+        )
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export LGLOD", "{}.nc".format("lglod")
+        )[0]
+        if name is not None and name != "":
+            try:
+                moon.write_comparison(
+                    lglod, name, datetime.now().astimezone(timezone.utc)
+                )
+            except Exception as e:
+                raise e
 
     @QtCore.Slot()
     def compare(self):
@@ -301,6 +327,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         comps = data[0]
         mos = data[1]
         srf = data[2]
+        self.comps = comps
+        self.srf = srf
+        self.mos = mos
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         to_remove = []
@@ -330,11 +359,17 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 to_remove.append(ch)
         self.output.remove_channels(to_remove)
         self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
 
     def compare_error(self, error: Exception):
         self._unblock_gui()
         error_dialog = QtWidgets.QErrorMessage(self)
         error_dialog.showMessage(str(error))
+        self.export_lglod_button.setEnabled(False)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(True)
         raise error
 
 
@@ -435,7 +470,7 @@ class MainSimulationsWidget(
     def _disable_lglod_export(self, disable: bool):
         self.export_lglod_button.setDisabled(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
-        window.save_simulation_action.setDisabled(disable)
+        window.set_save_simulation_action_disabled(disable)
 
     def _callback_regular_input_changed(self):
         self.lime_simulation.set_simulation_changed()
@@ -466,6 +501,9 @@ class MainSimulationsWidget(
             self.graph.update_size()
         elif i == 1:
             self.srf_widget.update_size()
+
+    def can_save_simulation(self) -> bool:
+        return self.export_lglod_button.isEnabled()
 
     @QtCore.Slot()
     def show_eli(self):
@@ -804,6 +842,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
             point = self.lime_simulation.get_point()
             self.main_page.load_observations_finished(point)
 
+    def can_save_simulation(self) -> bool:
+        return self.page.can_save_simulation()
+
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -868,6 +909,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         lime_tbx_w.propagate_close_event()
         return super().closeEvent(event)
 
+    def set_save_simulation_action_disabled(self, disable: bool) -> None:
+        self.save_simulation_action.setDisabled(disable)
+
     # ACTIONS
 
     def save_simulation(self):
@@ -902,6 +946,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         lime_tbx_w.lime_simulation.set_simulation_changed()
         lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
         self._is_comparing = True
+        self.set_save_simulation_action_disabled(not lime_tbx_w.can_save_simulation())
 
     def simulations(self):
         self.comparison_action.setText(
@@ -912,6 +957,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         lime_tbx_w.lime_simulation.set_simulation_changed()
         lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
         self._is_comparing = False
+        self.set_save_simulation_action_disabled(not lime_tbx_w.can_save_simulation())
 
     def exit(self):
         self.close()

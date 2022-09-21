@@ -890,3 +890,12 @@ class LGLODData:
     not_default_srf: bool
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
+
+
+@dataclass
+class LGLODComparisonData:
+    comparisons: List[ComparisonData]
+    ch_names: List[str]
+    sat_pos_ref: str
+    sat_name: str
+    sat_pos: List[SatellitePosition]
