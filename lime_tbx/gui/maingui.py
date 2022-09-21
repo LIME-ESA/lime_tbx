@@ -6,6 +6,7 @@ from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
 
 from lime_tbx.datatypes import constants
+from lime_tbx.gui import coefficients
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Third-Party Modules___"""
@@ -919,7 +920,11 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         pass
 
     def select_coefficients(self):
-        pass
+        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        select_coefficients_dialog = coefficients.SelectCoefficientsDialog(
+            lime_tbx_w.settings_manager, self
+        )
+        select_coefficients_dialog.exec_()
 
     def about(self):
         about_dialog = help.AboutDialog(self)

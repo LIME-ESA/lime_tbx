@@ -634,9 +634,11 @@ class ReflectanceCoefficients:
         Reflectance Coefficients, with an attribute for every coefficient group, a matrix each.
     unc_coeffs: _WlenReflCoeffs
         Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
+    version: str
+        Version name of the coefficients
     """
 
-    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs", "version"]
 
     @dataclass
     class _WlenReflCoeffs:
@@ -665,13 +667,14 @@ class ReflectanceCoefficients:
             self.d_coeffs = coeffs[11:14, :]
             self.p_coeffs = coeffs[14::, :]
 
-    def __init__(self, _ds: xarray.Dataset):
+    def __init__(self, _ds: xarray.Dataset, version: str):
         self._ds = _ds
         self.wlens: np.ndarray = _ds.wavelength.values
         coeffs: np.ndarray = _ds.coeff.values
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = _ds.u_coeff.values
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
+        self.version = version
 
 
 @dataclass

@@ -1,4 +1,4 @@
-"""describe class"""
+"""GUI Widgets related to the Help actions"""
 
 """___Built-In Modules___"""
 from typing import List, Callable, Union, Tuple, Optional
@@ -9,7 +9,7 @@ import os
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from . import settings, output, input, srf, constants
 from ..datatypes.datatypes import (
     PolarizationCoefficients,

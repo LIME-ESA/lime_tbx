@@ -171,4 +171,4 @@ def get_default_cimel_coeffs() -> ReflectanceCoefficients:
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
 
-    return ReflectanceCoefficients(ds_cimel)
+    return ReflectanceCoefficients(ds_cimel, "Default")
