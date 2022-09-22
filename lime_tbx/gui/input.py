@@ -349,6 +349,9 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.satellite_label = QtWidgets.QLabel("Satellite:")
         self.combo_sats = QtWidgets.QComboBox()
         self.combo_sats.addItems(self.sat_names)
+        for i, sat in enumerate(self.satellites):
+            if not sat.orbit_files:
+                self.combo_sats.model().item(i).setEnabled(False)
         self.combo_sats.currentIndexChanged.connect(self.update_from_combobox)
         # finish layout
         self.main_layout.addRow(self.satellite_label, self.combo_sats)

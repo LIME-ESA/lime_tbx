@@ -86,6 +86,10 @@ METOPSG_B3:
   n_files: 1
   orbit_files:
     - METOPSG/OSF/MA1_TEST_MPL_ORBSCT_20190101T213001_99999999T999999_0001.EOF
+PROBA-V:
+  id: 0 # incorect id TODO !!!
+  n_files: 0
+  orbit_files:
 ROSEL:
   id: 148
   n_files: 1
