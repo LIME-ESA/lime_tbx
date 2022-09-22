@@ -101,10 +101,6 @@ SENTINEL-1B:
   n_files: 1
   orbit_files:
     - SENTINEL1B/OSF/S1B_OPER_MPL_ORBSCT_20160425T224606_99999999T999999_0017.EOF
-SENTINEL-2:
-  id: 112
-  n_files: 0
-  orbit_files:
 SENTINEL-2A:
   id: 126
   n_files: 1
@@ -115,10 +111,6 @@ SENTINEL-2B:
   n_files: 1
   orbit_files:
     - SENTINEL2B/OSF/S2B_OPER_MPL_ORBSCT_20170309T104400_99999999T999999_0007.EOF
-SENTINEL-3:
-  id: 113
-  n_files: 0
-  orbit_files:
 SENTINEL-3A:
   id: 129
   n_files: 1
