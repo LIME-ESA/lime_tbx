@@ -45,7 +45,7 @@ class SpectralInterpolation(ISpectralInterpolation):
             method=method_main,
             method_hr=method_hr,
             min_scale=0.3,
-            #plot_residuals=True,
+            # plot_residuals=True,
         )
         self.prop = punpy.MCPropagation(MCsteps)
 
@@ -55,6 +55,10 @@ class SpectralInterpolation(ISpectralInterpolation):
     def get_interpolated_refl(
         self, cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav
     ):
+        # from scipy import interpolate
+        # f = interpolate.interp1d(cimel_wav, cimel_refl, fill_value="extrapolate")
+        # yy = f(final_wav)
+        # return yy
         yy = self.intp.interpolate_1d_along_example(
             cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav
         )
