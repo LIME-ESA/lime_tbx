@@ -1,10 +1,9 @@
-from lime_tbx.gui import gui
-from lime_tbx.datatypes import datatypes
+#!/usr/bin/env python3
+from lime_tbx import main as lmain
 
 
 def main():
-    kp = datatypes.KernelsPath("kernels", "kernels")
-    g = gui.GUI(kp, "eocfi_data")
+    lmain.main()
 
 
 if __name__ == "__main__":

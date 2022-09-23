@@ -30,7 +30,6 @@ from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
-from lime_tbx.simulation.comparison import comparison
 from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
