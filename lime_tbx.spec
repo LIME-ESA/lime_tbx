@@ -20,6 +20,8 @@ if sys.platform == 'linux':
     a_datas = [
         (src_path + 'gui/assets/style.qss', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/lime_logo.png', './lime_tbx/gui/assets'),
+        (src_path + 'gui/assets/NotesEsaBol.otf', './lime_tbx/gui/assets'),
+        (src_path + 'gui/assets/NotesEsaReg.otf', './lime_tbx/gui/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/u_coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
@@ -39,6 +41,8 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
     a_datas = [
         (src_path + 'gui\\assets\\style.qss', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\lime_logo.png', '.\\lime_tbx\\gui\\assets'),
+        (src_path + 'gui\\assets\\NotesEsaBol.otf', '.\\lime_tbx\\gui\\assets'),
+        (src_path + 'gui\\assets\\NotesEsaReg.otf', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\coefficients.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\coefficients_cimel.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\u_coefficients_cimel.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),

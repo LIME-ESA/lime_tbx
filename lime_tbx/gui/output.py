@@ -2,6 +2,7 @@
 
 """___Built-In Modules___"""
 from typing import Union, List, Tuple
+import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -11,6 +12,7 @@ from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
+from matplotlib import font_manager as fm
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -25,6 +27,7 @@ from ..datatypes.datatypes import (
     CustomPoint,
     SpectralData,
 )
+from . import constants
 from lime_tbx.gui.settings import ISettingsManager
 from ..filedata import csv
 from .ifaces import IMainSimulationsWidget
@@ -42,6 +45,13 @@ class MplCanvas(FigureCanvas):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes: Axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
+
+
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+bold_path = os.path.join(_current_dir, constants.ESABOLDFONT_PATH)
+reg_path = os.path.join(_current_dir, constants.ESAFONT_PATH)
+title_font_prop = fm.FontProperties(fname=bold_path)
+font_prop = fm.FontProperties(fname=reg_path)
 
 
 class GraphWidget(QtWidgets.QWidget):
@@ -71,19 +81,19 @@ class GraphWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # canvas
         self.canvas = MplCanvas(self)
-        self.canvas.axes.set_title(self.title)
+        self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
         version = self.settings_manager.get_cimel_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
         ay2 = self.canvas.axes.twiny()
-        ay2.set_xlabel(subtitle)
+        ay2.set_xlabel(subtitle, fontproperties=font_prop)
         ay2.tick_params(
             axis="x",
             which="both",
             top=False,
             labeltop=False,
         )
-        self.canvas.axes.set_xlabel(self.xlabel)
-        self.canvas.axes.set_ylabel(self.ylabel)
+        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=title_font_prop)
+        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=title_font_prop)
         self.toolbar = NavigationToolbar(self.canvas, self)
         self._redraw()
         # save buttons
@@ -273,7 +283,10 @@ class GraphWidget(QtWidgets.QWidget):
                         self.data_compare.standard_deviation_mrd,
                     )
                     lines += self.canvas.axes.plot([], [], " ", label=data_compare_info)
-                ax2.set_ylabel("Relative difference (Fraction of unity)")
+                ax2.set_ylabel(
+                    "Relative difference (Fraction of unity)",
+                    fontproperties=title_font_prop,
+                )
                 plt.setp(
                     self.canvas.axes.get_xticklabels(),
                     rotation=30,
@@ -284,11 +297,11 @@ class GraphWidget(QtWidgets.QWidget):
                     l for l in lines if not l.get_label().startswith("_child")
                 ]
                 labels = [l.get_label() for l in legend_lines]
-                self.canvas.axes.legend(legend_lines, labels, loc=0)
+                self.canvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
 
-        self.canvas.axes.set_title(self.title)
-        self.canvas.axes.set_xlabel(self.xlabel)
-        self.canvas.axes.set_ylabel(self.ylabel)
+        self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
+        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=title_font_prop)
+        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=title_font_prop)
         try:
             self.canvas.fig.tight_layout()
         except:
