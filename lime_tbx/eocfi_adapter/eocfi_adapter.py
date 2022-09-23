@@ -222,7 +222,6 @@ class EOCFIConverter(IEOCFIConverter):
             ]
         else:
             orbit_files = []
-
         fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
         metadata = yaml.load(fl, Loader=yaml.FullLoader)
         fl.close()

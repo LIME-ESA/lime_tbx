@@ -17,4 +17,5 @@ cp -r $assets/* $dst
 ln -s $dst/$executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications
 mv $bin_path/$executable $bin_path/$command_name
+sudo chmod -R +rx $dst
 echo "LIME Toolbox installed successfully."

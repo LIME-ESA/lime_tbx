@@ -32,7 +32,6 @@ def main():
         os.path.join(programfiles, "kernels"), os.path.join(appdata, "kernels")
     )
     eocfi_path = os.path.join(programfiles, "eocfi_data")
-    print(eocfi_path)
     args = sys.argv[1:]
     options = "hg:l:s:o:f:"
     long_options = []
@@ -59,8 +58,9 @@ def main():
         for opt, arg in opts:
             if opt == "-h":
                 print(
-                    "lime [-h | -g lat_deg,lon_deg,height_m,{} | -l <> | -s <> | -o output_file.csv | -f srf.nc]".format(
-                        _DT_FORMAT
+                    "lime [-h | -g lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,distance_observer_moon,\
+selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> | -o output_file.csv | -f srf.nc]".format(
+                        _DT_FORMAT, _DT_FORMAT
                     )
                 )
             elif opt == "-g":  # Geographic
@@ -76,6 +76,9 @@ def main():
                 sat_name = params_str[0]
                 dt = datetime.strptime(params_str[1] + "+00:00", _DT_FORMAT + "%z")
                 cli.calculate_satellital(sat_name, dt, output_file)
+            elif opt == "-l":
+                params = list(map(float, arg.split(",")))
+                cli.calculate_selenographic(*params, output_file)
 
 
 if __name__ == "__main__":
