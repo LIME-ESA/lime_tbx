@@ -76,29 +76,29 @@ def get_srf() -> SpectralResponseFunction:
 class TestCSV(unittest.TestCase):
     def test_export_csv_1(self):
         path = "./test_files/csv/export_1.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", SPOINT, path)
+        export_csv(SD1, "Wavelength", "Irradiance", SPOINT, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
     def test_export_csv_2(self):
         path = "./test_files/csv/export_2.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", CPOINT, path)
+        export_csv(SD1, "Wavelength", "Irradiance", CPOINT, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
     def test_export_csv_3(self):
         path = "./test_files/csv/export_3.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", SATPOINT, path)
+        export_csv(SD1, "Wavelength", "Irradiance", SATPOINT, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
     def test_export_csv_4(self):
         data = [SD1, SD2]
         path = "./test_files/csv/export_4.test.csv"
-        export_csv(data, "Wavelength", "Irradiance", SPOINT2, path)
+        export_csv(data, "Wavelength", "Irradiance", SPOINT2, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_4.csv"))
 
     def test_export_csv_5(self):
         data = [SD1, SD2]
         path = "./test_files/csv/export_5.test.csv"
-        export_csv(data, "Wavelength", "Irradiance", SATPOINT2, path)
+        export_csv(data, "Wavelength", "Irradiance", SATPOINT2, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
     def test_export_csv_comparation_1(self):
@@ -107,7 +107,7 @@ class TestCSV(unittest.TestCase):
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
-        export_csv_comparation(data, "Signal", [SPOINT, SPOINT3], path)
+        export_csv_comparation(data, "Signal", [SPOINT, SPOINT3], path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 
     def test_export_csv_integrated_irradiance(self):
@@ -120,7 +120,7 @@ class TestCSV(unittest.TestCase):
         )
         data = SpectralData(WLENS, signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
-        export_csv_integrated_irradiance(srf, data, path, SPOINT2)
+        export_csv_integrated_irradiance(srf, data, path, SPOINT2, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
 
     def test_read_datetimes(self):

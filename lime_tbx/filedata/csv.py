@@ -71,6 +71,7 @@ def export_csv(
     ylabel: str,
     point: Union[Point, None],
     name: str,
+    coeff_version: str,
 ):
     """
     Export the given data to a csv file
@@ -87,9 +88,12 @@ def export_csv(
         Point from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
+    coeff_version: str
+        Version of the CIMEL coefficients used for calculating the data
     """
     with open(name, "w") as file:
         writer = csv.writer(file)
+        writer.writerow(["LIME2 coefficients version", coeff_version])
         _write_point(writer, point)
         ylabels = []
         if not isinstance(point, CustomPoint) and point != None:
@@ -121,6 +125,7 @@ def export_csv_comparation(
     ylabel: str,
     points: List[SurfacePoint],
     name: str,
+    coeff_version: str,
 ):
     """
     Export the given data to a csv file
@@ -138,10 +143,13 @@ def export_csv_comparation(
         Points from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
+    coeff_version: str
+        Version of the CIMEL coefficients used for calculating the data
     """
 
     with open(name, "w") as file:
         writer = csv.writer(file)
+        writer.writerow(["LIME2 coefficients version", coeff_version])
         writer.writerow(
             [
                 "UTC datetime",
@@ -176,6 +184,7 @@ def export_csv_integrated_irradiance(
     signals: SpectralData,
     name: str,
     point: Point,
+    coeff_version: str,
 ):
     """
     Export the given integrated signal data to a csv file
@@ -190,11 +199,14 @@ def export_csv_integrated_irradiance(
         CSV file path
     point: Point
         Point from which the data is generated. In case it's None, no metadata will be printed.
+    coeff_version: str
+        Version of the CIMEL coefficients used for calculating the data
     """
     with open(name, "w") as file:
         writer = csv.writer(file)
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
+        writer.writerow(["LIME2 coefficients version", coeff_version])
         irr_titles = []
         if not isinstance(point, CustomPoint) and point != None:
             dts = point.dt

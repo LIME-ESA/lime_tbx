@@ -140,9 +140,7 @@ def _write_start_dataset(
         ds.time_coverage_end = max_dt.strftime(_DT_FORMAT)
     else:
         ds.time_coverage_end = ""
-    ds.reference_model = "LIME2 coefficients version {}".format(
-        coefficients_version
-    )  # TODO coefficients
+    ds.reference_model = "LIME2 coefficients version: {}".format(coefficients_version)
     ds.not_default_srf = int(not_default_srf)
     return ds
 
@@ -237,7 +235,7 @@ def write_obs(
     lglod: LGLODData,
     path: str,
     dt: datetime,
-    coefficients_version: str = "Mock coefficients",
+    coefficients_version: str,
 ):
     obs = lglod.observations
     quant_dates = len(obs)

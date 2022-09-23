@@ -50,7 +50,10 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.selection_layout.addWidget(self.load_button)
         # Graph
         self.graph = output.GraphWidget(
-            "SRF", "Wavelengths (nm)", "Intensity (Fractions of unity)"
+            self.settings_manager,
+            "SRF",
+            "Wavelengths (nm)",
+            "Intensity (Fractions of unity)",
         )
         # Finish main
         self.main_layout.addLayout(self.selection_layout)

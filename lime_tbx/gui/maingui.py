@@ -251,7 +251,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
-        self.output = output.ComparisonOutput()
+        self.output = output.ComparisonOutput(self.settings_manager)
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_lglod_button.clicked.connect(self.export_to_lglod)
@@ -464,7 +464,11 @@ class MainSimulationsWidget(
         self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         # graph
         self.graph = output.GraphWidget(
-            "Simulation output", "Wavelengths (nm)", "Units", parent=self
+            self.settings_manager,
+            "Simulation output",
+            "Wavelengths (nm)",
+            "Units",
+            parent=self,
         )
         self.graph.update_legend(
             [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
@@ -474,7 +478,7 @@ class MainSimulationsWidget(
             self.settings_manager, self._callback_regular_input_changed
         )
         # signal widget
-        self.signal_widget = output.SignalWidget()
+        self.signal_widget = output.SignalWidget(self.settings_manager)
         # finish tab
         self.lower_tabs.addTab(self.graph, "Result")
         self.lower_tabs.addTab(self.srf_widget, "SRF")
@@ -794,9 +798,12 @@ class MainSimulationsWidget(
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
+        version = self.settings_manager.get_cimel_coef().version
         if name is not None and name != "":
             try:
-                moon.write_obs(lglod, name, datetime.now().astimezone(timezone.utc))
+                moon.write_obs(
+                    lglod, name, datetime.now().astimezone(timezone.utc), version
+                )
             except Exception as e:
                 raise e
 
