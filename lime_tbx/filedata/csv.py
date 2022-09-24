@@ -204,9 +204,9 @@ def export_csv_integrated_irradiance(
     """
     with open(name, "w") as file:
         writer = csv.writer(file)
+        writer.writerow(["LIME2 coefficients version", coeff_version])
         _write_point(writer, point)
         writer.writerow(["srf name", srf.name])
-        writer.writerow(["LIME2 coefficients version", coeff_version])
         irr_titles = []
         if not isinstance(point, CustomPoint) and point != None:
             dts = point.dt

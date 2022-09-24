@@ -21,7 +21,7 @@ __status__ = "Development"
 EOCFI_PATH = "./eocfi_data"
 MANDATORY_SATS = [
     "ENVISAT",
-    "Proba-V",
+    "PROBA-V",
     "SENTINEL-2A",
     "SENTINEL-2B",
     "SENTINEL-3A",

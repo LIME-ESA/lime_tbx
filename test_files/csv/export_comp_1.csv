@@ -1,3 +1,4 @@
+LIME2 coefficients version,test
 UTC datetime,latitude,longitude,altitude(m),Observed Signal,Simulated Signal,Observation uncertainties,Simulation uncertainties
 2018-02-27 02:00:00,43,45,4500,0.02,0.03,0,0
 2019-02-23 02:00:00,43,45,4500,0.03,0.03,0.005,0
