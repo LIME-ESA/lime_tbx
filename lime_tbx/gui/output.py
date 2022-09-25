@@ -85,6 +85,7 @@ class GraphWidget(QtWidgets.QWidget):
         # canvas
         self.canvas = MplCanvas(self)
         self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
+        self.canvas.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_cimel_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
         ay2 = self.canvas.axes.twiny()
