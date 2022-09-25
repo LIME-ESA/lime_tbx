@@ -48,10 +48,13 @@ class MplCanvas(FigureCanvas):
 
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-bold_path = os.path.join(_current_dir, constants.ESABOLDFONT_PATH)
-reg_path = os.path.join(_current_dir, constants.ESAFONT_PATH)
-title_font_prop = fm.FontProperties(fname=bold_path)
-font_prop = fm.FontProperties(fname=reg_path)
+dir_font_path = os.path.dirname(os.path.join(_current_dir, constants.ESAFONT_PATH))
+font_dirs = [dir_font_path]
+font_files = fm.findSystemFonts(fontpaths=font_dirs, fontext="otf")
+for font_file in font_files:
+    fm.fontManager.addfont(font_file)
+title_font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"], weight="bold")
+font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"])
 
 
 class GraphWidget(QtWidgets.QWidget):

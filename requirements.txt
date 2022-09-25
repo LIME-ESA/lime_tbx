@@ -5,7 +5,7 @@ cycler==0.11.0
 fonttools==4.37.1
 joblib==1.1.0
 kiwisolver==1.4.4
-matplotlib==3.5.3
+matplotlib==3.6.0
 netCDF4==1.6.0
 numdifftools==0.9.39
 numpy==1.23.2
