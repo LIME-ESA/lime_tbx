@@ -6,10 +6,6 @@ import logging
 from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
 
-from lime_tbx.datatypes import constants
-from lime_tbx.gui import coefficients
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 import numpy as np
@@ -40,6 +36,8 @@ from ..datatypes.datatypes import (
 from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
+from lime_tbx.filedata.lglod_factory import create_lglod_data
+from lime_tbx.gui import coefficients
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -720,110 +718,7 @@ class MainSimulationsWidget(
         self._unblock_gui()
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
-        obs = []
-        ch_names = srf.get_channels_names()
-        sat_pos_ref = constants.EARTH_FRAME
-        elis = self.lime_simulation.get_elis()
-        elis_cimel = self.lime_simulation.get_elis_cimel()
-        if not isinstance(elis_cimel, list):
-            elis_cimel = [elis_cimel]
-        elrefs = self.lime_simulation.get_elrefs()
-        elrefs_cimel = self.lime_simulation.get_elrefs_cimel()
-        if not isinstance(elrefs_cimel, list):
-            elrefs_cimel = [elrefs_cimel]
-        polars = self.lime_simulation.get_polars()
-        if not isinstance(elis, list):
-            elis = [elis]
-        if not isinstance(elrefs, list):
-            elrefs = [elrefs]
-        if not isinstance(polars, list):
-            polars = [polars]
-        signals = self.lime_simulation.get_signals()
-        if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
-            dts = point.dt
-            if not isinstance(dts, list):
-                dts = [dts]
-            if isinstance(point, SurfacePoint):
-                sat_pos = [
-                    SatellitePosition(
-                        *SPICEAdapter.to_rectangular(
-                            point.latitude,
-                            point.longitude,
-                            point.altitude,
-                            "EARTH",
-                            self.kernels_path.main_kernels_path,
-                        )
-                    )
-                    for _ in dts
-                ]
-                sat_name = ""
-            else:
-                sur_points = self.lime_simulation.get_surfacepoints()
-                if isinstance(sur_points, SurfacePoint):
-                    sur_points = [sur_points]
-                sat_pos = [
-                    SatellitePosition(
-                        *SPICEAdapter.to_rectangular(
-                            sp.latitude,
-                            sp.longitude,
-                            sp.altitude,
-                            "EARTH",
-                            self.kernels_path.main_kernels_path,
-                        )
-                    )
-                    for sp in sur_points
-                ]
-                sat_name = point.name
-            for i, dt in enumerate(dts):
-                ob = LunarObservationWrite(
-                    ch_names,
-                    sat_pos_ref,
-                    dt,
-                    sat_pos[i],
-                    elis[i],
-                    elrefs[i],
-                    polars[i],
-                    sat_name,
-                    None,
-                )
-                obs.append(ob)
-        elif isinstance(point, CustomPoint):
-            sat_pos = SatellitePosition(
-                *SPICEAdapter.to_rectangular(
-                    point.selen_obs_lat,
-                    point.selen_obs_lon,
-                    point.distance_observer_moon * 1000,
-                    "MOON",
-                    self.kernels_path.main_kernels_path,
-                )
-            )
-            sat_name = ""
-            sat_pos_ref = constants.MOON_FRAME
-            obs = [
-                LunarObservationWrite(
-                    ch_names,
-                    sat_pos_ref,
-                    None,
-                    sat_pos,
-                    elis[0],
-                    elrefs[0],
-                    polars[0],
-                    sat_name,
-                    SelenographicDataWrite(
-                        point.distance_sun_moon,
-                        point.selen_sun_lon,
-                        point.moon_phase_angle,
-                    ),
-                )
-            ]
-        is_not_default_srf = True
-        if (
-            srf.name == constants.DEFAULT_SRF_NAME
-            and len(srf.get_channels_names()) == 1
-            and srf.get_channels_names()[0] == constants.DEFAULT_SRF_NAME
-        ):
-            is_not_default_srf = False
-        lglod = LGLODData(obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel)
+        lglod = create_lglod_data(point, srf, self.lime_simulation, self.kernels_path)
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
