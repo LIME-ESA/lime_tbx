@@ -2,6 +2,7 @@
 
 """___Built-In Modules___"""
 from enum import Enum
+import logging
 from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
 
@@ -48,6 +49,11 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
+_INTERNAL_ERROR_MSG = (
+    "Something went wrong while performing the operation. See log for more detail."
+)
+
+
 class CallbackWorker(QtCore.QObject):
     finished = QtCore.Signal(list)
     exception = QtCore.Signal(Exception)
@@ -63,6 +69,11 @@ class CallbackWorker(QtCore.QObject):
             self.finished.emit(list(res))
         except Exception as e:
             self.exception.emit(e)
+
+
+class LimeException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
 
 
 def eli_callback(
@@ -193,7 +204,9 @@ def compare_callback(
     co = comparison.Comparison(kernels_path)
     for mo in mos:
         if not mo.check_valid_srf(srf):
-            raise Exception("SRF file not valid for the chosen Moon observations file.")
+            raise LimeException(
+                "SRF file not valid for the chosen Moon observations file."
+            )
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
     return comparisons, mos, srf
 
@@ -402,14 +415,19 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
 
+    def handle_operation_error(self, error: Exception):
+        logging.critical(error)
+        if isinstance(error, LimeException):
+            self.show_error(error)
+        else:
+            self.show_error(_INTERNAL_ERROR_MSG)
+
     def compare_error(self, error: Exception):
         self._unblock_gui()
-        error_dialog = QtWidgets.QErrorMessage(self)
-        error_dialog.showMessage(str(error))
+        self.handle_operation_error(error)
         self.export_lglod_button.setEnabled(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
-        raise error
 
 
 class MainSimulationsWidget(
@@ -548,6 +566,13 @@ class MainSimulationsWidget(
     def can_save_simulation(self) -> bool:
         return self.export_lglod_button.isEnabled()
 
+    def handle_operation_error(self, error: Exception):
+        logging.critical(error)
+        if isinstance(error, LimeException):
+            self.show_error(error)
+        else:
+            self.show_error(_INTERNAL_ERROR_MSG)
+
     @QtCore.Slot()
     def show_eli(self):
         """
@@ -589,7 +614,7 @@ class MainSimulationsWidget(
 
     def eli_error(self, error: Exception):
         self._unblock_gui()
-        raise error
+        self.handle_operation_error(error)
 
     @QtCore.Slot()
     def show_elref(self):
@@ -631,7 +656,7 @@ class MainSimulationsWidget(
 
     def elref_error(self, error: Exception):
         self._unblock_gui()
-        raise error
+        self.handle_operation_error(error)
 
     @QtCore.Slot()
     def show_polar(self):
@@ -666,7 +691,7 @@ class MainSimulationsWidget(
 
     def polar_error(self, error: Exception):
         self._unblock_gui()
-        raise error
+        self.handle_operation_error(error)
 
     def load_observations_finished(
         self,
@@ -813,7 +838,7 @@ class MainSimulationsWidget(
 
     def calculate_all_error(self, error: Exception):
         self._unblock_gui()
-        raise error
+        self.handle_operation_error(error)
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -872,6 +897,10 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.page)
         self.page.show()
 
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     def load_observations_finished(
         self, lglod: LGLODData, srf: SpectralResponseFunction
     ):
@@ -883,9 +912,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
                 valid = False
         if not valid:
             error_msg = "SRF file not valid for the observation file."
-            error_dialog = QtWidgets.QErrorMessage(self)
-            error_dialog.showMessage(error_msg)
-            raise Exception(error_msg)
+            error = Exception(error_msg)
+            logging.critical(error)
+            self.show_error(error)
         else:
             self.main_page.srf_widget.set_srf(srf)
             self.lime_simulation.set_observations(lglod, srf)
@@ -904,9 +933,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
                 valid = False
         if not valid:
             error_msg = "SRF file not valid for the observation file."
-            error_dialog = QtWidgets.QErrorMessage(self)
-            error_dialog.showMessage(error_msg)
-            raise Exception(error_msg)
+            error = Exception(error_msg)
+            logging.critical(error)
+            self.show_error(error)
         else:
             self.comparison_page.load_lglod_comparisons(lglod, srf)
 
