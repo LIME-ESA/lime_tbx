@@ -908,7 +908,6 @@ QScrollBar:horizontal
 
 QScrollBar::handle:horizontal
 {
-    background-color: #41cd52;
     min-height: 20px;
 
 }
@@ -916,8 +915,6 @@ QScrollBar::handle:horizontal
 
 QScrollBar::add-line:horizontal
 {
-    border: 1px solid #1b1b19;
-    background-color: #41cd52;
     width: 14px;
     subcontrol-position: right;
     subcontrol-origin: margin;
@@ -927,8 +924,6 @@ QScrollBar::add-line:horizontal
 
 QScrollBar::sub-line:horizontal
 {
-    border: 1px solid #1b1b19;
-    background-color: #41cd52;
     width: 14px;
     subcontrol-position: left;
     subcontrol-origin: margin;
@@ -955,7 +950,6 @@ QScrollBar:vertical
 
 QScrollBar::handle:vertical
 {
-    background-color: #41cd52;
     min-height: 20px;
 
 }
@@ -963,8 +957,6 @@ QScrollBar::handle:vertical
 
 QScrollBar::add-line:vertical
 {
-    border: 1px solid #1b1b19;
-    background-color: #41cd52;
     height: 14px;
     subcontrol-position: bottom;
     subcontrol-origin: margin;
@@ -974,8 +966,6 @@ QScrollBar::add-line:vertical
 
 QScrollBar::sub-line:vertical
 {
-    border: 1px solid #41cd52;
-    background-color: #41cd52;
     height: 14px;
     subcontrol-position: top;
     subcontrol-origin: margin;
