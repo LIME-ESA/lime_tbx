@@ -10,7 +10,13 @@ from lime_tbx.filedata import csv
 # import here
 
 """___LIME_TBX Modules___"""
-from lime_tbx.cli.cli import CLI, ExportCSV, ExportData, ExportNetCDF
+from lime_tbx.cli.cli import (
+    CLI,
+    ExportCSV,
+    ExportComparisonCSV,
+    ExportData,
+    ExportNetCDF,
+)
 from lime_tbx.coefficients.access_data.appdata import (
     get_appdata_folder,
     get_programfiles_folder,
@@ -35,7 +41,7 @@ def main():
     )
     eocfi_path = os.path.join(programfiles, "eocfi_data")
     args = sys.argv[1:]
-    options = "he:l:s:o:f:t:"
+    options = "he:l:s:c:o:f:t:"
     long_options = []
     try:
         opts, args = getopt.getopt(args, options, long_options)
@@ -52,11 +58,17 @@ def main():
         export_data: ExportData = None
         timeseries_file: str = None
         # find settings data
+        is_comparison = False
+        for opt, arg in opts:
+            if opt == "-c":
+                is_comparison = True
+                break
         for opt, arg in opts:
             if opt == "-h":
                 print(
-                    "lime [-h | -t timeseries.csv (-e lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,distance_observer_moon,\
-selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}>) -o (csv,refl.csv,irr.csv,polar.csv | nc,output_file.nc) -f srf.nc]".format(
+                    'lime [-h | -t timeseries.csv (-e lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,distance_observer_moon,\
+selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> | -c "input_glod1.nc input_lglod2.nc ...")\
+-o (csv,refl.csv,irr.csv,polar.csv | csv,comparisons.csv| nc,output_file.nc) -f srf.nc]'.format(
                         _DT_FORMAT, _DT_FORMAT
                     )
                 )
@@ -65,7 +77,10 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}>) 
                 splitted = arg.split(",")
                 o_type = splitted[0]
                 if o_type == "csv":
-                    export_data = ExportCSV(splitted[1], splitted[2], splitted[3])
+                    if not is_comparison:
+                        export_data = ExportCSV(splitted[1], splitted[2], splitted[3])
+                    else:
+                        export_data = ExportComparisonCSV(splitted[1:])
                 elif o_type == "nc":
                     export_data = ExportNetCDF(splitted[1])
             elif opt == "-f":
@@ -85,7 +100,7 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}>) 
                 else:
                     dt = datetime.strptime(params_str[3] + "+00:00", _DT_FORMAT + "%z")
                 cli.calculate_geographic(lat, lon, height, dt, export_data)
-            elif opt == "-s":
+            elif opt == "-s":  # Satellite
                 params_str = arg.split(",")
                 sat_name = params_str[0]
                 if timeseries_file != None:
@@ -93,9 +108,12 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}>) 
                 else:
                     dt = datetime.strptime(params_str[1] + "+00:00", _DT_FORMAT + "%z")
                 cli.calculate_satellital(sat_name, dt, export_data)
-            elif opt == "-l":
+            elif opt == "-l":  # Lunar
                 params = list(map(float, arg.split(",")))
                 cli.calculate_selenographic(*params, export_data)
+            elif opt == "-c":  # Comparison
+                input_files = arg.split(" ")
+                cli.calculate_comparisons(input_files, export_data)
 
 
 if __name__ == "__main__":

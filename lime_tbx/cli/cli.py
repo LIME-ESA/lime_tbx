@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from abc import ABC
 from typing import List, Union
 
+from lime_tbx.gui.maingui import LimeException
+from lime_tbx.simulation.comparison import comparison
+
 """___Third-Party Modules___"""
 # import here
 
@@ -11,14 +14,16 @@ from typing import List, Union
 from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     KernelsPath,
+    LGLODComparisonData,
     LGLODData,
+    LunarObservation,
     Point,
     SatellitePoint,
     SurfacePoint,
 )
 from lime_tbx.gui import settings
 from lime_tbx.simulation.lime_simulation import LimeSimulation
-from lime_tbx.filedata import moon, srf, csv
+from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 
 
@@ -33,8 +38,17 @@ class ExportCSV(ExportData):
     o_file_polar: str
 
 
+class ExportComparison(ABC):
+    pass
+
+
 @dataclass
-class ExportNetCDF(ExportData):
+class ExportComparisonCSV(ExportComparison):
+    output_files: List[str]
+
+
+@dataclass
+class ExportNetCDF(ExportData, ExportComparison):
     output_file: str
 
 
@@ -50,7 +64,7 @@ class CLI:
         if srf_file == "":
             self.srf = self.settings_manager.get_default_srf()
         else:
-            self.srf = srf.read_srf(srf_file)
+            self.srf = srflib.read_srf(srf_file)
 
     def _calculate_irradiance(self, point: Point):
         self.lime_simulation.update_irradiance(
@@ -158,3 +172,62 @@ class CLI:
         )
         self._calculate_all(point)
         self._export(point, export_data)
+
+    def _add_observation(self, obs: LunarObservation):
+        for i, pob in enumerate(self.loaded_moons):
+            if obs.dt < pob.dt:
+                self.loaded_moons.insert(i, obs)
+                return
+        self.loaded_moons.append(obs)
+
+    def calculate_comparisons(
+        self,
+        input_files: List[str],
+        ed: ExportComparison,
+    ):
+        self.loaded_moons: List[LunarObservation] = []
+        for path in input_files:
+            self._add_observation(moon.read_moon_obs(path))
+        if len(self.loaded_moons) == 0:
+            raise LimeException("No observations given. Aborting.")
+        co = comparison.Comparison(self.kernels_path)
+        mos = self.loaded_moons
+        for mo in mos:
+            if not mo.check_valid_srf(self.srf):
+                raise LimeException(
+                    "SRF file not valid for the chosen Moon observations file."
+                )
+        cimel_coef = self.settings_manager.get_cimel_coef()
+        comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
+        # EXPORT
+        if isinstance(ed, ExportNetCDF):
+            lglod = LGLODComparisonData(
+                comps,
+                self.srf.get_channels_names(),
+                "TODO",
+            )
+            vers = self.settings_manager.get_cimel_coef().version
+            moon.write_comparison(
+                lglod,
+                ed.output_file,
+                datetime.now().astimezone(timezone.utc),
+                vers,
+                self.kernels_path,
+            )
+        elif isinstance(ed, ExportComparisonCSV):
+            version = self.settings_manager.get_cimel_coef().version
+            ch_names = self.srf.get_channels_names()
+            file_index = 0
+            for i, _ in enumerate(ch_names):
+                if len(comps[i].dts) > 0:
+                    data = [comps[i].observed_signal, comps[i].simulated_signal]
+                    points = comps[i].points
+                    ylabel = "Signal (Wm⁻²nm⁻¹)"
+                    csv.export_csv_comparation(
+                        data,
+                        ylabel,
+                        points,
+                        ed.output_files[file_index],
+                        version,
+                    )
+                    file_index += 1
