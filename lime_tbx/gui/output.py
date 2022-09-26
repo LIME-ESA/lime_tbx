@@ -313,9 +313,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.draw()
 
     def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QErrorMessage(self)
-        error_dialog.showMessage(str(error))
-        raise error
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
     @QtCore.Slot()
     def export_graph(self):
@@ -483,9 +482,8 @@ for wavelengths between 350 and 2500 nm"
         self.button_csv.setDisabled(disable)
 
     def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QErrorMessage(self)
-        error_dialog.showMessage(str(error))
-        raise error
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
     @QtCore.Slot()
     def export_csv(self):

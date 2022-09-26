@@ -304,7 +304,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     self.kernels_path,
                 )
             except Exception as e:
-                raise e
+                self.show_error(e)
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
     @QtCore.Slot()
     def compare(self):
@@ -805,11 +809,15 @@ class MainSimulationsWidget(
                     lglod, name, datetime.now().astimezone(timezone.utc), version
                 )
             except Exception as e:
-                raise e
+                self.show_error(e)
 
     def calculate_all_error(self, error: Exception):
         self._unblock_gui()
         raise error
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
 
 class LimePagesEnum(Enum):
@@ -973,6 +981,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
 
+    # ERROR
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     # ACTIONS
 
     def save_simulation(self):
@@ -985,32 +999,44 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def load_simulation(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self, "Select GLOD file")[0]
         if path != "":
-            lglod = moon.read_glod_file(path, self.kernels_path)
-            if isinstance(lglod, LGLODData):
-                self.simulations()
-                srf = None
-                cancel = False
-                if lglod.not_default_srf:
+            try:
+                lglod = moon.read_glod_file(path, self.kernels_path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                if isinstance(lglod, LGLODData):
+                    self.simulations()
+                    srf = None
+                    cancel = False
+                    if lglod.not_default_srf:
+                        srf_path = QtWidgets.QFileDialog().getOpenFileName(
+                            self, "Select SpectralResponseFunction file"
+                        )[0]
+                        if srf_path == "":
+                            cancel = True
+                        else:
+                            try:
+                                srf = srf_loader.read_srf(srf_path)
+                            except Exception as e:
+                                cancel = True
+                                self.show_error(e)
+                    if not cancel:
+                        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+                        lime_tbx_w.load_observations_finished(lglod, srf)
+                else:
+                    self.comparison()
+                    srf = None
                     srf_path = QtWidgets.QFileDialog().getOpenFileName(
                         self, "Select SpectralResponseFunction file"
                     )[0]
-                    if srf_path == "":
-                        cancel = True
-                    else:
-                        srf = srf_loader.read_srf(srf_path)
-                if not cancel:
-                    lime_tbx_w: LimeTBXWidget = self.centralWidget()
-                    lime_tbx_w.load_observations_finished(lglod, srf)
-            else:
-                self.comparison()
-                srf = None
-                srf_path = QtWidgets.QFileDialog().getOpenFileName(
-                    self, "Select SpectralResponseFunction file"
-                )[0]
-                if srf_path != "":
-                    srf = srf_loader.read_srf(srf_path)
-                    lime_tbx_w: LimeTBXWidget = self.centralWidget()
-                    lime_tbx_w.load_comparisons_finished(lglod, srf)
+                    if srf_path != "":
+                        try:
+                            srf = srf_loader.read_srf(srf_path)
+                        except Exception as e:
+                            self.show_error(e)
+                        else:
+                            lime_tbx_w: LimeTBXWidget = self.centralWidget()
+                            lime_tbx_w.load_comparisons_finished(lglod, srf)
 
     def comparison(self):
         if not self._is_comparing:

@@ -80,11 +80,19 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.combo_srf.setCurrentIndex(index)
         self.combobox_listen = True
 
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     @QtCore.Slot()
     def load_srf(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        srf = file_srf.read_srf(path)
-        self.set_srf(srf)
+        try:
+            srf = file_srf.read_srf(path)
+        except Exception as e:
+            self.show_error(e)
+        else:
+            self.set_srf(srf)
 
     @QtCore.Slot()
     def set_srf(self, srf):

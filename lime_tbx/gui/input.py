@@ -265,16 +265,24 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self._build_layout_multiple_datetime()
         self.callback_check_calculable()
 
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     @QtCore.Slot()
     def load_datetimes(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         if path != "":
-            self.loaded_datetimes = csv.read_datetimes(path)
-            shown_path = path
-            if len(shown_path) > MAX_PATH_LEN:
-                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-            self.loaded_datetimes_label.setText(shown_path)
-            self.callback_check_calculable()
+            try:
+                self.loaded_datetimes = csv.read_datetimes(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                shown_path = path
+                if len(shown_path) > MAX_PATH_LEN:
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+                self.loaded_datetimes_label.setText(shown_path)
+                self.callback_check_calculable()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -418,16 +426,24 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self._build_layout_multiple_datetime()
         self.callback_check_calculable()
 
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     @QtCore.Slot()
     def load_datetimes(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         if path != "":
-            self.loaded_datetimes = csv.read_datetimes(path)
-            shown_path = path
-            if len(shown_path) > MAX_PATH_LEN:
-                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-            self.loaded_datetimes_label.setText(path)
-            self.callback_check_calculable()
+            try:
+                self.loaded_datetimes = csv.read_datetimes(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                shown_path = path
+                if len(shown_path) > MAX_PATH_LEN:
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+                self.loaded_datetimes_label.setText(path)
+                self.callback_check_calculable()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -638,21 +654,33 @@ class ComparisonInput(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        self.loaded_srf = srf.read_srf(path)
-        shown_path = path
-        if len(shown_path) > MAX_PATH_LEN:
-            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-        self.srf_feedback.setText(shown_path)
-        self.callback_change()
+        try:
+            self.loaded_srf = srf.read_srf(path)
+        except Exception as e:
+            self.show_error(e)
+        else:
+            shown_path = path
+            if len(shown_path) > MAX_PATH_LEN:
+                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+            self.srf_feedback.setText(shown_path)
+            self.callback_change()
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
     @QtCore.Slot()
     def load_obs_files(self):
         paths = QtWidgets.QFileDialog().getOpenFileNames(self)[0]
         for path in paths:
-            self._add_observation(moon.read_moon_obs(path))
-        shown_path = "Loaded {} files".format(len(self.loaded_moons))
-        self.moon_obs_feedback.setText(shown_path)
-        self.callback_change()
+            try:
+                self._add_observation(moon.read_moon_obs(path))
+            except Exception as e:
+                self.show_error(e)
+        if len(self.loaded_moons) > 0:
+            shown_path = "Loaded {} files".format(len(self.loaded_moons))
+            self.moon_obs_feedback.setText(shown_path)
+            self.callback_change()
 
     def _add_observation(self, obs: LunarObservation):
         for i, pob in enumerate(self.loaded_moons):
