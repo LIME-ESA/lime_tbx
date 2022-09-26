@@ -42,7 +42,16 @@ def main():
     eocfi_path = os.path.join(programfiles, "eocfi_data")
     args = sys.argv[1:]
     options = "he:l:s:c:o:f:t:"
-    long_options = []
+    long_options = [
+        "help",
+        "earth=",
+        "lunar=",
+        "satellite=",
+        "comparison=",
+        "output=",
+        "srf=",
+        "timeseries=",
+    ]
     try:
         opts, args = getopt.getopt(args, options, long_options)
     except getopt.GetoptError:
@@ -60,11 +69,11 @@ def main():
         # find settings data
         is_comparison = False
         for opt, arg in opts:
-            if opt == "-c":
+            if opt in ("-c", "--comparison"):
                 is_comparison = True
                 break
         for opt, arg in opts:
-            if opt == "-h":
+            if opt in ("-h", "--help"):
                 print(
                     'lime [-h | -t timeseries.csv (-e lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,distance_observer_moon,\
 selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> | -c "input_glod1.nc input_lglod2.nc ...")\
@@ -73,7 +82,7 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> |
                     )
                 )
                 return
-            if opt == "-o":
+            if opt in ("-o", "--output"):
                 splitted = arg.split(",")
                 o_type = splitted[0]
                 if o_type == "csv":
@@ -83,13 +92,13 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> |
                         export_data = ExportComparisonCSV(splitted[1:])
                 elif o_type == "nc":
                     export_data = ExportNetCDF(splitted[1])
-            elif opt == "-f":
+            elif opt in ("-f", "--srf"):
                 srf_file = arg
-            elif opt == "-t":
+            elif opt in ("-t", "--timeseries"):
                 timeseries_file = arg
         cli.load_srf(srf_file)
         for opt, arg in opts:
-            if opt == "-e":  # Earth
+            if opt in ("-e", "--earth"):  # Earth
                 params_str = arg.split(",")
                 params = list(map(float, params_str[:3]))
                 lat = params[0]
@@ -100,7 +109,7 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> |
                 else:
                     dt = datetime.strptime(params_str[3] + "+00:00", _DT_FORMAT + "%z")
                 cli.calculate_geographic(lat, lon, height, dt, export_data)
-            elif opt == "-s":  # Satellite
+            elif opt in ("-s", "--satellite"):  # Satellite
                 params_str = arg.split(",")
                 sat_name = params_str[0]
                 if timeseries_file != None:
@@ -108,10 +117,10 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> |
                 else:
                     dt = datetime.strptime(params_str[1] + "+00:00", _DT_FORMAT + "%z")
                 cli.calculate_satellital(sat_name, dt, export_data)
-            elif opt == "-l":  # Lunar
+            elif opt in ("-l", "--lunar"):  # Lunar
                 params = list(map(float, arg.split(",")))
                 cli.calculate_selenographic(*params, export_data)
-            elif opt == "-c":  # Comparison
+            elif opt in ("-c", "--comparison"):  # Comparison
                 input_files = arg.split(" ")
                 cli.calculate_comparisons(input_files, export_data)
 
