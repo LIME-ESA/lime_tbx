@@ -9,6 +9,7 @@ a_pathex = []
 a_binaries = []
 a_datas = []
 a_icon = ''
+e_console = False
 
 if sys.platform == 'linux':
     src_path = 'lime_tbx/'
@@ -50,6 +51,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'lime_algorithms\\rolo\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
     ]
     a_icon = src_path + 'gui\\assets\\lime_logo.ico'
+    e_console = True
 runner_file = src_path + 'main.py'
 
 a = Analysis([runner_file],
@@ -83,7 +85,7 @@ if sys.platform == 'win32' or sys.platform == 'win64' or sys.platform == 'linux'
             upx=True,
             upx_exclude=[],
             runtime_tmpdir=None,
-            console=False,
+            console=e_console,
             icon=a_icon,
             disable_windowed_traceback=False,
             target_arch=None,

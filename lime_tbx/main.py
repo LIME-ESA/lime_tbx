@@ -60,7 +60,11 @@ def main():
         sys.exit(2)
     if len(opts) == 0:
         from lime_tbx.gui.gui import GUI
-
+        if sys.platform.lower().startswith('win'):
+            import ctypes
+            whnd = ctypes.windll.kernel32.GetConsoleWindow()
+            if whnd != 0:
+                ctypes.windll.user32.ShowWindow(whnd, 0)
         gui = GUI(kernels_path, eocfi_path)
     else:
         cli = CLI(kernels_path, eocfi_path)
