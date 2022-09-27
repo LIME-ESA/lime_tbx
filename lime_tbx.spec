@@ -20,6 +20,7 @@ if sys.platform == 'linux':
     ]
     a_datas = [
         (src_path + 'gui/assets/style.qss', './lime_tbx/gui/assets'),
+        (src_path + 'gui/assets/style_constants.txt', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/lime_logo.png', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/NotesEsaBol.otf', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/NotesEsaReg.otf', './lime_tbx/gui/assets'),
@@ -41,6 +42,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
     ]
     a_datas = [
         (src_path + 'gui\\assets\\style.qss', '.\\lime_tbx\\gui\\assets'),
+        (src_path + 'gui\\assets\\style_constants.txt', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\lime_logo.png', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\NotesEsaBol.otf', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\NotesEsaReg.otf', '.\\lime_tbx\\gui\\assets'),

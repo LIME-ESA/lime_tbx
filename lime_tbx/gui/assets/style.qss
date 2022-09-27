@@ -1,10 +1,10 @@
 /*-----QWidget-----*/
 QWidget
 {
-	background-color: #001923;
-	color: #ffffff;
-	border-color: #001923;
-	selection-background-color: #3b7e48;
+	background-color: @esaBackground;
+	color: @neutralSpace;
+	border-color: @esaBackground;
+	selection-background-color: @limeGreen;
     font-family: 'NotesESA', 'Arial', sans-serif;
 	font-weight: bold;
 	font-size: 11pt;
@@ -15,7 +15,7 @@ QWidget
 QLabel
 {
 	background-color: transparent;
-	color: #ffffff;
+	color: @neutralSpace;
     font-family: 'NotesESA', 'Arial', sans-serif;
 	font-weight: normal;
 }
@@ -33,7 +33,7 @@ QLabel::disabled
 QMenuBar
 {
     background-color: #262626;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-color: #051a39;
 
 }
@@ -57,16 +57,16 @@ QMenuBar::item
 
 QMenuBar::item:selected
 {
-    background-color: #5ab8a0;
-    border: 1px solid #41cd52;
+    background-color: @pureTeal;
+    border: 1px solid @limeGreen;
 
 }
 
 
 QMenuBar::item:pressed
 {
-    background-color: #3e7f6e;
-    border: 1px solid #5ab8a0;
+    background-color: @trustyAzure;
+    border: 1px solid @pureTeal;
     margin-bottom: -1px;
     padding-bottom: 1px;
 
@@ -78,7 +78,7 @@ QMenu
 {
     background-color: #1f2b2b;
     border: 1px solid;
-    color: #ffffff;
+    color: @neutralSpace;
 
 }
 
@@ -86,8 +86,8 @@ QMenu
 QMenu::separator
 {
     height: 1px;
-    background-color: #ffffff;
-    color: #ffffff;
+    background-color: @neutralSpace;
+    color: @neutralSpace;
     padding-left: 4px;
     margin-left: 10px;
     margin-right: 5px;
@@ -105,8 +105,8 @@ QMenu::item
 
 QMenu::item:selected
 {
-    background-color: #22a6b2;
-    color: #ffffff;
+    background-color: @pureTeal;
+    color: @neutralSpace;
 
 }
 
@@ -124,7 +124,7 @@ QToolTip
 {
 	border : 1px solid #000000;
 	background-color: #26264f;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-color: #051a39;
 
 }
@@ -133,12 +133,12 @@ QToolTip
 /*-----QPushButton-----*/
 QPushButton
 {
-	background-color: #003247;
-	color: #ffffff;
+	background-color: @deepSpace;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 2px;
-	border-color: #003247;
+	border-color: @deepSpace;
 	padding: 5px;
     text-transform: uppercase;
     font-size: 11pt;
@@ -158,7 +158,7 @@ QPushButton::disabled
 QPushButton::hover
 {
 	background-color: #072431;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 2px;
@@ -171,7 +171,7 @@ QPushButton::hover
 QPushButton::pressed
 {
 	background-color: #06212d;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 2px;
@@ -184,12 +184,12 @@ QPushButton::pressed
 /*-----QToolButton-----*/
 QToolButton
 {
-	background-color: #003247;
-	color: #ffffff;
+	background-color: @deepSpace;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 5px;
-	border-color: #003247;
+	border-color: @deepSpace;
 	padding: 5px;
 
 }
@@ -207,7 +207,7 @@ QToolButton::disabled
 QToolButton::hover
 {
 	background-color: #072431;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 5px;
@@ -220,7 +220,7 @@ QToolButton::hover
 QToolButton::pressed
 {
 	background-color: #06212d;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 5px;
@@ -268,14 +268,22 @@ QComboBox:on
 QComboBox QAbstractItemView
 {
     background-color: #383838;
-    color: #ffffff;
+    color: @neutralSpace;
     border: 1px solid black;
-    selection-background-color: #488f44;
-    selection-color: #ffffff;
+    selection-background-color: @limeGreen;
+    selection-color: @neutralSpace;
     outline: 0;
 
 }
 
+QComboBox QAbstractItemView:disabled
+{
+    background-color: #262626;
+    color: #8a8a8a;
+    selection-background-color: #262626;
+    selection-color: #8a8a8a;
+
+}
 
 /*-----QSpinBox & QDoubleSpinBox & QDateTimeEdit-----*/
 QSpinBox, 
@@ -358,7 +366,7 @@ QLineEdit::disabled
 /*-----QTextEdit-----*/
 QTextEdit
 {
-	background-color: #ffffff;
+	background-color: @neutralSpace;
 	color: #010201;
 	border-color: #051a39;
 
@@ -388,7 +396,7 @@ QGroupBox
 QGroupBox::title  
 {
     background-color: #1f2b2b;
-    color: #ffffff;
+    color: @neutralSpace;
     subcontrol-origin: margin;
     subcontrol-position: top left;
 	margin-left: 1px;
@@ -592,7 +600,7 @@ QHeaderView::section::horizontal
 QTabBar::tab
 {
 	background-color: #1f2b2b;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 1px;
 	border-color: #051a39;
@@ -621,7 +629,7 @@ QTabWidget::pane
 QTabBar::tab:selected
 {
     background-color: #1f2b2b;
-	color: #ffffff;
+	color: @neutralSpace;
 	border-style: solid;
 	border-width: 0px;
 	border-color: #051a39;
@@ -1010,7 +1018,7 @@ QProgressBar::chunk:disabled {
 QStatusBar
 {
 	background-color: qlineargradient(spread:repeat, x1:1, y1:0, x2:1, y2:1, stop:0.100962 rgba(98, 197, 95, 255),stop:1 rgba(80, 158, 75, 255));
-	color: #ffffff;
+	color: @neutralSpace;
 	border-color: #051a39;
 
 }
