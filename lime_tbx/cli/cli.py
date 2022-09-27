@@ -3,9 +3,7 @@ from datetime import datetime, timezone
 from dataclasses import dataclass
 from abc import ABC
 from typing import List, Union
-
-from lime_tbx.gui.maingui import LimeException
-from lime_tbx.simulation.comparison import comparison
+import os
 
 """___Third-Party Modules___"""
 # import here
@@ -25,6 +23,8 @@ from lime_tbx.gui import settings
 from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
+from lime_tbx.gui.maingui import LimeException
+from lime_tbx.simulation.comparison import comparison
 
 
 class ExportData(ABC):
@@ -45,6 +45,11 @@ class ExportComparison(ABC):
 @dataclass
 class ExportComparisonCSV(ExportComparison):
     output_files: List[str]
+
+
+@dataclass
+class ExportComparisonCSVDir(ExportComparison):
+    output_dir: str
 
 
 @dataclass
@@ -214,20 +219,28 @@ class CLI:
                 vers,
                 self.kernels_path,
             )
-        elif isinstance(ed, ExportComparisonCSV):
+        else:
+            if isinstance(ed, ExportComparisonCSVDir):
+                if not os.path.exists(ed.output_dir):
+                    os.makedirs(ed.output_dir)
             version = self.settings_manager.get_cimel_coef().version
             ch_names = self.srf.get_channels_names()
             file_index = 0
-            for i, _ in enumerate(ch_names):
+            for i, ch in enumerate(ch_names):
                 if len(comps[i].dts) > 0:
                     data = [comps[i].observed_signal, comps[i].simulated_signal]
                     points = comps[i].points
                     ylabel = "Signal (Wm⁻²nm⁻¹)"
+                    output = ""
+                    if isinstance(ed, ExportComparisonCSV):
+                        output = ed.output_files[file_index]
+                    elif isinstance(ed, ExportComparisonCSVDir):
+                        output = "{}.csv".format(os.path.join(ed.output_dir, ch))
                     csv.export_csv_comparation(
                         data,
                         ylabel,
                         points,
-                        ed.output_files[file_index],
+                        output,
                         version,
                     )
                     file_index += 1

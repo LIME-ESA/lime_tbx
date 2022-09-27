@@ -14,6 +14,7 @@ from lime_tbx.cli.cli import (
     CLI,
     ExportCSV,
     ExportComparisonCSV,
+    ExportComparisonCSVDir,
     ExportData,
     ExportNetCDF,
 )
@@ -77,7 +78,7 @@ def main():
                 print(
                     'lime [-h | -t timeseries.csv (-e lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,distance_observer_moon,\
 selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> | -c "input_glod1.nc input_lglod2.nc ...")\
--o (csv,refl.csv,irr.csv,polar.csv | csv,comparisons.csv| nc,output_file.nc) -f srf.nc]'.format(
+-o (csv,refl.csv,irr.csv,polar.csv | csv,comparison_ch1.csv,... | csvd,comparison_folder | nc,output_file.nc) -f srf.nc]'.format(
                         _DT_FORMAT, _DT_FORMAT
                     )
                 )
@@ -92,6 +93,8 @@ selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | -s <sat_name,{}> |
                         export_data = ExportComparisonCSV(splitted[1:])
                 elif o_type == "nc":
                     export_data = ExportNetCDF(splitted[1])
+                elif o_type == "csvd":
+                    export_data = ExportComparisonCSVDir(splitted[1])
             elif opt in ("-f", "--srf"):
                 srf_file = arg
             elif opt in ("-t", "--timeseries"):
