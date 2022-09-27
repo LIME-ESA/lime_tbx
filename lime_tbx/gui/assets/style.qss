@@ -5,8 +5,9 @@ QWidget
 	color: #ffffff;
 	border-color: #001923;
 	selection-background-color: #3b7e48;
-    font-family: 'NotesESA', sans-serif;
+    font-family: 'NotesESA', 'Arial', sans-serif;
 	font-weight: bold;
+	font-size: 11pt;
 }
 
 
@@ -15,8 +16,8 @@ QLabel
 {
 	background-color: transparent;
 	color: #ffffff;
-    font-family: 'NotesESA', sans-serif;
-    font-weight: normal;
+    font-family: 'NotesESA', 'Arial', sans-serif;
+	font-weight: normal;
 }
 
 
@@ -140,8 +141,8 @@ QPushButton
 	border-color: #003247;
 	padding: 5px;
     text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 1px;
+    font-size: 11pt;
+    letter-spacing: 1pt;
 }
 
 
@@ -310,7 +311,7 @@ QDateTimeEdit::hover
 }
 
 
-QSpinBox::disabled, 
+QSpinBox::disabled,
 QDoubleSpinBox::disabled,
 QDateTimeEdit::disabled
 {
