@@ -72,21 +72,35 @@ class ISettingsManager(ABC):
         """Obtain the CimelCoef the CIMEL coefficients and uncertainties"""
         pass
 
+    @abstractmethod
+    def get_available_cimel_coeffs(self) -> List[ReflectanceCoefficients]:
+        """Obtain a list with all the cimel coefficients available"""
+        pass
+
+    @abstractmethod
+    def select_cimel_coeff(self, index: int) -> None:
+        """Select the cimel_coeff from the cimel coefficients list at the given position."""
+        pass
+
 
 class MockSettingsManager(ISettingsManager):
     def __init__(self):
         # generate an arbitrary default srf
         self.srfs = [self.get_default_srf()]
         self.srf = self.srfs[0]
+        self.cimel_coeffs = [access_data.get_default_cimel_coeffs()]
+        self.cimel_coeff = self.cimel_coeffs[0]
 
     def get_default_srf(self) -> SpectralResponseFunction:
         spectral_response = {
             i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
         }
         ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Default", spectral_response
+            (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
+            constants.DEFAULT_SRF_NAME,
+            spectral_response,
         )
-        srf = SpectralResponseFunction("Default", [ch])
+        srf = SpectralResponseFunction(constants.DEFAULT_SRF_NAME, [ch])
         return srf
 
     def get_srf(self) -> SpectralResponseFunction:
@@ -108,5 +122,10 @@ class MockSettingsManager(ISettingsManager):
         return self.srfs
 
     def get_cimel_coef(self) -> ReflectanceCoefficients:
-        cimel_coef = access_data.get_default_cimel_coeffs()
-        return cimel_coef
+        return self.cimel_coeff
+
+    def get_available_cimel_coeffs(self) -> List[ReflectanceCoefficients]:
+        return self.cimel_coeffs
+
+    def select_cimel_coeff(self, index: int) -> None:
+        self.cimel_coeff = self.cimel_coeffs[index]

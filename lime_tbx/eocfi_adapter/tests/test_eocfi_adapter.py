@@ -1,7 +1,7 @@
 """Tests for eocfi_adapter module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Third-Party Modules___"""
 import unittest
@@ -21,7 +21,7 @@ __status__ = "Development"
 EOCFI_PATH = "./eocfi_data"
 MANDATORY_SATS = [
     "ENVISAT",
-    "Proba-V",
+    "PROBA-V",
     "SENTINEL-2A",
     "SENTINEL-2B",
     "SENTINEL-3A",
@@ -29,7 +29,7 @@ MANDATORY_SATS = [
     "FLEX",
 ]
 
-DT1 = datetime(2016, 1, 1, 15, 0, 2)
+DT1 = datetime(2016, 1, 1, 15, 0, 2, tzinfo=timezone.utc)
 
 
 def get_eocfi_converter() -> IEOCFIConverter:
@@ -41,13 +41,15 @@ class TestEOCFIConverter(unittest.TestCase):
         dts = _get_file_datetimes(
             "SENTINEL2A/OSF/S2A_OPER_MPL_ORBSCT_20150625T073255_99999999T999999_0008.EOF"
         )
-        self.assertEqual(dts[0], datetime(2015, 6, 25, 7, 32, 55))
-        self.assertEqual(dts[1], datetime(9999, 12, 31, 23, 59, 59))
+        self.assertEqual(dts[0], datetime(2015, 6, 25, 7, 32, 55, tzinfo=timezone.utc))
+        self.assertEqual(
+            dts[1], datetime(9999, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+        )
         dts = _get_file_datetimes(
             "SMOS/OSF/SM_OPER_MPL_ORBSCT_20091102T031142_20500101T000000_4540031.EEF"
         )
-        self.assertEqual(dts[0], datetime(2009, 11, 2, 3, 11, 42))
-        self.assertEqual(dts[1], datetime(2050, 1, 1, 0, 0, 0))
+        self.assertEqual(dts[0], datetime(2009, 11, 2, 3, 11, 42, tzinfo=timezone.utc))
+        self.assertEqual(dts[1], datetime(2050, 1, 1, 0, 0, 0, tzinfo=timezone.utc))
 
     def test_get_sat_names_mandatory(self):
         eo = get_eocfi_converter()
@@ -75,7 +77,7 @@ class TestEOCFIConverter(unittest.TestCase):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
         eo = get_eocfi_converter()
         lat, lon, hhh = eo.get_satellite_position(
-            "SENTINEL-5P", datetime(2022, 1, 2, 0, 0, 0)
+            "SENTINEL-5P", datetime(2022, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
         )
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},

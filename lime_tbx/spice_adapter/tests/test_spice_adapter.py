@@ -1,7 +1,7 @@
 """Tests for spice_adapter module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 """___Third-Party Modules___"""
@@ -9,7 +9,7 @@ import unittest
 
 """___LIME_TBX Modules___"""
 from ..spice_adapter import SPICEAdapter, ISPICEAdapter
-from ...datatypes.datatypes import MoonData
+from ...datatypes.datatypes import KernelsPath, MoonData
 
 
 """___Authorship___"""
@@ -22,26 +22,26 @@ __status__ = "Development"
 LAT = 21
 LON = 21
 ALT = 2400
-KERNELS_PATH = "./kernels"
-DT1 = datetime(2022, 1, 17, 2)
-DT2 = datetime(2022, 2, 16, 2)
+KERNELS_PATH = KernelsPath("./kernels", "./kernels")
+DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
+DT2 = datetime(2022, 2, 16, 2, tzinfo=timezone.utc)
 MD1 = MoonData(
-    0.9863616457381059,
-    398239.6861064414,
-    0.14317166573418066,
-    -4.714231814650785,
-    -2.971616952867521,
-    11.655526370063395,
-    -11.655526370063395,
+    0.9863676197729848,
+    399227.54900652857,
+    0.1343504656066533,
+    -4.658809009228347,
+    -3.139429310609046,
+    11.317038213996295,
+    -11.317038213996295,
 )
 MD2 = MoonData(
-    0.9904004369336903,
-    389056.3599474183,
-    0.05867768649163748,
-    -6.246903062051175,
-    -4.90385616224728,
-    9.473277579252443,
-    -9.473277579252443,
+    0.9904106311343145,
+    389941.3911970312,
+    0.049851687502014026,
+    -6.15147366076081,
+    -5.052383178500747,
+    9.11726084520294,
+    -9.11726084520294,
 )
 
 

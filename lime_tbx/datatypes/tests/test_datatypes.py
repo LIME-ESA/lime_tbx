@@ -1,7 +1,7 @@
 """Tests for datatypes module"""
 
 """___Built-In Modules___"""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 
@@ -127,9 +127,9 @@ class TestApolloIrradianceCoefficients(unittest.TestCase):
     pass
 
 
-DT1 = datetime(2000, 1, 16, 2)
-DT2 = datetime(2022, 1, 17, 3)
-DT3 = datetime(2032, 1, 17, 3)
+DT1 = datetime(2000, 1, 16, 2, tzinfo=timezone.utc)
+DT2 = datetime(2022, 1, 17, 3, tzinfo=timezone.utc)
+DT3 = datetime(2032, 1, 17, 3, tzinfo=timezone.utc)
 
 
 class TestSatellite(unittest.TestCase):
@@ -227,7 +227,7 @@ class TestReflectanceCoefficients(unittest.TestCase):
         u_data = np.array([i * U_COEFF_LINE for i in range(1, 7)])
         ds_cimel.coeff.values = data.T
         ds_cimel.u_coeff.values = u_data.T
-        coeffs = ReflectanceCoefficients(ds_cimel)
+        coeffs = ReflectanceCoefficients(ds_cimel, "Test")
         self.assertEqual(len(coeffs.coeffs.a_coeffs), 4)
         for i in range(4):  # a coeffs are 4 coefficients
             a_coeffs = coeffs.coeffs.a_coeffs[i]

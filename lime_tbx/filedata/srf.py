@@ -8,6 +8,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 import os
+import logging
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -25,6 +26,10 @@ __created__ = "20/05/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
+
+_READ_FILE_ERROR_STR = (
+    "There was a problem while loading the file. See log for details."
+)
 
 
 def _calc_factor_to_nm(units: str) -> float:
@@ -61,26 +66,30 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
     srf: SpectralResponseFunction
         Generated SpectralResponseFunction data object.
     """
-    ds = nc.Dataset(filepath)
-    n_channels = len(ds["channel"])
-    wvlens = [[] for _ in range(n_channels)]
-    factors = [[] for _ in range(n_channels)]
-    wlen_units: str = ds["wavelength"].units
-    f_to_nm = _calc_factor_to_nm(wlen_units)
-    for wvlen_arr in ds["wavelength"]:
-        for i in range(len(wvlen_arr)):
-            _append_if_not_masked(wvlens[i], wvlen_arr[i], f_to_nm)
-    for factor_arr in ds["srf"]:
-        for i in range(len(factor_arr)):
-            _append_if_not_masked(factors[i], factor_arr[i])
-    channels = []
-    ch_units: str = ds["channel"].units
-    ch_f_to_nm = _calc_factor_to_nm(ch_units)
-    for i in range(n_channels):
-        channel_spec_resp = dict(zip(wvlens[i], factors[i]))
-        center = float(ds["channel"][i].data) * ch_f_to_nm
-        c_id = ds["channel_id"][i]
-        channel = SRFChannel(center, c_id, channel_spec_resp)
-        channels.append(channel)
-    name = os.path.basename(filepath)
-    return SpectralResponseFunction(name, channels)
+    try:
+        ds = nc.Dataset(filepath)
+        n_channels = len(ds["channel"])
+        wvlens = [[] for _ in range(n_channels)]
+        factors = [[] for _ in range(n_channels)]
+        wlen_units: str = ds["wavelength"].units
+        f_to_nm = _calc_factor_to_nm(wlen_units)
+        for wvlen_arr in ds["wavelength"]:
+            for i in range(len(wvlen_arr)):
+                _append_if_not_masked(wvlens[i], wvlen_arr[i], f_to_nm)
+        for factor_arr in ds["srf"]:
+            for i in range(len(factor_arr)):
+                _append_if_not_masked(factors[i], factor_arr[i])
+        channels = []
+        ch_units: str = ds["channel"].units
+        ch_f_to_nm = _calc_factor_to_nm(ch_units)
+        for i in range(n_channels):
+            channel_spec_resp = dict(zip(wvlens[i], factors[i]))
+            center = float(ds["channel"][i].data) * ch_f_to_nm
+            c_id = ds["channel_id"][i]
+            channel = SRFChannel(center, c_id, channel_spec_resp)
+            channels.append(channel)
+        name = os.path.basename(filepath)
+        return SpectralResponseFunction(name, channels)
+    except Exception as e:
+        logging.critical(e)
+        raise Exception(_READ_FILE_ERROR_STR)

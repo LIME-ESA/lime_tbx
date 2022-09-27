@@ -1,7 +1,7 @@
 """Tests for csv module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 import filecmp
 
 
@@ -37,8 +37,8 @@ DATA = [0.0001, 0.0002, 0.0001, 0.0002, 0.0001, 0.0003]
 DATA2 = [0.0002, 0.0001, 0.0002, 0.0002, 0.0003, 0.0003]
 UNCS = [0, 0, 0, 0.0000000001, 0, 0]
 UNCS2 = [0.000002, 0, 0, 0.0000000001, 0, 0]
-DT1 = datetime(2018, 2, 27, 2)
-DT2 = datetime(2019, 2, 23, 2)
+DT1 = datetime(2018, 2, 27, 2, tzinfo=timezone.utc)
+DT2 = datetime(2019, 2, 23, 2, tzinfo=timezone.utc)
 SPOINT = SurfacePoint(43, 45, 4500, DT1)
 SPOINT2 = SurfacePoint(42, 45, 4500, [DT1, DT2])
 SPOINT3 = SurfacePoint(43, 45, 4500, DT2)
@@ -50,14 +50,14 @@ SD1 = SpectralData(WLENS, DATA, UNCS, None)
 SD2 = SpectralData(WLENS, DATA2, UNCS2, None)
 
 DTS = [
-    datetime(2022, 1, 17, 2, 30),
-    datetime(2022, 1, 26, 3, 25, 14),
-    datetime(2022, 1, 11, 3, 21, 4),
-    datetime(2022, 1, 13, 5, 29, 34),
-    datetime(2022, 1, 15, 7, 28, 14),
-    datetime(2022, 1, 16, 7, 23, 4),
-    datetime(2022, 1, 13, 3, 26, 34),
-    datetime(2022, 1, 14, 11, 22, 4),
+    datetime(2022, 1, 17, 2, 30, tzinfo=timezone.utc),
+    datetime(2022, 1, 26, 3, 25, 14, tzinfo=timezone.utc),
+    datetime(2022, 1, 11, 3, 21, 4, tzinfo=timezone.utc),
+    datetime(2022, 1, 13, 5, 29, 34, tzinfo=timezone.utc),
+    datetime(2022, 1, 15, 7, 28, 14, tzinfo=timezone.utc),
+    datetime(2022, 1, 16, 7, 23, 4, tzinfo=timezone.utc),
+    datetime(2022, 1, 13, 3, 26, 34, tzinfo=timezone.utc),
+    datetime(2022, 1, 14, 11, 22, 4, tzinfo=timezone.utc),
 ]
 
 
@@ -76,29 +76,29 @@ def get_srf() -> SpectralResponseFunction:
 class TestCSV(unittest.TestCase):
     def test_export_csv_1(self):
         path = "./test_files/csv/export_1.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", SPOINT, path)
+        export_csv(SD1, "Wavelength", "Irradiance", SPOINT, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
     def test_export_csv_2(self):
         path = "./test_files/csv/export_2.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", CPOINT, path)
+        export_csv(SD1, "Wavelength", "Irradiance", CPOINT, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
     def test_export_csv_3(self):
         path = "./test_files/csv/export_3.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", SATPOINT, path)
+        export_csv(SD1, "Wavelength", "Irradiance", SATPOINT, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
     def test_export_csv_4(self):
         data = [SD1, SD2]
         path = "./test_files/csv/export_4.test.csv"
-        export_csv(data, "Wavelength", "Irradiance", SPOINT2, path)
+        export_csv(data, "Wavelength", "Irradiance", SPOINT2, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_4.csv"))
 
     def test_export_csv_5(self):
         data = [SD1, SD2]
         path = "./test_files/csv/export_5.test.csv"
-        export_csv(data, "Wavelength", "Irradiance", SATPOINT2, path)
+        export_csv(data, "Wavelength", "Irradiance", SATPOINT2, path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
     def test_export_csv_comparation_1(self):
@@ -107,7 +107,7 @@ class TestCSV(unittest.TestCase):
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
-        export_csv_comparation(data, "Signal", [SPOINT, SPOINT3], path)
+        export_csv_comparation(data, "Signal", [SPOINT, SPOINT3], path, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 
     def test_export_csv_integrated_irradiance(self):
@@ -120,7 +120,7 @@ class TestCSV(unittest.TestCase):
         )
         data = SpectralData(WLENS, signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
-        export_csv_integrated_irradiance(srf, data, path, SPOINT2)
+        export_csv_integrated_irradiance(srf, data, path, SPOINT2, "test")
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
 
     def test_read_datetimes(self):

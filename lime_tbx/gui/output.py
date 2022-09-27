@@ -2,6 +2,7 @@
 
 """___Built-In Modules___"""
 from typing import Union, List, Tuple
+import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -11,6 +12,7 @@ from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
+from matplotlib import font_manager as fm
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -25,7 +27,10 @@ from ..datatypes.datatypes import (
     CustomPoint,
     SpectralData,
 )
+from . import constants
+from lime_tbx.gui.settings import ISettingsManager
 from ..filedata import csv
+from .ifaces import IMainSimulationsWidget
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -42,9 +47,28 @@ class MplCanvas(FigureCanvas):
         super(MplCanvas, self).__init__(self.fig)
 
 
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+dir_font_path = os.path.dirname(os.path.join(_current_dir, constants.ESAFONT_PATH))
+font_dirs = [dir_font_path]
+font_files = fm.findSystemFonts(fontpaths=font_dirs, fontext="otf")
+for font_file in font_files:
+    fm.fontManager.addfont(font_file)
+title_font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"], weight="bold")
+font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"])
+
+
 class GraphWidget(QtWidgets.QWidget):
-    def __init__(self, title="", xlabel="", ylabel=""):
-        super().__init__()
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        title="",
+        xlabel="",
+        ylabel="",
+        parent=None,
+    ):
+        super().__init__(parent)
+        self._init_parent = parent
+        self.settings_manager = settings_manager
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
@@ -60,9 +84,20 @@ class GraphWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # canvas
         self.canvas = MplCanvas(self)
-        self.canvas.axes.set_title(self.title)
-        self.canvas.axes.set_xlabel(self.xlabel)
-        self.canvas.axes.set_ylabel(self.ylabel)
+        self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
+        self.canvas.axes.tick_params(labelsize=8)
+        version = self.settings_manager.get_cimel_coef().version
+        subtitle = "LIME2 coefficients version: {}".format(version)
+        ay2 = self.canvas.axes.twiny()
+        ay2.set_xlabel(subtitle, fontproperties=font_prop)
+        ay2.tick_params(
+            axis="x",
+            which="both",
+            top=False,
+            labeltop=False,
+        )
+        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=title_font_prop)
+        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=title_font_prop)
         self.toolbar = NavigationToolbar(self.canvas, self)
         self._redraw()
         # save buttons
@@ -84,6 +119,8 @@ class GraphWidget(QtWidgets.QWidget):
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
         self.csv_button.setDisabled(disable)
+        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
+            self._init_parent.set_export_button_disabled(disable)
 
     def update_plot(
         self,
@@ -211,6 +248,7 @@ class GraphWidget(QtWidgets.QWidget):
                     label="ASD data points, scaled to LIME at 500nm",
                 )
 
+            data_compare_info = ""
             if self.data_compare:
                 iter_data = self.data_compare.diffs_signal
                 if not isinstance(iter_data, list):
@@ -244,31 +282,30 @@ class GraphWidget(QtWidgets.QWidget):
                             max(0.05, max(data_comp.data) + 0.05),
                         )
                     )
-                    ax2.text(
-                        0.85,
-                        0.85,
-                        "MRD: {:.4f}\nσ: {:.4f}".format(
-                            self.data_compare.mean_relative_difference,
-                            self.data_compare.standard_deviation_mrd,
-                        ),
-                        horizontalalignment="center",
-                        verticalalignment="center",
-                        transform=ax2.transAxes,
+                    data_compare_info = "MRD: {:.4f}\nσ: {:.4f}".format(
+                        self.data_compare.mean_relative_difference,
+                        self.data_compare.standard_deviation_mrd,
                     )
-                ax2.set_ylabel("Relative difference (Fraction of unity)")
+                    lines += self.canvas.axes.plot([], [], " ", label=data_compare_info)
+                ax2.set_ylabel(
+                    "Relative difference (Fraction of unity)",
+                    fontproperties=title_font_prop,
+                )
                 plt.setp(
                     self.canvas.axes.get_xticklabels(),
                     rotation=30,
                     horizontalalignment="right",
                 )
             if len(self.legend) > 0:
-                # added these three lines
-                labels = [l.get_label() for l in lines]
-                self.canvas.axes.legend(lines, labels, loc=0)
+                legend_lines = [
+                    l for l in lines if not l.get_label().startswith("_child")
+                ]
+                labels = [l.get_label() for l in legend_lines]
+                self.canvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
 
-        self.canvas.axes.set_title(self.title)
-        self.canvas.axes.set_xlabel(self.xlabel)
-        self.canvas.axes.set_ylabel(self.ylabel)
+        self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
+        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=title_font_prop)
+        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=title_font_prop)
         try:
             self.canvas.fig.tight_layout()
         except:
@@ -276,9 +313,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.draw()
 
     def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QErrorMessage(self)
-        error_dialog.showMessage(str(error))
-        raise error
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
     @QtCore.Slot()
     def export_graph(self):
@@ -302,6 +338,7 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
+        version = self.settings_manager.get_cimel_coef().version
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
@@ -310,6 +347,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.ylabel,
                         self.point,
                         name,
+                        version,
                     )
                 else:
                     csv.export_csv(
@@ -318,6 +356,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.ylabel,
                         self.point,
                         name,
+                        version,
                     )
             except Exception as e:
                 self.show_error(e)
@@ -326,8 +365,9 @@ class GraphWidget(QtWidgets.QWidget):
 
 
 class SignalWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, settings_manager: ISettingsManager, parent=None):
         super().__init__(parent)
+        self.settings_manager = settings_manager
         self._build_layout()
 
     def _build_layout(self):
@@ -442,9 +482,8 @@ for wavelengths between 350 and 2500 nm"
         self.button_csv.setDisabled(disable)
 
     def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QErrorMessage(self)
-        error_dialog.showMessage(str(error))
-        raise error
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
 
     @QtCore.Slot()
     def export_csv(self):
@@ -453,10 +492,11 @@ for wavelengths between 350 and 2500 nm"
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
+        version = self.settings_manager.get_cimel_coef().version
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(
-                    self.srf, self.signals, name, self.point
+                    self.srf, self.signals, name, self.point, version
                 )
             except Exception as e:
                 self.show_error(e)
@@ -465,8 +505,9 @@ for wavelengths between 350 and 2500 nm"
 
 
 class ComparisonOutput(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, settings_manager: ISettingsManager):
         super().__init__()
+        self.settings_manager = settings_manager
         self.channels: List[GraphWidget] = []
         self.ch_names = []
         self._build_layout()
@@ -485,7 +526,7 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.channels.clear()
         self.ch_names = []
         for ch in channels:
-            channel = GraphWidget(ch)
+            channel = GraphWidget(self.settings_manager, ch)
             self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)

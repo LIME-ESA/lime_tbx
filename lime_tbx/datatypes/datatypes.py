@@ -619,15 +619,6 @@ class LunarObservation:
         return True
 
 
-@dataclass
-class LunarObservationWrite(LunarObservation):
-    "Dataclass containing the needed information to create a GLOD file."
-    signals_uncs: np.ndarray
-    irrs: "SpectralData"
-    refls: "SpectralData"
-    polars: "SpectralData"
-
-
 class ReflectanceCoefficients:
     """
     Set of coefficients from the same version. Used in order to calculate the reflectance
@@ -643,9 +634,11 @@ class ReflectanceCoefficients:
         Reflectance Coefficients, with an attribute for every coefficient group, a matrix each.
     unc_coeffs: _WlenReflCoeffs
         Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
+    version: str
+        Version name of the coefficients
     """
 
-    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs", "version"]
 
     @dataclass
     class _WlenReflCoeffs:
@@ -674,13 +667,14 @@ class ReflectanceCoefficients:
             self.d_coeffs = coeffs[11:14, :]
             self.p_coeffs = coeffs[14::, :]
 
-    def __init__(self, _ds: xarray.Dataset):
+    def __init__(self, _ds: xarray.Dataset, version: str):
         self._ds = _ds
         self.wlens: np.ndarray = _ds.wavelength.values
         coeffs: np.ndarray = _ds.coeff.values
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = _ds.u_coeff.values
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
+        self.version = version
 
 
 @dataclass
@@ -823,3 +817,83 @@ class KernelsPath:
 
     main_kernels_path: str
     custom_kernel_path: str
+
+
+@dataclass
+class SelenographicDataWrite:
+    """
+    Extra data that allowes to define CustomPoints in the GLOD data file.
+
+    Attributes
+    ----------
+    distance_sun_moon : float
+        Distance between the Sun and the Moon (in astronomical units)
+    selen_sun_lon_rad : float
+        Selenographic longitude of the Sun (in radians)
+    mpa_degrees : float
+        Moon phase angle (in degrees)
+    """
+
+    distance_sun_moon: float
+    selen_sun_lon_rad: float
+    mpa_degrees: float
+
+
+@dataclass
+class LunarObservationWrite:
+    """Dataclass containing the needed information to create a Lunar observation in a LGLOD file.
+
+    Attributes
+    ----------
+    ch_names: list of str
+        Names of the channels present
+    sat_pos_ref: str
+        Name of the reference system (usually ITRF93)
+    ch_irrs: dict of str and float
+        Irradiances relative to each channel. The key is the channel name, and the irradiance
+        is given in Wm⁻²nm⁻¹.
+    dt: datetime
+        Datetime of the observation.
+    sat_pos: SatellitePosition
+        Satellite position at that moment.
+    """
+
+    ch_names: List[str]
+    sat_pos_ref: str
+    dt: datetime
+    sat_pos: SatellitePosition
+    irrs: "SpectralData"
+    refls: "SpectralData"
+    polars: "SpectralData"
+    sat_name: str  # if None or empty: SurfacePoint
+    selenographic_data: SelenographicDataWrite  # if None: not selenographic
+
+    def has_ch_value(self, name: str) -> bool:
+        return name in self.ch_names
+
+    def check_valid_srf(self, srf: SpectralResponseFunction) -> bool:
+        for ch in self.ch_names:
+            found = False
+            for ch_srf in srf.channels:
+                if ch_srf.id == ch:
+                    found = True
+                    break
+            if not found:
+                return False
+        return True
+
+
+@dataclass
+class LGLODData:
+    observations: List[LunarObservationWrite]
+    signals: "SpectralData"
+    not_default_srf: bool
+    elis_cimel: List["SpectralData"]
+    elrefs_cimel: List["SpectralData"]
+
+
+@dataclass
+class LGLODComparisonData:
+    comparisons: List[ComparisonData]
+    ch_names: List[str]
+    sat_name: str

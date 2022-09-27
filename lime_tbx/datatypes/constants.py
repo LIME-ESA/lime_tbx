@@ -1,2 +1,5 @@
 MIN_WLEN = 350
 MAX_WLEN = 2500
+DEFAULT_SRF_NAME = "Default"
+EARTH_FRAME = "IAU_EARTH"  # should be "ITRF93"
+MOON_FRAME = "IAU_MOON"  # should be "MOON_ME"

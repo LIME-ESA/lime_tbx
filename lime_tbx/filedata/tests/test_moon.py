@@ -1,7 +1,7 @@
 """Tests for moon module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 from lime_tbx.datatypes.datatypes import SatellitePosition
 
@@ -31,7 +31,7 @@ class TestMoon(unittest.TestCase):
             "VIS008": 1.6566640151377671e-06,
             "NIR016": 5.949228451947656e-07,
         }
-        dt = datetime(2014, 3, 18, 15, 1, 12, 25)
+        dt = datetime(2014, 3, 18, 14, 1, 12, 25, tzinfo=timezone.utc)
         sat_pos = SatellitePosition(
             42164.81038833844, -75.0548191222299, 66.49362502083844
         )

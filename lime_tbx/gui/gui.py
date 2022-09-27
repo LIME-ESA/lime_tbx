@@ -25,9 +25,10 @@ class GUI:
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
-        window = maingui.LimeTBXWindow()
+        self._init_fonts()
+        window = maingui.LimeTBXWindow(kernels_path)
         main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path)
-        # window.resize(400, 400)
+        window.resize(850, 850)
         window.setCentralWidget(main_widget)
         window.show()
         window.setWindowTitle(constants.APPLICATION_NAME)
@@ -37,8 +38,20 @@ class GUI:
         _current_dir = os.path.dirname(os.path.abspath(__file__))
         logo_path = os.path.join(_current_dir, constants.LOGO_PATH)
         window.setWindowIcon(QtGui.QIcon(logo_path))
-        if sys.platform == 'win32':
+        if sys.platform == "win32":
             import ctypes
-            myappid = u'esa.lime.limetbx'
+
+            myappid = "esa.lime.limetbx"
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         sys.exit(app.exec_())
+
+    def _init_fonts(self):
+        _current_dir = os.path.dirname(os.path.abspath(__file__))
+        bold_path = os.path.join(_current_dir, constants.ESABOLDFONT_PATH)
+        id = QtGui.QFontDatabase.addApplicationFont(bold_path)
+        if id < 0:
+            raise ("Error loading fonts.")
+        reg_path = os.path.join(_current_dir, constants.ESAFONT_PATH)
+        id = QtGui.QFontDatabase.addApplicationFont(reg_path)
+        if id < 0:
+            raise ("Error loading fonts.")

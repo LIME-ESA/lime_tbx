@@ -50,7 +50,10 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.selection_layout.addWidget(self.load_button)
         # Graph
         self.graph = output.GraphWidget(
-            "SRF", "Wavelengths (nm)", "Intensity (Fractions of unity)"
+            self.settings_manager,
+            "SRF",
+            "Wavelengths (nm)",
+            "Intensity (Fractions of unity)",
         )
         # Finish main
         self.main_layout.addLayout(self.selection_layout)
@@ -77,10 +80,22 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.combo_srf.setCurrentIndex(index)
         self.combobox_listen = True
 
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     @QtCore.Slot()
     def load_srf(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        srf = file_srf.read_srf(path)
+        try:
+            srf = file_srf.read_srf(path)
+        except Exception as e:
+            self.show_error(e)
+        else:
+            self.set_srf(srf)
+
+    @QtCore.Slot()
+    def set_srf(self, srf):
         self.loaded_srf = srf
         self.settings_manager.load_srf(srf)
         self.settings_manager.select_srf(-1)

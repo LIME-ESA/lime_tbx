@@ -4,18 +4,25 @@
 from typing import List, Union, Tuple
 from abc import ABC, abstractmethod
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 """___Third-Party Modules___"""
 import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
+    CustomPoint,
+    LGLODData,
+    LunarObservationWrite,
     MoonData,
     Point,
     PolarizationCoefficients,
+    SatellitePoint,
     SpectralResponseFunction,
     SpectralData,
     ReflectanceCoefficients,
     KernelsPath,
+    SurfacePoint,
 )
 
 from lime_tbx.lime_algorithms.rolo import rolo
@@ -140,13 +147,13 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
-    def get_signals(self) -> Union[SpectralData, List[SpectralData]]:
+    def get_signals(self) -> SpectralData:
         """
         Returns the stored value for integrated signals
 
         Returns
         -------
-        elrefs: SpectralData | list of SpectralData
+        signals: SpectralData
             Previously calculated integrated signal/s
         """
         pass
@@ -211,6 +218,31 @@ class ILimeSimulation(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
+        """
+        Returns the Satellites points converted to the equivalent of surface points.
+        In case they weren't Satellite Points, the behaviour is not defined.
+
+        Returns
+        -------
+        surface_points: SurfacePoint | list of SurfacePoint | None
+            Equivalent surface points
+        """
+        pass
+
+    @abstractmethod
+    def get_point(self) -> Point:
+        """
+        Returns the point that is being used in the simulation
+
+        Returns
+        -------
+        point: Point
+            The point used in the simulation.
+        """
+        pass
+
 
 class LimeSimulation(ILimeSimulation):
     """
@@ -241,13 +273,15 @@ class LimeSimulation(ILimeSimulation):
         self.wlens: List[float] = []
         self.elref: Union[SpectralData, List[SpectralData]] = None
         self.elis: Union[SpectralData, List[SpectralData]] = None
-        self.signals: Union[SpectralData, List[SpectralData]] = None
+        self.signals: SpectralData = None
         self.elref_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elref_asd: Union[SpectralData, List[SpectralData]] = None
         self.elis_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elis_asd: Union[SpectralData, List[SpectralData]] = None
         self.polars: Union[SpectralData, List[SpectralData]] = None
         self.srf: SpectralResponseFunction = None
+        self.surfaces_of_sat: Tuple[SurfacePoint, List[SurfacePoint], None] = None
+        self.point: Point = None
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
@@ -268,7 +302,18 @@ class LimeSimulation(ILimeSimulation):
 
     def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
         if not self.mds_uptodate:
-            self.mds = MoonDataFactory.get_md(point, self.eocfi_path, self.kernels_path)
+            if isinstance(point, SatellitePoint):
+                (
+                    self.mds,
+                    self.surfaces_of_sat,
+                ) = MoonDataFactory.get_md_and_surfaces_from_satellite(
+                    point, self.eocfi_path, self.kernels_path
+                )
+            else:
+                self.mds = MoonDataFactory.get_md(
+                    point, self.eocfi_path, self.kernels_path
+                )
+            self.point = point
             self.mds_uptodate = True
         if not self.srf_updtodate:
             self.srf = srf
@@ -512,13 +557,77 @@ class LimeSimulation(ILimeSimulation):
         sp_d = SpectralData(channel_ids, signals, uncs, ds_pol)
         return sp_d
 
+    def set_observations(self, lglod: LGLODData, srf: SpectralResponseFunction):
+        obss = lglod.observations
+        self.elref = [obs.refls for obs in obss]
+        self.elref_cimel = lglod.elrefs_cimel
+        self.elref_asd = None
+        self.elis = [obs.irrs for obs in obss]
+        self.elis_cimel = lglod.elis_cimel
+        self.elis_asd = None
+        self.polars = [obs.polars for obs in obss]
+        if obss[0].dt == None:
+            dts = []
+        else:
+            dts = [obs.dt for obs in obss]
+        signals = lglod.signals
+        ds_sign = SpectralData.make_signals_ds(
+            signals.wlens,
+            signals.data.T,
+            signals.uncertainties.T,
+        )
+        self.signals = SpectralData(
+            signals.wlens,
+            signals.data.T,
+            signals.uncertainties.T,
+            ds_sign,
+        )
+        if not dts:
+            sel = obss[0].selenographic_data
+            lat, lon, alt = SPICEAdapter.to_planetographic(
+                obss[0].sat_pos.x,
+                obss[0].sat_pos.y,
+                obss[0].sat_pos.z,
+                "MOON",
+                self.kernels_path.main_kernels_path,
+            )
+            point = CustomPoint(
+                sel.distance_sun_moon,
+                alt / 1000,
+                lat,
+                lon,
+                sel.selen_sun_lon_rad,
+                abs(sel.mpa_degrees),
+                sel.mpa_degrees,
+            )
+        elif not obss[0].sat_name or obss[0].sat_name == "":
+            point = SurfacePoint(
+                *SPICEAdapter.to_planetographic(
+                    obss[0].sat_pos.x,
+                    obss[0].sat_pos.y,
+                    obss[0].sat_pos.z,
+                    "EARTH",
+                    self.kernels_path.main_kernels_path,
+                ),
+                dts
+            )
+        else:
+            point = SatellitePoint(obss[0].sat_name, dts)
+        self._save_parameters(srf, point)
+        self.refl_uptodate = True
+        self.irr_uptodate = True
+        self.pol_uptodate = True
+        self.signals_uptodate = True
+        if self.verbose:
+            print("observations loaded")
+
     def get_elrefs(self) -> Union[SpectralData, List[SpectralData]]:
         return self.elref
 
     def get_elis(self) -> Union[SpectralData, List[SpectralData]]:
         return self.elis
 
-    def get_signals(self) -> Union[SpectralData, List[SpectralData]]:
+    def get_signals(self) -> SpectralData:
         return self.signals
 
     def get_elrefs_cimel(self) -> Union[SpectralData, List[SpectralData]]:
@@ -535,3 +644,9 @@ class LimeSimulation(ILimeSimulation):
 
     def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
         return self.polars
+
+    def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
+        return self.surfaces_of_sat
+
+    def get_point(self) -> Point:
+        return self.point

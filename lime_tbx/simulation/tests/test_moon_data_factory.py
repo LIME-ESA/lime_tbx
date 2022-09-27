@@ -1,7 +1,7 @@
 """Tests for moon_data_factory module"""
 
 """___Built-In Modules___"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Third-Party Modules___"""
 import unittest
@@ -29,19 +29,19 @@ EOCFI_PATH = "./eocfi_data"
 LAT = 21
 LON = 21
 ALT = 2400
-DT1 = datetime(2022, 1, 17, 2)
-DT2 = datetime(2022, 2, 16, 2)
+DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
+DT2 = datetime(2022, 2, 16, 2, tzinfo=timezone.utc)
 
 SURFACE_POINT = SurfacePoint(LAT, LON, ALT, DT1)
 SURFACE_POINT_DTS = SurfacePoint(LAT, LON, ALT, [DT1, DT2])
 CUSTOM_POINT = CustomPoint(
-    0.9863616457381059,
-    398239.6861064414,
-    -4.714231814650785,
-    -2.971616952867521,
-    0.14317166573418066,
-    11.655526370063395,
-    -11.655526370063395,
+    0.9863676197729848,
+    399227.54900652857,
+    -4.658809009228347,
+    -3.139429310609046,
+    0.1343504656066533,
+    11.317038213996295,
+    -11.317038213996295,
 )
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 
@@ -107,13 +107,13 @@ class TestMoonDataFactory(unittest.TestCase):
         md = MoonDataFactory.get_md_from_satellite(
             SATELLITE_POINT, EOCFI_PATH, KERNELS_PATH
         )
-        self.assertEqual(md.distance_sun_moon, 0.9863616457381059)
-        self.assertEqual(md.distance_observer_moon, 397829.4561003645)
-        self.assertEqual(md.long_sun_radians, 0.14317166573418066)
-        self.assertEqual(md.lat_obs, -4.179725430705073)
-        self.assertEqual(md.long_obs, -2.171879327665863)
-        self.assertEqual(md.absolute_mpa_degrees, 10.743032878019648)
-        self.assertEqual(md.mpa_degrees, -10.743032878019648)
+        self.assertEqual(md.distance_sun_moon, 0.9863676197729848)
+        self.assertEqual(md.distance_observer_moon, 397649.0852953482)
+        self.assertEqual(md.long_sun_radians, 0.1343504656066533)
+        self.assertEqual(md.lat_obs, -4.212019140774863)
+        self.assertEqual(md.long_obs, -2.317270553226024)
+        self.assertEqual(md.absolute_mpa_degrees, 10.40518474224147)
+        self.assertEqual(md.mpa_degrees, -10.40518474224147)
 
 
 if __name__ == "__main__":

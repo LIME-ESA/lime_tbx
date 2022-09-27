@@ -10,9 +10,8 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 from ctypes import *
 from typing import Tuple, List
-from datetime import datetime
+from datetime import datetime, timezone
 import os
-import pkgutil
 import platform
 
 """___Third-Party Modules___"""
@@ -65,11 +64,11 @@ def _make_clist(lst: List[str]):
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     splitted = filename.split("_")
-    date0 = datetime.strptime(splitted[-3], "%Y%m%dT%H%M%S")
+    date0 = datetime.strptime(splitted[-3] + "+00:00", "%Y%m%dT%H%M%S%z")
     if splitted[-2] == "99999999T999999":
-        date1 = datetime(9999, 12, 31, 23, 59, 59)
+        date1 = datetime(9999, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
     else:
-        date1 = datetime.strptime(splitted[-2], "%Y%m%dT%H%M%S")
+        date1 = datetime.strptime(splitted[-2] + "+00:00", "%Y%m%dT%H%M%S%z")
     return date0, date1
 
 
@@ -172,6 +171,8 @@ class EOCFIConverter(IEOCFIConverter):
             sat_data: dict = sat_yaml.get(s)
             id = sat_data["id"]
             orbit_files_names = sat_data["orbit_files"]
+            if orbit_files_names == None:
+                orbit_files_names = []
             orbit_files = []
             for file in orbit_files_names:
                 d0, df = _get_file_datetimes(file)
@@ -207,18 +208,20 @@ class EOCFIConverter(IEOCFIConverter):
             raise Exception("Satellite is not registered in LIME's satellite list.")
         sat: Satellite = [s for s in self.get_sat_list() if s.name == sat][0]
         orb_f = sat.get_best_orbit_file(dt)
-        if orb_f == None:
-            raise Exception(
-                "The satellite position can't be calculated for the given datetime."
-            )
-        # hay que hacer que esto sea un array
-        orbit_files = [
-            os.path.join(
-                self.eocfi_path,
-                f"data/mission_configuration_files/{orb_f.name}",
-            )
-        ]
-
+        if sat.orbit_files:
+            if orb_f == None:
+                raise Exception(
+                    "The satellite position can't be calculated for the given datetime."
+                )
+            # We have to make this a list/array
+            orbit_files = [
+                os.path.join(
+                    self.eocfi_path,
+                    f"data/mission_configuration_files/{orb_f.name}",
+                )
+            ]
+        else:
+            orbit_files = []
         fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
         metadata = yaml.load(fl, Loader=yaml.FullLoader)
         fl.close()
