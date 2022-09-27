@@ -1,7 +1,14 @@
 @esaBackground = #001923
+@deepSpace1 = #335e6f
+@deepSpace2 = #8197a6
 @deepSpace = #003247
 @neutralSpace = #e8e8e4
+@pureTeal2 = #006762
+@pureTeal1 = #008e7a
 @pureTeal = #00ae9d
 @trustyAzure = #009bdb
 @limeGreen = #30b855
 @limeBlack = #241f20
+@lightGray = #a9a9a9
+@darkGray = #404040
+@disabledGray = #656565

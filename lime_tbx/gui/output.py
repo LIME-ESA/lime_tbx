@@ -53,7 +53,10 @@ font_dirs = [dir_font_path]
 font_files = fm.findSystemFonts(fontpaths=font_dirs, fontext="otf")
 for font_file in font_files:
     fm.fontManager.addfont(font_file)
-title_font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"], weight="bold")
+title_font_prop = fm.FontProperties(
+    family=["NotesESA", "sans-serif"], weight="bold", size="large"
+)
+label_font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"], weight="bold")
 font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"])
 
 
@@ -96,8 +99,8 @@ class GraphWidget(QtWidgets.QWidget):
             top=False,
             labeltop=False,
         )
-        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=title_font_prop)
-        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=title_font_prop)
+        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
+        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
         self.toolbar = NavigationToolbar(self.canvas, self)
         self._redraw()
         # save buttons
@@ -289,7 +292,7 @@ class GraphWidget(QtWidgets.QWidget):
                     lines += self.canvas.axes.plot([], [], " ", label=data_compare_info)
                 ax2.set_ylabel(
                     "Relative difference (Fraction of unity)",
-                    fontproperties=title_font_prop,
+                    fontproperties=label_font_prop,
                 )
                 plt.setp(
                     self.canvas.axes.get_xticklabels(),
@@ -304,8 +307,8 @@ class GraphWidget(QtWidgets.QWidget):
                 self.canvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
 
         self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
-        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=title_font_prop)
-        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=title_font_prop)
+        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
+        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
         try:
             self.canvas.fig.tight_layout()
         except:
