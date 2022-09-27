@@ -278,7 +278,9 @@ QComboBox QAbstractItemView
 
 QComboBox QAbstractItemView:disabled
 {
-	color: @lightGray
+    background-color: @lightGray;
+    selection-background-color: @lightGray;
+	color: @lightGray;
 
 }
 
