@@ -106,7 +106,7 @@ class CLI:
         csv.export_csv(
             self.lime_simulation.get_elis(),
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²/nm)",
+            "Irradiances  ($W m^{-2} nm^{-1}$)",
             point,
             o_file_irr,
             version,
@@ -230,7 +230,7 @@ class CLI:
                 if len(comps[i].dts) > 0:
                     data = [comps[i].observed_signal, comps[i].simulated_signal]
                     points = comps[i].points
-                    ylabel = "Signal (Wm⁻²nm⁻¹)"
+                    ylabel = "Signal ($W m^{-2} nm^{-1}$)"
                     output = ""
                     if isinstance(ed, ExportComparisonCSV):
                         output = ed.output_files[file_index]

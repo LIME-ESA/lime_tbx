@@ -361,7 +361,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     i,
                     "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                     "datetimes",
-                    "Signal (Wm⁻²nm⁻¹)",
+                    "Signal ($W m^{-2} nm^{-1}$)",
                 )
                 self.output.update_legends(
                     i,
@@ -397,7 +397,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 i,
                 "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                 "datetimes",
-                "Signal (Wm⁻²nm⁻¹)",
+                "Signal ($W m^{-2} nm^{-1}$)",
             )
             self.output.update_legends(
                 i,
@@ -604,7 +604,7 @@ class MainSimulationsWidget(
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²/nm)",
+            "Irradiances  ($W m^{-2} nm^{-1}$)",
         )
         self.signal_widget.update_signals(data[0], data[1], data[5])
         self.lower_tabs.setCurrentIndex(0)

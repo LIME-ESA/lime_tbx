@@ -227,10 +227,10 @@ def export_csv_integrated_irradiance(
                 if not isinstance(dts, list):
                     dts = [dts]
                 for dt in dts:
-                    irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
+                    irr_titles.append("{} irradiances ($W m^{-2} nm^{-1}$)".format(str(dt)))
                     irr_titles.append("{} uncertainties".format(str(dt)))
             else:
-                irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
+                irr_titles.append("irradiances ($W m^{-2} nm^{-1}$)")
                 irr_titles.append("uncertainties")
             writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
             for i, ch in enumerate(srf.channels):
