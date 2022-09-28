@@ -60,7 +60,7 @@ class SpectralIntegration(ISpectralIntegration):
         """
         Convolve ch_srf and ch_elis over ch_wlens, generating the signal.
         """
-        ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens)
+        ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens)/np.trapz(ch_srf, ch_wlens)
         return ch_signal
 
     def integrate_elis(
