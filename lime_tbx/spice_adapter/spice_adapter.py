@@ -80,7 +80,7 @@ class SPICEAdapter(ISPICEAdapter):
                 altitude,
                 dt,
                 kernels_path.main_kernels_path,
-                #custom_kernel_path=kernels_path.custom_kernel_path,
+                custom_kernel_path=kernels_path.custom_kernel_path,
             )
             mds2 = []
             for md in mds:
@@ -101,7 +101,7 @@ class SPICEAdapter(ISPICEAdapter):
             altitude,
             [dt],
             kernels_path.main_kernels_path,
-            #custom_kernel_path=kernels_path.custom_kernel_path,
+            custom_kernel_path=kernels_path.custom_kernel_path,
         )[0]
         return datatypes.MoonData(
             md.dist_sun_moon_au,
