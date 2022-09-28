@@ -432,7 +432,7 @@ class SignalWidget(QtWidgets.QWidget):
             self.table.setColumnCount(len(dts) * 2 + 2)
             for i, dt in enumerate(dts):
                 item_title_value = QtWidgets.QTableWidgetItem(
-                    "Signal (Wm⁻²nm⁻¹) on {}".format(
+                    "Signal ($W m^{-2} nm^{-1}$) on {}".format(
                         dt.strftime("%Y-%m-%d %H:%M:%S UTC")
                     )
                 )
