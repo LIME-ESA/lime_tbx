@@ -4,8 +4,6 @@ import getopt
 import sys
 from datetime import datetime
 
-from lime_tbx.filedata import csv
-
 """___Third-Party Modules___"""
 # import here
 
@@ -23,6 +21,7 @@ from lime_tbx.coefficients.access_data.appdata import (
     get_programfiles_folder,
 )
 from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.filedata import csv
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -60,8 +59,10 @@ def main():
         sys.exit(2)
     if len(opts) == 0:
         from lime_tbx.gui.gui import GUI
-        if sys.platform.lower().startswith('win'):
+
+        if sys.platform.lower().startswith("win"):
             import ctypes
+
             whnd = ctypes.windll.kernel32.GetConsoleWindow()
             if whnd != 0:
                 ctypes.windll.user32.ShowWindow(whnd, 0)
