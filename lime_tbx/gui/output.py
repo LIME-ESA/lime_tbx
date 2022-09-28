@@ -423,7 +423,7 @@ class SignalWidget(QtWidgets.QWidget):
         self.table.setRowCount(1 + len(signals.data))
         if isinstance(point, CustomPoint):
             self.table.setColumnCount(2 + 2)
-            self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Signal (Wm⁻²nm⁻¹)"))
+            self.table.setItem(0, 2, QtWidgets.QTableWidgetItem(r"Signal ($W m^{-2} nm^{-1}$)"))
             self.table.setItem(0, 3, QtWidgets.QTableWidgetItem("Uncertainties"))
         else:
             dts = point.dt
