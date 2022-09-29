@@ -106,7 +106,7 @@ class CLI:
         csv.export_csv(
             self.lime_simulation.get_elis(),
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²/nm)",
+            "Irradiances  (Wm⁻²nm⁻¹)",
             point,
             o_file_irr,
             version,

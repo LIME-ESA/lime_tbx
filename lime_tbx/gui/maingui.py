@@ -604,7 +604,7 @@ class MainSimulationsWidget(
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²/nm)",
+            "Irradiances  (Wm⁻²nm⁻¹)",
         )
         self.signal_widget.update_signals(data[0], data[1], data[5])
         self.lower_tabs.setCurrentIndex(0)
