@@ -87,12 +87,13 @@ class SRFEditWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_srf(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        try:
-            srf = file_srf.read_srf(path)
-        except Exception as e:
-            self.show_error(e)
-        else:
-            self.set_srf(srf)
+        if path != "":
+            try:
+                srf = file_srf.read_srf(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                self.set_srf(srf)
 
     @QtCore.Slot()
     def set_srf(self, srf):

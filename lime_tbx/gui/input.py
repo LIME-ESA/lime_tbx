@@ -656,16 +656,17 @@ class ComparisonInput(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        try:
-            self.loaded_srf = srf.read_srf(path)
-        except Exception as e:
-            self.show_error(e)
-        else:
-            shown_path = path
-            if len(shown_path) > MAX_PATH_LEN:
-                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-            self.srf_feedback.setText(shown_path)
-            self.callback_change()
+        if path != "":
+            try:
+                self.loaded_srf = srf.read_srf(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                shown_path = path
+                if len(shown_path) > MAX_PATH_LEN:
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+                self.srf_feedback.setText(shown_path)
+                self.callback_change()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
