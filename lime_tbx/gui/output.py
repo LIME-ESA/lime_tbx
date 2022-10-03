@@ -101,7 +101,7 @@ class GraphWidget(QtWidgets.QWidget):
         )
         self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
         self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
-        self.toolbar = NavigationToolbar(self.canvas, self)
+        self._prepare_toolbar()
         self._redraw()
         # save buttons
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -118,6 +118,30 @@ class GraphWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.canvas, 1)
         self.main_layout.addLayout(self.buttons_layout)
+
+    def _prepare_toolbar(self):
+        self.toolbar = NavigationToolbar(self.canvas, self)
+        unwanted_buttons = ["Back", "Forward"]
+        for ta in self.toolbar.actions():
+            ta: QtWidgets.QAction = ta
+            if ta.text() in unwanted_buttons:
+                self.toolbar.removeAction(ta)
+                continue
+            icon = ta.icon()
+            sizes = icon.availableSizes()
+            max_h = max_w = 0
+            for i in range(len(sizes)):
+                max_h = max(max_h, sizes[i].height())
+                max_w = max(max_w, sizes[i].width())
+            pixmap: QtGui.QPixmap = icon.pixmap(QtCore.QSize(max_w, max_h))
+            tmp = pixmap.toImage()
+            color = QtGui.QColor(QtGui.qRgb(232, 232, 228))
+            for h in range(tmp.height()):
+                for w in range(tmp.width()):
+                    color.setAlpha(tmp.pixelColor(w, h).alpha())
+                    tmp.setPixelColor(w, h, color)
+            pixmap = QtGui.QPixmap.fromImage(tmp)
+            ta.setIcon(QtGui.QIcon(pixmap))
 
     def disable_buttons(self, disable: bool):
         self.export_button.setDisabled(disable)
