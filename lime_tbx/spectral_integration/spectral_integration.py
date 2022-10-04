@@ -60,9 +60,17 @@ class SpectralIntegration(ISpectralIntegration):
         """
         Convolve ch_srf and ch_elis over ch_wlens, generating the signal.
         """
+        if len(ch_srf > 0):
+            print(len(ch_srf), ch_srf[0])
+        if len(ch_wlens > 0):
+            print(len(ch_wlens), ch_wlens[0])
+        if len(ch_elis > 0):
+            print(len(ch_elis), ch_elis[0])
         divider = np.trapz(ch_srf, ch_wlens)
         if isinstance(divider, np.ndarray):
             divider[divider == 0] = 1
+        elif divider == 0:
+            divider = 1
         ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens) / divider
         return ch_signal
 

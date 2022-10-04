@@ -202,9 +202,15 @@ def compare_callback(
     co = comparison.Comparison(kernels_path)
     for mo in mos:
         if not mo.check_valid_srf(srf):
-            raise LimeException(
-                "SRF file not valid for the chosen Moon observations file."
-            )
+            srf_names = srf.get_channels_names()
+            if len(mo.ch_names) == len(srf_names):
+                for i in range(len(mo.ch_names)):
+                    mo.ch_irrs[srf_names[i]] = mo.ch_irrs.pop(mo.ch_names[i])
+                    mo.ch_names[i] = srf_names[i]
+            else:
+                raise LimeException(
+                    "SRF file not valid for the chosen Moon observations file."
+                )
     comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
     return comparisons, mos, srf
 
