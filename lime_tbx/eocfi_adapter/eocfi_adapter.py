@@ -33,11 +33,14 @@ ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
 SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux.so"
 SO_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.dll"
+SO_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin.so"
 
 if platform.system() == "Linux":
     so_file_satellite = SO_FILE_SATELLITE_LINUX
-else:
+elif platform.system() == "Windows":
     so_file_satellite = SO_FILE_SATELLITE_WINDOWS
+else:
+    so_file_satellite = SO_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _so_path = os.path.join(_current_dir, so_file_satellite)
