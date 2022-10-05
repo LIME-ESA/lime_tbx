@@ -1,6 +1,6 @@
 # set OS to your operating system (SOLARIS, WINDOWS, LINUX64_LEGACY, MACOS)
 
-  OS		= LINUX64
+  OS		= MACIN64
 
 # C standard
 
@@ -72,7 +72,7 @@ shared:
 	echo "--------------------"
 	echo "$(CFI): ... creating shared library"
 	echo "--------------------"
-	$(CC) -fPIC -shared $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions.so
+	$(CC) -fPIC -shared $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_darwin.so
 
 spice:
 	echo "--------------------"
