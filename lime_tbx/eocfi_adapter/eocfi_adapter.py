@@ -10,7 +10,7 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 from ctypes import *
 from typing import Tuple, List
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import os
 import platform
 
@@ -73,6 +73,12 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     else:
         date1 = datetime.strptime(splitted[-2] + "+00:00", "%Y%m%dT%H%M%S%z")
     return date0, date1
+
+
+def _to_mjd2000(dt: datetime) -> float:
+    mjd = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    tdelta = dt - mjd
+    return tdelta.total_seconds() / 86400
 
 
 class IEOCFIConverter(ABC):
@@ -211,27 +217,34 @@ class EOCFIConverter(IEOCFIConverter):
             raise Exception("Satellite is not registered in LIME's satellite list.")
         sat: Satellite = [s for s in self.get_sat_list() if s.name == sat][0]
         orb_f = sat.get_best_orbit_file(dt)
+        is_pred = False
         if sat.orbit_files:
             if orb_f == None:
                 raise Exception(
                     "The satellite position can't be calculated for the given datetime."
                 )
+            orbit_path = os.path.join(
+                self.eocfi_path,
+                f"data/mission_configuration_files/{orb_f.name}",
+            )
+            if not os.path.exists(orbit_path):
+                raise Exception("The orbit file {} is missing".format(orbit_path))
+            if "ORBPRE" in orb_f.name:
+                is_pred = True
             # We have to make this a list/array
-            orbit_files = [
-                os.path.join(
-                    self.eocfi_path,
-                    f"data/mission_configuration_files/{orb_f.name}",
-                )
-            ]
+            orbit_files = [orbit_path]
         else:
             orbit_files = []
         fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
         metadata = yaml.load(fl, Loader=yaml.FullLoader)
         fl.close()
+        if not is_pred:
+            bulletin_name = metadata.get("BULLETIN_IERS")["file_b"]
+        else:
+            bulletin_name = metadata.get("BULLETIN_IERS")["file_a"]
+        bulletin = os.path.join(self.eocfi_path, bulletin_name)
 
-        bulletin = os.path.join(self.eocfi_path, metadata.get("BULLETIN_IERS")["file"])
-
-        bulletinb_file_init_time = bulletin.encode()
+        bulletinb_file_init_time = c_char_p(bulletin.encode())
 
         eocfi_sat.get_satellite_position.restype = ndpointer(dtype=c_double, shape=(3,))
         sat_position = eocfi_sat.get_satellite_position(
@@ -254,4 +267,5 @@ class EOCFIConverter(IEOCFIConverter):
         lat, lon, hhh = transformer.transform(
             sat_position[0], sat_position[1], sat_position[2], radians=False
         )
+        print(lat, lon, hhh)
         return lat, lon, hhh
