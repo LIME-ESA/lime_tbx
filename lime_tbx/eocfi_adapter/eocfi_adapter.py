@@ -10,7 +10,7 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 from ctypes import *
 from typing import Tuple, List
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import os
 import platform
 
