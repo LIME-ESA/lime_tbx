@@ -81,6 +81,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.asd_data = None
         self.point = None
         self.data_compare = None
+        self.vertical_lines = []
         self._build_layout()
 
     def _build_layout(self):
@@ -149,6 +150,10 @@ class GraphWidget(QtWidgets.QWidget):
         if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
             self._init_parent.set_export_button_disabled(disable)
 
+    def set_vertical_lines(self, xs: List[float]):
+        self.vertical_lines = xs
+        self._redraw()
+
     def update_plot(
         self,
         data: Union[SpectralData, List[SpectralData]] = None,
@@ -201,7 +206,9 @@ class GraphWidget(QtWidgets.QWidget):
                 iter_data = [iter_data]
             for i, data in enumerate(iter_data):
                 label = ""
-                color = ["g"]
+                color = []
+                if i == 0:
+                    color = ["g"]
                 if len(self.legend) > 0:
                     if len(self.legend[0]) > i:
                         label = self.legend[0][i]
@@ -333,6 +340,9 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
         self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
         self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
+        if self.vertical_lines and len(self.vertical_lines) > 0:
+            for val in self.vertical_lines:
+                self.canvas.axes.axvline(x=val, color="k", label="LIME Spectrum limit")
         try:
             self.canvas.fig.tight_layout()
         except:

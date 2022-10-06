@@ -73,7 +73,7 @@ class CLI:
 
     def _calculate_irradiance(self, point: Point):
         self.lime_simulation.update_irradiance(
-            self.srf, self.srf, point, self.settings_manager.get_cimel_coef()
+            self.srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_reflectance(self, point: Point):

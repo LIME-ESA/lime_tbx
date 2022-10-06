@@ -87,7 +87,7 @@ class TestLimeSimulation(unittest.TestCase):
     # Function update_irradiance
     def test_update_irradiance(self):
         ls = get_lime_simulation()
-        ls.update_irradiance(get_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_irradiance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
         elis = ls.get_elis()
         self.assertIsNotNone(elis)
         self.assertIsInstance(elis, list)

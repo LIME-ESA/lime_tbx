@@ -26,6 +26,7 @@ from ..datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
 )
+from ..datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -126,7 +127,7 @@ def export_csv(
             for i in range(len(x_data)):
                 writer.writerow([x_data[i], *y_data[i]])
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
 
 
@@ -188,7 +189,7 @@ def export_csv_comparation(
                     ]
                 )
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
 
 
@@ -247,7 +248,7 @@ def export_csv_integrated_irradiance(
 
                 writer.writerow([ch.id, ch.center, validity, *print_data])
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
 
 
@@ -275,5 +276,5 @@ def read_datetimes(path: str) -> List[datetime]:
                 datetimes.append(dt)
             return datetimes
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)

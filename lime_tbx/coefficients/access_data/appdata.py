@@ -8,8 +8,8 @@ from os import path, environ, makedirs
 """___Third-Party Modules___"""
 # import here
 
-"""___NPL Modules___"""
-# import here
+"""___LIME Modules___"""
+from ...datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -27,7 +27,7 @@ def _is_valid_appdata(appdata: str) -> bool:
         try:
             makedirs(kpath)
         except Exception as e:
-            print(e)
+            logger.get_logger().critical(e)
             return False
     return True
 

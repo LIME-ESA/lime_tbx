@@ -181,9 +181,7 @@ class Comparison(IComparison):
             )
             sp = SurfacePoint(lat, lon, h, dt)
             lime_simulation.set_simulation_changed()
-            lime_simulation.update_irradiance(
-                self._get_full_srf(), srf, sp, coefficients
-            )
+            lime_simulation.update_irradiance(srf, sp, coefficients)
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):

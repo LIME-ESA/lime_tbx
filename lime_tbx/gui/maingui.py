@@ -2,7 +2,6 @@
 
 """___Built-In Modules___"""
 from enum import Enum
-import logging
 from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
 
@@ -38,6 +37,7 @@ from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.gui import coefficients
+from ..datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -66,6 +66,7 @@ class CallbackWorker(QtCore.QObject):
             res = self.callback(*self.args)
             self.finished.emit(list(res))
         except Exception as e:
+            logger.get_logger().exception(e)
             self.exception.emit(e)
 
 
@@ -75,7 +76,6 @@ class LimeException(Exception):
 
 
 def eli_callback(
-    def_srf: SpectralResponseFunction,
     srf: SpectralResponseFunction,
     point: Point,
     coeffs: ApolloIrradianceCoefficients,
@@ -95,10 +95,8 @@ def eli_callback(
 
     Parameters
     ----------
-    def_srf: SpectralResponseFunction
-        SRF that will be used to calculate the first graph
     srf: SpectralResponseFunction
-        SRF that will be used to calculate the integrated irradiance
+        SRF that will be used to calculate the data
     point: Point
         Point used
     coeffs: IrradianceCoefficients
@@ -125,7 +123,7 @@ def eli_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    lime_simulation.update_irradiance(srf, point, cimel_coef)
     return (
         point,
         srf,
@@ -205,7 +203,8 @@ def compare_callback(
             srf_names = srf.get_channels_names()
             if len(mo.ch_names) == len(srf_names):
                 for i in range(len(mo.ch_names)):
-                    mo.ch_irrs[srf_names[i]] = mo.ch_irrs.pop(mo.ch_names[i])
+                    if mo.ch_names[i] in mo.ch_irrs:
+                        mo.ch_irrs[srf_names[i]] = mo.ch_irrs.pop(mo.ch_names[i])
                     mo.ch_names[i] = srf_names[i]
             else:
                 raise LimeException(
@@ -217,7 +216,6 @@ def compare_callback(
 
 def calculate_all_callback(
     srf: SpectralResponseFunction,
-    signals_srf: SpectralResponseFunction,
     point: Point,
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
@@ -225,9 +223,9 @@ def calculate_all_callback(
     lime_simulation: ILimeSimulation,
 ):
     lime_simulation.update_reflectance(srf, point, cimel_coef)
-    lime_simulation.update_irradiance(srf, signals_srf, point, cimel_coef)
+    lime_simulation.update_irradiance(srf, point, cimel_coef)
     lime_simulation.update_polarization(srf, point, p_coeffs)
-    return (point, signals_srf)
+    return (point, srf)
 
 
 def _start_thread(
@@ -420,7 +418,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         window.set_save_simulation_action_disabled(False)
 
     def handle_operation_error(self, error: Exception):
-        logging.critical(error)
+        logger.get_logger().critical(error)
         if isinstance(error, LimeException):
             self.show_error(error)
         else:
@@ -571,7 +569,7 @@ class MainSimulationsWidget(
         return self.export_lglod_button.isEnabled()
 
     def handle_operation_error(self, error: Exception):
-        logging.critical(error)
+        logger.get_logger().critical(error)
         if isinstance(error, LimeException):
             self.show_error(error)
         else:
@@ -585,12 +583,11 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, cimel_coef, self.lime_simulation],
+            [srf, point, coeffs, cimel_coef, self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -617,8 +614,8 @@ class MainSimulationsWidget(
         self.lower_tabs.setTabEnabled(2, True)
 
     def eli_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     @QtCore.Slot()
     def show_elref(self):
@@ -627,11 +624,11 @@ class MainSimulationsWidget(
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        def_srf = self.settings_manager.get_default_srf()
+        srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, cimel_coef, self.lime_simulation]
+            elref_callback, [srf, point, coeffs, cimel_coef, self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -659,8 +656,8 @@ class MainSimulationsWidget(
         self.lower_tabs.setCurrentIndex(0)
 
     def elref_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     @QtCore.Slot()
     def show_polar(self):
@@ -669,10 +666,10 @@ class MainSimulationsWidget(
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        def_srf = self.settings_manager.get_default_srf()
+        srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            polar_callback, [def_srf, point, coeffs, self.lime_simulation]
+            polar_callback, [srf, point, coeffs, self.lime_simulation]
         )
         self._start_thread(self.polar_finished, self.polar_error)
 
@@ -694,8 +691,8 @@ class MainSimulationsWidget(
         self.lower_tabs.setCurrentIndex(0)
 
     def polar_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     def load_observations_finished(
         self,
@@ -709,14 +706,13 @@ class MainSimulationsWidget(
     def export_glod(self):
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        def_srf = self.settings_manager.get_default_srf()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
             calculate_all_callback,
-            [def_srf, srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
+            [srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
         )
         self._start_thread(self.calculate_all_finished, self.calculate_all_error)
 
@@ -738,8 +734,8 @@ class MainSimulationsWidget(
                 self.show_error(e)
 
     def calculate_all_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -814,7 +810,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         if not valid:
             error_msg = "SRF file not valid for the observation file."
             error = Exception(error_msg)
-            logging.critical(error)
+            logger.get_logger().critical(error)
             self.show_error(error)
         else:
             self.main_page.srf_widget.set_srf(srf)
@@ -835,7 +831,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         if not valid:
             error_msg = "SRF file not valid for the observation file."
             error = Exception(error_msg)
-            logging.critical(error)
+            logger.get_logger().critical(error)
             self.show_error(error)
         else:
             self.comparison_page.load_lglod_comparisons(lglod, srf)
