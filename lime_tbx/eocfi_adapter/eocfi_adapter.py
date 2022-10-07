@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 import os
 import platform
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 """___Third-Party Modules___"""
 from numpy.ctypeslib import ndpointer
 import yaml
@@ -264,7 +266,7 @@ class EOCFIConverter(IEOCFIConverter):
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
             {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
         )
-        lat, lon, hhh = transformer.transform(
+        lon, lat, hhh = transformer.transform(
             sat_position[0], sat_position[1], sat_position[2], radians=False
         )
         print(lat, lon, hhh)
