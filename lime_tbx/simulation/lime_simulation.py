@@ -615,6 +615,26 @@ class LimeSimulation(ILimeSimulation):
             )
         else:
             point = SatellitePoint(obss[0].sat_name, dts)
+            surfaces_of_sat = []
+            mds = []
+            for i, dt in enumerate(dts):
+                sp = SurfacePoint(
+                    *SPICEAdapter.to_planetographic(
+                        obss[i].sat_pos.x,
+                        obss[i].sat_pos.y,
+                        obss[i].sat_pos.z,
+                        "EARTH",
+                        self.kernels_path.main_kernels_path,
+                    ),
+                    dt
+                )
+                md = MoonDataFactory.get_md(sp, self.eocfi_path, self.kernels_path)
+                surfaces_of_sat.append(sp)
+                mds.append(md)
+            self.surfaces_of_sat = surfaces_of_sat
+            self.mds = mds
+            self.point = point
+            self.mds_uptodate = True
         self._save_parameters(srf, point)
         self.refl_uptodate = True
         self.irr_uptodate = True

@@ -7,7 +7,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime, timezone
 import os
 from typing import List, Union, Tuple
 
@@ -24,11 +24,9 @@ from ..datatypes.datatypes import (
     LGLODData,
     LunarObservation,
     LunarObservationWrite,
-    SatellitePoint,
     SatellitePosition,
     SelenographicDataWrite,
     SpectralData,
-    SpectralResponseFunction,
     SurfacePoint,
 )
 from lime_tbx.datatypes import constants, logger
@@ -446,11 +444,17 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         )
     )
     channel_names_0 = [
-        chn.tobytes().decode("utf-8") for chn in ds.variables["channel_name"][:].data
+        chn.tobytes().decode("utf-8").replace("\x00", "")
+        for chn in ds.variables["channel_name"][:].data
     ]
     lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
-    sat_pos_ref_0 = ds.variables["sat_pos_ref"][:].data.tobytes().decode("utf-8")
+    sat_pos_ref_0 = (
+        ds.variables["sat_pos_ref"][:]
+        .data.tobytes()
+        .decode("utf-8")
+        .replace("\x00", "")
+    )
     signals_data = np.array(ds.variables["irr_obs"][:].data)
     signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data)
     signals = SpectralData(
