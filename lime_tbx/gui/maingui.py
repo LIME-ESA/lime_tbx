@@ -27,6 +27,7 @@ from ..datatypes.datatypes import (
     SelenographicDataWrite,
     SpectralResponseFunction,
     ApolloIrradianceCoefficients,
+    SpectralValidity,
     SurfacePoint,
     CustomPoint,
     ReflectanceCoefficients,
@@ -378,6 +379,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 )
             else:
                 to_remove.append(ch)
+        for chsrf in srf.channels:
+            if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
+                self.output.set_as_partly(chsrf.id)
         self.output.remove_channels(to_remove)
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
@@ -412,6 +416,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     ["Relative Differences"],
                 ],
             )
+        for chsrf in srf.channels:
+            if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
+                self.output.set_as_partly(chsrf.id)
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()

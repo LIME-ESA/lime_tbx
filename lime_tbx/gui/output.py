@@ -553,6 +553,7 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.channel_tabs = QtWidgets.QTabWidget()
         self.channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.range_warning = None
         self.main_layout.addWidget(self.channel_tabs)
 
     def set_channels(self, channels: List[str]):
@@ -567,6 +568,31 @@ class ComparisonOutput(QtWidgets.QWidget):
             self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
+        # Remove range warning
+        if self.range_warning:
+            self.range_warning.setParent(None)
+            self.range_warning = None
+
+    def set_as_partly(self, ch_name: str):
+        if ch_name in self.ch_names:
+            index = self.ch_names.index(ch_name)
+            self.channel_tabs.setTabText(index, "{} *".format(ch_name))
+            if self.range_warning == None:
+                self.range_warning = QtWidgets.QLabel(
+                    "* The LIME can only give a reliable simulation \
+for wavelengths between 350 and 2500 nm"
+                )
+                self.range_warning.setWordWrap(True)
+                self.main_layout.addWidget(self.range_warning)
+
+    def _check_range_warning_needed(self):
+        for i in range(len(self.ch_names)):
+            if "*" in self.channel_tabs.tabText(i):
+                return
+        # Not needed
+        if self.range_warning:
+            self.range_warning.setParent(None)
+            self.range_warning = None
 
     def remove_channels(self, channels: List[str]):
         for ch_name in channels:
@@ -576,6 +602,7 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.channels[index].setParent(None)
                 self.channels.pop(index)
                 self.ch_names.pop(index)
+        self._check_range_warning_needed()
 
     def update_plot(self, index: int, comparison: ComparisonData):
         """Update the <index> plot with the given data
