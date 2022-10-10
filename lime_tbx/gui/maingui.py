@@ -524,11 +524,24 @@ class MainSimulationsWidget(
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.lower_tabs, 1)
+        self.lower_stack = QtWidgets.QStackedLayout()
+        self.lower_stack.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.loading_spinner = SpinnerPage()
+        self.loading_spinner.setVisible(False)
+        self.lower_stack.addWidget(self.loading_spinner)
+        self.lower_stack.addWidget(self.lower_tabs)
+        self.lower_stack.setCurrentIndex(1)
+        self.main_layout.addLayout(self.lower_stack, 1)
         self.main_layout.addWidget(self.export_lglod_button)
 
     def _set_spinner(self, enabled: bool):
-        self.parentWidget().set_spinner_enabled(enabled)
+        self.loading_spinner.setVisible(enabled)
+        if enabled:
+            self.loading_spinner.movie_start()
+            self.lower_stack.setCurrentIndex(0)
+        else:
+            self.loading_spinner.movie_stop()
+            self.lower_stack.setCurrentIndex(1)
 
     def _unblock_gui(self):
         self._set_spinner(False)
@@ -766,6 +779,7 @@ class SpinnerPage(QtWidgets.QWidget):
         _current_dir = os.path.dirname(os.path.abspath(__file__))
         _movie_path = os.path.join(_current_dir, constants.SPINNER_PATH)
         self.movie = QtGui.QMovie(_movie_path)
+        self.movie.setScaledSize(QtCore.QSize(50, 50))
         self._build_layout()
 
     def _build_layout(self):
@@ -834,8 +848,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self._build_layout()
 
     def _build_layout(self):
-        self.stack_layout = QtWidgets.QStackedLayout(self)
-        self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.main_layout = QtWidgets.QVBoxLayout(self)
         self.settings_manager = settings.MockSettingsManager()
         self.comparison_page = ComparisonPageWidget(
             self.lime_simulation, self.settings_manager, self.kernels_path
@@ -848,31 +861,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
             self.settings_manager,
         )
         self.page = self.main_page
-        self.spinner_page = SpinnerPage()
-        self.spinner_page.setVisible(False)
-        self.stack_layout.addWidget(self.spinner_page)
-        self.stack_layout.addWidget(self.main_page)
-        self.stack_layout.addWidget(self.comparison_page)
-        self.stack_layout.setCurrentIndex(1)
-
-    def _set_spinner_on(self):
-        self.stack_layout.setCurrentIndex(0)
-        self.spinner_page.movie_start()
-        self.spinner_page.setVisible(True)
-
-    def _set_spinner_off(self):
-        if isinstance(self.page, MainSimulationsWidget):
-            self.stack_layout.setCurrentIndex(1)
-        else:
-            self.stack_layout.setCurrentIndex(2)
-        self.spinner_page.movie_stop()
-        self.spinner_page.setVisible(False)
-
-    def set_spinner_enabled(self, enabled: bool):
-        if enabled:
-            self._set_spinner_on()
-        else:
-            self._set_spinner_off()
+        self.main_layout.addWidget(self.main_page)
 
     def setDisabled(self, arg__1: bool) -> None:
         self.parentWidget().setDisabled(arg__1)
@@ -883,12 +872,12 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
     def change_page(self, pageEnum: LimePagesEnum):
         self.page.hide()
+        self.main_layout.removeWidget(self.page)
         if pageEnum == LimePagesEnum.COMPARISON:
             self.page = self.comparison_page
-            self.stack_layout.setCurrentIndex(2)
         else:
-            self.stack_layout.setCurrentIndex(1)
             self.page = self.main_page
+        self.main_layout.addWidget(self.page)
         self.page.show()
 
     def show_error(self, error: Exception):
