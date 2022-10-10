@@ -1035,6 +1035,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     # ERROR
 
     def show_error(self, error: Exception):
+        self._get_lime_widget().get_current_page()._unblock_gui()
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
