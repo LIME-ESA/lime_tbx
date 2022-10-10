@@ -161,6 +161,7 @@ class GraphWidget(QtWidgets.QWidget):
         data_asd: Union[SpectralData, List[SpectralData]] = None,
         point: Union[Point, List[Point]] = None,
         data_compare: ComparisonData = None,
+        redraw: bool = True,
     ):
         self.point = point
         self.data = data
@@ -171,15 +172,17 @@ class GraphWidget(QtWidgets.QWidget):
             self.disable_buttons(False)
         else:
             self.disable_buttons(True)
-        self._redraw()
+        if redraw:
+            self._redraw()
 
-    def update_labels(self, title: str, xlabel: str, ylabel: str):
+    def update_labels(self, title: str, xlabel: str, ylabel: str, redraw: bool = True):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
-        self._redraw()
+        if redraw:
+            self._redraw()
 
-    def update_legend(self, legend: List[List[str]]):
+    def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
         Parameters
         ----------
@@ -192,7 +195,8 @@ class GraphWidget(QtWidgets.QWidget):
             3: comparison
         """
         self.legend = legend
-        self._redraw()
+        if redraw:
+            self._redraw()
 
     def update_size(self):
         self._redraw()
@@ -604,7 +608,7 @@ for wavelengths between 350 and 2500 nm"
                 self.ch_names.pop(index)
         self._check_range_warning_needed()
 
-    def update_plot(self, index: int, comparison: ComparisonData):
+    def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
         """Update the <index> plot with the given data
 
         Parameters
@@ -612,16 +616,20 @@ for wavelengths between 350 and 2500 nm"
         index: int
             Plot index (SRF)
         comparison: ComparisonData
+        redraw: bool
+            Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
         data = [comparison.observed_signal, comparison.simulated_signal]
         self.channels[index].update_plot(
-            data, point=comparison.points, data_compare=comparison
+            data, point=comparison.points, data_compare=comparison, redraw=redraw
         )
 
-    def update_labels(self, index: int, title: str, xlabel: str, ylabel: str):
-        self.channels[index].update_labels(title, xlabel, ylabel)
+    def update_labels(
+        self, index: int, title: str, xlabel: str, ylabel: str, redraw: bool = True
+    ):
+        self.channels[index].update_labels(title, xlabel, ylabel, redraw=redraw)
 
-    def update_legends(self, index: int, legends: List[List[str]]):
+    def update_legends(self, index: int, legends: List[List[str]], redraw: bool = True):
         """
         Parameters
         ----------
@@ -634,5 +642,7 @@ for wavelengths between 350 and 2500 nm"
             1: cimel_data
             2: cimel_data errorbars
             3: comparison
+        redraw: bool
+            Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.channels[index].update_legend(legends)
+        self.channels[index].update_legend(legends, redraw=redraw)

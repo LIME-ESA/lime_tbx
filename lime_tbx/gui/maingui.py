@@ -418,12 +418,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = lglod.ch_names
         self.output.set_channels(lglod.ch_names)
         for i, ch in enumerate(ch_names):
-            self.output.update_plot(i, comps[i])
+            self.output.update_plot(i, comps[i], False)
             self.output.update_labels(
                 i,
                 "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                 "datetimes",
                 "Signal (Wm⁻²nm⁻¹)",
+                False,
             )
             self.output.update_legends(
                 i,
