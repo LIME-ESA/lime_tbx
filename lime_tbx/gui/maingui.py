@@ -267,14 +267,21 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
+        self.stack_layout = QtWidgets.QStackedLayout()
+        self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
         self.output = output.ComparisonOutput(self.settings_manager)
+        self.spinner = SpinnerPage()
+        self.spinner.setVisible(False)
+        self.stack_layout.addWidget(self.spinner)
+        self.stack_layout.addWidget(self.output)
+        self.stack_layout.setCurrentIndex(1)
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_lglod_button.clicked.connect(self.export_to_lglod)
         self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
-        self.main_layout.addWidget(self.output)
+        self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
 
     def _callback_compare_input_changed(self):
@@ -290,10 +297,21 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.worker_th = QtCore.QThread()
         _start_thread(self.worker, self.worker_th, finished, error)
 
+    def _set_spinner(self, enabled: bool):
+        self.spinner.setVisible(enabled)
+        if enabled:
+            self.spinner.movie_start()
+            self.stack_layout.setCurrentIndex(0)
+        else:
+            self.spinner.movie_stop()
+            self.stack_layout.setCurrentIndex(1)
+
     def _unblock_gui(self):
+        self._set_spinner(False)
         self.parentWidget().setDisabled(False)
 
     def _block_gui_loading(self):
+        self._set_spinner(True)
         self.parentWidget().setDisabled(True)
 
     def can_save_simulation(self) -> bool:
@@ -812,7 +830,7 @@ def check_srf_observation_callback(lglod: LGLODData, srf: SpectralResponseFuncti
         error_msg = "SRF file not valid for the observation file."
         error = Exception(error_msg)
         raise error
-    return [lglod]
+    return [lglod, srf]
 
 
 def check_srf_comparison_callback(
@@ -900,6 +918,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
     def _load_observations_finished_2(self, data):
         lglod = data[0]
+        srf = data[1]
         self.main_page.srf_widget.set_srf(srf)
         self.lime_simulation.set_observations(lglod, srf)
         point = self.lime_simulation.get_point()
