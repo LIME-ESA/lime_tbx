@@ -1049,8 +1049,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def load_simulation_finished(self, data):
         lglod = data[0]
+        lime_tbx_w = self._get_lime_widget()
+        page = lime_tbx_w.get_current_page()
+        page._unblock_gui()
         if isinstance(lglod, LGLODData):
             self.simulations()
+            lime_tbx_w.get_current_page()._block_gui_loading()
             srf = None
             cancel = False
             if lglod.not_default_srf:
@@ -1072,6 +1076,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                 )
         else:
             self.comparison()
+            lime_tbx_w.get_current_page()._block_gui_loading()
             srf = None
             srf_path = QtWidgets.QFileDialog().getOpenFileName(
                 self, "Select SpectralResponseFunction file"
