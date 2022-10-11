@@ -253,7 +253,7 @@ class LimeSimulation(ILimeSimulation):
         eocfi_path: str,
         kernels_path: KernelsPath,
         MCsteps: int = 100,
-        verbose: bool = True,
+        verbose: bool = False,
     ):
         """
         Parameters
