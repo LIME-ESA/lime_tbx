@@ -484,15 +484,20 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         sat = self.satellites[i]
-        d0, df = sat.get_datetime_range()
-        if d0 == None:
-            d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        dt0 = QtCore.QDateTime(d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second)
-        self.datetime_edit.setMinimumDateTime(dt0)
-        if df == None:
-            df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        dtf = QtCore.QDateTime(df.year, df.month, df.day, df.hour, df.minute, df.second)
-        self.datetime_edit.setMaximumDateTime(dtf)
+        if self.single_datetime:
+            d0, df = sat.get_datetime_range()
+            if d0 == None:
+                d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+            dt0 = QtCore.QDateTime(
+                d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
+            )
+            self.datetime_edit.setMinimumDateTime(dt0)
+            if df == None:
+                df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+            dtf = QtCore.QDateTime(
+                df.year, df.month, df.day, df.hour, df.minute, df.second
+            )
+            self.datetime_edit.setMaximumDateTime(dtf)
 
     def is_calculable(self) -> bool:
         if self.single_datetime:
