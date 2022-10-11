@@ -654,6 +654,12 @@ class MainSimulationsWidget(
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
+    def _set_graph_dts(self, pt: Point):
+        self.graph.set_dts([])
+        if isinstance(pt, SurfacePoint) or isinstance(pt, SatellitePoint):
+            if isinstance(pt.dt, list) and len(pt.dt) > 1:
+                self.graph.set_dts(pt.dt)
+
     def eli_finished(
         self,
         data: Tuple[
@@ -666,7 +672,8 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[2], data[3], data[4], data[0])
+        self._set_graph_dts(data[0])
+        self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -709,7 +716,8 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[1], data[2], data[3], data[0])
+        self._set_graph_dts(data[0])
+        self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -744,7 +752,8 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[1], point=data[0])
+        self._set_graph_dts(data[0])
+        self.graph.update_plot(data[1], point=data[0], redraw=False)
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",

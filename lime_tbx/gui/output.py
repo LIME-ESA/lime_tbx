@@ -1,8 +1,10 @@
 """describe class"""
 
 """___Built-In Modules___"""
+from configparser import NoSectionError
 from typing import Union, List, Tuple
 import os
+from datetime import datetime
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -15,6 +17,7 @@ from matplotlib.figure import Figure
 from matplotlib import font_manager as fm
 from matplotlib import pyplot as plt
 import numpy as np
+import mplcursors
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
@@ -82,6 +85,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.point = None
         self.data_compare = None
         self.vertical_lines = []
+        self.dts = []
+        self.mpl_cursor = NoSectionError
         self._build_layout()
 
     def _build_layout(self):
@@ -200,6 +205,9 @@ class GraphWidget(QtWidgets.QWidget):
 
     def update_size(self):
         self._redraw()
+
+    def set_dts(self, dts: List[datetime]):
+        self.dts = dts
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
@@ -351,6 +359,26 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.fig.tight_layout()
         except:
             pass
+        if self.dts:
+            cursor_lines = [
+                l
+                for l in lines
+                if l.get_label().startswith("_child")
+                or l.get_label() == self.legend[0][0]
+            ]
+            self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
+
+            @self.mpl_cursor.connect("add")
+            def _(sel):
+                sel.annotation.get_bbox_patch().set(fc="white")
+                label = sel.artist.get_label()
+                num = 0
+                if label.startswith("_child"):
+                    num = int(int(label[6:]) / 2)
+                dt: datetime = self.dts[num]
+                label = dt.strftime("%Y/%m/%d %H:%M:%S")
+                sel.annotation.set_text(label)
+
         self.canvas.draw()
 
     def show_error(self, error: Exception):
