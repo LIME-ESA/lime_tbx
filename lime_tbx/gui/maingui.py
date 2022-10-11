@@ -56,15 +56,20 @@ _INTERNAL_ERROR_MSG = (
 class CallbackWorker(QtCore.QObject):
     finished = QtCore.Signal(list)
     exception = QtCore.Signal(Exception)
+    info = QtCore.Signal(str)
 
-    def __init__(self, callback: Callable, args: list):
+    def __init__(self, callback: Callable, args: list, with_info: bool = False):
         super().__init__()
         self.callback = callback
         self.args = args
+        self.with_info = with_info
 
     def run(self):
         try:
-            res = self.callback(*self.args)
+            if not self.with_info:
+                res = self.callback(*self.args)
+            else:
+                res = self.callback(*self.args, self.info)
             self.finished.emit(list(res))
         except Exception as e:
             logger.get_logger().exception(e)
@@ -197,6 +202,7 @@ def compare_callback(
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
+    signal_info: QtCore.Signal,
 ) -> Tuple[List[ComparisonData], List[LunarObservation], SpectralResponseFunction,]:
     co = comparison.Comparison(kernels_path)
     for mo in mos:
@@ -211,7 +217,10 @@ def compare_callback(
                 raise LimeException(
                     "SRF file not valid for the chosen Moon observations file."
                 )
-    comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
+    callback_obs = lambda: signal_info.emit("another_obs_simulated")
+    comparisons = co.get_simulations(
+        mos, srf, cimel_coef, lime_simulation, callback_obs
+    )
     return comparisons, mos, srf
 
 
@@ -234,6 +243,7 @@ def _start_thread(
     worker_th: QtCore.QThread,
     finished: Callable,
     error: Callable,
+    info: Callable = None,
 ):
     worker.moveToThread(worker_th)
     worker_th.started.connect(worker.run)
@@ -243,6 +253,8 @@ def _start_thread(
     worker.exception.connect(worker_th.quit)
     worker.exception.connect(worker.deleteLater)
     worker.exception.connect(error)
+    if info:
+        worker.info.connect(info)
     worker_th.finished.connect(worker_th.deleteLater)
     worker_th.start()
 
@@ -293,9 +305,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         else:
             self.compare_button.setDisabled(False)
 
-    def _start_thread(self, finished: Callable, error: Callable):
+    def _start_thread(self, finished: Callable, error: Callable, info: Callable = None):
         self.worker_th = QtCore.QThread()
-        _start_thread(self.worker, self.worker_th, finished, error)
+        _start_thread(self.worker, self.worker_th, finished, error, info)
 
     def _set_spinner(self, enabled: bool):
         self.spinner.setVisible(enabled)
@@ -351,11 +363,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf = self.input.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
+        self.quant_mos = len(mos)
+        self.quant_mos_simulated = 0
         self.worker = CallbackWorker(
             compare_callback,
             [mos, srf, coeffs, cimel_coef, self.lime_simulation, self.kernels_path],
+            True,
         )
-        self._start_thread(self.compare_finished, self.compare_error)
+        self._start_thread(self.compare_finished, self.compare_error, self.compare_info)
+
+    def compare_info(self, data: str):
+        self.quant_mos_simulated += 1
+        self.spinner.set_text("{}/{}".format(self.quant_mos_simulated, self.quant_mos))
 
     def compare_finished(
         self,
@@ -805,16 +824,22 @@ class SpinnerPage(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.label_spinner = QtWidgets.QLabel()
         self.label_spinner.setMovie(self.movie)
-        self.h_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.addLayout(self.h_layout)
-        self.h_layout.addWidget(self.label_spinner, 1)
-        self.h_layout.setAlignment(self.label_spinner, QtGui.Qt.AlignHCenter)
+        self.label_text = QtWidgets.QLabel()
+        self.main_layout.addWidget(QtWidgets.QLabel())
+        self.main_layout.addWidget(self.label_spinner)
+        self.main_layout.addWidget(self.label_text)
+        self.main_layout.addWidget(QtWidgets.QLabel())
+        self.main_layout.setAlignment(self.label_spinner, QtGui.Qt.AlignHCenter)
+        self.main_layout.setAlignment(self.label_text, QtGui.Qt.AlignHCenter)
 
     def movie_start(self):
         self.movie.start()
 
     def movie_stop(self):
         self.movie.stop()
+
+    def set_text(self, text: str):
+        self.label_text.setText(text)
 
 
 def load_simulation_callback(path: str, kernels_path: KernelsPath):

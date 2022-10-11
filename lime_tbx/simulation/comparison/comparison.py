@@ -10,7 +10,7 @@ It exports the following classes:
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 import math
-from typing import List, Tuple
+from typing import List, Callable
 
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
@@ -162,7 +162,18 @@ class Comparison(IComparison):
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
+        callback_observation: Callable = None,
     ) -> List[ComparisonData]:
+        """
+        Parameters
+        ----------
+        observations: list of LunarObservations
+        srf: SpectralResponseFunction
+        coefficients: ReflectanceCoefficients
+        lime_simulation: ILimeSimulation
+        callback_observation: Callable
+            Function that will be called once for every observation when simulated.
+        """
         ch_names = srf.get_channels_names()
         comparisons = []
         sigs = [[] for _ in ch_names]
@@ -190,6 +201,8 @@ class Comparison(IComparison):
                     # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
                     obs_irrs[j].append(obs.ch_irrs[ch])
+            if callback_observation:
+                callback_observation()
         for i, ch in enumerate(ch_names):
             if len(ch_dates[i]) > 0:
                 irrs = np.array([s[0] for s in sigs[i]])
