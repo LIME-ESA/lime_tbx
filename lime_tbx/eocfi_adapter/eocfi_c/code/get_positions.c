@@ -246,23 +246,23 @@ double * get_moon_position(
 }
 
 #ifdef _WIN32
-__declspec(dllexport) double *  get_satellite_position(
+__declspec(dllexport) double **  get_satellite_position(
 #else
-    double *  get_satellite_position(
+    double **  get_satellite_position(
 #endif
         long sat_id,
-        int y,
-        int m,
-        int d,
-        int hh,
-        int mm,
-        int ss,
+        int quant_dates,
+        int** dates,
         char *init_time_file,
         char **orbit_files, //char orbit_file[],
         long n_orbit_files
         ){
     
-    double static position_returns[3];
+    static double **position_returns;
+    position_returns = (double**)malloc(sizeof(double*)*quant_dates);
+    for(int i = 0; i < quant_dates; i++){
+        position_returns[i] = (double*)malloc(sizeof(double)*3);
+    }
 
     char msg[XO_MAX_COD][XO_MAX_STR];
     long n = 0;
@@ -299,7 +299,6 @@ __declspec(dllexport) double *  get_satellite_position(
     double pos[3];
     double vel[3];
     double acc[3];
-    struct Date dt = {y, m, d, hh, mm, ss};
 
     /* Time Initialization */
     /* ------------------- */
@@ -308,10 +307,6 @@ __declspec(dllexport) double *  get_satellite_position(
        the same in all files. For that reason, in the following examples the time reference
        and the orbit will be initialized using the same file.*/
 
-    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss;
-    double start_time     = getDifference(dt);
-    vstart2 = start_time + seconds / 86400.;
-    vstop2 = vstart2 + 0.5;
 
     trif_time_model     = XL_TIMEMOD_AUTO;
     trif_n_files        = 1;
@@ -367,44 +362,55 @@ __declspec(dllexport) double *  get_satellite_position(
 
     status = xo_orbit_get_osv_compute_validity(&orbit_id, &val_time);
 
-    val_time0 = vstart2;
-    val_time1 = vstop2;
-#if defined DEBUG
-    printf("\n\t-  validity times = ( %f , %f )", val_time0, val_time1 );
-#endif
-    time = val_time0;
+    for (int i = 0; i < quant_dates; i++){
+        struct Date dt = {dates[i][0], dates[i][1], dates[i][2], dates[i][3], dates[i][4], dates[i][5]};
+        double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss;
+        double start_time     = getDifference(dt);
+        vstart2 = start_time + seconds / 86400.;
+        vstop2 = vstart2 + 0.5;
+        val_time0 = vstart2;
+        val_time1 = vstop2;
+        #if defined DEBUG
+        printf("\n\t-  validity times = ( %f , %f )", val_time0, val_time1 );
+        #endif
+        time = val_time0;
 
-    status = xo_osv_compute(&orbit_id, &propag_model, &time_ref_utc, &time,
-            /* outputs */
-                            pos, vel, acc, errors);
+        status = xo_osv_compute(&orbit_id, &propag_model, &time_ref_utc, &time,
+                /* outputs */
+                                pos, vel, acc, errors);
 
-    if (status != XO_OK)
-    {
-        func_id = XO_OSV_COMPUTE_ID;
-        xo_get_msg(&func_id, errors, &n, msg);
-        xo_print_msg(&n, msg);
-    }
-#if defined DEBUG
-    printf( "\n\t-  time = %lf (%s)", time,  to_timestamp(&time_id, time));
-    printf( "\n\t-  pos[0] = %lf", pos[0] );
-    printf( "\n\t-  pos[1] = %lf", pos[1] );
-    printf( "\n\t-  pos[2] = %lf", pos[2] );
-    printf( "\n\t-  vel[0] = %lf", vel[0] );
-    printf( "\n\t-  vel[1] = %lf", vel[1] );
-    printf( "\n\t-  vel[2] = %lf", vel[2] );
-    printf( "\n\t-  acc[0] = %lf", acc[0] );
-    printf( "\n\t-  acc[1] = %lf", acc[1] );
-    printf( "\n\t-  acc[2] = %lf", acc[2] );
-#endif
-    extra_choice = XO_ORBIT_EXTRA_NO_RESULTS;
+        if (status != XO_OK)
+        {
+            func_id = XO_OSV_COMPUTE_ID;
+            xo_get_msg(&func_id, errors, &n, msg);
+            xo_print_msg(&n, msg);
+        }
+        #if defined DEBUG
+        printf( "\n\t-  time = %lf (%s)", time,  to_timestamp(&time_id, time));
+        printf( "\n\t-  pos[0] = %lf", pos[0] );
+        printf( "\n\t-  pos[1] = %lf", pos[1] );
+        printf( "\n\t-  pos[2] = %lf", pos[2] );
+        printf( "\n\t-  vel[0] = %lf", vel[0] );
+        printf( "\n\t-  vel[1] = %lf", vel[1] );
+        printf( "\n\t-  vel[2] = %lf", vel[2] );
+        printf( "\n\t-  acc[0] = %lf", acc[0] );
+        printf( "\n\t-  acc[1] = %lf", acc[1] );
+        printf( "\n\t-  acc[2] = %lf", acc[2] );
+        #endif
+        extra_choice = XO_ORBIT_EXTRA_NO_RESULTS;
 
-    status = xo_osv_compute_extra(&orbit_id, &extra_choice,
-                                  orbit_model_out, orbit_extra_out, errors);
-    if (status != XO_OK)
-    {
-        func_id = XO_OSV_COMPUTE_EXTRA_ID;
-        xo_get_msg(&func_id, errors, &n, msg);
-        xo_print_msg(&n, msg);
+        status = xo_osv_compute_extra(&orbit_id, &extra_choice,
+                                        orbit_model_out, orbit_extra_out, errors);
+        if (status != XO_OK)
+        {
+            func_id = XO_OSV_COMPUTE_EXTRA_ID;
+            xo_get_msg(&func_id, errors, &n, msg);
+            xo_print_msg(&n, msg);
+        }
+
+        position_returns[i][0] = pos[0];
+        position_returns[i][1] = pos[1];
+        position_returns[i][2] = pos[2];
     }
 
 
@@ -422,27 +428,29 @@ __declspec(dllexport) double *  get_satellite_position(
 
     xl_time_close(&time_id, errors);
 
-    position_returns[0] = pos[0];
-    position_returns[1] = pos[1];
-    position_returns[2] = pos[2];
-
     return position_returns;
 }
 
 int main (int argc, char *argv[]){
-    double *positions;
+    double **positions;
     char   *orbit_file[5] = {'\0'};
     orbit_file[0] = "data/mission_configuration_files/SENTINEL5P/OSF/S5P_OPER_MPL_ORBSCT_20171013T104928_99999999T999999_0008.EOF";
+    int **dates = (int**)malloc(sizeof(int*));
+    dates[0] = (int*)malloc(sizeof(int)*6);
+    dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0;
     positions = get_satellite_position(
             XO_SAT_SENTINEL_5P,
-            2022, 1, 2, 00, 12, 00,
+            1,
+            dates,
             "data/207_BULLETIN_B207.txt",
             orbit_file,
             1
             );
     printf("****************************************************\n");
-    printf("*    position_x  = %lf\n", positions[0]);
-    printf("*    position_y  = %lf\n", positions[1]);
-    printf("*    position_z  = %lf\n", positions[2]);
+    printf("*    position_x  = %lf\n", positions[0][0]);
+    printf("*    position_y  = %lf\n", positions[0][1]);
+    printf("*    position_z  = %lf\n", positions[0][2]);
     printf("****************************************************\n");
+    free(dates[0]);
+    free(dates);
 }

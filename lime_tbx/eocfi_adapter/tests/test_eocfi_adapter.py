@@ -68,7 +68,7 @@ class TestEOCFIConverter(unittest.TestCase):
 
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
-        lat, lon, h = eo.get_satellite_position("SENTINEL-2A", DT1)
+        lat, lon, h = eo.get_satellite_position("SENTINEL-2A", DT1)[0]
         self.assertEqual(lat, -65.90847446723077)
         self.assertEqual(lon, 10.38388866324515)
         self.assertEqual(h, 791026.5592273567)
@@ -77,8 +77,8 @@ class TestEOCFIConverter(unittest.TestCase):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
         eo = get_eocfi_converter()
         lat, lon, hhh = eo.get_satellite_position(
-            "SENTINEL-5P", datetime(2022, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
-        )
+            "SENTINEL-5P", [datetime(2022, 1, 2, 0, 0, 0, tzinfo=timezone.utc)]
+        )[0]
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
             {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},

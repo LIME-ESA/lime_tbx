@@ -111,8 +111,8 @@ class IEOCFIConverter(ABC):
 
     @abstractmethod
     def get_satellite_position(
-        self, sat: str, dt: datetime
-    ) -> Tuple[float, float, float]:
+        self, sat: str, dt: List[datetime]
+    ) -> List[Tuple[float, float, float]]:
         """
         Get the geographic satellite position for a concrete datetime.
 
@@ -120,17 +120,19 @@ class IEOCFIConverter(ABC):
         ----------
         sat: str
             Satellite name. Should be present in get_sat_names
-        dt: datetime
-            Datetime for which the position will be calculated
+        dts: List of datetime
+            Datetimes for which the position will be calculated
 
         Returns
         -------
-        latitude: float
-            Geocentric latitude of the satellite
-        longitude: float
-            Geocentric longitude of the satellite
-        height: float
-            Height of the satellite over sea level in meters.
+        positions: list of tuples of floats
+            List of tuples of 3 floats, representing:
+            latitude: float
+                Geocentric latitude of the satellite
+            longitude: float
+                Geocentric longitude of the satellite
+            height: float
+                Height of the satellite over sea level in meters.
         """
         pass
 
@@ -194,8 +196,8 @@ class EOCFIConverter(IEOCFIConverter):
         return sat_list
 
     def get_satellite_position(
-        self, sat: str, dt: datetime
-    ) -> Tuple[float, float, float]:
+        self, sat: str, dts: List[datetime]
+    ) -> List[Tuple[float, float, float]]:
         """
         Get the geographic satellite position for a concrete datetime.
 
@@ -203,22 +205,45 @@ class EOCFIConverter(IEOCFIConverter):
         ----------
         sat: str
             Satellite name. Should be present in get_sat_names
-        dt: datetime
-            Datetime for which the position will be calculated
+        dts: List of datetime
+            Datetimes for which the position will be calculated
 
         Returns
         -------
-        latitude: float
-            Geocentric latitude of the satellite.
-        longitude: float
-            Geocentric longitude of the satellite.
-        height: float
-            Height of the satellite over sea level in meters.
+        positions: list of tuples of floats
+            List of tuples of 3 floats, representing:
+            latitude: float
+                Geocentric latitude of the satellite
+            longitude: float
+                Geocentric longitude of the satellite
+            height: float
+                Height of the satellite over sea level in meters.
         """
         if sat not in self.get_sat_names():
             raise Exception("Satellite is not registered in LIME's satellite list.")
         sat: Satellite = [s for s in self.get_sat_list() if s.name == sat][0]
-        orb_f = sat.get_best_orbit_file(dt)
+        dt_orb_f = {}
+        for dt in dts:
+            orb_f = sat.get_best_orbit_file(dt)
+            if not orb_f in dt_orb_f:
+                dt_orb_f[orb_f] = [dt]
+            else:
+                dt_orb_f[orb_f].append(dt)
+        positions_map = {}
+        for orb_f in dt_orb_f:
+            positions = self._get_sat_position_one_orbit_file(
+                sat, dt_orb_f[orb_f], orb_f
+            )
+            for i, dt in enumerate(dt_orb_f[orb_f]):
+                positions_map[dt] = positions[i]
+        positions_ret = []
+        for dt in dts:
+            positions_ret.append(positions_map[dt])
+        return positions_ret
+
+    def _get_sat_position_one_orbit_file(
+        self, sat: Satellite, dts: List[datetime], orb_f: OrbitFile
+    ) -> List[Tuple[float, float, float]]:
         is_pred = False
         if sat.orbit_files:
             if orb_f == None:
@@ -248,26 +273,39 @@ class EOCFIConverter(IEOCFIConverter):
 
         bulletinb_file_init_time = c_char_p(bulletin.encode())
 
-        eocfi_sat.get_satellite_position.restype = ndpointer(dtype=c_double, shape=(3,))
-        sat_position = eocfi_sat.get_satellite_position(
+        n_dates = len(dts)
+        l_cdt = []
+        for dt in dts:
+            c_dt = (c_int * 6)(
+                *[dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
+            )
+            l_cdt.append(c_dt)
+        c_dts = (POINTER(c_int) * n_dates)(*l_cdt)
+        eocfi_sat.get_satellite_position.restype = ndpointer(
+            dtype=c_double, ndim=2, shape=(n_dates, 3)
+        )
+        sat_positions = eocfi_sat.get_satellite_position(
             c_long(sat.id),
-            c_int(dt.year),
-            c_int(dt.month),
-            c_int(dt.day),
-            c_int(dt.hour),
-            c_int(dt.minute),
-            c_int(dt.second),
+            c_int(n_dates),
+            c_dts,
             bulletinb_file_init_time,
             _make_clist(orbit_files),
             c_long(len(orbit_files)),
         )
+        print(*sat_positions)
 
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
             {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
         )
-        lon, lat, hhh = transformer.transform(
-            sat_position[0], sat_position[1], sat_position[2], radians=False
-        )
-        print(lat, lon, hhh)
-        return lat, lon, hhh
+        positions = []
+        for i in range(n_dates):
+            lon, lat, hhh = transformer.transform(
+                sat_positions[i][0],
+                sat_positions[i][1],
+                sat_positions[i][2],
+                radians=False,
+            )
+            print(lat, lon, hhh)
+            positions.append((lat, lon, hhh))
+        return positions

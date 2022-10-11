@@ -465,7 +465,7 @@ class ApolloIrradianceCoefficients:
         return self.apollo_coeffs
 
 
-@dataclass
+@dataclass(eq=True, frozen=True)
 class OrbitFile:
     """
     Dataclass that represents a Satellite orbit file.
