@@ -68,9 +68,9 @@ class TestEOCFIConverter(unittest.TestCase):
 
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
-        lat, lon, h = eo.get_satellite_position("SENTINEL-2A", DT1)[0]
-        self.assertEqual(lat, -65.90847446723077)
-        self.assertEqual(lon, 10.38388866324515)
+        lat, lon, h = eo.get_satellite_position("SENTINEL-2A", [DT1])[0]
+        self.assertEqual(lon, -65.90847446723077)
+        self.assertEqual(lat, 10.38388866324515)
         self.assertEqual(h, 791026.5592273567)
 
     def test_get_satellite_position_true_data(self):
@@ -83,7 +83,7 @@ class TestEOCFIConverter(unittest.TestCase):
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
             {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
         )
-        lat2, lon2, hh2 = transformer.transform(
+        lon2, lat2, hh2 = transformer.transform(
             -3496004.37772468, -404044.1700419, 6279426.45463165, radians=False
         )
         self.assertAlmostEqual(lat, lat2)

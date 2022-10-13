@@ -230,7 +230,7 @@ class CLI:
                 if len(comps[i].dts) > 0:
                     data = [comps[i].observed_signal, comps[i].simulated_signal]
                     points = comps[i].points
-                    ylabel = "Signal (Wm⁻²nm⁻¹)"
+                    ylabel = "Irradiance (Wm⁻²nm⁻¹)"
                     output = ""
                     if isinstance(ed, ExportComparisonCSV):
                         output = ed.output_files[file_index]

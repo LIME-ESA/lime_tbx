@@ -399,12 +399,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     i,
                     "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                     "datetimes",
-                    "Signal (Wm⁻²nm⁻¹)",
+                    "Irradiance (Wm⁻²nm⁻¹)",
                 )
                 self.output.update_legends(
                     i,
                     [
-                        ["Observed Signal", "Simulated Signal"],
+                        ["Observed Irradiance", "Simulated Irradiance"],
                         [],
                         [],
                         ["Relative Differences"],
@@ -438,7 +438,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 i,
                 "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                 "datetimes",
-                "Signal (Wm⁻²nm⁻¹)",
+                "Irradiance (Wm⁻²nm⁻¹)",
                 False,
             )
             self.output.update_legends(
