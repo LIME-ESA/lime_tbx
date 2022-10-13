@@ -253,6 +253,7 @@ class EOCFIConverter(IEOCFIConverter):
         self, sat: Satellite, dts: List[datetime], orb_f: OrbitFile
     ) -> List[Tuple[float, float, float]]:
         is_pred = False
+        orbit_path = ""
         if sat.orbit_files:
             if orb_f == None:
                 raise LimeException(
@@ -267,9 +268,6 @@ class EOCFIConverter(IEOCFIConverter):
             if "ORBPRE" in orb_f.name:
                 is_pred = True
             # We have to make this a list/array
-            orbit_files = [orbit_path]
-        else:
-            orbit_files = []
         fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
         metadata = yaml.load(fl, Loader=yaml.FullLoader)
         fl.close()
@@ -278,8 +276,6 @@ class EOCFIConverter(IEOCFIConverter):
         else:
             bulletin_name = metadata.get("BULLETIN_IERS")["file_a"]
         bulletin = os.path.join(self.eocfi_path, bulletin_name)
-
-        bulletinb_file_init_time = ct.c_char_p(bulletin.encode())
 
         n_dates = len(dts)
         l_cdt = []
@@ -301,26 +297,31 @@ class EOCFIConverter(IEOCFIConverter):
         if sat.intdes != None:
             intdes = sat.intdes
         if orb_f.name.endswith(".txt") or orb_f.name.endswith(".TLE"):
-            tle_file = orbit_files[0]
-            orbit_files = [
-                os.path.join(
-                    self.eocfi_path,
-                    f"data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF",
-                )
-            ]
-        eocfi_sat.get_satellite_position(
-            ct.c_long(sat.id),
-            ct.c_int(n_dates),
-            c_dts,
-            bulletinb_file_init_time,
-            _make_clist(orbit_files),
-            ct.c_long(len(orbit_files)),
-            ct.c_long(norad),
-            ct.c_char_p(sat.name.encode()),
-            ct.c_char_p(intdes.encode()),
-            ct.c_char_p(tle_file.encode()),
-            sat_positions,
-        )
+            tle_file = orbit_path
+            orbit_path = os.path.join(
+                self.eocfi_path,
+                f"data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF",
+            )
+        if tle_file == "":
+            eocfi_sat.get_satellite_position_osf(
+                ct.c_long(sat.id),
+                ct.c_int(n_dates),
+                c_dts,
+                ct.c_char_p(orbit_path.encode()),
+                sat_positions,
+            )
+        else:
+            eocfi_sat.get_satellite_position_tle(
+                ct.c_long(sat.id),
+                ct.c_int(n_dates),
+                c_dts,
+                ct.c_char_p(orbit_path.encode()),
+                ct.c_long(norad),
+                ct.c_char_p(sat.name.encode()),
+                ct.c_char_p(intdes.encode()),
+                ct.c_char_p(tle_file.encode()),
+                sat_positions,
+            )
 
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},

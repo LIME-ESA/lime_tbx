@@ -44,7 +44,10 @@ SHELL = /bin/bash
 CFLAGS = \
         -m64 \
 	-Iinclude \
-	-D$(OS)
+	-D$(OS) -Wall
+
+DEBUG_FLAGS = \
+		-g -DDEBUG
 
 #------------------------------------------------------------------------------
 #       Linker tool, flags and libraries 
@@ -68,11 +71,23 @@ example:
 	echo "--------------------"
 	$(CC) $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions
 
+debug:
+	echo "--------------------"
+	echo "$(CFI): ... creating the debug-executable"
+	echo "--------------------"
+	$(CC) $(CFLAGS) $(DEBUG_FLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions
+
 shared:
 	echo "--------------------"
 	echo "$(CFI): ... creating shared library"
 	echo "--------------------"
 	$(CC) -fPIC -shared $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_darwin.so
+
+shared_debug:
+	echo "--------------------"
+	echo "$(CFI): ... creating shared debug library"
+	echo "--------------------"
+	$(CC) -fPIC -shared $(CFLAGS) $(DEBUG_FLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_linux.so
 
 spice:
 	echo "--------------------"

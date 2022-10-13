@@ -1,2 +1,4 @@
 logs
 Makefile
+bin/get_positions
+bin/get_positions.exe
