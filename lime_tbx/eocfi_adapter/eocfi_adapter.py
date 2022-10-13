@@ -184,6 +184,14 @@ class EOCFIConverter(IEOCFIConverter):
             sat_data: dict = sat_yaml.get(s)
             id = sat_data["id"]
             orbit_files_names = sat_data["orbit_files"]
+            norad_key = "norad_sat_number"
+            norad = None
+            if norad_key in sat_data:
+                norad = int(sat_data[norad_key])
+            intdes_key = "intdes"
+            intdes = None
+            if intdes_key in sat_data:
+                intdes = sat_data[intdes_key]
             if orbit_files_names == None:
                 orbit_files_names = []
             orbit_files = []
@@ -191,7 +199,7 @@ class EOCFIConverter(IEOCFIConverter):
                 d0, df = _get_file_datetimes(file)
                 orbit_f = OrbitFile(file, d0, df)
                 orbit_files.append(orbit_f)
-            sat = Satellite(name, id, orbit_files)
+            sat = Satellite(name, id, orbit_files, norad, intdes)
             sat_list.append(sat)
         return sat_list
 
@@ -285,6 +293,21 @@ class EOCFIConverter(IEOCFIConverter):
         for _ in range(n_dates):
             sat_positions_arrs.append((ct.c_double * 3)(*[0.0, 0.0, 0.0]))
         sat_positions = (ct.POINTER(ct.c_double) * n_dates)(*sat_positions_arrs)
+        norad = 0
+        intdes = ""
+        tle_file = ""
+        if sat.norad_sat_number != None:
+            norad = sat.norad_sat_number
+        if sat.intdes != None:
+            intdes = sat.intdes
+        if orb_f.name.endswith(".txt") or orb_f.name.endswith(".TLE"):
+            tle_file = orbit_files[0]
+            orbit_files = [
+                os.path.join(
+                    self.eocfi_path,
+                    f"data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF",
+                )
+            ]
         eocfi_sat.get_satellite_position(
             ct.c_long(sat.id),
             ct.c_int(n_dates),
@@ -292,6 +315,10 @@ class EOCFIConverter(IEOCFIConverter):
             bulletinb_file_init_time,
             _make_clist(orbit_files),
             ct.c_long(len(orbit_files)),
+            ct.c_long(norad),
+            ct.c_char_p(sat.name.encode()),
+            ct.c_char_p(intdes.encode()),
+            ct.c_char_p(tle_file.encode()),
             sat_positions,
         )
 

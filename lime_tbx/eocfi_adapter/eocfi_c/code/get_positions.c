@@ -246,9 +246,9 @@ double * get_moon_position(
 }
 
 #ifdef _WIN32
-__declspec(dllexport) void  get_satellite_position(
+__declspec(dllexport) int  get_satellite_position(
 #else
-    void  get_satellite_position(
+    int  get_satellite_position(
 #endif
         long sat_id,
         int quant_dates,
@@ -256,6 +256,10 @@ __declspec(dllexport) void  get_satellite_position(
         char *init_time_file,
         char **orbit_files, //char orbit_file[],
         long n_orbit_files,
+        long norad,
+        char *sat_name,
+        char *intdes,
+        char *tle_file,
         double** position_returns
         ){
 
@@ -276,7 +280,7 @@ __declspec(dllexport) void  get_satellite_position(
     xo_orbit_id    orbit_id    = {NULL};
     xl_model_id    model_id    = {NULL};
     long time_init_mode, orbit_mode;
-    char   *input_orbit_files[3];
+    char   *input_orbit_files[10];
     long orbit0, orbit1;
     double val_time0, val_time1, time;
     xo_validity_time val_time;
@@ -294,6 +298,23 @@ __declspec(dllexport) void  get_satellite_position(
     double pos[3];
     double vel[3];
     double acc[3];
+
+
+    /* TLE Initialization */
+    int use_tle = 0;
+    if (norad != 0 && strlen(tle_file) > 0) {
+        use_tle = 1;
+    }
+    if (use_tle) {
+        char norad_satcat[50];
+        char int_des[10];
+        strcpy(norad_satcat, sat_name);
+        strcpy(int_des, intdes);
+        status = xl_set_tle_sat_data(&sat_id, &norad, norad_satcat, int_des);
+        if (status != XL_OK){
+            if (status <= XL_ERR) return(XL_ERR);
+        }
+    }
 
     /* Time Initialization */
     /* ------------------- */
@@ -331,15 +352,17 @@ __declspec(dllexport) void  get_satellite_position(
 
     time_init_mode = XO_SEL_FILE;
 
-
-//    xl_verbose();
-//    xo_verbose();
     // input_orbit_files[0] = orbit_file;
     for (int i=0;i<n_orbit_files; i++){
         input_orbit_files[i] = orbit_files[i];
     }
 
     orbit_mode = XO_ORBIT_INIT_AUTO;
+
+    if (use_tle){
+        input_orbit_files[0] = tle_file;
+    }
+    printf("%s\n", input_orbit_files[0]);fflush(stdout);
 
     status =  xo_orbit_init_file(&sat_id, &model_id, &time_id,
                                  &orbit_mode, &n_orbit_files, input_orbit_files,
@@ -348,6 +371,7 @@ __declspec(dllexport) void  get_satellite_position(
                                  &val_time0, &val_time1, &orbit_id,
                                  errors);
 
+    printf("eon");fflush(stdout);
     if (status != XO_OK)
     {
         func_id = XO_ORBIT_INIT_FILE_ID;
@@ -422,6 +446,7 @@ __declspec(dllexport) void  get_satellite_position(
     }
 
     xl_time_close(&time_id, errors);
+    return XL_OK;
 }
 
 int main (int argc, char *argv[]){
@@ -442,6 +467,10 @@ int main (int argc, char *argv[]){
             "data/207_BULLETIN_B207.txt",
             orbit_file,
             1,
+            0,
+            "SENTINEL5P",
+            "",
+            "",
             positions
             );
     printf("****************************************************\n");

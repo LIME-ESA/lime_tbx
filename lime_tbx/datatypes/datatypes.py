@@ -498,11 +498,19 @@ class Satellite:
         Satellite id
     orbit_files: list of OrbitFile
         Orbit files of the Satellite
+    norad_sat_number: int | None
+        Number of the satellite in the NORAD Catalog number (Celestrak)
+        Only present if the satellite has TLE files.
+    intdes: str | None
+        International Designator of the object.
+        Only present if the satellite has TLE files.
     """
 
     name: str
     id: int
     orbit_files: List[OrbitFile]
+    norad_sat_number: Union[int, None]
+    intdes: Union[str, None]
 
     def get_datetime_range(self) -> Tuple[datetime, datetime]:
         """
