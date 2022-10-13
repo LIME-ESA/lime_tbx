@@ -183,9 +183,9 @@ class MoonDataFactory:
 
         mds: List[MoonData] = []
         srps: List[SurfacePoint] = []
-        for dt in dts:
-            lat, lon, height = eocfi.get_satellite_position(sp.name, [dt])[0]
-            srp = SurfacePoint(lat, lon, height, dt)
+        llhs = eocfi.get_satellite_position(sp.name, dts)
+        for i, llh in enumerate(llhs):
+            srp = SurfacePoint(llh[0], llh[1], llh[2], dts[i])
             srps.append(srp)
             mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
 

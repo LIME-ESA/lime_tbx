@@ -897,3 +897,8 @@ class LGLODComparisonData:
     comparisons: List[ComparisonData]
     ch_names: List[str]
     sat_name: str
+
+
+class LimeException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

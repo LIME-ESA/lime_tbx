@@ -246,23 +246,18 @@ double * get_moon_position(
 }
 
 #ifdef _WIN32
-__declspec(dllexport) double **  get_satellite_position(
+__declspec(dllexport) void  get_satellite_position(
 #else
-    double **  get_satellite_position(
+    void  get_satellite_position(
 #endif
         long sat_id,
         int quant_dates,
         int** dates,
         char *init_time_file,
         char **orbit_files, //char orbit_file[],
-        long n_orbit_files
+        long n_orbit_files,
+        double** position_returns
         ){
-    
-    static double **position_returns;
-    position_returns = (double**)malloc(sizeof(double*)*quant_dates);
-    for(int i = 0; i < quant_dates; i++){
-        position_returns[i] = (double*)malloc(sizeof(double)*3);
-    }
 
     char msg[XO_MAX_COD][XO_MAX_STR];
     long n = 0;
@@ -427,24 +422,27 @@ __declspec(dllexport) double **  get_satellite_position(
     }
 
     xl_time_close(&time_id, errors);
-
-    return position_returns;
 }
 
 int main (int argc, char *argv[]){
     double **positions;
+    positions = (double**)malloc(sizeof(double*)*1);
+    for(int i = 0; i < 1; i++){
+        positions[i] = (double*)malloc(sizeof(double)*3);
+    }
     char   *orbit_file[5] = {'\0'};
     orbit_file[0] = "data/mission_configuration_files/SENTINEL5P/OSF/S5P_OPER_MPL_ORBSCT_20171013T104928_99999999T999999_0008.EOF";
     int **dates = (int**)malloc(sizeof(int*));
     dates[0] = (int*)malloc(sizeof(int)*6);
     dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0;
-    positions = get_satellite_position(
+    get_satellite_position(
             XO_SAT_SENTINEL_5P,
             1,
             dates,
             "data/207_BULLETIN_B207.txt",
             orbit_file,
-            1
+            1,
+            positions
             );
     printf("****************************************************\n");
     printf("*    position_x  = %lf\n", positions[0][0]);

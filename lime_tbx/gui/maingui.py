@@ -18,6 +18,7 @@ from ..datatypes.datatypes import (
     KernelsPath,
     LGLODComparisonData,
     LGLODData,
+    LimeException,
     LunarObservation,
     LunarObservationWrite,
     Point,
@@ -74,11 +75,6 @@ class CallbackWorker(QtCore.QObject):
         except Exception as e:
             logger.get_logger().exception(e)
             self.exception.emit(e)
-
-
-class LimeException(Exception):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
 
 
 def eli_callback(
@@ -463,10 +459,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         window.set_save_simulation_action_disabled(False)
 
     def handle_operation_error(self, error: Exception):
-        logger.get_logger().critical(error)
         if isinstance(error, LimeException):
             self.show_error(error)
         else:
+            logger.get_logger().critical(error)
             self.show_error(_INTERNAL_ERROR_MSG)
 
     def compare_error(self, error: Exception):
@@ -632,10 +628,10 @@ class MainSimulationsWidget(
         return self.export_lglod_button.isEnabled()
 
     def handle_operation_error(self, error: Exception):
-        logger.get_logger().critical(error)
         if isinstance(error, LimeException):
             self.show_error(error)
         else:
+            logger.get_logger().critical(error)
             self.show_error(_INTERNAL_ERROR_MSG)
 
     @QtCore.Slot()

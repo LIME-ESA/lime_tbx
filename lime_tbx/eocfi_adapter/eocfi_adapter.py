@@ -8,7 +8,7 @@ It exports the following classes:
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from ctypes import *
+import ctypes as ct
 from typing import Tuple, List
 from datetime import datetime, timezone
 import os
@@ -22,7 +22,7 @@ import yaml
 import pyproj
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import OrbitFile, Satellite
+from ..datatypes.datatypes import LimeException, OrbitFile, Satellite
 
 """___Authorship___"""
 __author__ = "Ramiro González Catón"
@@ -46,7 +46,7 @@ else:
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _so_path = os.path.join(_current_dir, so_file_satellite)
-eocfi_sat = CDLL(_so_path)
+eocfi_sat = ct.CDLL(_so_path)
 
 
 def _make_clist(lst: List[str]):
@@ -64,7 +64,7 @@ def _make_clist(lst: List[str]):
     clst: c_char_p_Array
         ctypes array of byte strings
     """
-    return (c_char_p * len(lst))(*[x.encode() for x in lst])
+    return (ct.c_char_p * len(lst))(*[x.encode() for x in lst])
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -247,15 +247,15 @@ class EOCFIConverter(IEOCFIConverter):
         is_pred = False
         if sat.orbit_files:
             if orb_f == None:
-                raise Exception(
-                    "The satellite position can't be calculated for the given datetime."
+                raise LimeException(
+                    "The satellite position can't be calculated for a given datetime."
                 )
             orbit_path = os.path.join(
                 self.eocfi_path,
                 f"data/mission_configuration_files/{orb_f.name}",
             )
             if not os.path.exists(orbit_path):
-                raise Exception("The orbit file {} is missing".format(orbit_path))
+                raise LimeException("The orbit file {} is missing".format(orbit_path))
             if "ORBPRE" in orb_f.name:
                 is_pred = True
             # We have to make this a list/array
@@ -271,28 +271,29 @@ class EOCFIConverter(IEOCFIConverter):
             bulletin_name = metadata.get("BULLETIN_IERS")["file_a"]
         bulletin = os.path.join(self.eocfi_path, bulletin_name)
 
-        bulletinb_file_init_time = c_char_p(bulletin.encode())
+        bulletinb_file_init_time = ct.c_char_p(bulletin.encode())
 
         n_dates = len(dts)
         l_cdt = []
         for dt in dts:
-            c_dt = (c_int * 6)(
+            c_dt = (ct.c_int * 6)(
                 *[dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
             )
             l_cdt.append(c_dt)
-        c_dts = (POINTER(c_int) * n_dates)(*l_cdt)
-        eocfi_sat.get_satellite_position.restype = ndpointer(
-            dtype=c_double, ndim=2, shape=(n_dates, 3)
-        )
-        sat_positions = eocfi_sat.get_satellite_position(
-            c_long(sat.id),
-            c_int(n_dates),
+        c_dts = (ct.POINTER(ct.c_int) * n_dates)(*l_cdt)
+        sat_positions_arrs = []
+        for _ in range(n_dates):
+            sat_positions_arrs.append((ct.c_double * 3)(*[0.0, 0.0, 0.0]))
+        sat_positions = (ct.POINTER(ct.c_double) * n_dates)(*sat_positions_arrs)
+        eocfi_sat.get_satellite_position(
+            ct.c_long(sat.id),
+            ct.c_int(n_dates),
             c_dts,
             bulletinb_file_init_time,
             _make_clist(orbit_files),
-            c_long(len(orbit_files)),
+            ct.c_long(len(orbit_files)),
+            sat_positions,
         )
-        print(*sat_positions)
 
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},

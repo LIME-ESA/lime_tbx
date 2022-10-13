@@ -14,6 +14,7 @@ from lime_tbx.datatypes.datatypes import (
     KernelsPath,
     LGLODComparisonData,
     LGLODData,
+    LimeException,
     LunarObservation,
     Point,
     SatellitePoint,
@@ -23,7 +24,6 @@ from lime_tbx.gui import settings
 from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.gui.maingui import LimeException
 from lime_tbx.simulation.comparison import comparison
 
 
