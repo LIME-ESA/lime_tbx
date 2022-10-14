@@ -17,6 +17,7 @@ if sys.platform == 'linux':
     a_binaries = [
         ('.venv/lib/python3.8/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
         (src_path + 'eocfi_adapter/eocfi_c/bin/get_positions_linux.so', './lime_tbx/eocfi_adapter/eocfi_c/bin'),
+        (src_path + 'eocfi_adapter/eocfi_c/bin/get_positions_linux', './lime_tbx/eocfi_adapter/eocfi_c/bin'),
     ]
     a_datas = [
         (src_path + 'gui/assets/style.qss', './lime_tbx/gui/assets'),
@@ -38,6 +39,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
     a_binaries = [
         ('.venv\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
+        (src_path + 'eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.exe', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\msvcr100.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\pthreadVC2.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
     ]

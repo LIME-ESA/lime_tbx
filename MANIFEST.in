@@ -13,4 +13,7 @@ include lime_tbx/gui/assets/NotesEsaReg.otf
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_linux.so
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_darwin.so
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_win64.dll
+include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_linux
+include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_darwin
+include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_win64.exe
 include lime_tbx/interpolation/access_data/assets/SomeMoonReflectances.txt

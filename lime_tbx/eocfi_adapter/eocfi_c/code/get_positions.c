@@ -34,12 +34,12 @@ struct Date{
     int y, m, d, hh, mm, ss;
 };
 
-const int monthDays[12]
+static const int monthDays[12]
         = { 31, 28, 31, 30, 31, 30,
             31, 31, 30, 31, 30, 31
         };
 
-int countLeapYears(struct Date d)
+static int countLeapYears(struct Date d)
 {
     int years = d.y;
 
@@ -60,7 +60,7 @@ int countLeapYears(struct Date d)
 
 // This function returns number of
 // days between two given dates
-int getDifference(struct Date dt)
+static int getDifference(struct Date dt)
 {
     struct Date dt2 = dt;
     struct Date dt1 = {2000, 1, 1, 00, 00, 00};
@@ -90,7 +90,7 @@ int getDifference(struct Date dt)
     return (n2 - n1);
 }
 
-char* to_timestamp(const xl_time_id *time, double instant) {
+static char* to_timestamp(const xl_time_id *time, double instant) {
 
     long time_ref = XL_TIME_UTC;
     long fmt_in   = XL_PROC;
@@ -410,7 +410,7 @@ __declspec(dllexport) int  get_satellite_position_osf(
 }
 
 #ifdef _WIN32
-__declspec(dllexport) int  get_satellite_position(
+__declspec(dllexport) int  get_satellite_position_tle(
 #else
     int  get_satellite_position_tle(
 #endif
@@ -424,6 +424,18 @@ __declspec(dllexport) int  get_satellite_position(
         char *tle_file,
         double** position_returns
         ){
+
+#ifdef DEBUG
+    printf("%ld, %d\n", sat_id, quant_dates);
+    for(int i = 0; i < quant_dates; i++){
+        for(int j = 0; j < 6; j++){
+            printf("%d ", dates[i][j]);
+        }
+        printf("\n");
+    }
+    printf("%s\n%ld, %s, %s\n%s\n", time_file, norad, sat_name, intdes, tle_file);
+    fflush(stdout);
+#endif
 
     char msg[XO_MAX_COD][XO_MAX_STR];
     long n = 0;
@@ -476,14 +488,19 @@ __declspec(dllexport) int  get_satellite_position(
     trif_time_init_mode = XL_SEL_FILE;
     trif_time_ref       = XL_TIME_UTC;
 
+#ifdef DEBUG
     printf("init\n");fflush(stdout);
+#endif
 
     status = xl_time_ref_init_file(&trif_time_model, &one,
                                    &time_file,
                                    &trif_time_init_mode, &trif_time_ref, NULL,
                                    NULL, NULL, NULL, &vstart, &vstop, &time_id, errors);
 
+#ifdef DEBUG
     printf("check\n");fflush(stdout);
+#endif
+
     if (status != XO_OK)
     {
         func_id = XL_TIME_REF_INIT_FILE_ID;
@@ -507,15 +524,18 @@ __declspec(dllexport) int  get_satellite_position(
     time_init_mode = XO_SEL_FILE;
 
     orbit_mode = XO_ORBIT_INIT_TLE_MODE;
-
+#ifdef DEBUG
+    printf("almost\n");fflush(stdout);
+#endif
     status =  xo_orbit_init_file(&sat_id, &model_id, &time_id,
                                  &orbit_mode, &one, &tle_file,
                                  &time_init_mode, &time_ref_utc,
                                  &vstart, &vstop, &orbit0, &orbit1,
                                  &val_time0, &val_time1, &orbit_id,
                                  errors);
-
-    printf("fin");fflush(stdout);
+#ifdef DEBUG
+    printf("fin\n");fflush(stdout);
+#endif
     if (status != XO_OK)
     {
         func_id = XO_ORBIT_INIT_FILE_ID;
@@ -593,36 +613,71 @@ __declspec(dllexport) int  get_satellite_position(
     return XL_OK;
 }
 
+#define STR_SIZE_INPUT 1000
+
 int main (int argc, char *argv[]){
-    double **positions;
-    positions = (double**)malloc(sizeof(double*)*1);
-    for(int i = 0; i < 1; i++){
-        positions[i] = (double*)malloc(sizeof(double)*3);
+    // Main code can be called to perform tle calculations, as the shared library doesn't seem to work.
+    int n_dates;
+    long sat_id;
+    long norad;
+    char *tle_file = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
+    char *orbit_file = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
+    char *sat_name = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
+    char *intdes = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
+    if(argc < 5){
+        n_dates = 1;
+    }else{
+        n_dates = atoi(argv[1]);
     }
-    char   *orbit_file[5] = {'\0'};
-    orbit_file[0] = "../../../../eocfi_data/data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF";
-    //orbit_file[0] = "../../../../eocfi_data/data/mission_configuration_files/SENTINEL1B/OSF/S1B_OPER_MPL_ORBSCT_20160425T224606_99999999T999999_0017.EOF";
-    char *tle_file = "../../../../eocfi_data/data/mission_configuration_files/PROBAV/TLE/PROBA-V_20130507T000000_20221012T000000_0001.TLE";
-    int **dates = (int**)malloc(sizeof(int*));
-    dates[0] = (int*)malloc(sizeof(int)*6);
-    dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0;
-    long norad = 39159;
+    int **dates = (int**)malloc(sizeof(int*)*n_dates);
+    double **positions = (double**)malloc(sizeof(double*)*n_dates);
+    for(int i = 0; i < n_dates; i++){
+        positions[i] = (double*)malloc(sizeof(double)*3);
+        dates[i] = (int*)malloc(sizeof(int)*6);
+    }
+    if(argc < 5){
+        sat_id = 200;
+        dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0;
+        strcpy(orbit_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF");
+        strcpy(tle_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/TLE/PROBA-V_20130507T000000_20221012T000000_0001.TLE");
+        norad = 39159;
+        strcpy(sat_name, "PROBA-V");
+        strcpy(intdes, "13021A");
+    }else{
+        sat_id = atol(argv[2]);
+        norad = atol(argv[3]);
+        strcpy(tle_file, argv[4]);
+        strcpy(orbit_file, argv[5]);
+        strcpy(sat_name, argv[6]);
+        strcpy(intdes, argv[7]);
+        for(int i = 0; i < n_dates; i++){
+            sscanf(argv[8+i], "%d-%d-%dT%d:%d:%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5]);
+        }
+    }
     get_satellite_position_tle(
-            200,
-            1,
-            dates,
-            orbit_file[0],
-            norad,
-            "PROBA-V",
-            "13021A",
-            tle_file,
-            positions
-            );
-    printf("****************************************************\n");
-    printf("*    position_x  = %lf\n", positions[0][0]);
-    printf("*    position_y  = %lf\n", positions[0][1]);
-    printf("*    position_z  = %lf\n", positions[0][2]);
-    printf("****************************************************\n");
-    free(dates[0]);
+        sat_id,
+        n_dates,
+        dates,
+        orbit_file,
+        norad,
+        sat_name,
+        intdes,
+        tle_file,
+        positions
+    );
+    free(tle_file);
+    free(orbit_file);
+    free(sat_name);
+    free(intdes);
+    for(int i = 0; i < n_dates; i++){
+        printf("%lf\n", positions[i][0]);
+        printf("%lf\n", positions[i][1]);
+        printf("%lf\n", positions[i][2]);
+        fflush(stdout);
+        free(dates[i]);
+        free(positions[i]);
+    }
     free(dates);
+    free(positions);
+    return 0;
 }

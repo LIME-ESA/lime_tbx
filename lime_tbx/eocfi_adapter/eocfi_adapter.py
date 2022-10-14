@@ -36,16 +36,23 @@ METADATA_FILE = "metadata.yml"
 SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux.so"
 SO_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.dll"
 SO_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin.so"
+EXE_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux"
+EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
+EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
 
 if platform.system() == "Linux":
     so_file_satellite = SO_FILE_SATELLITE_LINUX
+    exe_file_satellite = EXE_FILE_SATELLITE_LINUX
 elif platform.system() == "Windows":
     so_file_satellite = SO_FILE_SATELLITE_WINDOWS
+    exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
 else:
     so_file_satellite = SO_FILE_SATELLLITE_DARWIN
+    exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _so_path = os.path.join(_current_dir, so_file_satellite)
+_exe_path = os.path.join(_current_dir, exe_file_satellite)
 eocfi_sat = ct.CDLL(_so_path)
 
 
@@ -192,6 +199,10 @@ class EOCFIConverter(IEOCFIConverter):
             intdes = None
             if intdes_key in sat_data:
                 intdes = sat_data[intdes_key]
+            time_file_key = "time_file"
+            time_file = None
+            if time_file_key in sat_data:
+                time_file = sat_data[time_file_key]
             if orbit_files_names == None:
                 orbit_files_names = []
             orbit_files = []
@@ -199,7 +210,7 @@ class EOCFIConverter(IEOCFIConverter):
                 d0, df = _get_file_datetimes(file)
                 orbit_f = OrbitFile(file, d0, df)
                 orbit_files.append(orbit_f)
-            sat = Satellite(name, id, orbit_files, norad, intdes)
+            sat = Satellite(name, id, orbit_files, norad, intdes, time_file)
             sat_list.append(sat)
         return sat_list
 
@@ -300,7 +311,9 @@ class EOCFIConverter(IEOCFIConverter):
             tle_file = orbit_path
             orbit_path = os.path.join(
                 self.eocfi_path,
-                f"data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF",
+                "data",
+                "mission_configuration_files",
+                sat.time_file,
             )
         if tle_file == "":
             eocfi_sat.get_satellite_position_osf(
@@ -311,17 +324,28 @@ class EOCFIConverter(IEOCFIConverter):
                 sat_positions,
             )
         else:
-            eocfi_sat.get_satellite_position_tle(
-                ct.c_long(sat.id),
-                ct.c_int(n_dates),
-                c_dts,
-                ct.c_char_p(orbit_path.encode()),
-                ct.c_long(norad),
-                ct.c_char_p(sat.name.encode()),
-                ct.c_char_p(intdes.encode()),
-                ct.c_char_p(tle_file.encode()),
-                sat_positions,
+            # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK FOR TLE
+            cmd = "{} {} {} {} {} {} {} {}".format(
+                _exe_path,
+                n_dates,
+                sat.id,
+                norad,
+                tle_file,
+                orbit_path,
+                sat.name,
+                intdes,
             )
+            for dt in dts:
+                cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
+            so = os.popen(cmd).read()
+            out_lines = so.splitlines()
+            if len(out_lines) == 3 * n_dates:
+                for i in range(n_dates):
+                    sat_positions[i][0] = ct.c_double(float(out_lines[i * 3]))
+                    sat_positions[i][1] = ct.c_double(float(out_lines[i * 3 + 1]))
+                    sat_positions[i][2] = ct.c_double(float(out_lines[i * 3 + 2]))
+            else:
+                raise Exception("Number of lines unexpected.\n{}".format(out_lines))
 
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
