@@ -324,6 +324,11 @@ class EOCFIConverter(IEOCFIConverter):
                 sat_positions,
             )
         else:
+            if platform.system() == "Windows":
+                orbit_path = orbit_path.replace("/", "\\")
+                tle_file = tle_file.replace("/", "\\")
+            orbit_path = "\"{}\"".format(orbit_path)
+            tle_file = "\"{}\"".format(tle_file)
             # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK FOR TLE
             cmd = "{} {} {} {} {} {} {} {}".format(
                 _exe_path,
@@ -345,7 +350,7 @@ class EOCFIConverter(IEOCFIConverter):
                     sat_positions[i][1] = ct.c_double(float(out_lines[i * 3 + 1]))
                     sat_positions[i][2] = ct.c_double(float(out_lines[i * 3 + 2]))
             else:
-                raise Exception("Number of lines unexpected.\n{}".format(out_lines))
+                raise Exception("Number of lines unexpected. {}/{}.\n{}".format(str(len(out_lines)), str(3*n_dates),out_lines))
 
         transformer = pyproj.Transformer.from_crs(
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
