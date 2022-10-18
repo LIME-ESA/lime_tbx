@@ -17,12 +17,10 @@ import platform
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Third-Party Modules___"""
-from numpy.ctypeslib import ndpointer
 import yaml
-import pyproj
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import LimeException, OrbitFile, Satellite
+from ..datatypes.datatypes import KernelsPath, LimeException, OrbitFile, Satellite
 
 """___Authorship___"""
 __author__ = "Ramiro González Catón"
@@ -145,9 +143,10 @@ class IEOCFIConverter(ABC):
 
 
 class EOCFIConverter(IEOCFIConverter):
-    def __init__(self, eocfi_path: str):
+    def __init__(self, eocfi_path: str, kernels_path: KernelsPath):
         super().__init__()
         self.eocfi_path = eocfi_path
+        self.kernels_path = kernels_path
 
     def get_sat_names(self) -> List[str]:
         """
@@ -327,8 +326,8 @@ class EOCFIConverter(IEOCFIConverter):
             if platform.system() == "Windows":
                 orbit_path = orbit_path.replace("/", "\\")
                 tle_file = tle_file.replace("/", "\\")
-            orbit_path = "\"{}\"".format(orbit_path)
-            tle_file = "\"{}\"".format(tle_file)
+            orbit_path = '"{}"'.format(orbit_path)
+            tle_file = '"{}"'.format(tle_file)
             # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK FOR TLE
             cmd = "{} {} {} {} {} {} {} {}".format(
                 _exe_path,
@@ -350,19 +349,17 @@ class EOCFIConverter(IEOCFIConverter):
                     sat_positions[i][1] = ct.c_double(float(out_lines[i * 3 + 1]))
                     sat_positions[i][2] = ct.c_double(float(out_lines[i * 3 + 2]))
             else:
-                raise Exception("Number of lines unexpected. {}/{}.\n{}".format(str(len(out_lines)), str(3*n_dates),out_lines))
+                raise Exception(
+                    "Number of lines unexpected. {}/{}.\n{}".format(
+                        str(len(out_lines)), str(3 * n_dates), out_lines
+                    )
+                )
 
-        transformer = pyproj.Transformer.from_crs(
-            {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
-            {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
-        )
         positions = []
         for i in range(n_dates):
-            lon, lat, hhh = transformer.transform(
-                sat_positions[i][0],
-                sat_positions[i][1],
-                sat_positions[i][2],
-                radians=False,
+            x, y, z = (sat_positions[i][0], sat_positions[i][1], sat_positions[i][2])
+            lat, lon, hhh = SPICEAdapter.to_planetographic(
+                x, y, z, "EARTH", self.kernels_path.main_kernels_path
             )
             print(lat, lon, hhh)
             positions.append((lat, lon, hhh))

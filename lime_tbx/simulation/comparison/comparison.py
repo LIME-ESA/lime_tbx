@@ -16,7 +16,6 @@ from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Third-Party Modules___"""
 import numpy as np
-import pyproj
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (

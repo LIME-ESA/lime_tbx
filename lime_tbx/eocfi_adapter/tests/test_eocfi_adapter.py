@@ -3,12 +3,14 @@
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 """___Third-Party Modules___"""
 import unittest
-import pyproj
 
 """___LIME_TBX Modules___"""
 from ..eocfi_adapter import EOCFIConverter, IEOCFIConverter, _get_file_datetimes
+from lime_tbx.datatypes.datatypes import KernelsPath
 
 
 """___Authorship___"""
@@ -19,6 +21,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 EOCFI_PATH = "./eocfi_data"
+KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 MANDATORY_SATS = [
     "ENVISAT",
     "PROBA-V",
@@ -33,7 +36,7 @@ DT1 = datetime(2016, 1, 1, 15, 0, 2, tzinfo=timezone.utc)
 
 
 def get_eocfi_converter() -> IEOCFIConverter:
-    return EOCFIConverter(EOCFI_PATH)
+    return EOCFIConverter(EOCFI_PATH, KERNELS_PATH)
 
 
 class TestEOCFIConverter(unittest.TestCase):
@@ -69,9 +72,9 @@ class TestEOCFIConverter(unittest.TestCase):
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
         lat, lon, h = eo.get_satellite_position("SENTINEL-2A", [DT1])[0]
-        self.assertEqual(lon, -65.90847446723077)
-        self.assertEqual(lat, 10.38388866324515)
-        self.assertEqual(h, 791026.5592273567)
+        self.assertEqual(lon, -65.90847446723075)
+        self.assertEqual(lat, 10.383888702133119)
+        self.assertEqual(h, 791026.9596526251)
 
     def test_get_satellite_position_true_data(self):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
@@ -79,12 +82,12 @@ class TestEOCFIConverter(unittest.TestCase):
         lat, lon, hhh = eo.get_satellite_position(
             "SENTINEL-5P", [datetime(2022, 1, 2, 0, 0, 0, tzinfo=timezone.utc)]
         )[0]
-        transformer = pyproj.Transformer.from_crs(
-            {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
-            {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
-        )
-        lon2, lat2, hh2 = transformer.transform(
-            -3496004.37772468, -404044.1700419, 6279426.45463165, radians=False
+        lat2, lon2, hh2 = SPICEAdapter.to_planetographic(
+            -3496004.37772468,
+            -404044.1700419,
+            6279426.45463165,
+            "EARTH",
+            KERNELS_PATH.main_kernels_path,
         )
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2)

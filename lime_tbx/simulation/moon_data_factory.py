@@ -176,7 +176,7 @@ class MoonDataFactory:
         srp: SurfacePoint | list of SurfacePoint
             SurfacePoint generated from the position of the SatellitePoint at the given datetimes.
         """
-        eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path)
+        eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path, kernels_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]
