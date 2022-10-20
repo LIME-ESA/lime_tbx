@@ -39,7 +39,7 @@ from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.gui import coefficients, constants
-from ..datatypes import logger
+from ..datatypes import logger, constants as logic_constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -539,6 +539,7 @@ class MainSimulationsWidget(
         self.graph.update_legend(
             [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
         )
+        self.graph.set_xlim(logic_constants.CERTAIN_MIN_WLEN)
         # srf widget
         self.srf_widget = srf.SRFEditWidget(
             self.settings_manager, self._callback_regular_input_changed

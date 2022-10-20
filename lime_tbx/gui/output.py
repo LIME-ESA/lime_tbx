@@ -1,7 +1,6 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from configparser import NoSectionError
 from typing import Union, List, Tuple
 import os
 from datetime import datetime
@@ -86,7 +85,9 @@ class GraphWidget(QtWidgets.QWidget):
         self.data_compare = None
         self.vertical_lines = []
         self.dts = []
-        self.mpl_cursor = NoSectionError
+        self.mpl_cursor = None
+        self.xlim_left = None
+        self.xlim_right = None
         self._build_layout()
 
     def _build_layout(self):
@@ -158,6 +159,10 @@ class GraphWidget(QtWidgets.QWidget):
     def set_vertical_lines(self, xs: List[float]):
         self.vertical_lines = xs
         self._redraw()
+
+    def set_xlim(self, left: float = None, right: float = None):
+        self.xlim_left = left
+        self.xlim_right = right
 
     def update_plot(
         self,
@@ -379,6 +384,7 @@ class GraphWidget(QtWidgets.QWidget):
                 label = dt.strftime("%Y/%m/%d %H:%M:%S")
                 sel.annotation.set_text(label)
 
+        self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
         self.canvas.draw()
 
     def show_error(self, error: Exception):
