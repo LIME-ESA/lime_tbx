@@ -140,6 +140,10 @@ class IComparison(ABC):
         """
         pass
 
+    @abstractmethod
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> None:
+        pass
+
 
 class Comparison(IComparison):
     def _get_full_srf(self) -> SpectralResponseFunction:
@@ -193,7 +197,7 @@ class Comparison(IComparison):
             sp = SurfacePoint(lat, lon, h, dt)
             mpa = SPICEAdapter.get_moon_data_from_earth(
                 lat, lon, h, dt, self.kernels_path
-            )
+            ).mpa_degrees
             lime_simulation.set_simulation_changed()
             lime_simulation.update_irradiance(srf, sp, coefficients)
             signals = lime_simulation.get_signals()
@@ -257,3 +261,24 @@ class Comparison(IComparison):
                     ComparisonData(None, None, None, None, None, None, None, [], [], [])
                 )
         return comparisons
+
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> None:
+        # TODO make it work
+        for c in comparisons:
+            spectrals = [c.observed_signal, c.simulated_signal, c.diffs_signal]
+            sp_vals = []
+            for spectr in spectrals:
+                sp_vals.append(spectr.wlens)
+                sp_vals.append(spectr.data)
+                sp_vals.append(spectr.uncertainties)
+            vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
+            vals.sort(key=lambda v: v[-1])
+            index = 0
+            for i, spectr in enumerate(spectrals):
+                index = i * 3
+                spectr.wlens = [v[index] for v in vals]
+                spectr.data = [v[index + 1] for v in vals]
+                spectr.uncertainties = [v[index + 2] for v in vals]
+            c.dts = [v[-3] for v in vals]
+            c.points = [v[-2] for v in vals]
+            c.mpas = [v[-1] for v in vals]
