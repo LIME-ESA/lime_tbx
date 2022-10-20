@@ -178,18 +178,22 @@ class Comparison(IComparison):
         sigs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
         sps = [[] for _ in ch_names]
+        mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
         for obs in observations:
             sat_pos = obs.sat_pos
             dt = obs.dt
             lat, lon, h = SPICEAdapter.to_planetographic(
-                sat_pos.x * 1000,
-                sat_pos.y * 1000,
-                sat_pos.z * 1000,
+                sat_pos.x,
+                sat_pos.y,
+                sat_pos.z,
                 "EARTH",
                 self.kernels_path.main_kernels_path,
             )
             sp = SurfacePoint(lat, lon, h, dt)
+            mpa = SPICEAdapter.get_moon_data_from_earth(
+                lat, lon, h, dt, self.kernels_path
+            )
             lime_simulation.set_simulation_changed()
             lime_simulation.update_irradiance(srf, sp, coefficients)
             signals = lime_simulation.get_signals()
@@ -199,6 +203,7 @@ class Comparison(IComparison):
                     sigs[j].append((signals.data[j][0], signals.uncertainties[j][0]))
                     # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
+                    mpas[j].append(mpa)
                     obs_irrs[j].append(obs.ch_irrs[ch])
             if callback_observation:
                 callback_observation()
@@ -244,10 +249,11 @@ class Comparison(IComparison):
                     num_samples,
                     ch_dates[i],
                     sps[i],
+                    mpas[i],
                 )
                 comparisons.append(cp)
             else:
                 comparisons.append(
-                    ComparisonData(None, None, None, None, None, None, None, [], [])
+                    ComparisonData(None, None, None, None, None, None, None, [], [], [])
                 )
         return comparisons

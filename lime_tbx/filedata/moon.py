@@ -45,6 +45,13 @@ _READ_FILE_ERROR_STR = (
 _EXPORT_ERROR_STR = "Error while exporting as LGLOD. See log for details."
 
 
+def _calc_divisor_to_m(units: str) -> float:
+    if units == "km":
+        return 0.001
+    # if units == "m":
+    return 1
+
+
 def _calc_divisor_to_nm(units: str) -> float:
     if units == "W m-2 m-1":
         d_to_nm = 1000000000
@@ -86,7 +93,11 @@ def read_moon_obs(path: str) -> LunarObservation:
             ch_names.append(ch_name)
         dt = datetime.fromtimestamp(float(ds["date"][0].data), tz=timezone.utc)
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
-        sat_pos = SatellitePosition(*list(map(float, ds["sat_pos"][:][:].data)))
+        sat_pos_units: str = ds["sat_pos"].units
+        d_to_m = _calc_divisor_to_m(sat_pos_units)
+        sat_pos = SatellitePosition(
+            *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
+        )
         irr_obs = ds["irr_obs"][:]
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
@@ -217,14 +228,17 @@ def _write_normal_simulations(
     channel_name[:] = np.array(
         [nc.stringtochar(np.array([ch], chan_st_type)) for ch in sim_data.ch_names]
     )
-    sat_pos = ds.createVariable("sat_pos", "f4", ("number_obs", "sat_xyz"))
+    sat_pos = ds.createVariable("sat_pos", "f8", ("number_obs", "sat_xyz"))
     sat_pos.long_name = "satellite position x y z in sat_pos_ref"
     sat_pos.units = "km"
-    sat_pos.valid_min = 0.0
+    sat_pos.valid_min = -999999995904.0
     sat_pos.valid_max = 999999995904.0
     sat_pos[:] = np.array(
-        [np.array([sat_pos.x, sat_pos.y, sat_pos.z]) for sat_pos in sim_data.sat_pos]
-    )
+        [
+            np.array([sat_pos.x / 1000, sat_pos.y / 1000, sat_pos.z / 1000])
+            for sat_pos in sim_data.sat_pos
+        ]
+    )  # divided by 1000 because they were in meters
     sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
     sat_pos_ref.long_name = "reference frame of satellite position"
     sat_pos_ref[:] = nc.stringtochar(
@@ -447,7 +461,11 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         chn.tobytes().decode("utf-8").replace("\x00", "")
         for chn in ds.variables["channel_name"][:].data
     ]
-    lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
+    sat_pos_units: str = ds["sat_pos"].units
+    d_to_m = _calc_divisor_to_m(sat_pos_units)
+    lambda_to_satpos = lambda xyz: SatellitePosition(
+        *list(map(lambda a: a / d_to_m, xyz))
+    )
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
     sat_pos_ref_0 = (
         ds.variables["sat_pos_ref"][:]
@@ -770,7 +788,11 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
         chn.tobytes().decode("utf-8").replace("\x00", "")
         for chn in ds.variables["channel_name"][:].data
     ]
-    lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
+    sat_pos_units: str = ds["sat_pos"].units
+    d_to_m = _calc_divisor_to_m(sat_pos_units)
+    lambda_to_satpos = lambda xyz: SatellitePosition(
+        *list(map(lambda a: a / d_to_m, xyz))
+    )
     fill_value = -999
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
     irr_obs_data = np.array(ds.variables["irr_obs"][:].data).T

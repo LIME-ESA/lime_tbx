@@ -821,6 +821,7 @@ class ComparisonData:
     number_samples: int
     dts: List[datetime]
     points: List[Point]
+    mpas: List[float]
 
 
 @dataclass
