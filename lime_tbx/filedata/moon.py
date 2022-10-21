@@ -809,20 +809,24 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
     comps = []
     points = []
+    mpas = []
     ds.close()
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
     temporal_trend = temporal_trend[temporal_trend != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     for i, sp in enumerate(sat_poss):
-        points.append(
-            SurfacePoint(
-                *SPICEAdapter.to_planetographic(
-                    sp.x, sp.y, sp.z, "EARTH", kernels_path.main_kernels_path
-                ),
-                datetimes[i]
-            )
+        sp = SurfacePoint(
+            *SPICEAdapter.to_planetographic(
+                sp.x, sp.y, sp.z, "EARTH", kernels_path.main_kernels_path
+            ),
+            datetimes[i]
         )
+        points.append(sp)
+        mpa = SPICEAdapter.get_moon_data_from_earth(
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
+        ).mpa_degrees
+        mpas.append(mpa)
 
     points = np.array(points)
     for i in range(len(ch_names)):
@@ -849,6 +853,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             number_samples[i],
             dts,
             points[indexes],
+            mpas[indexes],
         )
         comps.append(comp)
     return LGLODComparisonData(comps, ch_names, sat_name)
