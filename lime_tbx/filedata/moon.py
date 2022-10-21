@@ -829,6 +829,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
         mpas.append(mpa)
 
     points = np.array(points)
+    mpas = np.array(mpas)
     for i in range(len(ch_names)):
         indexes = irr_comp_data[i] != fill_value
         irr_comp_data_i = irr_comp_data[i][irr_comp_data[i] != fill_value]
