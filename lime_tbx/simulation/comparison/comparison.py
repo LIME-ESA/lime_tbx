@@ -262,9 +262,12 @@ class Comparison(IComparison):
                 )
         return comparisons
 
-    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> None:
-        # TODO make it work
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> List[ComparisonData]:
+        new_comparisons = []
         for c in comparisons:
+            if c.observed_signal == None:
+                new_comparisons.append(c)
+                continue
             spectrals = [c.observed_signal, c.simulated_signal, c.diffs_signal]
             sp_vals = []
             for spectr in spectrals:
@@ -273,12 +276,32 @@ class Comparison(IComparison):
                 sp_vals.append(spectr.uncertainties)
             vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
             vals.sort(key=lambda v: v[-1])
+            mpas = [v[-1] for v in vals]
+            new_spectrals = []
             index = 0
             for i, spectr in enumerate(spectrals):
                 index = i * 3
-                spectr.wlens = [v[index] for v in vals]
-                spectr.data = [v[index + 1] for v in vals]
-                spectr.uncertainties = [v[index + 2] for v in vals]
-            c.dts = [v[-3] for v in vals]
-            c.points = [v[-2] for v in vals]
-            c.mpas = [v[-1] for v in vals]
+                wlens = np.array(mpas)  # [v[index] for v in vals]
+                data = np.array([v[index + 1] for v in vals])
+                uncertainties = np.array([v[index + 2] for v in vals])
+                new_spectrals.append(SpectralData(wlens, data, uncertainties, None))
+            mrd = c.mean_relative_difference
+            std = c.standard_deviation_mrd
+            ttrend = c.temporal_trend
+            nsamp = c.number_samples
+            dts = [v[-3] for v in vals]
+            points = [v[-2] for v in vals]
+            nc = ComparisonData(
+                new_spectrals[0],
+                new_spectrals[1],
+                new_spectrals[2],
+                mrd,
+                std,
+                ttrend,
+                nsamp,
+                dts,
+                points,
+                mpas,
+            )
+            new_comparisons.append(nc)
+        return new_comparisons

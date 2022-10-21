@@ -137,6 +137,7 @@ def export_csv_comparation(
     points: List[SurfacePoint],
     name: str,
     coeff_version: str,
+    x_datetime: bool = True,
 ):
     """
     Export the given data to a csv file
@@ -156,14 +157,19 @@ def export_csv_comparation(
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    x_datetime: bool
+        True if it used datetimes as the x_axis, False if it used mpa
     """
+    x_label = "UTC datetime"
+    if not x_datetime:
+        x_label = "Moon phase angle (degrees)"
     try:
         with open(name, "w") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
             writer.writerow(
                 [
-                    "UTC datetime",
+                    x_label,
                     "latitude",
                     "longitude",
                     "altitude(m)",
@@ -176,9 +182,13 @@ def export_csv_comparation(
             x_data = data[0].wlens
             for i in range(len(x_data)):
                 pt = points[i]
+                if x_datetime:
+                    x_val = pt.dt.strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    x_val = x_data[i]
                 writer.writerow(
                     [
-                        pt.dt.strftime("%Y-%m-%d %H:%M:%S"),
+                        x_val,
                         pt.latitude,
                         pt.longitude,
                         pt.altitude,

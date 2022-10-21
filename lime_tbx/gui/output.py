@@ -69,6 +69,7 @@ class GraphWidget(QtWidgets.QWidget):
         title="",
         xlabel="",
         ylabel="",
+        comparison_x_datetime=True,
         parent=None,
     ):
         super().__init__(parent)
@@ -88,6 +89,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.mpl_cursor = None
         self.xlim_left = None
         self.xlim_right = None
+        self.comparison_x_datetime = comparison_x_datetime
         self._build_layout()
 
     def _build_layout(self):
@@ -423,6 +425,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.point,
                         name,
                         version,
+                        self.comparison_x_datetime,
                     )
                 else:
                     csv.export_csv(
@@ -582,11 +585,12 @@ for wavelengths between 350 and 2500 nm"
 
 
 class ComparisonOutput(QtWidgets.QWidget):
-    def __init__(self, settings_manager: ISettingsManager):
+    def __init__(self, settings_manager: ISettingsManager, x_datetime: bool):
         super().__init__()
         self.settings_manager = settings_manager
         self.channels: List[GraphWidget] = []
         self.ch_names = []
+        self.x_datetime = x_datetime
         self._build_layout()
 
     def _build_layout(self):
@@ -604,7 +608,9 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.channels.clear()
         self.ch_names = []
         for ch in channels:
-            channel = GraphWidget(self.settings_manager, ch)
+            channel = GraphWidget(
+                self.settings_manager, ch, comparison_x_datetime=self.x_datetime
+            )
             self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
@@ -682,3 +688,9 @@ for wavelengths between 350 and 2500 nm"
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
         self.channels[index].update_legend(legends, redraw=redraw)
+
+    def get_current_channel_index(self) -> int:
+        return self.channel_tabs.currentIndex()
+
+    def set_current_channel_index(self, index: int):
+        return self.channel_tabs.setCurrentIndex(index)

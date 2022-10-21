@@ -199,7 +199,12 @@ def compare_callback(
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
     signal_info: QtCore.Signal,
-) -> Tuple[List[ComparisonData], List[LunarObservation], SpectralResponseFunction,]:
+) -> Tuple[
+    List[ComparisonData],
+    List[ComparisonData],
+    List[LunarObservation],
+    SpectralResponseFunction,
+]:
     co = comparison.Comparison(kernels_path)
     for mo in mos:
         if not mo.check_valid_srf(srf):
@@ -217,7 +222,8 @@ def compare_callback(
     comparisons = co.get_simulations(
         mos, srf, cimel_coef, lime_simulation, callback_obs
     )
-    return comparisons, mos, srf
+    mpa_comp = co.sort_by_mpa(comparisons)
+    return comparisons, mpa_comp, mos, srf
 
 
 def calculate_all_callback(
@@ -266,6 +272,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
+        self.comparing_dts = True
         self._build_layout()
 
     def _build_layout(self):
@@ -275,13 +282,22 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
+        self.change_mpa_dts_button = QtWidgets.QPushButton("Compare by MPA")
+        self.change_mpa_dts_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.change_mpa_dts_button.clicked.connect(self.switch_show_compare_mpa_dts)
+        self.change_mpa_dts_button.setDisabled(True)
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
-        self.output = output.ComparisonOutput(self.settings_manager)
+        self.output = output.ComparisonOutput(self.settings_manager, True)
+        self.output_mpa = output.ComparisonOutput(self.settings_manager, False)
+        self.output_mpa.setVisible(False)
         self.spinner = SpinnerPage()
         self.spinner.setVisible(False)
         self.stack_layout.addWidget(self.spinner)
         self.stack_layout.addWidget(self.output)
+        self.stack_layout.addWidget(self.output_mpa)
         self.stack_layout.setCurrentIndex(1)
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -289,6 +305,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
+        self.main_layout.addWidget(self.change_mpa_dts_button)
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
 
@@ -312,7 +329,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.stack_layout.setCurrentIndex(0)
         else:
             self.spinner.movie_stop()
-            self.stack_layout.setCurrentIndex(1)
+            if self.comparing_dts:
+                self.stack_layout.setCurrentIndex(1)
+            else:
+                self.stack_layout.setCurrentIndex(2)
 
     def _unblock_gui(self):
         self._set_spinner(False)
@@ -376,32 +396,79 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self,
         data: Tuple[
             List[ComparisonData],
+            List[ComparisonData],
             List[LunarObservation],
             SpectralResponseFunction,
         ],
     ):
         comps = data[0]
-        mos = data[1]
-        srf = data[2]
+        mpa_comps = data[1]
+        mos = data[2]
+        srf = data[3]
         self.comps = comps
+        self.mpa_comps = mpa_comps
         self.srf = srf
-        ch_names = srf.get_channels_names()
-        self.output.set_channels(ch_names)
+        self.show_comparisons()
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+        self.change_mpa_dts_button.setEnabled(True)
+
+    def switch_show_compare_mpa_dts(self):
+        if self.comparing_dts:
+            self.comparing_dts = False
+            self.change_mpa_dts_button.setText("Compare by datetime")
+            self.show_compare_mpa()
+        else:
+            self.comparing_dts = True
+            self.change_mpa_dts_button.setText("Compare by MPA")
+            self.show_compare_dts()
+
+    def show_compare_dts(self):
+        self._block_gui_loading()
+        ch_index = self.output_mpa.get_current_channel_index()
+        self.output.set_current_channel_index(ch_index)
+        self.output.setVisible(True)
+        self.output_mpa.setVisible(False)
+        self.stack_layout.setCurrentIndex(1)
+        self._unblock_gui()
+
+    def show_compare_mpa(self):
+        self._block_gui_loading()
+        ch_index = self.output.get_current_channel_index()
+        self.output_mpa.set_current_channel_index(ch_index)
+        self.output.setVisible(False)
+        self.output_mpa.setVisible(True)
+        self.stack_layout.setCurrentIndex(2)
+        self._unblock_gui()
+
+    def show_comparisons(self):
+        self._show_comps_output()
+        self._show_comps_output(True)
+
+    def _show_comps_output(self, comps_mpa: bool = False):
+        if comps_mpa:
+            comps = self.mpa_comps
+            y_label = "Moon Phase Angle (degrees)"
+            output = self.output_mpa
+        else:
+            comps = self.comps
+            y_label = "datetimes"
+            output = self.output
+        ch_names = self.srf.get_channels_names()
+        output.set_channels(ch_names)
         to_remove = []
         for i, ch in enumerate(ch_names):
-            obs_irrs = []
-            for mo in mos:
-                if mo.has_ch_value(ch):
-                    obs_irrs.append(mo.ch_irrs[ch])
             if len(comps[i].dts) > 0:
-                self.output.update_plot(i, comps[i])
-                self.output.update_labels(
+                output.update_plot(i, comps[i])
+                output.update_labels(
                     i,
-                    "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
-                    "datetimes",
+                    "{} ({} nm)".format(ch, self.srf.get_channel_from_name(ch).center),
+                    y_label,
                     "Irradiance (Wm⁻²nm⁻¹)",
                 )
-                self.output.update_legends(
+                output.update_legends(
                     i,
                     [
                         ["Observed Irradiance", "Simulated Irradiance"],
@@ -412,14 +479,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 )
             else:
                 to_remove.append(ch)
-        for chsrf in srf.channels:
+        for chsrf in self.srf.channels:
             if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
-                self.output.set_as_partly(chsrf.id)
-        self.output.remove_channels(to_remove)
-        self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
-        window: LimeTBXWindow = self.parentWidget().parentWidget()
-        window.set_save_simulation_action_disabled(False)
+                output.set_as_partly(chsrf.id)
+        output.remove_channels(to_remove)
 
     def load_lglod_comparisons(
         self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
@@ -429,34 +492,14 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         comps = lglod.comparisons
         srf = srf
         self.comps = comps
+        self.mpa_comps = comparison.Comparison(self.kernels_path).sort_by_mpa(comps)
         self.srf = srf
-        ch_names = lglod.ch_names
-        self.output.set_channels(lglod.ch_names)
-        for i, ch in enumerate(ch_names):
-            self.output.update_plot(i, comps[i], False)
-            self.output.update_labels(
-                i,
-                "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
-                "datetimes",
-                "Irradiance (Wm⁻²nm⁻¹)",
-                False,
-            )
-            self.output.update_legends(
-                i,
-                [
-                    ["Observed Signal", "Simulated Signal"],
-                    [],
-                    [],
-                    ["Relative Differences"],
-                ],
-            )
-        for chsrf in srf.channels:
-            if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
-                self.output.set_as_partly(chsrf.id)
+        self.show_comparisons()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
+        self.change_mpa_dts_button.setEnabled(True)
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):
