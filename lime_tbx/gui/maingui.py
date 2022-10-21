@@ -282,12 +282,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
+        self.clear_comparison_button = QtWidgets.QPushButton("New Comparison")
+        self.clear_comparison_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
+        self.clear_comparison_button.setVisible(False)
         self.change_mpa_dts_button = QtWidgets.QPushButton("Compare by MPA")
         self.change_mpa_dts_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
         self.change_mpa_dts_button.clicked.connect(self.switch_show_compare_mpa_dts)
-        self.change_mpa_dts_button.setDisabled(True)
+        self.change_mpa_dts_button.setVisible(False)
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
         self.output = output.ComparisonOutput(self.settings_manager, True)
@@ -305,6 +311,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
+        self.main_layout.addWidget(self.clear_comparison_button)
         self.main_layout.addWidget(self.change_mpa_dts_button)
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
@@ -392,6 +399,43 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.quant_mos_simulated += 1
         self.spinner.set_text("{}/{}".format(self.quant_mos_simulated, self.quant_mos))
 
+    def set_show_comparison_input(self, show: bool):
+        self.input.setVisible(show)
+        self.compare_button.setVisible(show)
+        self.clear_comparison_button.setVisible(not show)
+        if show:
+            self.output_mpa.set_channels([])
+            self.output.set_channels([])
+
+    @QtCore.Slot()
+    def clear_comparison_pressed(self):
+        self.clear_comp_dialog = QtWidgets.QMessageBox(self)
+        self.clear_comp_dialog.setStandardButtons(
+            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel
+        )
+        self.clear_comp_dialog.setIcon(QtWidgets.QMessageBox.Information)
+        self.clear_comp_dialog.setText("Are you sure?")
+        self.clear_comp_dialog.setInformativeText(
+            "This will clear the current comparison"
+        )
+        self.clear_comp_dialog.setWindowTitle("New comparison")
+        self.clear_comp_dialog.accepted.connect(self.clear_comparison_accepted)
+        self.clear_comp_dialog.rejected.connect(self.clear_comparison_rejected)
+        self.clear_comp_dialog.show()
+
+    @QtCore.Slot()
+    def clear_comparison_accepted(self):
+        self.input.clear_input()
+        self.set_show_comparison_input(True)
+        self.clear_comp_dialog.close()
+        if not self.comparing_dts:
+            self.switch_show_compare_mpa_dts()
+            self.change_mpa_dts_button.setVisible(False)
+
+    @QtCore.Slot()
+    def clear_comparison_rejected(self):
+        self.clear_comp_dialog.close()
+
     def compare_finished(
         self,
         data: Tuple[
@@ -401,6 +445,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             SpectralResponseFunction,
         ],
     ):
+        self.set_show_comparison_input(False)
         comps = data[0]
         mpa_comps = data[1]
         mos = data[2]
@@ -413,7 +458,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
-        self.change_mpa_dts_button.setEnabled(True)
+        self.change_mpa_dts_button.setVisible(True)
 
     def switch_show_compare_mpa_dts(self):
         if self.comparing_dts:
@@ -487,6 +532,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def load_lglod_comparisons(
         self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
     ):
+        self.set_show_comparison_input(False)
         self.input.clear_input()
         self.compare_button.setDisabled(True)
         comps = lglod.comparisons
@@ -499,7 +545,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
-        self.change_mpa_dts_button.setEnabled(True)
+        self.change_mpa_dts_button.setVisible(True)
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):

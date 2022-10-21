@@ -711,6 +711,5 @@ class ComparisonInput(QtWidgets.QWidget):
 
     def clear_input(self) -> None:
         self.loaded_srf = None
-        self.loaded_moons = []
-        self.moon_obs_feedback.setText("No files loaded")
         self.srf_feedback.setText("No file loaded")
+        self.clear_obs_files()
