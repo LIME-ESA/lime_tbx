@@ -85,13 +85,48 @@ class ExportNetCDF(ExportData, ExportComparison):
 
 def print_help():
     print(
-        'lime [-h | -t timeseries.csv (-e lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,\
-distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | \
--s <sat_name,{}> | -c "input_glod1.nc input_lglod2.nc ...") -o (csv,refl.csv,irr.csv,polar.csv \
-| csv,({}),comparison_ch1.csv,... | csvd,({}),comparison_folder | nc,output_file.nc) \
--f srf.nc]'.format(
-            _DT_FORMAT, _DT_FORMAT, "|".join(COMP_KEYS), "|".join(COMP_KEYS)
+        "The lime toolbox performs simulations of lunar irradiance, reflectance and \
+polarization for a given point and datetime. It also performs comparisons for some given \
+observations files in GLOD format.\n"
+    )
+    print("It won't work unless given only one of the options (-h|-e|-l|-s|-c).")
+    print("  -h, --help\t\t Displays the help message.")
+    print(
+        "  -e, --earth\t\t Performs simulations from a geographic point. -e lat_deg,\
+lon_deg,height_m,{}".format(
+            _DT_FORMAT
         )
+    )
+    print(
+        "  -l, --lunar\t\t Performs a simulation from a selenographic point. -l \
+distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,\
+moon_phase_angle"
+    )
+    print(
+        "  -s, --satellite\t Performs simulations from a satellite point. \
+-s sat_name,{}".format(
+            _DT_FORMAT
+        )
+    )
+    print(
+        '  -c, --comparison\t Performs comparisons from observations files in \
+GLOD format. -c "input_glod1.nc input_glod2.nc ...'
+    )
+    print(
+        "  -o, --output\t\t Select the output path and format. If it's not a \
+comparison: -o csv,refl.csv,irr.csv,polar.csv | -o nc,output_lglod.nc\tIf it's a \
+comparison: csv,({}),comparison_ch1.csv,... | csvd,({}),comparison_folder | \
+nc,output_lglod.nc".format(
+            "|".join(COMP_KEYS), "|".join(COMP_KEYS)
+        )
+    )
+    print(
+        "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
+inputing directly only one datetime. Valid only if the main option is -e or -s."
+    )
+    print(
+        "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
+in GLOD format."
     )
 
 
@@ -333,8 +368,8 @@ class CLI:
         for opt, arg in opts:
             if opt in ("-h", "--help"):
                 print_help()
-                return
-            if opt in ("-o", "--output"):
+                return 0
+            if opt in ("-o", "--output"):  # Output
                 splitted = arg.split(",")
                 o_type = splitted[0]
                 if o_type == "csv":
@@ -373,7 +408,15 @@ class CLI:
         if export_data == None:
             print("Error: The output flag (-o | --output) must be included.")
             return 1
-        self.load_srf(srf_file)
+        if os.path.exists(srf_file):
+            try:
+                self.load_srf(srf_file)
+            except Exception as e:
+                print("Error: {}".format(str(e)))
+                return 1
+        else:
+            print("Error: The given srf path does not exist.")
+            return 1
 
         # Simulation input
         sim_opts = (

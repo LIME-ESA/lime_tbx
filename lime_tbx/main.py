@@ -39,8 +39,8 @@ def main():
     long_options = LONG_OPTIONS
     try:
         opts, args = getopt.getopt(args, options, long_options)
-    except getopt.GetoptError:
-        print("Error parsing input parameters.")
+    except getopt.GetoptError as e:
+        print("Error parsing input parameters: " + str(e))
         print_help()
         sys.exit(2)
     if len(opts) == 0:
