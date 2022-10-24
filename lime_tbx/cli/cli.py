@@ -90,43 +90,41 @@ polarization for a given point and datetime. It also performs comparisons for so
 observations files in GLOD format.\n"
     )
     print("It won't work unless given only one of the options (-h|-e|-l|-s|-c).")
+    print("")
+    print("Options:")
     print("  -h, --help\t\t Displays the help message.")
+    print("  -e, --earth\t\t Performs simulations from a geographic point.")
+    print("\t\t\t -e lat_deg,lon_deg,height_m,{}".format(_DT_FORMAT))
+    print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
     print(
-        "  -e, --earth\t\t Performs simulations from a geographic point. -e lat_deg,\
-lon_deg,height_m,{}".format(
-            _DT_FORMAT
+        "\t\t\t -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,\
+selen_sun_lon,moon_phase_angle"
+    )
+    print("  -s, --satellite\t Performs simulations from a satellite point.")
+    print("\t\t\t -s sat_name,{}".format(_DT_FORMAT))
+    print(
+        "  -c, --comparison\t Performs comparisons from observations files in GLOD format."
+    )
+    print('\t\t\t -c "input_glod1.nc input_glod2.nc ..."')
+    print("  -o, --output\t\t Select the output path and format.")
+    print("\t\t\t If it's a simulation:")
+    print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv")
+    print("\t\t\t   GLOD (netcdf): -o nc,output_lglod.nc")
+    print("\t\t\t If it's a comparison:")
+    print(
+        "\t\t\t   CSV: csv,({}),comparison_channel1.csv,comparison_channel2,...".format(
+            "|".join(COMP_KEYS)
         )
     )
+    print("\t\t\t   CSV dirs: csvd,({}),comparison_folder".format("|".join(COMP_KEYS)))
+    print("\t\t\t   GLOD (netcdf): nc,output_lglod.nc")
     print(
-        "  -l, --lunar\t\t Performs a simulation from a selenographic point. -l \
-distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,\
-moon_phase_angle"
-    )
-    print(
-        "  -s, --satellite\t Performs simulations from a satellite point. \
--s sat_name,{}".format(
-            _DT_FORMAT
-        )
-    )
-    print(
-        '  -c, --comparison\t Performs comparisons from observations files in \
-GLOD format. -c "input_glod1.nc input_glod2.nc ...'
-    )
-    print(
-        "  -o, --output\t\t Select the output path and format. If it's not a \
-comparison: -o csv,refl.csv,irr.csv,polar.csv | -o nc,output_lglod.nc\tIf it's a \
-comparison: csv,({}),comparison_ch1.csv,... | csvd,({}),comparison_folder | \
-nc,output_lglod.nc".format(
-            "|".join(COMP_KEYS), "|".join(COMP_KEYS)
-        )
+        "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
+in GLOD format."
     )
     print(
         "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
 inputing directly only one datetime. Valid only if the main option is -e or -s."
-    )
-    print(
-        "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
-in GLOD format."
     )
 
 
