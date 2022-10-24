@@ -6,6 +6,7 @@ from typing import List, Union, Tuple
 import os
 from enum import Enum
 import glob
+import sys
 
 """___Third-Party Modules___"""
 # import here
@@ -40,6 +41,10 @@ LONG_OPTIONS = [
     "srf=",
     "timeseries=",
 ]
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 
 class ExportData(ABC):
@@ -373,29 +378,29 @@ class CLI:
                 if o_type == "csv":
                     if not is_comparison:
                         if len(splitted) != 4:
-                            print("Error: Wrong number of arguments for -o csv,...")
+                            eprint("Error: Wrong number of arguments for -o csv,...")
                             return 1
                         export_data = ExportCSV(splitted[1], splitted[2], splitted[3])
                     else:
                         if len(splitted) < 3:
-                            print("Error: Wrong number of arguments for -o csv,...")
+                            eprint("Error: Wrong number of arguments for -o csv,...")
                             return 1
                         if splitted[1] not in COMP_KEYS:
-                            print("Error in csv DT|MPA|BOTH parameter.")
+                            eprint("Error in csv DT|MPA|BOTH parameter.")
                             return 1
                         comp_key = ComparisonKey[splitted[1]]
                         export_data = ExportComparisonCSV(comp_key, splitted[2:])
                 elif o_type == "nc":
                     if len(splitted) != 2:
-                        print("Error: Wrong number of arguments for -o nc,...")
+                        eprint("Error: Wrong number of arguments for -o nc,...")
                         return 1
                     export_data = ExportNetCDF(splitted[1])
                 elif o_type == "csvd":
                     if len(splitted) != 3:
-                        print("Error: Wrong number of arguments for -o csvd,...")
+                        eprint("Error: Wrong number of arguments for -o csvd,...")
                         return 1
                     if splitted[1] not in COMP_KEYS:
-                        print("Error in csvd DT|MPA|BOTH parameter.")
+                        eprint("Error in csvd DT|MPA|BOTH parameter.")
                         return 1
                     comp_key = ComparisonKey[splitted[1]]
                     export_data = ExportComparisonCSVDir(comp_key, splitted[2])
@@ -404,16 +409,16 @@ class CLI:
             elif opt in ("-t", "--timeseries"):
                 timeseries_file = arg
         if export_data == None:
-            print("Error: The output flag (-o | --output) must be included.")
+            eprint("Error: The output flag (-o | --output) must be included.")
             return 1
-        if os.path.exists(srf_file):
+        if srf_file == "" or os.path.exists(srf_file):
             try:
                 self.load_srf(srf_file)
             except Exception as e:
-                print("Error: {}".format(str(e)))
+                eprint("Error: {}".format(str(e)))
                 return 1
         else:
-            print("Error: The given srf path does not exist.")
+            eprint("Error: The given srf path does not exist.")
             return 1
 
         # Simulation input
@@ -429,44 +434,76 @@ class CLI:
         )
         num_sim_ops = sum(item[0] in sim_opts for item in opts)
         if num_sim_ops == 0:
-            print("Error: There must be one of the following flags: (-e|-s|-l|-c).")
+            eprint("Error: There must be one of the following flags: (-e|-s|-l|-c).")
             print_help()
             return 1
         elif num_sim_ops > 1:
-            print("Error: There can only be one of the following flags: (-e|-s|-l|-c).")
+            eprint(
+                "Error: There can only be one of the following flags: (-e|-s|-l|-c)."
+            )
             print_help()
             return 1
-        for opt, arg in opts:
-            if opt in ("-e", "--earth"):  # Earth
-                params_str = arg.split(",")
-                params = list(map(float, params_str[:3]))
-                lat = params[0]
-                lon = params[1]
-                height = params[2]
-                if timeseries_file != None:
-                    dt = csv.read_datetimes(timeseries_file)
-                else:
-                    dt = datetime.strptime(params_str[3] + "+00:00", _DT_FORMAT + "%z")
-                self.calculate_geographic(lat, lon, height, dt, export_data)
-                break
-            elif opt in ("-s", "--satellite"):  # Satellite
-                params_str = arg.split(",")
-                sat_name = params_str[0]
-                if timeseries_file != None:
-                    dt = csv.read_datetimes(timeseries_file)
-                else:
-                    dt = datetime.strptime(params_str[1] + "+00:00", _DT_FORMAT + "%z")
-                self.calculate_satellital(sat_name, dt, export_data)
-                break
-            elif opt in ("-l", "--lunar"):  # Lunar
-                params = list(map(float, arg.split(",")))
-                self.calculate_selenographic(*params, export_data)
-                break
-            elif opt in ("-c", "--comparison"):  # Comparison
-                params = arg.split(" ")
-                input_files = []
-                for param in params:
-                    input_files += glob.glob(param)
-                self.calculate_comparisons(input_files, export_data)
-                break
+        timeseries = None
+        if timeseries_file != None and any(
+            item[0] in ("-e", "--earth", "-s", "--satellite") for item in opts
+        ):
+            if os.path.exists(timeseries_file):
+                try:
+                    timeseries = csv.read_datetimes(timeseries_file)
+                except Exception as e:
+                    eprint("Error reading timeseries file: {}".format(str(e)))
+                    return 1
+            else:
+                eprint("Error: Timeseries file does not exist.")
+                return 1
+        try:
+            for opt, arg in opts:
+                if opt in ("-e", "--earth"):  # Earth
+                    params_str = arg.split(",")
+                    if len(params_str) != 4:
+                        eprint("Error: Wrong number of arguments for -e")
+                    params = list(map(float, params_str[:3]))
+                    lat = params[0]
+                    lon = params[1]
+                    height = params[2]
+                    if timeseries_file != None:
+                        dt = timeseries
+                    else:
+                        dt = datetime.strptime(
+                            params_str[3] + "+00:00", _DT_FORMAT + "%z"
+                        )
+                    self.calculate_geographic(lat, lon, height, dt, export_data)
+                    break
+                elif opt in ("-s", "--satellite"):  # Satellite
+                    params_str = arg.split(",")
+                    if len(params_str) != 2:
+                        eprint("Error: Wrong number of arguments for -s")
+                    sat_name = params_str[0]
+                    if timeseries_file != None:
+                        dt = timeseries
+                    else:
+                        dt = datetime.strptime(
+                            params_str[1] + "+00:00", _DT_FORMAT + "%z"
+                        )
+                    self.calculate_satellital(sat_name, dt, export_data)
+                    break
+                elif opt in ("-l", "--lunar"):  # Lunar
+                    params_str = arg.split(",")
+                    if len(params_str) != 6:
+                        eprint("Error: Wrong number of arguments for -l")
+                    params = list(map(float, params_str))
+                    self.calculate_selenographic(*params, export_data)
+                    break
+                elif opt in ("-c", "--comparison"):  # Comparison
+                    params = arg.split(" ")
+                    if len(params) < 1:
+                        eprint("Error: Wrong number of arguments for -c")
+                    input_files = []
+                    for param in params:
+                        input_files += glob.glob(param)
+                    self.calculate_comparisons(input_files, export_data)
+                    break
+        except Exception as e:
+            eprint("Error when performing operations: {}".format(str(e)))
+            return 1
         return 0
