@@ -462,6 +462,7 @@ class CLI:
                     params_str = arg.split(",")
                     if len(params_str) != 4:
                         eprint("Error: Wrong number of arguments for -e")
+                        return 1
                     params = list(map(float, params_str[:3]))
                     lat = params[0]
                     lon = params[1]
@@ -478,6 +479,7 @@ class CLI:
                     params_str = arg.split(",")
                     if len(params_str) != 2:
                         eprint("Error: Wrong number of arguments for -s")
+                        return 1
                     sat_name = params_str[0]
                     if timeseries_file != None:
                         dt = timeseries
@@ -491,6 +493,7 @@ class CLI:
                     params_str = arg.split(",")
                     if len(params_str) != 6:
                         eprint("Error: Wrong number of arguments for -l")
+                        return 1
                     params = list(map(float, params_str))
                     self.calculate_selenographic(*params, export_data)
                     break
@@ -498,6 +501,7 @@ class CLI:
                     params = arg.split(" ")
                     if len(params) < 1:
                         eprint("Error: Wrong number of arguments for -c")
+                        return 1
                     input_files = []
                     for param in params:
                         input_files += glob.glob(param)

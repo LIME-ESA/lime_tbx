@@ -213,7 +213,7 @@ def _write_normal_simulations(
     row = ds.createDimension("row", 0)
     sat_xyz = ds.createDimension("sat_xyz", 3)
     # VARIABLES
-    dates = ds.createVariable("date", "f4", ("date",))
+    dates = ds.createVariable("date", "f8", ("date",))
     dates.standard_name = "time"
     dates.long_name = "time of lunar observation"
     dates.units = "seconds since 1970-01-01T00:00:00Z"
