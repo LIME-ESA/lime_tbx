@@ -311,14 +311,13 @@ class GraphWidget(QtWidgets.QWidget):
                     label = ""
                     if len(self.legend) > 3 and len(self.legend[3]) > 0:
                         label = self.legend[3][0]
-                    marker = ""
+                    marker = "--"
                     if len(data_comp.data) == 1:
                         marker = "o"
                     lines += ax2.plot(
                         data_comp.wlens,
                         data_comp.data,
-                        color="pink",
-                        marker=marker,
+                        "k{}".format(marker),
                         label=label,
                     )
                     if data_comp.uncertainties is not None:
