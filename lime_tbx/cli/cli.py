@@ -2,8 +2,10 @@
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from abc import ABC
-from typing import List, Union
+from typing import List, Union, Tuple
 import os
+from enum import Enum
+import glob
 
 """___Third-Party Modules___"""
 # import here
@@ -26,6 +28,19 @@ from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
 
+_DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
+OPTIONS = "he:l:s:c:o:f:t:"
+LONG_OPTIONS = [
+    "help",
+    "earth=",
+    "lunar=",
+    "satellite=",
+    "comparison=",
+    "output=",
+    "srf=",
+    "timeseries=",
+]
+
 
 class ExportData(ABC):
     pass
@@ -38,23 +53,46 @@ class ExportCSV(ExportData):
     o_file_polar: str
 
 
+COMP_KEYS = ["DT", "MPA", "BOTH"]
+
+
+class ComparisonKey(Enum):
+    DT = 0
+    MPA = 1
+    BOTH = 2
+
+
 class ExportComparison(ABC):
     pass
 
 
 @dataclass
 class ExportComparisonCSV(ExportComparison):
+    comparison_key: ComparisonKey
     output_files: List[str]
 
 
 @dataclass
 class ExportComparisonCSVDir(ExportComparison):
+    comparison_key: ComparisonKey
     output_dir: str
 
 
 @dataclass
 class ExportNetCDF(ExportData, ExportComparison):
     output_file: str
+
+
+def print_help():
+    print(
+        'lime [-h | -t timeseries.csv (-e lat_deg,lon_deg,height_m,{} | -l <distance_sun_moon,\
+distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle> | \
+-s <sat_name,{}> | -c "input_glod1.nc input_lglod2.nc ...") -o (csv,refl.csv,irr.csv,polar.csv \
+| csv,({}),comparison_ch1.csv,... | csvd,({}),comparison_folder | nc,output_file.nc) \
+-f srf.nc]'.format(
+            _DT_FORMAT, _DT_FORMAT, "|".join(COMP_KEYS), "|".join(COMP_KEYS)
+        )
+    )
 
 
 class CLI:
@@ -199,9 +237,16 @@ class CLI:
         mos = self.loaded_moons
         for mo in mos:
             if not mo.check_valid_srf(self.srf):
-                raise LimeException(
-                    "SRF file not valid for the chosen Moon observations file."
-                )
+                srf_names = self.srf.get_channels_names()
+                if len(mo.ch_names) == len(srf_names):
+                    for i in range(len(mo.ch_names)):
+                        if mo.ch_names[i] in mo.ch_irrs:
+                            mo.ch_irrs[srf_names[i]] = mo.ch_irrs.pop(mo.ch_names[i])
+                        mo.ch_names[i] = srf_names[i]
+                else:
+                    raise LimeException(
+                        "SRF file not valid for the chosen Moon observations file."
+                    )
         cimel_coef = self.settings_manager.get_cimel_coef()
         comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
         # EXPORT
@@ -226,21 +271,161 @@ class CLI:
             version = self.settings_manager.get_cimel_coef().version
             ch_names = self.srf.get_channels_names()
             file_index = 0
-            for i, ch in enumerate(ch_names):
-                if len(comps[i].dts) > 0:
-                    data = [comps[i].observed_signal, comps[i].simulated_signal]
-                    points = comps[i].points
-                    ylabel = "Irradiance (Wm⁻²nm⁻¹)"
-                    output = ""
-                    if isinstance(ed, ExportComparisonCSV):
-                        output = ed.output_files[file_index]
-                    elif isinstance(ed, ExportComparisonCSVDir):
-                        output = "{}.csv".format(os.path.join(ed.output_dir, ch))
-                    csv.export_csv_comparation(
-                        data,
-                        ylabel,
-                        points,
-                        output,
-                        version,
-                    )
-                    file_index += 1
+            is_both = ed.comparison_key == ComparisonKey.BOTH
+            if ed.comparison_key != ComparisonKey.MPA:
+                for i, ch in enumerate(ch_names):
+                    if len(comps[i].dts) > 0:
+                        data = [comps[i].observed_signal, comps[i].simulated_signal]
+                        points = comps[i].points
+                        ylabel = "Irradiance (Wm⁻²nm⁻¹)"
+                        output = ""
+                        if isinstance(ed, ExportComparisonCSV):
+                            output = ed.output_files[file_index]
+                        elif isinstance(ed, ExportComparisonCSVDir):
+                            output = "{}.csv".format(os.path.join(ed.output_dir, ch))
+                        if is_both:
+                            idx = output.rindex(".")
+                            output = output[:idx] + ".dt" + output[idx:]
+                        csv.export_csv_comparation(
+                            data,
+                            ylabel,
+                            points,
+                            output,
+                            version,
+                        )
+                        file_index += 1
+            file_index = 0
+            if ed.comparison_key != ComparisonKey.DT:
+                mpa_comps = co.sort_by_mpa(comps)
+                for i, ch in enumerate(ch_names):
+                    if len(mpa_comps[i].dts) > 0:
+                        data = [
+                            mpa_comps[i].observed_signal,
+                            mpa_comps[i].simulated_signal,
+                        ]
+                        points = mpa_comps[i].points
+                        ylabel = "Irradiance (Wm⁻²nm⁻¹)"
+                        output = ""
+                        if isinstance(ed, ExportComparisonCSV):
+                            output = ed.output_files[file_index]
+                        elif isinstance(ed, ExportComparisonCSVDir):
+                            output = "{}.csv".format(os.path.join(ed.output_dir, ch))
+                        if is_both:
+                            idx = output.rindex(".")
+                            output = output[:idx] + ".mpa" + output[idx:]
+                        csv.export_csv_comparation(
+                            data,
+                            ylabel,
+                            points,
+                            output,
+                            version,
+                            False,
+                        )
+                        file_index += 1
+
+    def handle_input(self, opts: List[Tuple[str, str]]) -> int:
+        srf_file = ""
+        export_data: ExportData = None
+        timeseries_file: str = None
+        # Check if it's comparison
+        is_comparison = any(item[0] in ("-c", "--comparison") for item in opts)
+        # find settings data
+        for opt, arg in opts:
+            if opt in ("-h", "--help"):
+                print_help()
+                return
+            if opt in ("-o", "--output"):
+                splitted = arg.split(",")
+                o_type = splitted[0]
+                if o_type == "csv":
+                    if not is_comparison:
+                        if len(splitted) != 4:
+                            print("Error: Wrong number of arguments for -o csv,...")
+                            return 1
+                        export_data = ExportCSV(splitted[1], splitted[2], splitted[3])
+                    else:
+                        if len(splitted) < 3:
+                            print("Error: Wrong number of arguments for -o csv,...")
+                            return 1
+                        if splitted[1] not in COMP_KEYS:
+                            print("Error in csv DT|MPA|BOTH parameter.")
+                            return 1
+                        comp_key = ComparisonKey[splitted[1]]
+                        export_data = ExportComparisonCSV(comp_key, splitted[2:])
+                elif o_type == "nc":
+                    if len(splitted) != 2:
+                        print("Error: Wrong number of arguments for -o nc,...")
+                        return 1
+                    export_data = ExportNetCDF(splitted[1])
+                elif o_type == "csvd":
+                    if len(splitted) != 3:
+                        print("Error: Wrong number of arguments for -o csvd,...")
+                        return 1
+                    if splitted[1] not in COMP_KEYS:
+                        print("Error in csvd DT|MPA|BOTH parameter.")
+                        return 1
+                    comp_key = ComparisonKey[splitted[1]]
+                    export_data = ExportComparisonCSVDir(comp_key, splitted[2])
+            elif opt in ("-f", "--srf"):
+                srf_file = arg
+            elif opt in ("-t", "--timeseries"):
+                timeseries_file = arg
+        if export_data == None:
+            print("Error: The output flag (-o | --output) must be included.")
+            return 1
+        self.load_srf(srf_file)
+
+        # Simulation input
+        sim_opts = (
+            "-e",
+            "--earth",
+            "-s",
+            "--satellite",
+            "-l",
+            "--lunar",
+            "-c",
+            "--comparison",
+        )
+        num_sim_ops = sum(item[0] in sim_opts for item in opts)
+        if num_sim_ops == 0:
+            print("Error: There must be one of the following flags: (-e|-s|-l|-c).")
+            print_help()
+            return 1
+        elif num_sim_ops > 1:
+            print("Error: There can only be one of the following flags: (-e|-s|-l|-c).")
+            print_help()
+            return 1
+        for opt, arg in opts:
+            if opt in ("-e", "--earth"):  # Earth
+                params_str = arg.split(",")
+                params = list(map(float, params_str[:3]))
+                lat = params[0]
+                lon = params[1]
+                height = params[2]
+                if timeseries_file != None:
+                    dt = csv.read_datetimes(timeseries_file)
+                else:
+                    dt = datetime.strptime(params_str[3] + "+00:00", _DT_FORMAT + "%z")
+                self.calculate_geographic(lat, lon, height, dt, export_data)
+                break
+            elif opt in ("-s", "--satellite"):  # Satellite
+                params_str = arg.split(",")
+                sat_name = params_str[0]
+                if timeseries_file != None:
+                    dt = csv.read_datetimes(timeseries_file)
+                else:
+                    dt = datetime.strptime(params_str[1] + "+00:00", _DT_FORMAT + "%z")
+                self.calculate_satellital(sat_name, dt, export_data)
+                break
+            elif opt in ("-l", "--lunar"):  # Lunar
+                params = list(map(float, arg.split(",")))
+                self.calculate_selenographic(*params, export_data)
+                break
+            elif opt in ("-c", "--comparison"):  # Comparison
+                params = arg.split(" ")
+                input_files = []
+                for param in params:
+                    input_files += glob.glob(param)
+                self.calculate_comparisons(input_files, export_data)
+                break
+        return 0
