@@ -448,8 +448,13 @@ class CLI:
             self._add_observation(moon.read_moon_obs(path))
         if len(self.loaded_moons) == 0:
             raise LimeException("No observations given. Aborting.")
-        co = comparison.Comparison(self.kernels_path)
         mos = self.loaded_moons
+        if isinstance(ed, ExportComparisonCSV) or isinstance(ed, ExportComparisonGraph):
+            ch_names_obs = {ch_name for mo in mos for ch_name in mo.ch_names}
+            if len(ch_names_obs) > len(ed.output_files):
+                raise LimeException(
+                    "The amount of export files given is not enough. There are more channels."
+                )
         for mo in mos:
             if not mo.check_valid_srf(self.srf):
                 srf_names = self.srf.get_channels_names()
@@ -462,6 +467,7 @@ class CLI:
                     raise LimeException(
                         "SRF file not valid for the chosen Moon observations file."
                     )
+        co = comparison.Comparison(self.kernels_path)
         cimel_coef = self.settings_manager.get_cimel_coef()
         comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
         # EXPORT
@@ -779,6 +785,9 @@ class CLI:
                         input_files += glob.glob(param)
                     self.calculate_comparisons(input_files, export_data)
                     break
+        except LimeException as e:
+            eprint("Error: {}".format(str(e)))
+            return 1
         except Exception as e:
             eprint("Error when performing operations: {}".format(str(e)))
             return 1
