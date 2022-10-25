@@ -17,7 +17,6 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     KernelsPath,
     LGLODComparisonData,
-    LGLODData,
     LimeException,
     LunarObservation,
     Point,
@@ -154,8 +153,12 @@ selen_sun_lon,moon_phase_angle"
             compsel
         )
     )
-    print("\t\t\t   GRAPH dirs: graphd,{},{},comparison_folder".format(imsel, compsel))
-    print("\t\t\t   CSV dirs: csvd,{},comparison_folder".format(compsel))
+    print(
+        "\t\t\t   GRAPH directory: graphd,{},{},comparison_folder".format(
+            imsel, compsel
+        )
+    )
+    print("\t\t\t   CSV directory: csvd,{},comparison_folder".format(compsel))
     print("\t\t\t   LGLOD (netcdf): nc,output_lglod.nc")
     print(
         "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
