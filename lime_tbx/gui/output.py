@@ -1,38 +1,36 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import Union, List, Tuple
-import os
+from typing import Union, List
 from datetime import datetime
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
-from matplotlib.axes import Axes
 from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar,
 )
-from matplotlib.figure import Figure
-from matplotlib import font_manager as fm
-from matplotlib import pyplot as plt
 import numpy as np
 import mplcursors
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from ..datatypes.datatypes import (
     ComparisonData,
     Point,
-    SatellitePoint,
     SpectralResponseFunction,
     SpectralValidity,
-    SurfacePoint,
     CustomPoint,
     SpectralData,
 )
-from . import constants
 from lime_tbx.gui.settings import ISettingsManager
 from ..filedata import csv
 from .ifaces import IMainSimulationsWidget
+from .canvas import (
+    MplCanvas,
+    title_font_prop,
+    label_font_prop,
+    font_prop,
+    redraw_canvas,
+)
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -40,26 +38,6 @@ __created__ = "05/05/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
-
-
-class MplCanvas(FigureCanvas):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes: Axes = self.fig.add_subplot(111)
-        super(MplCanvas, self).__init__(self.fig)
-
-
-_current_dir = os.path.dirname(os.path.abspath(__file__))
-dir_font_path = os.path.dirname(os.path.join(_current_dir, constants.ESAFONT_PATH))
-font_dirs = [dir_font_path]
-font_files = fm.findSystemFonts(fontpaths=font_dirs, fontext="otf")
-for font_file in font_files:
-    fm.fontManager.addfont(font_file)
-title_font_prop = fm.FontProperties(
-    family=["NotesESA", "sans-serif"], weight="bold", size="large"
-)
-label_font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"], weight="bold")
-font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"])
 
 
 class GraphWidget(QtWidgets.QWidget):
@@ -218,149 +196,18 @@ class GraphWidget(QtWidgets.QWidget):
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
-        lines = []
-        if self.data is not None:
-            iter_data = self.data
-            if not isinstance(iter_data, list):
-                iter_data = [iter_data]
-            for i, data in enumerate(iter_data):
-                label = ""
-                color = []
-                if i == 0:
-                    color = ["g"]
-                if len(self.legend) > 0:
-                    if len(self.legend[0]) > i:
-                        label = self.legend[0][i]
-                    if len(self.legend[0]) > 1:
-                        color = []
-                marker = ""
-                if len(data.data) == 1:
-                    marker = "o"
-                lines += self.canvas.axes.plot(
-                    data.wlens,
-                    data.data,
-                    *color,
-                    marker=marker,
-                    label=label,
-                )
-                if data.uncertainties is not None:
-                    self.canvas.axes.fill_between(
-                        data.wlens,
-                        data.data - 2 * data.uncertainties,
-                        data.data + 2 * data.uncertainties,
-                        color="green",
-                        alpha=0.3,
-                    )
-
-            if self.cimel_data:
-                iter_data = self.cimel_data
-                if not isinstance(iter_data, list):
-                    iter_data = [iter_data]
-                for i, cimel_data in enumerate(iter_data):
-                    label0 = ""
-                    label1 = ""
-                    if i == 0 and len(self.legend) >= 3:
-                        label0 = self.legend[1][0]
-                        label1 = self.legend[2][0]
-                    extra_lines = []
-                    extra_lines += self.canvas.axes.plot(
-                        cimel_data.wlens,
-                        cimel_data.data,
-                        color="orange",
-                        ls="none",
-                        marker="o",
-                        label=label0,
-                    )
-                    extra_lines += [
-                        self.canvas.axes.errorbar(
-                            cimel_data.wlens,
-                            cimel_data.data,
-                            yerr=cimel_data.uncertainties * 2,
-                            color="black",
-                            capsize=3,
-                            ls="none",
-                            label=label1,
-                        )
-                    ]
-                    if i == 0:
-                        lines += extra_lines
-
-            if self.asd_data:
-                if isinstance(self.asd_data, list):
-                    asd_data = self.asd_data[0]
-                else:
-                    asd_data = self.asd_data
-
-                scaling_factor = (
-                    asd_data.data[np.where(asd_data.wlens == 500)]
-                    / cimel_data.data[np.where(cimel_data.wlens == 500)]
-                )
-                lines += self.canvas.axes.plot(
-                    asd_data.wlens,
-                    asd_data.data / scaling_factor,
-                    label="ASD data points, scaled to LIME at 500nm",
-                )
-
-            data_compare_info = ""
-            if self.data_compare:
-                iter_data = self.data_compare.diffs_signal
-                if not isinstance(iter_data, list):
-                    iter_data = [iter_data]
-                ax2 = self.canvas.axes.twinx()
-                for i, data_comp in enumerate(iter_data):
-                    label = ""
-                    if len(self.legend) > 3 and len(self.legend[3]) > 0:
-                        label = self.legend[3][0]
-                    marker = "--"
-                    if len(data_comp.data) == 1:
-                        marker = "o"
-                    lines += ax2.plot(
-                        data_comp.wlens,
-                        data_comp.data,
-                        "k{}".format(marker),
-                        label=label,
-                    )
-                    if data_comp.uncertainties is not None:
-                        ax2.fill_between(
-                            data_comp.wlens,
-                            data_comp.data - 2 * data_comp.uncertainties,
-                            data_comp.data + 2 * data_comp.uncertainties,
-                            color="pink",
-                            alpha=0.3,
-                        )
-                    ax2.set_ylim(
-                        (
-                            min(-0.05, min(data_comp.data) - 0.05),
-                            max(0.05, max(data_comp.data) + 0.05),
-                        )
-                    )
-                    data_compare_info = "MRD: {:.4f}\nσ: {:.4f}".format(
-                        self.data_compare.mean_relative_difference,
-                        self.data_compare.standard_deviation_mrd,
-                    )
-                    lines += self.canvas.axes.plot([], [], " ", label=data_compare_info)
-                ax2.set_ylabel(
-                    "Relative difference (Fraction of unity)",
-                    fontproperties=label_font_prop,
-                )
-                plt.setp(
-                    self.canvas.axes.get_xticklabels(),
-                    rotation=30,
-                    horizontalalignment="right",
-                )
-            if len(self.legend) > 0:
-                legend_lines = [
-                    l for l in lines if not l.get_label().startswith("_child")
-                ]
-                labels = [l.get_label() for l in legend_lines]
-                self.canvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
-
-        self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
-        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
-        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
-        if self.vertical_lines and len(self.vertical_lines) > 0:
-            for val in self.vertical_lines:
-                self.canvas.axes.axvline(x=val, color="k", label="LIME Spectrum limit")
+        lines = redraw_canvas(
+            self.canvas,
+            self.data,
+            self.legend,
+            self.cimel_data,
+            self.asd_data,
+            self.data_compare,
+            self.title,
+            self.xlabel,
+            self.ylabel,
+            self.vertical_lines,
+        )
         try:
             self.canvas.fig.tight_layout()
         except:
