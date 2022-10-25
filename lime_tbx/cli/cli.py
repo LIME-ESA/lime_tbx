@@ -144,22 +144,22 @@ selen_sun_lon,moon_phase_angle"
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print("\t\t\t If it's a comparison:")
     print(
-        "\t\t\t   GRAPH: graph,{},{},comparison_channel1,comparison_channel2,...".format(
+        "\t\t\t   GRAPH: -o graph,{},{},comparison_channel1,comparison_channel2,...".format(
             imsel, compsel
         )
     )
     print(
-        "\t\t\t   CSV: csv,{},comparison_channel1.csv,comparison_channel2.csv,...".format(
+        "\t\t\t   CSV: -o csv,{},comparison_channel1.csv,comparison_channel2.csv,...".format(
             compsel
         )
     )
     print(
-        "\t\t\t   GRAPH directory: graphd,{},{},comparison_folder".format(
+        "\t\t\t   GRAPH directory: -o graphd,{},{},comparison_folder".format(
             imsel, compsel
         )
     )
-    print("\t\t\t   CSV directory: csvd,{},comparison_folder".format(compsel))
-    print("\t\t\t   LGLOD (netcdf): nc,output_lglod.nc")
+    print("\t\t\t   CSV directory: -o csvd,{},comparison_folder".format(compsel))
+    print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print(
         "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
 in GLOD format."
