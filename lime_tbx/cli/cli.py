@@ -114,7 +114,7 @@ selen_sun_lon,moon_phase_angle"
     print("  -o, --output\t\t Select the output path and format.")
     print("\t\t\t If it's a simulation:")
     print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv")
-    print("\t\t\t   GLOD (netcdf): -o nc,output_lglod.nc")
+    print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print("\t\t\t If it's a comparison:")
     print(
         "\t\t\t   CSV: csv,({}),comparison_channel1.csv,comparison_channel2,...".format(
@@ -122,7 +122,7 @@ selen_sun_lon,moon_phase_angle"
         )
     )
     print("\t\t\t   CSV dirs: csvd,({}),comparison_folder".format("|".join(COMP_KEYS)))
-    print("\t\t\t   GLOD (netcdf): nc,output_lglod.nc")
+    print("\t\t\t   LGLOD (netcdf): nc,output_lglod.nc")
     print(
         "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
 in GLOD format."
@@ -460,7 +460,8 @@ class CLI:
             for opt, arg in opts:
                 if opt in ("-e", "--earth"):  # Earth
                     params_str = arg.split(",")
-                    if len(params_str) != 4:
+                    lenpar = len(params_str)
+                    if lenpar < 3 or (timeseries_file == None and lenpar != 4):
                         eprint("Error: Wrong number of arguments for -e")
                         return 1
                     params = list(map(float, params_str[:3]))
@@ -477,7 +478,8 @@ class CLI:
                     break
                 elif opt in ("-s", "--satellite"):  # Satellite
                     params_str = arg.split(",")
-                    if len(params_str) != 2:
+                    lenpar = len(params_str)
+                    if lenpar < 1 or (timeseries_file == None and lenpar != 2):
                         eprint("Error: Wrong number of arguments for -s")
                         return 1
                     sat_name = params_str[0]
