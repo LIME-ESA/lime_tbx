@@ -69,7 +69,7 @@ example:
 	echo "--------------------"
 	echo "$(CFI): ... creating the executable"
 	echo "--------------------"
-	$(CC) $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_linux
+	$(CC) $(CFLAGS) -O3 code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_linux
 
 debug:
 	echo "--------------------"
@@ -81,7 +81,7 @@ shared:
 	echo "--------------------"
 	echo "$(CFI): ... creating shared library"
 	echo "--------------------"
-	$(CC) -fPIC -shared $(CFLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_linux.so
+	$(CC) -fPIC -shared $(CFLAGS) -O3 code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_linux.so
 
 shared_debug:
 	echo "--------------------"
