@@ -4,6 +4,7 @@
 import getopt
 import sys
 import io
+import shlex
 
 """___Third-Party Modules___"""
 import unittest
@@ -34,7 +35,7 @@ def get_cli():
 
 
 def get_opts(args_str: str):
-    args = args_str.split()
+    args = shlex.split(args_str)
     opts, args = getopt.getopt(args, OPTIONS, LONG_OPTIONS)
     return opts
 
@@ -152,6 +153,28 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    def test_comparison_no_observations(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        f = open("./test_files/cli/err_c_no_obs.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_comparison_glob_csvd_wrong_mpa_dt(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BATH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        f = open("./test_files/cli/err_c_o_mpa_dt_both_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
@@ -243,4 +266,36 @@ class TestCLI(unittest.TestCase):
                 mpimg.imread("./test_files/cli/proba_polar.png"),
             ),
             0.99,
+        )
+
+    def test_comparison_glob_csvd_both_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+
+    def test_comparison_glob_csvd_dt_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,DT,test_files/cli/comp_out.test.dir/'
+            )
+        )
+
+    def test_comparison_glob_csvd_mpa_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,MPA,test_files/cli/comp_out.test.dir/'
+            )
+        )
+
+    def test_comparison_csvd_both_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
         )
