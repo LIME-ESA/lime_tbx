@@ -130,6 +130,28 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    def test_lunar_missing_arg(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-l 0.98,420000,20.5,-30.2,0.69 -o nc,test_files/cli/cliglod.test.nc"
+            )
+        )
+        f = open("./test_files/cli/err_wrong_l_args.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_lunar_extra_arg(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-l 0.98,420000,20.5,-30.2,0.69,15,2 -o nc,test_files/cli/cliglod.test.nc"
+            )
+        )
+        f = open("./test_files/cli/err_wrong_l_args.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
@@ -156,6 +178,14 @@ class TestCLI(unittest.TestCase):
         cli.handle_input(
             get_opts(
                 "-e 80,80,2000,2010-10-1T02:02:02 -t ./test_files/csv/timeseries.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+
+    def test_lunar_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-l 0.98,420000,20.5,-30.2,0.69,15 -o nc,test_files/cli/cliglod.test.nc"
             )
         )
 
