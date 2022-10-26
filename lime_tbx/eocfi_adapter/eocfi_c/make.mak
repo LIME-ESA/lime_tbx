@@ -39,9 +39,12 @@ EXT		= _c
 #
 #------------------------------------------------------------------------------
 
+DEBUG_FLAGS = \
+        /D "NDEBUG" /Od /RTC1 \
+
 CFLAGS = \
-        /c /nologo /W0 /EHsc /Od /RTC1 \
-        /D "_LIB"  /D "NDEBUG" /D "_CONSOLE" /D "_MBCS"\
+        /c /nologo /W1 /EHsc /O2 \
+        /D "_LIB" /D "_CONSOLE" /D "_MBCS"\
         /D "WIN64"\
         /D "_WINDOWS"\
         /D "WINDOWS"\
@@ -88,7 +91,9 @@ example:
 	$(CC) $(CFLAGS) code\get_positions.c
 	$(LINK_STA) get_positions.obj /out:bin\get_positions_win64.exe $(LIBS_DIR) $(LIBS)
 	-erase *.obj
-	-erase *.ilk
+	-erase bin\*.ilk
+	-erase bin\get_positions_win64.exp
+	-erase bin\get_positions_win64.lib
 
 shared:	
 	echo "--------------------"
@@ -99,6 +104,8 @@ shared:
 	$(LINK_STA) /DLL /OUT:bin\get_positions_win64.dll get_positions.obj $(LIBS_DIR) $(LIBS)
 	-erase *.obj
 	-erase bin\*.ilk
+	-erase bin\get_positions_win64.exp
+	-erase bin\get_positions_win64.lib
 #-erase *.obj
 #-erase *.ilk
 

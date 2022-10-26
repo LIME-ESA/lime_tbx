@@ -99,7 +99,7 @@ def export_csv(
         Version of the CIMEL coefficients used for calculating the data
     """
     try:
-        with open(name, "w") as file:
+        with open(name, "w", newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
             _write_point(writer, point)
@@ -164,7 +164,7 @@ def export_csv_comparation(
     if not x_datetime:
         x_label = "Moon phase angle (degrees)"
     try:
-        with open(name, "w") as file:
+        with open(name, "w", newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
             writer.writerow(
@@ -227,7 +227,7 @@ def export_csv_integrated_irradiance(
         Version of the CIMEL coefficients used for calculating the data
     """
     try:
-        with open(name, "w") as file:
+        with open(name, "w", newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
             _write_point(writer, point)
