@@ -15,7 +15,7 @@ Options:
   -o, --output		 Select the output path and format.
 			 If it's a simulation:
 			   GRAPH: -o graph,(pdf|jpg|png|svg),refl,irr,polar
-			   CSV: -o csv,refl.csv,irr.csv,polar.csv
+			   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv
 			   LGLOD (netcdf): -o nc,output_lglod.nc
 			 If it's a comparison:
 			   GRAPH: -o graph,(pdf|jpg|png|svg),(DT|MPA|BOTH),comparison_channel1,comparison_channel2,...

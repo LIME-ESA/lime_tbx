@@ -3,7 +3,6 @@
 """___Built-In Modules___"""
 import getopt
 import sys
-import filecmp
 import io
 
 """___Third-Party Modules___"""
@@ -70,6 +69,17 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    def test_sat_err_date_timeseries(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
+            )
+        )
+        f = open("./test_files/cli/sat_err_date.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
     def test_sat_err_graphd(self):
         cli = get_cli()
         cli.handle_input(
@@ -81,27 +91,100 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    def test_sat_probav_csv_missing_arg(self):
+        cli = get_cli()
+        cli.handle_input(get_opts("-s PROBA-V,2020-01-20T02:00:00 -o csv,p1,p2,p3"))
+        f = open("./test_files/cli/err_num_args_o_csv.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_sat_probav_csv_extra_arg(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts("-s PROBA-V,2020-01-20T02:00:00 -o csv,p1,p2,p3,p4,p5")
+        )
+        f = open("./test_files/cli/err_num_args_o_csv.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_sat_probav_missing_datetime(self):
+        cli = get_cli()
+        cli.handle_input(get_opts("-s PROBA-V -o csv,p1,p2,p3,p4"))
+        f = open("./test_files/cli/err_miss_datetime_sat.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_earth_glod_missing_path(self):
+        cli = get_cli()
+        cli.handle_input(get_opts("-e 80,80,2000,2010-10-1T02:02:02 -o nc"))
+        f = open("./test_files/cli/err_miss_o_nc_path.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_earth_glod_missing_datetime(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts("-e 80,80,2000 -o nc,./test_files/cli/cliglod.test.nc")
+        )
+        f = open("./test_files/cli/err_miss_e_datetime.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
-    """
-    # This method doesnt work because interpolation gives different results each time
+    # Cant compare output as interpolation gives different results each time
+
+    def test_earth_glod_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+
+    def test_earth_timeseries_glod_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-e 80,80,2000 -t ./test_files/csv/timeseries.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+
+    def test_earth_timeseries_with_datetime_glod_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -t ./test_files/csv/timeseries.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+
     def test_sat_probav_csv(self):
         path_refl = "./test_files/cli/proba_refl.test.csv"
         path_irr = "./test_files/cli/proba_irr.test.csv"
         path_polar = "./test_files/cli/proba_polar.test.csv"
+        path_integrated = "./test_files/cli/proba_integrated.test.csv"
         cli = get_cli()
-        cli.handle_input(get_opts("-s PROBA-V,2020-01-20T02:00:00 -o csv,{},{},{}".format(path_refl, path_irr, path_polar)))
+        cli.handle_input(
+            get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o csv,{},{},{},{}".format(
+                    path_refl, path_irr, path_polar, path_integrated
+                )
+            )
+        )
+        # This method doesnt work because interpolation gives different results each time
+        """
         self.assertTrue(filecmp.cmp(path_refl, "./test_files/cli/proba_refl.csv"))
         self.assertTrue(filecmp.cmp(path_irr, "./test_files/cli/proba_irr.csv"))
         self.assertTrue(filecmp.cmp(path_polar, "./test_files/cli/proba_polar.csv"))
-    """
+        self.assertTrue(filecmp.cmp(path_integrated, "./test_files/cli/proba_integrated.csv"))
+        """
 
     def test_sat_probav_graph(self):
         try:
             from sewar.full_ref import uqi
         except:
-            print("Missing 'sewar' library (needed for some image testing).")
+            print("\nMissing 'sewar' library (needed for some image testing).")
             return
         import matplotlib.image as mpimg
 

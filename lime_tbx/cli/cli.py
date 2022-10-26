@@ -22,6 +22,7 @@ from lime_tbx.datatypes.datatypes import (
     Point,
     SatellitePoint,
     SpectralData,
+    SpectralResponseFunction,
     SurfacePoint,
 )
 from lime_tbx.gui import settings
@@ -57,6 +58,7 @@ class ExportCSV(ExportData):
     o_file_refl: str
     o_file_irr: str
     o_file_polar: str
+    o_file_integrated_irr: str
 
 
 @dataclass
@@ -140,7 +142,7 @@ selen_sun_lon,moon_phase_angle"
     print("  -o, --output\t\t Select the output path and format.")
     print("\t\t\t If it's a simulation:")
     print("\t\t\t   GRAPH: -o graph,{},refl,irr,polar".format(imsel))
-    print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv")
+    print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv")
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print("\t\t\t If it's a comparison:")
     print(
@@ -205,7 +207,9 @@ class CLI:
         self._calculate_polarization(point)
 
     def _export_csvs(
-        self, point: Point, o_file_refl: str, o_file_irr: str, o_file_polar: str
+        self,
+        point: Point,
+        ed: ExportCSV,
     ):
         version = self.settings_manager.get_cimel_coef().version
         csv.export_csv(
@@ -213,7 +217,7 @@ class CLI:
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
             point,
-            o_file_refl,
+            ed.o_file_refl,
             version,
         )
         csv.export_csv(
@@ -221,7 +225,7 @@ class CLI:
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
             point,
-            o_file_irr,
+            ed.o_file_irr,
             version,
         )
         csv.export_csv(
@@ -229,7 +233,14 @@ class CLI:
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
             point,
-            o_file_polar,
+            ed.o_file_polar,
+            version,
+        )
+        csv.export_csv_integrated_irradiance(
+            self.srf,
+            self.lime_simulation.get_signals(),
+            ed.o_file_integrated_irr,
+            point,
             version,
         )
 
@@ -384,7 +395,7 @@ class CLI:
 
     def _export(self, point: Point, ed: ExportData):
         if isinstance(ed, ExportCSV):
-            self._export_csvs(point, ed.o_file_refl, ed.o_file_irr, ed.o_file_polar)
+            self._export_csvs(point, ed)
         elif isinstance(ed, ExportNetCDF):
             self._export_lglod(point, ed.output_file)
         elif isinstance(ed, ExportGraph):
@@ -593,10 +604,12 @@ class CLI:
                 o_type = splitted[0]
                 if o_type == "csv":
                     if not is_comparison:
-                        if len(splitted) != 4:
+                        if len(splitted) != 5:
                             eprint("Error: Wrong number of arguments for -o csv,...")
                             return 1
-                        export_data = ExportCSV(splitted[1], splitted[2], splitted[3])
+                        export_data = ExportCSV(
+                            splitted[1], splitted[2], splitted[3], splitted[4]
+                        )
                     else:
                         if len(splitted) < 3:
                             eprint("Error: Wrong number of arguments for -o csv,...")
