@@ -2,12 +2,14 @@
 
 """___Built-In Modules___"""
 import getopt
+import os
 import sys
 import io
 import shlex
 
 """___Third-Party Modules___"""
 import unittest
+import matplotlib.image as mpimg
 import numpy as np
 
 """___LIME_TBX Modules___"""
@@ -247,8 +249,6 @@ class TestCLI(unittest.TestCase):
         """
 
     def test_sat_probav_graph(self):
-        import matplotlib.image as mpimg
-
         path_refl = "./test_files/cli/proba_refl.test.png"
         path_irr = "./test_files/cli/proba_irr.test.png"
         path_polar = "./test_files/cli/proba_polar.test.png"
@@ -262,18 +262,18 @@ class TestCLI(unittest.TestCase):
             mse(
                 mpimg.imread(path_refl), mpimg.imread("./test_files/cli/proba_refl.png")
             ),
-            0.1,
+            0.05,
         )
         self.assertLess(
             mse(mpimg.imread(path_irr), mpimg.imread("./test_files/cli/proba_irr.png")),
-            0.1,
+            0.05,
         )
         self.assertLess(
             mse(
                 mpimg.imread(path_polar),
                 mpimg.imread("./test_files/cli/proba_polar.png"),
             ),
-            0.1,
+            0.05,
         )
 
     def test_comparison_glob_csvd_both_ok(self):
@@ -283,6 +283,27 @@ class TestCLI(unittest.TestCase):
                 '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
             )
         )
+    
+    def test_comparison_glob_graphd_png_both_ok(self):
+        cli = get_cli()
+        cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        graphs = ["NIR016.dt.png", "NIR016.mpa.png", "VIS006.dt.png", "VIS006.mpa.png", "VIS008.dt.png", "VIS008.mpa.png"]
+        src_path = "test_files/cli/comp_out.dir"
+        test_path = "test_files/cli/comp_out.test.dir"
+        for gname in graphs:
+            test_filepath = os.path.join(test_path, gname)
+            self.assertTrue(os.path.exists(test_filepath))
+            self.assertLess(
+                mse(
+                    mpimg.imread(os.path.join(src_path, gname)), mpimg.imread(test_filepath),
+                ),
+                0.05,
+            )
+
 
     def test_comparison_glob_csvd_dt_ok(self):
         cli = get_cli()
