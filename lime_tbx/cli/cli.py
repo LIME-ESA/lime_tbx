@@ -256,7 +256,6 @@ class CLI:
         from lime_tbx.gui import canvas
 
         canv = canvas.MplCanvas(width=15, height=10, dpi=200)
-        return
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_cimel_coef().version
