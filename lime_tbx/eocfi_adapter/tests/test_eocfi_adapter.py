@@ -71,10 +71,16 @@ class TestEOCFIConverter(unittest.TestCase):
 
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
+        supposed_lat = 10.383888702133119
+        supposed_h = 791026.9596526251
         lat, lon, h = eo.get_satellite_position("SENTINEL-2A", [DT1])[0]
         self.assertEqual(lon, -65.90847446723075)
-        self.assertEqual(lat, 10.383888702133119)
-        self.assertEqual(h, 791026.9596526251)
+        self.assertAlmostEqual(lat, supposed_lat)
+        self.assertAlmostEqual(h, supposed_h)
+        if lat != supposed_lat:
+            print("\nWARNING: In test_get_satellite_position_ok, lat != supposed_lat. Unexplained Windows behaviour.\n {} != {}\n".format(lat, supposed_lat))
+        if h != supposed_h:
+            print("\nWARNING: In test_get_satellite_position_ok, h != supposed_h. Unexplained Windows behaviour.\n {} != {}\n".format(h, supposed_h))
 
     def test_get_satellite_position_true_data(self):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
