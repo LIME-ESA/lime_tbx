@@ -38,7 +38,7 @@ from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.gui import coefficients, constants
+from lime_tbx.gui import canvas, coefficients, constants
 from ..datatypes import logger, constants as logic_constants
 
 """___Authorship___"""
@@ -507,11 +507,26 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         for i, ch in enumerate(ch_names):
             if len(comps[i].dts) > 0:
                 output.update_plot(i, comps[i])
+                n_comp_points = len(comps[i].diffs_signal.wlens)
+                data_start = min(comps[i].dts)
+                data_end = max(comps[i].dts)
+                version = self.settings_manager.get_cimel_coef().version
+                subtitle = "LIME2 coefficients version: {}".format(version)
+                _subtitle_date_format = canvas._SUBTITLE_DATE_FORMAT
+                subtitle = (
+                    "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
+                        subtitle,
+                        data_start.strftime(_subtitle_date_format),
+                        data_end.strftime(_subtitle_date_format),
+                        n_comp_points,
+                    )
+                )
                 output.update_labels(
                     i,
                     "{} ({} nm)".format(ch, self.srf.get_channel_from_name(ch).center),
                     y_label,
                     "Irradiance (Wm⁻²nm⁻¹)",
+                    subtitle=subtitle,
                 )
                 output.update_legends(
                     i,

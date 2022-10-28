@@ -23,6 +23,9 @@ from ..datatypes.datatypes import (
 from . import constants
 
 
+_SUBTITLE_DATE_FORMAT = "%y/%m/%d %H:%M:%S"
+
+
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 dir_font_path = os.path.dirname(os.path.join(_current_dir, constants.ESAFONT_PATH))
 font_dirs = [dir_font_path]
@@ -41,6 +44,29 @@ class MplCanvas(FigureCanvas):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes: Axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
+        self.axes_y_2 = None
+
+    def set_title(self, title: str, fontproperties: fm.FontProperties = None):
+        self.axes.set_title(title, fontproperties=fontproperties)
+
+    def get_title(self) -> str:
+        return self.axes.get_title()
+
+    def set_subtitle(self, subtitle: str, fontproperties: fm.FontProperties = None):
+        if self.axes_y_2 == None:
+            self.axes_y_2 = self.axes.twiny()
+        self.axes_y_2.set_xlabel(subtitle, fontproperties=fontproperties)
+        self.axes_y_2.tick_params(
+            axis="x",
+            which="both",
+            top=False,
+            labeltop=False,
+        )
+
+    def get_subtitle(self) -> str:
+        if self.axes_y_2 == None:
+            return ""
+        return self.axes_y_2.get_xlabel()
 
 
 def redraw_canvas(
@@ -54,6 +80,7 @@ def redraw_canvas(
     sxlabel: str,
     sylabel: str,
     svertical_lines: List[float],
+    subtitle: str = None,
 ):
     lines = []
     if sdata is not None:
@@ -140,42 +167,39 @@ def redraw_canvas(
 
         data_compare_info = ""
         if sdata_compare:
-            iter_data = sdata_compare.diffs_signal
-            if not isinstance(iter_data, list):
-                iter_data = [iter_data]
+            data_comp = sdata_compare.diffs_signal
             ax2 = scanvas.axes.twinx()
-            for i, data_comp in enumerate(iter_data):
-                label = ""
-                if len(slegend) > 3 and len(slegend[3]) > 0:
-                    label = slegend[3][0]
-                marker = "--"
-                if len(data_comp.data) == 1:
-                    marker = "o"
-                lines += ax2.plot(
+            label = ""
+            if len(slegend) > 3 and len(slegend[3]) > 0:
+                label = slegend[3][0]
+            marker = "--"
+            if len(data_comp.data) == 1:
+                marker = "o"
+            lines += ax2.plot(
+                data_comp.wlens,
+                data_comp.data,
+                "k{}".format(marker),
+                label=label,
+            )
+            if data_comp.uncertainties is not None:
+                ax2.fill_between(
                     data_comp.wlens,
-                    data_comp.data,
-                    "k{}".format(marker),
-                    label=label,
+                    data_comp.data - 2 * data_comp.uncertainties,
+                    data_comp.data + 2 * data_comp.uncertainties,
+                    color="pink",
+                    alpha=0.3,
                 )
-                if data_comp.uncertainties is not None:
-                    ax2.fill_between(
-                        data_comp.wlens,
-                        data_comp.data - 2 * data_comp.uncertainties,
-                        data_comp.data + 2 * data_comp.uncertainties,
-                        color="pink",
-                        alpha=0.3,
-                    )
-                ax2.set_ylim(
-                    (
-                        min(-0.05, min(data_comp.data) - 0.05),
-                        max(0.05, max(data_comp.data) + 0.05),
-                    )
+            ax2.set_ylim(
+                (
+                    min(-0.05, min(data_comp.data) - 0.05),
+                    max(0.05, max(data_comp.data) + 0.05),
                 )
-                data_compare_info = "MRD: {:.4f}\nσ: {:.4f}".format(
-                    sdata_compare.mean_relative_difference,
-                    sdata_compare.standard_deviation_mrd,
-                )
-                lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
+            )
+            data_compare_info = "MRD: {:.4f}\nσ: {:.4f}\n".format(
+                sdata_compare.mean_relative_difference,
+                sdata_compare.standard_deviation_mrd,
+            )
+            lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
             ax2.set_ylabel(
                 "Relative difference (Fraction of unity)",
                 fontproperties=label_font_prop,
@@ -190,7 +214,9 @@ def redraw_canvas(
             labels = [l.get_label() for l in legend_lines]
             scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
 
-    scanvas.axes.set_title(stitle, fontproperties=title_font_prop)
+    if subtitle != None:
+        scanvas.set_subtitle(subtitle, fontproperties=font_prop)
+    scanvas.set_title(stitle, fontproperties=title_font_prop)
     scanvas.axes.set_xlabel(sxlabel, fontproperties=label_font_prop)
     scanvas.axes.set_ylabel(sylabel, fontproperties=label_font_prop)
     if svertical_lines and len(svertical_lines) > 0:

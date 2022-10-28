@@ -74,18 +74,12 @@ class GraphWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # canvas
         self.canvas = MplCanvas(self)
-        self.canvas.axes.set_title(self.title, fontproperties=title_font_prop)
+        self.canvas.set_title(self.title, fontproperties=title_font_prop)
         self.canvas.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_cimel_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
-        ay2 = self.canvas.axes.twiny()
-        ay2.set_xlabel(subtitle, fontproperties=font_prop)
-        ay2.tick_params(
-            axis="x",
-            which="both",
-            top=False,
-            labeltop=False,
-        )
+        self.subtitle = subtitle
+        self.canvas.set_subtitle(subtitle, fontproperties=font_prop)
         self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
         self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
         self._prepare_toolbar()
@@ -165,10 +159,19 @@ class GraphWidget(QtWidgets.QWidget):
         if redraw:
             self._redraw()
 
-    def update_labels(self, title: str, xlabel: str, ylabel: str, redraw: bool = True):
+    def update_labels(
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        redraw: bool = True,
+        subtitle: str = None,
+    ):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
+        if subtitle != None:
+            self.subtitle = subtitle
         if redraw:
             self._redraw()
 
@@ -207,6 +210,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.xlabel,
             self.ylabel,
             self.vertical_lines,
+            self.subtitle,
         )
         try:
             self.canvas.fig.tight_layout()
@@ -513,9 +517,17 @@ for wavelengths between 350 and 2500 nm"
         )
 
     def update_labels(
-        self, index: int, title: str, xlabel: str, ylabel: str, redraw: bool = True
+        self,
+        index: int,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        redraw: bool = True,
+        subtitle: str = None,
     ):
-        self.channels[index].update_labels(title, xlabel, ylabel, redraw=redraw)
+        self.channels[index].update_labels(
+            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
+        )
 
     def update_legends(self, index: int, legends: List[List[str]], redraw: bool = True):
         """

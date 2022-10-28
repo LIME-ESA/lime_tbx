@@ -341,7 +341,9 @@ class EOCFIConverter(IEOCFIConverter):
             )
             for dt in dts:
                 cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
-            so = os.popen(cmd).read()
+            cmd_exec = os.popen(cmd)
+            so = cmd_exec.read()
+            cmd_exec.close()
             out_lines = so.splitlines()
             if len(out_lines) == 3 * n_dates:
                 for i in range(n_dates):
