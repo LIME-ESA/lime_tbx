@@ -23,7 +23,7 @@ from ..datatypes.datatypes import (
 from . import constants
 
 
-SUBTITLE_DATE_FORMAT = "%y/%m/%d %H:%M:%S"
+SUBTITLE_DATE_FORMAT = "%Y/%m/%d %H:%M:%S"
 
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
