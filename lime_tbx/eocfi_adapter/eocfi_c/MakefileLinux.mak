@@ -63,9 +63,9 @@ LIBS = 	\
 	-lexplorer_file_handling \
 	-lgeotiff -ltiff -lproj -lxml2 -lm -lc -lpthread
 
-default : example
+default : executable
 
-example:
+executable:
 	echo "--------------------"
 	echo "$(CFI): ... creating the executable"
 	echo "--------------------"

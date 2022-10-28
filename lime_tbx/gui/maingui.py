@@ -512,7 +512,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 data_end = max(comps[i].dts)
                 version = self.settings_manager.get_cimel_coef().version
                 subtitle = "LIME2 coefficients version: {}".format(version)
-                _subtitle_date_format = canvas._SUBTITLE_DATE_FORMAT
+                _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
                 subtitle = (
                     "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
                         subtitle,

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 
 #include <explorer_orbit.h>
 
@@ -617,17 +618,19 @@ __declspec(dllexport) int  get_satellite_position_tle(
 
 int main (int argc, char *argv[]){
     // Main code can be called to perform tle calculations, as the shared library doesn't seem to work.
-    int n_dates;
+    int n_dates, is_tle;
     long sat_id;
     long norad;
     char *tle_file = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
     char *orbit_file = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
     char *sat_name = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
     char *intdes = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
-    if(argc < 5){
+    if(argc < 6){
+        is_tle = 1;
         n_dates = 1;
     }else{
-        n_dates = atoi(argv[1]);
+        is_tle = atoi(argv[1]);
+        n_dates = atoi(argv[2]);
     }
     int **dates = (int**)malloc(sizeof(int*)*n_dates);
     double **positions = (double**)malloc(sizeof(double*)*n_dates);
@@ -635,7 +638,7 @@ int main (int argc, char *argv[]){
         positions[i] = (double*)malloc(sizeof(double)*3);
         dates[i] = (int*)malloc(sizeof(int)*6);
     }
-    if(argc < 5){
+    if(argc < 6){
         sat_id = 200;
         dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0;
         strcpy(orbit_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF");
@@ -643,36 +646,50 @@ int main (int argc, char *argv[]){
         norad = 39159;
         strcpy(sat_name, "PROBA-V");
         strcpy(intdes, "13021A");
-    }else{
-        sat_id = atol(argv[2]);
-        norad = atol(argv[3]);
-        strcpy(tle_file, argv[4]);
-        strcpy(orbit_file, argv[5]);
-        strcpy(sat_name, argv[6]);
-        strcpy(intdes, argv[7]);
+    }else if(is_tle){
+        sat_id = atol(argv[3]);
+        norad = atol(argv[4]);
+        strcpy(tle_file, argv[5]);
+        strcpy(orbit_file, argv[6]);
+        strcpy(sat_name, argv[7]);
+        strcpy(intdes, argv[8]);
         for(int i = 0; i < n_dates; i++){
-            sscanf(argv[8+i], "%d-%d-%dT%d:%d:%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5]);
+            sscanf(argv[9+i], "%d-%d-%dT%d:%d:%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5]);
         }
+        get_satellite_position_tle(
+            sat_id,
+            n_dates,
+            dates,
+            orbit_file,
+            norad,
+            sat_name,
+            intdes,
+            tle_file,
+            positions
+        );
+    }else{
+        sat_id = atol(argv[3]);
+        strcpy(orbit_file, argv[4]);
+        for(int i = 0; i < n_dates; i++){
+            sscanf(argv[5+i], "%d-%d-%dT%d:%d:%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5]);
+        }
+        get_satellite_position_osf(
+            sat_id,
+            n_dates,
+            dates,
+            orbit_file,
+            positions
+        );
     }
-    get_satellite_position_tle(
-        sat_id,
-        n_dates,
-        dates,
-        orbit_file,
-        norad,
-        sat_name,
-        intdes,
-        tle_file,
-        positions
-    );
     free(tle_file);
     free(orbit_file);
     free(sat_name);
     free(intdes);
+    int digs = DECIMAL_DIG;
     for(int i = 0; i < n_dates; i++){
-        printf("%lf\n", positions[i][0]);
-        printf("%lf\n", positions[i][1]);
-        printf("%lf\n", positions[i][2]);
+        printf("%.*e\n", digs, positions[i][0]);
+        printf("%.*e\n", digs, positions[i][1]);
+        printf("%.*e\n", digs, positions[i][2]);
         fflush(stdout);
         free(dates[i]);
         free(positions[i]);

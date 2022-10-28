@@ -256,18 +256,12 @@ class CLI:
         from lime_tbx.gui import canvas
 
         canv = canvas.MplCanvas(width=15, height=10, dpi=200)
+        return
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_cimel_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
-        ay2 = canv.axes.twiny()
-        ay2.set_xlabel(subtitle, fontproperties=canvas.font_prop)
-        ay2.tick_params(
-            axis="x",
-            which="both",
-            top=False,
-            labeltop=False,
-        )
+        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
         canv.axes.cla()  # Clear the canvas.
@@ -359,7 +353,7 @@ class CLI:
         data_end = max(comparison.dts)
         version = self.settings_manager.get_cimel_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
-        _subtitle_date_format = canvas._SUBTITLE_DATE_FORMAT
+        _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
         subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
             subtitle,
             data_start.strftime(_subtitle_date_format),

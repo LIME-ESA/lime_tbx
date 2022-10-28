@@ -10,9 +10,6 @@ include lime_tbx/gui/assets/lime_logo.png
 include lime_tbx/gui/assets/spinner.gif
 include lime_tbx/gui/assets/NotesEsaBol.otf
 include lime_tbx/gui/assets/NotesEsaReg.otf
-include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_linux.so
-include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_darwin.so
-include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_win64.dll
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_linux
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_darwin
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_win64.exe

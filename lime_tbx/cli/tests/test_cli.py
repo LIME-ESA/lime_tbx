@@ -8,6 +8,7 @@ import shlex
 
 """___Third-Party Modules___"""
 import unittest
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import KernelsPath
@@ -38,6 +39,18 @@ def get_opts(args_str: str):
     args = shlex.split(args_str)
     opts, args = getopt.getopt(args, OPTIONS, LONG_OPTIONS)
     return opts
+
+
+def mse(imageA, imageB) -> float:
+    # the 'Mean Squared Error' between the two images is the
+    # sum of the squared difference between the two images;
+    # NOTE: the two images must have the same dimension
+    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+    err /= float(imageA.shape[0] * imageA.shape[1])
+
+    # return the MSE, the lower the error, the more "similar"
+    # the two images are
+    return err
 
 
 class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
@@ -234,11 +247,6 @@ class TestCLI(unittest.TestCase):
         """
 
     def test_sat_probav_graph(self):
-        try:
-            from sewar.full_ref import uqi
-        except:
-            print("\nMissing 'sewar' library (needed for some image testing).")
-            return
         import matplotlib.image as mpimg
 
         path_refl = "./test_files/cli/proba_refl.test.png"
@@ -250,22 +258,22 @@ class TestCLI(unittest.TestCase):
                 "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
             )
         )
-        self.assertGreater(
-            uqi(
+        self.assertLess(
+            mse(
                 mpimg.imread(path_refl), mpimg.imread("./test_files/cli/proba_refl.png")
             ),
-            0.99,
+            0.1,
         )
-        self.assertGreater(
-            uqi(mpimg.imread(path_irr), mpimg.imread("./test_files/cli/proba_irr.png")),
-            0.99,
+        self.assertLess(
+            mse(mpimg.imread(path_irr), mpimg.imread("./test_files/cli/proba_irr.png")),
+            0.1,
         )
-        self.assertGreater(
-            uqi(
+        self.assertLess(
+            mse(
                 mpimg.imread(path_polar),
                 mpimg.imread("./test_files/cli/proba_polar.png"),
             ),
-            0.99,
+            0.1,
         )
 
     def test_comparison_glob_csvd_both_ok(self):

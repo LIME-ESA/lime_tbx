@@ -8,7 +8,6 @@ It exports the following classes:
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-import ctypes as ct
 from typing import Tuple, List
 from datetime import datetime, timezone
 import os
@@ -31,45 +30,19 @@ __status__ = "Development"
 
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
-SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux.so"
-SO_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.dll"
-SO_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin.so"
 EXE_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux"
 EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
 EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
 
 if platform.system() == "Linux":
-    so_file_satellite = SO_FILE_SATELLITE_LINUX
     exe_file_satellite = EXE_FILE_SATELLITE_LINUX
 elif platform.system() == "Windows":
-    so_file_satellite = SO_FILE_SATELLITE_WINDOWS
     exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
 else:
-    so_file_satellite = SO_FILE_SATELLLITE_DARWIN
     exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_so_path = os.path.join(_current_dir, so_file_satellite)
 _exe_path = os.path.join(_current_dir, exe_file_satellite)
-eocfi_sat = ct.CDLL(_so_path)
-
-
-def _make_clist(lst: List[str]):
-    """
-    Helper function to turn Python list of Unicode strings
-    into a ctypes array of byte strings.
-
-    Parameters
-    ----------
-    lst: list of str
-        List of unicode strings
-
-    Returns
-    -------
-    clst: c_char_p_Array
-        ctypes array of byte strings
-    """
-    return (ct.c_char_p * len(lst))(*[x.encode() for x in lst])
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -262,7 +235,6 @@ class EOCFIConverter(IEOCFIConverter):
     def _get_sat_position_one_orbit_file(
         self, sat: Satellite, dts: List[datetime], orb_f: OrbitFile
     ) -> List[Tuple[float, float, float]]:
-        is_pred = False
         orbit_path = ""
         if sat.orbit_files:
             if orb_f == None:
@@ -275,30 +247,8 @@ class EOCFIConverter(IEOCFIConverter):
             )
             if not os.path.exists(orbit_path):
                 raise LimeException("The orbit file {} is missing".format(orbit_path))
-            if "ORBPRE" in orb_f.name:
-                is_pred = True
-            # We have to make this a list/array
-        fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
-        metadata = yaml.load(fl, Loader=yaml.FullLoader)
-        fl.close()
-        if not is_pred:
-            bulletin_name = metadata.get("BULLETIN_IERS")["file_b"]
-        else:
-            bulletin_name = metadata.get("BULLETIN_IERS")["file_a"]
-        bulletin = os.path.join(self.eocfi_path, bulletin_name)
 
         n_dates = len(dts)
-        l_cdt = []
-        for dt in dts:
-            c_dt = (ct.c_int * 6)(
-                *[dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second]
-            )
-            l_cdt.append(c_dt)
-        c_dts = (ct.POINTER(ct.c_int) * n_dates)(*l_cdt)
-        sat_positions_arrs = []
-        for _ in range(n_dates):
-            sat_positions_arrs.append((ct.c_double * 3)(*[0.0, 0.0, 0.0]))
-        sat_positions = (ct.POINTER(ct.c_double) * n_dates)(*sat_positions_arrs)
         norad = 0
         intdes = ""
         tle_file = ""
@@ -314,23 +264,25 @@ class EOCFIConverter(IEOCFIConverter):
                 "mission_configuration_files",
                 sat.time_file,
             )
+        # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
+        if platform.system() == "Windows":
+            orbit_path = orbit_path.replace("/", "\\")
+            if tle_file != "":
+                tle_file = tle_file.replace("/", "\\")
+        orbit_path = '"{}"'.format(orbit_path)
         if tle_file == "":
-            eocfi_sat.get_satellite_position_osf(
-                ct.c_long(sat.id),
-                ct.c_int(n_dates),
-                c_dts,
-                ct.c_char_p(orbit_path.encode()),
-                sat_positions,
+            cmd = "{} {} {} {} {}".format(
+                _exe_path,
+                0,
+                n_dates,
+                sat.id,
+                orbit_path,
             )
         else:
-            if platform.system() == "Windows":
-                orbit_path = orbit_path.replace("/", "\\")
-                tle_file = tle_file.replace("/", "\\")
-            orbit_path = '"{}"'.format(orbit_path)
             tle_file = '"{}"'.format(tle_file)
-            # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK FOR TLE
-            cmd = "{} {} {} {} {} {} {} {}".format(
+            cmd = "{} {} {} {} {} {} {} {} {}".format(
                 _exe_path,
+                1,
                 n_dates,
                 sat.id,
                 norad,
@@ -339,23 +291,26 @@ class EOCFIConverter(IEOCFIConverter):
                 sat.name,
                 intdes,
             )
-            for dt in dts:
-                cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
-            cmd_exec = os.popen(cmd)
-            so = cmd_exec.read()
-            cmd_exec.close()
-            out_lines = so.splitlines()
-            if len(out_lines) == 3 * n_dates:
-                for i in range(n_dates):
-                    sat_positions[i][0] = ct.c_double(float(out_lines[i * 3]))
-                    sat_positions[i][1] = ct.c_double(float(out_lines[i * 3 + 1]))
-                    sat_positions[i][2] = ct.c_double(float(out_lines[i * 3 + 2]))
-            else:
-                raise Exception(
-                    "Number of lines unexpected. {}/{}.\n{}".format(
-                        str(len(out_lines)), str(3 * n_dates), out_lines
-                    )
+        for dt in dts:
+            cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
+        cmd_exec = os.popen(cmd)
+        so = cmd_exec.read()
+        cmd_exec.close()
+        out_lines = so.splitlines()
+        sat_positions = []
+        if len(out_lines) == 3 * n_dates:
+            for i in range(n_dates):
+                sat_positions_date = []
+                sat_positions_date.append(float(out_lines[i * 3]))
+                sat_positions_date.append(float(out_lines[i * 3 + 1]))
+                sat_positions_date.append(float(out_lines[i * 3 + 2]))
+                sat_positions.append(sat_positions_date)
+        else:
+            raise Exception(
+                "Number of lines unexpected. {}/{}.\n{}".format(
+                    str(len(out_lines)), str(3 * n_dates), out_lines
                 )
+            )
 
         positions = []
         for i in range(n_dates):
