@@ -70,22 +70,15 @@ LIBS = 	libexplorer_data_handling.lib\
 EXAMPLE = $(CFI)
 
 #------------------------------------------------------------------------------
-#	Makefile default target
-#------------------------------------------------------------------------------
-
-WIN_STA: example_sta run
-WIN_DLL: example_dll run
-
-#------------------------------------------------------------------------------
 #	Compilation after preprocessing rules
 #------------------------------------------------------------------------------
 
 
-default : example
+default : executable
 
-example:
+executable:
 	echo "--------------------"
-	echo "$(CFI): ... creating the example (WIN_STA)"
+	echo "$(CFI): ... creating the executable (WIN_STA)"
 	echo "--------------------"
   
 	$(CC) $(CFLAGS) code\get_positions.c
@@ -97,7 +90,7 @@ example:
 
 shared:	
 	echo "--------------------"
-	echo "$(CFI): ... creating the example (WIN_DLL)"
+	echo "$(CFI): ... creating the shared (WIN_DLL)"
 	echo "--------------------"
   
 	$(CC) $(CFLAGS) code\get_positions.c
