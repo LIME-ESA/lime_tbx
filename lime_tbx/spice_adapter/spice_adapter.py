@@ -169,6 +169,13 @@ class SPICEAdapter(ISPICEAdapter):
         pol_rad = radios[2]  # Polar radius
         flattening = (eq_rad - pol_rad) / eq_rad
         pos_iau = np.array(list(map(lambda n: n / 1000, [x, y, z])))
-        lat, lon, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
+        lon, lat, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
         SPICEAdapter._clear_kernels()
-        return lat * spice.dpr(), lon * spice.dpr(), alt_km * 1000
+        lat = lat * spice.dpr()
+        lon = lon * spice.dpr()
+        alt = alt_km * 1000
+        while lon < -180:
+            lon += 360
+        while lon > 180:
+            lon -= 360
+        return lat, lon, alt

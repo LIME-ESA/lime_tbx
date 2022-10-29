@@ -33,7 +33,7 @@ class TestMoon(unittest.TestCase):
         }
         dt = datetime(2014, 3, 18, 14, 1, 12, 25, tzinfo=timezone.utc)
         sat_pos = SatellitePosition(
-            42164.81038833844, -75.0548191222299, 66.49362502083844
+            42164810.38833844, -75054.8191222299, 66493.62502083843
         )
         for i, name in enumerate(lo.ch_names):
             self.assertEqual(name, ch_names[i])

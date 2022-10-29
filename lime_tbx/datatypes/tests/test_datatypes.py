@@ -3,8 +3,6 @@
 """___Built-In Modules___"""
 from datetime import datetime, timedelta, timezone
 
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
-
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
@@ -25,6 +23,7 @@ from ..datatypes import (
     SpectralValidity,
 )
 from .. import constants
+from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -135,7 +134,7 @@ DT3 = datetime(2032, 1, 17, 3, tzinfo=timezone.utc)
 class TestSatellite(unittest.TestCase):
     def test_satellite_functions_ok(self):
         obfs = [OrbitFile("a", DT1, DT2), OrbitFile("e", DT2, DT3)]
-        sat = Satellite("SAT", 0, obfs)
+        sat = Satellite("SAT", 0, obfs, None, None, None)
         self.assertEqual(sat.get_best_orbit_file(DT2 - timedelta(5)), obfs[0])
         self.assertEqual(sat.get_best_orbit_file(DT2 + timedelta(5)), obfs[1])
         self.assertIsNone(sat.get_best_orbit_file(DT3 + timedelta(5)))

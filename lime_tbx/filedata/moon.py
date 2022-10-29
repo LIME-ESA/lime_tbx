@@ -7,10 +7,9 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime, timezone
 import os
 from typing import List, Union, Tuple
-import logging
 
 
 """___Third-Party Modules___"""
@@ -25,14 +24,12 @@ from ..datatypes.datatypes import (
     LGLODData,
     LunarObservation,
     LunarObservationWrite,
-    SatellitePoint,
     SatellitePosition,
     SelenographicDataWrite,
     SpectralData,
-    SpectralResponseFunction,
     SurfacePoint,
 )
-from lime_tbx.datatypes import constants
+from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
@@ -45,7 +42,14 @@ __status__ = "Development"
 _READ_FILE_ERROR_STR = (
     "There was a problem while loading the file. See log for details."
 )
-_EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
+_EXPORT_ERROR_STR = "Error while exporting as LGLOD. See log for details."
+
+
+def _calc_divisor_to_m(units: str) -> float:
+    if units == "km":
+        return 0.001
+    # if units == "m":
+    return 1
 
 
 def _calc_divisor_to_nm(units: str) -> float:
@@ -89,7 +93,11 @@ def read_moon_obs(path: str) -> LunarObservation:
             ch_names.append(ch_name)
         dt = datetime.fromtimestamp(float(ds["date"][0].data), tz=timezone.utc)
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
-        sat_pos = SatellitePosition(*list(map(float, ds["sat_pos"][:][:].data)))
+        sat_pos_units: str = ds["sat_pos"].units
+        d_to_m = _calc_divisor_to_m(sat_pos_units)
+        sat_pos = SatellitePosition(
+            *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
+        )
         irr_obs = ds["irr_obs"][:]
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
@@ -99,7 +107,7 @@ def read_moon_obs(path: str) -> LunarObservation:
         ds.close()
         return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)
 
 
@@ -205,7 +213,7 @@ def _write_normal_simulations(
     row = ds.createDimension("row", 0)
     sat_xyz = ds.createDimension("sat_xyz", 3)
     # VARIABLES
-    dates = ds.createVariable("date", "f4", ("date",))
+    dates = ds.createVariable("date", "f8", ("date",))
     dates.standard_name = "time"
     dates.long_name = "time of lunar observation"
     dates.units = "seconds since 1970-01-01T00:00:00Z"
@@ -220,14 +228,17 @@ def _write_normal_simulations(
     channel_name[:] = np.array(
         [nc.stringtochar(np.array([ch], chan_st_type)) for ch in sim_data.ch_names]
     )
-    sat_pos = ds.createVariable("sat_pos", "f4", ("number_obs", "sat_xyz"))
+    sat_pos = ds.createVariable("sat_pos", "f8", ("number_obs", "sat_xyz"))
     sat_pos.long_name = "satellite position x y z in sat_pos_ref"
     sat_pos.units = "km"
-    sat_pos.valid_min = 0.0
+    sat_pos.valid_min = -999999995904.0
     sat_pos.valid_max = 999999995904.0
     sat_pos[:] = np.array(
-        [np.array([sat_pos.x, sat_pos.y, sat_pos.z]) for sat_pos in sim_data.sat_pos]
-    )
+        [
+            np.array([sat_pos.x / 1000, sat_pos.y / 1000, sat_pos.z / 1000])
+            for sat_pos in sim_data.sat_pos
+        ]
+    )  # divided by 1000 because they were in meters
     sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
     sat_pos_ref.long_name = "reference frame of satellite position"
     sat_pos_ref[:] = nc.stringtochar(
@@ -434,7 +445,7 @@ def write_obs(
         )
         ds.close()
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
 
 
@@ -447,11 +458,21 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         )
     )
     channel_names_0 = [
-        chn.tobytes().decode("utf-8") for chn in ds.variables["channel_name"][:].data
+        chn.tobytes().decode("utf-8").replace("\x00", "")
+        for chn in ds.variables["channel_name"][:].data
     ]
-    lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
+    sat_pos_units: str = ds["sat_pos"].units
+    d_to_m = _calc_divisor_to_m(sat_pos_units)
+    lambda_to_satpos = lambda xyz: SatellitePosition(
+        *list(map(lambda a: a / d_to_m, xyz))
+    )
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
-    sat_pos_ref_0 = ds.variables["sat_pos_ref"][:].data.tobytes().decode("utf-8")
+    sat_pos_ref_0 = (
+        ds.variables["sat_pos_ref"][:]
+        .data.tobytes()
+        .decode("utf-8")
+        .replace("\x00", "")
+    )
     signals_data = np.array(ds.variables["irr_obs"][:].data)
     signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data)
     signals = SpectralData(
@@ -559,75 +580,65 @@ def write_comparison(
         index_useful_channel = [
             i for i, c in enumerate(lglod.comparisons) if c.simulated_signal is not None
         ]
-        irr_obs_data = np.array(
-            [
-                c.simulated_signal.data
-                for c in lglod.comparisons
-                if c.simulated_signal is not None
-            ]
-        )
-        irr_obs_data_unc = np.array(
-            [
-                c.simulated_signal.uncertainties
-                for c in lglod.comparisons
-                if c.simulated_signal is not None
-            ]
-        )
-        irr_comp_data = np.array(
-            [
-                c.observed_signal.data
-                for c in lglod.comparisons
-                if c.observed_signal is not None
-            ]
-        )
-        irr_comp_data_unc = np.array(
-            [
-                c.observed_signal.uncertainties
-                for c in lglod.comparisons
-                if c.observed_signal is not None
-            ]
-        )
-        irr_diff_data = np.array(
-            [
-                c.diffs_signal.data
-                for c in lglod.comparisons
-                if c.diffs_signal is not None
-            ]
-        )
-        irr_diff_data_unc = np.array(
-            [
-                c.diffs_signal.uncertainties
-                for c in lglod.comparisons
-                if c.diffs_signal is not None
-            ]
-        )
+        irr_obs_data = [
+            c.simulated_signal.data
+            for c in lglod.comparisons
+            if c.simulated_signal is not None
+        ]
+        irr_obs_data_unc = [
+            c.simulated_signal.uncertainties
+            for c in lglod.comparisons
+            if c.simulated_signal is not None
+        ]
+        irr_comp_data = [
+            c.observed_signal.data
+            for c in lglod.comparisons
+            if c.observed_signal is not None
+        ]
+        irr_comp_data_unc = [
+            c.observed_signal.uncertainties
+            for c in lglod.comparisons
+            if c.observed_signal is not None
+        ]
+        irr_diff_data = [
+            c.diffs_signal.data for c in lglod.comparisons if c.diffs_signal is not None
+        ]
+        irr_diff_data_unc = [
+            c.diffs_signal.uncertainties
+            for c in lglod.comparisons
+            if c.diffs_signal is not None
+        ]
         mrd_data = np.array(
             [
                 c.mean_relative_difference
                 for c in lglod.comparisons
                 if c.mean_relative_difference is not None
-            ]
+            ],
+            dtype=object,
         )
         number_samples_data = np.array(
             [
                 c.number_samples
                 for c in lglod.comparisons
                 if c.number_samples is not None
-            ]
+            ],
+            dtype=object,
         )
         std_mrd_data = np.array(
             [
                 c.standard_deviation_mrd
                 for c in lglod.comparisons
                 if c.standard_deviation_mrd is not None
-            ]
+            ],
+            dtype=object,
         )
         temporal_trend_data = np.array(
             [
                 c.temporal_trend
                 for c in lglod.comparisons
                 if c.temporal_trend is not None
-            ]
+            ],
+            dtype=object,
         )
         for c in lglod.comparisons:
             for i, cdt in enumerate(c.dts):
@@ -666,25 +677,31 @@ def write_comparison(
         fill_value = -999
         ds = _write_normal_simulations(lglod, path, dt, sim_data)
         ds.is_comparison = 1
-        for c in lglod.comparisons:
+        for j, c in enumerate(lglod.comparisons):
             for i, dt in enumerate(dates):
                 if dt not in c.dts and c.dts != []:
-                    irr_obs_data = np.insert(irr_obs_data, i, fill_value, axis=0)
-                    irr_obs_data_unc = np.insert(
-                        irr_obs_data_unc, i, fill_value, axis=0
+                    irr_obs_data[j] = np.insert(irr_obs_data[j], i, fill_value, axis=0)
+                    irr_obs_data_unc[j] = np.insert(
+                        irr_obs_data_unc[j], i, fill_value, axis=0
                     )
-                    irr_comp_data = np.insert(irr_comp_data, i, fill_value, axis=0)
-                    irr_comp_data_unc = np.insert(
-                        irr_comp_data_unc, i, fill_value, axis=0
+                    irr_comp_data[j] = np.insert(
+                        irr_comp_data[j], i, fill_value, axis=0
                     )
-                    irr_diff_data = np.insert(irr_diff_data, i, fill_value, axis=0)
-                    irr_diff_data_unc = np.insert(
-                        irr_diff_data_unc, i, fill_value, axis=0
+                    irr_comp_data_unc[j] = np.insert(
+                        irr_comp_data_unc[j], i, fill_value, axis=0
                     )
-                    mrd_data = np.insert(mrd_data, i, fill_value)
-                    number_samples_data = np.insert(number_samples_data, i, fill_value)
-                    std_mrd_data = np.insert(std_mrd_data, i, fill_value)
-                    temporal_trend_data = np.insert(temporal_trend_data, i, fill_value)
+                    irr_diff_data[j] = np.insert(
+                        irr_diff_data[j], i, fill_value, axis=0
+                    )
+                    irr_diff_data_unc[j] = np.insert(
+                        irr_diff_data_unc[j], i, fill_value, axis=0
+                    )
+        irr_obs_data = np.array(irr_obs_data)
+        irr_obs_data_unc = np.array(irr_obs_data_unc)
+        irr_comp_data = np.array(irr_comp_data)
+        irr_comp_data_unc = np.array(irr_comp_data_unc)
+        irr_diff_data = np.array(irr_diff_data)
+        irr_diff_data_unc = np.array(irr_diff_data_unc)
         # DIMENSIONS
         # vals
         irr_obs = ds.createVariable(
@@ -754,7 +771,7 @@ def write_comparison(
         temporal_trend[:] = temporal_trend_data
         ds.close()
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
 
 
@@ -771,7 +788,11 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
         chn.tobytes().decode("utf-8").replace("\x00", "")
         for chn in ds.variables["channel_name"][:].data
     ]
-    lambda_to_satpos = lambda xyz: SatellitePosition(*xyz)
+    sat_pos_units: str = ds["sat_pos"].units
+    d_to_m = _calc_divisor_to_m(sat_pos_units)
+    lambda_to_satpos = lambda xyz: SatellitePosition(
+        *list(map(lambda a: a / d_to_m, xyz))
+    )
     fill_value = -999
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
     irr_obs_data = np.array(ds.variables["irr_obs"][:].data).T
@@ -788,37 +809,40 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
     comps = []
     points = []
+    mpas = []
     ds.close()
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
     temporal_trend = temporal_trend[temporal_trend != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     for i, sp in enumerate(sat_poss):
-        points.append(
-            SurfacePoint(
-                *SPICEAdapter.to_planetographic(
-                    sp.x, sp.y, sp.z, "EARTH", kernels_path.main_kernels_path
-                ),
-                datetimes[i]
-            )
+        sp = SurfacePoint(
+            *SPICEAdapter.to_planetographic(
+                sp.x, sp.y, sp.z, "EARTH", kernels_path.main_kernels_path
+            ),
+            datetimes[i]
         )
+        points.append(sp)
+        mpa = SPICEAdapter.get_moon_data_from_earth(
+            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
+        ).mpa_degrees
+        mpas.append(mpa)
 
     points = np.array(points)
+    mpas = np.array(mpas)
     for i in range(len(ch_names)):
         indexes = irr_comp_data[i] != fill_value
-        irr_comp_data[i] = irr_comp_data[i][irr_comp_data[i] != fill_value]
-        irr_comp_uncs[i] = irr_comp_uncs[i][irr_comp_uncs[i] != fill_value]
-        irr_obs_data[i] = irr_obs_data[i][irr_obs_data[i] != fill_value]
-        irr_obs_uncs[i] = irr_obs_uncs[i][irr_obs_uncs[i] != fill_value]
-        irr_diff_data[i] = irr_diff_data[i][irr_diff_data[i] != fill_value]
-        irr_diff_uncs[i] = irr_diff_uncs[i][irr_diff_uncs[i] != fill_value]
+        irr_comp_data_i = irr_comp_data[i][irr_comp_data[i] != fill_value]
+        irr_comp_uncs_i = irr_comp_uncs[i][irr_comp_uncs[i] != fill_value]
+        irr_obs_data_i = irr_obs_data[i][irr_obs_data[i] != fill_value]
+        irr_obs_uncs_i = irr_obs_uncs[i][irr_obs_uncs[i] != fill_value]
+        irr_diff_data_i = irr_diff_data[i][irr_diff_data[i] != fill_value]
+        irr_diff_uncs_i = irr_diff_uncs[i][irr_diff_uncs[i] != fill_value]
         dts = datetimes[indexes]
-        obs_signal = SpectralData(
-            np.array(dts), irr_comp_data[i], irr_comp_uncs[i], None
-        )
-        sim_signal = SpectralData(np.array(dts), irr_obs_data[i], irr_obs_uncs[i], None)
+        obs_signal = SpectralData(np.array(dts), irr_comp_data_i, irr_comp_uncs_i, None)
+        sim_signal = SpectralData(np.array(dts), irr_obs_data_i, irr_obs_uncs_i, None)
         diffs_signal = SpectralData(
-            np.array(dts), irr_diff_data[i], irr_diff_uncs[i], None
+            np.array(dts), irr_diff_data_i, irr_diff_uncs_i, None
         )
         comp = ComparisonData(
             obs_signal,
@@ -830,6 +854,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             number_samples[i],
             dts,
             points[indexes],
+            mpas[indexes],
         )
         comps.append(comp)
     return LGLODComparisonData(comps, ch_names, sat_name)
@@ -844,5 +869,5 @@ def read_glod_file(
             return _read_comparison(ds, kernels_path)
         return _read_lime_glod(ds)
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)

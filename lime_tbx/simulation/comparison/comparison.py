@@ -10,13 +10,12 @@ It exports the following classes:
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 import math
-from typing import List, Tuple
+from typing import List, Callable
 
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Third-Party Modules___"""
 import numpy as np
-import pyproj
 
 """___NPL Modules___"""
 from ...datatypes.datatypes import (
@@ -141,6 +140,10 @@ class IComparison(ABC):
         """
         pass
 
+    @abstractmethod
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> None:
+        pass
+
 
 class Comparison(IComparison):
     def _get_full_srf(self) -> SpectralResponseFunction:
@@ -162,28 +165,41 @@ class Comparison(IComparison):
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
+        callback_observation: Callable = None,
     ) -> List[ComparisonData]:
+        """
+        Parameters
+        ----------
+        observations: list of LunarObservations
+        srf: SpectralResponseFunction
+        coefficients: ReflectanceCoefficients
+        lime_simulation: ILimeSimulation
+        callback_observation: Callable
+            Function that will be called once for every observation when simulated.
+        """
         ch_names = srf.get_channels_names()
         comparisons = []
         sigs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
         sps = [[] for _ in ch_names]
+        mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
         for obs in observations:
             sat_pos = obs.sat_pos
             dt = obs.dt
             lat, lon, h = SPICEAdapter.to_planetographic(
-                sat_pos.x * 1000,
-                sat_pos.y * 1000,
-                sat_pos.z * 1000,
+                sat_pos.x,
+                sat_pos.y,
+                sat_pos.z,
                 "EARTH",
                 self.kernels_path.main_kernels_path,
             )
             sp = SurfacePoint(lat, lon, h, dt)
+            mpa = SPICEAdapter.get_moon_data_from_earth(
+                lat, lon, h, dt, self.kernels_path
+            ).mpa_degrees
             lime_simulation.set_simulation_changed()
-            lime_simulation.update_irradiance(
-                self._get_full_srf(), srf, sp, coefficients
-            )
+            lime_simulation.update_irradiance(srf, sp, coefficients)
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
@@ -191,7 +207,10 @@ class Comparison(IComparison):
                     sigs[j].append((signals.data[j][0], signals.uncertainties[j][0]))
                     # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
+                    mpas[j].append(mpa)
                     obs_irrs[j].append(obs.ch_irrs[ch])
+            if callback_observation:
+                callback_observation()
         for i, ch in enumerate(ch_names):
             if len(ch_dates[i]) > 0:
                 irrs = np.array([s[0] for s in sigs[i]])
@@ -234,10 +253,55 @@ class Comparison(IComparison):
                     num_samples,
                     ch_dates[i],
                     sps[i],
+                    mpas[i],
                 )
                 comparisons.append(cp)
             else:
                 comparisons.append(
-                    ComparisonData(None, None, None, None, None, None, None, [], [])
+                    ComparisonData(None, None, None, None, None, None, None, [], [], [])
                 )
         return comparisons
+
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> List[ComparisonData]:
+        new_comparisons = []
+        for c in comparisons:
+            if c.observed_signal == None:
+                new_comparisons.append(c)
+                continue
+            spectrals = [c.observed_signal, c.simulated_signal, c.diffs_signal]
+            sp_vals = []
+            for spectr in spectrals:
+                sp_vals.append(spectr.wlens)
+                sp_vals.append(spectr.data)
+                sp_vals.append(spectr.uncertainties)
+            vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
+            vals.sort(key=lambda v: v[-1])
+            mpas = [v[-1] for v in vals]
+            new_spectrals = []
+            index = 0
+            for i, spectr in enumerate(spectrals):
+                index = i * 3
+                wlens = np.array(mpas)  # [v[index] for v in vals]
+                data = np.array([v[index + 1] for v in vals])
+                uncertainties = np.array([v[index + 2] for v in vals])
+                new_spectrals.append(SpectralData(wlens, data, uncertainties, None))
+            mrd = c.mean_relative_difference
+            std = c.standard_deviation_mrd
+            ttrend = c.temporal_trend
+            nsamp = c.number_samples
+            dts = [v[-3] for v in vals]
+            points = [v[-2] for v in vals]
+            nc = ComparisonData(
+                new_spectrals[0],
+                new_spectrals[1],
+                new_spectrals[2],
+                mrd,
+                std,
+                ttrend,
+                nsamp,
+                dts,
+                points,
+                mpas,
+            )
+            new_comparisons.append(nc)
+        return new_comparisons

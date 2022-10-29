@@ -1,8 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from datetime import datetime
-from typing import Union, Tuple, Optional
+# import here
 
 """___Third-Party Modules___"""
 from typing import Callable
@@ -11,6 +10,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___NPL Modules___"""
 from ..filedata import srf as file_srf
 from ..datatypes.datatypes import SurfacePoint, CustomPoint, SpectralData
+from lime_tbx.datatypes import constants
 from . import settings, output
 
 """___Authorship___"""
@@ -55,6 +55,7 @@ class SRFEditWidget(QtWidgets.QWidget):
             "Wavelengths (nm)",
             "Intensity (Fractions of unity)",
         )
+        self.graph.set_vertical_lines([constants.MIN_WLEN, constants.MAX_WLEN])
         # Finish main
         self.main_layout.addLayout(self.selection_layout)
         self.main_layout.addWidget(self.graph)
@@ -64,9 +65,12 @@ class SRFEditWidget(QtWidgets.QWidget):
 
     def update_output_data(self):
         srf = self.settings_manager.get_srf()
-        x_data = list(srf.get_wavelengths())
-        y_data = list(srf.get_values())
-        srf_data = SpectralData(x_data, y_data, None, None)
+        srf_data = []
+        for ch in srf.channels:
+            x_data = list(ch.spectral_response.keys())
+            y_data = list(ch.spectral_response.values())
+            ch_data = SpectralData(x_data, y_data, None, None)
+            srf_data.append(ch_data)
         self.graph.update_plot(srf_data)
         self.changed_callback()
 
@@ -87,12 +91,13 @@ class SRFEditWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_srf(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        try:
-            srf = file_srf.read_srf(path)
-        except Exception as e:
-            self.show_error(e)
-        else:
-            self.set_srf(srf)
+        if path != "":
+            try:
+                srf = file_srf.read_srf(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                self.set_srf(srf)
 
     @QtCore.Slot()
     def set_srf(self, srf):

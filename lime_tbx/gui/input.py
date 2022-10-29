@@ -484,15 +484,20 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         sat = self.satellites[i]
-        d0, df = sat.get_datetime_range()
-        if d0 == None:
-            d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        dt0 = QtCore.QDateTime(d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second)
-        self.datetime_edit.setMinimumDateTime(dt0)
-        if df == None:
-            df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        dtf = QtCore.QDateTime(df.year, df.month, df.day, df.hour, df.minute, df.second)
-        self.datetime_edit.setMaximumDateTime(dtf)
+        if self.single_datetime:
+            d0, df = sat.get_datetime_range()
+            if d0 == None:
+                d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+            dt0 = QtCore.QDateTime(
+                d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
+            )
+            self.datetime_edit.setMinimumDateTime(dt0)
+            if df == None:
+                df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+            dtf = QtCore.QDateTime(
+                df.year, df.month, df.day, df.hour, df.minute, df.second
+            )
+            self.datetime_edit.setMaximumDateTime(dtf)
 
     def is_calculable(self) -> bool:
         if self.single_datetime:
@@ -656,16 +661,17 @@ class ComparisonInput(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        try:
-            self.loaded_srf = srf.read_srf(path)
-        except Exception as e:
-            self.show_error(e)
-        else:
-            shown_path = path
-            if len(shown_path) > MAX_PATH_LEN:
-                shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-            self.srf_feedback.setText(shown_path)
-            self.callback_change()
+        if path != "":
+            try:
+                self.loaded_srf = srf.read_srf(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                shown_path = path
+                if len(shown_path) > MAX_PATH_LEN:
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+                self.srf_feedback.setText(shown_path)
+                self.callback_change()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -705,6 +711,5 @@ class ComparisonInput(QtWidgets.QWidget):
 
     def clear_input(self) -> None:
         self.loaded_srf = None
-        self.loaded_moons = []
-        self.moon_obs_feedback.setText("No files loaded")
         self.srf_feedback.setText("No file loaded")
+        self.clear_obs_files()

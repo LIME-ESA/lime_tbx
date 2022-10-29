@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from typing import List
 
 """___Third-Party Modules___"""
-from PySide2 import QtWidgets, QtCore, QtGui
 import numpy as np
 
 """___NPL Modules___"""

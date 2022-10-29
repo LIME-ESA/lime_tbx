@@ -27,6 +27,7 @@ def _preprocess_qss(qss: str, qss_constants: str):
         qss = qss.replace(key_val[0], key_val[1])
     return qss
 
+
 class GUI:
     def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
         self.kernels_path = kernels_path
@@ -41,7 +42,9 @@ class GUI:
         window.setWindowTitle(constants.APPLICATION_NAME)
 
         qss = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH).decode()
-        qss_constants = pkgutil.get_data(__name__, constants.QSS_CONSTANTS_PATH).decode()
+        qss_constants = pkgutil.get_data(
+            __name__, constants.QSS_CONSTANTS_PATH
+        ).decode()
         window.setStyleSheet(_preprocess_qss(qss, qss_constants))
         _current_dir = os.path.dirname(os.path.abspath(__file__))
         logo_path = os.path.join(_current_dir, constants.LOGO_PATH)

@@ -1,3 +1,4 @@
 # https://www.iers.org/IERS/EN/Publications/Bulletins/bulletins.html
 BULLETIN_IERS:
-  file: data/207_BULLETIN_B207.txt
+  file_a: data/bulletina-xxxv-035.txt
+  file_b: data/207_BULLETIN_B207.txt

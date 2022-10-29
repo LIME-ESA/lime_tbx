@@ -103,6 +103,45 @@ class TestSPICEAdapter(unittest.TestCase):
         self.assertIsInstance(mds, list)
         self.assertEqual(len(mds), 0)
 
+    def test_to_rectangular(self):
+        x, y, z = SPICEAdapter.to_rectangular(
+            LAT, LON, ALT, "EARTH", KERNELS_PATH.main_kernels_path
+        )
+        # Compared data obtained using library pyproj
+        """
+        import pyproj
+        transformer = pyproj.Transformer.from_crs(
+            {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
+            {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
+        )
+        x2, y2, z2 = transformer.transform(LON, LAT, ALT/1000, radians=False)
+        print("PYPROJ XYZ: ", x2, y2, z2)
+        """
+        x2, y2, z2 = (5561401.547028502, 2134822.038294565, 2271395.8792928336)
+        self.assertAlmostEqual(x, x2, -4)
+        self.assertAlmostEqual(y, y2, -4)
+        self.assertAlmostEqual(z, z2, -4)
+
+    def test_to_planetographic(self):
+        x, y, z = (5563490.882007386, 2135624.0588501, 2272254.9494123333)
+        lat, lon, hhh = SPICEAdapter.to_planetographic(
+            x, y, z, "EARTH", KERNELS_PATH.main_kernels_path
+        )
+        # Compared data obtained using library pyproj
+        """
+        import pyproj
+        transformer = pyproj.Transformer.from_crs(
+            {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
+            {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
+        )
+        lon2, lat2, hhh2 = transformer.transform(x, y, z, radians=False)
+        print("PYPROJ DATA: ", lon2, lat2, hhh2)
+        """
+        lon2, lat2, hhh2 = (21.000000000000004, 20.999999914165222, 2399.598176131025)
+        self.assertAlmostEqual(lat, lat2, 6)
+        self.assertAlmostEqual(lon, lon2)
+        self.assertAlmostEqual(hhh, hhh2, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

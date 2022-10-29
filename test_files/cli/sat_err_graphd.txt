@@ -1,0 +1,1 @@
+Error: graphd output is only available for comparisons.

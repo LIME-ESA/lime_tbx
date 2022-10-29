@@ -2,13 +2,12 @@
 
 """___Built-In Modules___"""
 from enum import Enum
-import logging
 from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
+import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
-import numpy as np
 
 """___NPL Modules___"""
 from . import settings, output, input, srf, help
@@ -19,6 +18,7 @@ from ..datatypes.datatypes import (
     KernelsPath,
     LGLODComparisonData,
     LGLODData,
+    LimeException,
     LunarObservation,
     LunarObservationWrite,
     Point,
@@ -28,6 +28,7 @@ from ..datatypes.datatypes import (
     SelenographicDataWrite,
     SpectralResponseFunction,
     ApolloIrradianceCoefficients,
+    SpectralValidity,
     SurfacePoint,
     CustomPoint,
     ReflectanceCoefficients,
@@ -37,7 +38,8 @@ from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.gui import coefficients
+from lime_tbx.gui import canvas, coefficients, constants
+from ..datatypes import logger, constants as logic_constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -55,27 +57,27 @@ _INTERNAL_ERROR_MSG = (
 class CallbackWorker(QtCore.QObject):
     finished = QtCore.Signal(list)
     exception = QtCore.Signal(Exception)
+    info = QtCore.Signal(str)
 
-    def __init__(self, callback: Callable, args: list):
+    def __init__(self, callback: Callable, args: list, with_info: bool = False):
         super().__init__()
         self.callback = callback
         self.args = args
+        self.with_info = with_info
 
     def run(self):
         try:
-            res = self.callback(*self.args)
+            if not self.with_info:
+                res = self.callback(*self.args)
+            else:
+                res = self.callback(*self.args, self.info)
             self.finished.emit(list(res))
         except Exception as e:
+            logger.get_logger().exception(e)
             self.exception.emit(e)
 
 
-class LimeException(Exception):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
-
-
 def eli_callback(
-    def_srf: SpectralResponseFunction,
     srf: SpectralResponseFunction,
     point: Point,
     coeffs: ApolloIrradianceCoefficients,
@@ -95,10 +97,8 @@ def eli_callback(
 
     Parameters
     ----------
-    def_srf: SpectralResponseFunction
-        SRF that will be used to calculate the first graph
     srf: SpectralResponseFunction
-        SRF that will be used to calculate the integrated irradiance
+        SRF that will be used to calculate the data
     point: Point
         Point used
     coeffs: IrradianceCoefficients
@@ -125,7 +125,7 @@ def eli_callback(
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     """
-    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    lime_simulation.update_irradiance(srf, point, cimel_coef)
     return (
         point,
         srf,
@@ -198,20 +198,36 @@ def compare_callback(
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
-) -> Tuple[List[ComparisonData], List[LunarObservation], SpectralResponseFunction,]:
+    signal_info: QtCore.Signal,
+) -> Tuple[
+    List[ComparisonData],
+    List[ComparisonData],
+    List[LunarObservation],
+    SpectralResponseFunction,
+]:
     co = comparison.Comparison(kernels_path)
     for mo in mos:
         if not mo.check_valid_srf(srf):
-            raise LimeException(
-                "SRF file not valid for the chosen Moon observations file."
-            )
-    comparisons = co.get_simulations(mos, srf, cimel_coef, lime_simulation)
-    return comparisons, mos, srf
+            srf_names = srf.get_channels_names()
+            if len(mo.ch_names) == len(srf_names):
+                for i in range(len(mo.ch_names)):
+                    if mo.ch_names[i] in mo.ch_irrs:
+                        mo.ch_irrs[srf_names[i]] = mo.ch_irrs.pop(mo.ch_names[i])
+                    mo.ch_names[i] = srf_names[i]
+            else:
+                raise LimeException(
+                    "SRF file not valid for the chosen Moon observations file."
+                )
+    callback_obs = lambda: signal_info.emit("another_obs_simulated")
+    comparisons = co.get_simulations(
+        mos, srf, cimel_coef, lime_simulation, callback_obs
+    )
+    mpa_comp = co.sort_by_mpa(comparisons)
+    return comparisons, mpa_comp, mos, srf
 
 
 def calculate_all_callback(
     srf: SpectralResponseFunction,
-    signals_srf: SpectralResponseFunction,
     point: Point,
     coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
@@ -219,9 +235,9 @@ def calculate_all_callback(
     lime_simulation: ILimeSimulation,
 ):
     lime_simulation.update_reflectance(srf, point, cimel_coef)
-    lime_simulation.update_irradiance(srf, signals_srf, point, cimel_coef)
+    lime_simulation.update_irradiance(srf, point, cimel_coef)
     lime_simulation.update_polarization(srf, point, p_coeffs)
-    return (point, signals_srf)
+    return (point, srf)
 
 
 def _start_thread(
@@ -229,6 +245,7 @@ def _start_thread(
     worker_th: QtCore.QThread,
     finished: Callable,
     error: Callable,
+    info: Callable = None,
 ):
     worker.moveToThread(worker_th)
     worker_th.started.connect(worker.run)
@@ -238,6 +255,8 @@ def _start_thread(
     worker.exception.connect(worker_th.quit)
     worker.exception.connect(worker.deleteLater)
     worker.exception.connect(error)
+    if info:
+        worker.info.connect(info)
     worker_th.finished.connect(worker_th.deleteLater)
     worker_th.start()
 
@@ -253,6 +272,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
+        self.comparing_dts = True
         self._build_layout()
 
     def _build_layout(self):
@@ -262,14 +282,38 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
-        self.output = output.ComparisonOutput(self.settings_manager)
+        self.clear_comparison_button = QtWidgets.QPushButton("New Comparison")
+        self.clear_comparison_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
+        self.clear_comparison_button.setVisible(False)
+        self.change_mpa_dts_button = QtWidgets.QPushButton("Compare by MPA")
+        self.change_mpa_dts_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.change_mpa_dts_button.clicked.connect(self.switch_show_compare_mpa_dts)
+        self.change_mpa_dts_button.setVisible(False)
+        self.stack_layout = QtWidgets.QStackedLayout()
+        self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.output = output.ComparisonOutput(self.settings_manager, True)
+        self.output_mpa = output.ComparisonOutput(self.settings_manager, False)
+        self.output_mpa.setVisible(False)
+        self.spinner = SpinnerPage()
+        self.spinner.setVisible(False)
+        self.stack_layout.addWidget(self.spinner)
+        self.stack_layout.addWidget(self.output)
+        self.stack_layout.addWidget(self.output_mpa)
+        self.stack_layout.setCurrentIndex(1)
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_lglod_button.clicked.connect(self.export_to_lglod)
         self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
-        self.main_layout.addWidget(self.output)
+        self.main_layout.addWidget(self.clear_comparison_button)
+        self.main_layout.addWidget(self.change_mpa_dts_button)
+        self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
 
     def _callback_compare_input_changed(self):
@@ -281,14 +325,28 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         else:
             self.compare_button.setDisabled(False)
 
-    def _start_thread(self, finished: Callable, error: Callable):
+    def _start_thread(self, finished: Callable, error: Callable, info: Callable = None):
         self.worker_th = QtCore.QThread()
-        _start_thread(self.worker, self.worker_th, finished, error)
+        _start_thread(self.worker, self.worker_th, finished, error, info)
+
+    def _set_spinner(self, enabled: bool):
+        self.spinner.setVisible(enabled)
+        if enabled:
+            self.spinner.movie_start()
+            self.stack_layout.setCurrentIndex(0)
+        else:
+            self.spinner.movie_stop()
+            if self.comparing_dts:
+                self.stack_layout.setCurrentIndex(1)
+            else:
+                self.stack_layout.setCurrentIndex(2)
 
     def _unblock_gui(self):
+        self._set_spinner(False)
         self.parentWidget().setDisabled(False)
 
     def _block_gui_loading(self):
+        self._set_spinner(True)
         self.parentWidget().setDisabled(True)
 
     def can_save_simulation(self) -> bool:
@@ -328,45 +386,152 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf = self.input.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
+        self.quant_mos = len(mos)
+        self.quant_mos_simulated = 0
         self.worker = CallbackWorker(
             compare_callback,
             [mos, srf, coeffs, cimel_coef, self.lime_simulation, self.kernels_path],
+            True,
         )
-        self._start_thread(self.compare_finished, self.compare_error)
+        self._start_thread(self.compare_finished, self.compare_error, self.compare_info)
+
+    def compare_info(self, data: str):
+        self.quant_mos_simulated += 1
+        self.spinner.set_text("{}/{}".format(self.quant_mos_simulated, self.quant_mos))
+
+    def set_show_comparison_input(self, show: bool):
+        self.input.setVisible(show)
+        self.compare_button.setVisible(show)
+        self.clear_comparison_button.setVisible(not show)
+        if show:
+            self.output_mpa.set_channels([])
+            self.output.set_channels([])
+
+    @QtCore.Slot()
+    def clear_comparison_pressed(self):
+        self.clear_comp_dialog = QtWidgets.QMessageBox(self)
+        self.clear_comp_dialog.setStandardButtons(
+            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel
+        )
+        self.clear_comp_dialog.setIcon(QtWidgets.QMessageBox.Information)
+        self.clear_comp_dialog.setText("Are you sure?")
+        self.clear_comp_dialog.setInformativeText(
+            "This will clear the current comparison"
+        )
+        self.clear_comp_dialog.setWindowTitle("New comparison")
+        self.clear_comp_dialog.accepted.connect(self.clear_comparison_accepted)
+        self.clear_comp_dialog.rejected.connect(self.clear_comparison_rejected)
+        self.clear_comp_dialog.show()
+
+    @QtCore.Slot()
+    def clear_comparison_accepted(self):
+        self.input.clear_input()
+        self.set_show_comparison_input(True)
+        self.clear_comp_dialog.close()
+        if not self.comparing_dts:
+            self.switch_show_compare_mpa_dts()
+            self.change_mpa_dts_button.setVisible(False)
+
+    @QtCore.Slot()
+    def clear_comparison_rejected(self):
+        self.clear_comp_dialog.close()
 
     def compare_finished(
         self,
         data: Tuple[
             List[ComparisonData],
+            List[ComparisonData],
             List[LunarObservation],
             SpectralResponseFunction,
         ],
     ):
+        self.set_show_comparison_input(False)
         comps = data[0]
-        mos = data[1]
-        srf = data[2]
+        mpa_comps = data[1]
+        mos = data[2]
+        srf = data[3]
         self.comps = comps
+        self.mpa_comps = mpa_comps
         self.srf = srf
-        ch_names = srf.get_channels_names()
-        self.output.set_channels(ch_names)
+        self.show_comparisons()
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+        self.change_mpa_dts_button.setVisible(True)
+
+    def switch_show_compare_mpa_dts(self):
+        if self.comparing_dts:
+            self.comparing_dts = False
+            self.change_mpa_dts_button.setText("Compare by datetime")
+            self.show_compare_mpa()
+        else:
+            self.comparing_dts = True
+            self.change_mpa_dts_button.setText("Compare by MPA")
+            self.show_compare_dts()
+
+    def show_compare_dts(self):
+        self._block_gui_loading()
+        ch_index = self.output_mpa.get_current_channel_index()
+        self.output.set_current_channel_index(ch_index)
+        self.output.setVisible(True)
+        self.output_mpa.setVisible(False)
+        self.stack_layout.setCurrentIndex(1)
+        self._unblock_gui()
+
+    def show_compare_mpa(self):
+        self._block_gui_loading()
+        ch_index = self.output.get_current_channel_index()
+        self.output_mpa.set_current_channel_index(ch_index)
+        self.output.setVisible(False)
+        self.output_mpa.setVisible(True)
+        self.stack_layout.setCurrentIndex(2)
+        self._unblock_gui()
+
+    def show_comparisons(self):
+        self._show_comps_output()
+        self._show_comps_output(True)
+
+    def _show_comps_output(self, comps_mpa: bool = False):
+        if comps_mpa:
+            comps = self.mpa_comps
+            y_label = "Moon Phase Angle (degrees)"
+            output = self.output_mpa
+        else:
+            comps = self.comps
+            y_label = "datetimes"
+            output = self.output
+        ch_names = self.srf.get_channels_names()
+        output.set_channels(ch_names)
         to_remove = []
         for i, ch in enumerate(ch_names):
-            obs_irrs = []
-            for mo in mos:
-                if mo.has_ch_value(ch):
-                    obs_irrs.append(mo.ch_irrs[ch])
             if len(comps[i].dts) > 0:
-                self.output.update_plot(i, comps[i])
-                self.output.update_labels(
-                    i,
-                    "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
-                    "datetimes",
-                    "Signal (Wm⁻²nm⁻¹)",
+                output.update_plot(i, comps[i])
+                n_comp_points = len(comps[i].diffs_signal.wlens)
+                data_start = min(comps[i].dts)
+                data_end = max(comps[i].dts)
+                version = self.settings_manager.get_cimel_coef().version
+                subtitle = "LIME2 coefficients version: {}".format(version)
+                _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
+                subtitle = (
+                    "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
+                        subtitle,
+                        data_start.strftime(_subtitle_date_format),
+                        data_end.strftime(_subtitle_date_format),
+                        n_comp_points,
+                    )
                 )
-                self.output.update_legends(
+                output.update_labels(
+                    i,
+                    "{} ({} nm)".format(ch, self.srf.get_channel_from_name(ch).center),
+                    y_label,
+                    "Irradiance (Wm⁻²nm⁻¹)",
+                    subtitle=subtitle,
+                )
+                output.update_legends(
                     i,
                     [
-                        ["Observed Signal", "Simulated Signal"],
+                        ["Observed Irradiance", "Simulated Irradiance"],
                         [],
                         [],
                         ["Relative Differences"],
@@ -374,50 +539,34 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 )
             else:
                 to_remove.append(ch)
-        self.output.remove_channels(to_remove)
-        self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
-        window: LimeTBXWindow = self.parentWidget().parentWidget()
-        window.set_save_simulation_action_disabled(False)
+        for chsrf in self.srf.channels:
+            if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
+                output.set_as_partly(chsrf.id)
+        output.remove_channels(to_remove)
 
     def load_lglod_comparisons(
         self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
     ):
+        self.set_show_comparison_input(False)
         self.input.clear_input()
         self.compare_button.setDisabled(True)
         comps = lglod.comparisons
         srf = srf
         self.comps = comps
+        self.mpa_comps = comparison.Comparison(self.kernels_path).sort_by_mpa(comps)
         self.srf = srf
-        ch_names = lglod.ch_names
-        self.output.set_channels(lglod.ch_names)
-        for i, ch in enumerate(ch_names):
-            self.output.update_plot(i, comps[i])
-            self.output.update_labels(
-                i,
-                "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
-                "datetimes",
-                "Signal (Wm⁻²nm⁻¹)",
-            )
-            self.output.update_legends(
-                i,
-                [
-                    ["Observed Signal", "Simulated Signal"],
-                    [],
-                    [],
-                    ["Relative Differences"],
-                ],
-            )
+        self.show_comparisons()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
+        self.change_mpa_dts_button.setVisible(True)
 
     def handle_operation_error(self, error: Exception):
-        logging.critical(error)
         if isinstance(error, LimeException):
             self.show_error(error)
         else:
+            logger.get_logger().critical(error)
             self.show_error(_INTERNAL_ERROR_MSG)
 
     def compare_error(self, error: Exception):
@@ -449,7 +598,8 @@ class MainSimulationsWidget(
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.eocfi: eocfi_adapter.IEOCFIConverter = eocfi_adapter.EOCFIConverter(
-            eocfi_path
+            eocfi_path,
+            kernels_path,
         )
         self.satellites = self.eocfi.get_sat_list()
         self._build_layout()
@@ -493,6 +643,7 @@ class MainSimulationsWidget(
         self.graph.update_legend(
             [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
         )
+        self.graph.set_xlim(logic_constants.CERTAIN_MIN_WLEN)
         # srf widget
         self.srf_widget = srf.SRFEditWidget(
             self.settings_manager, self._callback_regular_input_changed
@@ -513,16 +664,34 @@ class MainSimulationsWidget(
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.lower_tabs, 1)
+        self.lower_stack = QtWidgets.QStackedLayout()
+        self.lower_stack.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.loading_spinner = SpinnerPage()
+        self.loading_spinner.setVisible(False)
+        self.lower_stack.addWidget(self.loading_spinner)
+        self.lower_stack.addWidget(self.lower_tabs)
+        self.lower_stack.setCurrentIndex(1)
+        self.main_layout.addLayout(self.lower_stack, 1)
         self.main_layout.addWidget(self.export_lglod_button)
 
+    def _set_spinner(self, enabled: bool):
+        self.loading_spinner.setVisible(enabled)
+        if enabled:
+            self.loading_spinner.movie_start()
+            self.lower_stack.setCurrentIndex(0)
+        else:
+            self.loading_spinner.movie_stop()
+            self.lower_stack.setCurrentIndex(1)
+
     def _unblock_gui(self):
+        self._set_spinner(False)
         self.parentWidget().setDisabled(False)
         self._disable_lglod_export(False)
         self._export_lglod_button_was_disabled = False
 
     def _block_gui_loading(self):
-        self.export_lglod_button.setDisabled(True)
+        self._set_spinner(True)
+        self.parentWidget().setDisabled(True)
         self._disable_lglod_export(True)
         self._export_lglod_button_was_disabled = True
 
@@ -565,10 +734,10 @@ class MainSimulationsWidget(
         return self.export_lglod_button.isEnabled()
 
     def handle_operation_error(self, error: Exception):
-        logging.critical(error)
         if isinstance(error, LimeException):
             self.show_error(error)
         else:
+            logger.get_logger().critical(error)
             self.show_error(_INTERNAL_ERROR_MSG)
 
     @QtCore.Slot()
@@ -579,14 +748,19 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        def_srf = self.settings_manager.get_default_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             eli_callback,
-            [def_srf, srf, point, coeffs, cimel_coef, self.lime_simulation],
+            [srf, point, coeffs, cimel_coef, self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
+
+    def _set_graph_dts(self, pt: Point):
+        self.graph.set_dts([])
+        if isinstance(pt, SurfacePoint) or isinstance(pt, SatellitePoint):
+            if isinstance(pt.dt, list) and len(pt.dt) > 1:
+                self.graph.set_dts(pt.dt)
 
     def eli_finished(
         self,
@@ -600,7 +774,8 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[2], data[3], data[4], data[0])
+        self._set_graph_dts(data[0])
+        self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
@@ -611,8 +786,8 @@ class MainSimulationsWidget(
         self.lower_tabs.setTabEnabled(2, True)
 
     def eli_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     @QtCore.Slot()
     def show_elref(self):
@@ -621,11 +796,11 @@ class MainSimulationsWidget(
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        def_srf = self.settings_manager.get_default_srf()
+        srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
-            elref_callback, [def_srf, point, coeffs, cimel_coef, self.lime_simulation]
+            elref_callback, [srf, point, coeffs, cimel_coef, self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -643,7 +818,8 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[1], data[2], data[3], data[0])
+        self._set_graph_dts(data[0])
+        self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
@@ -653,8 +829,8 @@ class MainSimulationsWidget(
         self.lower_tabs.setCurrentIndex(0)
 
     def elref_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     @QtCore.Slot()
     def show_polar(self):
@@ -663,10 +839,10 @@ class MainSimulationsWidget(
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        def_srf = self.settings_manager.get_default_srf()
+        srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
-            polar_callback, [def_srf, point, coeffs, self.lime_simulation]
+            polar_callback, [srf, point, coeffs, self.lime_simulation]
         )
         self._start_thread(self.polar_finished, self.polar_error)
 
@@ -678,7 +854,8 @@ class MainSimulationsWidget(
         ],
     ):
         self._unblock_gui()
-        self.graph.update_plot(data[1], point=data[0])
+        self._set_graph_dts(data[0])
+        self.graph.update_plot(data[1], point=data[0], redraw=False)
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
@@ -688,8 +865,8 @@ class MainSimulationsWidget(
         self.lower_tabs.setCurrentIndex(0)
 
     def polar_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     def load_observations_finished(
         self,
@@ -703,14 +880,13 @@ class MainSimulationsWidget(
     def export_glod(self):
         self._block_gui_loading()
         point = self.input_widget.get_point()
-        def_srf = self.settings_manager.get_default_srf()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
             calculate_all_callback,
-            [def_srf, srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
+            [srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
         )
         self._start_thread(self.calculate_all_finished, self.calculate_all_error)
 
@@ -732,8 +908,8 @@ class MainSimulationsWidget(
                 self.show_error(e)
 
     def calculate_all_error(self, error: Exception):
-        self._unblock_gui()
         self.handle_operation_error(error)
+        self._unblock_gui()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -743,6 +919,74 @@ class MainSimulationsWidget(
 class LimePagesEnum(Enum):
     SIMULATION = 0
     COMPARISON = 1
+
+
+class SpinnerPage(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # Loading spinner
+        _current_dir = os.path.dirname(os.path.abspath(__file__))
+        _movie_path = os.path.join(_current_dir, constants.SPINNER_PATH)
+        self.movie = QtGui.QMovie(_movie_path)
+        self.movie.setScaledSize(QtCore.QSize(50, 50))
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.label_spinner = QtWidgets.QLabel()
+        self.label_spinner.setMovie(self.movie)
+        self.label_text = QtWidgets.QLabel()
+        self.main_layout.addWidget(QtWidgets.QLabel())
+        self.main_layout.addWidget(self.label_spinner)
+        self.main_layout.addWidget(self.label_text)
+        self.main_layout.addWidget(QtWidgets.QLabel())
+        self.main_layout.setAlignment(self.label_spinner, QtGui.Qt.AlignHCenter)
+        self.main_layout.setAlignment(self.label_text, QtGui.Qt.AlignHCenter)
+
+    def movie_start(self):
+        self.movie.start()
+
+    def movie_stop(self):
+        self.movie.stop()
+
+    def set_text(self, text: str):
+        self.label_text.setText(text)
+
+
+def load_simulation_callback(path: str, kernels_path: KernelsPath):
+    lglod = moon.read_glod_file(path, kernels_path)
+    return [lglod]
+
+
+def check_srf_observation_callback(lglod: LGLODData, srf: SpectralResponseFunction):
+    valid = True
+    for obs in lglod.observations:
+        if not obs.check_valid_srf(srf):
+            valid = False
+    if not valid:
+        error_msg = "SRF file not valid for the observation file."
+        error = Exception(error_msg)
+        raise error
+    return [lglod, srf]
+
+
+def check_srf_comparison_callback(
+    lglod: LGLODComparisonData, srf: SpectralResponseFunction
+):
+    valid = True
+    srf_chans = srf.get_channels_names()
+    for ch_name in lglod.ch_names:
+        if ch_name not in srf_chans:
+            valid = False
+    if not valid:
+        error_msg = "SRF file not valid for the observation file."
+        error = Exception(error_msg)
+        raise error
+    return [lglod, srf]
+
+
+def return_args_callback(*args):
+    return args
 
 
 class LimeTBXWidget(QtWidgets.QWidget):
@@ -772,7 +1016,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
             self.settings_manager,
         )
         self.page = self.main_page
-        self.main_layout.addWidget(self.page)
+        self.main_layout.addWidget(self.main_page)
 
     def setDisabled(self, arg__1: bool) -> None:
         self.parentWidget().setDisabled(arg__1)
@@ -782,9 +1026,8 @@ class LimeTBXWidget(QtWidgets.QWidget):
         pass
 
     def change_page(self, pageEnum: LimePagesEnum):
-        self.main_layout.removeWidget(self.page)
         self.page.hide()
-        self.page.setParent(None)
+        self.main_layout.removeWidget(self.page)
         if pageEnum == LimePagesEnum.COMPARISON:
             self.page = self.comparison_page
         else:
@@ -796,46 +1039,60 @@ class LimeTBXWidget(QtWidgets.QWidget):
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
+    def _start_thread(self, finished: Callable, error: Callable):
+        self.worker_th = QtCore.QThread()
+        _start_thread(self.worker, self.worker_th, finished, error)
+
     def load_observations_finished(
         self, lglod: LGLODData, srf: SpectralResponseFunction
     ):
-        valid = True
         if srf == None:
             srf = self.settings_manager.get_default_srf()
-        for obs in lglod.observations:
-            if not obs.check_valid_srf(srf):
-                valid = False
-        if not valid:
-            error_msg = "SRF file not valid for the observation file."
-            error = Exception(error_msg)
-            logging.critical(error)
-            self.show_error(error)
-        else:
-            self.main_page.srf_widget.set_srf(srf)
-            self.lime_simulation.set_observations(lglod, srf)
-            point = self.lime_simulation.get_point()
-            self.main_page.load_observations_finished(point)
+        self.worker = CallbackWorker(check_srf_observation_callback, [lglod, srf])
+        self._start_thread(
+            self._load_observations_finished_2, self._load_observations_finished_error
+        )
+
+    def _load_observations_finished_2(self, data):
+        lglod = data[0]
+        srf = data[1]
+        self.main_page.srf_widget.set_srf(srf)
+        self.lime_simulation.set_observations(lglod, srf)
+        point = self.lime_simulation.get_point()
+        self.main_page.load_observations_finished(point)
+        self.main_page._unblock_gui()
+
+    def _load_observations_finished_error(self, error: Exception):
+        logger.get_logger().critical(error)
+        self.show_error(error)
+        self.main_page._unblock_gui()
 
     def load_comparisons_finished(
         self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
     ):
-        valid = True
         if srf == None:
             srf = self.settings_manager.get_default_srf()
-        srf_chans = srf.get_channels_names()
-        for ch_name in lglod.ch_names:
-            if ch_name not in srf_chans:
-                valid = False
-        if not valid:
-            error_msg = "SRF file not valid for the observation file."
-            error = Exception(error_msg)
-            logging.critical(error)
-            self.show_error(error)
-        else:
-            self.comparison_page.load_lglod_comparisons(lglod, srf)
+        self.worker = CallbackWorker(check_srf_comparison_callback, [lglod, srf])
+        self._start_thread(
+            self._load_comparisons_finished_2, self._load_comparisons_finished_error
+        )
+
+    def _load_comparisons_finished_2(self, data):
+        lglod = data[0]
+        srf = data[1]
+        self.comparison_page.load_lglod_comparisons(lglod, srf)
+        self.comparison_page._unblock_gui()
+
+    def _load_comparisons_finished_error(self, error: Exception):
+        logger.get_logger().critical(error)
+        self.show_error(error)
+        self.comparison_page._unblock_gui()
 
     def can_save_simulation(self) -> bool:
         return self.page.can_save_simulation()
+
+    def get_current_page(self) -> Union[MainSimulationsWidget, ComparisonPageWidget]:
+        return self.page
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
@@ -898,69 +1155,108 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.menu_bar.addMenu(help_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
-        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w = self._get_lime_widget()
         lime_tbx_w.propagate_close_event()
         return super().closeEvent(event)
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
 
+    def _start_thread(self, finished: Callable, error: Callable):
+        self.worker_th = QtCore.QThread()
+        _start_thread(self.worker, self.worker_th, finished, error)
+
+    def _get_lime_widget(self) -> LimeTBXWidget:
+        return self.centralWidget()
+
     # ERROR
 
     def show_error(self, error: Exception):
+        self._get_lime_widget().get_current_page()._unblock_gui()
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
     # ACTIONS
 
     def save_simulation(self):
-        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w = self._get_lime_widget()
         if self._is_comparing:
             lime_tbx_w.comparison_page.export_to_lglod()
         else:
             lime_tbx_w.main_page.export_glod()
 
+    def load_simulation_finished(self, data):
+        lglod = data[0]
+        lime_tbx_w = self._get_lime_widget()
+        page = lime_tbx_w.get_current_page()
+        page._unblock_gui()
+        if isinstance(lglod, LGLODData):
+            self.simulations()
+            lime_tbx_w.get_current_page()._block_gui_loading()
+            srf = None
+            cancel = False
+            if lglod.not_default_srf:
+                srf_path = QtWidgets.QFileDialog().getOpenFileName(
+                    self, "Select SpectralResponseFunction file"
+                )[0]
+                if srf_path == "":
+                    cancel = True
+                else:
+                    try:
+                        srf = srf_loader.read_srf(srf_path)
+                    except Exception as e:
+                        cancel = True
+                        self.show_error(e)
+            if not cancel:
+                self.worker = CallbackWorker(return_args_callback, [lglod, srf])
+                self._start_thread(
+                    self._load_observations_finished, self.load_simulation_error
+                )
+        else:
+            self.comparison()
+            lime_tbx_w.get_current_page()._block_gui_loading()
+            srf = None
+            srf_path = QtWidgets.QFileDialog().getOpenFileName(
+                self, "Select SpectralResponseFunction file"
+            )[0]
+            if srf_path != "":
+                try:
+                    srf = srf_loader.read_srf(srf_path)
+                except Exception as e:
+                    self.show_error(e)
+                else:
+                    self.worker = CallbackWorker(return_args_callback, [lglod, srf])
+                    self._start_thread(
+                        self._load_comparisons_finished, self.load_simulation_error
+                    )
+
+    def _load_observations_finished(self, data):
+        lglod = data[0]
+        srf = data[1]
+        lime_tbx_w = self._get_lime_widget()
+        lime_tbx_w.load_observations_finished(lglod, srf)
+
+    def _load_comparisons_finished(self, data):
+        lglod = data[0]
+        srf = data[1]
+        lime_tbx_w = self._get_lime_widget()
+        lime_tbx_w.load_comparisons_finished(lglod, srf)
+
+    def load_simulation_error(self, e: Exception):
+        self.show_error(e)
+
     def load_simulation(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self, "Select GLOD file")[0]
+        lime_tbx_w = self._get_lime_widget()
+        page = lime_tbx_w.get_current_page()
         if path != "":
-            try:
-                lglod = moon.read_glod_file(path, self.kernels_path)
-            except Exception as e:
-                self.show_error(e)
-            else:
-                if isinstance(lglod, LGLODData):
-                    self.simulations()
-                    srf = None
-                    cancel = False
-                    if lglod.not_default_srf:
-                        srf_path = QtWidgets.QFileDialog().getOpenFileName(
-                            self, "Select SpectralResponseFunction file"
-                        )[0]
-                        if srf_path == "":
-                            cancel = True
-                        else:
-                            try:
-                                srf = srf_loader.read_srf(srf_path)
-                            except Exception as e:
-                                cancel = True
-                                self.show_error(e)
-                    if not cancel:
-                        lime_tbx_w: LimeTBXWidget = self.centralWidget()
-                        lime_tbx_w.load_observations_finished(lglod, srf)
-                else:
-                    self.comparison()
-                    srf = None
-                    srf_path = QtWidgets.QFileDialog().getOpenFileName(
-                        self, "Select SpectralResponseFunction file"
-                    )[0]
-                    if srf_path != "":
-                        try:
-                            srf = srf_loader.read_srf(srf_path)
-                        except Exception as e:
-                            self.show_error(e)
-                        else:
-                            lime_tbx_w: LimeTBXWidget = self.centralWidget()
-                            lime_tbx_w.load_comparisons_finished(lglod, srf)
+            page._block_gui_loading()
+            self.worker = CallbackWorker(
+                load_simulation_callback, [path, self.kernels_path]
+            )
+            self._start_thread(
+                self.load_simulation_finished, self.load_simulation_error
+            )
 
     def comparison(self):
         if not self._is_comparing:
@@ -969,7 +1265,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
             )
             self.comparison_action.setText("Perform &simulations")
             self.comparison_action.triggered.connect(self.simulations)
-            lime_tbx_w: LimeTBXWidget = self.centralWidget()
+            lime_tbx_w = self._get_lime_widget()
             lime_tbx_w.lime_simulation.set_simulation_changed()
             lime_tbx_w.change_page(LimePagesEnum.COMPARISON)
             self._is_comparing = True
@@ -986,7 +1282,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                 "Perform &comparisons from a remote sensing instrument"
             )
             self.comparison_action.triggered.connect(self.comparison)
-            lime_tbx_w: LimeTBXWidget = self.centralWidget()
+            lime_tbx_w = self._get_lime_widget()
             lime_tbx_w.lime_simulation.set_simulation_changed()
             lime_tbx_w.change_page(LimePagesEnum.SIMULATION)
             self._is_comparing = False
@@ -1001,7 +1297,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         pass
 
     def select_coefficients(self):
-        lime_tbx_w: LimeTBXWidget = self.centralWidget()
+        lime_tbx_w = self._get_lime_widget()
         select_coefficients_dialog = coefficients.SelectCoefficientsDialog(
             lime_tbx_w.settings_manager, self
         )

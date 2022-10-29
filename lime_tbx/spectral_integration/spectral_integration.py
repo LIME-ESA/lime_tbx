@@ -63,6 +63,8 @@ class SpectralIntegration(ISpectralIntegration):
         divider = np.trapz(ch_srf, ch_wlens)
         if isinstance(divider, np.ndarray):
             divider[divider == 0] = 1
+        elif divider == 0:
+            divider = 1
         ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens) / divider
         return ch_signal
 

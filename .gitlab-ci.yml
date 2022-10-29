@@ -146,7 +146,7 @@ tox-3.8:
 #     needs: []
 
 test_report:
-  needs: ["tox-3.7"]
+  needs: ["tox-3.8"]
   stage: Publish test report
   image: 
      name: oberonamsterdam/wkhtmltopdf

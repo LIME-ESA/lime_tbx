@@ -16,12 +16,13 @@ if sys.platform == 'linux':
     a_pathex = ['./.venv/lib/python3.8/site-packages/', './.venv/lib64/python3.8/site-packages/']
     a_binaries = [
         ('.venv/lib/python3.8/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
-        (src_path + 'eocfi_adapter/eocfi_c/bin/get_positions_linux.so', './lime_tbx/eocfi_adapter/eocfi_c/bin'),
+        (src_path + 'eocfi_adapter/eocfi_c/bin/get_positions_linux', './lime_tbx/eocfi_adapter/eocfi_c/bin'),
     ]
     a_datas = [
         (src_path + 'gui/assets/style.qss', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/style_constants.txt', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/lime_logo.png', './lime_tbx/gui/assets'),
+        (src_path + 'gui/assets/spinner.gif', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/NotesEsaBol.otf', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/NotesEsaReg.otf', './lime_tbx/gui/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients.csv', './lime_tbx/coefficients/access_data/assets'),
@@ -36,7 +37,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
     a_pathex = ['.\\.venv\\Lib\\site-packages\\']
     a_binaries = [
         ('.venv\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
-        (src_path + 'eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
+        (src_path + 'eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.exe', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\msvcr100.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\pthreadVC2.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
     ]
@@ -44,6 +45,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'gui\\assets\\style.qss', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\style_constants.txt', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\lime_logo.png', '.\\lime_tbx\\gui\\assets'),
+        (src_path + 'gui\\assets\\spinner.gif', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\NotesEsaBol.otf', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\NotesEsaReg.otf', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\coefficients.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),

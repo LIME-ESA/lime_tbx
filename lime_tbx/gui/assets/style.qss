@@ -186,11 +186,10 @@ QToolButton
 {
 	background-color: @deepSpace;
 	color: @neutralSpace;
-	border-style: solid;
-	border-width: 1px;
 	border-radius: 5px;
 	border-color: @deepSpace;
 	padding: 5px;
+	margin: 2px;
 
 }
 
@@ -199,7 +198,7 @@ QToolButton::disabled
 {
 	background-color: @darkGray;
 	color: @disabledGray;
-	border-color: #051a39;
+	border-color: @darkGray;
 
 }
 

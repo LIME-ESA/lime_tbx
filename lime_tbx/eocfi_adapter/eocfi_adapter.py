@@ -8,19 +8,18 @@ It exports the following classes:
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from ctypes import *
 from typing import Tuple, List
 from datetime import datetime, timezone
 import os
 import platform
 
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+
 """___Third-Party Modules___"""
-from numpy.ctypeslib import ndpointer
 import yaml
-import pyproj
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import OrbitFile, Satellite
+from ..datatypes.datatypes import KernelsPath, LimeException, OrbitFile, Satellite
 
 """___Authorship___"""
 __author__ = "Ramiro González Catón"
@@ -31,35 +30,19 @@ __status__ = "Development"
 
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
-SO_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux.so"
-SO_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.dll"
+EXE_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux"
+EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
+EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
 
 if platform.system() == "Linux":
-    so_file_satellite = SO_FILE_SATELLITE_LINUX
+    exe_file_satellite = EXE_FILE_SATELLITE_LINUX
+elif platform.system() == "Windows":
+    exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
 else:
-    so_file_satellite = SO_FILE_SATELLITE_WINDOWS
+    exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_so_path = os.path.join(_current_dir, so_file_satellite)
-eocfi_sat = CDLL(_so_path)
-
-
-def _make_clist(lst: List[str]):
-    """
-    Helper function to turn Python list of Unicode strings
-    into a ctypes array of byte strings.
-
-    Parameters
-    ----------
-    lst: list of str
-        List of unicode strings
-
-    Returns
-    -------
-    clst: c_char_p_Array
-        ctypes array of byte strings
-    """
-    return (c_char_p * len(lst))(*[x.encode() for x in lst])
+_exe_path = os.path.join(_current_dir, exe_file_satellite)
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -70,6 +53,12 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     else:
         date1 = datetime.strptime(splitted[-2] + "+00:00", "%Y%m%dT%H%M%S%z")
     return date0, date1
+
+
+def _to_mjd2000(dt: datetime) -> float:
+    mjd = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    tdelta = dt - mjd
+    return tdelta.total_seconds() / 86400
 
 
 class IEOCFIConverter(ABC):
@@ -100,8 +89,8 @@ class IEOCFIConverter(ABC):
 
     @abstractmethod
     def get_satellite_position(
-        self, sat: str, dt: datetime
-    ) -> Tuple[float, float, float]:
+        self, sat: str, dt: List[datetime]
+    ) -> List[Tuple[float, float, float]]:
         """
         Get the geographic satellite position for a concrete datetime.
 
@@ -109,25 +98,28 @@ class IEOCFIConverter(ABC):
         ----------
         sat: str
             Satellite name. Should be present in get_sat_names
-        dt: datetime
-            Datetime for which the position will be calculated
+        dts: List of datetime
+            Datetimes for which the position will be calculated
 
         Returns
         -------
-        latitude: float
-            Geocentric latitude of the satellite
-        longitude: float
-            Geocentric longitude of the satellite
-        height: float
-            Height of the satellite over sea level in meters.
+        positions: list of tuples of floats
+            List of tuples of 3 floats, representing:
+            latitude: float
+                Geocentric latitude of the satellite
+            longitude: float
+                Geocentric longitude of the satellite
+            height: float
+                Height of the satellite over sea level in meters.
         """
         pass
 
 
 class EOCFIConverter(IEOCFIConverter):
-    def __init__(self, eocfi_path: str):
+    def __init__(self, eocfi_path: str, kernels_path: KernelsPath):
         super().__init__()
         self.eocfi_path = eocfi_path
+        self.kernels_path = kernels_path
 
     def get_sat_names(self) -> List[str]:
         """
@@ -171,6 +163,18 @@ class EOCFIConverter(IEOCFIConverter):
             sat_data: dict = sat_yaml.get(s)
             id = sat_data["id"]
             orbit_files_names = sat_data["orbit_files"]
+            norad_key = "norad_sat_number"
+            norad = None
+            if norad_key in sat_data:
+                norad = int(sat_data[norad_key])
+            intdes_key = "intdes"
+            intdes = None
+            if intdes_key in sat_data:
+                intdes = sat_data[intdes_key]
+            time_file_key = "time_file"
+            time_file = None
+            if time_file_key in sat_data:
+                time_file = sat_data[time_file_key]
             if orbit_files_names == None:
                 orbit_files_names = []
             orbit_files = []
@@ -178,13 +182,13 @@ class EOCFIConverter(IEOCFIConverter):
                 d0, df = _get_file_datetimes(file)
                 orbit_f = OrbitFile(file, d0, df)
                 orbit_files.append(orbit_f)
-            sat = Satellite(name, id, orbit_files)
+            sat = Satellite(name, id, orbit_files, norad, intdes, time_file)
             sat_list.append(sat)
         return sat_list
 
     def get_satellite_position(
-        self, sat: str, dt: datetime
-    ) -> Tuple[float, float, float]:
+        self, sat: str, dts: List[datetime]
+    ) -> List[Tuple[float, float, float]]:
         """
         Get the geographic satellite position for a concrete datetime.
 
@@ -192,63 +196,128 @@ class EOCFIConverter(IEOCFIConverter):
         ----------
         sat: str
             Satellite name. Should be present in get_sat_names
-        dt: datetime
-            Datetime for which the position will be calculated
+        dts: List of datetime
+            Datetimes for which the position will be calculated
 
         Returns
         -------
-        latitude: float
-            Geocentric latitude of the satellite.
-        longitude: float
-            Geocentric longitude of the satellite.
-        height: float
-            Height of the satellite over sea level in meters.
+        positions: list of tuples of floats
+            List of tuples of 3 floats, representing:
+            latitude: float
+                Geocentric latitude of the satellite
+            longitude: float
+                Geocentric longitude of the satellite
+            height: float
+                Height of the satellite over sea level in meters.
         """
         if sat not in self.get_sat_names():
             raise Exception("Satellite is not registered in LIME's satellite list.")
         sat: Satellite = [s for s in self.get_sat_list() if s.name == sat][0]
-        orb_f = sat.get_best_orbit_file(dt)
+        dt_orb_f = {}
+        for dt in dts:
+            orb_f = sat.get_best_orbit_file(dt)
+            if not orb_f in dt_orb_f:
+                dt_orb_f[orb_f] = [dt]
+            else:
+                dt_orb_f[orb_f].append(dt)
+        positions_map = {}
+        for orb_f in dt_orb_f:
+            positions = self._get_sat_position_one_orbit_file(
+                sat, dt_orb_f[orb_f], orb_f
+            )
+            for i, dt in enumerate(dt_orb_f[orb_f]):
+                positions_map[dt] = positions[i]
+        positions_ret = []
+        for dt in dts:
+            positions_ret.append(positions_map[dt])
+        return positions_ret
+
+    def _get_sat_position_one_orbit_file(
+        self, sat: Satellite, dts: List[datetime], orb_f: OrbitFile
+    ) -> List[Tuple[float, float, float]]:
+        orbit_path = ""
         if sat.orbit_files:
             if orb_f == None:
-                raise Exception(
-                    "The satellite position can't be calculated for the given datetime."
+                raise LimeException(
+                    "The satellite position can't be calculated for a given datetime."
                 )
-            # We have to make this a list/array
-            orbit_files = [
-                os.path.join(
-                    self.eocfi_path,
-                    f"data/mission_configuration_files/{orb_f.name}",
-                )
-            ]
+            orbit_path = os.path.join(
+                self.eocfi_path,
+                f"data/mission_configuration_files/{orb_f.name}",
+            )
+            if not os.path.exists(orbit_path):
+                raise LimeException("The orbit file {} is missing".format(orbit_path))
+
+        n_dates = len(dts)
+        norad = 0
+        intdes = ""
+        tle_file = ""
+        if sat.norad_sat_number != None:
+            norad = sat.norad_sat_number
+        if sat.intdes != None:
+            intdes = sat.intdes
+        if orb_f.name.endswith(".txt") or orb_f.name.endswith(".TLE"):
+            tle_file = orbit_path
+            orbit_path = os.path.join(
+                self.eocfi_path,
+                "data",
+                "mission_configuration_files",
+                sat.time_file,
+            )
+        # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
+        if platform.system() == "Windows":
+            orbit_path = orbit_path.replace("/", "\\")
+            if tle_file != "":
+                tle_file = tle_file.replace("/", "\\")
+        orbit_path = '"{}"'.format(orbit_path)
+        if tle_file == "":
+            cmd = "{} {} {} {} {}".format(
+                _exe_path,
+                0,
+                n_dates,
+                sat.id,
+                orbit_path,
+            )
         else:
-            orbit_files = []
-        fl = open(os.path.join(self.eocfi_path, METADATA_FILE))
-        metadata = yaml.load(fl, Loader=yaml.FullLoader)
-        fl.close()
+            tle_file = '"{}"'.format(tle_file)
+            cmd = "{} {} {} {} {} {} {} {} {}".format(
+                _exe_path,
+                1,
+                n_dates,
+                sat.id,
+                norad,
+                tle_file,
+                orbit_path,
+                sat.name,
+                intdes,
+            )
+        for dt in dts:
+            cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
+        cmd_exec = os.popen(cmd)
+        so = cmd_exec.read()
+        cmd_exec.close()
+        out_lines = so.splitlines()
+        sat_positions = []
+        if len(out_lines) == 3 * n_dates:
+            for i in range(n_dates):
+                sat_positions_date = []
+                sat_positions_date.append(float(out_lines[i * 3]))
+                sat_positions_date.append(float(out_lines[i * 3 + 1]))
+                sat_positions_date.append(float(out_lines[i * 3 + 2]))
+                sat_positions.append(sat_positions_date)
+        else:
+            raise Exception(
+                "Number of lines unexpected. {}/{}.\n{}".format(
+                    str(len(out_lines)), str(3 * n_dates), out_lines
+                )
+            )
 
-        bulletin = os.path.join(self.eocfi_path, metadata.get("BULLETIN_IERS")["file"])
-
-        bulletinb_file_init_time = bulletin.encode()
-
-        eocfi_sat.get_satellite_position.restype = ndpointer(dtype=c_double, shape=(3,))
-        sat_position = eocfi_sat.get_satellite_position(
-            c_long(sat.id),
-            c_int(dt.year),
-            c_int(dt.month),
-            c_int(dt.day),
-            c_int(dt.hour),
-            c_int(dt.minute),
-            c_int(dt.second),
-            bulletinb_file_init_time,
-            _make_clist(orbit_files),
-            c_long(len(orbit_files)),
-        )
-
-        transformer = pyproj.Transformer.from_crs(
-            {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
-            {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
-        )
-        lat, lon, hhh = transformer.transform(
-            sat_position[0], sat_position[1], sat_position[2], radians=False
-        )
-        return lat, lon, hhh
+        positions = []
+        for i in range(n_dates):
+            x, y, z = (sat_positions[i][0], sat_positions[i][1], sat_positions[i][2])
+            lat, lon, hhh = SPICEAdapter.to_planetographic(
+                x, y, z, "EARTH", self.kernels_path.main_kernels_path
+            )
+            print(lat, lon, hhh)
+            positions.append((lat, lon, hhh))
+        return positions

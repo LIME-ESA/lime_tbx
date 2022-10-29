@@ -465,7 +465,7 @@ class ApolloIrradianceCoefficients:
         return self.apollo_coeffs
 
 
-@dataclass
+@dataclass(eq=True, frozen=True)
 class OrbitFile:
     """
     Dataclass that represents a Satellite orbit file.
@@ -498,11 +498,23 @@ class Satellite:
         Satellite id
     orbit_files: list of OrbitFile
         Orbit files of the Satellite
+    norad_sat_number: int | None
+        Number of the satellite in the NORAD Catalog number (Celestrak)
+        Only present if the satellite has TLE files.
+    intdes: str | None
+        International Designator of the object.
+        Only present if the satellite has TLE files.
+    time_file: str | None
+        File used for time initialization.
+        Only present if the satellite has TLE files.
     """
 
     name: str
     id: int
     orbit_files: List[OrbitFile]
+    norad_sat_number: Union[int, None]
+    intdes: Union[str, None]
+    time_file: Union[str, None]
 
     def get_datetime_range(self) -> Tuple[datetime, datetime]:
         """
@@ -809,6 +821,7 @@ class ComparisonData:
     number_samples: int
     dts: List[datetime]
     points: List[Point]
+    mpas: List[float]
 
 
 @dataclass
@@ -897,3 +910,8 @@ class LGLODComparisonData:
     comparisons: List[ComparisonData]
     ch_names: List[str]
     sat_name: str
+
+
+class LimeException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

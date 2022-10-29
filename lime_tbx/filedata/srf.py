@@ -8,7 +8,6 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 import os
-import logging
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
@@ -19,6 +18,7 @@ from ..datatypes.datatypes import (
     SRFChannel,
     SpectralResponseFunction,
 )
+from ..datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -91,5 +91,5 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
         name = os.path.basename(filepath)
         return SpectralResponseFunction(name, channels)
     except Exception as e:
-        logging.critical(e)
+        logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)

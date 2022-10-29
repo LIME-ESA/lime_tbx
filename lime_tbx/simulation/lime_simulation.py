@@ -24,7 +24,7 @@ from lime_tbx.datatypes.datatypes import (
     KernelsPath,
     SurfacePoint,
 )
-
+from lime_tbx.datatypes import constants
 from lime_tbx.lime_algorithms.rolo import rolo
 from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
@@ -81,7 +81,6 @@ class ILimeSimulation(ABC):
     def update_irradiance(
         self,
         srf: SpectralResponseFunction,
-        signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
     ):
@@ -91,9 +90,7 @@ class ILimeSimulation(ABC):
         Parameters
         ----------
         srf: SpectralResponseFunction
-            SRF for which the reflectance and irradiance will be calculated.
-        signals_srf: SpectralResponseFunction
-            SRF for which the integrated signal will be calculated.
+            SRF for which the reflectance, irradiance and integrated signal will be calculated.
         point: Point
             Point (location) for which the irradiance will be calculated.
         cimel_coeff: ReflectanceCoefficients
@@ -256,7 +253,7 @@ class LimeSimulation(ILimeSimulation):
         eocfi_path: str,
         kernels_path: KernelsPath,
         MCsteps: int = 100,
-        verbose: bool = True,
+        verbose: bool = False,
     ):
         """
         Parameters
@@ -317,7 +314,13 @@ class LimeSimulation(ILimeSimulation):
             self.mds_uptodate = True
         if not self.srf_updtodate:
             self.srf = srf
-            self.wlens = srf.get_wavelengths()
+            self.wlens = [*set(srf.get_wavelengths())]
+            self.wlens = [
+                x
+                for x in self.wlens
+                if x >= constants.MIN_WLEN and x <= constants.MAX_WLEN
+            ]
+            self.wlens.sort()
             self.srf_updtodate = True
 
     def update_reflectance(
@@ -373,7 +376,6 @@ class LimeSimulation(ILimeSimulation):
     def update_irradiance(
         self,
         srf: SpectralResponseFunction,
-        signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
     ):
@@ -396,7 +398,7 @@ class LimeSimulation(ILimeSimulation):
                 print("irradiance update done")
 
         if not self.signals_uptodate:
-            self.signals = self._calculate_signals(signals_srf)
+            self.signals = self._calculate_signals(srf)
             self.signals_uptodate = True
             if self.verbose:
                 print("signals update done")
@@ -613,6 +615,26 @@ class LimeSimulation(ILimeSimulation):
             )
         else:
             point = SatellitePoint(obss[0].sat_name, dts)
+            surfaces_of_sat = []
+            mds = []
+            for i, dt in enumerate(dts):
+                sp = SurfacePoint(
+                    *SPICEAdapter.to_planetographic(
+                        obss[i].sat_pos.x,
+                        obss[i].sat_pos.y,
+                        obss[i].sat_pos.z,
+                        "EARTH",
+                        self.kernels_path.main_kernels_path,
+                    ),
+                    dt
+                )
+                md = MoonDataFactory.get_md(sp, self.eocfi_path, self.kernels_path)
+                surfaces_of_sat.append(sp)
+                mds.append(md)
+            self.surfaces_of_sat = surfaces_of_sat
+            self.mds = mds
+            self.point = point
+            self.mds_uptodate = True
         self._save_parameters(srf, point)
         self.refl_uptodate = True
         self.irr_uptodate = True

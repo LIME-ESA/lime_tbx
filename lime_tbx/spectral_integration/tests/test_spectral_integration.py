@@ -38,10 +38,10 @@ def get_srf() -> SpectralResponseFunction:
 class TestSpectralIntegration(unittest.TestCase):
 
     # Function _convolve_srf
-    def test__convolve_srf_ok(self):
+    def test_convolve_srf_ok(self):
         si: SpectralIntegration = get_spectral_integrator()
         signal = si._convolve_srf(CH_WLENS, CH_SRF, CH_ELIS)
-        ch_signal = np.trapz(CH_SRF * CH_ELIS, CH_WLENS)
+        ch_signal = np.trapz(CH_SRF * CH_ELIS, CH_WLENS) / np.trapz(CH_SRF, CH_WLENS)
         self.assertEqual(signal, ch_signal)
 
     # Function integrate_elis

@@ -1,0 +1,1 @@
+Error: The satellite position can't be calculated for a given datetime.

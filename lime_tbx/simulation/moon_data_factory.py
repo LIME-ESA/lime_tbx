@@ -176,16 +176,16 @@ class MoonDataFactory:
         srp: SurfacePoint | list of SurfacePoint
             SurfacePoint generated from the position of the SatellitePoint at the given datetimes.
         """
-        eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path)
+        eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path, kernels_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]
 
         mds: List[MoonData] = []
         srps: List[SurfacePoint] = []
-        for dt in dts:
-            lat, lon, height = eocfi.get_satellite_position(sp.name, dt)
-            srp = SurfacePoint(lat, lon, height, dt)
+        llhs = eocfi.get_satellite_position(sp.name, dts)
+        for i, llh in enumerate(llhs):
+            srp = SurfacePoint(llh[0], llh[1], llh[2], dts[i])
             srps.append(srp)
             mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
 
