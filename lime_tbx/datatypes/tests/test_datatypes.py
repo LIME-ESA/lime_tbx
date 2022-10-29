@@ -3,8 +3,6 @@
 """___Built-In Modules___"""
 from datetime import datetime, timedelta, timezone
 
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
-
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
@@ -25,6 +23,7 @@ from ..datatypes import (
     SpectralValidity,
 )
 from .. import constants
+from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -191,7 +190,6 @@ COEFF_LINE = np.array(
         9.596769204,
     ]
 )
-
 U_COEFF_LINE = np.array(
     [
         9.3686983712e-03,
