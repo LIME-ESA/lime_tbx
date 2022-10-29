@@ -45,7 +45,7 @@ def _get_asd_data(abs_phase_angle: float) -> SpectralData:
 
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
     unc_tot = (
-        ds_asd.u_ran_reflectance.values ** 2 + ds_asd.u_sys_reflectance.values ** 2
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
     )
 
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
@@ -66,7 +66,7 @@ def _get_default_asd_data() -> SpectralData:
 
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
     unc_tot = (
-        ds_asd.u_ran_reflectance.values ** 2 + ds_asd.u_sys_reflectance.values ** 2
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
     )
 
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
@@ -82,7 +82,7 @@ def _get_apollo_data() -> SpectralData:
 
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
     unc_tot = (
-        ds_asd.u_ran_reflectance.values ** 2 + ds_asd.u_sys_reflectance.values ** 2
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
     )
 
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
