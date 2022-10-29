@@ -191,6 +191,7 @@ COEFF_LINE = np.array(
         9.596769204,
     ]
 )
+
 U_COEFF_LINE = np.array(
     [
         9.3686983712e-03,

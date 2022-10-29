@@ -32,6 +32,7 @@ MANDATORY_SATS = [
     "FLEX",
 ]
 
+
 DT1 = datetime(2016, 1, 1, 15, 0, 2, tzinfo=timezone.utc)
 
 
@@ -78,9 +79,17 @@ class TestEOCFIConverter(unittest.TestCase):
         self.assertAlmostEqual(lat, supposed_lat)
         self.assertAlmostEqual(h, supposed_h)
         if lat != supposed_lat:
-            print("\nWARNING: In test_get_satellite_position_ok, lat != supposed_lat. Unexplained Windows behaviour.\n {} != {}\n".format(lat, supposed_lat))
+            print(
+                "\nWARNING: In test_get_satellite_position_ok, lat != supposed_lat. Unexplained Windows behaviour.\n {} != {}\n".format(
+                    lat, supposed_lat
+                )
+            )
         if h != supposed_h:
-            print("\nWARNING: In test_get_satellite_position_ok, h != supposed_h. Unexplained Windows behaviour.\n {} != {}\n".format(h, supposed_h))
+            print(
+                "\nWARNING: In test_get_satellite_position_ok, h != supposed_h. Unexplained Windows behaviour.\n {} != {}\n".format(
+                    h, supposed_h
+                )
+            )
 
     def test_get_satellite_position_true_data(self):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
