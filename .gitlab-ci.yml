@@ -45,6 +45,9 @@ cache:
     # Set up git for test commits
     - git config --global user.name "Gitlabs CI Testing"
     - git config --global user.email "test@example.com"
+    # Get needed libs
+    - yes | apt-get update
+    - yes | apt-get install libgl1
     # Make a virtual environment to install deps into (this will be cached for each step)
     - python --version
     - pip install virtualenv
@@ -86,7 +89,6 @@ mypy:
     - python -c "import sys;print(sys.path)"
     - pip install tox
     - mkdir test_report
-    - yes | apt-get install libgl1
     - tox
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
