@@ -86,7 +86,6 @@ mypy:
     - python -c "import sys;print(sys.path)"
     - pip install tox
     - mkdir test_report
-    - yes | apt-get update 
     - yes | apt-get install libgl1
     - tox
   coverage: '/^TOTAL.+?(\d+\%)$/'
