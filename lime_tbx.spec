@@ -10,6 +10,7 @@ a_binaries = []
 a_datas = []
 a_icon = ''
 e_console = False
+deploy_name = "LimeTBX"
 
 if sys.platform == 'linux':
     src_path = 'lime_tbx/'
@@ -77,7 +78,7 @@ elif sys.platform == 'darwin':
         (src_path + 'interpolation/access_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/access_data/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
-    a_icon = src_path + 'gui/assets/lime_logo.ico'
+    a_icon = src_path + 'gui/assets/lime_logo.icns'
 runner_file = src_path + 'main.py'
 
 a = Analysis([runner_file],
@@ -101,9 +102,9 @@ exe = EXE(pyz,
         a.scripts,
         a.binaries,
         a.zipfiles,
-        a.datas,  
+        a.datas,
         [],
-        name='LIME_TBX',
+        name=deploy_name,
         debug=False,
         bootloader_ignore_signals=False,
         strip=False,
@@ -116,5 +117,13 @@ exe = EXE(pyz,
         target_arch=None,
         argv_emulation=None,
         codesign_identity=None,
-        entitlements_file=None )
+        entitlements_file=None
+)
 
+if sys.platform == "darwin":
+    app = BUNDLE(
+        exe,
+        name=deploy_name+'.app',
+        icon=a_icon,
+        bundle_identifier=None,
+    )

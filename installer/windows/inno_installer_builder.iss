@@ -4,7 +4,7 @@
 #define MyAppName "LimeTBX"
 #define MyAppVersion "0.0.2"
 #define MyAppPublisher "European Space Agency"
-#define MyAppExeName "LIME_TBX.exe"
+#define MyAppExeName "LimeTBX.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
