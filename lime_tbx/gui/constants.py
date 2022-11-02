@@ -1,6 +1,7 @@
 APPLICATION_NAME = "LIME TBX"
 MAIN_QSS_PATH = "assets/style.qss"
 QSS_CONSTANTS_PATH = "assets/style_constants.txt"
+QSS_DARWIN_CONSTANTS_PATH = "assets/style_constants_darwin.txt"
 LOGO_PATH = "assets/lime_logo.png"
 ESABOLDFONT_PATH = "assets/NotesEsaBol.otf"
 ESAFONT_PATH = "assets/NotesEsaReg.otf"

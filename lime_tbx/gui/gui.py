@@ -40,8 +40,13 @@ class GUI:
         window.setCentralWidget(main_widget)
         window.show()
         window.setWindowTitle(constants.APPLICATION_NAME)
-
+        # QSS | Read, and preprocess it with global constants and os constants
         qss = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH).decode()
+        if sys.platform == "darwin":
+            qss_os_constants = pkgutil.get_data(
+                __name__, constants.QSS_DARWIN_CONSTANTS_PATH
+            ).decode()
+            qss = _preprocess_qss(qss, qss_os_constants)
         qss_constants = pkgutil.get_data(
             __name__, constants.QSS_CONSTANTS_PATH
         ).decode()
