@@ -24,6 +24,8 @@ def _preprocess_qss(qss: str, qss_constants: str):
     consts = qss_constants.split("\n")
     for const in consts:
         key_val = list(map(lambda c: c.strip(), const.split("=")))
+        if key_val[0] == "":
+            continue
         qss = qss.replace(key_val[0], key_val[1])
     return qss
 
