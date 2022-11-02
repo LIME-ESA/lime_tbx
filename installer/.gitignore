@@ -1,3 +1,5 @@
 linux/installer_files
 linux/lime_installer.zip
 windows/*.exe
+mac/installer_files
+mac/lime_installer.zip
