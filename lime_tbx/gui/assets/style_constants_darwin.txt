@@ -1,1 +1,2 @@
 @default_fontsize = 15pt
+@default_fontfallback = system-ui
