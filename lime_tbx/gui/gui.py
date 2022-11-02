@@ -54,6 +54,8 @@ class GUI:
 
             myappid = "esa.lime.limetbx"
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        else:
+            app.setStyle("Fusion")
         sys.exit(app.exec_())
 
     def _init_fonts(self):
