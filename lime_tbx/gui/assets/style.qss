@@ -5,7 +5,7 @@ QWidget
 	color: @neutralSpace;
 	border-color: @esaBackground;
 	selection-background-color: @deepSpace2;
-    font-family: 'NotesESA', 'Arial', @default_fontfallback;
+    font-family: 'NotesESA', 'Arial', sans-serif;
 	font-weight: bold;
 	font-size: @default_fontsize;
 }
@@ -16,7 +16,7 @@ QLabel
 {
 	background-color: transparent;
 	color: @neutralSpace;
-    font-family: 'NotesESA', 'Arial', @default_fontfallback;
+    font-family: 'NotesESA', 'Arial', sans-serif;
 	font-weight: normal;
 }
 
