@@ -3,7 +3,7 @@
 """___Built-In Modules___"""
 import sys
 import pathlib
-from os import path, environ, makedirs
+from os import path, environ, makedirs, getcwd
 
 """___Third-Party Modules___"""
 # import here
@@ -42,7 +42,11 @@ def _is_valid_programfiles(programdata: str) -> bool:
 
 def get_programfiles_folder() -> str:
     if sys.platform == "darwin":
-        programfiles = get_appdata_folder()
+        curr_dir = getcwd()
+        print("Current_dir: {}".format(curr_dir))
+        programfiles = path.join(curr_dir, "Contents/Resources")
+        print("Programfiles: {}".format(programfiles))
+        # programfiles = get_appdata_folder()
     elif sys.platform == "win32":
         import winreg
 
