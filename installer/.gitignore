@@ -4,3 +4,5 @@
 windows/*.exe
 *.app
 *.pkg
+mac/bundle
+mac/temp_files/
