@@ -125,5 +125,5 @@ if sys.platform == "darwin":
         exe,
         name=deploy_name+'.app',
         icon=a_icon,
-        bundle_identifier=None,
+        bundle_identifier="int.esa.LimeTBX",
     )

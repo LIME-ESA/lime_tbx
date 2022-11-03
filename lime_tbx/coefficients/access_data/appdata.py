@@ -3,7 +3,8 @@
 """___Built-In Modules___"""
 import sys
 import pathlib
-from os import path, environ, makedirs, getcwd
+from os import path, environ
+import os
 
 """___Third-Party Modules___"""
 # import here
@@ -25,7 +26,7 @@ def _is_valid_appdata(appdata: str) -> bool:
     kpath = path.join(appdata, "kernels")
     if not path.exists(kpath):
         try:
-            makedirs(kpath)
+            os.makedirs(kpath)
         except Exception as e:
             logger.get_logger().critical(e)
             return False
@@ -42,11 +43,20 @@ def _is_valid_programfiles(programdata: str) -> bool:
 
 def get_programfiles_folder() -> str:
     if sys.platform == "darwin":
-        curr_dir = getcwd()
-        print("Current_dir: {}".format(curr_dir))
-        programfiles = path.join(curr_dir, "Contents/Resources")
-        print("Programfiles: {}".format(programfiles))
-        # programfiles = get_appdata_folder()
+        _stream = os.popen('mdfind "kMDItemCFBundleIdentifier = int.esa.LimeTBX"')
+        output = _stream.read()
+        _stream.close()
+        possible_bundles = output.splitlines()
+        programfiles = ""
+        log = logger.get_logger()
+        for bundle in possible_bundles:
+            bundle = path.join(bundle, "Contents/Resources")
+            if _is_valid_programfiles(bundle):
+                programfiles = bundle
+                break
+        if programfiles == "":
+            programfiles = "/Applications/{}.app/Contents/Resources".format(APPNAME)
+        log.info("Programfiles: {}".format(programfiles))
     elif sys.platform == "win32":
         import winreg
 
