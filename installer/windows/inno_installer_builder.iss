@@ -33,14 +33,15 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\Users\Javier\Repositorios\lime_tbx\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\Users\Javier\Repositorios\lime_tbx\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\LimeTBX\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
