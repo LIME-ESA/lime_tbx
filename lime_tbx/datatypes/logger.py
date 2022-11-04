@@ -15,7 +15,7 @@ from lime_tbx.coefficients.access_data.appdata import get_appdata_folder
 # SINGLETON
 _logger: logging.Logger = None
 
-_FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+_FORMAT = "%(levelname)s: [%(filename)s:%(lineno)s - %(funcName)10s() ] %(message)s"
 _DATEFORMAT = "%H:%M:%S"
 
 

@@ -42,13 +42,13 @@ def _is_valid_programfiles(programdata: str) -> bool:
 
 
 def get_programfiles_folder() -> str:
+    log = logger.get_logger()
     if sys.platform == "darwin":
         _stream = os.popen('mdfind "kMDItemCFBundleIdentifier = int.esa.LimeTBX"')
         output = _stream.read()
         _stream.close()
         possible_bundles = output.splitlines()
         programfiles = ""
-        log = logger.get_logger()
         for bundle in possible_bundles:
             bundle = path.join(bundle, "Contents/Resources")
             if _is_valid_programfiles(bundle):
@@ -56,31 +56,45 @@ def get_programfiles_folder() -> str:
                 break
         if programfiles == "":
             programfiles = "/Applications/{}.app/Contents/Resources".format(APPNAME)
-        log.info("Programfiles: {}".format(programfiles))
     elif sys.platform == "win32":
         import winreg
 
+        programfiles = ""
         a_reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
-        sub_key_admin = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
-        sub_key_user = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
         valid = True
         try:
-            a_key = winreg.OpenKey(a_reg, sub_key_admin)
+            sub_key_install_folder = "SOFTWARE\\ESA\\LimeTBX\\Settings"
+            a_key = winreg.OpenKey(a_reg, sub_key_install_folder)
+            programfiles = winreg.QueryValueEx(a_key, "InstallPath")[0]
         except:
             valid = False
-        if not valid:
-            valid = True
+        if not valid: # Search for admin uninstall key
+            sub_key_admin = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
             try:
-                a_key = winreg.OpenKey(a_reg, sub_key_user)
+                a_key = winreg.OpenKey(a_reg, sub_key_admin)
             except:
                 valid = False
-        if valid:
-            programfiles = winreg.QueryValueEx(a_key, "Inno Setup: App Path")[0]
-        else:
+            if not valid: # Search for user uninstall key
+                sub_key_user = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
+                a_reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+                valid = True
+                try:
+                    a_key = winreg.OpenKey(a_reg, sub_key_user)
+                except:
+                    valid = False
+            if valid:
+                try:
+                    programfiles = winreg.QueryValueEx(a_key, "Inno Setup: App Path")[0]
+                except:
+                    valid = False
+        if not valid:
+            log.warning("Did not find LimeTBX key in winreg registry.")
             programfiles = path.join(environ["PROGRAMFILES"], APPNAME)
     else:
         programfiles = path.join("/opt/esa", APPNAME)
+    log.info("Programfiles: {}".format(programfiles))
     if not _is_valid_programfiles(programfiles):
+        log.warning("Programfiles directory not valid. Using current dir.")
         programfiles = "."
     return programfiles
 

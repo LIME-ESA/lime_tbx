@@ -42,7 +42,7 @@ else:
     exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_exe_path = os.path.join(_current_dir, exe_file_satellite)
+_exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -306,11 +306,16 @@ class EOCFIConverter(IEOCFIConverter):
                 sat_positions_date.append(float(out_lines[i * 3 + 2]))
                 sat_positions.append(sat_positions_date)
         else:
-            raise Exception(
-                "Number of lines unexpected. {}/{}.\n{}".format(
-                    str(len(out_lines)), str(3 * n_dates), out_lines
+            if len(out_lines) == 0:
+                raise Exception(
+                    "No lines outputed after executing the EOCFI binary. Command executed: {}".format(cmd)
                 )
-            )
+            else:
+                raise Exception(
+                    "Number of lines unexpected. {}/{}.\n{}".format(
+                        str(len(out_lines)), str(3 * n_dates), out_lines
+                    )
+                )
 
         positions = []
         for i in range(n_dates):

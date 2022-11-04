@@ -18,6 +18,7 @@ from lime_tbx.coefficients.access_data.appdata import (
     get_programfiles_folder,
 )
 from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -28,6 +29,7 @@ __status__ = "Development"
 
 
 def main():
+    logger.get_logger().info("ToolBox started")
     programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
     kernels_path = KernelsPath(

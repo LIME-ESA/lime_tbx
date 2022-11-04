@@ -9,7 +9,7 @@
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{BA556966-3F6F-4065-8A45-BF787E56A6DF}
+AppId={{BA556966-3F6F-4065-8A45-BF787E56A6DF}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -17,8 +17,7 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf64}\{#MyAppName}
 DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64
-; Uncomment the following line to run in non administrative install mode (install for current user only.)
-;PrivilegesRequired=lowest
+PrivilegesRequired=admin
 OutputDir=C:\Users\Javier\Repositorios\lime_tbx\installer\windows
 OutputBaseFilename=LimeTBX installer
 SetupIconFile=C:\Users\Javier\Repositorios\lime_tbx\lime_tbx\gui\assets\lime_logo.ico
@@ -45,3 +44,13 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"; T
 
 [Run]
 Filename: "{app}\LimeTBX\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Registry]
+Root: HKLM64; Subkey: "SOFTWARE\ESA"; Flags: uninsdeletekeyifempty; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}\Settings"; Flags: createvalueifdoesntexist; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Check: IsWin64
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\kernels"
+Type: filesandordirs; Name: "{app}\eocfi_data"
+Type: filesandordirs; Name: "{app}\LimeTBX"
