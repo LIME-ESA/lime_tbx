@@ -81,48 +81,56 @@ elif sys.platform == 'darwin':
     a_icon = src_path + 'gui/assets/lime_logo.icns'
 runner_file = src_path + 'main.py'
 
-a = Analysis([runner_file],
-            pathex=a_pathex,
-            binaries=a_binaries,
-            datas=a_datas,
-            hiddenimports=["sklearn.utils._typedefs", "sklearn.utils._heap", "sklearn.utils._sorting", "sklearn.utils._vector_sentinel"],
-            hookspath=[],
-            hooksconfig={},
-            runtime_hooks=[],
-            excludes=[],
-            win_no_prefer_redirects=False,
-            win_private_assemblies=False,
-            cipher=block_cipher,
-            noarchive=False)
+a = Analysis(
+    [runner_file],
+    pathex=a_pathex,
+    binaries=a_binaries,
+    datas=a_datas,
+    hiddenimports=["sklearn.utils._typedefs", "sklearn.utils._heap", "sklearn.utils._sorting", "sklearn.utils._vector_sentinel"],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
 
-pyz = PYZ(a.pure, a.zipped_data,
-             cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
-exe = EXE(pyz,
-        a.scripts,
-        a.binaries,
-        a.zipfiles,
-        a.datas,
-        [],
-        name=deploy_name,
-        debug=False,
-        bootloader_ignore_signals=False,
-        strip=False,
-        upx=True,
-        upx_exclude=[],
-        runtime_tmpdir=None,
-        console=e_console,
-        icon=a_icon,
-        disable_windowed_traceback=False,
-        target_arch=None,
-        argv_emulation=None,
-        codesign_identity=None,
-        entitlements_file=None
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    name=deploy_name + ".exe",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=e_console,
+    icon=a_icon,
+    disable_windowed_traceback=False,
+    target_arch=None,
+    argv_emulation=None,
+    codesign_identity=None,
+    entitlements_file=None
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas, 
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name=deploy_name,
 )
 
 if sys.platform == "darwin":
     app = BUNDLE(
-        exe,
+        coll,
         name=deploy_name+'.app',
         icon=a_icon,
         bundle_identifier="int.esa.LimeTBX",
