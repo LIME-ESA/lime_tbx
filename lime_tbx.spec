@@ -103,6 +103,7 @@ exe = EXE(
     pyz,
     a.scripts,
     [],
+    exclude_binaries=True,
     name=deploy_name + ".exe",
     debug=False,
     bootloader_ignore_signals=False,
@@ -114,14 +115,14 @@ exe = EXE(
     target_arch=None,
     argv_emulation=None,
     codesign_identity=None,
-    entitlements_file=None
+    entitlements_file=None,
 )
 
 coll = COLLECT(
     exe,
     a.binaries,
     a.zipfiles,
-    a.datas, 
+    a.datas,
     strip=False,
     upx=True,
     upx_exclude=[],

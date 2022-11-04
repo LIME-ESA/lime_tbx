@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-ln -s /Applications/LimeTBX.app/Contents/MacOS/LimeTBX /usr/local/bin/lime
+ln -s /Applications/LimeTBX.app/Contents/MacOS/LimeTBX.exe /usr/local/bin/lime
