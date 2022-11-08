@@ -1,5 +1,5 @@
 [ -d "mac/bundle" ] && rm -rf mac/bundle
-[ -d "mac/lime.pkg" ] && rm -rf mac/lime.pkg
+[ -f "mac/lime.pkg" ] && rm -rf mac/lime.pkg
 mkdir -p mac/bundle
 cp -r ../dist/LimeTBX.app mac/bundle/LimeTBX.app
 cp -r ../kernels mac/bundle/LimeTBX.app/Contents/Resources/kernels
