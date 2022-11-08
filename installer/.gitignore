@@ -6,3 +6,4 @@ windows/*.exe
 *.pkg
 mac/bundle
 mac/temp_files/
+debian/lime*
