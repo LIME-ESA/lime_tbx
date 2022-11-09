@@ -292,7 +292,7 @@ class EOCFIConverter(IEOCFIConverter):
                 intdes,
             )
         for dt in dts:
-            cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
+            cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S.%f"))
         cmd_exec = os.popen(cmd)
         so = cmd_exec.read()
         cmd_exec.close()
@@ -308,7 +308,9 @@ class EOCFIConverter(IEOCFIConverter):
         else:
             if len(out_lines) == 0:
                 raise Exception(
-                    "No lines outputed after executing the EOCFI binary. Command executed: {}".format(cmd)
+                    "No lines outputed after executing the EOCFI binary. Command executed: {}".format(
+                        cmd
+                    )
                 )
             else:
                 raise Exception(
