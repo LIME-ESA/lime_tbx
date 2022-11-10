@@ -33,13 +33,18 @@ METADATA_FILE = "metadata.yml"
 EXE_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux"
 EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
 EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
+# At this moment there is no ARM binary yet
+EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin"
 
 if platform.system() == "Linux":
     exe_file_satellite = EXE_FILE_SATELLITE_LINUX
 elif platform.system() == "Windows":
     exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
-else:
-    exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
+else:  # Darwin
+    if "ARM" in platform.version().upper():
+        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN_ARM
+    else:
+        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
