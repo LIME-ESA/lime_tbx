@@ -308,7 +308,7 @@ class EOCFIConverter(IEOCFIConverter):
         so, serr = cmd_exec.communicate()
         out_lines = so.splitlines()
         if len(serr) > 0:
-            err_msg = "Executing EO CFI: {}".format(serr)
+            err_msg = "Executing EO CFI: {}".format(serr.rstrip())
             log = logger.get_logger()
             if len(out_lines) == 3 * n_dates:
                 log.warning(err_msg)
