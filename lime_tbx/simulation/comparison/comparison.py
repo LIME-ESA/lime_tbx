@@ -249,7 +249,6 @@ class Comparison(IComparison):
                     ratio_spec,
                     mean_rel_diff,
                     std,
-                    0,  # TODO add real valid correct value
                     num_samples,
                     ch_dates[i],
                     sps[i],
@@ -258,7 +257,7 @@ class Comparison(IComparison):
                 comparisons.append(cp)
             else:
                 comparisons.append(
-                    ComparisonData(None, None, None, None, None, None, None, [], [], [])
+                    ComparisonData(None, None, None, None, None, None, [], [], [])
                 )
         return comparisons
 
@@ -287,7 +286,6 @@ class Comparison(IComparison):
                 new_spectrals.append(SpectralData(wlens, data, uncertainties, None))
             mrd = c.mean_relative_difference
             std = c.standard_deviation_mrd
-            ttrend = c.temporal_trend
             nsamp = c.number_samples
             dts = [v[-3] for v in vals]
             points = [v[-2] for v in vals]
@@ -297,7 +295,6 @@ class Comparison(IComparison):
                 new_spectrals[2],
                 mrd,
                 std,
-                ttrend,
                 nsamp,
                 dts,
                 points,

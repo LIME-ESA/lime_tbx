@@ -632,14 +632,6 @@ def write_comparison(
             ],
             dtype=object,
         )
-        temporal_trend_data = np.array(
-            [
-                c.temporal_trend
-                for c in lglod.comparisons
-                if c.temporal_trend is not None
-            ],
-            dtype=object,
-        )
         for c in lglod.comparisons:
             for i, cdt in enumerate(c.dts):
                 if cdt not in dates_n_points:
@@ -765,10 +757,6 @@ def write_comparison(
         number_samples[:] = number_samples_data
         std_mrd = ds.createVariable("std_mrd", "f4", ("chan",), fill_value=fill_value)
         std_mrd[:] = std_mrd_data
-        temporal_trend = ds.createVariable(
-            "temporal_trend", "f4", ("chan",), fill_value=fill_value
-        )
-        temporal_trend[:] = temporal_trend_data
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
@@ -803,7 +791,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     irr_diff_uncs = np.array(ds.variables["irr_diff_unc"][:].data).T
     mrd = np.array(ds.variables["mrd"][:].data)
     std_mrd = np.array(ds.variables["std_mrd"][:].data)
-    temporal_trend = np.array(ds.variables["temporal_trend"][:].data)
     number_samples = np.array(ds.variables["number_samples"][:].data)
     lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
@@ -813,7 +800,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     ds.close()
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
-    temporal_trend = temporal_trend[temporal_trend != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     for i, sp in enumerate(sat_poss):
         sp = SurfacePoint(
@@ -850,7 +836,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             diffs_signal,
             mrd[i],
             std_mrd[i],
-            temporal_trend[i],
             number_samples[i],
             dts,
             points[indexes],
