@@ -63,13 +63,22 @@ LIBS = 	\
 	-lexplorer_file_handling \
 	-lgeotiff -ltiff -lproj -lxml2 -lm -lc -lpthread
 
+
+ARCH = $(shell arch)
+
+BIN_NAME = get_positions_darwin
+
+ifeq ($(ARCH), arm64)
+BIN_NAME = get_positions_darwin_arm
+endif
+
 default : executable
 
 executable:
 	echo "--------------------"
 	echo "$(CFI): ... creating the executable"
 	echo "--------------------"
-	$(CC) $(CFLAGS) -O3 code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_darwin
+	$(CC) $(CFLAGS) -O3 code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/$(BIN_NAME)
 
 debug:
 	echo "--------------------"
@@ -81,13 +90,13 @@ shared:
 	echo "--------------------"
 	echo "$(CFI): ... creating shared library"
 	echo "--------------------"
-	$(CC) -fPIC -shared $(CFLAGS) -O3 code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_darwin.so
+	$(CC) -fPIC -shared $(CFLAGS) -O3 code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/$(BIN_NAME).so
 
 shared_debug:
 	echo "--------------------"
 	echo "$(CFI): ... creating shared debug library"
 	echo "--------------------"
-	$(CC) -fPIC -shared $(CFLAGS) $(DEBUG_FLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/get_positions_darwin.so
+	$(CC) -fPIC -shared $(CFLAGS) $(DEBUG_FLAGS) code/get_positions.c $(LIBS_DIR) $(LIBS) -o bin/$(BIN_NAME).so
 
 spice:
 	echo "--------------------"

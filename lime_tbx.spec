@@ -58,11 +58,14 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
     a_icon = src_path + 'gui\\assets\\lime_logo.ico'
     e_console = True
 elif sys.platform == 'darwin':
+    eocfi_bin_path = 'eocfi_adapter/eocfi_c/bin/get_positions_darwin'
+    if "ARM" in platform.version().upper():
+        eocfi_bin_path = 'eocfi_adapter/eocfi_c/bin/get_positions_darwin_arm'
     src_path = 'lime_tbx/'
     a_pathex = ['./.venv/lib/python3.9/site-packages/', './.venv/lib64/python3.9/site-packages/']
     a_binaries = [
         ('.venv/lib/python3.9/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
-        (src_path + 'eocfi_adapter/eocfi_c/bin/get_positions_darwin', './lime_tbx/eocfi_adapter/eocfi_c/bin'),
+        (src_path + eocfi_bin_path, './lime_tbx/eocfi_adapter/eocfi_c/bin'),
     ]
     a_datas = [
         (src_path + 'gui/assets/style.qss', './lime_tbx/gui/assets'),

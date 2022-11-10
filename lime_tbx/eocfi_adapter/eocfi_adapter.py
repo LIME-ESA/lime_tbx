@@ -34,8 +34,7 @@ METADATA_FILE = "metadata.yml"
 EXE_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux"
 EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
 EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
-# At this moment there is no ARM binary yet
-EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin"
+EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin_arm"
 
 if platform.system() == "Linux":
     exe_file_satellite = EXE_FILE_SATELLITE_LINUX
