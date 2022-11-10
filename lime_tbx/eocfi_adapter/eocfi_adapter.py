@@ -300,12 +300,13 @@ class EOCFIConverter(IEOCFIConverter):
         for dt in dts:
             cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S.%f"))
         cmd_exec = subprocess.Popen(
-            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
         )
         so, serr = cmd_exec.communicate()
-        # cmd_exec = os.popen(cmd)
-        # so = cmd_exec.read()
-        # cmd_exec.close()
         out_lines = so.splitlines()
         if len(serr) > 0:
             err_msg = "Executing EO CFI: {}".format(serr)
