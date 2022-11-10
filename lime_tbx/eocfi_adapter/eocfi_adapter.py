@@ -12,14 +12,15 @@ from typing import Tuple, List
 from datetime import datetime, timezone
 import os
 import platform
-
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+import subprocess
 
 """___Third-Party Modules___"""
 import yaml
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import KernelsPath, LimeException, OrbitFile, Satellite
+from ..datatypes import logger
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
 __author__ = "Ramiro González Catón"
@@ -298,10 +299,21 @@ class EOCFIConverter(IEOCFIConverter):
             )
         for dt in dts:
             cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S.%f"))
-        cmd_exec = os.popen(cmd)
-        so = cmd_exec.read()
-        cmd_exec.close()
+        cmd_exec = subprocess.Popen(
+            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        so, serr = cmd_exec.communicate()
+        # cmd_exec = os.popen(cmd)
+        # so = cmd_exec.read()
+        # cmd_exec.close()
         out_lines = so.splitlines()
+        if len(serr) > 0:
+            err_msg = "Executing EO CFI: {}".format(serr)
+            log = logger.get_logger()
+            if len(out_lines) == 3 * n_dates:
+                log.warning(err_msg)
+            else:
+                log.error(err_msg)
         sat_positions = []
         if len(out_lines) == 3 * n_dates:
             for i in range(n_dates):
