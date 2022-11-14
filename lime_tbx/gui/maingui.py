@@ -159,10 +159,20 @@ def polar_callback(
     point: Point,
     coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
-) -> Tuple[List[float], List[float], Point]:
+) -> Tuple[
+    Point,
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+]:
 
     lime_simulation.update_polarization(srf, point, coeffs)
-    return point, lime_simulation.get_polars()
+    return (
+        point,
+        lime_simulation.get_polars(),
+        lime_simulation.get_polars_cimel(),
+        lime_simulation.get_polars_asd(),
+    )
 
 
 def compare_callback(
@@ -804,11 +814,13 @@ class MainSimulationsWidget(
         data: Tuple[
             Point,
             Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
-        self.graph.update_plot(data[1], point=data[0], redraw=False)
+        self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",

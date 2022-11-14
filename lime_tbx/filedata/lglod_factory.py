@@ -49,6 +49,9 @@ def create_lglod_data(
     if not isinstance(elrefs_cimel, list):
         elrefs_cimel = [elrefs_cimel]
     polars = lime_simulation.get_polars()
+    polars_cimel = lime_simulation.get_polars_cimel()
+    if not isinstance(polars_cimel, list):
+        polars_cimel = [polars_cimel]
     if not isinstance(elis, list):
         elis = [elis]
     if not isinstance(elrefs, list):
@@ -140,4 +143,6 @@ def create_lglod_data(
         and srf.get_channels_names()[0] == constants.DEFAULT_SRF_NAME
     ):
         is_not_default_srf = False
-    return LGLODData(obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel)
+    return LGLODData(
+        obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel, polars_cimel
+    )

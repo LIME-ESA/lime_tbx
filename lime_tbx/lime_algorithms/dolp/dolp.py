@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 """___NPL Modules___"""
-from ...datatypes.datatypes import PolarizationCoefficients
+from ...datatypes.datatypes import PolarizationCoefficients, SpectralData
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -116,7 +116,7 @@ class DOLP(IDOLP):
         wavelengths: List[float],
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
-    ) -> List[float]:
+    ) -> SpectralData:
         """
         Calculation of the degree of linear polarization.
 
@@ -131,7 +131,7 @@ class DOLP(IDOLP):
 
         Returns
         -------
-        polarizations: list of float
+        polarizations: np.array of float
             List with the degrees of polarization for each given wavelength.
         """
         polarizations = []
@@ -139,4 +139,11 @@ class DOLP(IDOLP):
         for wlen in wavelengths:
             result = self._get_interpolated_polarized(wlen, mpa, coefficients)
             polarizations.append(result)
-        return polarizations
+        polarizations = np.array(polarizations)
+        ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None)
+        return SpectralData(
+            np.array(wavelengths),
+            polarizations,
+            ds_pol.u_ran_polarization.values,
+            ds_pol,
+        )

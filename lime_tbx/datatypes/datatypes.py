@@ -902,6 +902,7 @@ class LGLODData:
     not_default_srf: bool
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
+    polars_cimel: List["SpectralData"]
 
 
 @dataclass

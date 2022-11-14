@@ -443,6 +443,22 @@ def write_obs(
         refl_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.elrefs_cimel]
         )
+        polar_cimel = ds.createVariable(
+            "polar_cimel", "f4", ("number_obs", "wlens_cimel")
+        )
+        polar_cimel.units = "Fractions of unity"
+        polar_cimel.long_name = "Simulated polarization for the cimel wavelengths."
+        polar_cimel[:] = np.array([cimel.data for cimel in lglod.polars_cimel])
+        polar_cimel_unc = ds.createVariable(
+            "polar_cimel_unc", "f4", ("number_obs", "wlens_cimel")
+        )
+        polar_cimel_unc.units = "Fractions of unity"
+        polar_cimel_unc.long_name = (
+            "Uncertainties for the simulated polarization for the cimel wavelengths."
+        )
+        polar_cimel_unc[:] = np.array(
+            [cimel.uncertainties for cimel in lglod.polars_cimel]
+        )
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
