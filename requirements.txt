@@ -1,6 +1,6 @@
 certifi==2022.6.15
 cftime==1.6.1
-comet-maths==0.11
+comet-maths==0.14
 cycler==0.11.0
 fonttools==4.37.1
 joblib==1.1.0
@@ -10,11 +10,11 @@ mplcursors==0.5.2
 netCDF4==1.6.1
 numdifftools==0.9.39
 numpy==1.23.2
-obsarray==0.1
+obsarray==0.2.2
 packaging==21.3
 pandas==1.4.4
 Pillow==9.2.0
-punpy==0.32
+punpy==0.35
 pyparsing==3.0.9
 PySide2==5.15.2.1
 python-dateutil==2.8.2
