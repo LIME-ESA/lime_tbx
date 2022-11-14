@@ -887,7 +887,7 @@ class LimePagesEnum(Enum):
 
 
 def load_simulation_callback(path: str, kernels_path: KernelsPath):
-    lglod = moon.read_glod_file(path, kernels_path)
+    lglod = moon.read_lglod_file(path, kernels_path)
     return [lglod]
 
 

@@ -3,13 +3,18 @@
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 
-from lime_tbx.datatypes.datatypes import SatellitePosition
+from lime_tbx.datatypes.datatypes import (
+    KernelsPath,
+    SatellitePosition,
+    LGLODComparisonData,
+    LGLODData,
+)
 
 """___Third-Party Modules___"""
 import unittest
 
 """___LIME_TBX Modules___"""
-from ..moon import read_moon_obs
+from .. import moon
 from ..srf import read_srf
 
 """___Authorship___"""
@@ -21,10 +26,12 @@ __status__ = "Development"
 
 PATH = "./test_files/moon/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc"
 
+KERNELS_PATH = KernelsPath("./kernels", "./kernels")
+
 
 class TestMoon(unittest.TestCase):
     def test_read_moon_obs_ok(self):
-        lo = read_moon_obs(PATH)
+        lo = moon.read_moon_obs(PATH)
         ch_names = ["VIS006", "VIS008", "NIR016", "HRVIS"]
         ch_irrs = {
             "VIS006": 1.9233498386870263e-06,
@@ -44,11 +51,25 @@ class TestMoon(unittest.TestCase):
         self.assertEqual(lo.sat_pos_ref, "ITRF93")
 
     def test_read_moon_obs_check_srf(self):
-        lo = read_moon_obs(PATH)
+        lo = moon.read_moon_obs(PATH)
         srf = read_srf(
             "./test_files/srf/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc"
         )
         self.assertTrue(lo.check_valid_srf(srf))
+
+    def test_read_lglod_sim(self):
+        path = "./test_files/moon/simulation.nc"
+        data = moon.read_lglod_file(path, KERNELS_PATH)
+        self.assertFalse(data.not_default_srf)
+        self.assertIsInstance(data, LGLODData)
+
+    def test_read_lglod_comp(self):
+        path = "./test_files/moon/comparison.nc"
+        srf = read_srf("./test_files/moon/cimel_srf.nc")
+        cdata = moon.read_lglod_file(path, KERNELS_PATH)
+        self.assertIsInstance(cdata, LGLODComparisonData)
+        for ch_name in cdata.ch_names:
+            self.assertIn(ch_name, srf.get_channels_names())
 
 
 if __name__ == "__main__":

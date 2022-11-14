@@ -524,6 +524,12 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     refl_cimel_unc = [
         list(map(float, data)) for data in ds.variables["refl_cimel_unc"][:].data
     ]
+    polar_cimel = [
+        list(map(float, data)) for data in ds.variables["polar_cimel"][:].data
+    ]
+    polar_cimel_unc = [
+        list(map(float, data)) for data in ds.variables["polar_cimel_unc"][:].data
+    ]
     if len(datetimes) == 0:
         mpa_degrees = ds.variables["mpa_degrees"][:].data
         distance_sun_moon = ds.variables["distance_sun_moon"][:].data
@@ -581,7 +587,15 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         )
         for i in range(len(refl_cimel))
     ]
-    return LGLODData(obss, signals, not_default_srf, elis_cimel, elrefs_cimel)
+    polars_cimel = [
+        SpectralData(
+            cimel_wlens, np.array(polar_cimel[i]), np.array(polar_cimel_unc[i]), None
+        )
+        for i in range(len(polar_cimel))
+    ]
+    return LGLODData(
+        obss, signals, not_default_srf, elis_cimel, elrefs_cimel, polars_cimel
+    )
 
 
 def write_comparison(
@@ -861,7 +875,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     return LGLODComparisonData(comps, ch_names, sat_name)
 
 
-def read_glod_file(
+def read_lglod_file(
     path: str, kernels_path: KernelsPath
 ) -> Union[LGLODData, LGLODComparisonData]:
     try:
