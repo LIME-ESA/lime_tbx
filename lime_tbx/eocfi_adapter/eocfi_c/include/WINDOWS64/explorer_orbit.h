@@ -193,11 +193,13 @@
  *               +----------------------------------------------------------------------------------+
  *               |   4.22  | 22/12/21 | DEIMOS Space S.L.U| Maintenance release                     |
  *               +----------------------------------------------------------------------------------+
+ *               |   4.23  | 23/06/22 | DEIMOS Space S.L.U| Maintenance release                     |
+ *               +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
-#ifndef _EXPLORER_ORBIT_H
-#define _EXPLORER_ORBIT_H
+#ifndef EXPLORER_ORBIT_H
+#define EXPLORER_ORBIT_H
 
 #include <explorer_data_handling.h>
 #include <explorer_lib.h>
@@ -269,6 +271,11 @@
 /* AN-353: Geostationary default values */
 #define XO_GEO_DEFAULT_LATITUDE 0.
 #define XO_GEO_DEFAULT_ALTITUDE 35786000.
+
+/* Generic maximum lengths */
+#define XO_MAX_LENGTH_1 1
+#define XO_MAX_LENGTH_3 3
+#define XO_MAX_LENGTH_6 6
 
 #ifdef __cplusplus
 extern "C"
@@ -357,6 +364,7 @@ extern "C"
     XO_SAT_CO2M = XL_SAT_CO2M,
     XO_SAT_LSTM = XL_SAT_LSTM,
     XO_SAT_FORUM = XL_SAT_FORUM,
+    XO_SAT_TRUTHS = XL_SAT_TRUTHS,
     XO_SAT_GENERIC = XL_SAT_GENERIC,
     XO_SAT_GENERIC_GEO = XL_SAT_GENERIC_GEO, /* ANR-353 */
     XO_SAT_MTG = XL_SAT_MTG, /* ANR-353 */
@@ -1446,9 +1454,9 @@ extern "C"
     double anx_utc;
     double anx_ut1;
     double time_ref_of;
-    double anx_pos[3];
-    double anx_vel[3];
-    double kepl[6];
+    double anx_pos[XO_MAX_LENGTH_3];
+    double anx_vel[XO_MAX_LENGTH_3];
+    double kepl[XO_MAX_LENGTH_6];
     double tnod;
   } xo_anx_info;
 
@@ -1475,10 +1483,10 @@ extern "C"
     long abs_orbit; /* Predicted Absolute orbit (only for xo_propag_init_def and init_file) */
     double time_since_anx; /* Time since ANX           (only for xo_propag_init_def and init_file) */
     double time; /* Predicted time (UT1) */
-    double pos[3]; /* Osculating position vector at pred. time (EF) */
-    double vel[3]; /* Osculating velocity vector at pred. time (EF) */
-    double acc[3]; /* Osculating acceleration vector at pred. time (EF) */
-    double x[6]; /* Osculating keplerian elements at pred. time (TOD) */
+    double pos[XO_MAX_LENGTH_3]; /* Osculating position vector at pred. time (EF) */
+    double vel[XO_MAX_LENGTH_3]; /* Osculating velocity vector at pred. time (EF) */
+    double acc[XO_MAX_LENGTH_3]; /* Osculating acceleration vector at pred. time (EF) */
+    double x[XO_MAX_LENGTH_6]; /* Osculating keplerian elements at pred. time (TOD) */
 
   } xo_uni_propag; /* Universal model internal propagation structure */
 
@@ -1497,10 +1505,10 @@ extern "C"
     double time;
     long abs_orbit;
     double time_since_anx;
-    double pos[3];
-    double vel[3];
-    double acc[3];
-    double kep[6];
+    double pos[XO_MAX_LENGTH_3];
+    double vel[XO_MAX_LENGTH_3];
+    double acc[XO_MAX_LENGTH_3];
+    double kep[XO_MAX_LENGTH_6];
     xo_validity_time val_time; /* Interpolation Validity time range */
   } xo_interpol_id_data;
 
@@ -1670,14 +1678,14 @@ extern "C"
                            xo_orbit_id* orbit_id,
                            long ierr[XO_NUM_ERR_ORBIT_INIT_DEF]);
 
-  long xo_orbit_cart_init(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time, double pos[3], double vel[3], long* abs_orbit,
+  long xo_orbit_cart_init(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time, double pos[XO_MAX_LENGTH_3], double vel[XO_MAX_LENGTH_3], long* abs_orbit,
                           /* output */
                           double* val_time0,
                           double* val_time1,
                           xo_orbit_id* orbit_id,
                           long ierr[XO_NUM_ERR_ORBIT_CART_INIT]);
 
-  long xo_orbit_cart_init_precise(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time, double pos[3], double vel[3], long* abs_orbit, xo_propag_precise_config* propag_precise_conf,
+  long xo_orbit_cart_init_precise(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time, double pos[XO_MAX_LENGTH_3], double vel[XO_MAX_LENGTH_3], long* abs_orbit, xo_propag_precise_config* propag_precise_conf,
                                   /* output */
                                   double* val_time0,
                                   double* val_time1,
@@ -1788,18 +1796,18 @@ extern "C"
                       long* mode,
                       long* time_ref,
                       double* time,
-                      double pos_out[3],
-                      double vel_out[3],
-                      double acc_out[3],
+                      double pos_out[XO_MAX_LENGTH_3],
+                      double vel_out[XO_MAX_LENGTH_3],
+                      double acc_out[XO_MAX_LENGTH_3],
                       long ierr[XO_NUM_ERR_OSV_COMPUTE]);
 
   long xo_osv_compute_run(long* run_id,
                           long* mode,
                           long* time_ref,
                           double* time,
-                          double pos_out[3],
-                          double vel_out[3],
-                          double acc_out[3],
+                          double pos_out[XO_MAX_LENGTH_3],
+                          double vel_out[XO_MAX_LENGTH_3],
+                          double acc_out[XO_MAX_LENGTH_3],
                           long ierr[XO_NUM_ERR_OSV_COMPUTE]);
 
   long xo_osv_compute_extra(xo_orbit_id* orbit_id,
@@ -2261,7 +2269,7 @@ extern "C"
                             long* version_number,
                             char* fh_system,
                             /* output */
-                            long ierr[1]);
+                            long ierr[XO_MAX_LENGTH_1]);
 
   long xo_gen_rof_prototype_run(long* run_id,
                                 long* propag_model,
@@ -2399,9 +2407,9 @@ extern "C"
   long xo_position_on_orbit_to_time(xo_orbit_id* orbit_id, long* abs_orbit_number, long* angle_type, double* angle, double* angle_rate, double* angle_rate_rate, long* deriv, long* time_ref,
                                     /*output*/
                                     double* time,
-                                    double pos_out[3],
-                                    double vel_out[3],
-                                    double acc_out[3],
+                                    double pos_out[XO_MAX_LENGTH_3],
+                                    double vel_out[XO_MAX_LENGTH_3],
+                                    double acc_out[XO_MAX_LENGTH_3],
                                     long ierr[XO_NUM_ERR_OSV_COMPUTE]);
 
   long xo_orbit_data_filter(xo_orbit_id_init_data* orbit_data_in,

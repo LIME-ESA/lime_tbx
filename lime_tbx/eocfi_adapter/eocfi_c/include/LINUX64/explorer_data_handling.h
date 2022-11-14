@@ -162,11 +162,13 @@
  *              |         |          |                   |  + Enable support for AEM with     |
  *              |         |          |                   |    custom REF_FRAME used by EUM    |
  *              +-----------------------------------------------------------------------------+
+ *              |   4.23  | 23/06/22 | DEIMOS Space S.L.U| Maintenance release                |
+ *              +-----------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
-#ifndef _EXPLORER_DATA_HANDLING_H
-#define _EXPLORER_DATA_HANDLING_H
+#ifndef EXPLORER_DATA_HANDLING_H
+#define EXPLORER_DATA_HANDLING_H
 
 #include <explorer_file_handling.h>
 
@@ -235,11 +237,31 @@ extern "C"
 /* Maximum length of a string (function name or error message) */
 #define XD_MAX_STR 512
 
-// Maximum length of path (AN-821)
+/* Maximum length of path (AN-821) */
 #define XD_MAX_PATH 4096
 
 /* Maximum number of error codes that can be defined for a single function */
 #define XD_MAX_COD 256
+
+/* Generic maximum lengths */
+#define XD_MAX_LENGTH_2   2
+#define XD_MAX_LENGTH_3   3
+#define XD_MAX_LENGTH_4   4
+#define XD_MAX_LENGTH_5   5
+#define XD_MAX_LENGTH_6   6
+#define XD_MAX_LENGTH_8   8
+#define XD_MAX_LENGTH_9   9
+#define XD_MAX_LENGTH_10  10
+#define XD_MAX_LENGTH_15  15
+#define XD_MAX_LENGTH_20  20
+#define XD_MAX_LENGTH_24  24
+#define XD_MAX_LENGTH_25  25
+#define XD_MAX_LENGTH_29  29
+#define XD_MAX_LENGTH_30  30
+#define XD_MAX_LENGTH_31  31
+#define XD_MAX_LENGTH_32  32
+#define XD_MAX_LENGTH_100 100
+#define XD_MAX_LENGTH_250 250
 
 /* Error handling constants */
 #define XD_ZERO_E    0
@@ -365,6 +387,7 @@ extern "C"
     XD_SAT_CO2M = 151,
     XD_SAT_LSTM = 152,
     XD_SAT_FORUM = 153,
+    XD_SAT_TRUTHS = 154,
     XD_SAT_GENERIC = 200,
     XD_SAT_GENERIC_GEO = 300, /* ANR-353 */
     XD_SAT_MTG = 301, /* ANR-353 */
@@ -1531,12 +1554,12 @@ extern "C"
     char file_type[XD_MAX_STR];
     long version;
     char eoffs_version[XD_MAX_STR];
-    char val_start_date[32];
-    char val_stop_date[32];
+    char val_start_date[XD_MAX_LENGTH_32];
+    char val_stop_date[XD_MAX_LENGTH_32];
     char system[XD_MAX_STR];
     char creator[XD_MAX_STR];
     char creator_version[XD_MAX_STR];
-    char creation_date[32];
+    char creation_date[XD_MAX_LENGTH_32];
   } xd_fhr;
 
   typedef struct
@@ -1557,8 +1580,8 @@ extern "C"
 
   typedef struct
   {
-    xd_bulb_table table1[100];
-    xd_bulb_table table2[100];
+    xd_bulb_table table1[XD_MAX_LENGTH_100];
+    xd_bulb_table table2[XD_MAX_LENGTH_100];
   } xd_iers_bulletin_b;
 
   /* --------------------------------------------------- */
@@ -1671,8 +1694,8 @@ extern "C"
     long abs_orbit; /* absolute orbit */
     long ref_frame; /* reference frame */
     long time_ref_of; /* Reference time to be considered as original */
-    double pos[3]; /* position of the OSV (x, y, z) components*/
-    double vel[3]; /* velocity of the OSV (x, y, z) components*/
+    double pos[XD_MAX_LENGTH_3]; /* position of the OSV (x, y, z) components*/
+    double vel[XD_MAX_LENGTH_3]; /* velocity of the OSV (x, y, z) components*/
     double quality; /* quality index = uncertainty of the location in EF (LSB = 1cm)*/
   } xd_osv_rec;
 
@@ -1702,8 +1725,8 @@ extern "C"
   typedef struct
   {
     char filename[XD_MAX_STR];
-    char sensing_start[30]; /* UTC */
-    char sensing_stop[30]; /* UTC */
+    char sensing_start[XD_MAX_LENGTH_30]; /* UTC */
+    char sensing_stop[XD_MAX_LENGTH_30]; /* UTC */
     long rel_orbit;
     long abs_orbit;
     double delta_ut1;
@@ -1717,35 +1740,35 @@ extern "C"
     /* extra data: the following values are not read from the file.
      but it must be provided for the writing function */
     /*MPH*/
-    char proc_stage_code[10];
-    char ref_doc[24];
-    char proc_time[31];
-    char software_version[20];
-    char phase[2];
+    char proc_stage_code[XD_MAX_LENGTH_10];
+    char ref_doc[XD_MAX_LENGTH_24];
+    char proc_time[XD_MAX_LENGTH_31];
+    char software_version[XD_MAX_LENGTH_20];
+    char phase[XD_MAX_LENGTH_2];
     long cycle;
-    char state_vector_time[31];
+    char state_vector_time[XD_MAX_LENGTH_31];
     double x_position;
     double y_position;
     double z_position;
     double x_velocity;
     double y_velocity;
     double z_velocity;
-    char state_vector_source[3];
-    char product_err[2];
+    char state_vector_source[XD_MAX_LENGTH_3];
+    char product_err[XD_MAX_LENGTH_2];
     long tot_size;
     long num_data_sets;
 
     /*SPH*/
-    char sph_descriptor[29];
-    char sensing_start_tai[31]; /* TAI */
+    char sph_descriptor[XD_MAX_LENGTH_29];
+    char sensing_start_tai[XD_MAX_LENGTH_31]; /* TAI */
     long abs_orbit_start;
     double rel_time_asc_node_start;
-    char sensing_stop_tai[31]; /* TAI */
+    char sensing_stop_tai[XD_MAX_LENGTH_31]; /* TAI */
     long abs_orbit_stop;
     double rel_time_asc_node_stop;
-    char equator_cross_time[31];
+    char equator_cross_time[XD_MAX_LENGTH_31];
     long equator_cross_long;
-    char ascending_flag[2];
+    char ascending_flag[XD_MAX_LENGTH_2];
     long start_lat;
     long start_long;
     long stop_lat;
@@ -1816,14 +1839,13 @@ extern "C"
 
   typedef struct
   {
-    long num_terms[3];
+    long num_terms[XD_MAX_LENGTH_3];
     long harmonic_type_pitch[XD_MAX_NUM_HARMONIC];
     long harmonic_type_roll[XD_MAX_NUM_HARMONIC];
     long harmonic_type_yaw[XD_MAX_NUM_HARMONIC];
     double harmonic_coef_pitch[XD_MAX_NUM_HARMONIC];
     double harmonic_coef_roll[XD_MAX_NUM_HARMONIC];
     double harmonic_coef_yaw[XD_MAX_NUM_HARMONIC];
-
   } xd_harmonic_data;
 
   /* Structure containing Instrument View Direction Definition */
@@ -1851,7 +1873,7 @@ extern "C"
   {
     long angle_type;
     xd_harmonic_data harmonics;
-    double offsets[3];
+    double offsets[XD_MAX_LENGTH_3];
   } xd_harmonic_model_str;
 
   /* File model structure */
@@ -1860,6 +1882,7 @@ extern "C"
     long num_files;
     char** files;
     char* aux_file;
+    char* time_selection;
     long time_ref;
     double time0; /* time0=time1=0 for selecting the whole file*/
     double time1;
@@ -1868,15 +1891,15 @@ extern "C"
   /* Angle model structure */
   typedef struct
   {
-    double angles[3];
-    double offsets[3];
+    double angles[XD_MAX_LENGTH_3];
+    double offsets[XD_MAX_LENGTH_3];
   } xd_angle_model_str;
 
   /* Matrix model structure */
   typedef struct
   {
-    double att_matrix[3][3];
-    double offsets[3];
+    double att_matrix[XD_MAX_LENGTH_3][XD_MAX_LENGTH_3];
+    double offsets[XD_MAX_LENGTH_3];
   } xd_matrix_model_str;
 
   /* Attitude model union */
@@ -1973,8 +1996,8 @@ extern "C"
     long orbit_start; /* Start orbit of validity range */
     long orbit_stop; /* Stop orbit of validity range */
 
-    double pos[3];
-    double vel[3];
+    double pos[XD_MAX_LENGTH_3];
+    double vel[XD_MAX_LENGTH_3];
   } xd_stf_vhr;
 
   /* xd_stf_data */
@@ -1994,7 +2017,7 @@ extern "C"
   {
     long time_ref; /* time ref */
     double time; /* time */
-    double data[4]; /* Quaternions or angles:
+    double data[XD_MAX_LENGTH_4]; /* Quaternions or angles:
                             if angles, the fourth value is dummy */
   } xd_att_rec;
 
@@ -2027,7 +2050,7 @@ extern "C"
     long aberr_correction;
     char satellite[XD_MAX_STR];
     xd_tracker_limits str_limit;
-    double str_att_rot[3][3];
+    double str_att_rot[XD_MAX_LENGTH_3][XD_MAX_LENGTH_3];
   } xd_tracker_conf_file;
 
   /* --------------------------------------------- */
@@ -2037,7 +2060,7 @@ extern "C"
   /*  Star tracker quaternion */
   typedef struct
   {
-    float quaternion[4];
+    float quaternion[XD_MAX_LENGTH_4];
     double time; /* in STR_TIME_REF time reference */
     unsigned char status;
   } xd_star_tracker;
@@ -2073,8 +2096,8 @@ extern "C"
     long data_size; /* Size in bytes of the data stored in the files */
     long data_type; /* data type (int, long, float, double) */
 
-    double north_alt[4]; /* Altitude at the North pole cell */
-    double south_alt[4]; /* Altitude at the South pole cell */
+    double north_alt[XD_MAX_LENGTH_4]; /* Altitude at the North pole cell */
+    double south_alt[XD_MAX_LENGTH_4]; /* Altitude at the South pole cell */
 
     double offset_x;
     double offset_y; /* For ANR - 187: The points will be given for the center
@@ -2278,12 +2301,12 @@ extern "C"
   typedef struct
   {
     /* line 0 */
-    char norad_satcat[25]; /* Satellite name  consistent with the NORAD SATCAT */
+    char norad_satcat[XD_MAX_LENGTH_25]; /* Satellite name  consistent with the NORAD SATCAT */
 
     /* line 1 */
     long sat_number; /* NORAD Catalogue number */
     char classification; /* Classification: U=unclassified, S=secret data */
-    char int_des[9]; /* International Designator: (Last two digits of launch year) 
+    char int_des[XD_MAX_LENGTH_9]; /* International Designator: (Last two digits of launch year)
                                                         (Launch number of the year)
                                                         (Piece of the launch) */
     double time; /* reference time for the element set (UTC processing days MJ2000)*/
@@ -2372,10 +2395,10 @@ extern "C"
     // Line 1
     long type; // XD_SP3_file_type_enum (position of position+velocity)
     double global_time_start; // Gegorian initial time for all the file (MJD2000).
-    char data_used[6];
-    char coordinate_system[6];
-    char orbit_type[4];
-    char agency[5];
+    char data_used[XD_MAX_LENGTH_6];
+    char coordinate_system[XD_MAX_LENGTH_6];
+    char orbit_type[XD_MAX_LENGTH_4];
+    char agency[XD_MAX_LENGTH_5];
 
     // Line 2
     long gps_week;
@@ -2396,7 +2419,7 @@ extern "C"
     double clock_std_dev; // base number for computing the standard deviations for the clock correction and the rate-of-change of the clock correction (units: picosec and 10**-4 picosec/sec)
 
     // Lines 19-22
-    char* comments[4]; // Comments
+    char* comments[XD_MAX_LENGTH_4]; // Comments
 
     double delta_tai_gps; // Delta TAI-GPS [seconds]
 
@@ -2408,9 +2431,9 @@ extern "C"
   typedef struct
   {
     // OEM Header
-    char ccsds_oem_vers[5];
+    char ccsds_oem_vers[XD_MAX_LENGTH_5];
     char comment_header[XD_MAX_STR];
-    char creation_date[25];
+    char creation_date[XD_MAX_LENGTH_25];
     char originator[XD_MAX_STR];
 
     // OEM METADATA
@@ -2419,14 +2442,14 @@ extern "C"
     char object_id[XD_MAX_STR];
     char center_name[XD_MAX_STR];
     char ref_frame[XD_MAX_STR];
-    char ref_frame_epoch[25];
-    char time_system[4];
-    char start_time[25];
-    char useable_start_time[25];
-    char useable_stop_time[25];
-    char stop_time[25];
+    char ref_frame_epoch[XD_MAX_LENGTH_25];
+    char time_system[XD_MAX_LENGTH_4];
+    char start_time[XD_MAX_LENGTH_25];
+    char useable_start_time[XD_MAX_LENGTH_25];
+    char useable_stop_time[XD_MAX_LENGTH_25];
+    char stop_time[XD_MAX_LENGTH_25];
     char interpolation[XD_MAX_STR];
-    char interpolation_degree[2];
+    char interpolation_degree[XD_MAX_LENGTH_2];
 
     //EPHEMERIS DATA LINES
     xd_osv_rec* osv_rec; /* array of state vectors */
@@ -2443,18 +2466,18 @@ extern "C"
     char center_name[XD_MAX_STR];
     char ref_frame_A[XD_MAX_STR];
     char ref_frame_B[XD_MAX_STR];
-    char attitude_dir[4];
-    char time_system[4];
-    char start_time[25];
-    char useable_start_time[25];
-    char useable_stop_time[25];
-    char stop_time[25];
+    char attitude_dir[XD_MAX_LENGTH_4];
+    char time_system[XD_MAX_LENGTH_4];
+    char start_time[XD_MAX_LENGTH_25];
+    char useable_start_time[XD_MAX_LENGTH_25];
+    char useable_stop_time[XD_MAX_LENGTH_25];
+    char stop_time[XD_MAX_LENGTH_25];
     char attitude_type[XD_MAX_STR];
     char quaternion_type[XD_MAX_STR];
-    char euler_rot_seq[4];
-    char rate_frame[15];
+    char euler_rot_seq[XD_MAX_LENGTH_4];
+    char rate_frame[XD_MAX_LENGTH_15];
     char interpolation[XD_MAX_STR];
-    char interpolation_degree[2];
+    char interpolation_degree[XD_MAX_LENGTH_2];
   } xd_aem_metadata;
 
   typedef struct
@@ -2462,7 +2485,7 @@ extern "C"
     long data_type; // data type XD_Attitude_data_type_enum
     long time_ref;
     double time;
-    double data[8];
+    double data[XD_MAX_LENGTH_8];
   } xd_aem_att_rec;
 
   typedef struct
@@ -2481,9 +2504,9 @@ extern "C"
   typedef struct
   {
     // AEM Header
-    char ccsds_aem_vers[5];
+    char ccsds_aem_vers[XD_MAX_LENGTH_5];
     char comment_header[XD_MAX_STR];
-    char creation_date[25];
+    char creation_date[XD_MAX_LENGTH_25];
     char originator[XD_MAX_STR];
 
     xd_aem_segment* segment;
@@ -2979,7 +3002,7 @@ extern "C"
     XD_FFS_ERROR
   } XD_EOFFS_version;
 
-  static const char file_format_standard_version[sizeof(XD_EOFFS_version) + 2][250] = {"DEFAULT", "1.0", "2.0", "3.0", "MAX", "ERROR"};
+  static const char file_format_standard_version[sizeof(XD_EOFFS_version) + 2][XD_MAX_LENGTH_250] = {"DEFAULT", "1.0", "2.0", "3.0", "MAX", "ERROR"};
   extern XD_EOFFS_version eoffs_version;
 
 /* Alias for xx_check_library_version */

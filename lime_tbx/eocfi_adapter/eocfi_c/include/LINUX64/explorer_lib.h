@@ -218,11 +218,13 @@
  *               +----------------------------------------------------------------------------------+
  *               |   4.22  | 22/12/21 | DEIMOS Space S.L.U| Maintenance release                     |
  *               +----------------------------------------------------------------------------------+
+ *               |   4.23  | 23/06/22 | DEIMOS Space S.L.U| Maintenance release                     |
+ *               +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
-#ifndef _EXPLORER_LIB_H
-#define _EXPLORER_LIB_H
+#ifndef EXPLORER_LIB_H
+#define EXPLORER_LIB_H
 
 #include <explorer_data_handling.h>
 #include <explorer_file_handling.h>
@@ -317,6 +319,14 @@
 #define XL_MAX_T_FIELD_CUC_UNIT_OCTETS    7
 #define XL_MAX_T_FIELD_CUC_SUBUNIT_OCTETS 10
 #define XL_MAX_CUC_ARRAY_LENGTH           (XL_MAX_P_FIELD_CUC_UNIT_OCTETS + XL_MAX_T_FIELD_CUC_UNIT_OCTETS + XL_MAX_T_FIELD_CUC_SUBUNIT_OCTETS)
+
+/* Generic maximum lengths */
+#define XL_MAX_LENGTH_2  2
+#define XL_MAX_LENGTH_3  3
+#define XL_MAX_LENGTH_4  4
+#define XL_MAX_LENGTH_6  6
+#define XL_MAX_LENGTH_9  9
+#define XL_MAX_LENGTH_25 25
 
 #ifdef __cplusplus
 extern "C"
@@ -413,6 +423,7 @@ extern "C"
     XL_SAT_CO2M = 151,
     XL_SAT_LSTM = 152,
     XL_SAT_FORUM = 153,
+    XL_SAT_TRUTHS = 154,
     XL_SAT_GENERIC = 200,
     XL_SAT_GENERIC_GEO = 300, /* ANR-353 */
     XL_SAT_MTG = 301, /* ANR-353 */
@@ -934,14 +945,14 @@ extern "C"
   {
     long sat_id;
     double time0;
-    unsigned long obt0[2];
+    unsigned long obt0[XL_MAX_LENGTH_2];
     unsigned long period0;
   } xl_envisat_obt_param;
 
   typedef struct
   {
     long sat_id;
-    unsigned long obt[2];
+    unsigned long obt[XL_MAX_LENGTH_2];
   } xl_envisat_obt_value;
 
   /* GOCE OBT Structure */
@@ -1009,9 +1020,9 @@ extern "C"
   {
     XL_CS_rl_enum cs;
     XL_Deriv_enum deriv;
-    double v[3];
-    double vd[3];
-    double v2d[3];
+    double v[XL_MAX_LENGTH_3];
+    double vd[XL_MAX_LENGTH_3];
+    double v2d[XL_MAX_LENGTH_3];
   } xl_cord;
 
   /* Azimuth/ elevation definition */
@@ -1031,12 +1042,12 @@ extern "C"
     XL_Attitude_fr_enum ref_f;
     XL_Boolean amb_flag;
     XL_Deriv_enum deriv;
-    double v[3];
-    double vd[3];
-    double v2d[3];
-    double m[3][3];
-    double md[3][3];
-    double m2d[3][3];
+    double v[XL_MAX_LENGTH_3];
+    double vd[XL_MAX_LENGTH_3];
+    double v2d[XL_MAX_LENGTH_3];
+    double m[XL_MAX_LENGTH_3][XL_MAX_LENGTH_3];
+    double md[XL_MAX_LENGTH_3][XL_MAX_LENGTH_3];
+    double m2d[XL_MAX_LENGTH_3][XL_MAX_LENGTH_3];
   } xl_cs_tra;
 
   /* data from model */
@@ -1147,8 +1158,8 @@ long xl_model_set_data(xl_model_id* model_id,
                        xl_model_data* model_data);
 */
 
-  /* Time Id. Accesors */
-  /* ----------------- */
+  /* Time Id. Accessors */
+  /* ------------------ */
 
   long xl_time_init_status(xl_time_id* time_id);
 
@@ -1160,6 +1171,8 @@ long xl_model_set_data(xl_model_id* model_id,
 
   long xl_time_set_id_data(xl_time_id* time_id, xl_time_id_data* data);
 
+  void xl_time_free_id_data(xl_time_id_data* data);
+
   /* Time initialization functions */
   /* ----------------------------- */
   long xl_time_ref_init_file(long* time_model, long* n_files, char** time_file, long* time_init_mode, long* time_ref, double* time0, double* time1, long* orbit0, long* orbit1,
@@ -1169,7 +1182,7 @@ long xl_model_set_data(xl_model_id* model_id,
                              xl_time_id* time_id,
                              long ierr[XL_NUM_ERR_TIME_REF_INIT_FILE]);
 
-  long xl_time_ref_init(double time[4], long* orbit_num, double* anx_time, double* orbit_duration,
+  long xl_time_ref_init(double time[XL_MAX_LENGTH_4], long* orbit_num, double* anx_time, double* orbit_duration,
                         /* output */
                         xl_time_id* time_id,
                         long ierr[XL_NUM_ERR_TIME_REF_INIT]);
@@ -1440,38 +1453,38 @@ long xl_model_set_data(xl_model_id* model_id,
   /* Ephemerides functions */
   long xl_sun(xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time,
               /* output */
-              double sun_pos[3],
-              double sun_vel[3],
+              double sun_pos[XL_MAX_LENGTH_3],
+              double sun_vel[XL_MAX_LENGTH_3],
               long ierr[XL_NUM_ERR_SUN]);
 
   long xl_sun_run(long* run_id, long* time_ref, double* time,
                   /* output */
-                  double sun_pos[3],
-                  double sun_vel[3],
+                  double sun_pos[XL_MAX_LENGTH_3],
+                  double sun_vel[XL_MAX_LENGTH_3],
                   long ierr[XL_NUM_ERR_SUN]);
 
   long xl_moon(xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time,
                /* output */
-               double moon_pos[3],
-               double moon_vel[3],
+               double moon_pos[XL_MAX_LENGTH_3],
+               double moon_vel[XL_MAX_LENGTH_3],
                long ierr[XL_NUM_ERR_MOON]);
 
   long xl_moon_run(long* run_id, long* time_ref, double* time,
                    /* output */
-                   double moon_pos[3],
-                   double moon_vel[3],
+                   double moon_pos[XL_MAX_LENGTH_3],
+                   double moon_vel[XL_MAX_LENGTH_3],
                    long ierr[XL_NUM_ERR_MOON]);
 
   long xl_planet(xl_model_id* model_id, xl_time_id* time_id, long* planet, long* time_ref, double* time,
                  /* output */
-                 double planet_pos[3],
-                 double planet_vel[3],
+                 double planet_pos[XL_MAX_LENGTH_3],
+                 double planet_vel[XL_MAX_LENGTH_3],
                  long ierr[XL_NUM_ERR_PLANET]);
 
   long xl_planet_run(long* run_id, long* planet, long* time_ref, double* time,
                      /* output */
-                     double planet_pos[3],
-                     double planet_vel[3],
+                     double planet_pos[XL_MAX_LENGTH_3],
+                     double planet_vel[XL_MAX_LENGTH_3],
                      long ierr[XL_NUM_ERR_PLANET]);
 
   long xl_star_radec(xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time, double* ra0, double* dec0, double* mu_ra, double* mu_dec, double* rad_vel, double* par,
@@ -1499,17 +1512,17 @@ long xl_model_set_data(xl_model_id* model_id,
                            long ierr[XL_NUM_ERR_STAR_CATALOG]);
 
   /* Reference system transformations */
-  long xl_change_cart_cs(xl_model_id* model_id, xl_time_id* time_id, long* mode, long* cs_in, long* cs_out, long* time_ref, double* time, double pos[3], double vel[3], double acc[3],
+  long xl_change_cart_cs(xl_model_id* model_id, xl_time_id* time_id, long* mode, long* cs_in, long* cs_out, long* time_ref, double* time, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double acc[XL_MAX_LENGTH_3],
                          /* output */
-                         double pos_out[3],
-                         double vel_out[3],
-                         double acc_out[3]);
+                         double pos_out[XL_MAX_LENGTH_3],
+                         double vel_out[XL_MAX_LENGTH_3],
+                         double acc_out[XL_MAX_LENGTH_3]);
 
-  long xl_change_cart_cs_run(long* run_id, long* mode, long* cs_in, long* cs_out, long* time_ref, double* time, double pos[3], double vel[3], double acc[3],
+  long xl_change_cart_cs_run(long* run_id, long* mode, long* cs_in, long* cs_out, long* time_ref, double* time, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double acc[XL_MAX_LENGTH_3],
                              /* output */
-                             double pos_out[3],
-                             double vel_out[3],
-                             double acc_out[3]);
+                             double pos_out[XL_MAX_LENGTH_3],
+                             double vel_out[XL_MAX_LENGTH_3],
+                             double acc_out[XL_MAX_LENGTH_3]);
 
   long xl_cart_to_geod(xl_model_id* model_id, long* mode, double* pos, double* vel,
                        /* output */
@@ -1541,41 +1554,41 @@ long xl_model_set_data(xl_model_id* model_id,
 
   long xl_kepl_to_cart(xl_model_id* model_id,
                        long* kepl_mode,
-                       double kepl_in[6],
+                       double kepl_in[XL_MAX_LENGTH_6],
                        /* output */
-                       double pos_out[3],
-                       double vel_out[3],
+                       double pos_out[XL_MAX_LENGTH_3],
+                       double vel_out[XL_MAX_LENGTH_3],
                        long ierr[XL_NUM_ERR_KEPL_CART]);
 
   long xl_kepl_to_cart_run(long* run_id,
                            long* kepl_mode,
-                           double kepl_in[6],
+                           double kepl_in[XL_MAX_LENGTH_6],
                            /* output */
-                           double pos_out[3],
-                           double vel_out[3],
+                           double pos_out[XL_MAX_LENGTH_3],
+                           double vel_out[XL_MAX_LENGTH_3],
                            long ierr[XL_NUM_ERR_KEPL_CART]);
 
   long xl_cart_to_kepl(xl_model_id* model_id,
-                       double pos_in[3],
-                       double vel_in[3],
+                       double pos_in[XL_MAX_LENGTH_3],
+                       double vel_in[XL_MAX_LENGTH_3],
                        long* kepl_mode,
                        /* output */
-                       double kepl_out[6],
+                       double kepl_out[XL_MAX_LENGTH_6],
                        long ierr[XL_NUM_ERR_CART_KEPL]);
 
   long xl_cart_to_kepl_run(long* run_id,
-                           double pos_in[3],
-                           double vel_in[3],
+                           double pos_in[XL_MAX_LENGTH_3],
+                           double vel_in[XL_MAX_LENGTH_3],
                            long* kepl_mode,
                            /* output */
-                           double kepl_out[6],
+                           double kepl_out[XL_MAX_LENGTH_6],
                            long ierr[XL_NUM_ERR_CART_KEPL]);
 
   long xl_cart_to_radec(xl_model_id* model_id,
                         long* mode,
                         long* cs_in,
-                        double pos[3],
-                        double vel[3],
+                        double pos[XL_MAX_LENGTH_3],
+                        double vel[XL_MAX_LENGTH_3],
                         /* output */
                         double* ra,
                         double* dec,
@@ -1588,8 +1601,8 @@ long xl_model_set_data(xl_model_id* model_id,
   long xl_cart_to_radec_run(long* run_id,
                             long* mode,
                             long* cs_in,
-                            double pos[3],
-                            double vel[3],
+                            double pos[XL_MAX_LENGTH_3],
+                            double vel[XL_MAX_LENGTH_3],
                             /* output */
                             double* ra,
                             double* dec,
@@ -1609,8 +1622,8 @@ long xl_model_set_data(xl_model_id* model_id,
                         double* rad_vel,
                         double* par,
                         /* output */
-                        double pos[3],
-                        double vel[3],
+                        double pos[XL_MAX_LENGTH_3],
+                        double vel[XL_MAX_LENGTH_3],
                         long ierr[XL_NUM_ERR_RADEC_CART]);
 
   long xl_radec_to_cart_run(long* run_id,
@@ -1623,23 +1636,23 @@ long xl_model_set_data(xl_model_id* model_id,
                             double* rad_vel,
                             double* par,
                             /* output */
-                            double pos[3],
-                            double vel[3],
+                            double pos[XL_MAX_LENGTH_3],
+                            double vel[XL_MAX_LENGTH_3],
                             long ierr[XL_NUM_ERR_RADEC_CART]);
 
-  long xl_topocentric_to_ef(xl_model_id* model_id, long* mode, long* deriv, double pos[3], double vel[3], double* azim, double* elev, double* range, double* azim_d, double* elev_d, double* range_d,
+  long xl_topocentric_to_ef(xl_model_id* model_id, long* mode, long* deriv, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double* azim, double* elev, double* range, double* azim_d, double* elev_d, double* range_d,
                             /* output */
-                            double ef_dir[3],
-                            double ef_dir_d[3],
+                            double ef_dir[XL_MAX_LENGTH_3],
+                            double ef_dir_d[XL_MAX_LENGTH_3],
                             long ierr[XL_NUM_ERR_TOP_TO_EF]);
 
-  long xl_topocentric_to_ef_run(long* run_id, long* mode, long* deriv, double pos[3], double vel[3], double* azim, double* elev, double* range, double* azim_d, double* elev_d, double* range_d,
+  long xl_topocentric_to_ef_run(long* run_id, long* mode, long* deriv, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double* azim, double* elev, double* range, double* azim_d, double* elev_d, double* range_d,
                                 /* output */
-                                double ef_dir[3],
-                                double ef_dir_d[3],
+                                double ef_dir[XL_MAX_LENGTH_3],
+                                double ef_dir_d[XL_MAX_LENGTH_3],
                                 long ierr[XL_NUM_ERR_TOP_TO_EF]);
 
-  long xl_ef_to_topocentric(xl_model_id* model_id, long* mode, long* deriv, double pos[3], double vel[3], double ef_dif[3], double ef_dir_d[3],
+  long xl_ef_to_topocentric(xl_model_id* model_id, long* mode, long* deriv, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double ef_dif[XL_MAX_LENGTH_3], double ef_dir_d[XL_MAX_LENGTH_3],
                             /* output */
                             double* azim,
                             double* elev,
@@ -1649,7 +1662,7 @@ long xl_model_set_data(xl_model_id* model_id,
                             double* range_d,
                             long ierr[XL_NUM_ERR_EF_TO_TOP]);
 
-  long xl_ef_to_topocentric_run(long* run_id, long* mode, long* deriv, double pos[3], double vel[3], double ef_dif[3], double ef_dir_d[3],
+  long xl_ef_to_topocentric_run(long* run_id, long* mode, long* deriv, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double ef_dif[XL_MAX_LENGTH_3], double ef_dir_d[XL_MAX_LENGTH_3],
                                 /* output */
                                 double* azim,
                                 double* elev,
@@ -1659,14 +1672,14 @@ long xl_model_set_data(xl_model_id* model_id,
                                 double* range_d,
                                 long ierr[XL_NUM_ERR_EF_TO_TOP]);
 
-  long xl_euler_to_matrix(double ang[3],
+  long xl_euler_to_matrix(double ang[XL_MAX_LENGTH_3],
                           /* output */
-                          double matrix[3][3],
+                          double matrix[XL_MAX_LENGTH_3][XL_MAX_LENGTH_3],
                           long ierr[XL_NUM_ERR_EULER_TO_MATRIX]);
 
-  long xl_matrix_to_euler(double matrix[3][3],
+  long xl_matrix_to_euler(double matrix[XL_MAX_LENGTH_3][XL_MAX_LENGTH_3],
                           /* output */
-                          double ang[3],
+                          double ang[XL_MAX_LENGTH_3],
                           long ierr[XL_NUM_ERR_MATRIX_TO_EULER]);
 
   /* Geodesic functions */
@@ -1699,8 +1712,8 @@ long xl_model_set_data(xl_model_id* model_id,
 
   long xl_set_tle_sat_data(long* sat_id,
                            long* norad_sat_number,
-                           char norad_satcat[25],
-                           char int_des[9]);
+                           char norad_satcat[XL_MAX_LENGTH_25],
+                           char int_des[XL_MAX_LENGTH_9]);
 
   long xl_set_sp3_sat_data(long sat_id,
                            const char* sp3_id);
@@ -1745,7 +1758,7 @@ long xl_model_set_data(xl_model_id* model_id,
                                  long ierr[XL_NUM_ERR_VEC_TO_QUATERNION]);
 
   /* xl_position_on_orbit */
-  long xl_position_on_orbit(xl_model_id* model_id, xl_time_id* time_id, long* angle_type, long* time_ref, double* time, double pos[3], double vel[3], double acc[3], long* deriv,
+  long xl_position_on_orbit(xl_model_id* model_id, xl_time_id* time_id, long* angle_type, long* time_ref, double* time, double pos[XL_MAX_LENGTH_3], double vel[XL_MAX_LENGTH_3], double acc[XL_MAX_LENGTH_3], long* deriv,
                             /* Output */
                             double* angle,
                             double* angle_rate,
@@ -1756,9 +1769,9 @@ long xl_model_set_data(xl_model_id* model_id,
                                 long* angle_type,
                                 long* time_ref,
                                 double* time,
-                                double pos[3],
-                                double vel[3],
-                                double acc[3],
+                                double pos[XL_MAX_LENGTH_3],
+                                double vel[XL_MAX_LENGTH_3],
+                                double acc[XL_MAX_LENGTH_3],
                                 long* deriv,
                                 /* Output */
                                 double* angle,

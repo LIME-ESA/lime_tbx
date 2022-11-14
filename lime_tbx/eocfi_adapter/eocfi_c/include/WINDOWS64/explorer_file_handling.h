@@ -1,8 +1,8 @@
 /*!
     @file   explorer_file_handling.h
     @brief  Public header file for the explorer_file_handling library.
-    @version  4.22
-    @date   22/12/2021
+    @version  4.23
+    @date   23/06/2022
 
     <b>Copyright DEIMOS SPACE S.L.U</b>
 
@@ -19,24 +19,24 @@
 
     <center><b>Software User Manual
 
-    EE-MA-DMS-GS-008 Issue 4.22
+    EE-MA-DMS-GS-008 Issue 4.23
 
-    22/12/2021</b></center>
+    23/06/2022</b></center>
 
 
     @htmlinclude usage_guide.html
 
 */
 
-#ifndef _EXPLORER_FILE_HANDLING_H
-#define _EXPLORER_FILE_HANDLING_H
+#ifndef EXPLORER_FILE_HANDLING_H
+#define EXPLORER_FILE_HANDLING_H
 
 /* Constants */
 /* ========= */
 
 /*! @def XF_MAX_FILES_NUMBER
          Maximum number of open files allowed*/
-#define XF_MAX_FILES_NUMBER 10
+#define XF_MAX_FILES_NUMBER 512
 /*! @def XF_MAX_ERROR_MSG_LENGTH
          Maximum number of characters in error message*/
 #define XF_MAX_ERROR_MSG_LENGTH 512
@@ -2247,6 +2247,7 @@ extern "C"
     XF_SAT_CO2M = 151,
     XF_SAT_LSTM = 152,
     XF_SAT_FORUM = 153,
+    XF_SAT_TRUTHS = 154,
     XF_SAT_GENERIC = 200,
     XF_SAT_GENERIC_GEO = 300, /* ANR-353 */
     XF_SAT_MTG = 301, /* ANR-353 */

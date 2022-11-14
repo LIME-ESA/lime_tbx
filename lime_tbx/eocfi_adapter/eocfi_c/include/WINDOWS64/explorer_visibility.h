@@ -171,10 +171,12 @@
  *             +----------------------------------------------------------------------------------+
  *             |   4.22  | 22/12/21 | DEIMOS Space S.L.U    | Maintenance release                 |
  *             +----------------------------------------------------------------------------------+
+ *             |   4.23  | 23/06/22 | DEIMOS Space S.L.U    | Maintenance release                 |
+ *             +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
-#ifndef _EXPLORER_VISIBILITY_H
-#define _EXPLORER_VISIBILITY_H
+#ifndef EXPLORER_VISIBILITY_H
+#define EXPLORER_VISIBILITY_H
 
 #include <explorer_lib.h>
 #include <explorer_orbit.h>
@@ -1696,6 +1698,7 @@ typedef enum
   XV_SAT_CO2M = XL_SAT_CO2M,
   XV_SAT_LSTM = XL_SAT_LSTM,
   XV_SAT_FORUM = XL_SAT_FORUM,
+  XV_SAT_TRUTHS = XL_SAT_TRUTHS,
   XV_SAT_GENERIC = XL_SAT_GENERIC,
   XV_SAT_GENERIC_GEO = XL_SAT_GENERIC_GEO, /* ANR-353 */
   XV_SAT_MTG = XL_SAT_MTG, /* ANR-353 */
@@ -1953,7 +1956,8 @@ typedef enum
   XV_CFI_ZONE_VIS_TIME_SWATH_FLAG_LARGER_THAN_LIN_APPROX_VAL_WARN,
   XV_CFI_ZONE_VIS_TIME_GEO_SAT_ERR,
   XV_CFI_ZONE_VIS_TIME_DEPRECATED_WARN,
-  XV_CFI_ZONE_VIS_TIME_PRECISE_PROPAG_WARN
+  XV_CFI_ZONE_VIS_TIME_PRECISE_PROPAG_WARN,
+  XV_CFI_ZONE_VIS_TIME_CHECK_ORBIT_VS_STF_WARN
 } XV_CFI_Zone_vis_time_err_enum;
 
 /* Error codes list of xv_zonevistime_compute (AN-468) */
@@ -2000,7 +2004,8 @@ typedef enum
   XV_CFI_ZONEVISTIME_COMPUTE_ORBIT_VALIDITY_ERR, // AN-663
   XV_CFI_ZONEVISTIME_COMPUTE_ORBIT_VAL_START_WARN, // AN-663
   XV_CFI_ZONEVISTIME_COMPUTE_ORBIT_VAL_STOP_WARN, // AN-663
-  XV_CFI_ZONEVISTIME_COMPUTE_ADJUST_TO_ORBIT_VALIDITY_ERR // AN-663
+  XV_CFI_ZONEVISTIME_COMPUTE_ADJUST_TO_ORBIT_VALIDITY_ERR, // AN-663
+  XV_CFI_ZONEVISTIME_COMPUTE_CHECK_ORBIT_VS_STF_WARN // AN-961
 } XV_CFI_Zonevistime_compute_err_enum;
 
 /* Error codes list of xv_stationvistime_compute (AN-468) */

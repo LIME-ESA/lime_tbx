@@ -48,7 +48,7 @@ CFLAGS = \
         /D "WIN64"\
         /D "_WINDOWS"\
         /D "WINDOWS"\
-        /I "include"
+        /I "include\$(OS)"
 
 #------------------------------------------------------------------------------
 #       Linker tool, flags and libraries

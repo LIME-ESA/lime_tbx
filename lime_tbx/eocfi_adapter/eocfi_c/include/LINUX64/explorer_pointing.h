@@ -197,10 +197,12 @@
  *               +--------------------------------------------------------------------------------+
  *               |   4.22  |22/12/21| DEIMOS Space S.L.U| Maintenance release                     |
  *               +--------------------------------------------------------------------------------+
+ *               |   4.23  |23/06/22| DEIMOS Space S.L.U| Maintenance release                     |
+ *               +--------------------------------------------------------------------------------+
  *
  *****************************************************************************/
-#ifndef _EXPLORER_POINTING_H
-#define _EXPLORER_POINTING_H
+#ifndef EXPLORER_POINTING_H
+#define EXPLORER_POINTING_H
 
 #include <explorer_lib.h>
 #include <explorer_orbit.h>
@@ -2139,6 +2141,7 @@ typedef enum
   XP_SAT_CO2M = XL_SAT_CO2M,
   XP_SAT_LSTM = XL_SAT_LSTM,
   XP_SAT_FORUM = XL_SAT_FORUM,
+  XP_SAT_TRUTHS = XL_SAT_TRUTHS,
   XP_SAT_GENERIC = XL_SAT_GENERIC,
   XP_SAT_GENERIC_GEO = XL_SAT_GENERIC_GEO, /* ANR-353 */
   XP_SAT_MTG = XL_SAT_MTG, /* ANR-353 */
