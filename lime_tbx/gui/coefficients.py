@@ -94,6 +94,7 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
     def __init__(self, settings_manager: ISettingsManager, parent=None):
         super().__init__(parent)
         self.settings_manager = settings_manager
+        self._downloading = False
         self._build_layout()
         self._start_downloading()
 
@@ -122,6 +123,7 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         self.main_layout.addLayout(self.buttons_layout)
 
     def _start_downloading(self):
+        self._downloading = True
         self.spinner.setVisible(True)
         self.spinner.movie_start()
         self.worker = CallbackWorker(
@@ -136,6 +138,7 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         _start_thread(self.worker, self.worker_th, finished, error, info)
 
     def _finished_loading(self):
+        self._downloading = False
         self.spinner.setVisible(False)
         self.spinner.movie_stop()
         self.ok_button.setDisabled(False)
@@ -155,6 +158,7 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def cancel_clicked(self):
-        self.worker.stop()
-        self.worker_th.quit()
+        if self._downloading:
+            self.worker.stop()
+            self.worker_th.quit()
         self.close()
