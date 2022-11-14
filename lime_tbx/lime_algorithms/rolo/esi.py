@@ -11,7 +11,7 @@ It exports the following functions:
 import pkgutil
 import csv
 from io import StringIO
-from typing import Dict, Tuple, Union, List
+from typing import Dict, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -55,7 +55,7 @@ def _get_wehrli_data() -> Dict[float, Tuple[float, float]]:
     return _loaded_data
 
 
-def get_esi_per_nms(wavelengths_nm: List[float]) -> np.ndarray:
+def get_esi_per_nms(wavelengths_nm: np.ndarray) -> np.ndarray:
     """Gets the expected extraterrestrial solar irradiance at some concrete wavelengths
     Returns the data in Wm⁻²/nm.
 
@@ -64,7 +64,7 @@ def get_esi_per_nms(wavelengths_nm: List[float]) -> np.ndarray:
 
     Parameters
     ----------
-    wavelengths_nm : list of float
+    wavelengths_nm : np.array of float
         Wavelengths (in nanometers) of which the extraterrestrial solar irradiance will be
         obtained
 
