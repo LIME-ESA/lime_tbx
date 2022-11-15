@@ -30,12 +30,20 @@ def _is_valid_appdata(appdata: str) -> bool:
         except Exception as e:
             logger.get_logger().critical(e)
             return False
+    cpath = path.join(appdata, "coeff_data")
+    if not path.exists(cpath):
+        try:
+            os.makedirs(cpath)
+        except Exception as e:
+            logger.get_logger().critical(e)
+            return False
     return True
 
 
 def _is_valid_programfiles(programdata: str) -> bool:
     if path.exists(path.join(programdata, "kernels")) and path.exists(
         path.join(programdata, "eocfi_data")
+        and path.exists(path.join(programdata, "coeff_data"))
     ):
         return True
     return False
@@ -68,13 +76,15 @@ def get_programfiles_folder() -> str:
             programfiles = winreg.QueryValueEx(a_key, "InstallPath")[0]
         except:
             valid = False
-        if not valid: # Search for admin uninstall key
-            sub_key_admin = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
+        if not valid:  # Search for admin uninstall key
+            sub_key_admin = (
+                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
+            )
             try:
                 a_key = winreg.OpenKey(a_reg, sub_key_admin)
             except:
                 valid = False
-            if not valid: # Search for user uninstall key
+            if not valid:  # Search for user uninstall key
                 sub_key_user = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
                 a_reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
                 valid = True

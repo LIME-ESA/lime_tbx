@@ -1,6 +1,7 @@
 mkdir -p linux/installer_files
 [ ! -d "linux/installer_files/kernels" ] && cp -r ../kernels linux/installer_files
 [ ! -d "linux/installer_files/eocfi_data" ] && cp -r ../eocfi_data linux/installer_files
+[ ! -d "linux/installer_files/coeff_data" ] && cp -r ../coeff_data linux/installer_files
 [ -d "linux/installer_files/LimeTBX" ] && rm -rf linux/installer_files/LimeTBX
 [ -f "linux/lime_installer.zip" ] && rm -f linux/lime_installer.zip
 cp -r ../dist/LimeTBX linux/installer_files

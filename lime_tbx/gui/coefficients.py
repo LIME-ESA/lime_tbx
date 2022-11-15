@@ -15,6 +15,7 @@ from lime_tbx.gui.util import (
     WorkerStopper,
 )
 from lime_tbx.datatypes import logger
+from lime_tbx.coefficients.update.update import IUpdate, Update
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -77,7 +78,12 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
         self.close()
 
 
-def _callback_download(stopper: WorkerStopper):
+def _callback_download(stopper: WorkerStopper) -> bool:
+    updater: IUpdate = Update()
+    if updater.check_for_updates():
+        updater.download_coefficients()
+        return True
+    return False
     import time
 
     for _ in range(10):
@@ -143,8 +149,13 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         self.spinner.movie_stop()
         self.ok_button.setDisabled(False)
 
-    def download_finished(self):
-        self.title_label.setText("Download finished.\nThere were no updates.")
+    def download_finished(self, updates: bool):
+        msg = "Download finished.\nThere were no updates."
+        if updates:
+            "Download finished.\nThere were updates."
+        self.title_label.setText(msg)
+        if updates:
+            self.settings_manager.reload_coeffs()
         self._finished_loading()
 
     def download_error(self, error: Exception):

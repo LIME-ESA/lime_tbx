@@ -4,7 +4,7 @@ This module contains the functionality that access to local coefficients data an
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, List
 import pkgutil
 import csv
 from io import StringIO
@@ -22,6 +22,7 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
+from . import appdata
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -148,7 +149,7 @@ def _get_coefficients_data() -> Dict[
     return data
 
 
-def get_default_cimel_coeffs() -> ReflectanceCoefficients:
+def read_cimel_coeffs(filepath: str) -> ReflectanceCoefficients:
     # define dim_size_dict to specify size of arrays
     dim_sizes = {
         "wavelength": 6,
@@ -161,9 +162,7 @@ def get_default_cimel_coeffs() -> ReflectanceCoefficients:
     ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data = np.genfromtxt(
-        os.path.join(current_dir, "assets/coefficients_cimel.csv"), delimiter=","
-    )
+    data = np.genfromtxt(os.path.join(current_dir, filepath), delimiter=",")
     u_data = np.genfromtxt(
         os.path.join(current_dir, "assets/u_coefficients_cimel.csv"), delimiter=","
     )
@@ -172,3 +171,21 @@ def get_default_cimel_coeffs() -> ReflectanceCoefficients:
     ds_cimel.u_coeff.values = u_data.T
 
     return ReflectanceCoefficients(ds_cimel, "vDemo")
+
+
+def get_default_cimel_coeffs() -> ReflectanceCoefficients:
+    return read_cimel_coeffs("assets/coefficients_cimel.csv")
+
+
+def get_all_cimel_coefficients() -> List[ReflectanceCoefficients]:
+    folder = os.path.join(appdata.get_programfiles_folder(), "coeff_data", "versions")
+    version_files = os.listdir(folder)
+    coeffs = []
+    for vf in version_files:
+        coeffs.append()
+    return coeffs
+
+
+def get_coefficients_filenames() -> List[str]:
+    folder = os.path.join(appdata.get_programfiles_folder(), "coeff_data", "versions")
+    return os.listdir(folder)
