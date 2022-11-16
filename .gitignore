@@ -127,3 +127,6 @@ ignore_folder
 
 # Mac filesystem
 .DS_Store
+
+# Logfiles
+./log_*.txt
