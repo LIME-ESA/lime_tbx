@@ -1,7 +1,7 @@
 """GUI Widgets related to the coefficients actions."""
 
 """___Built-In Modules___"""
-from typing import Callable
+from typing import Callable, Tuple
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -78,12 +78,12 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
         self.close()
 
 
-def _callback_download(stopper: WorkerStopper) -> bool:
+def _callback_download(stopper: WorkerStopper) -> Tuple[bool]:
     updater: IUpdate = Update()
     if updater.check_for_updates():
         updater.download_coefficients()
-        return True
-    return False
+        return (True,)
+    return (False,)
     import time
 
     for _ in range(10):
@@ -149,7 +149,8 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         self.spinner.movie_stop()
         self.ok_button.setDisabled(False)
 
-    def download_finished(self, updates: bool):
+    def download_finished(self, data: Tuple[bool]):
+        updates = data[0]
         msg = "Download finished.\nThere were no updates."
         if updates:
             "Download finished.\nThere were updates."

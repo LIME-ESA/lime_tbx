@@ -32,7 +32,9 @@ class IUpdate(ABC):
 
 class Update(IUpdate):
     def __init__(self):
-        self.url = self._get_url()
+        self.url = self._get_url(
+            os.path.join(programdata.get_programfiles_folder(), "coeff_data")
+        )
 
     def _get_url(self, urlfile_dir: str) -> str:
         filepath = os.path.join(urlfile_dir, "coefficients_server.txt")
