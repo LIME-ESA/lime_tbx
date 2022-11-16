@@ -22,7 +22,7 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
-from . import appdata
+from . import programdata
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -178,7 +178,9 @@ def get_default_cimel_coeffs() -> ReflectanceCoefficients:
 
 
 def get_all_cimel_coefficients() -> List[ReflectanceCoefficients]:
-    folder = os.path.join(appdata.get_programfiles_folder(), "coeff_data", "versions")
+    folder = os.path.join(
+        programdata.get_programfiles_folder(), "coeff_data", "versions"
+    )
     version_files = os.listdir(folder)
     coeffs = []
     for vf in version_files:
@@ -187,5 +189,7 @@ def get_all_cimel_coefficients() -> List[ReflectanceCoefficients]:
 
 
 def get_coefficients_filenames() -> List[str]:
-    folder = os.path.join(appdata.get_programfiles_folder(), "coeff_data", "versions")
+    folder = os.path.join(
+        programdata.get_programfiles_folder(), "coeff_data", "versions"
+    )
     return os.listdir(folder)

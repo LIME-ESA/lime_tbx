@@ -10,7 +10,7 @@ import requests
 
 """___LIME Modules___"""
 from ..access_data import access_data
-from ..access_data import appdata
+from ..access_data import programdata
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -60,7 +60,10 @@ class Update(IUpdate):
                 fcontent = requests.get(os.path.join(self.url, vf)).text
                 with open(
                     os.path.join(
-                        appdata.get_programfiles_folder(), "coeff_data", "versions", vf
+                        programdata.get_programfiles_folder(),
+                        "coeff_data",
+                        "versions",
+                        vf,
                     ),
                     "w",
                 ) as fp:

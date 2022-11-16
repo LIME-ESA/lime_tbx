@@ -13,7 +13,7 @@ from lime_tbx.cli.cli import (
     LONG_OPTIONS,
     print_help,
 )
-from lime_tbx.coefficients.access_data.appdata import (
+from lime_tbx.coefficients.access_data.programdata import (
     get_appdata_folder,
     get_programfiles_folder,
 )
