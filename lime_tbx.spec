@@ -59,6 +59,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
     e_console = True
 elif sys.platform == 'darwin':
     eocfi_bin_path = 'eocfi_adapter/eocfi_c/bin/get_positions_darwin'
+    import platform
     if "ARM" in platform.version().upper():
         eocfi_bin_path = 'eocfi_adapter/eocfi_c/bin/get_positions_darwin_arm'
     src_path = 'lime_tbx/'
