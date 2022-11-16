@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 import requests
 from typing import Callable, Tuple
+from io import StringIO
 
 """___Third-Party Modules___"""
 # import here
@@ -13,6 +14,7 @@ from typing import Callable, Tuple
 from ..access_data import access_data
 from ..access_data import programdata
 from lime_tbx.filedata import csv as lcsv
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -73,9 +75,14 @@ class Update(IUpdate):
                 quant_news += 1
                 fcontent = requests.get(os.path.join(self.url, "versions", vf)).text
                 try:
-                    lcsv.read_refl_coefficients_from_stream(fcontent)
-                except Exception:
+                    lcsv.read_refl_coefficients_from_stream(StringIO(fcontent))
+                except Exception as e:
                     quant_fails += 1
+                    logger.get_logger().warning(
+                        "Wrong coefficient data downloaded. Error {}: {}".format(
+                            e, fcontent
+                        )
+                    )
                 else:
                     with open(
                         os.path.join(

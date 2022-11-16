@@ -12,7 +12,6 @@ It exports the following functions:
 from typing import Union, List, Iterable
 from datetime import datetime, timezone
 import csv
-from io import StringIO
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -27,6 +26,7 @@ from ..datatypes.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
+    LimeException,
 )
 from ..datatypes import logger
 from ..datatypes.datatypes import ReflectanceCoefficients
@@ -309,8 +309,12 @@ def read_refl_coefficients_from_stream(
     reader = csv.reader(stream)
     rows = []
     for row in reader:
-        if row[0][0] != "#":
+        if len(row) > 0 and len(row[0]) > 0 and row[0][0] != "#":
             rows.append(row)
+    if len(rows) != 13:
+        raise LimeException(
+            f"Wrong format in the coefficients update file. There should be 13 uncommented lines, found {len(rows)}."
+        )
     version_name = rows[0][0]
     data = np.array(rows[1:7]).astype(float)
     u_data = np.array(rows[7:]).astype(float)
