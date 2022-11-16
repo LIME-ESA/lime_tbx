@@ -4,6 +4,7 @@
 import logging
 from datetime import datetime
 import os
+import sys
 
 """___Third-Party Modules___"""
 # import here
@@ -20,15 +21,11 @@ _DATEFORMAT = "%H:%M:%S"
 
 
 def _get_printout_logger() -> logging.Logger:
-    dtnow = datetime.utcnow()
-    logname = dtnow.strftime("%Y%m%d")
-    logname = "log_{}.txt".format(logname)
-    logname = os.path.join(".", logname)
-    logging.basicConfig(
-        filename=logname, filemode="a", format=_FORMAT, datefmt=_DATEFORMAT
-    )
-    logger = logging.getLogger(__name__ + "_printout")
-    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter(_FORMAT, _DATEFORMAT))
+    logger = logging.getLogger("printout_logger")
+    logger.setLevel(logging.WARNING)
+    logger.addHandler(handler)
     return logger
 
 

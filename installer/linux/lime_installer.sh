@@ -16,6 +16,7 @@ chmod 777 $local_appdata/eocfi_data
 chmod 777 $local_appdata/coeff_data
 mkdir -p $dst
 cp -r $assets/* $dst
+chmod 777 $dst/coeff_data/versions
 ln -s $dst/LimeTBX/$executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications
 mv $bin_path/$executable $bin_path/$command_name

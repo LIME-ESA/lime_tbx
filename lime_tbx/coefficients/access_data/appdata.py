@@ -49,6 +49,8 @@ def get_appdata_folder(logger: Logger) -> str:
         appdata = path.join(environ["APPDATA"], APPNAME)
     else:
         appdata = path.expanduser(path.join("~", "." + APPNAME))
+    logger.info(f"Appdata folder: {appdata}")
     if not _is_valid_appdata(appdata, logger):
+        logger.warning("Appdata folder not valid, using '.'")
         appdata = "."
     return appdata

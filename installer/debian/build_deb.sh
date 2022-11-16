@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 echo "Building lime .deb package."
 echo "This script uses files from ../linux directory, so generate that installer first."
 version="0.0-3"
@@ -21,6 +21,7 @@ mkdir -p $name/usr/share/applications
 mkdir -p $name/usr/bin
 ln -s /opt/esa/LimeTBX/limetbx.desktop $name/usr/share/applications
 ln -s /opt/esa/LimeTBX/LimeTBX/LimeTBX.exe $name/usr/bin/lime
+chmod 777 $name/opt/esa/LimeTBX/coeff_data/versions
 mkdir $name/DEBIAN
 cp control $name/DEBIAN
 dpkg-deb --build $name
