@@ -129,4 +129,4 @@ ignore_folder
 .DS_Store
 
 # Logfiles
-./log_*.txt
+log_*.txt
