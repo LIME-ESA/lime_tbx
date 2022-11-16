@@ -22,3 +22,239 @@ INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/Li
 INFO: [main.py:32 -       main() ] ToolBox started
 INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
 INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+ERROR: [csv.py:333 - read_refl_coefficients() ] replacement data must match the Variable's shape. replacement data has shape (18,); Variable has shape (18, 6)
+Traceback (most recent call last):
+  File "/home/javgat/Repositorios/lime_tbx/lime_tbx/filedata/csv.py", line 328, in read_refl_coefficients
+    ds_cimel.coeff.values = data
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/common.py", line 300, in __setattr__
+    object.__setattr__(self, name, value)
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/dataarray.py", line 729, in values
+    self.variable.values = value
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/variable.py", line 563, in values
+    self.data = values
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/variable.py", line 392, in data
+    raise ValueError(
+ValueError: replacement data must match the Variable's shape. replacement data has shape (18,); Variable has shape (18, 6)
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+ERROR: [csv.py:333 - read_refl_coefficients() ] replacement data must match the Variable's shape. replacement data has shape (18,); Variable has shape (18, 6)
+Traceback (most recent call last):
+  File "/home/javgat/Repositorios/lime_tbx/lime_tbx/filedata/csv.py", line 328, in read_refl_coefficients
+    ds_cimel.coeff.values = data
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/common.py", line 300, in __setattr__
+    object.__setattr__(self, name, value)
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/dataarray.py", line 729, in values
+    self.variable.values = value
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/variable.py", line 563, in values
+    self.data = values
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/variable.py", line 392, in data
+    raise ValueError(
+ValueError: replacement data must match the Variable's shape. replacement data has shape (18,); Variable has shape (18, 6)
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+ERROR: [csv.py:334 - read_refl_coefficients() ] replacement data must match the Variable's shape. replacement data has shape (18,); Variable has shape (18, 6)
+Traceback (most recent call last):
+  File "/home/javgat/Repositorios/lime_tbx/lime_tbx/filedata/csv.py", line 329, in read_refl_coefficients
+    ds_cimel.coeff.values = data.T
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/common.py", line 300, in __setattr__
+    object.__setattr__(self, name, value)
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/dataarray.py", line 729, in values
+    self.variable.values = value
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/variable.py", line 563, in values
+    self.data = values
+  File "/home/javgat/Repositorios/lime_tbx/.venv/lib/python3.8/site-packages/xarray/core/variable.py", line 392, in data
+    raise ValueError(
+ValueError: replacement data must match the Variable's shape. replacement data has shape (18,); Variable has shape (18, 6)
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [main.py:32 -       main() ] ToolBox started
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+WARNING: [eocfi_adapter.py:314 - _get_sat_position_one_orbit_file() ] Executing EO CFI: EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+WARNING: [eocfi_adapter.py:314 - _get_sat_position_one_orbit_file() ] Executing EO CFI: EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+INFO: [programdata.py:87 - get_programfiles_folder() ] Programfiles: /opt/esa/LimeTBX
+WARNING: [programdata.py:89 - get_programfiles_folder() ] Programfiles directory not valid. Using current dir.
+WARNING: [eocfi_adapter.py:314 - _get_sat_position_one_orbit_file() ] Executing EO CFI: EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day.

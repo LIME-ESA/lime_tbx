@@ -92,9 +92,7 @@ class MockSettingsManager(ISettingsManager):
         # generate an arbitrary default srf
         self.srfs = [self.get_default_srf()]
         self.srf = self.srfs[0]
-        self.cimel_coeffs = (
-            access_data.get_all_cimel_coefficients()
-        )  # [access_data.get_default_cimel_coeffs()]
+        self.cimel_coeffs = access_data.get_all_cimel_coefficients()
         self.cimel_coeff = self.cimel_coeffs[-1]
 
     def get_default_srf(self) -> SpectralResponseFunction:
