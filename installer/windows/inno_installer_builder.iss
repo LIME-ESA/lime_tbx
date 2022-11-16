@@ -35,6 +35,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ;Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\Users\Javier\Repositorios\lime_tbx\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\Javier\Repositorios\lime_tbx\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\Users\Javier\Repositorios\lime_tbx\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -53,4 +54,5 @@ Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}\Settings"; Flags: createvalueif
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\kernels"
 Type: filesandordirs; Name: "{app}\eocfi_data"
+Type: filesandordirs; Name: "{app}\coeff_data"
 Type: filesandordirs; Name: "{app}\LimeTBX"

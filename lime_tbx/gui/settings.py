@@ -81,14 +81,19 @@ class ISettingsManager(ABC):
         """Select the cimel_coeff from the cimel coefficients list at the given position."""
         pass
 
+    @abstractmethod
+    def reload_coeffs(self) -> None:
+        """Reload the cimel coefficients from file to the logic instance"""
+        pass
+
 
 class MockSettingsManager(ISettingsManager):
     def __init__(self):
         # generate an arbitrary default srf
         self.srfs = [self.get_default_srf()]
         self.srf = self.srfs[0]
-        self.cimel_coeffs = [access_data.get_default_cimel_coeffs()]
-        self.cimel_coeff = self.cimel_coeffs[0]
+        self.cimel_coeffs = access_data.get_all_cimel_coefficients()
+        self.cimel_coeff = self.cimel_coeffs[-1]
 
     def get_default_srf(self) -> SpectralResponseFunction:
         spectral_response = {
@@ -128,3 +133,7 @@ class MockSettingsManager(ISettingsManager):
 
     def select_cimel_coeff(self, index: int) -> None:
         self.cimel_coeff = self.cimel_coeffs[index]
+
+    def reload_coeffs(self) -> None:
+        self.cimel_coeffs = access_data.get_all_cimel_coefficients()
+        self.cimel_coeff = self.cimel_coeffs[-1]

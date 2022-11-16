@@ -9,9 +9,11 @@ command_name="lime"
 desktop_applications="/usr/share/applications"
 mkdir -p $local_appdata/kernels
 mkdir -p $local_appdata/eocfi_data
+mkdir -p $local_appdata/coeff_data
 chmod 777 $local_appdata
 chmod 777 $local_appdata/kernels
 chmod 777 $local_appdata/eocfi_data
+chmod 777 $local_appdata/coeff_data
 mkdir -p $dst
 cp -r $assets/* $dst
 ln -s $dst/LimeTBX/$executable $bin_path

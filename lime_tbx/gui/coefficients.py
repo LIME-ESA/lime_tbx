@@ -1,7 +1,7 @@
 """GUI Widgets related to the coefficients actions."""
 
 """___Built-In Modules___"""
-from typing import Callable
+from typing import Callable, Tuple
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -15,6 +15,7 @@ from lime_tbx.gui.util import (
     WorkerStopper,
 )
 from lime_tbx.datatypes import logger
+from lime_tbx.coefficients.update.update import IUpdate, Update
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -77,17 +78,23 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
         self.close()
 
 
-def _callback_download(stopper: WorkerStopper):
-    import time
-
-    for _ in range(10):
-        time.sleep(1)
-        stopper.mutex.lock()
-        if stopper.running == False:
-            stopper.mutex.unlock()
-            break
+def _callback_stopper_check_is_running(stopper: WorkerStopper):
+    stopper.mutex.lock()
+    if stopper.running == False:
         stopper.mutex.unlock()
-    return []
+        return False
+    stopper.mutex.unlock()
+    return True
+
+
+def _callback_download(stopper: WorkerStopper) -> Tuple[bool]:
+    updater: IUpdate = Update()
+    if updater.check_for_updates():
+        news, fails = updater.download_coefficients(
+            _callback_stopper_check_is_running, [stopper]
+        )
+        return (True, news, fails)
+    return (False, 0, 0)
 
 
 class DownloadCoefficientsDialog(QtWidgets.QDialog):
@@ -103,7 +110,7 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.title_label = QtWidgets.QLabel(
-            "Downloading coefficients...\n(This is a demo, it's not doing anything)",
+            "\tDownloading coefficients...\t\n",
             alignment=QtCore.Qt.AlignCenter,
         )
         self.main_layout.addWidget(self.title_label)
@@ -143,12 +150,28 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         self.spinner.movie_stop()
         self.ok_button.setDisabled(False)
 
-    def download_finished(self):
-        self.title_label.setText("Download finished.\nThere were no updates.")
+    def download_finished(self, data: Tuple[bool, int, int]):
+        updates, news, fails = data
+        msg = "Download finished.\nThere were no updates."
+        if updates:
+            newsstring = f"There was 1 update"
+            failsstring = f"it failed"
+            if news > 1:
+                newsstring = f"There were {news} updates"
+                failsstring = f"{fails} of them failed"
+            if fails == 0:
+                msg = f"Download finished.\n{newsstring}."
+            else:
+                msg = f"Download finished with errors.\n{newsstring}, {failsstring}."
+        self.title_label.setText(msg)
+        if updates:
+            self.settings_manager.reload_coeffs()
         self._finished_loading()
 
     def download_error(self, error: Exception):
-        self.title_label.setText("Error downloading. Check log for details.")
+        self.title_label.setText(
+            "Error connecting to the server.\nCheck log for details."
+        )
         logger.get_logger().error(str(error))
         self._finished_loading()
 
