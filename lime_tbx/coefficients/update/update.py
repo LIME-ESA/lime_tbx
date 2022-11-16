@@ -62,7 +62,7 @@ class Update(IUpdate):
     def download_coefficients(
         self, stopper_checker: Callable, stopper_args: list
     ) -> Tuple[int, int]:
-        urlpath = os.path.join(self.url, "list.txt")
+        urlpath = f"{self.url}/list.txt"
         version_files = requests.get(urlpath).text.split()
         self_files = access_data.get_coefficients_filenames()
         quant_news = 0
@@ -73,7 +73,7 @@ class Update(IUpdate):
                 return
             if vf not in self_files:
                 quant_news += 1
-                fcontent = requests.get(os.path.join(self.url, "versions", vf)).text
+                fcontent = requests.get(f"{self.url}/versions/{vf}").text
                 try:
                     lcsv.read_refl_coefficients_from_stream(StringIO(fcontent))
                 except Exception as e:

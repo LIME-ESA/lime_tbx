@@ -14,6 +14,7 @@ from lime_tbx.gui.util import (
     start_thread as _start_thread,
     WorkerStopper,
 )
+from lime_tbx.gui import constants
 from lime_tbx.datatypes import logger
 from lime_tbx.coefficients.update.update import IUpdate, Update
 
@@ -109,6 +110,7 @@ class DownloadCoefficientsDialog(QtWidgets.QDialog):
         self.setWindowFlag(QtCore.Qt.CustomizeWindowHint, True)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle(constants.APPLICATION_NAME)
         self.title_label = QtWidgets.QLabel(
             "\tDownloading coefficients...\t\n",
             alignment=QtCore.Qt.AlignCenter,
