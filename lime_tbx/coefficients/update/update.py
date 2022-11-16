@@ -4,6 +4,7 @@
 import os
 from abc import ABC, abstractmethod
 import requests
+from typing import Callable, Tuple
 
 """___Third-Party Modules___"""
 # import here
@@ -11,6 +12,7 @@ import requests
 """___LIME Modules___"""
 from ..access_data import access_data
 from ..access_data import programdata
+from lime_tbx.filedata import csv as lcsv
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -26,7 +28,9 @@ class IUpdate(ABC):
         pass
 
     @abstractmethod
-    def download_coefficients(self):
+    def download_coefficients(
+        self, stopper_checker: Callable, stopper_args: list
+    ) -> Tuple[int, int]:
         pass
 
 
@@ -53,20 +57,34 @@ class Update(IUpdate):
                 return True
         return False
 
-    def download_coefficients(self):
+    def download_coefficients(
+        self, stopper_checker: Callable, stopper_args: list
+    ) -> Tuple[int, int]:
         urlpath = os.path.join(self.url, "list.txt")
         version_files = requests.get(urlpath).text.split()
         self_files = access_data.get_coefficients_filenames()
+        quant_news = 0
+        quant_fails = 0
         for vf in version_files:
+            is_running = stopper_checker(*stopper_args)
+            if not is_running:
+                return
             if vf not in self_files:
-                fcontent = requests.get(os.path.join(self.url, vf)).text
-                with open(
-                    os.path.join(
-                        programdata.get_programfiles_folder(),
-                        "coeff_data",
-                        "versions",
-                        vf,
-                    ),
-                    "w",
-                ) as fp:
-                    fp.write(fcontent)
+                quant_news += 1
+                fcontent = requests.get(os.path.join(self.url, "versions", vf)).text
+                try:
+                    lcsv.read_refl_coefficients_from_stream(fcontent)
+                except Exception:
+                    quant_fails += 1
+                else:
+                    with open(
+                        os.path.join(
+                            programdata.get_programfiles_folder(),
+                            "coeff_data",
+                            "versions",
+                            vf,
+                        ),
+                        "w",
+                    ) as fp:
+                        fp.write(fcontent)
+        return (quant_news, quant_fails)

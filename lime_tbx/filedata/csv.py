@@ -9,9 +9,10 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from typing import Union, List, Tuple
+from typing import Union, List, Iterable
 from datetime import datetime, timezone
 import csv
+from io import StringIO
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -293,6 +294,32 @@ def read_datetimes(path: str) -> List[datetime]:
         raise Exception(_READ_FILE_ERROR_STR)
 
 
+def read_refl_coefficients_from_stream(
+    stream: Iterable[str],
+) -> ReflectanceCoefficients:
+    # define dim_size_dict to specify size of arrays
+    dim_sizes = {
+        "wavelength": 6,
+        "i_coeff": 18,
+    }
+    # create dataset
+    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
+
+    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
+    reader = csv.reader(stream)
+    rows = []
+    for row in reader:
+        if row[0][0] != "#":
+            rows.append(row)
+    version_name = rows[0][0]
+    data = np.array(rows[1:7]).astype(float)
+    u_data = np.array(rows[7:]).astype(float)
+    ds_cimel.coeff.values = data.T
+    ds_cimel.u_coeff.values = u_data.T
+
+    return ReflectanceCoefficients(ds_cimel, version_name)
+
+
 def read_refl_coefficients(path: str) -> ReflectanceCoefficients:
     """
     Read a Reflectance Coefficients CSV file.
@@ -307,29 +334,9 @@ def read_refl_coefficients(path: str) -> ReflectanceCoefficients:
     rc: ReflectanceCoefficients
         ReflectanceCoefficients read.
     """
-    # define dim_size_dict to specify size of arrays
-    dim_sizes = {
-        "wavelength": 6,
-        "i_coeff": 18,
-    }
-    # create dataset
-    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
-
-    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
     try:
         with open(path, "r") as file:
-            reader = csv.reader(file)
-            rows = []
-            for row in reader:
-                if row[0][0] != "#":
-                    rows.append(row)
-            version_name = rows[0][0]
-            data = np.array(rows[1:7]).astype(float)
-            u_data = np.array(rows[7:]).astype(float)
-            ds_cimel.coeff.values = data.T
-            ds_cimel.u_coeff.values = u_data.T
-
-            return ReflectanceCoefficients(ds_cimel, version_name)
+            return read_refl_coefficients_from_stream(file)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)
