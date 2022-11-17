@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 echo "Building lime .deb package."
 echo "This script uses files from ../linux directory, so generate that installer first."
-version="0.0-3"
+# 0.0.4 Comment so the search for the version a.b.c appears (here it is a.b-c)
+version="0.0-4"
 name="lime_"$version
 [ -d $name ] && rm -rf $name
 [ -f $name".deb" ] && rm -f $name".deb"
