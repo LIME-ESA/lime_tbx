@@ -55,9 +55,22 @@ def _launch_cmd(cmd: str) -> Tuple[str, str]:
     return so, serr
 
 
-def _go_to_link(link: str):
+def _try_go_to_link_sensible_browser(link: str) -> bool:
+    if which("sensible-browser") is not None:
+        logger.get_logger().info("Using sensible-browser to open link")
+        cmd = f"sensible-browser {link} >/dev/null 2>&1 &"
+        so, serr = _launch_cmd(cmd)
+        logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+        if serr is not None and len(serr) > 0:
+            logger.get_logger().error(f"Returned error: Linux {cmd}: {serr}")
+            return False
+        return True
+    return False
+
+
+def _go_to_link(link: str) -> bool:
     if sys.platform != "linux":
-        webbrowser.open_new_tab(link)
+        return webbrowser.open_new_tab(link)
     else:
         try:
             user_home = os.environ.get("HOME")
@@ -75,6 +88,8 @@ def _go_to_link(link: str):
                     end = line.index("\n") if ";" not in line else line.index(";")
                     appname = line[start:end]
                     break
+            else:
+                return _try_go_to_link_sensible_browser(link)
             desktop_folders = [
                 os.path.join(user_home, ".local/share/applications/"),
                 "/usr/share/applications/",
@@ -87,21 +102,18 @@ def _go_to_link(link: str):
                             break
                 except PermissionError:
                     logger.get_logger().debug(f"PermissionError for directory {folder}")
+            else:
+                return _try_go_to_link_sensible_browser(link)
             appname = os.path.join(folder, appname)
             cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
             so, serr = _launch_cmd(cmd)
             logger.get_logger().debug(f"Linux executing {cmd}: {so}")
             if serr is not None and len(serr) > 0:
                 raise Exception(f"Returned error: Linux {cmd}: {serr}")
+            return True
         except Exception as e:
             logger.get_logger().exception(e)
-            if which("sensible-browser") is not None:
-                logger.get_logger().info("Using sensible-browser to open link")
-                cmd = f"sensible-browser {link}"
-                so, serr = _launch_cmd(cmd)
-                logger.get_logger().debug(f"Linux executing {cmd}: {so}")
-                if serr is not None and len(serr) > 0:
-                    raise Exception(f"Returned error: Linux {cmd}: {serr}")
+            return _try_go_to_link_sensible_browser(link)
 
 
 class AboutDialog(QtWidgets.QDialog):
