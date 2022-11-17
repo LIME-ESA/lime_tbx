@@ -10,6 +10,7 @@ include lime_tbx/gui/assets/style_constants_darwin.txt
 include lime_tbx/gui/assets/lime_logo.png
 include lime_tbx/gui/assets/esa_logo.png
 include lime_tbx/gui/assets/uva_logo.png
+include lime_tbx/gui/assets/goa_uva_logo.png
 include lime_tbx/gui/assets/npl_logo.png
 include lime_tbx/gui/assets/vito_logo.png
 include lime_tbx/gui/assets/spinner.gif

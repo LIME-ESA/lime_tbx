@@ -150,7 +150,6 @@ class AboutDialog(QtWidgets.QDialog):
         # Collaborators
         self.collaborators_layout = QtWidgets.QVBoxLayout()
         self.collaborators_text = QtWidgets.QLabel("In collaboration with:")
-        open_links = True  # sys.platform != "linux"
         ## UVa
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
@@ -158,7 +157,15 @@ class AboutDialog(QtWidgets.QDialog):
         uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(100)
         self.uva_logo.setPixmap(uva_pixmap)
         self.uva_logo.mousePressEvent = self._open_web_uva
-        self.uva_logo.setOpenExternalLinks(open_links)
+        self.uva_logo.setOpenExternalLinks(True)
+        ## GOA UVa
+        goa_logo_path = os.path.join(_current_dir, constants.GOA_UVA_LOGO_PATH)
+        self.goa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
+        self.goa_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(100)
+        self.goa_logo.setPixmap(goa_pixmap)
+        self.goa_logo.mousePressEvent = self._open_web_goa_uva
+        self.goa_logo.setOpenExternalLinks(True)
         ## NPL
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
@@ -166,7 +173,7 @@ class AboutDialog(QtWidgets.QDialog):
         npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(100)
         self.npl_logo.setPixmap(npl_pixmap)
         self.npl_logo.mousePressEvent = self._open_web_npl
-        self.npl_logo.setOpenExternalLinks(open_links)
+        self.npl_logo.setOpenExternalLinks(True)
         ## VITO
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
@@ -174,10 +181,11 @@ class AboutDialog(QtWidgets.QDialog):
         vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(90)
         self.vito_logo.setPixmap(vito_pixmap)
         self.vito_logo.mousePressEvent = self._open_web_vito
-        self.vito_logo.setOpenExternalLinks(open_links)
+        self.vito_logo.setOpenExternalLinks(True)
         ## Finish Collaborators layout
         self.collaborators_img_layout = QtWidgets.QHBoxLayout()
         self.collaborators_img_layout.addWidget(self.uva_logo)
+        self.collaborators_img_layout.addWidget(self.goa_logo)
         self.collaborators_img_layout.addWidget(self.npl_logo)
         self.collaborators_img_layout.addWidget(self.vito_logo)
         self.collaborators_layout.addWidget(self.collaborators_text)
@@ -204,6 +212,10 @@ class AboutDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def _open_web_uva(self, event):
         _go_to_link("http://www.uva.es/")
+
+    @QtCore.Slot()
+    def _open_web_goa_uva(self, event):
+        _go_to_link("http://goa.uva.es/")
 
     @QtCore.Slot()
     def _open_web_npl(self, event):
