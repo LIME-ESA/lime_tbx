@@ -1,9 +1,9 @@
 """GUI Widgets related to the Help actions"""
 
 """___Built-In Modules___"""
-from typing import List, Callable, Union, Tuple, Optional
+from typing import Optional
 import os
-import webbrowser
+import sys
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -73,27 +73,28 @@ class AboutDialog(QtWidgets.QDialog):
         # Collaborators
         self.collaborators_layout = QtWidgets.QVBoxLayout()
         self.collaborators_text = QtWidgets.QLabel("In collaboration with:")
+        open_links = sys.platform != "linux"
         ## UVa
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
-        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(100)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.uva_logo.setPixmap(uva_pixmap)
-        self.uva_logo.mousePressEvent = self._open_link_uva
-        self.uva_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.uva_logo.setText(
+            f'<a href="http://www.uva.es/"><img src="{uva_logo_path}" alt="University of Valladolid (UVa) logo" height="100" /></a>'
+        )
+        self.uva_logo.setOpenExternalLinks(open_links)
         ## NPL
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
-        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(100)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.npl_logo.setPixmap(npl_pixmap)
-        self.npl_logo.mousePressEvent = self._open_link_npl
-        self.npl_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.npl_logo.setText(
+            f'<a href="https://www.npl.co.uk/"><img src="{npl_logo_path}" alt="UK National Physics Laboratory (NPL) logo" height="100" /></a>'
+        )
+        self.npl_logo.setOpenExternalLinks(open_links)
         ## VITO
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
-        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(90)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.vito_logo.setPixmap(vito_pixmap)
-        self.vito_logo.mousePressEvent = self._open_link_vito
-        self.vito_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.vito_logo.setText(
+            f'<a href="https://vito.be/en"><img src="{vito_logo_path}" alt="VITO logo" height="90" /></a>'
+        )
+        self.vito_logo.setOpenExternalLinks(open_links)
         ## Finish Collaborators layout
         self.collaborators_img_layout = QtWidgets.QHBoxLayout()
         self.collaborators_img_layout.addWidget(self.uva_logo)
@@ -119,18 +120,3 @@ class AboutDialog(QtWidgets.QDialog):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setWidget(self.groupbox)
         self.main_layout.addWidget(self.scroll_area)
-
-    @QtCore.Slot()
-    def _open_link_uva(self, event):
-        self._open_link("https://www.uva.es/")
-
-    @QtCore.Slot()
-    def _open_link_npl(self, event):
-        self._open_link("https://www.npl.co.uk/")
-
-    @QtCore.Slot()
-    def _open_link_vito(self, event):
-        self._open_link("https://vito.be/en")
-
-    def _open_link(self, link: str):
-        webbrowser.open(link, new=2)
