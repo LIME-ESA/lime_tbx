@@ -2,22 +2,12 @@
 
 """___Built-In Modules___"""
 from typing import List, Callable, Union, Tuple, Optional
-from datetime import datetime
-import pkgutil
-import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
-from . import settings, output, input, srf, constants
-from ..datatypes.datatypes import (
-    PolarizationCoefficients,
-    SpectralResponseFunction,
-    ApolloIrradianceCoefficients,
-    SurfacePoint,
-    CustomPoint,
-)
+from . import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -34,6 +24,7 @@ class AboutDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle(constants.APPLICATION_NAME)
         # title
         title = "Lunar Irradiance Model of ESA ToolBox"
         self.title_label = QtWidgets.QLabel(title, alignment=QtCore.Qt.AlignCenter)

@@ -35,6 +35,7 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle(constants.APPLICATION_NAME)
         self.title_label = QtWidgets.QLabel("Select the coefficients")
         self.main_layout.addWidget(self.title_label)
         self.combo_versions = QtWidgets.QComboBox()
