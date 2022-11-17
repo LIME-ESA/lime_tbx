@@ -1,15 +1,19 @@
 """GUI Widgets related to the Help actions"""
 
 """___Built-In Modules___"""
-from typing import Optional
+from typing import Optional, Tuple
 import os
 import sys
+from shutil import which
+import webbrowser
+import subprocess
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
 from . import constants
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -37,6 +41,67 @@ sensing instrument (pre-stored in GLOD format files) to the LIME model output.
     .replace("\\n", "\n")
     .strip()
 )
+
+
+def _launch_cmd(cmd: str) -> Tuple[str, str]:
+    cmd_exec = subprocess.Popen(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+    )
+    so, serr = cmd_exec.communicate()
+    return so, serr
+
+
+def _go_to_link(link: str):
+    if sys.platform != "linux":
+        webbrowser.open_new_tab(link)
+    else:
+        try:
+            user_home = os.environ.get("HOME")
+            xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+            if xdg_config_home is None:
+                xdg_config_home = os.path.join(user_home, ".config")
+            mimeapps_list = os.path.join(xdg_config_home, "mimeapps.list")
+            with open(mimeapps_list, "r") as fp:
+                lines = fp.readlines()
+            for line in lines:
+                if line.startswith("text/html") or line.startswith(
+                    "x-scheme-handler/http"
+                ):
+                    start = line.index("=") + 1
+                    end = line.index("\n") if ";" not in line else line.index(";")
+                    appname = line[start:end]
+                    break
+            desktop_folders = [
+                os.path.join(user_home, ".local/share/applications/"),
+                "/usr/share/applications/",
+                "/usr/local/share/applications/",
+            ]
+            for folder in desktop_folders:
+                try:
+                    if os.path.exists(folder):
+                        if appname in os.listdir(folder):
+                            break
+                except PermissionError:
+                    logger.get_logger().debug(f"PermissionError for directory {folder}")
+            appname = os.path.join(folder, appname)
+            cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
+            so, serr = _launch_cmd(cmd)
+            logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+            if serr is not None and len(serr) > 0:
+                raise Exception(f"Returned error: Linux {cmd}: {serr}")
+        except Exception as e:
+            logger.get_logger().exception(e)
+            if which("sensible-browser") is not None:
+                logger.get_logger().info("Using sensible-browser to open link")
+                cmd = f"sensible-browser {link}"
+                so, serr = _launch_cmd(cmd)
+                logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+                if serr is not None and len(serr) > 0:
+                    raise Exception(f"Returned error: Linux {cmd}: {serr}")
 
 
 class AboutDialog(QtWidgets.QDialog):
@@ -73,27 +138,30 @@ class AboutDialog(QtWidgets.QDialog):
         # Collaborators
         self.collaborators_layout = QtWidgets.QVBoxLayout()
         self.collaborators_text = QtWidgets.QLabel("In collaboration with:")
-        open_links = sys.platform != "linux"
+        open_links = True  # sys.platform != "linux"
         ## UVa
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.uva_logo.setText(
-            f'<a href="http://www.uva.es/"><img src="{uva_logo_path}" alt="University of Valladolid (UVa) logo" height="100" /></a>'
-        )
+        self.uva_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(100)
+        self.uva_logo.setPixmap(uva_pixmap)
+        self.uva_logo.mousePressEvent = self._open_web_uva
         self.uva_logo.setOpenExternalLinks(open_links)
         ## NPL
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.npl_logo.setText(
-            f'<a href="https://www.npl.co.uk/"><img src="{npl_logo_path}" alt="UK National Physics Laboratory (NPL) logo" height="100" /></a>'
-        )
+        self.npl_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(100)
+        self.npl_logo.setPixmap(npl_pixmap)
+        self.npl_logo.mousePressEvent = self._open_web_npl
         self.npl_logo.setOpenExternalLinks(open_links)
         ## VITO
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.vito_logo.setText(
-            f'<a href="https://vito.be/en"><img src="{vito_logo_path}" alt="VITO logo" height="90" /></a>'
-        )
+        self.vito_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(90)
+        self.vito_logo.setPixmap(vito_pixmap)
+        self.vito_logo.mousePressEvent = self._open_web_vito
         self.vito_logo.setOpenExternalLinks(open_links)
         ## Finish Collaborators layout
         self.collaborators_img_layout = QtWidgets.QHBoxLayout()
@@ -120,3 +188,15 @@ class AboutDialog(QtWidgets.QDialog):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setWidget(self.groupbox)
         self.main_layout.addWidget(self.scroll_area)
+
+    @QtCore.Slot()
+    def _open_web_uva(self, event):
+        _go_to_link("http://www.uva.es/")
+
+    @QtCore.Slot()
+    def _open_web_npl(self, event):
+        _go_to_link("https://www.npl.co.uk/")
+
+    @QtCore.Slot()
+    def _open_web_vito(self, event):
+        _go_to_link("https://vito.be/en")
