@@ -342,6 +342,8 @@ class EOCFIConverter(IEOCFIConverter):
             lat, lon, hhh = SPICEAdapter.to_planetographic(
                 x, y, z, "EARTH", self.kernels_path.main_kernels_path
             )
-            print(lat, lon, hhh)
+            logger.get_logger().debug(
+                f"EOCFI output (lat, lon, height): {lat}, {lon}, {hhh}"
+            )
             positions.append((lat, lon, hhh))
         return positions
