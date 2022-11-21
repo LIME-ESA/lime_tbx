@@ -13,7 +13,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
 from . import constants
-from lime_tbx.datatypes import logger
+from lime_tbx.datatypes import logger, constants as dtp_constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -129,7 +129,7 @@ class AboutDialog(QtWidgets.QDialog):
         self.title_label = QtWidgets.QLabel(title, alignment=QtCore.Qt.AlignCenter)
         # Version
         self.version_label = QtWidgets.QLabel(
-            f"Version: {constants.VERSION_NAME}", alignment=QtCore.Qt.AlignCenter
+            f"Version: {dtp_constants.VERSION_NAME}", alignment=QtCore.Qt.AlignCenter
         )
         # LIME Logo
         _current_dir = os.path.dirname(os.path.abspath(__file__))

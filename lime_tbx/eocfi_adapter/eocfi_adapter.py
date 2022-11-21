@@ -248,7 +248,7 @@ class EOCFIConverter(IEOCFIConverter):
                 )
             orbit_path = os.path.join(
                 self.eocfi_path,
-                f"data/mission_configuration_files/{orb_f.name}",
+                f"data/missions/{orb_f.name}",
             )
             if not os.path.exists(orbit_path):
                 raise LimeException("The orbit file {} is missing".format(orbit_path))
@@ -266,7 +266,7 @@ class EOCFIConverter(IEOCFIConverter):
             orbit_path = os.path.join(
                 self.eocfi_path,
                 "data",
-                "mission_configuration_files",
+                "missions",
                 sat.time_file,
             )
         # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
@@ -342,6 +342,8 @@ class EOCFIConverter(IEOCFIConverter):
             lat, lon, hhh = SPICEAdapter.to_planetographic(
                 x, y, z, "EARTH", self.kernels_path.main_kernels_path
             )
-            print(lat, lon, hhh)
+            logger.get_logger().debug(
+                f"EOCFI output (lat, lon, height): {lat}, {lon}, {hhh}"
+            )
             positions.append((lat, lon, hhh))
         return positions

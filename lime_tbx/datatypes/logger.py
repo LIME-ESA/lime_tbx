@@ -12,6 +12,7 @@ import sys
 
 """___LIME Modules___"""
 from lime_tbx.coefficients.access_data import appdata
+from lime_tbx.datatypes import constants
 
 # SINGLETON
 _logger: logging.Logger = None
@@ -42,5 +43,11 @@ def get_logger() -> logging.Logger:
             filename=logname, filemode="a", format=_FORMAT, datefmt=_DATEFORMAT
         )
         _logger = logging.getLogger(__name__)
-        _logger.setLevel(logging.DEBUG)
+        debug_value = "INFO"
+        if constants.DEBUG_ENV_NAME in os.environ:
+            debug_value = os.environ[constants.DEBUG_ENV_NAME]
+        if isinstance(debug_value, str) and debug_value.upper() == "DEBUG":
+            _logger.setLevel(logging.DEBUG)
+        else:
+            _logger.setLevel(logging.INFO)
     return _logger

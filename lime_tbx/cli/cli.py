@@ -30,11 +30,14 @@ from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
+from lime_tbx.datatypes import constants
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
-OPTIONS = "he:l:s:c:o:f:t:"
+OPTIONS = "hvde:l:s:c:o:f:t:"
 LONG_OPTIONS = [
     "help",
+    "version",
+    "debug",
     "earth=",
     "lunar=",
     "satellite=",
@@ -126,6 +129,7 @@ observations files in GLOD format.\n"
     print("")
     print("Options:")
     print("  -h, --help\t\t Displays the help message.")
+    print("  -v, --version\t\t Displays the version name.")
     print("  -e, --earth\t\t Performs simulations from a geographic point.")
     print("\t\t\t -e lat_deg,lon_deg,height_m,{}".format(_DT_FORMAT))
     print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
@@ -170,6 +174,10 @@ in GLOD format."
         "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
 inputing directly only one datetime. Valid only if the main option is -e or -s."
     )
+
+
+def print_version():
+    print(constants.VERSION_NAME)
 
 
 class CLI:
@@ -597,6 +605,9 @@ class CLI:
         for opt, arg in opts:
             if opt in ("-h", "--help"):
                 print_help()
+                return 0
+            if opt in ("-v", "--version"):
+                print_version()
                 return 0
             if opt in ("-o", "--output"):  # Output
                 splitted = arg.split(",")
