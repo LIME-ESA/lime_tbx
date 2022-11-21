@@ -1,16 +1,19 @@
 """GUI Widgets related to the Help actions"""
 
 """___Built-In Modules___"""
-from typing import List, Callable, Union, Tuple, Optional
+from typing import Optional, Tuple
 import os
+import sys
+from shutil import which
 import webbrowser
+import subprocess
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
 from . import constants
-from lime_tbx.datatypes import constants as dtp_constants
+from lime_tbx.datatypes import logger, constants as dtp_constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -38,6 +41,79 @@ sensing instrument (pre-stored in GLOD format files) to the LIME model output.
     .replace("\\n", "\n")
     .strip()
 )
+
+
+def _launch_cmd(cmd: str) -> Tuple[str, str]:
+    cmd_exec = subprocess.Popen(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+    )
+    so, serr = cmd_exec.communicate()
+    return so, serr
+
+
+def _try_go_to_link_sensible_browser(link: str) -> bool:
+    if which("sensible-browser") is not None:
+        logger.get_logger().info("Using sensible-browser to open link")
+        cmd = f"sensible-browser {link} >/dev/null 2>&1 &"
+        so, serr = _launch_cmd(cmd)
+        logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+        if serr is not None and len(serr) > 0:
+            logger.get_logger().error(f"Returned error: Linux {cmd}: {serr}")
+            return False
+        return True
+    return False
+
+
+def _go_to_link(link: str) -> bool:
+    if sys.platform != "linux":
+        return webbrowser.open_new_tab(link)
+    else:
+        try:
+            user_home = os.environ.get("HOME")
+            xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+            if xdg_config_home is None:
+                xdg_config_home = os.path.join(user_home, ".config")
+            mimeapps_list = os.path.join(xdg_config_home, "mimeapps.list")
+            with open(mimeapps_list, "r") as fp:
+                lines = fp.readlines()
+            for line in lines:
+                if line.startswith("text/html") or line.startswith(
+                    "x-scheme-handler/http"
+                ):
+                    start = line.index("=") + 1
+                    end = line.index("\n") if ";" not in line else line.index(";")
+                    appname = line[start:end]
+                    break
+            else:
+                return _try_go_to_link_sensible_browser(link)
+            desktop_folders = [
+                os.path.join(user_home, ".local/share/applications/"),
+                "/usr/share/applications/",
+                "/usr/local/share/applications/",
+            ]
+            for folder in desktop_folders:
+                try:
+                    if os.path.exists(folder):
+                        if appname in os.listdir(folder):
+                            break
+                except PermissionError:
+                    logger.get_logger().debug(f"PermissionError for directory {folder}")
+            else:
+                return _try_go_to_link_sensible_browser(link)
+            appname = os.path.join(folder, appname)
+            cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
+            so, serr = _launch_cmd(cmd)
+            logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+            if serr is not None and len(serr) > 0:
+                raise Exception(f"Returned error: Linux {cmd}: {serr}")
+            return True
+        except Exception as e:
+            logger.get_logger().exception(e)
+            return _try_go_to_link_sensible_browser(link)
 
 
 class AboutDialog(QtWidgets.QDialog):
@@ -76,28 +152,40 @@ class AboutDialog(QtWidgets.QDialog):
         self.collaborators_text = QtWidgets.QLabel("In collaboration with:")
         ## UVa
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
-        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(100)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.uva_logo.setPixmap(uva_pixmap)
-        self.uva_logo.mousePressEvent = self._open_link_uva
         self.uva_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(100)
+        self.uva_logo.setPixmap(uva_pixmap)
+        self.uva_logo.mousePressEvent = self._open_web_uva
+        self.uva_logo.setOpenExternalLinks(True)
+        ## GOA UVa
+        goa_logo_path = os.path.join(_current_dir, constants.GOA_UVA_LOGO_PATH)
+        self.goa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
+        self.goa_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(100)
+        self.goa_logo.setPixmap(goa_pixmap)
+        self.goa_logo.mousePressEvent = self._open_web_goa_uva
+        self.goa_logo.setOpenExternalLinks(True)
         ## NPL
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
-        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(100)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.npl_logo.setPixmap(npl_pixmap)
-        self.npl_logo.mousePressEvent = self._open_link_npl
         self.npl_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(100)
+        self.npl_logo.setPixmap(npl_pixmap)
+        self.npl_logo.mousePressEvent = self._open_web_npl
+        self.npl_logo.setOpenExternalLinks(True)
         ## VITO
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
-        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(90)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
-        self.vito_logo.setPixmap(vito_pixmap)
-        self.vito_logo.mousePressEvent = self._open_link_vito
         self.vito_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(90)
+        self.vito_logo.setPixmap(vito_pixmap)
+        self.vito_logo.mousePressEvent = self._open_web_vito
+        self.vito_logo.setOpenExternalLinks(True)
         ## Finish Collaborators layout
         self.collaborators_img_layout = QtWidgets.QHBoxLayout()
         self.collaborators_img_layout.addWidget(self.uva_logo)
+        self.collaborators_img_layout.addWidget(self.goa_logo)
         self.collaborators_img_layout.addWidget(self.npl_logo)
         self.collaborators_img_layout.addWidget(self.vito_logo)
         self.collaborators_layout.addWidget(self.collaborators_text)
@@ -122,16 +210,17 @@ class AboutDialog(QtWidgets.QDialog):
         self.main_layout.addWidget(self.scroll_area)
 
     @QtCore.Slot()
-    def _open_link_uva(self, event):
-        self._open_link("https://www.uva.es/")
+    def _open_web_uva(self, event):
+        _go_to_link("http://www.uva.es/")
 
     @QtCore.Slot()
-    def _open_link_npl(self, event):
-        self._open_link("https://www.npl.co.uk/")
+    def _open_web_goa_uva(self, event):
+        _go_to_link("http://goa.uva.es/")
 
     @QtCore.Slot()
-    def _open_link_vito(self, event):
-        self._open_link("https://vito.be/en")
+    def _open_web_npl(self, event):
+        _go_to_link("https://www.npl.co.uk/")
 
-    def _open_link(self, link: str):
-        webbrowser.open(link, new=2)
+    @QtCore.Slot()
+    def _open_web_vito(self, event):
+        _go_to_link("https://vito.be/en")
