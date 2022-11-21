@@ -131,9 +131,10 @@ def _go_to_link(link: str) -> bool:
                 so, serr = _launch_cmd(cmd)
                 logger.get_logger().debug(f"Linux executing {cmd}: {so}")
                 if serr is not None and len(serr) > 0:
-                    logger.get_logger().error(f"Returned error: Linux {cmd}: {serr}")
-                else:
-                    return True
+                    logger.get_logger().warning(
+                        f"Returned error messages: Linux {cmd}: {serr}"
+                    )
+                return True
             except Exception as e:
                 logger.get_logger().exception(e)
         return _try_go_to_link_sensible_browser(link)
