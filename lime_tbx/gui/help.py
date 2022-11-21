@@ -1,7 +1,7 @@
 """GUI Widgets related to the Help actions"""
 
 """___Built-In Modules___"""
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Union
 import os
 import sys
 from shutil import which
@@ -68,52 +68,75 @@ def _try_go_to_link_sensible_browser(link: str) -> bool:
     return False
 
 
+def _get_mimeapps_lines() -> List[str]:
+    user_home = os.environ.get("HOME")
+    xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+    if xdg_config_home is None:
+        xdg_config_home = os.path.join(user_home, ".config")
+    mimeapps_list = os.path.join(xdg_config_home, "mimeapps.list")
+    if os.path.exists(mimeapps_list):
+        with open(mimeapps_list, "r") as fp:
+            lines = fp.readlines()
+    else:
+        lines = []
+    return lines
+
+
+def _get_default_browser_desktopfile() -> Union[str, None]:
+    valid_starts = (
+        "text/html",
+        "x-scheme-handler/http",
+        "x-scheme-handler/https",
+        "x-scheme-handler/about",
+        "x-scheme-handler/unknown",
+    )
+    for line in _get_mimeapps_lines():
+        if line.startswith(valid_starts):
+            start = line.index("=") + 1
+            end = line.index("\n") if ";" not in line else line.index(";")
+            appname = line[start:end]
+            return appname
+    else:
+        return None
+
+
+def _get_default_browser_desktoppath() -> Union[str, None]:
+    appname = _get_default_browser_desktopfile()
+    if appname == None:
+        return None
+    user_home = os.environ.get("HOME")
+    desktop_folders = [
+        os.path.join(user_home, ".local/share/applications/"),
+        "/usr/share/applications/",
+        "/usr/local/share/applications/",
+    ]
+    for folder in desktop_folders:
+        if os.access(folder, os.R_OK) and os.path.exists(folder):
+            if appname in os.listdir(folder):
+                break
+    else:
+        return None
+    appname = os.path.join(folder, appname)
+    return appname
+
+
 def _go_to_link(link: str) -> bool:
     if sys.platform != "linux":
         return webbrowser.open_new_tab(link)
     else:
-        try:
-            user_home = os.environ.get("HOME")
-            xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
-            if xdg_config_home is None:
-                xdg_config_home = os.path.join(user_home, ".config")
-            mimeapps_list = os.path.join(xdg_config_home, "mimeapps.list")
-            with open(mimeapps_list, "r") as fp:
-                lines = fp.readlines()
-            for line in lines:
-                if line.startswith("text/html") or line.startswith(
-                    "x-scheme-handler/http"
-                ):
-                    start = line.index("=") + 1
-                    end = line.index("\n") if ";" not in line else line.index(";")
-                    appname = line[start:end]
-                    break
-            else:
-                return _try_go_to_link_sensible_browser(link)
-            desktop_folders = [
-                os.path.join(user_home, ".local/share/applications/"),
-                "/usr/share/applications/",
-                "/usr/local/share/applications/",
-            ]
-            for folder in desktop_folders:
-                try:
-                    if os.path.exists(folder):
-                        if appname in os.listdir(folder):
-                            break
-                except PermissionError:
-                    logger.get_logger().debug(f"PermissionError for directory {folder}")
-            else:
-                return _try_go_to_link_sensible_browser(link)
-            appname = os.path.join(folder, appname)
-            cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
-            so, serr = _launch_cmd(cmd)
-            logger.get_logger().debug(f"Linux executing {cmd}: {so}")
-            if serr is not None and len(serr) > 0:
-                raise Exception(f"Returned error: Linux {cmd}: {serr}")
-            return True
-        except Exception as e:
-            logger.get_logger().exception(e)
-            return _try_go_to_link_sensible_browser(link)
+        appname = _get_default_browser_desktoppath()
+        if appname != None:
+            try:
+                cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
+                so, serr = _launch_cmd(cmd)
+                logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+                if serr is not None and len(serr) > 0:
+                    logger.get_logger().error(f"Returned error: Linux {cmd}: {serr}")
+                else:
+                    return True
+            except Exception as e:
+                logger.get_logger().exception(e)
+        return _try_go_to_link_sensible_browser(link)
 
 
 class AboutDialog(QtWidgets.QDialog):
@@ -154,7 +177,7 @@ class AboutDialog(QtWidgets.QDialog):
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.uva_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(100)
+        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(80)
         self.uva_logo.setPixmap(uva_pixmap)
         self.uva_logo.mousePressEvent = self._open_web_uva
         self.uva_logo.setOpenExternalLinks(True)
@@ -162,7 +185,7 @@ class AboutDialog(QtWidgets.QDialog):
         goa_logo_path = os.path.join(_current_dir, constants.GOA_UVA_LOGO_PATH)
         self.goa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.goa_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(100)
+        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(80)
         self.goa_logo.setPixmap(goa_pixmap)
         self.goa_logo.mousePressEvent = self._open_web_goa_uva
         self.goa_logo.setOpenExternalLinks(True)
@@ -170,7 +193,7 @@ class AboutDialog(QtWidgets.QDialog):
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.npl_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(100)
+        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(80)
         self.npl_logo.setPixmap(npl_pixmap)
         self.npl_logo.mousePressEvent = self._open_web_npl
         self.npl_logo.setOpenExternalLinks(True)
@@ -178,7 +201,7 @@ class AboutDialog(QtWidgets.QDialog):
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.vito_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(90)
+        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(72)
         self.vito_logo.setPixmap(vito_pixmap)
         self.vito_logo.mousePressEvent = self._open_web_vito
         self.vito_logo.setOpenExternalLinks(True)
