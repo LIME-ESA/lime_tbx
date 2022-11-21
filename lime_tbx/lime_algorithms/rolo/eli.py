@@ -8,7 +8,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 import math
-from typing import List, Union
+from typing import Union
 
 """___Third-Party Modules___"""
 # import here
@@ -39,7 +39,7 @@ DIST_EARTH_MOON_KM: int = 384400
 def measurement_func_eli(
     a_l: Union[float, np.ndarray],
     omega: float,
-    esk: Union[float, List[float]],
+    esk: Union[float, np.ndarray],
     dsm: float,
     distance_earth_moon_km: float,
     dom: float,
@@ -80,7 +80,7 @@ def calculate_eli(
     """
     a_l = elref.calculate_elref(cimel_coef, moon_data)
 
-    esk = list(esi.get_esi_per_nms(cimel_coef.wlens))
+    esk = esi.get_esi_per_nms(cimel_coef.wlens)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
@@ -91,7 +91,7 @@ def calculate_eli(
 
 
 def calculate_eli_from_elref(
-    wavelengths_nm: List[float], moon_data: MoonData, elrefs: np.ndarray
+    wavelengths_nm: np.ndarray, moon_data: MoonData, elrefs: np.ndarray
 ) -> np.ndarray:
     """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
@@ -100,7 +100,7 @@ def calculate_eli_from_elref(
 
     Parameters
     ----------
-    wavelength_nm : list of float
+    wavelength_nm : np.array of float
         Wavelengths (in nanometers) of which the extraterrestrial lunar irradiance will be
         calculated.
     moon_data : MoonData
@@ -113,7 +113,7 @@ def calculate_eli_from_elref(
     np.ndarray of float
         The extraterrestrial lunar irradiance calculated
     """
-    esk = list(esi.get_esi_per_nms(wavelengths_nm))
+    esk = esi.get_esi_per_nms(wavelengths_nm)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
@@ -143,7 +143,7 @@ def calculate_eli_from_elref_unc(
     np.ndarray of float
         The uncertainties calculated
     """
-    esk = list(esi.get_esi_per_nms(elref_spectrum.wlens))
+    esk = esi.get_esi_per_nms(elref_spectrum.wlens)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 

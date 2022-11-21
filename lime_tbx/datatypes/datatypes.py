@@ -817,7 +817,6 @@ class ComparisonData:
     diffs_signal: SpectralData
     mean_relative_difference: float
     standard_deviation_mrd: float
-    temporal_trend: Union[float, None]
     number_samples: int
     dts: List[datetime]
     points: List[Point]
@@ -903,6 +902,7 @@ class LGLODData:
     not_default_srf: bool
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
+    polars_cimel: List["SpectralData"]
 
 
 @dataclass

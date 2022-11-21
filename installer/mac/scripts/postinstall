@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+[ -f "/usr/local/bin/lime" ] && rm -f /usr/local/bin/lime
+ln -s /Applications/LimeTBX.app/Contents/MacOS/LimeTBX.exe /usr/local/bin/lime
+chmod 777 /Applications/LimeTBX.app/Contents/Resources/coeff_data/versions

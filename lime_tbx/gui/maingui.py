@@ -4,12 +4,11 @@
 from enum import Enum
 from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
-import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from . import settings, output, input, srf, help
 from lime_tbx.filedata import moon, srf as srf_loader
 from ..simulation.comparison import comparison
@@ -20,17 +19,13 @@ from ..datatypes.datatypes import (
     LGLODData,
     LimeException,
     LunarObservation,
-    LunarObservationWrite,
     Point,
     PolarizationCoefficients,
     SatellitePoint,
-    SatellitePosition,
-    SelenographicDataWrite,
     SpectralResponseFunction,
     ApolloIrradianceCoefficients,
     SpectralValidity,
     SurfacePoint,
-    CustomPoint,
     ReflectanceCoefficients,
     SpectralData,
 )
@@ -38,7 +33,9 @@ from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.gui import canvas, coefficients, constants
+from lime_tbx.gui import canvas, coefficients
+from lime_tbx.gui.spinner import SpinnerPage
+from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
 from ..datatypes import logger, constants as logic_constants
 
 """___Authorship___"""
@@ -52,29 +49,6 @@ __status__ = "Development"
 _INTERNAL_ERROR_MSG = (
     "Something went wrong while performing the operation. See log for more detail."
 )
-
-
-class CallbackWorker(QtCore.QObject):
-    finished = QtCore.Signal(list)
-    exception = QtCore.Signal(Exception)
-    info = QtCore.Signal(str)
-
-    def __init__(self, callback: Callable, args: list, with_info: bool = False):
-        super().__init__()
-        self.callback = callback
-        self.args = args
-        self.with_info = with_info
-
-    def run(self):
-        try:
-            if not self.with_info:
-                res = self.callback(*self.args)
-            else:
-                res = self.callback(*self.args, self.info)
-            self.finished.emit(list(res))
-        except Exception as e:
-            logger.get_logger().exception(e)
-            self.exception.emit(e)
 
 
 def eli_callback(
@@ -185,10 +159,20 @@ def polar_callback(
     point: Point,
     coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
-) -> Tuple[List[float], List[float], Point]:
+) -> Tuple[
+    Point,
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+]:
 
     lime_simulation.update_polarization(srf, point, coeffs)
-    return point, lime_simulation.get_polars()
+    return (
+        point,
+        lime_simulation.get_polars(),
+        lime_simulation.get_polars_cimel(),
+        lime_simulation.get_polars_asd(),
+    )
 
 
 def compare_callback(
@@ -238,27 +222,6 @@ def calculate_all_callback(
     lime_simulation.update_irradiance(srf, point, cimel_coef)
     lime_simulation.update_polarization(srf, point, p_coeffs)
     return (point, srf)
-
-
-def _start_thread(
-    worker: CallbackWorker,
-    worker_th: QtCore.QThread,
-    finished: Callable,
-    error: Callable,
-    info: Callable = None,
-):
-    worker.moveToThread(worker_th)
-    worker_th.started.connect(worker.run)
-    worker.finished.connect(worker_th.quit)
-    worker.finished.connect(worker.deleteLater)
-    worker.finished.connect(finished)
-    worker.exception.connect(worker_th.quit)
-    worker.exception.connect(worker.deleteLater)
-    worker.exception.connect(error)
-    if info:
-        worker.info.connect(info)
-    worker_th.finished.connect(worker_th.deleteLater)
-    worker_th.start()
 
 
 class ComparisonPageWidget(QtWidgets.QWidget):
@@ -851,11 +814,13 @@ class MainSimulationsWidget(
         data: Tuple[
             Point,
             Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
-        self.graph.update_plot(data[1], point=data[0], redraw=False)
+        self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
@@ -921,40 +886,8 @@ class LimePagesEnum(Enum):
     COMPARISON = 1
 
 
-class SpinnerPage(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        # Loading spinner
-        _current_dir = os.path.dirname(os.path.abspath(__file__))
-        _movie_path = os.path.join(_current_dir, constants.SPINNER_PATH)
-        self.movie = QtGui.QMovie(_movie_path)
-        self.movie.setScaledSize(QtCore.QSize(50, 50))
-        self._build_layout()
-
-    def _build_layout(self):
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.label_spinner = QtWidgets.QLabel()
-        self.label_spinner.setMovie(self.movie)
-        self.label_text = QtWidgets.QLabel()
-        self.main_layout.addWidget(QtWidgets.QLabel())
-        self.main_layout.addWidget(self.label_spinner)
-        self.main_layout.addWidget(self.label_text)
-        self.main_layout.addWidget(QtWidgets.QLabel())
-        self.main_layout.setAlignment(self.label_spinner, QtGui.Qt.AlignHCenter)
-        self.main_layout.setAlignment(self.label_text, QtGui.Qt.AlignHCenter)
-
-    def movie_start(self):
-        self.movie.start()
-
-    def movie_stop(self):
-        self.movie.stop()
-
-    def set_text(self, text: str):
-        self.label_text.setText(text)
-
-
 def load_simulation_callback(path: str, kernels_path: KernelsPath):
-    lglod = moon.read_glod_file(path, kernels_path)
+    lglod = moon.read_lglod_file(path, kernels_path)
     return [lglod]
 
 
@@ -1127,7 +1060,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.download_coefficients_action = QtWidgets.QAction(self)
         self.download_coefficients_action.setText("&Download updated coefficients")
         self.download_coefficients_action.triggered.connect(self.download_coefficients)
-        self.download_coefficients_action.setDisabled(True)
+        # self.download_coefficients_action.setDisabled(True)
         self.select_coefficients_action = QtWidgets.QAction(self)
         self.select_coefficients_action.setText("&Select coefficients")
         self.select_coefficients_action.triggered.connect(self.select_coefficients)
@@ -1294,7 +1227,11 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.close()
 
     def download_coefficients(self):
-        pass
+        lime_tbx_w = self._get_lime_widget()
+        download_coeffs_dialog = coefficients.DownloadCoefficientsDialog(
+            lime_tbx_w.settings_manager, self
+        )
+        download_coeffs_dialog.exec_()
 
     def select_coefficients(self):
         lime_tbx_w = self._get_lime_widget()

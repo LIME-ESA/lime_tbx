@@ -24,6 +24,8 @@ def _preprocess_qss(qss: str, qss_constants: str):
     consts = qss_constants.split("\n")
     for const in consts:
         key_val = list(map(lambda c: c.strip(), const.split("=")))
+        if key_val[0] == "":
+            continue
         qss = qss.replace(key_val[0], key_val[1])
     return qss
 
@@ -40,8 +42,13 @@ class GUI:
         window.setCentralWidget(main_widget)
         window.show()
         window.setWindowTitle(constants.APPLICATION_NAME)
-
+        # QSS | Read, and preprocess it with global constants and os constants
         qss = pkgutil.get_data(__name__, constants.MAIN_QSS_PATH).decode()
+        if sys.platform == "darwin":
+            qss_os_constants = pkgutil.get_data(
+                __name__, constants.QSS_DARWIN_CONSTANTS_PATH
+            ).decode()
+            qss = _preprocess_qss(qss, qss_os_constants)
         qss_constants = pkgutil.get_data(
             __name__, constants.QSS_CONSTANTS_PATH
         ).decode()
@@ -54,6 +61,8 @@ class GUI:
 
             myappid = "esa.lime.limetbx"
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        else:
+            app.setStyle("Fusion")
         sys.exit(app.exec_())
 
     def _init_fonts(self):

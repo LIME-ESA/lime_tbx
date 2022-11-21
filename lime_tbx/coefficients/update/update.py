@@ -1,13 +1,20 @@
 """describe class"""
 
 """___Built-In Modules___"""
-# import here
+import os
+from abc import ABC, abstractmethod
+import requests
+from typing import Callable, Tuple
+from io import StringIO
 
 """___Third-Party Modules___"""
 # import here
 
-"""___NPL Modules___"""
-# import here
+"""___LIME Modules___"""
+from ..access_data import access_data
+from ..access_data import programdata
+from lime_tbx.filedata import csv as lcsv
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -16,22 +23,75 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
-from abc import ABC, abstractmethod
-
 
 class IUpdate(ABC):
     @abstractmethod
-    def check_for_updates() -> bool:
+    def check_for_updates(self) -> bool:
         pass
 
     @abstractmethod
-    def download_coefficients() -> bool:
+    def download_coefficients(
+        self, stopper_checker: Callable, stopper_args: list
+    ) -> Tuple[int, int]:
         pass
 
 
 class Update(IUpdate):
-    def check_for_updates() -> bool:
-        pass
+    def __init__(self):
+        self.url = self._get_url(
+            os.path.join(programdata.get_programfiles_folder(), "coeff_data")
+        )
 
-    def download_coefficients() -> bool:
-        pass
+    def _get_url(self, urlfile_dir: str) -> str:
+        filepath = os.path.join(urlfile_dir, "coefficients_server.txt")
+        url = ""
+        with open(filepath) as fp:
+            url = fp.readlines()[0].strip()
+        return url
+
+    def check_for_updates(self) -> bool:
+        """True if there are updates"""
+        urlpath = os.path.join(self.url, "list.txt")
+        version_files = requests.get(urlpath).text.split()
+        self_files = access_data.get_coefficients_filenames()
+        for vf in version_files:
+            if vf not in self_files:
+                return True
+        return False
+
+    def download_coefficients(
+        self, stopper_checker: Callable, stopper_args: list
+    ) -> Tuple[int, int]:
+        urlpath = f"{self.url}/list.txt"
+        version_files = requests.get(urlpath).text.split()
+        self_files = access_data.get_coefficients_filenames()
+        quant_news = 0
+        quant_fails = 0
+        for vf in version_files:
+            is_running = stopper_checker(*stopper_args)
+            if not is_running:
+                return
+            if vf not in self_files:
+                quant_news += 1
+                fcontent = requests.get(f"{self.url}/versions/{vf}").text
+                try:
+                    lcsv.read_refl_coefficients_from_stream(StringIO(fcontent))
+                except Exception as e:
+                    quant_fails += 1
+                    logger.get_logger().warning(
+                        "Wrong coefficient data downloaded. Error {}: {}".format(
+                            e, fcontent
+                        )
+                    )
+                else:
+                    with open(
+                        os.path.join(
+                            programdata.get_programfiles_folder(),
+                            "coeff_data",
+                            "versions",
+                            vf,
+                        ),
+                        "w",
+                    ) as fp:
+                        fp.write(fcontent)
+        return (quant_news, quant_fails)

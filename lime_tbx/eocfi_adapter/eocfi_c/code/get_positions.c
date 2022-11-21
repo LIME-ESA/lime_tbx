@@ -32,7 +32,7 @@ DEFINE_CHECK_STATUS(xd, XD)
 DEFINE_CHECK_STATUS(xl, XL)
 
 struct Date{
-    int y, m, d, hh, mm, ss;
+    int y, m, d, hh, mm, ss, microsecs;
 };
 
 static const int monthDays[12]
@@ -64,7 +64,7 @@ static int countLeapYears(struct Date d)
 static int getDifference(struct Date dt)
 {
     struct Date dt2 = dt;
-    struct Date dt1 = {2000, 1, 1, 00, 00, 00};
+    struct Date dt1 = {2000, 1, 1, 00, 00, 00, 00};
     // COUNT TOTAL NUMBER OF DAYS
     // BEFORE FIRST DATE 'dt1'
 
@@ -113,11 +113,12 @@ double * get_sun_position(
         int hh,
         int mm,
         int ss,
+        int microsecs,
         char *init_time_file
 ){
 
     double static position_returns[3];
-    struct Date dt = {y, m, d, hh, mm, ss};
+    struct Date dt = {y, m, d, hh, mm, ss, microsecs};
 
     xl_model_id model = {NULL};
     {
@@ -145,7 +146,7 @@ double * get_sun_position(
     }
 
     // Convert the datetime to a correct format
-    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss;  // [seconds]
+    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss + dt.microsecs/1000000.0;  // [seconds]
     double start     = getDifference(dt);
 
     double instant =
@@ -183,11 +184,12 @@ double * get_moon_position(
         int hh,
         int mm,
         int ss,
+        int microsecs,
         char *init_time_file
         ){
 
     double static position_returns[3];
-    struct Date dt = {y, m, d, hh, mm, ss};
+    struct Date dt = {y, m, d, hh, mm, ss, microsecs};
 
     xl_model_id model = {NULL};
     {
@@ -215,7 +217,7 @@ double * get_moon_position(
     }
 
     // Convert the datetime to a correct format
-    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss;  // [seconds]
+    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss + dt.microsecs/1000000.0;  // [seconds]
     double start     = getDifference(dt);
 
     double instant =
@@ -343,8 +345,8 @@ __declspec(dllexport) int  get_satellite_position_osf(
     status = xo_orbit_get_osv_compute_validity(&orbit_id, &val_time);
 
     for (int i = 0; i < quant_dates; i++){
-        struct Date dt = {dates[i][0], dates[i][1], dates[i][2], dates[i][3], dates[i][4], dates[i][5]};
-        double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss;
+        struct Date dt = {dates[i][0], dates[i][1], dates[i][2], dates[i][3], dates[i][4], dates[i][5], dates[i][6]};
+        double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss + dt.microsecs/1000000.0;
         double start_time     = getDifference(dt);
         vstart2 = start_time + seconds / 86400.;
         vstop2 = vstart2 + 0.5;
@@ -547,8 +549,8 @@ __declspec(dllexport) int  get_satellite_position_tle(
     status = xo_orbit_get_osv_compute_validity(&orbit_id, &val_time);
 
     for (int i = 0; i < quant_dates; i++){
-        struct Date dt = {dates[i][0], dates[i][1], dates[i][2], dates[i][3], dates[i][4], dates[i][5]};
-        double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss;
+        struct Date dt = {dates[i][0], dates[i][1], dates[i][2], dates[i][3], dates[i][4], dates[i][5], dates[i][6]};
+        double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss + dt.microsecs/1000000.0;
         double start_time     = getDifference(dt);
         vstart2 = start_time + seconds / 86400.;
         vstop2 = vstart2 + 0.5;
@@ -636,11 +638,11 @@ int main (int argc, char *argv[]){
     double **positions = (double**)malloc(sizeof(double*)*n_dates);
     for(int i = 0; i < n_dates; i++){
         positions[i] = (double*)malloc(sizeof(double)*3);
-        dates[i] = (int*)malloc(sizeof(int)*6);
+        dates[i] = (int*)malloc(sizeof(int)*7);
     }
     if(argc < 6){
         sat_id = 200;
-        dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0;
+        dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0; dates[0][6] = 0;
         strcpy(orbit_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF");
         strcpy(tle_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/TLE/PROBA-V_20130507T000000_20221012T000000_0001.TLE");
         norad = 39159;
@@ -654,7 +656,7 @@ int main (int argc, char *argv[]){
         strcpy(sat_name, argv[7]);
         strcpy(intdes, argv[8]);
         for(int i = 0; i < n_dates; i++){
-            sscanf(argv[9+i], "%d-%d-%dT%d:%d:%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5]);
+            sscanf(argv[9+i], "%d-%d-%dT%d:%d:%d.%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5], &dates[i][6]);
         }
         get_satellite_position_tle(
             sat_id,
@@ -671,7 +673,7 @@ int main (int argc, char *argv[]){
         sat_id = atol(argv[3]);
         strcpy(orbit_file, argv[4]);
         for(int i = 0; i < n_dates; i++){
-            sscanf(argv[5+i], "%d-%d-%dT%d:%d:%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5]);
+            sscanf(argv[5+i], "%d-%d-%dT%d:%d:%d.%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5], &dates[i][6]);
         }
         get_satellite_position_osf(
             sat_id,

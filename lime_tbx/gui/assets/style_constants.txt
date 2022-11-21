@@ -12,3 +12,4 @@
 @lightGray = #a9a9a9
 @darkGray = #404040
 @disabledGray = #656565
+@default_fontsize = 11pt

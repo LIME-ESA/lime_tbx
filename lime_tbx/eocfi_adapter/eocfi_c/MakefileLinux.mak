@@ -43,7 +43,7 @@ SHELL = /bin/bash
 
 CFLAGS = \
         -m64 \
-	-Iinclude \
+	-Iinclude/$(OS) \
 	-D$(OS) -Wall
 
 DEBUG_FLAGS = \

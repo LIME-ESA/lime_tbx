@@ -9,13 +9,14 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from typing import Union, List, Tuple
+from typing import Union, List, Iterable
 from datetime import datetime, timezone
 import csv
-import logging
 
 """___Third-Party Modules___"""
 import numpy as np
+import xarray
+import obsarray
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
@@ -25,8 +26,11 @@ from ..datatypes.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
+    LimeException,
 )
 from ..datatypes import logger
+from ..datatypes.datatypes import ReflectanceCoefficients
+from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -285,6 +289,58 @@ def read_datetimes(path: str) -> List[datetime]:
                 dt = datetime(*irow, tzinfo=timezone.utc)
                 datetimes.append(dt)
             return datetimes
+    except Exception as e:
+        logger.get_logger().exception(e)
+        raise Exception(_READ_FILE_ERROR_STR)
+
+
+def read_refl_coefficients_from_stream(
+    stream: Iterable[str],
+) -> ReflectanceCoefficients:
+    # define dim_size_dict to specify size of arrays
+    dim_sizes = {
+        "wavelength": 6,
+        "i_coeff": 18,
+    }
+    # create dataset
+    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
+
+    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
+    reader = csv.reader(stream)
+    rows = []
+    for row in reader:
+        if len(row) > 0 and len(row[0]) > 0 and row[0][0] != "#":
+            rows.append(row)
+    if len(rows) != 13:
+        raise LimeException(
+            f"Wrong format in the coefficients update file. There should be 13 uncommented lines, found {len(rows)}."
+        )
+    version_name = rows[0][0]
+    data = np.array(rows[1:7]).astype(float)
+    u_data = np.array(rows[7:]).astype(float)
+    ds_cimel.coeff.values = data.T
+    ds_cimel.u_coeff.values = u_data.T
+
+    return ReflectanceCoefficients(ds_cimel, version_name)
+
+
+def read_refl_coefficients(path: str) -> ReflectanceCoefficients:
+    """
+    Read a Reflectance Coefficients CSV file.
+
+    Parameters
+    ----------
+    path: str
+        Path where the file is stored.
+
+    Returns
+    -------
+    rc: ReflectanceCoefficients
+        ReflectanceCoefficients read.
+    """
+    try:
+        with open(path, "r") as file:
+            return read_refl_coefficients_from_stream(file)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)

@@ -443,6 +443,22 @@ def write_obs(
         refl_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.elrefs_cimel]
         )
+        polar_cimel = ds.createVariable(
+            "polar_cimel", "f4", ("number_obs", "wlens_cimel")
+        )
+        polar_cimel.units = "Fractions of unity"
+        polar_cimel.long_name = "Simulated polarization for the cimel wavelengths."
+        polar_cimel[:] = np.array([cimel.data for cimel in lglod.polars_cimel])
+        polar_cimel_unc = ds.createVariable(
+            "polar_cimel_unc", "f4", ("number_obs", "wlens_cimel")
+        )
+        polar_cimel_unc.units = "Fractions of unity"
+        polar_cimel_unc.long_name = (
+            "Uncertainties for the simulated polarization for the cimel wavelengths."
+        )
+        polar_cimel_unc[:] = np.array(
+            [cimel.uncertainties for cimel in lglod.polars_cimel]
+        )
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
@@ -508,6 +524,12 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     refl_cimel_unc = [
         list(map(float, data)) for data in ds.variables["refl_cimel_unc"][:].data
     ]
+    polar_cimel = [
+        list(map(float, data)) for data in ds.variables["polar_cimel"][:].data
+    ]
+    polar_cimel_unc = [
+        list(map(float, data)) for data in ds.variables["polar_cimel_unc"][:].data
+    ]
     if len(datetimes) == 0:
         mpa_degrees = ds.variables["mpa_degrees"][:].data
         distance_sun_moon = ds.variables["distance_sun_moon"][:].data
@@ -565,7 +587,15 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         )
         for i in range(len(refl_cimel))
     ]
-    return LGLODData(obss, signals, not_default_srf, elis_cimel, elrefs_cimel)
+    polars_cimel = [
+        SpectralData(
+            cimel_wlens, np.array(polar_cimel[i]), np.array(polar_cimel_unc[i]), None
+        )
+        for i in range(len(polar_cimel))
+    ]
+    return LGLODData(
+        obss, signals, not_default_srf, elis_cimel, elrefs_cimel, polars_cimel
+    )
 
 
 def write_comparison(
@@ -629,14 +659,6 @@ def write_comparison(
                 c.standard_deviation_mrd
                 for c in lglod.comparisons
                 if c.standard_deviation_mrd is not None
-            ],
-            dtype=object,
-        )
-        temporal_trend_data = np.array(
-            [
-                c.temporal_trend
-                for c in lglod.comparisons
-                if c.temporal_trend is not None
             ],
             dtype=object,
         )
@@ -765,10 +787,6 @@ def write_comparison(
         number_samples[:] = number_samples_data
         std_mrd = ds.createVariable("std_mrd", "f4", ("chan",), fill_value=fill_value)
         std_mrd[:] = std_mrd_data
-        temporal_trend = ds.createVariable(
-            "temporal_trend", "f4", ("chan",), fill_value=fill_value
-        )
-        temporal_trend[:] = temporal_trend_data
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
@@ -803,7 +821,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     irr_diff_uncs = np.array(ds.variables["irr_diff_unc"][:].data).T
     mrd = np.array(ds.variables["mrd"][:].data)
     std_mrd = np.array(ds.variables["std_mrd"][:].data)
-    temporal_trend = np.array(ds.variables["temporal_trend"][:].data)
     number_samples = np.array(ds.variables["number_samples"][:].data)
     lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
@@ -813,7 +830,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     ds.close()
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
-    temporal_trend = temporal_trend[temporal_trend != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     for i, sp in enumerate(sat_poss):
         sp = SurfacePoint(
@@ -850,7 +866,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             diffs_signal,
             mrd[i],
             std_mrd[i],
-            temporal_trend[i],
             number_samples[i],
             dts,
             points[indexes],
@@ -860,7 +875,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     return LGLODComparisonData(comps, ch_names, sat_name)
 
 
-def read_glod_file(
+def read_lglod_file(
     path: str, kernels_path: KernelsPath
 ) -> Union[LGLODData, LGLODComparisonData]:
     try:

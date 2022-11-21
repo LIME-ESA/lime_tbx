@@ -1,15 +1,17 @@
-"""describe class"""
+"""Module in charge of obtaining the path for the appdata folder. It does not import the Lime logger module."""
 
 """___Built-In Modules___"""
 import sys
 import pathlib
-from os import path, environ, makedirs
+from os import path, environ
+import os
+from logging import Logger
 
 """___Third-Party Modules___"""
 # import here
 
 """___LIME Modules___"""
-from ...datatypes import logger
+# import here
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -21,57 +23,25 @@ __status__ = "Development"
 APPNAME = "LimeTBX"
 
 
-def _is_valid_appdata(appdata: str) -> bool:
+def _is_valid_appdata(appdata: str, logger: Logger) -> bool:
     kpath = path.join(appdata, "kernels")
     if not path.exists(kpath):
         try:
-            makedirs(kpath)
+            os.makedirs(kpath)
         except Exception as e:
-            logger.get_logger().critical(e)
+            logger.critical(e)
+            return False
+    cpath = path.join(appdata, "coeff_data")
+    if not path.exists(cpath):
+        try:
+            os.makedirs(cpath)
+        except Exception as e:
+            logger.critical(e)
             return False
     return True
 
 
-def _is_valid_programfiles(programdata: str) -> bool:
-    if path.exists(path.join(programdata, "kernels")) and path.exists(
-        path.join(programdata, "eocfi_data")
-    ):
-        return True
-    return False
-
-
-def get_programfiles_folder() -> str:
-    if sys.platform == "darwin":
-        programfiles = get_appdata_folder()
-    elif sys.platform == "win32":
-        import winreg
-
-        a_reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
-        sub_key_admin = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
-        sub_key_user = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
-        valid = True
-        try:
-            a_key = winreg.OpenKey(a_reg, sub_key_admin)
-        except:
-            valid = False
-        if not valid:
-            valid = True
-            try:
-                a_key = winreg.OpenKey(a_reg, sub_key_user)
-            except:
-                valid = False
-        if valid:
-            programfiles = winreg.QueryValueEx(a_key, "Inno Setup: App Path")[0]
-        else:
-            programfiles = path.join(environ["PROGRAMFILES"], APPNAME)
-    else:
-        programfiles = path.join("/opt/esa", APPNAME)
-    if not _is_valid_programfiles(programfiles):
-        programfiles = "."
-    return programfiles
-
-
-def get_appdata_folder() -> str:
+def get_appdata_folder(logger: Logger) -> str:
     if sys.platform == "darwin":
         home = pathlib.Path.home()
         appdata = str(home / "Library/Application Support" / APPNAME)
@@ -79,6 +49,8 @@ def get_appdata_folder() -> str:
         appdata = path.join(environ["APPDATA"], APPNAME)
     else:
         appdata = path.expanduser(path.join("~", "." + APPNAME))
-    if not _is_valid_appdata(appdata):
+    logger.info(f"Appdata folder: {appdata}")
+    if not _is_valid_appdata(appdata, logger):
+        logger.warning("Appdata folder not valid, using '.'")
         appdata = "."
     return appdata

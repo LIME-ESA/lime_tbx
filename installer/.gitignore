@@ -1,3 +1,9 @@
-linux/installer_files
-linux/lime_installer.zip
+*/installer_files
+**/installer_files
+*/lime_installer.zip
 windows/*.exe
+*.app
+*.pkg
+mac/bundle
+mac/temp_files/
+debian/lime*

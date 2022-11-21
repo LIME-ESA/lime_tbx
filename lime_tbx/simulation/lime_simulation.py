@@ -210,7 +210,31 @@ class ILimeSimulation(ABC):
 
         Returns
         -------
-        elrefs: SpectralData | list of SpectralData
+        polars: SpectralData | list of SpectralData
+            Previously calculated polarization/s
+        """
+        pass
+
+    @abstractmethod
+    def get_polars_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for lunar polarization degree for the cimel wavelengths
+
+        Returns
+        -------
+        polars_cimel: SpectralData | list of SpectralData
+            Previously calculated polarization/s
+        """
+        pass
+
+    @abstractmethod
+    def get_polars_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for lunar polarization degree for the asd spectrum.
+
+        Returns
+        -------
+        polars_asd: SpectralData | list of SpectralData
             Previously calculated polarization/s
         """
         pass
@@ -270,12 +294,14 @@ class LimeSimulation(ILimeSimulation):
         self.wlens: List[float] = []
         self.elref: Union[SpectralData, List[SpectralData]] = None
         self.elis: Union[SpectralData, List[SpectralData]] = None
+        self.polars: Union[SpectralData, List[SpectralData]] = None
         self.signals: SpectralData = None
         self.elref_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elref_asd: Union[SpectralData, List[SpectralData]] = None
         self.elis_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elis_asd: Union[SpectralData, List[SpectralData]] = None
-        self.polars: Union[SpectralData, List[SpectralData]] = None
+        self.polars_cimel: Union[SpectralData, List[SpectralData]] = None
+        self.polars_asd: Union[SpectralData, List[SpectralData]] = None
         self.srf: SpectralResponseFunction = None
         self.surfaces_of_sat: Tuple[SurfacePoint, List[SurfacePoint], None] = None
         self.point: Point = None
@@ -367,11 +393,34 @@ class LimeSimulation(ILimeSimulation):
     @staticmethod
     def _calculate_irradiances_values(
         mds: Union[MoonData, List[MoonData]], elrefs, elref_cimel, elref_asd
-    ):
+    ) -> Tuple[
+        Union[SpectralData, List[SpectralData]],
+        Union[SpectralData, List[SpectralData]],
+        Union[SpectralData, List[SpectralData]],
+    ]:
         elis = LimeSimulation._calculate_eli_from_elref(mds, elrefs)
         elis_cimel = LimeSimulation._calculate_eli_from_elref(mds, elref_cimel)
         elis_asd = LimeSimulation._calculate_eli_from_elref(mds, elref_asd)
         return elis, elis_cimel, elis_asd
+
+    @staticmethod
+    def _calculate_polarization_values(
+        mds: Union[MoonData, List[MoonData]],
+        polar_coeff: PolarizationCoefficients,
+        intp: SpectralInterpolation,
+        wlens: List[float],
+    ) -> Tuple[
+        Union[SpectralData, List[SpectralData]],
+        Union[SpectralData, List[SpectralData]],
+        Union[SpectralData, List[SpectralData]],
+    ]:
+        polar_cimel = LimeSimulation._calculate_polar(mds, polar_coeff)
+        if isinstance(mds, list):
+            polar_asd = [intp.get_best_polar_asd_reference(md) for md in mds]
+        else:
+            polar_asd = intp.get_best_polar_asd_reference(mds)
+        polar = LimeSimulation._interpolate_polar(polar_asd, polar_cimel, intp, wlens)
+        return polar_cimel, polar_asd, polar
 
     def update_irradiance(
         self,
@@ -413,7 +462,13 @@ class LimeSimulation(ILimeSimulation):
         if not self.pol_uptodate:
             if self.verbose:
                 print("starting polarisation update")
-            self.polars = self._calculate_polar(polar_coeff)
+            (
+                self.polars_cimel,
+                self.polars_asd,
+                self.polars,
+            ) = LimeSimulation._calculate_polarization_values(
+                self.mds, polar_coeff, self.intp, self.wlens
+            )
             self.pol_uptodate = True
             if self.verbose:
                 print("polarisation update done")
@@ -470,6 +525,38 @@ class LimeSimulation(ILimeSimulation):
         return specs
 
     @staticmethod
+    def _interpolate_polar(
+        asd_data: Union[SpectralData, List[SpectralData]],
+        cimel_data: Union[SpectralData, List[SpectralData]],
+        intp: SpectralInterpolation,
+        wlens: List[float],
+    ) -> Union[SpectralData, List[SpectralData]]:
+
+        is_list = isinstance(cimel_data, list)
+        if not is_list:
+            cimel_data = [cimel_data]
+            asd_data = [asd_data]  # both same length
+        specs: Union[SpectralData, List[SpectralData]] = []
+        for i, cf in enumerate(cimel_data):
+            polars_intp = intp.get_interpolated_refl(
+                cf.wlens,
+                cf.data,
+                asd_data[i].wlens,
+                asd_data[i].data,
+                wlens,
+            )
+            u_polars_intp = None
+            u_polars_intp = polars_intp * 0.01
+            ds_intp = SpectralData.make_reflectance_ds(
+                wlens, polars_intp, u_polars_intp
+            )
+
+            specs.append(SpectralData(wlens, polars_intp, u_polars_intp, ds_intp))
+        if not is_list:
+            specs = specs[0]
+        return specs
+
+    @staticmethod
     def _calculate_elref(
         mds: Union[MoonData, List[MoonData]], cimel_coeff: ReflectanceCoefficients
     ) -> Union[SpectralData, List[SpectralData]]:
@@ -512,31 +599,19 @@ class LimeSimulation(ILimeSimulation):
             specs.append(rl.get_elis_from_elrefs(elrefs[i], m))
         return specs
 
+    @staticmethod
     def _calculate_polar(
-        self,
+        mds: Union[MoonData, List[MoonData]],
         polar_coeff: PolarizationCoefficients,
     ) -> Union[SpectralData, List[SpectralData]]:
         dl = dolp.DOLP()
-        if not isinstance(self.mds, list):
-            polarizations = np.array(
-                dl.get_polarized(self.wlens, self.mds.mpa_degrees, polar_coeff)
-            )
-            ds_pol = SpectralData.make_polarization_ds(self.wlens, polarizations, None)
-            return SpectralData(
-                self.wlens, polarizations, ds_pol.u_ran_polarization.values, ds_pol
-            )
+        wlens = polar_coeff.get_wavelengths()
+        if not isinstance(mds, list):
+            return dl.get_polarized(wlens, mds.mpa_degrees, polar_coeff)
         else:
             specs = []
-            for m in self.mds:
-                polarizations = np.array(
-                    dl.get_polarized(self.wlens, m.mpa_degrees, polar_coeff)
-                )
-                ds_pol = SpectralData.make_polarization_ds(
-                    self.wlens, polarizations, None
-                )
-                spectral_data = SpectralData(
-                    self.wlens, polarizations, ds_pol.u_ran_polarization.values, ds_pol
-                )
+            for m in mds:
+                spectral_data = dl.get_polarized(wlens, m.mpa_degrees, polar_coeff)
                 specs.append(spectral_data)
         return specs
 
@@ -568,6 +643,7 @@ class LimeSimulation(ILimeSimulation):
         self.elis_cimel = lglod.elis_cimel
         self.elis_asd = None
         self.polars = [obs.polars for obs in obss]
+        self.polars_asd = None
         if obss[0].dt == None:
             dts = []
         else:
@@ -666,6 +742,12 @@ class LimeSimulation(ILimeSimulation):
 
     def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
         return self.polars
+
+    def get_polars_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.polars_cimel
+
+    def get_polars_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.polars_asd
 
     def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
         return self.surfaces_of_sat

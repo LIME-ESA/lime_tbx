@@ -12,14 +12,15 @@ from typing import Tuple, List
 from datetime import datetime, timezone
 import os
 import platform
-
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+import subprocess
 
 """___Third-Party Modules___"""
 import yaml
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import KernelsPath, LimeException, OrbitFile, Satellite
+from ..datatypes import logger
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
 __author__ = "Ramiro González Catón"
@@ -33,16 +34,20 @@ METADATA_FILE = "metadata.yml"
 EXE_FILE_SATELLITE_LINUX = "eocfi_c/bin/get_positions_linux"
 EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
 EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
+EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin_arm"
 
 if platform.system() == "Linux":
     exe_file_satellite = EXE_FILE_SATELLITE_LINUX
 elif platform.system() == "Windows":
     exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
-else:
-    exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
+else:  # Darwin
+    if "ARM" in platform.version().upper():
+        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN_ARM
+    else:
+        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_exe_path = os.path.join(_current_dir, exe_file_satellite)
+_exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -243,7 +248,7 @@ class EOCFIConverter(IEOCFIConverter):
                 )
             orbit_path = os.path.join(
                 self.eocfi_path,
-                f"data/mission_configuration_files/{orb_f.name}",
+                f"data/missions/{orb_f.name}",
             )
             if not os.path.exists(orbit_path):
                 raise LimeException("The orbit file {} is missing".format(orbit_path))
@@ -261,7 +266,7 @@ class EOCFIConverter(IEOCFIConverter):
             orbit_path = os.path.join(
                 self.eocfi_path,
                 "data",
-                "mission_configuration_files",
+                "missions",
                 sat.time_file,
             )
         # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
@@ -292,11 +297,23 @@ class EOCFIConverter(IEOCFIConverter):
                 intdes,
             )
         for dt in dts:
-            cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S"))
-        cmd_exec = os.popen(cmd)
-        so = cmd_exec.read()
-        cmd_exec.close()
+            cmd = cmd + " {}".format(dt.strftime("%Y-%m-%dT%H:%M:%S.%f"))
+        cmd_exec = subprocess.Popen(
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+        )
+        so, serr = cmd_exec.communicate()
         out_lines = so.splitlines()
+        if len(serr) > 0:
+            err_msg = "Executing EO CFI: {}".format(serr.rstrip())
+            log = logger.get_logger()
+            if len(out_lines) == 3 * n_dates:
+                log.warning(err_msg)
+            else:
+                log.error(err_msg)
         sat_positions = []
         if len(out_lines) == 3 * n_dates:
             for i in range(n_dates):
@@ -306,11 +323,18 @@ class EOCFIConverter(IEOCFIConverter):
                 sat_positions_date.append(float(out_lines[i * 3 + 2]))
                 sat_positions.append(sat_positions_date)
         else:
-            raise Exception(
-                "Number of lines unexpected. {}/{}.\n{}".format(
-                    str(len(out_lines)), str(3 * n_dates), out_lines
+            if len(out_lines) == 0:
+                raise Exception(
+                    "No lines outputed after executing the EOCFI binary. Command executed: {}".format(
+                        cmd
+                    )
                 )
-            )
+            else:
+                raise Exception(
+                    "Number of lines unexpected. {}/{}.\n{}".format(
+                        str(len(out_lines)), str(3 * n_dates), out_lines
+                    )
+                )
 
         positions = []
         for i in range(n_dates):
@@ -318,6 +342,8 @@ class EOCFIConverter(IEOCFIConverter):
             lat, lon, hhh = SPICEAdapter.to_planetographic(
                 x, y, z, "EARTH", self.kernels_path.main_kernels_path
             )
-            print(lat, lon, hhh)
+            logger.get_logger().debug(
+                f"EOCFI output (lat, lon, height): {lat}, {lon}, {hhh}"
+            )
             positions.append((lat, lon, hhh))
         return positions
