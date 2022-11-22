@@ -14,6 +14,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
+    LimeCoefficients,
     PolarizationCoefficients,
     ReflectanceCoefficients,
 )
@@ -31,28 +32,21 @@ __status__ = "Development"
 
 class IAccessData(ABC):
     @abstractmethod
-    def get_all_cimel_coefficients(self) -> List[ReflectanceCoefficients]:
-        pass
-
-    @abstractmethod
-    def get_all_coefficients_polarization() -> list:
+    def get_all_coefficients(self) -> List[LimeCoefficients]:
         pass
 
 
 class AccessData(IAccessData):
-    def get_all_cimel_coefficients(self) -> List[ReflectanceCoefficients]:
+    def get_all_coefficients(self) -> List[LimeCoefficients]:
         folder = os.path.join(
             programdata.get_programfiles_folder(), "coeff_data", "versions"
         )
         version_files = os.listdir(folder)
         coeffs = []
         for vf in version_files:
-            rf = lcsv.read_refl_coefficients(os.path.join(folder, vf))
-            coeffs.append(rf)
+            cf = lcsv.read_lime_coefficients(os.path.join(folder, vf))
+            coeffs.append(cf)
         return coeffs
-
-    def get_all_coefficients_polarization() -> list:
-        pass
 
 
 _DEFAULT_C_COEFFS = [0.00034115, -0.0013425, 0.00095906, 0.00066229]
@@ -109,19 +103,26 @@ _DEFAULT_NEG_POLAR_COEFFS = [
     (-0.002546369943, 0.000158157867, -0.000002469036, 0.000000012675),
     (-0.002726077195, 0.000171190004, -0.000002850707, 0.000000015473),
 ]
+_DEFAULT_UNCS = [
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+]
 
 
 def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     wlens = _POLARIZATION_WLENS
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
-    coeffs = PolarizationCoefficients(wlens, pos_coeffs, neg_coeffs)
+    uncs = _DEFAULT_UNCS
+    coeffs = PolarizationCoefficients(wlens, pos_coeffs, uncs, neg_coeffs, uncs)
     return coeffs
 
 
-def _read_cimel_coeffs_files(
-    filepath: str, u_filepath: str, version: str
-) -> ReflectanceCoefficients:
+def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoefficients:
     # define dim_size_dict to specify size of arrays
     dim_sizes = {
         "wavelength": 6,
@@ -140,13 +141,13 @@ def _read_cimel_coeffs_files(
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
 
-    return ReflectanceCoefficients(ds_cimel, version)
+    return ReflectanceCoefficients(ds_cimel)
 
 
 def _get_demo_cimel_coeffs() -> ReflectanceCoefficients:
     # Demo coefficients, used for testing only
     return _read_cimel_coeffs_files(
-        "assets/coefficients_cimel.csv", "assets/u_coefficients_cimel.csv", "vDemo"
+        "assets/coefficients_cimel.csv", "assets/u_coefficients_cimel.csv"
     )
 
 

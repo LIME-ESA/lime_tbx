@@ -791,7 +791,7 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_polar_coeffs()
+        coeffs = self.settings_manager.get_polar_coef()
         self.worker = CallbackWorker(
             polar_callback, [srf, point, coeffs, self.lime_simulation]
         )
@@ -835,7 +835,7 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
-        p_coeffs = self.settings_manager.get_polar_coeffs()
+        p_coeffs = self.settings_manager.get_polar_coef()
         self.worker = CallbackWorker(
             calculate_all_callback,
             [srf, point, cimel_coef, p_coeffs, self.lime_simulation],

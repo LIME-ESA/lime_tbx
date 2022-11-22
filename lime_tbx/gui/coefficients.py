@@ -54,20 +54,18 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
 
     def update_combo_versions(self):
         self.combobox_listen = False
-        self.available_cimel_coeffs = self.settings_manager.get_available_cimel_coeffs()
+        self.available_coeffs = self.settings_manager.get_available_coeffs()
         self.combo_versions.clear()
-        self.combo_versions.addItems(
-            [coeff.version for coeff in self.available_cimel_coeffs]
-        )
+        self.combo_versions.addItems([coeff.version for coeff in self.available_coeffs])
         coeff = self.settings_manager.get_cimel_coef()
-        index = self.available_cimel_coeffs.index(coeff)
+        index = self.available_coeffs.index(coeff)
         self.combo_versions.setCurrentIndex(index)
         self.combobox_listen = True
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         if self.combobox_listen:
-            self.settings_manager.select_cimel_coeff(i)
+            self.settings_manager.select_lime_coeff(i)
 
     @QtCore.Slot()
     def save_clicked(self):

@@ -213,7 +213,7 @@ class CLI:
 
     def _calculate_polarization(self, point: Point):
         self.lime_simulation.update_polarization(
-            self.srf, point, self.settings_manager.get_polar_coeffs()
+            self.srf, point, self.settings_manager.get_polar_coef()
         )
 
     def _calculate_all(self, point: Point):
@@ -226,7 +226,7 @@ class CLI:
         point: Point,
         ed: ExportCSV,
     ):
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         csv.export_csv(
             self.lime_simulation.get_elrefs(),
             "Wavelengths (nm)",
@@ -264,7 +264,7 @@ class CLI:
             point, self.srf, self.lime_simulation, self.kernels_path
         )
         now = datetime.now(timezone.utc)
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         moon.write_obs(lglod, output_file, now, version)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
@@ -273,7 +273,7 @@ class CLI:
         canv = canvas.MplCanvas(width=15, height=10, dpi=200)
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
@@ -365,7 +365,7 @@ class CLI:
         n_comp_points = len(comparison.diffs_signal.wlens)
         data_start = min(comparison.dts)
         data_end = max(comparison.dts)
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         subtitle = "LIME2 coefficients version: {}".format(version)
         _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
         subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -505,7 +505,7 @@ class CLI:
                 self.srf.get_channels_names(),
                 "TODO",
             )
-            vers = self.settings_manager.get_cimel_coef().version
+            vers = self.settings_manager.get_lime_coef().version
             moon.write_comparison(
                 lglod,
                 ed.output_file,
@@ -519,7 +519,7 @@ class CLI:
             ):
                 if not os.path.exists(ed.output_dir):
                     os.makedirs(ed.output_dir)
-            version = self.settings_manager.get_cimel_coef().version
+            version = self.settings_manager.get_lime_coef().version
             ch_names = self.srf.get_channels_names()
             file_index = 0
             is_both = ed.comparison_key == ComparisonKey.BOTH

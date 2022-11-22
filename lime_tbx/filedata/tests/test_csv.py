@@ -24,8 +24,8 @@ from ..csv import (
     export_csv_comparation,
     export_csv_integrated_irradiance,
     read_datetimes,
-    read_refl_coefficients,
-    read_refl_coefficients_from_stream,
+    read_lime_coefficients,
+    read_lime_coefficients_from_stream,
 )
 
 """___Authorship___"""
@@ -381,10 +381,11 @@ class TestCSV(unittest.TestCase):
             self.assertEqual(dt, DTS[i])
 
     def test_read_refl_coefficients(self):
-        rf = read_refl_coefficients("./coeff_data/versions/23_01_01.csv")
+        cf = read_lime_coefficients("./coeff_data/versions/23_01_01.csv")
         version = "23.01.01"
         data, u_data = _get_230101_coeff_data()
-        self.assertEqual(rf.version, version)
+        self.assertEqual(cf.version, version)
+        rf = cf.reflectance
         for i, arr in enumerate(rf._ds.coeff.values.T):
             for j, val in enumerate(arr):
                 self.assertEqual(val, data[i][j])
@@ -394,10 +395,11 @@ class TestCSV(unittest.TestCase):
 
     def test_read_refl_coefficients_stream(self):
         with open("./coeff_data/versions/23_01_01.csv", "r") as fp:
-            rf = read_refl_coefficients_from_stream(fp)
+            cf = read_lime_coefficients_from_stream(fp)
         version = "23.01.01"
         data, u_data = _get_230101_coeff_data()
-        self.assertEqual(rf.version, version)
+        self.assertEqual(cf.version, version)
+        rf = cf.reflectance
         for i, arr in enumerate(rf._ds.coeff.values.T):
             for j, val in enumerate(arr):
                 self.assertEqual(val, data[i][j])

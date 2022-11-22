@@ -253,78 +253,6 @@ class SatellitePoint(Point):
     dt: Union[datetime, List[datetime]]
 
 
-class PolarizationCoefficients:
-    """
-    Coefficients used in the DoLP algorithm.
-    """
-
-    def __init__(
-        self,
-        wavelengths: List[float],
-        pos_coeffs: List[Tuple[float, float, float, float]],
-        neg_coeffs: List[Tuple[float, float, float, float]],
-    ):
-        """
-        Parameters
-        ----------
-        wavelengths: list of float
-            Wavelengths present in the model, in nanometers
-        pos_coeffs: list of tuples of 4 floats
-            Positive phase angles related to the given wavelengths
-        neg_coeffs: list of tuples of 4 floats
-            Negative phase angles related to the given wavelengths
-        """
-        self.wlens = wavelengths
-        self.pos_coeffs = pos_coeffs
-        self.neg_coeffs = neg_coeffs
-
-    def get_wavelengths(self) -> List[float]:
-        """Gets all wavelengths present in the model, in nanometers
-
-        Returns
-        -------
-        list of float
-            A list of floats that are the wavelengths in nanometers, in order
-        """
-        return self.wlens
-
-    def get_coefficients_positive(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
-        """Gets all positive phase angle coefficients for a concrete wavelength
-
-        Parameters
-        ----------
-        wavelength_nm : float
-            Wavelength in nanometers from which one wants to obtain the coefficients.
-
-        Returns
-        -------
-        list of float
-            A list containing the 'a' coefficients for the wavelength
-        """
-        index = self.get_wavelengths().index(wavelength_nm)
-        return self.pos_coeffs[index]
-
-    def get_coefficients_negative(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
-        """Gets all negative phase angle coefficients for a concrete wavelength
-
-        Parameters
-        ----------
-        wavelength_nm : float
-            Wavelength in nanometers from which one wants to obtain the coefficients.
-
-        Returns
-        -------
-        list of float
-            A list containing the 'a' coefficients for the wavelength
-        """
-        index = self.get_wavelengths().index(wavelength_nm)
-        return self.neg_coeffs[index]
-
-
 @dataclass(eq=True, frozen=True)
 class OrbitFile:
     """
@@ -506,11 +434,9 @@ class ReflectanceCoefficients:
         Reflectance Coefficients, with an attribute for every coefficient group, a matrix each.
     unc_coeffs: _WlenReflCoeffs
         Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
-    version: str
-        Version name of the coefficients
     """
 
-    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs", "version"]
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
 
     @dataclass
     class _WlenReflCoeffs:
@@ -539,14 +465,108 @@ class ReflectanceCoefficients:
             self.d_coeffs = coeffs[11:14, :]
             self.p_coeffs = coeffs[14::, :]
 
-    def __init__(self, _ds: xarray.Dataset, version: str):
+    def __init__(self, _ds: xarray.Dataset):
         self._ds = _ds
         self.wlens: np.ndarray = _ds.wavelength.values
         coeffs: np.ndarray = _ds.coeff.values
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = _ds.u_coeff.values
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
-        self.version = version
+
+
+class PolarizationCoefficients:
+    """
+    Coefficients used in the DoLP algorithm.
+    """
+
+    def __init__(
+        self,
+        wavelengths: List[float],
+        pos_coeffs: List[Tuple[float, float, float, float]],
+        pos_unc: List[Tuple[float, float, float, float]],
+        neg_coeffs: List[Tuple[float, float, float, float]],
+        neg_unc: List[Tuple[float, float, float, float]],
+    ):
+        """
+        Parameters
+        ----------
+        wavelengths: list of float
+            Wavelengths present in the model, in nanometers
+        pos_coeffs: list of tuples of 4 floats
+            Positive phase angles related to the given wavelengths
+        neg_coeffs: list of tuples of 4 floats
+            Negative phase angles related to the given wavelengths
+        """
+        self.wlens = wavelengths
+        self.pos_coeffs = pos_coeffs
+        self.pos_unc = pos_unc
+        self.neg_coeffs = neg_coeffs
+        self.neg_unc = neg_unc
+
+    def get_wavelengths(self) -> List[float]:
+        """Gets all wavelengths present in the model, in nanometers
+
+        Returns
+        -------
+        list of float
+            A list of floats that are the wavelengths in nanometers, in order
+        """
+        return self.wlens
+
+    def get_coefficients_positive(
+        self, wavelength_nm: float
+    ) -> Tuple[float, float, float, float]:
+        """Gets all positive phase angle coefficients for a concrete wavelength
+
+        Parameters
+        ----------
+        wavelength_nm : float
+            Wavelength in nanometers from which one wants to obtain the coefficients.
+
+        Returns
+        -------
+        list of float
+            A list containing the 'a' coefficients for the wavelength
+        """
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.pos_coeffs[index]
+
+    def get_uncertainties_positive(
+        self, wavelength_nm: float
+    ) -> Tuple[float, float, float, float]:
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.pos_unc[index]
+
+    def get_coefficients_negative(
+        self, wavelength_nm: float
+    ) -> Tuple[float, float, float, float]:
+        """Gets all negative phase angle coefficients for a concrete wavelength
+
+        Parameters
+        ----------
+        wavelength_nm : float
+            Wavelength in nanometers from which one wants to obtain the coefficients.
+
+        Returns
+        -------
+        list of float
+            A list containing the 'a' coefficients for the wavelength
+        """
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.neg_coeffs[index]
+
+    def get_uncertainties_negative(
+        self, wavelength_nm: float
+    ) -> Tuple[float, float, float, float]:
+        index = self.get_wavelengths().index(wavelength_nm)
+        return self.neg_unc[index]
+
+
+@dataclass
+class LimeCoefficients:
+    reflectance: ReflectanceCoefficients
+    polarization: PolarizationCoefficients
+    version: str
 
 
 @dataclass

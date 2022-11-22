@@ -75,7 +75,7 @@ class Update(IUpdate):
                 quant_news += 1
                 fcontent = requests.get(f"{self.url}/versions/{vf}").text
                 try:
-                    lcsv.read_refl_coefficients_from_stream(StringIO(fcontent))
+                    lcsv.read_lime_coefficients_from_stream(StringIO(fcontent))
                 except Exception as e:
                     quant_fails += 1
                     logger.get_logger().warning(
