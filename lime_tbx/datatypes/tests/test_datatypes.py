@@ -121,11 +121,6 @@ class TestPolarizationCoefficients(unittest.TestCase):
         self.assertEqual(coeffs.get_coefficients_negative(COEF_WLENS[0]), NEG_COEFFS[0])
 
 
-class TestApolloIrradianceCoefficients(unittest.TestCase):
-    # This class is not deleted for legacy purposes, but it's not used. If it were to be used in the future, these tests should be developed.
-    pass
-
-
 DT1 = datetime(2000, 1, 16, 2, tzinfo=timezone.utc)
 DT2 = datetime(2022, 1, 17, 3, tzinfo=timezone.utc)
 DT3 = datetime(2032, 1, 17, 3, tzinfo=timezone.utc)

@@ -4,10 +4,7 @@ This module contains the functionality that access to local coefficients data an
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from typing import Dict, List
-import pkgutil
-import csv
-from io import StringIO
+from typing import List
 import os
 
 """___Third-Party Modules___"""
@@ -17,16 +14,15 @@ import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    ApolloIrradianceCoefficients,
     PolarizationCoefficients,
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
-from . import programdata
+from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import csv as lcsv
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
 __created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
@@ -107,47 +103,12 @@ _DEFAULT_NEG_POLAR_COEFFS = [
 ]
 
 
-def _get_default_irradiance_coefficients() -> ApolloIrradianceCoefficients:
-    data = _get_coefficients_data()
-    wlens = list(data.keys())
-    w_coeffs = list(data.values())
-    coeffs = ApolloIrradianceCoefficients(
-        wlens, w_coeffs, _DEFAULT_C_COEFFS, _DEFAULT_P_COEFFS, _DEFAULT_APOLLO_COEFFS
-    )
-    return coeffs
-
-
 def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     wlens = _POLARIZATION_WLENS
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
     coeffs = PolarizationCoefficients(wlens, pos_coeffs, neg_coeffs)
     return coeffs
-
-
-def _get_coefficients_data() -> Dict[
-    float, ApolloIrradianceCoefficients.CoefficientsWln
-]:
-    """Returns all variable coefficients (a, b and d) for all wavelengths
-
-    Returns
-    -------
-    A dict that has the wavelengths as keys (float), and as values the _CoefficientsWln associated
-    to the wavelength.
-    """
-    coeff_bytes = pkgutil.get_data(__name__, "assets/coefficients.csv")
-    coeff_string = coeff_bytes.decode()
-    file = StringIO(coeff_string)
-    csvreader = csv.reader(file)
-    next(csvreader)  # Discard the header
-    data = {}
-    for row in csvreader:
-        coeffs = []
-        for i in range(1, 11):
-            coeffs.append(float(row[i]))
-        data[float(row[0])] = ApolloIrradianceCoefficients.CoefficientsWln(coeffs)
-    file.close()
-    return data
 
 
 def _read_cimel_coeffs_files(

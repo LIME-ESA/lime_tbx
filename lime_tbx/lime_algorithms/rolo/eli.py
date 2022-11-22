@@ -19,7 +19,6 @@ import punpy
 from . import esi, elref
 from ...datatypes.datatypes import (
     MoonData,
-    ApolloIrradianceCoefficients,
     ReflectanceCoefficients,
     SpectralData,
 )
@@ -155,44 +154,3 @@ def calculate_eli_from_elref_unc(
     )
 
     return unc
-
-
-# APOLLO
-
-
-def calculate_elis_apollo(
-    wavelengths_nm: np.ndarray,
-    moon_data: MoonData,
-    coefficients: ApolloIrradianceCoefficients,
-) -> np.ndarray:
-    """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
-
-    Simulates a lunar observation for a wavelength for any observer/solar selenographic
-    latitude and longitude. The irradiance is calculated in Wm⁻²/nm.
-
-    Parameters
-    ----------
-    wavelengths_nm : np.ndarray of float
-        Wavelength (in nanometers) of which the extraterrestrial lunar irradiance will be
-        calculated.
-    moon_data : MoonData
-        Moon data needed to calculate Moon's irradiance
-    coefficients : IrradianceCoefficients
-        Needed coefficients for the simulation.
-
-    Returns
-    -------
-    np.ndarray of float
-        The extraterrestrial lunar irradiance calculated
-    """
-    a_l = elref.calculate_elref_apollo(wavelengths_nm, moon_data, coefficients)
-
-    esk = esi.get_esi_per_nms(wavelengths_nm)
-    dsm = moon_data.distance_sun_moon
-    dom = moon_data.distance_observer_moon
-
-    lunar_irr = measurement_func_eli(
-        a_l, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom
-    )
-
-    return lunar_irr

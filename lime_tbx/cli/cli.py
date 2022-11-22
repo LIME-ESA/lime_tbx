@@ -22,7 +22,6 @@ from lime_tbx.datatypes.datatypes import (
     Point,
     SatellitePoint,
     SpectralData,
-    SpectralResponseFunction,
     SurfacePoint,
 )
 from lime_tbx.gui import settings
@@ -31,6 +30,14 @@ from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.datatypes import constants
+
+"""___Authorship___"""
+__author__ = "Javier Gatón Herguedas"
+__created__ = "01/09/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
+__status__ = "Development"
+
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
 OPTIONS = "hvde:l:s:c:o:f:t:"

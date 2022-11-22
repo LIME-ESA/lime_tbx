@@ -11,7 +11,7 @@ import sys
 
 
 """___LIME Modules___"""
-from lime_tbx.coefficients.access_data import appdata
+from lime_tbx.local_storage import appdata
 from lime_tbx.datatypes import constants
 
 # SINGLETON

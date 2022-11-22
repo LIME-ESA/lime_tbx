@@ -23,7 +23,6 @@ from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
-    ApolloIrradianceCoefficients,
     SpectralValidity,
     SurfacePoint,
     ReflectanceCoefficients,
@@ -54,7 +53,6 @@ _INTERNAL_ERROR_MSG = (
 def eli_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
 ) -> Tuple[
@@ -113,7 +111,6 @@ def eli_callback(
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
 ) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
@@ -125,14 +122,10 @@ def elref_callback(
         SRF that will be used to calculate the graph
     point: Point
         Point used
-    coeffs: IrradianceCoefficients
-        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
     cimel_coef: CimelCoef
         CimelCoef with the CIMEL coefficients and uncertainties.
-    kernels_path: str
-        Path where the directory with the SPICE kernels is located.
-    eocfi_path: str
-        Path where the directory with the needed EOCFI data files is located.
+    lime_simulation: ILimeSimulation
+        Lime Simulation instance
 
     Returns
     -------
@@ -178,7 +171,6 @@ def polar_callback(
 def compare_callback(
     mos: List[LunarObservation],
     srf: SpectralResponseFunction,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
@@ -213,7 +205,6 @@ def compare_callback(
 def calculate_all_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     p_coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
@@ -347,13 +338,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._block_gui_loading()
         mos = self.input.get_moon_obs()
         srf = self.input.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.quant_mos = len(mos)
         self.quant_mos_simulated = 0
         self.worker = CallbackWorker(
             compare_callback,
-            [mos, srf, coeffs, cimel_coef, self.lime_simulation, self.kernels_path],
+            [mos, srf, cimel_coef, self.lime_simulation, self.kernels_path],
             True,
         )
         self._start_thread(self.compare_finished, self.compare_error, self.compare_info)
@@ -711,11 +701,10 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             eli_callback,
-            [srf, point, coeffs, cimel_coef, self.lime_simulation],
+            [srf, point, cimel_coef, self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -760,10 +749,9 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
-            elref_callback, [srf, point, coeffs, cimel_coef, self.lime_simulation]
+            elref_callback, [srf, point, cimel_coef, self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -846,12 +834,11 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coeffs()
         self.worker = CallbackWorker(
             calculate_all_callback,
-            [srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
+            [srf, point, cimel_coef, p_coeffs, self.lime_simulation],
         )
         self._start_thread(self.calculate_all_finished, self.calculate_all_error)
 

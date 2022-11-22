@@ -9,7 +9,7 @@ import os
 # import here
 
 """___LIME Modules___"""
-from ...datatypes import logger
+from ..datatypes import logger
 from . import appdata
 
 """___Authorship___"""

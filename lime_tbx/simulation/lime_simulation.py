@@ -34,10 +34,10 @@ from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
 __created__ = "01/06/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__maintainer__ = "Pieter De Vis, Javier Gatón Herguedas"
+__email__ = "pieter.de.vis@npl.co.uk, gaton@goa.uva.es"
 __status__ = "Development"
 
 

@@ -2,8 +2,7 @@
 
 """___Built-In Modules___"""
 from lime_tbx.interpolation.access_data.access_data import (
-    _get_default_asd_data,
-    _get_asd_data,
+    get_asd_data,
 )
 
 """___Third-Party Modules___"""
@@ -21,7 +20,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 from abc import ABC, abstractmethod
-from ...datatypes.datatypes import MoonData, ApolloIrradianceCoefficients
+from ...datatypes.datatypes import MoonData
 
 
 class ISpectralInterpolation(ABC):
@@ -56,10 +55,10 @@ class SpectralInterpolation(ISpectralInterpolation):
         self.prop = punpy.MCPropagation(MCsteps)
 
     def get_best_asd_reference(self, moon_data: MoonData):
-        return _get_asd_data(moon_data.absolute_mpa_degrees)
+        return get_asd_data(moon_data.absolute_mpa_degrees)
 
     def get_best_polar_asd_reference(self, moon_data: MoonData):
-        mock = _get_asd_data(moon_data.absolute_mpa_degrees)
+        mock = get_asd_data(moon_data.absolute_mpa_degrees)
         mock.data.fill(1)
         return mock
 

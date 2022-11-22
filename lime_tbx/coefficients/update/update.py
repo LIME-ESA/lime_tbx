@@ -12,15 +12,15 @@ from io import StringIO
 
 """___LIME Modules___"""
 from ..access_data import access_data
-from ..access_data import programdata
+from ...local_storage import programdata
 from lime_tbx.filedata import csv as lcsv
 from lime_tbx.datatypes import logger
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
 __created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 

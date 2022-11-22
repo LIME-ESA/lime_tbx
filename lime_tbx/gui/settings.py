@@ -12,7 +12,6 @@ from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SRFChannel,
     SpectralResponseFunction,
-    ApolloIrradianceCoefficients,
     ReflectanceCoefficients,
 )
 from ..datatypes import constants
@@ -39,11 +38,6 @@ class ISettingsManager(ABC):
     @abstractmethod
     def get_srf(self) -> SpectralResponseFunction:
         """Obtain the current Spectral Response Function chosen by the user."""
-        pass
-
-    @abstractmethod
-    def get_irr_coeffs(self) -> ApolloIrradianceCoefficients:
-        """Obtain the current IrradianceCoefficients chosen by the user."""
         pass
 
     @abstractmethod
@@ -109,9 +103,6 @@ class MockSettingsManager(ISettingsManager):
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
-
-    def get_irr_coeffs(self) -> ApolloIrradianceCoefficients:
-        return access_data._get_default_irradiance_coefficients()
 
     def get_polar_coeffs(self) -> PolarizationCoefficients:
         return access_data._get_default_polarization_coefficients()

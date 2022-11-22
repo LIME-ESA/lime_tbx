@@ -13,7 +13,7 @@ from lime_tbx.cli.cli import (
     LONG_OPTIONS,
     print_help,
 )
-from lime_tbx.coefficients.access_data.programdata import (
+from lime_tbx.local_storage.programdata import (
     get_appdata_folder,
     get_programfiles_folder,
 )
@@ -21,7 +21,7 @@ from lime_tbx.datatypes.datatypes import KernelsPath
 from lime_tbx.datatypes import logger
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
 __created__ = "01/02/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
