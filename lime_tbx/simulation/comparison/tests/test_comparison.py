@@ -19,7 +19,7 @@ from ....datatypes.datatypes import (
     SatellitePoint,
     KernelsPath,
 )
-from ....coefficients.access_data.access_data import _get_default_cimel_coeffs
+from ....coefficients.access_data.access_data import _get_demo_cimel_coeffs
 from ...lime_simulation import LimeSimulation, ILimeSimulation
 
 """___Authorship___"""
@@ -52,7 +52,7 @@ def get_srf() -> SpectralResponseFunction:
 
 
 def get_cimel_coeffs() -> ReflectanceCoefficients:
-    return _get_default_cimel_coeffs()
+    return _get_demo_cimel_coeffs()
 
 
 def get_lime_simulation() -> ILimeSimulation:

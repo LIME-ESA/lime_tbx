@@ -20,7 +20,7 @@ from ...datatypes.datatypes import (
 )
 from ...coefficients.access_data.access_data import (
     _get_default_polarization_coefficients,
-    _get_default_cimel_coeffs,
+    _get_demo_cimel_coeffs,
 )
 
 """___Authorship___"""
@@ -53,7 +53,7 @@ def get_srf() -> SpectralResponseFunction:
 
 
 def get_cimel_coeffs() -> ReflectanceCoefficients:
-    return _get_default_cimel_coeffs()
+    return _get_demo_cimel_coeffs()
 
 
 def get_polar_coeffs() -> PolarizationCoefficients:

@@ -31,7 +31,7 @@ __status__ = "Development"
 
 class IAccessData(ABC):
     @abstractmethod
-    def get_all_coefficients_irradiance() -> list:
+    def get_all_cimel_coefficients(self) -> List[ReflectanceCoefficients]:
         pass
 
     @abstractmethod
@@ -40,8 +40,16 @@ class IAccessData(ABC):
 
 
 class AccessData(IAccessData):
-    def get_all_coefficients_irradiance() -> list:
-        pass
+    def get_all_cimel_coefficients(self) -> List[ReflectanceCoefficients]:
+        folder = os.path.join(
+            programdata.get_programfiles_folder(), "coeff_data", "versions"
+        )
+        version_files = os.listdir(folder)
+        coeffs = []
+        for vf in version_files:
+            rf = lcsv.read_refl_coefficients(os.path.join(folder, vf))
+            coeffs.append(rf)
+        return coeffs
 
     def get_all_coefficients_polarization() -> list:
         pass
@@ -135,23 +143,11 @@ def _read_cimel_coeffs_files(
     return ReflectanceCoefficients(ds_cimel, version)
 
 
-def _get_default_cimel_coeffs() -> ReflectanceCoefficients:
+def _get_demo_cimel_coeffs() -> ReflectanceCoefficients:
+    # Demo coefficients, used for testing only
     return _read_cimel_coeffs_files(
         "assets/coefficients_cimel.csv", "assets/u_coefficients_cimel.csv", "vDemo"
     )
-
-
-def get_all_cimel_coefficients() -> List[ReflectanceCoefficients]:
-    # return [access_data.get_default_cimel_coeffs()]
-    folder = os.path.join(
-        programdata.get_programfiles_folder(), "coeff_data", "versions"
-    )
-    version_files = os.listdir(folder)
-    coeffs = []
-    for vf in version_files:
-        rf = lcsv.read_refl_coefficients(os.path.join(folder, vf))
-        coeffs.append(rf)
-    return coeffs
 
 
 def get_coefficients_filenames() -> List[str]:
