@@ -316,7 +316,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        vers = self.settings_manager.get_cimel_coef().version
+        vers = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             try:
                 moon.write_comparison(
@@ -463,7 +463,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 n_comp_points = len(comps[i].diffs_signal.wlens)
                 data_start = min(comps[i].dts)
                 data_end = max(comps[i].dts)
-                version = self.settings_manager.get_cimel_coef().version
+                version = self.settings_manager.get_lime_coef().version
                 subtitle = "LIME2 coefficients version: {}".format(version)
                 _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
                 subtitle = (
@@ -850,7 +850,7 @@ class MainSimulationsWidget(
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             try:
                 moon.write_obs(

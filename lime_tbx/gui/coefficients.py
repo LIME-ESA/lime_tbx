@@ -57,7 +57,7 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
         self.available_coeffs = self.settings_manager.get_available_coeffs()
         self.combo_versions.clear()
         self.combo_versions.addItems([coeff.version for coeff in self.available_coeffs])
-        coeff = self.settings_manager.get_cimel_coef()
+        coeff = self.settings_manager.get_lime_coef()
         index = self.available_coeffs.index(coeff)
         self.combo_versions.setCurrentIndex(index)
         self.combobox_listen = True

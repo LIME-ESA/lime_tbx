@@ -265,7 +265,7 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
@@ -422,7 +422,7 @@ for wavelengths between 350 and 2500 nm"
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(
