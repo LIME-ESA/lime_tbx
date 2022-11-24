@@ -4,10 +4,7 @@ This module contains the functionality that access to local coefficients data an
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from typing import Dict, List
-import pkgutil
-import csv
-from io import StringIO
+from typing import List
 import os
 
 """___Third-Party Modules___"""
@@ -17,16 +14,16 @@ import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    ApolloIrradianceCoefficients,
+    LimeCoefficients,
     PolarizationCoefficients,
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
-from . import programdata
+from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import csv as lcsv
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
 __created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
@@ -35,20 +32,47 @@ __status__ = "Development"
 
 class IAccessData(ABC):
     @abstractmethod
-    def get_all_coefficients_irradiance() -> list:
+    def get_all_coefficients(self) -> List[LimeCoefficients]:
         pass
 
     @abstractmethod
-    def get_all_coefficients_polarization() -> list:
+    def get_previously_selected_version(self) -> str:
+        pass
+
+    @abstractmethod
+    def set_previusly_selected_version(self, name: str):
         pass
 
 
 class AccessData(IAccessData):
-    def get_all_coefficients_irradiance() -> list:
-        pass
+    def get_all_coefficients(self) -> List[LimeCoefficients]:
+        folder = os.path.join(
+            programdata.get_programfiles_folder(), "coeff_data", "versions"
+        )
+        version_files = os.listdir(folder)
+        coeffs = []
+        for vf in version_files:
+            cf = lcsv.read_lime_coefficients(os.path.join(folder, vf))
+            coeffs.append(cf)
+        return coeffs
 
-    def get_all_coefficients_polarization() -> list:
-        pass
+    def get_previously_selected_version(self) -> str:
+        file = os.path.join(
+            programdata.get_programfiles_folder(), "coeff_data", "selected.txt"
+        )
+        if os.path.exists(file):
+            name = None
+            with open(file, "r") as fp:
+                name = fp.readlines()[0].strip()
+            return name
+        return None
+
+    def set_previusly_selected_version(self, name: str):
+        file = os.path.join(
+            programdata.get_programfiles_folder(), "coeff_data", "selected.txt"
+        )
+        with open(file, "w") as fp:
+            fp.write(name)
 
 
 _DEFAULT_C_COEFFS = [0.00034115, -0.0013425, 0.00095906, 0.00066229]
@@ -105,54 +129,26 @@ _DEFAULT_NEG_POLAR_COEFFS = [
     (-0.002546369943, 0.000158157867, -0.000002469036, 0.000000012675),
     (-0.002726077195, 0.000171190004, -0.000002850707, 0.000000015473),
 ]
-
-
-def _get_default_irradiance_coefficients() -> ApolloIrradianceCoefficients:
-    data = _get_coefficients_data()
-    wlens = list(data.keys())
-    w_coeffs = list(data.values())
-    coeffs = ApolloIrradianceCoefficients(
-        wlens, w_coeffs, _DEFAULT_C_COEFFS, _DEFAULT_P_COEFFS, _DEFAULT_APOLLO_COEFFS
-    )
-    return coeffs
+_DEFAULT_UNCS = [
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+]
 
 
 def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     wlens = _POLARIZATION_WLENS
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
-    coeffs = PolarizationCoefficients(wlens, pos_coeffs, neg_coeffs)
+    uncs = _DEFAULT_UNCS
+    coeffs = PolarizationCoefficients(wlens, pos_coeffs, uncs, neg_coeffs, uncs)
     return coeffs
 
 
-def _get_coefficients_data() -> Dict[
-    float, ApolloIrradianceCoefficients.CoefficientsWln
-]:
-    """Returns all variable coefficients (a, b and d) for all wavelengths
-
-    Returns
-    -------
-    A dict that has the wavelengths as keys (float), and as values the _CoefficientsWln associated
-    to the wavelength.
-    """
-    coeff_bytes = pkgutil.get_data(__name__, "assets/coefficients.csv")
-    coeff_string = coeff_bytes.decode()
-    file = StringIO(coeff_string)
-    csvreader = csv.reader(file)
-    next(csvreader)  # Discard the header
-    data = {}
-    for row in csvreader:
-        coeffs = []
-        for i in range(1, 11):
-            coeffs.append(float(row[i]))
-        data[float(row[0])] = ApolloIrradianceCoefficients.CoefficientsWln(coeffs)
-    file.close()
-    return data
-
-
-def _read_cimel_coeffs_files(
-    filepath: str, u_filepath: str, version: str
-) -> ReflectanceCoefficients:
+def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoefficients:
     # define dim_size_dict to specify size of arrays
     dim_sizes = {
         "wavelength": 6,
@@ -171,26 +167,14 @@ def _read_cimel_coeffs_files(
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
 
-    return ReflectanceCoefficients(ds_cimel, version)
+    return ReflectanceCoefficients(ds_cimel)
 
 
-def _get_default_cimel_coeffs() -> ReflectanceCoefficients:
+def _get_demo_cimel_coeffs() -> ReflectanceCoefficients:
+    # Demo coefficients, used for testing only
     return _read_cimel_coeffs_files(
-        "assets/coefficients_cimel.csv", "assets/u_coefficients_cimel.csv", "vDemo"
+        "assets/coefficients_cimel.csv", "assets/u_coefficients_cimel.csv"
     )
-
-
-def get_all_cimel_coefficients() -> List[ReflectanceCoefficients]:
-    # return [access_data.get_default_cimel_coeffs()]
-    folder = os.path.join(
-        programdata.get_programfiles_folder(), "coeff_data", "versions"
-    )
-    version_files = os.listdir(folder)
-    coeffs = []
-    for vf in version_files:
-        rf = lcsv.read_refl_coefficients(os.path.join(folder, vf))
-        coeffs.append(rf)
-    return coeffs
 
 
 def get_coefficients_filenames() -> List[str]:

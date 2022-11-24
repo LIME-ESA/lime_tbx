@@ -130,3 +130,6 @@ ignore_folder
 
 # Logfiles
 log_*.txt
+
+# Other files
+coeff_data/selected.txt

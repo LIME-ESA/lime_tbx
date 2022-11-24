@@ -123,7 +123,7 @@ class SpectralIntegration(ISpectralIntegration):
                         corr_x=[None, None, None],
                     )
                 )
-                u_signals.append(u_ch_signals)
+            u_signals.append(u_ch_signals)
         if wasnt_lists:
             u_signals = [s[0] for s in u_signals]
         return u_signals

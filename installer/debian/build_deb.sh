@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 echo "Building lime .deb package."
-# 0.0.4 Comment so the search for the version a.b.c appears (here it is a.b-c)
+# 0.0.5 Comment so the search for the version a.b.c appears (here it is a.b-c)
 # Change it in the control file too!
-version="0.0-4"
+version="0.0-5"
 name="lime_"$version
 [ -d $name ] && rm -rf $name
 [ -f $name".deb" ] && rm -f $name".deb"
@@ -27,6 +27,7 @@ mkdir -p $name/usr/bin
 ln -s /opt/esa/LimeTBX/limetbx.desktop $name/usr/share/applications
 ln -s /opt/esa/LimeTBX/LimeTBX/LimeTBX.exe $name/usr/bin/lime
 chmod 777 $name/opt/esa/LimeTBX/coeff_data/versions
+chmod 777 $name/opt/esa/LimeTBX/coeff_data
 mkdir $name/DEBIAN
 cp control $name/DEBIAN
 dpkg-deb --build $name

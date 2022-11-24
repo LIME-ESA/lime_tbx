@@ -23,7 +23,6 @@ from ..datatypes.datatypes import (
     PolarizationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
-    ApolloIrradianceCoefficients,
     SpectralValidity,
     SurfacePoint,
     ReflectanceCoefficients,
@@ -54,7 +53,6 @@ _INTERNAL_ERROR_MSG = (
 def eli_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
 ) -> Tuple[
@@ -113,7 +111,6 @@ def eli_callback(
 def elref_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
 ) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
@@ -125,14 +122,10 @@ def elref_callback(
         SRF that will be used to calculate the graph
     point: Point
         Point used
-    coeffs: IrradianceCoefficients
-        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
     cimel_coef: CimelCoef
         CimelCoef with the CIMEL coefficients and uncertainties.
-    kernels_path: str
-        Path where the directory with the SPICE kernels is located.
-    eocfi_path: str
-        Path where the directory with the needed EOCFI data files is located.
+    lime_simulation: ILimeSimulation
+        Lime Simulation instance
 
     Returns
     -------
@@ -178,7 +171,6 @@ def polar_callback(
 def compare_callback(
     mos: List[LunarObservation],
     srf: SpectralResponseFunction,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
@@ -213,7 +205,6 @@ def compare_callback(
 def calculate_all_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: ApolloIrradianceCoefficients,
     cimel_coef: ReflectanceCoefficients,
     p_coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
@@ -325,7 +316,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        vers = self.settings_manager.get_cimel_coef().version
+        vers = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             try:
                 moon.write_comparison(
@@ -347,13 +338,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._block_gui_loading()
         mos = self.input.get_moon_obs()
         srf = self.input.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.quant_mos = len(mos)
         self.quant_mos_simulated = 0
         self.worker = CallbackWorker(
             compare_callback,
-            [mos, srf, coeffs, cimel_coef, self.lime_simulation, self.kernels_path],
+            [mos, srf, cimel_coef, self.lime_simulation, self.kernels_path],
             True,
         )
         self._start_thread(self.compare_finished, self.compare_error, self.compare_info)
@@ -473,7 +463,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 n_comp_points = len(comps[i].diffs_signal.wlens)
                 data_start = min(comps[i].dts)
                 data_end = max(comps[i].dts)
-                version = self.settings_manager.get_cimel_coef().version
+                version = self.settings_manager.get_lime_coef().version
                 subtitle = "LIME2 coefficients version: {}".format(version)
                 _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
                 subtitle = (
@@ -711,11 +701,10 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
             eli_callback,
-            [srf, point, coeffs, cimel_coef, self.lime_simulation],
+            [srf, point, cimel_coef, self.lime_simulation],
         )
         self._start_thread(self.eli_finished, self.eli_error)
 
@@ -739,10 +728,12 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
+        version = self.settings_manager.get_lime_coef().version
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
+            subtitle=f"LIME2 coefficients version: {version}",
         )
         self.signal_widget.update_signals(data[0], data[1], data[5])
         self.lower_tabs.setCurrentIndex(0)
@@ -760,10 +751,9 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.worker = CallbackWorker(
-            elref_callback, [srf, point, coeffs, cimel_coef, self.lime_simulation]
+            elref_callback, [srf, point, cimel_coef, self.lime_simulation]
         )
         self._start_thread(self.elref_finished, self.elref_error)
 
@@ -783,10 +773,12 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        version = self.settings_manager.get_lime_coef().version
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
+            subtitle=f"LIME2 coefficients version: {version}",
         )
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
@@ -803,7 +795,7 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_polar_coeffs()
+        coeffs = self.settings_manager.get_polar_coef()
         self.worker = CallbackWorker(
             polar_callback, [srf, point, coeffs, self.lime_simulation]
         )
@@ -821,10 +813,12 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        version = self.settings_manager.get_lime_coef().version
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
+            subtitle=f"LIME2 coefficients version: {version}",
         )
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
@@ -846,12 +840,11 @@ class MainSimulationsWidget(
         self._block_gui_loading()
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
-        coeffs = self.settings_manager.get_irr_coeffs()
         cimel_coef = self.settings_manager.get_cimel_coef()
-        p_coeffs = self.settings_manager.get_polar_coeffs()
+        p_coeffs = self.settings_manager.get_polar_coef()
         self.worker = CallbackWorker(
             calculate_all_callback,
-            [srf, point, coeffs, cimel_coef, p_coeffs, self.lime_simulation],
+            [srf, point, cimel_coef, p_coeffs, self.lime_simulation],
         )
         self._start_thread(self.calculate_all_finished, self.calculate_all_error)
 
@@ -863,7 +856,7 @@ class MainSimulationsWidget(
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        version = self.settings_manager.get_cimel_coef().version
+        version = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             try:
                 moon.write_obs(
@@ -927,17 +920,19 @@ class LimeTBXWidget(QtWidgets.QWidget):
     Main widget of the lime toolbox desktop app.
     """
 
-    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
+    def __init__(
+        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str
+    ):
         super().__init__()
         self.setLocale("English")
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
+        self.settings_manager = settings.SettingsManager(selected_version)
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.settings_manager = settings.MockSettingsManager()
         self.comparison_page = ComparisonPageWidget(
             self.lime_simulation, self.settings_manager, self.kernels_path
         )
@@ -1236,7 +1231,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def select_coefficients(self):
         lime_tbx_w = self._get_lime_widget()
         select_coefficients_dialog = coefficients.SelectCoefficientsDialog(
-            lime_tbx_w.settings_manager, self
+            lime_tbx_w.settings_manager,
+            lime_tbx_w.lime_simulation,
+            self,
         )
         select_coefficients_dialog.exec_()
 

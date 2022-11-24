@@ -20,7 +20,9 @@ import obsarray
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    LimeCoefficients,
     Point,
+    PolarizationCoefficients,
     SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
@@ -294,37 +296,46 @@ def read_datetimes(path: str) -> List[datetime]:
         raise Exception(_READ_FILE_ERROR_STR)
 
 
-def read_refl_coefficients_from_stream(
+def read_lime_coefficients_from_stream(
     stream: Iterable[str],
-) -> ReflectanceCoefficients:
+) -> LimeCoefficients:
     # define dim_size_dict to specify size of arrays
     dim_sizes = {
         "wavelength": 6,
         "i_coeff": 18,
     }
-    # create dataset
-    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
-
-    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
     reader = csv.reader(stream)
     rows = []
     for row in reader:
         if len(row) > 0 and len(row[0]) > 0 and row[0][0] != "#":
             rows.append(row)
-    if len(rows) != 13:
+    if len(rows) != 37:
         raise LimeException(
-            f"Wrong format in the coefficients update file. There should be 13 uncommented lines, found {len(rows)}."
+            f"Wrong format in the coefficients update file. There should be 37 uncommented lines, found {len(rows)}."
         )
+    wlens = [440, 500, 675, 870, 1020, 1640]
     version_name = rows[0][0]
     data = np.array(rows[1:7]).astype(float)
-    u_data = np.array(rows[7:]).astype(float)
+    u_data = np.array(rows[7:13]).astype(float)
+    # create dataset
+    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
+    ds_cimel = ds_cimel.assign_coords(wavelength=wlens)
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
 
-    return ReflectanceCoefficients(ds_cimel, version_name)
+    rf = ReflectanceCoefficients(ds_cimel)
+
+    p_pos_data = np.array(rows[13:19]).astype(float)
+    p_pos_u_data = np.array(rows[19:25]).astype(float)
+    p_neg_data = np.array(rows[25:31]).astype(float)
+    p_neg_u_data = np.array(rows[31:37]).astype(float)
+    pol = PolarizationCoefficients(
+        wlens, p_pos_data, p_pos_u_data, p_neg_data, p_neg_u_data
+    )
+    return LimeCoefficients(rf, pol, version_name)
 
 
-def read_refl_coefficients(path: str) -> ReflectanceCoefficients:
+def read_lime_coefficients(path: str) -> LimeCoefficients:
     """
     Read a Reflectance Coefficients CSV file.
 
@@ -335,12 +346,12 @@ def read_refl_coefficients(path: str) -> ReflectanceCoefficients:
 
     Returns
     -------
-    rc: ReflectanceCoefficients
-        ReflectanceCoefficients read.
+    lc: LimeCoefficients
+        LimeCoefficients read.
     """
     try:
         with open(path, "r") as file:
-            return read_refl_coefficients_from_stream(file)
+            return read_lime_coefficients_from_stream(file)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)

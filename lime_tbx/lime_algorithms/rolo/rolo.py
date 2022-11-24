@@ -24,7 +24,6 @@ import numpy as np
 from . import eli, elref
 from ...datatypes.datatypes import (
     MoonData,
-    ApolloIrradianceCoefficients,
     ReflectanceCoefficients,
     SpectralData,
 )
@@ -46,10 +45,6 @@ class IROLO(ABC):
             from reflectance data.
         * get_elrefs: Calculates the extra-terrestrial lunar reflectance in fractions of unity for some
             given parameters.
-        * get_eli_apollo: Calculates the extra-terrestrial lunar irradiance in Wm⁻²/nm for some given
-            parameters, using the apollo coefficients.
-        * get_elref: Calculates the extra-terrestrial lunar reflectance in fractions of unity for some
-            given parameters, using the apollo coefficients.
     """
 
     @staticmethod
@@ -107,70 +102,6 @@ class IROLO(ABC):
         """
         pass
 
-    @staticmethod
-    @abstractmethod
-    def get_eli_apollo(
-        wavelengths: Union[float, List[float]],
-        moon_data: MoonData,
-        coefficients: ApolloIrradianceCoefficients,
-    ) -> np.ndarray:
-        """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020,
-        using the Apollo Coefficients.
-
-        Allow users to simulate lunar observation for any observer/solar selenographic
-        latitude and longitude.
-
-        Returns the data in Wm⁻²/nm
-
-        Parameters
-        ----------
-        wavelengths : float | list of float
-            Wavelength/s (in nanometers) of which the extraterrestrial lunar irradiance will be
-            calculated.
-        moon_data : MoonData
-            Moon data needed to calculate Moon's irradiance.
-        coefficients : IrradianceCoefficients
-            Needed coefficients for the simulation.
-
-        Returns
-        -------
-        np.ndarray of float
-            The extraterrestrial lunar irradiances calculated.
-        """
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_elref_apollo(
-        wavelengths: Union[float, List[float]],
-        moon_data: MoonData,
-        coefficients: ApolloIrradianceCoefficients,
-    ) -> np.ndarray:
-        """Calculation of Extraterrestrial Lunar Reflectance following Eq 3 in Roman et al., 2020
-        for the calculation of the irradiance, using the Apollo Coefficients.
-
-        Allow users to simulate lunar observation for any observer/solar selenographic
-        latitude and longitude.
-
-        Returns the data in fractions of unity.
-
-        Parameters
-        ----------
-        wavelengths : float | list of float
-            Wavelength/s (in nanometers) of which the extraterrestrial lunar irradiance will be
-            calculated.
-        moon_data : MoonData
-            Moon data needed to calculate Moon's irradiance.
-        coefficients : IrradianceCoefficients
-            Needed coefficients for the simulation.
-
-        Returns
-        -------
-        np.ndarray of float
-            The extraterrestrial lunar reflectances calculated.
-        """
-        pass
-
 
 class ROLO(IROLO):
     """
@@ -196,68 +127,3 @@ class ROLO(IROLO):
         unc = elref.calculate_elref_unc(coefficients, moon_data)
         ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc_rand=unc)
         return SpectralData(wlens, elrefs, unc, ds)
-
-    @staticmethod
-    def get_eli_apollo(
-        wavelengths: Union[float, List[float]],
-        moon_data: MoonData,
-        coefficients: ApolloIrradianceCoefficients,
-    ) -> np.ndarray:
-        """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
-
-        Allow users to simulate lunar observation for any observer/solar selenographic
-        latitude and longitude.
-
-        Returns the data in Wm⁻²/nm
-
-        Parameters
-        ----------
-        wavelengths : float | list of float
-            Wavelength/s (in nanometers) of which the extraterrestrial lunar irradiance will be
-            calculated.
-        moon_data : MoonData
-            Moon data needed to calculate Moon's irradiance.
-        coefficients : IrradianceCoefficients
-            Needed coefficients for the simulation.
-
-        Returns
-        -------
-        np.ndarray of float
-            The extraterrestrial lunar irradiances calculated.
-        """
-        if not isinstance(wavelengths, list):
-            wavelengths = [wavelengths]
-        return eli.calculate_elis_apollo(wavelengths, moon_data, coefficients)
-
-    @staticmethod
-    def get_elref_apollo(
-        wavelengths: Union[float, List[float]],
-        moon_data: MoonData,
-        coefficients: ApolloIrradianceCoefficients,
-    ) -> np.ndarray:
-        """Calculation of Extraterrestrial Lunar Reflectance following Eq 3 in Roman et al., 2020
-        for the calculation of the irradiance.
-
-        Allow users to simulate lunar observation for any observer/solar selenographic
-        latitude and longitude.
-
-        Returns the data in fractions of unity.
-
-        Parameters
-        ----------
-        wavelengths : float | list of float
-            Wavelength/s (in nanometers) of which the extraterrestrial lunar irradiance will be
-            calculated.
-        moon_data : MoonData
-            Moon data needed to calculate Moon's irradiance.
-        coefficients : IrradianceCoefficients
-            Needed coefficients for the simulation.
-
-        Returns
-        -------
-        np.ndarray of float
-            The extraterrestrial lunar reflectances calculated.
-        """
-        if not isinstance(wavelengths, list):
-            wavelengths = [wavelengths]
-        return elref.calculate_elref_apollo(wavelengths, moon_data, coefficients)

@@ -9,10 +9,10 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    LimeCoefficients,
     PolarizationCoefficients,
     SRFChannel,
     SpectralResponseFunction,
-    ApolloIrradianceCoefficients,
     ReflectanceCoefficients,
 )
 from ..datatypes import constants
@@ -42,12 +42,7 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_irr_coeffs(self) -> ApolloIrradianceCoefficients:
-        """Obtain the current IrradianceCoefficients chosen by the user."""
-        pass
-
-    @abstractmethod
-    def get_polar_coeffs(self) -> PolarizationCoefficients:
+    def get_polar_coef(self) -> PolarizationCoefficients:
         """Obtain the current PolarizationCoefficients chosen by the user."""
         pass
 
@@ -72,12 +67,17 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_available_cimel_coeffs(self) -> List[ReflectanceCoefficients]:
-        """Obtain a list with all the cimel coefficients available"""
+    def get_lime_coef(self) -> LimeCoefficients:
+        """Obtain the LimeCoef coefficients and uncertainties"""
         pass
 
     @abstractmethod
-    def select_cimel_coeff(self, index: int) -> None:
+    def get_available_coeffs(self) -> List[LimeCoefficients]:
+        """Obtain a list with all the lime coefficients available"""
+        pass
+
+    @abstractmethod
+    def select_lime_coeff(self, index: int) -> None:
         """Select the cimel_coeff from the cimel coefficients list at the given position."""
         pass
 
@@ -87,13 +87,20 @@ class ISettingsManager(ABC):
         pass
 
 
-class MockSettingsManager(ISettingsManager):
-    def __init__(self):
+class SettingsManager(ISettingsManager):
+    def __init__(self, previous_coeff_name: str = None):
         # generate an arbitrary default srf
         self.srfs = [self.get_default_srf()]
         self.srf = self.srfs[0]
-        self.cimel_coeffs = access_data.get_all_cimel_coefficients()
-        self.cimel_coeff = self.cimel_coeffs[-1]
+        self.coeffs = access_data.AccessData().get_all_coefficients()
+        index = -1
+        if previous_coeff_name != None:
+            versions = [coef.version for coef in self.coeffs]
+            if previous_coeff_name in versions:
+                index = versions.index(previous_coeff_name)
+        self.coeff = self.coeffs[index]
+        self.cimel_coeff = self.coeffs[index].reflectance
+        self.polar_coeff = self.coeffs[index].polarization
 
     def get_default_srf(self) -> SpectralResponseFunction:
         spectral_response = {
@@ -110,11 +117,8 @@ class MockSettingsManager(ISettingsManager):
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
 
-    def get_irr_coeffs(self) -> ApolloIrradianceCoefficients:
-        return access_data._get_default_irradiance_coefficients()
-
-    def get_polar_coeffs(self) -> PolarizationCoefficients:
-        return access_data._get_default_polarization_coefficients()
+    def get_polar_coef(self) -> PolarizationCoefficients:
+        return self.polar_coeff
 
     def load_srf(self, srf: SpectralResponseFunction):
         self.srfs.append(srf)
@@ -128,12 +132,20 @@ class MockSettingsManager(ISettingsManager):
     def get_cimel_coef(self) -> ReflectanceCoefficients:
         return self.cimel_coeff
 
-    def get_available_cimel_coeffs(self) -> List[ReflectanceCoefficients]:
-        return self.cimel_coeffs
+    def get_lime_coef(self) -> LimeCoefficients:
+        return self.coeff
 
-    def select_cimel_coeff(self, index: int) -> None:
-        self.cimel_coeff = self.cimel_coeffs[index]
+    def get_available_coeffs(self) -> List[LimeCoefficients]:
+        return self.coeffs
+
+    def select_lime_coeff(self, index: int) -> None:
+        self.coeff = self.coeffs[index]
+        self.cimel_coeff = self.coeffs[index].reflectance
+        self.polar_coeff = self.coeffs[index].polarization
+        access_data.AccessData().set_previusly_selected_version(self.coeff.version)
 
     def reload_coeffs(self) -> None:
-        self.cimel_coeffs = access_data.get_all_cimel_coefficients()
-        self.cimel_coeff = self.cimel_coeffs[-1]
+        self.coeffs = access_data.AccessData().get_all_coefficients()
+        self.coeff = self.coeffs[-1]
+        self.cimel_coeff = self.coeffs[-1].reflectance
+        self.polar_coeff = self.coeffs[-1].polarization

@@ -3,6 +3,8 @@
 """___Built-In Modules___"""
 from typing import Callable, Tuple
 
+from lime_tbx.simulation.lime_simulation import ILimeSimulation
+
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 
@@ -27,9 +29,15 @@ __status__ = "Development"
 
 
 class SelectCoefficientsDialog(QtWidgets.QDialog):
-    def __init__(self, settings_manager: ISettingsManager, parent=None):
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        lime_simulation: ILimeSimulation,
+        parent=None,
+    ):
         super().__init__(parent)
         self.settings_manager = settings_manager
+        self.lime_simulation = lime_simulation
         self.combobox_listen = True
         self._build_layout()
 
@@ -54,20 +62,19 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
 
     def update_combo_versions(self):
         self.combobox_listen = False
-        self.available_cimel_coeffs = self.settings_manager.get_available_cimel_coeffs()
+        self.available_coeffs = self.settings_manager.get_available_coeffs()
         self.combo_versions.clear()
-        self.combo_versions.addItems(
-            [coeff.version for coeff in self.available_cimel_coeffs]
-        )
-        coeff = self.settings_manager.get_cimel_coef()
-        index = self.available_cimel_coeffs.index(coeff)
+        self.combo_versions.addItems([coeff.version for coeff in self.available_coeffs])
+        coeff = self.settings_manager.get_lime_coef()
+        index = self.available_coeffs.index(coeff)
         self.combo_versions.setCurrentIndex(index)
         self.combobox_listen = True
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         if self.combobox_listen:
-            self.settings_manager.select_cimel_coeff(i)
+            self.settings_manager.select_lime_coeff(i)
+            self.lime_simulation.set_simulation_changed()
 
     @QtCore.Slot()
     def save_clicked(self):

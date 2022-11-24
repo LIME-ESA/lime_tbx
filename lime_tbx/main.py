@@ -3,6 +3,7 @@ import os
 import getopt
 import sys
 
+
 """___Third-Party Modules___"""
 # import here
 
@@ -13,15 +14,16 @@ from lime_tbx.cli.cli import (
     LONG_OPTIONS,
     print_help,
 )
-from lime_tbx.coefficients.access_data.programdata import (
+from lime_tbx.local_storage.programdata import (
     get_appdata_folder,
     get_programfiles_folder,
 )
 from lime_tbx.datatypes.datatypes import KernelsPath
 from lime_tbx.datatypes import logger
+from lime_tbx.coefficients.access_data.access_data import AccessData
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
 __created__ = "01/02/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
@@ -39,6 +41,7 @@ def main():
     args = sys.argv[1:]
     options = OPTIONS
     long_options = LONG_OPTIONS
+    selected_version = AccessData().get_previously_selected_version()
     try:
         opts, args = getopt.getopt(args, options, long_options)
     except getopt.GetoptError as e:
@@ -54,9 +57,9 @@ def main():
             whnd = ctypes.windll.kernel32.GetConsoleWindow()
             if whnd != 0:
                 ctypes.windll.user32.ShowWindow(whnd, 0)
-        gui = GUI(kernels_path, eocfi_path)
+        gui = GUI(kernels_path, eocfi_path, selected_version)
     else:
-        cli = CLI(kernels_path, eocfi_path)
+        cli = CLI(kernels_path, eocfi_path, selected_version)
         status = cli.handle_input(opts)
         sys.exit(status)
 

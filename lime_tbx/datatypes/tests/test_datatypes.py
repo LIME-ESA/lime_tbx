@@ -111,19 +111,17 @@ class TestSpectralResponseFunction(unittest.TestCase):
 COEF_WLENS = [350, 500, 650]
 POS_COEFFS = [(1, 2, 3, 4), (10, 2, 3, 4), (0.1, 2, 3, 4)]
 NEG_COEFFS = [(-1, -2, -3, -4), (-1, -2, -3, -4), (-1, -2, -3, -4)]
+UNCERTAINTIES = [(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)]
 
 
 class TestPolarizationCoefficients(unittest.TestCase):
     def test_func(self):
-        coeffs = PolarizationCoefficients(COEF_WLENS, POS_COEFFS, NEG_COEFFS)
+        coeffs = PolarizationCoefficients(
+            COEF_WLENS, POS_COEFFS, UNCERTAINTIES, NEG_COEFFS, UNCERTAINTIES
+        )
         self.assertEqual(coeffs.get_wavelengths(), COEF_WLENS)
         self.assertEqual(coeffs.get_coefficients_positive(COEF_WLENS[0]), POS_COEFFS[0])
         self.assertEqual(coeffs.get_coefficients_negative(COEF_WLENS[0]), NEG_COEFFS[0])
-
-
-class TestApolloIrradianceCoefficients(unittest.TestCase):
-    # This class is not deleted for legacy purposes, but it's not used. If it were to be used in the future, these tests should be developed.
-    pass
 
 
 DT1 = datetime(2000, 1, 16, 2, tzinfo=timezone.utc)
@@ -226,7 +224,7 @@ class TestReflectanceCoefficients(unittest.TestCase):
         u_data = np.array([i * U_COEFF_LINE for i in range(1, 7)])
         ds_cimel.coeff.values = data.T
         ds_cimel.u_coeff.values = u_data.T
-        coeffs = ReflectanceCoefficients(ds_cimel, "Test")
+        coeffs = ReflectanceCoefficients(ds_cimel)
         self.assertEqual(len(coeffs.coeffs.a_coeffs), 4)
         for i in range(4):  # a coeffs are 4 coefficients
             a_coeffs = coeffs.coeffs.a_coeffs[i]
