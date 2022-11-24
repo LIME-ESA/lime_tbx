@@ -87,15 +87,20 @@ class ISettingsManager(ABC):
         pass
 
 
-class MockSettingsManager(ISettingsManager):
-    def __init__(self):
+class SettingsManager(ISettingsManager):
+    def __init__(self, previous_coeff_name: str = None):
         # generate an arbitrary default srf
         self.srfs = [self.get_default_srf()]
         self.srf = self.srfs[0]
         self.coeffs = access_data.AccessData().get_all_coefficients()
-        self.coeff = self.coeffs[-1]
-        self.cimel_coeff = self.coeffs[-1].reflectance
-        self.polar_coeff = self.coeffs[-1].polarization
+        index = -1
+        if previous_coeff_name != None:
+            versions = [coef.version for coef in self.coeffs]
+            if previous_coeff_name in versions:
+                index = versions.index(previous_coeff_name)
+        self.coeff = self.coeffs[index]
+        self.cimel_coeff = self.coeffs[index].reflectance
+        self.polar_coeff = self.coeffs[index].polarization
 
     def get_default_srf(self) -> SpectralResponseFunction:
         spectral_response = {
@@ -134,8 +139,10 @@ class MockSettingsManager(ISettingsManager):
         return self.coeffs
 
     def select_lime_coeff(self, index: int) -> None:
+        self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
         self.polar_coeff = self.coeffs[index].polarization
+        access_data.AccessData().set_previusly_selected_version(self.coeff.version)
 
     def reload_coeffs(self) -> None:
         self.coeffs = access_data.AccessData().get_all_coefficients()

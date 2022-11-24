@@ -728,10 +728,12 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
+        version = self.settings_manager.get_lime_coef().version
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
+            subtitle=f"LIME2 coefficients version: {version}",
         )
         self.signal_widget.update_signals(data[0], data[1], data[5])
         self.lower_tabs.setCurrentIndex(0)
@@ -771,10 +773,12 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        version = self.settings_manager.get_lime_coef().version
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
+            subtitle=f"LIME2 coefficients version: {version}",
         )
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
@@ -809,10 +813,12 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        version = self.settings_manager.get_lime_coef().version
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
+            subtitle=f"LIME2 coefficients version: {version}",
         )
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
@@ -914,17 +920,19 @@ class LimeTBXWidget(QtWidgets.QWidget):
     Main widget of the lime toolbox desktop app.
     """
 
-    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
+    def __init__(
+        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str
+    ):
         super().__init__()
         self.setLocale("English")
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
+        self.settings_manager = settings.SettingsManager(selected_version)
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.settings_manager = settings.MockSettingsManager()
         self.comparison_page = ComparisonPageWidget(
             self.lime_simulation, self.settings_manager, self.kernels_path
         )
@@ -1223,7 +1231,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def select_coefficients(self):
         lime_tbx_w = self._get_lime_widget()
         select_coefficients_dialog = coefficients.SelectCoefficientsDialog(
-            lime_tbx_w.settings_manager, self
+            lime_tbx_w.settings_manager,
+            lime_tbx_w.lime_simulation,
+            self,
         )
         select_coefficients_dialog.exec_()
 

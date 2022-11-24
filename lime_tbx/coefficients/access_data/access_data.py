@@ -35,6 +35,14 @@ class IAccessData(ABC):
     def get_all_coefficients(self) -> List[LimeCoefficients]:
         pass
 
+    @abstractmethod
+    def get_previously_selected_version(self) -> str:
+        pass
+
+    @abstractmethod
+    def set_previusly_selected_version(self, name: str):
+        pass
+
 
 class AccessData(IAccessData):
     def get_all_coefficients(self) -> List[LimeCoefficients]:
@@ -47,6 +55,24 @@ class AccessData(IAccessData):
             cf = lcsv.read_lime_coefficients(os.path.join(folder, vf))
             coeffs.append(cf)
         return coeffs
+
+    def get_previously_selected_version(self) -> str:
+        file = os.path.join(
+            programdata.get_programfiles_folder(), "coeff_data", "selected.txt"
+        )
+        if os.path.exists(file):
+            name = None
+            with open(file, "r") as fp:
+                name = fp.readlines()[0].strip()
+            return name
+        return None
+
+    def set_previusly_selected_version(self, name: str):
+        file = os.path.join(
+            programdata.get_programfiles_folder(), "coeff_data", "selected.txt"
+        )
+        with open(file, "w") as fp:
+            fp.write(name)
 
 
 _DEFAULT_C_COEFFS = [0.00034115, -0.0013425, 0.00095906, 0.00066229]

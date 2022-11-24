@@ -188,11 +188,13 @@ def print_version():
 
 
 class CLI:
-    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
+    def __init__(
+        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str = None
+    ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
-        self.settings_manager = settings.MockSettingsManager()
+        self.settings_manager = settings.SettingsManager(selected_version)
         self.srf = self.settings_manager.get_default_srf()
 
     def load_srf(self, srf_file: str):

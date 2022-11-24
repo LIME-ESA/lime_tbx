@@ -31,13 +31,15 @@ def _preprocess_qss(qss: str, qss_constants: str):
 
 
 class GUI:
-    def __init__(self, kernels_path: KernelsPath, eocfi_path: str):
+    def __init__(
+        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str = None
+    ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         app = QtWidgets.QApplication([constants.APPLICATION_NAME])
         self._init_fonts()
         window = maingui.LimeTBXWindow(kernels_path)
-        main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path)
+        main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path, selected_version)
         window.resize(850, 850)
         window.setCentralWidget(main_widget)
         window.show()
