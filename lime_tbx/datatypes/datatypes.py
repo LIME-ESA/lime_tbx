@@ -477,6 +477,8 @@ class ReflectanceCoefficients:
 class PolarizationCoefficients:
     """
     Coefficients used in the DoLP algorithm.
+
+    If created with numpy arrays, it will return those numpy arrays.
     """
 
     def __init__(
