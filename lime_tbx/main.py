@@ -2,6 +2,7 @@
 import os
 import getopt
 import sys
+import warnings
 
 
 """___Third-Party Modules___"""
@@ -32,6 +33,8 @@ __status__ = "Development"
 
 def main():
     logger.get_logger().info("ToolBox started")
+    warnings.filterwarnings("ignore", ".*Gtk-WARNING.*")
+    warnings.filterwarnings("ignore", ".*Fontconfig warning.*")
     programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
     kernels_path = KernelsPath(
