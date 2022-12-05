@@ -23,8 +23,9 @@ APPNAME = "LimeTBX"
 
 
 def _is_valid_programfiles(programdata: str) -> bool:
-    if path.exists(path.join(programdata, "kernels")) and path.exists(
-        path.join(programdata, "eocfi_data")
+    if (
+        path.exists(path.join(programdata, "kernels"))
+        and path.exists(path.join(programdata, "eocfi_data"))
         and path.exists(path.join(programdata, "coeff_data"))
     ):
         return True
