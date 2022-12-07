@@ -656,12 +656,13 @@ class SpectralData:
         if unc_rand is not None:
             ds_pol.u_ran_polarization.values = unc_rand
         else:
-            ds_pol.u_ran_polarization.values = polarization * 0.01
+            ds_pol.u_ran_polarization.values = np.abs(polarization) * 0.01
 
         if unc_syst is not None:
             ds_pol.u_sys_polarization.values = unc_syst
         else:
-            ds_pol.u_sys_polarization.values = polarization * 0.05
+            ds_pol.u_sys_polarization.values = np.abs(polarization) * 0.05
+        # Doing the abs of the polarization because the dolp model may output negative values.
 
         return ds_pol
 
