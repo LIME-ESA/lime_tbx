@@ -76,7 +76,7 @@ def _measurement_func_elref(
         gr_value = gd_value
     d1_value = d_coeffs[0] * np.exp(-gd_value / p_coeffs[0])
     d2_value = d_coeffs[1] * np.exp(-gd_value / p_coeffs[1])
-    d3_value = d_coeffs[2] * np.cos(np.deg2rad((gd_value - p_coeffs[2]) / p_coeffs[3]))
+    d3_value = d_coeffs[2] * np.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
 
     sum_a: float = np.sum(
         [a_coeffs[i] * gr_value**i for i in range(len(a_coeffs))], axis=0
