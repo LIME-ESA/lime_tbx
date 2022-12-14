@@ -54,7 +54,7 @@ setup(
         "six==1.16.0",
         "sklearn==0.0",
         "spicedmoon==1.0.3",
-        "spiceypy==5.1.1",
+        "spiceypy==5.1.2",
         "threadpoolctl==3.1.0",
         "xarray==2022.10.0",
     ],
