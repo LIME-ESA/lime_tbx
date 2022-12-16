@@ -1,0 +1,18 @@
+[run]
+branch = True
+source =
+        ./lime_tbx
+omit =
+        */tests/*
+        *__init__*
+        lime_tbx/main.py
+        lime_tbx/gui/*.py
+        lime_tbx/_version.py
+
+[report]
+omit =
+        */tests/*
+        *__init__*
+        lime_tbx/main.py
+        lime_tbx/gui/*.py
+        lime_tbx/_version.py

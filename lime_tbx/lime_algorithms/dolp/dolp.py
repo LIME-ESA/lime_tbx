@@ -43,7 +43,7 @@ class IDOLP(ABC):
         wavelengths: List[float],
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
-    ) -> List[float]:
+    ) -> SpectralData:
         """
         Calculation of the degree of linear polarization.
 
@@ -58,8 +58,8 @@ class IDOLP(ABC):
 
         Returns
         -------
-        polarizations: list of float
-            List with the degrees of polarization for each given wavelength.
+        polarizations: SpectralData
+            SpectralData with the degrees of polarization for each given wavelength.
         """
         pass
 
@@ -131,7 +131,7 @@ class DOLP(IDOLP):
 
         Returns
         -------
-        polarizations: np.array of float
+        polarizations: SpectralData
             List with the degrees of polarization for each given wavelength.
         """
         polarizations = []
