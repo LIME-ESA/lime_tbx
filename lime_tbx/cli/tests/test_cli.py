@@ -371,6 +371,15 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(errcode, 0)
 
+    def test_comparison_glob_nc_both_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o nc,test_files/cli/compcli.nc'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
     def test_comparison_glob_graphd_png_both_ok(self):
         if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
             self.skipTest("Graph output fails in python docker of gitlab ci")

@@ -908,7 +908,12 @@ def check_srf_comparison_callback(
         error_msg = "SRF file not valid for the observation file."
         error = Exception(error_msg)
         raise error
-    return [lglod, srf]
+    new_channels = []
+    for chan in srf_chans:
+        if chan in lglod.ch_names:
+            new_channels.append(srf.get_channel_from_name(chan))
+    new_srf = SpectralResponseFunction(srf.name, new_channels)
+    return [lglod, new_srf]
 
 
 def return_args_callback(*args):
