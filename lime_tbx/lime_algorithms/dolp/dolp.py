@@ -40,7 +40,6 @@ class IDOLP(ABC):
     @abstractmethod
     def get_polarized(
         self,
-        wavelengths: List[float],
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
     ) -> SpectralData:
@@ -49,8 +48,6 @@ class IDOLP(ABC):
 
         Parameters
         ----------
-        wavelengths: list of float
-            List of wavelengths from which the polarization needs to be calculated.
         mpa_degrees: float
             Moon phase angle in degrees.
         coefficients: PolarizationCoefficients
@@ -83,37 +80,8 @@ class DOLP(IDOLP):
         )
         return result
 
-    def _get_interpolated_polarized(
-        self,
-        wlen: float,
-        mpa: float,
-        coefficients: PolarizationCoefficients,
-    ) -> float:
-        wvlens = coefficients.get_wavelengths()
-        if wlen < wvlens[0]:
-            # The extrapolation done is "nearest"
-            return self._get_direct_polarized(wvlens[0], mpa, coefficients)
-        if wlen > wvlens[-1]:
-            # The extrapolation done is "nearest"
-            return self._get_direct_polarized(wvlens[-1], mpa, coefficients)
-        if wlen in wvlens:
-            return self._get_direct_polarized(wlen, mpa, coefficients)
-        near_left = -math.inf
-        near_right = math.inf
-        for wvlen in wvlens:
-            if near_left < wvlen < wlen:
-                near_left = wvlen
-            elif wlen < wvlen < near_right:
-                near_right = wvlen
-        x_values = [near_left, near_right]
-        y_values = []
-        y_values.append(self._get_direct_polarized(x_values[0], mpa, coefficients))
-        y_values.append(self._get_direct_polarized(x_values[1], mpa, coefficients))
-        return np.interp(wlen, x_values, y_values)
-
     def get_polarized(
         self,
-        wavelengths: List[float],
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
     ) -> SpectralData:
@@ -122,8 +90,6 @@ class DOLP(IDOLP):
 
         Parameters
         ----------
-        wavelengths: list of float
-            List of wavelengths from which the polarization needs to be calculated.
         mpa_degrees: float
             Moon phase angle in degrees.
         coefficients: PolarizationCoefficients
@@ -136,8 +102,9 @@ class DOLP(IDOLP):
         """
         polarizations = []
         mpa = mpa_degrees
+        wavelengths = coefficients.get_wavelengths()
         for wlen in wavelengths:
-            result = self._get_interpolated_polarized(wlen, mpa, coefficients)
+            result = self._get_direct_polarized(wlen, mpa, coefficients)
             polarizations.append(result)
         polarizations = np.array(polarizations)
         ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None)

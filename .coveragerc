@@ -8,6 +8,7 @@ omit =
         lime_tbx/main.py
         lime_tbx/gui/*.py
         lime_tbx/_version.py
+        lime_tbx/local_storage/*.py
 
 [report]
 omit =
@@ -16,3 +17,4 @@ omit =
         lime_tbx/main.py
         lime_tbx/gui/*.py
         lime_tbx/_version.py
+        lime_tbx/local_storage/*.py

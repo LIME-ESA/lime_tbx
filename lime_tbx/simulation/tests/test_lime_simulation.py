@@ -2,6 +2,8 @@
 
 """___Built-In Modules___"""
 from datetime import datetime, timezone
+import sys
+import io
 
 """___Third-Party Modules___"""
 import unittest
@@ -17,11 +19,13 @@ from ...datatypes.datatypes import (
     SRFChannel,
     SurfacePoint,
     KernelsPath,
+    LGLODData,
 )
 from ...coefficients.access_data.access_data import (
     _get_default_polarization_coefficients,
     _get_demo_cimel_coeffs,
 )
+from ...filedata import moon, srf as srflib
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -96,12 +100,57 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(signals, SpectralData)
 
     # Function update_polarization
-    def test_update_reflectance(self):
+    def test_update_polarization(self):
         ls = get_lime_simulation()
         ls.update_polarization(get_srf(), SURFACE_POINT, get_polar_coeffs())
         polars = ls.get_polars()
         self.assertIsNotNone(polars)
         self.assertIsInstance(polars, list)
+
+    def test_update_irr_polar_verbose(self):
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+
+        ls = LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=True)
+        ls.update_irradiance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_polarization(get_srf(), SURFACE_POINT, get_polar_coeffs())
+        elis = ls.get_elis()
+        self.assertIsNotNone(elis)
+        self.assertIsInstance(elis, list)
+        signals = ls.get_signals()
+        self.assertIsNotNone(signals)
+        self.assertIsInstance(signals, SpectralData)
+        polars = ls.get_polars()
+        self.assertIsNotNone(polars)
+        self.assertIsInstance(polars, list)
+
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+
+    def test_update_get_point(self):
+        ls = get_lime_simulation()
+        ls.update_reflectance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        elrefs = ls.get_elrefs()
+        self.assertIsNotNone(elrefs)
+        self.assertIsInstance(elrefs, list)
+        pt = ls.get_point()
+        self.assertEqual(pt, SURFACE_POINT)
+
+    def test_load_lglod(self):
+        ls = get_lime_simulation()
+        lglod: LGLODData = moon.read_lglod_file(
+            "test_files/moon/simulation.nc", KERNELS_PATH
+        )
+        srf = srflib.read_srf(
+            "test_files/srf/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc"
+        )
+        ls.set_observations(lglod, srf)
+        ls.get_elis()
+        np.testing.assert_array_equal(
+            lglod.observations[0].irrs.data, ls.get_elis()[0].data
+        )
 
 
 if __name__ == "__main__":

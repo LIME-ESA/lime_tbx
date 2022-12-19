@@ -1,0 +1,1 @@
+Something went wrong while exporting irradiance graph. [Errno 13] Permission denied: '/root.png'

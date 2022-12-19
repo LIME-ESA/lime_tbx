@@ -264,6 +264,20 @@ class ILimeSimulation(ABC):
         """
         pass
 
+    @abstractmethod
+    def set_observations(self, lglod: LGLODData, srf: SpectralResponseFunction):
+        """
+        Loads a set of observations and the relative SRF into the lime simulation
+
+        Parameters
+        ----------
+        lglod: LGLODData
+            Observations to be loaded
+        srf: SpectralResponseFunction
+            SRF related to those observations
+        """
+        pass
+
 
 class LimeSimulation(ILimeSimulation):
     """
@@ -605,13 +619,12 @@ class LimeSimulation(ILimeSimulation):
         polar_coeff: PolarizationCoefficients,
     ) -> Union[SpectralData, List[SpectralData]]:
         dl = dolp.DOLP()
-        wlens = polar_coeff.get_wavelengths()
         if not isinstance(mds, list):
-            return dl.get_polarized(wlens, mds.mpa_degrees, polar_coeff)
+            return dl.get_polarized(mds.mpa_degrees, polar_coeff)
         else:
             specs = []
             for m in mds:
-                spectral_data = dl.get_polarized(wlens, m.mpa_degrees, polar_coeff)
+                spectral_data = dl.get_polarized(m.mpa_degrees, polar_coeff)
                 specs.append(spectral_data)
         return specs
 
