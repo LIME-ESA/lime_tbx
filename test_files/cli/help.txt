@@ -5,6 +5,7 @@ It won't work unless given only one of the options (-h|-e|-l|-s|-c).
 Options:
   -h, --help		 Displays the help message.
   -v, --version		 Displays the version name.
+  -u, --update		 Updates the coefficients.
   -e, --earth		 Performs simulations from a geographic point.
 			 -e lat_deg,lon_deg,height_m,%Y-%m-%dT%H:%M:%S
   -l, --lunar		 Performs a simulation from a selenographic point.
@@ -26,3 +27,4 @@ Options:
 			   LGLOD (netcdf): -o nc,output_lglod.nc
   -f, --srf		 Select the file that contains the Spectral Response Function in GLOD format.
   -t, --timeseries	 Select a CSV file with multiple datetimes instead of inputing directly only one datetime. Valid only if the main option is -e or -s.
+  -C, --coefficients	 Select the coefficients version used.

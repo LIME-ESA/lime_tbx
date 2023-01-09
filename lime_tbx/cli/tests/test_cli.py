@@ -6,6 +6,7 @@ import os
 import sys
 import io
 import shlex
+import locale
 
 """___Third-Party Modules___"""
 import unittest
@@ -57,6 +58,14 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
 
     def setUp(self):
         self.capturedOutput = io.StringIO()
@@ -279,6 +288,26 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         errcode = cli.handle_input(get_opts("-v"))
         self.assertEqual(errcode, 0)
 
+    def test_update_err_connection(self):
+        cli = get_cli()
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_update_connection.txt")
+        self.assertEqual(self.capturedOutput.getvalue(), f.read())
+        f.close()
+
+    def test_select_coeff_err_earth_glod(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C inventedcoeffs"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_select_coeffs.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
@@ -292,6 +321,16 @@ class TestCLI(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 0)
+
+    def test_earth_glod_ok_select_coeff(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C 23.01.01"
+            )
+        )
+        self.assertEqual(errcode, 0)
+        os.remove(os.path.join(".", "coeff_data", "selected.txt"))
 
     def test_earth_timeseries_glod_ok(self):
         cli = get_cli()

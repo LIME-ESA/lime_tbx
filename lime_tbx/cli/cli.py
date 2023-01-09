@@ -7,6 +7,7 @@ import os
 from enum import Enum
 import glob
 import sys
+from lime_tbx.coefficients.update.update import IUpdate, Update
 
 """___Third-Party Modules___"""
 # import here
@@ -29,7 +30,7 @@ from lime_tbx.simulation.lime_simulation import LimeSimulation
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
-from lime_tbx.datatypes import constants
+from lime_tbx.datatypes import constants, logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -40,10 +41,11 @@ __status__ = "Development"
 
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
-OPTIONS = "hvde:l:s:c:o:f:t:"
+OPTIONS = "hvude:l:s:c:o:f:t:C:"
 LONG_OPTIONS = [
     "help",
     "version",
+    "update",
     "debug",
     "earth=",
     "lunar=",
@@ -52,6 +54,7 @@ LONG_OPTIONS = [
     "output=",
     "srf=",
     "timeseries=",
+    "coefficients=",
 ]
 
 
@@ -137,6 +140,7 @@ observations files in GLOD format.\n"
     print("Options:")
     print("  -h, --help\t\t Displays the help message.")
     print("  -v, --version\t\t Displays the version name.")
+    print("  -u, --update\t\t Updates the coefficients.")
     print("  -e, --earth\t\t Performs simulations from a geographic point.")
     print("\t\t\t -e lat_deg,lon_deg,height_m,{}".format(_DT_FORMAT))
     print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
@@ -181,6 +185,7 @@ in GLOD format."
         "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
 inputing directly only one datetime. Valid only if the main option is -e or -s."
     )
+    print("  -C, --coefficients\t Select the coefficients version used.")
 
 
 def print_version():
@@ -604,6 +609,34 @@ class CLI:
                             )
                         file_index += 1
 
+    def update_coefficients(self) -> int:
+        updater: IUpdate = Update()
+        stopper_checker_true = lambda *_: True
+        updates = False
+        try:
+            if updater.check_for_updates():
+                news, fails = updater.download_coefficients(stopper_checker_true, [])
+                updates = True
+        except Exception as error:
+            print("Error connecting to the server.\nCheck log for details.")
+            logger.get_logger().error(str(error))
+            return 1
+        msg = "Download finished.\nThere were no updates."
+        if updates:
+            newsstring = f"There was 1 update"
+            failsstring = f"it failed"
+            if news > 1:
+                newsstring = f"There were {news} updates"
+                failsstring = f"{fails} of them failed"
+            if fails == 0:
+                msg = f"Download finished.\n{newsstring}."
+            else:
+                msg = f"Download finished with errors.\n{newsstring}, {failsstring}."
+        print(msg)
+        if updates:
+            self.settings_manager.reload_coeffs()
+        return 0
+
     def handle_input(self, opts: List[Tuple[str, str]]) -> int:
         srf_file = ""
         export_data: ExportData = None
@@ -618,6 +651,8 @@ class CLI:
             if opt in ("-v", "--version"):
                 print_version()
                 return 0
+            if opt in ("-u", "--update"):
+                return self.update_coefficients()
             if opt in ("-o", "--output"):  # Output
                 splitted = arg.split(",")
                 o_type = splitted[0]
@@ -717,6 +752,17 @@ class CLI:
                 srf_file = arg
             elif opt in ("-t", "--timeseries"):
                 timeseries_file = arg
+            elif opt in ("-C", "--coefficients"):
+                names = [
+                    coef.version
+                    for coef in self.settings_manager.get_available_coeffs()
+                ]
+                if arg not in names:
+                    eprint(
+                        f"Coefficients version not recognized. Selected: {arg}. Available: {names}."
+                    )
+                    return 1
+                self.settings_manager.select_lime_coeff(names.index(arg))
         if export_data == None:
             eprint("Error: The output flag (-o | --output) must be included.")
             return 1
