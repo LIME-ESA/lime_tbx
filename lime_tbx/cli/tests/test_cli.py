@@ -414,7 +414,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o nc,test_files/cli/compcli.nc'
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o nc,test_files/cli/compcli.test.nc'
             )
         )
         self.assertEqual(errcode, 0)
