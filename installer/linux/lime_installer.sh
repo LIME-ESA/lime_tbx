@@ -24,6 +24,13 @@ ln -s $dst/LimeTBX/$x11_executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications
 mv $bin_path/$x11_executable $bin_path/$command_name
 chmod -R +rx $dst
+# Removing the packaged libstdc++.so.6 library if the system's version is greater or equal
+packaged_libstdcp=$dst/LimeTBX/libstdc++.so.6
+sys_libstd="$(ldconfig -p | grep libstdc++.so.6 | tr ' ' '\n' | grep /)"
+if [ -f $sys_libstd ]; then
+    glibcversion=$(strings $packaged_libstdcp | grep GLIBCXX | tail -2 | head -1)
+    strings $sys_libstd | grep -q $glibcversion && rm $packaged_libstdcp
+fi
 # /usr/lib/x86_64-linux-gnu is a debian-ism. In order to simulate it in other distros a link is created where those
 # libraries actually are in those distros (/usr/lib64). This supresses some warnings, but if removed the functionalities
 # wouldn't be affected.
