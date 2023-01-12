@@ -26,9 +26,11 @@ cp ../linux/limetbx.desktop $name/opt/esa/LimeTBX
 mkdir -p $name/usr/share/applications
 mkdir -p $name/usr/bin
 ln -s /opt/esa/LimeTBX/limetbx.desktop $name/usr/share/applications
-ln -s /opt/esa/LimeTBX/LimeTBX/LimeTBX.exe $name/usr/bin/lime
+printf "#!/usr/bin/env sh\nXDG_SESSION_TYPE=x11 GDK_BACKEND=x11 /opt/esa/LimeTBX/LimeTBX/LimeTBX.exe" >$name/opt/esa/LimeTBX/LimeTBX/LimeTBX.sh
+ln -s /opt/esa/LimeTBX/LimeTBX/LimeTBX.sh $name/usr/bin/lime
 chmod 777 $name/opt/esa/LimeTBX/coeff_data/versions
 chmod 777 $name/opt/esa/LimeTBX/coeff_data
 mkdir $name/DEBIAN
 cp control $name/DEBIAN
+chmod -R +rx $name/opt/esa/LimeTBX
 dpkg-deb --build $name

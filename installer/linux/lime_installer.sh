@@ -4,6 +4,7 @@ dst="/opt/esa/LimeTBX"
 user_home=$(bash -c "cd ~$(printf %q $SUDO_USER) && pwd")
 local_appdata="$user_home/.LimeTBX"
 executable="LimeTBX.exe"
+x11_executable="LimeTBX.sh"
 bin_path="/usr/bin"
 command_name="lime"
 desktop_applications="/usr/share/applications"
@@ -18,8 +19,9 @@ mkdir -p $dst
 cp -r $assets/* $dst
 chmod 777 $dst/coeff_data/versions
 chmod 777 $dst/coeff_data
-ln -s $dst/LimeTBX/$executable $bin_path
+printf "#!/usr/bin/env sh\nXDG_SESSION_TYPE=x11 GDK_BACKEND=x11 $dst/LimeTBX/$executable" >$dst/LimeTBX/$x11_executable
+ln -s $dst/LimeTBX/$x11_executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications
-mv $bin_path/$executable $bin_path/$command_name
+mv $bin_path/$x11_executable $bin_path/$command_name
 chmod -R +rx $dst
 echo "LIME Toolbox installed successfully."
