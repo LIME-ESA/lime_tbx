@@ -9,6 +9,7 @@ a_pathex = []
 a_binaries = []
 a_datas = []
 a_icon = ''
+a_hooksconfig = {}
 e_console = False
 deploy_name = "LimeTBX"
 
@@ -38,6 +39,12 @@ if sys.platform == 'linux':
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.ico'
+    a_hooksconfig = {
+        "gi": {
+            "icons": ["Adwaita"],
+            "themes": ["Adwaita"],
+        },
+    }
 elif sys.platform == 'win32' or sys.platform == 'win64':
     src_path = 'lime_tbx\\'
     a_pathex = ['.\\.venv\\Lib\\site-packages\\']
@@ -107,7 +114,7 @@ a = Analysis(
     datas=a_datas,
     hiddenimports=["sklearn.utils._typedefs", "sklearn.utils._heap", "sklearn.utils._sorting", "sklearn.utils._vector_sentinel"],
     hookspath=[],
-    hooksconfig={},
+    hooksconfig=a_hooksconfig,
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,
