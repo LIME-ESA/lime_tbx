@@ -24,4 +24,8 @@ ln -s $dst/LimeTBX/$x11_executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications
 mv $bin_path/$x11_executable $bin_path/$command_name
 chmod -R +rx $dst
+# /usr/lib/x86_64-linux-gnu is a debian-ism. In order to simulate it in other distros a link is created where those
+# libraries actually are in those distros (/usr/lib64). This supresses some warnings, but if removed the functionalities
+# wouldn't be affected.
+[ ! -d "/usr/lib/x86_64-linux-gnu" ] && ln -s /usr/lib64 /usr/lib/x86_64-linux-gnu
 echo "LIME Toolbox installed successfully."
