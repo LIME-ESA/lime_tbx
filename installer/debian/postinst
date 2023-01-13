@@ -2,15 +2,15 @@
 dst="/opt/esa/LimeTBX"
 # Removing the packaged libstdc++.so.6 library if the system's version is greater or equal
 packaged_libstdcp=$dst/LimeTBX/libstdc++.so.6
-sys_libstd="$(ldconfig -p | grep libstdc++.so.6 | tr ' ' '\n' | grep /)"
-if [ -f $sys_libstd ]; then
+sys_libstd="$(ldconfig -p | grep libstdc++.so.6 | grep x86-64 | tr ' ' '\n' | grep / | head -1)"
+if [ ! -z $sys_libstd ] && [ -f $sys_libstd ]; then
     glibcversion=$(strings $packaged_libstdcp | grep GLIBCXX | tail -2 | head -1)
     strings $sys_libstd | grep -q $glibcversion && rm $packaged_libstdcp
 fi
 # Removing the packaged libgio-2.0.so library if the system's version is greater or equal
 packaged_libgio=$dst/LimeTBX/libgio-2.0.so.0
-sys_libgio="$(ldconfig -p | grep libgio-2.0.so.0 | tr ' ' '\n' | grep /)"
-if [ -f $sys_libgio ]; then
+sys_libgio="$(ldconfig -p | grep libgio-2.0.so.0 | grep x86-64 | tr ' ' '\n' | grep / | head -1)"
+if [ ! -z $sys_libgio ] && [ -f $sys_libgio ]; then
     pack_libgioversion=$(strings $packaged_libgio | grep "<\!\-\-.* GDBus" | sed 's/[^0-9\.]*//g')
     sys_libgioversion=$(strings $sys_libgio | grep "<\!\-\-.* GDBus" | sed 's/[^0-9\.]*//g')
     [[ ! $sys_libgioversion < $pack_libgioversion ]] && rm $packaged_libgio
