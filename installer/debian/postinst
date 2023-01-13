@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 dst="/opt/esa/LimeTBX"
 # Removing the packaged libstdc++.so.6 library if the system's version is greater or equal
 packaged_libstdcp=$dst/LimeTBX/libstdc++.so.6
