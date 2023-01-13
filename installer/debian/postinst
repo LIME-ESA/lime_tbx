@@ -13,7 +13,7 @@ sys_libgio="$(ldconfig -p | grep libgio-2.0.so.0 | tr ' ' '\n' | grep /)"
 if [ -f $sys_libgio ]; then
     pack_libgioversion=$(strings $packaged_libgio | grep "<\!\-\-.* GDBus" | sed 's/[^0-9\.]*//g')
     sys_libgioversion=$(strings $sys_libgio | grep "<\!\-\-.* GDBus" | sed 's/[^0-9\.]*//g')
-    [[ ! sys_libgioversion < pack_libgioversion ]] && rm $packaged_libgio
+    [[ ! $sys_libgioversion < $pack_libgioversion ]] && rm $packaged_libgio
 fi
 # /usr/lib/x86_64-linux-gnu is a debian-ism. In order to simulate it in other distros a link is created where those
 # libraries actually are in those distros (/usr/lib64). This supresses some warnings, but if removed the functionalities
