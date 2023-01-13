@@ -32,5 +32,6 @@ chmod 777 $name/opt/esa/LimeTBX/coeff_data/versions
 chmod 777 $name/opt/esa/LimeTBX/coeff_data
 mkdir $name/DEBIAN
 cp control $name/DEBIAN
+cp postinst $name/DEBIAN
 chmod -R +rx $name/opt/esa/LimeTBX
 dpkg-deb --build $name
