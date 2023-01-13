@@ -19,3 +19,4 @@ fi
 # libraries actually are in those distros (/usr/lib64). This supresses some warnings, but if removed the functionalities
 # wouldn't be affected.
 [ ! -d "/usr/lib/x86_64-linux-gnu" ] && ln -s /usr/lib64 /usr/lib/x86_64-linux-gnu
+return 0
