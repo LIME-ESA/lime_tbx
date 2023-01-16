@@ -63,8 +63,8 @@ Requirements:
 - python 3.8 (Windows and Linux) or python 3.9 (Mac).
 - pyinstaller (installed outside of the virtual environment).
 
-It is strongly recommended to create the app-bundle using a virtual environment (venv). Inside of it,
-the project dependencies can be installed with::
+It is strongly recommended to create the app-bundle using a virtual environment (venv) in order to minimize
+the application size. Inside of it, the project dependencies can be installed with::
 
     pip install -r requirements.txt
 
@@ -76,9 +76,16 @@ Now you can deactivate the virtual environment. You may create an installer for 
 For Windows you must use "InnoSetup", for Mac and Linux you must execute the scripts "build_mac_installer.sh"
 and "build_linux_installer.sh" respectively, and for Debian you must execute the "build_deb.sh" script.
 
+For more information about the recommended environments for the production of TBX binaries please check the
+installer directory.
+
 
 Compatibility
 -------------
+
+- Windows 10 with x86_64 arch.
+- Linux with GLIBC >= 2.23 and x86_64 arch.
+- Mac with x86_64 arch. or with ARM64 arch. and Rosetta interpreter.
 
 Licence
 -------
