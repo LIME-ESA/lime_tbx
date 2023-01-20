@@ -1,9 +1,10 @@
 LIME2 coefficients version,test
+**,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
 latitude,42
 longitude,45
 altitude(m),4500
 datetimes,2018-02-27 02:00:00+00:00,2019-02-23 02:00:00+00:00
-Wavelength,2018-02-27 02:00:00+00:00 Irradiance,2018-02-27 02:00:00+00:00 uncertainties,2019-02-23 02:00:00+00:00 Irradiance,2019-02-23 02:00:00+00:00 uncertainties
+Wavelength,2018-02-27 02:00:00+00:00 Irradiance,2018-02-27 02:00:00+00:00 uncertainties,2019-02-23 02:00:00+00:00 Irradiance **,2019-02-23 02:00:00+00:00 uncertainties **
 350,0.0001,0,0.0002,2e-06
 370,0.0002,0,0.0001,0
 390,0.0001,0,0.0002,0

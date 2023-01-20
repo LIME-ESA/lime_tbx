@@ -41,6 +41,23 @@ __email__ = "pieter.de.vis@npl.co.uk, gaton@goa.uva.es"
 __status__ = "Development"
 
 
+def _is_ampa_valid_range(ampa: float) -> bool:
+    """
+    Checks if the value of the absolute moon phase angle is inside the valid range for the simulation.
+
+    Parameters
+    ----------
+    ampa: float
+        Absolute moon phase angle in degrees
+
+    Returns
+    -------
+    valid_range: bool
+        True if the angle is inside the valid range for the simulation.
+    """
+    return 2 <= ampa <= 90
+
+
 class ILimeSimulation(ABC):
     """
     Interface for running the main lime-tbx functionality
@@ -261,6 +278,30 @@ class ILimeSimulation(ABC):
         -------
         point: Point
             The point used in the simulation.
+        """
+        pass
+
+    @abstractmethod
+    def get_moon_datas(self) -> Union[MoonData, List[MoonData]]:
+        """
+        Returns the moon datas for the current point
+
+        Returns
+        -------
+        mds: MoonData | list of MoonData
+            MoonData/s of the current point.
+        """
+        pass
+
+    @abstractmethod
+    def are_mpas_inside_mpa_range(self) -> Union[bool, List[bool]]:
+        """
+        Returns a list of values indicating if the moon datas contain a valid mpa range.
+
+        Returns
+        -------
+        are_valid: bool | list of bool
+            True/s if the MoonData/s contains mpa values in the valid range.
         """
         pass
 
@@ -767,3 +808,14 @@ class LimeSimulation(ILimeSimulation):
 
     def get_point(self) -> Point:
         return self.point
+
+    def get_moon_datas(self) -> Union[MoonData, List[MoonData]]:
+        return self.mds
+
+    def are_mpas_inside_mpa_range(self) -> Union[bool, List[bool]]:
+        l = []
+        if isinstance(self.mds, list):
+            for md in self.mds:
+                l.append(_is_ampa_valid_range(md.absolute_mpa_degrees))
+            return l
+        return _is_ampa_valid_range(self.mds.absolute_mpa_degrees)

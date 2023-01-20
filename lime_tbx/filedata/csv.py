@@ -45,6 +45,8 @@ _EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
 _READ_FILE_ERROR_STR = (
     "There was a problem while loading the file. See log for details."
 )
+_WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
 
 
 def _write_point(writer, point: Union[Point, None]):
@@ -85,6 +87,7 @@ def export_csv(
     point: Union[Point, None],
     name: str,
     coeff_version: str,
+    inside_mpa_range: Union[bool, List[bool]],
 ):
     """
     Export the given data to a csv file
@@ -103,22 +106,42 @@ def export_csv(
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    inside_mpa_range: bool | list of bool
+        Indication if the point moon phase angle/s were inside the valid LIME range.
     """
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            some_out_mpa_range = (
+                not inside_mpa_range
+                if not isinstance(inside_mpa_range, list)
+                else False in inside_mpa_range
+            )
+            if some_out_mpa_range:
+                writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             _write_point(writer, point)
             ylabels = []
             if not isinstance(point, CustomPoint) and point != None:
                 dts = point.dt
                 if not isinstance(dts, list):
                     dts = [dts]
-                for dt in dts:
-                    ylabels.append("{} {}".format(str(dt), ylabel))
-                    ylabels.append("{} uncertainties".format(str(dt)))
+                    inside_mpa_range = [inside_mpa_range]
+                for dt, inside_mpa in zip(dts, inside_mpa_range):
+                    warn_out_mpa_range = ""
+                    if not inside_mpa:
+                        warn_out_mpa_range = " **"
+                    ylabels.append(
+                        "{} {}{}".format(str(dt), ylabel, warn_out_mpa_range)
+                    )
+                    ylabels.append(
+                        "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
+                    )
             else:
-                ylabels.append(ylabel)
+                warn_out_mpa_range = ""
+                if some_out_mpa_range:
+                    warn_out_mpa_range = " **"
+                ylabels.append(f"{ylabel}{warn_out_mpa_range}")
             writer.writerow([xlabel, *ylabels])
             if not isinstance(data, list) and not isinstance(data, np.ndarray):
                 data = [data]
@@ -215,6 +238,7 @@ def export_csv_integrated_irradiance(
     name: str,
     point: Point,
     coeff_version: str,
+    inside_mpa_range: Union[bool, List[bool]],
 ):
     """
     Export the given integrated signal data to a csv file
@@ -231,11 +255,20 @@ def export_csv_integrated_irradiance(
         Point from which the data is generated. In case it's None, no metadata will be printed.
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    inside_mpa_range: bool | list of bool
+        Indication if the point moon phase angle/s were inside the valid LIME range.
     """
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            some_out_mpa_range = (
+                not inside_mpa_range
+                if not isinstance(inside_mpa_range, list)
+                else False in inside_mpa_range
+            )
+            if some_out_mpa_range:
+                writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             _write_point(writer, point)
             writer.writerow(["srf name", srf.name])
             irr_titles = []
@@ -243,9 +276,19 @@ def export_csv_integrated_irradiance(
                 dts = point.dt
                 if not isinstance(dts, list):
                     dts = [dts]
-                for dt in dts:
-                    irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
-                    irr_titles.append("{} uncertainties".format(str(dt)))
+                    inside_mpa_range = [inside_mpa_range]
+                for dt, inside_mpa in zip(dts, inside_mpa_range):
+                    warn_out_mpa_range = ""
+                    if not inside_mpa:
+                        warn_out_mpa_range = " **"
+                    irr_titles.append(
+                        "{} irradiances (Wm⁻²nm⁻¹){}".format(
+                            str(dt), warn_out_mpa_range
+                        )
+                    )
+                    irr_titles.append(
+                        "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
+                    )
             else:
                 irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
                 irr_titles.append("uncertainties")

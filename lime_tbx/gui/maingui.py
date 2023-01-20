@@ -27,6 +27,7 @@ from ..datatypes.datatypes import (
     SurfacePoint,
     ReflectanceCoefficients,
     SpectralData,
+    MoonData,
 )
 from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
@@ -49,6 +50,9 @@ _INTERNAL_ERROR_MSG = (
     "Something went wrong while performing the operation. See log for more detail."
 )
 
+_WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
+
 
 def eli_callback(
     srf: SpectralResponseFunction,
@@ -62,7 +66,7 @@ def eli_callback(
     Point,
     List[float],
     SpectralResponseFunction,
-    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData], Union[bool, List[bool]]],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -96,6 +100,8 @@ def eli_callback(
         SRF used for the integrated irradiance signal calculation.
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
+    inside_mpa_range: bool or list of bool
+        Indicates if the different point locations/s are inside the valid mpa range.
     """
     lime_simulation.update_irradiance(srf, point, cimel_coef)
     return (
@@ -105,6 +111,7 @@ def eli_callback(
         lime_simulation.get_elis_cimel(),
         lime_simulation.get_elis_asd(),
         lime_simulation.get_signals(),
+        lime_simulation.are_mpas_inside_mpa_range(),
     )
 
 
@@ -113,7 +120,13 @@ def elref_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
-) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
+) -> Tuple[
+    List[float],
+    List[float],
+    Point,
+    Union[SpectralData, List[SpectralData]],
+    Union[bool, List[bool]],
+]:
     """Callback that performs the Reflectance operations.
 
     Parameters
@@ -137,6 +150,8 @@ def elref_callback(
         Point that was used in the calculations.
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
+    inside_mpa_range: bool or list of bool
+        Indicates if the different point locations/s are inside the valid mpa range.
     """
     lime_simulation.update_reflectance(srf, point, cimel_coef)
     return (
@@ -144,6 +159,7 @@ def elref_callback(
         lime_simulation.get_elrefs(),
         lime_simulation.get_elrefs_cimel(),
         lime_simulation.get_elrefs_asd(),
+        lime_simulation.are_mpas_inside_mpa_range(),
     )
 
 
@@ -157,6 +173,7 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
+    Union[bool, List[bool]],
 ]:
 
     lime_simulation.update_polarization(srf, point, coeffs)
@@ -165,6 +182,7 @@ def polar_callback(
         lime_simulation.get_polars(),
         lime_simulation.get_polars_cimel(),
         lime_simulation.get_polars_asd(),
+        lime_simulation.are_mpas_inside_mpa_range(),
     )
 
 
@@ -723,19 +741,27 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             SpectralData,
+            Union[bool, List[bool]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
+        is_out_mpa_range = (
+            not data[6] if not isinstance(data[6], list) else False in data[6]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
-            subtitle=f"LIME2 coefficients version: {version}",
+            subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
         )
-        self.signal_widget.update_signals(data[0], data[1], data[5])
+        self.graph.set_inside_mpa_range(data[6])
+        self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
         self.lower_tabs.setTabEnabled(2, True)
 
@@ -768,18 +794,26 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
+            Union[bool, List[bool]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
+        is_out_mpa_range = (
+            not data[4] if not isinstance(data[4], list) else False in data[4]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}",
+            subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
         )
+        self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
 
@@ -808,18 +842,26 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
+            Union[bool, List[bool]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
+        is_out_mpa_range = (
+            not data[4] if not isinstance(data[4], list) else False in data[4]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}",
+            subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
         )
+        self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
 

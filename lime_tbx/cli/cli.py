@@ -56,6 +56,8 @@ LONG_OPTIONS = [
     "timeseries=",
     "coefficients=",
 ]
+_WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
 
 
 def eprint(*args, **kwargs):
@@ -234,6 +236,7 @@ class CLI:
         ed: ExportCSV,
     ):
         version = self.settings_manager.get_lime_coef().version
+        are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         csv.export_csv(
             self.lime_simulation.get_elrefs(),
             "Wavelengths (nm)",
@@ -241,6 +244,7 @@ class CLI:
             point,
             ed.o_file_refl,
             version,
+            are_mpas_oinside_mpa_range,
         )
         csv.export_csv(
             self.lime_simulation.get_elis(),
@@ -249,6 +253,7 @@ class CLI:
             point,
             ed.o_file_irr,
             version,
+            are_mpas_oinside_mpa_range,
         )
         csv.export_csv(
             self.lime_simulation.get_polars(),
@@ -257,6 +262,7 @@ class CLI:
             point,
             ed.o_file_polar,
             version,
+            are_mpas_oinside_mpa_range,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -264,6 +270,7 @@ class CLI:
             ed.o_file_integrated_irr,
             point,
             version,
+            are_mpas_oinside_mpa_range,
         )
 
     def _export_lglod(self, point: Point, output_file: str):
@@ -281,7 +288,16 @@ class CLI:
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_lime_coef().version
-        subtitle = "LIME2 coefficients version: {}".format(version)
+        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        is_out_mpa_range = (
+            not inside_mpa_range
+            if not isinstance(inside_mpa_range, list)
+            else False in inside_mpa_range
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        subtitle = f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
