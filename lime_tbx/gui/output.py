@@ -278,6 +278,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.point,
                         name,
                         version,
+                        self.data_compare.ampa_valid_range,
                         self.comparison_x_datetime,
                     )
                 else:

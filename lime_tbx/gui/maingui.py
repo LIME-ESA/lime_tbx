@@ -482,7 +482,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 data_start = min(comps[i].dts)
                 data_end = max(comps[i].dts)
                 version = self.settings_manager.get_lime_coef().version
-                subtitle = "LIME2 coefficients version: {}".format(version)
+                warning_out_mpa_range = ""
+                if False in comps[i].ampa_valid_range:
+                    warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+                subtitle = (
+                    f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
+                )
                 _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
                 subtitle = (
                     "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -899,10 +904,15 @@ class MainSimulationsWidget(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
         version = self.settings_manager.get_lime_coef().version
+        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         if name is not None and name != "":
             try:
                 moon.write_obs(
-                    lglod, name, datetime.now().astimezone(timezone.utc), version
+                    lglod,
+                    name,
+                    datetime.now().astimezone(timezone.utc),
+                    version,
+                    inside_mpa_range,
                 )
             except Exception as e:
                 self.show_error(e)

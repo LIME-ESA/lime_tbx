@@ -20,6 +20,7 @@ import obsarray
 
 """___NPL Modules___"""
 from ..datatypes.datatypes import (
+    ComparisonData,
     LimeCoefficients,
     Point,
     PolarizationCoefficients,
@@ -166,6 +167,7 @@ def export_csv_comparation(
     points: List[SurfacePoint],
     name: str,
     coeff_version: str,
+    ampa_valid_range: List[bool],
     x_datetime: bool = True,
 ):
     """
@@ -186,6 +188,8 @@ def export_csv_comparation(
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    ampa_valid_range: list of bool
+        Indicates if the given points are inside of the valid LIME moon phase angle range.
     x_datetime: bool
         True if it used datetimes as the x_axis, False if it used mpa
     """
@@ -196,6 +200,8 @@ def export_csv_comparation(
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            if False in ampa_valid_range:
+                writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             writer.writerow(
                 [
                     x_label,
@@ -215,6 +221,10 @@ def export_csv_comparation(
                     x_val = pt.dt.strftime("%Y-%m-%d %H:%M:%S")
                 else:
                     x_val = x_data[i]
+                warn_out_mpa_range = ""
+                if not ampa_valid_range[i]:
+                    warn_out_mpa_range = " **"
+                x_val = f"{x_val}{warn_out_mpa_range}"
                 writer.writerow(
                     [
                         x_val,

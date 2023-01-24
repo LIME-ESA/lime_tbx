@@ -704,6 +704,7 @@ class ComparisonData:
     dts: List[datetime]
     points: List[Point]
     mpas: List[float]
+    ampa_valid_range: List[bool]
 
 
 @dataclass

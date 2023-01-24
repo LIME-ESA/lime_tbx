@@ -362,7 +362,9 @@ class TestCSV(unittest.TestCase):
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
-        export_csv_comparation(data, "Signal", [SPOINT, SPOINT3], path, "test")
+        export_csv_comparation(
+            data, "Signal", [SPOINT, SPOINT3], path, "test", [True, False]
+        )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 
     def test_export_csv_integrated_irradiance(self):

@@ -279,7 +279,8 @@ class CLI:
         )
         now = datetime.now(timezone.utc)
         version = self.settings_manager.get_lime_coef().version
-        moon.write_obs(lglod, output_file, now, version)
+        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        moon.write_obs(lglod, output_file, now, version, inside_mpa_range)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
         from lime_tbx.gui import canvas
@@ -389,6 +390,10 @@ class CLI:
         data_start = min(comparison.dts)
         data_end = max(comparison.dts)
         version = self.settings_manager.get_lime_coef().version
+        warning_out_mpa_range = ""
+        if False in comparison.ampa_valid_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        subtitle = f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
         subtitle = "LIME2 coefficients version: {}".format(version)
         _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
         subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -575,6 +580,7 @@ class CLI:
                                 points,
                                 output,
                                 version,
+                                comps[i].ampa_valid_range,
                             )
                         else:
                             xlabel = "UTC datetime"
@@ -616,6 +622,7 @@ class CLI:
                                 points,
                                 output,
                                 version,
+                                mpa_comps[i].ampa_valid_range,
                                 False,
                             )
                         else:

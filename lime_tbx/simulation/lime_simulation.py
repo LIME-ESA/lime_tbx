@@ -41,7 +41,7 @@ __email__ = "pieter.de.vis@npl.co.uk, gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def _is_ampa_valid_range(ampa: float) -> bool:
+def is_ampa_valid_range(ampa: float) -> bool:
     """
     Checks if the value of the absolute moon phase angle is inside the valid range for the simulation.
 
@@ -697,6 +697,7 @@ class LimeSimulation(ILimeSimulation):
         self.elis_cimel = lglod.elis_cimel
         self.elis_asd = None
         self.polars = [obs.polars for obs in obss]
+        self.polars_cimel = lglod.polars_cimel
         self.polars_asd = None
         if obss[0].dt == None:
             dts = []
@@ -816,6 +817,6 @@ class LimeSimulation(ILimeSimulation):
         l = []
         if isinstance(self.mds, list):
             for md in self.mds:
-                l.append(_is_ampa_valid_range(md.absolute_mpa_degrees))
+                l.append(is_ampa_valid_range(md.absolute_mpa_degrees))
             return l
-        return _is_ampa_valid_range(self.mds.absolute_mpa_degrees)
+        return is_ampa_valid_range(self.mds.absolute_mpa_degrees)

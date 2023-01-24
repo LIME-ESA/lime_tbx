@@ -28,7 +28,7 @@ from ...datatypes.datatypes import (
     SurfacePoint,
     SRFChannel,
 )
-from lime_tbx.simulation.lime_simulation import ILimeSimulation
+from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 from ...datatypes import constants
 
@@ -243,6 +243,7 @@ class Comparison(IComparison):
                 ratio_spec = SpectralData(
                     specs[0].wlens, np.array(rel_diffs), np.array(uncs_r), None
                 )
+                ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas[i]]
                 cp = ComparisonData(
                     specs[0],
                     specs[1],
@@ -253,11 +254,12 @@ class Comparison(IComparison):
                     ch_dates[i],
                     sps[i],
                     mpas[i],
+                    ampa_valid_range,
                 )
                 comparisons.append(cp)
             else:
                 comparisons.append(
-                    ComparisonData(None, None, None, None, None, None, [], [], [])
+                    ComparisonData(None, None, None, None, None, None, [], [], [], [])
                 )
         return comparisons
 
@@ -276,6 +278,7 @@ class Comparison(IComparison):
             vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
             vals.sort(key=lambda v: v[-1])
             mpas = [v[-1] for v in vals]
+            ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas]
             new_spectrals = []
             index = 0
             for i, spectr in enumerate(spectrals):
@@ -299,6 +302,7 @@ class Comparison(IComparison):
                 dts,
                 points,
                 mpas,
+                ampa_valid_range,
             )
             new_comparisons.append(nc)
         return new_comparisons

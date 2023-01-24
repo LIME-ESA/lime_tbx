@@ -31,6 +31,7 @@ from ..datatypes.datatypes import (
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -43,6 +44,8 @@ _READ_FILE_ERROR_STR = (
     "There was a problem while loading the file. See log for details."
 )
 _EXPORT_ERROR_STR = "Error while exporting as LGLOD. See log for details."
+_WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
 
 
 def _calc_divisor_to_m(units: str) -> float:
@@ -121,6 +124,7 @@ def _write_start_dataset(
     not_default_srf: bool,
     min_dt: datetime,
     max_dt: datetime,
+    warning_outside_mpa_range: bool,
 ):
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
@@ -130,6 +134,8 @@ def _write_start_dataset(
     ds.title = "LIME simulation lunar observation file"
     ds.summary = "Lunar observation file"
     ds.keywords = "GSICS, satellites, lunar, moon, observation, visible, LIME"
+    if warning_outside_mpa_range:
+        ds.warning = _WARN_OUT_MPA_RANGE
     ds.references = "TBD"
     ds.institution = "ESA"
     ds.licence = ""
@@ -178,6 +184,7 @@ def _write_normal_simulations(
     path: str,
     dt: datetime,
     sim_data: _NormalSimulationData,
+    inside_mpa_range: List[bool],
 ):
     not_default_srf = True
     if isinstance(lglod, LGLODData):
@@ -193,8 +200,15 @@ def _write_normal_simulations(
         not_default_srf = lglod.not_default_srf
     else:
         min_dt = max_dt = None
+    warning_outside_mpa_range = False in inside_mpa_range
     ds = _write_start_dataset(
-        path, dt, sim_data.coefficients_version, not_default_srf, min_dt, max_dt
+        path,
+        dt,
+        sim_data.coefficients_version,
+        not_default_srf,
+        min_dt,
+        max_dt,
+        warning_outside_mpa_range,
     )
     # DIMENSIONS
     max_len_strlen = len(max(sim_data.ch_names, key=len))
@@ -222,6 +236,13 @@ def _write_normal_simulations(
         dates[:] = np.array([dt.timestamp() for dt in sim_data.dates])
     else:
         dates[:] = np.array([])
+    outside_mpa_range = ds.createVariable("outside_mpa_range", "i1", ("number_obs",))
+    outside_mpa_range.long_name = "Outside Moon Phase Angle valid range"
+    print(np.array(list(map(lambda x: not x, inside_mpa_range)), dtype=np.int8))
+    print(len(sim_data.sat_pos))
+    outside_mpa_range[:] = np.array(
+        list(map(lambda x: not x, inside_mpa_range)), dtype=np.int8
+    )
     channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
     channel_name.standard_name = "sensor_band_identifier"
     channel_name.long_name = "channel identifier"
@@ -256,7 +277,10 @@ def write_obs(
     path: str,
     dt: datetime,
     coefficients_version: str,
+    inside_mpa_range: Union[bool, List[bool]],
 ):
+    if not isinstance(inside_mpa_range, list):
+        inside_mpa_range = [inside_mpa_range]
     try:
         obs = lglod.observations
         quant_dates = len(obs)
@@ -271,7 +295,7 @@ def write_obs(
             [o.sat_pos for o in obs],
             [o.dt for o in obs],
         )
-        ds = _write_normal_simulations(lglod, path, dt, sim_data)
+        ds = _write_normal_simulations(lglod, path, dt, sim_data, inside_mpa_range)
         ds.is_comparison = 0
         # dims
         wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
@@ -665,18 +689,20 @@ def write_comparison(
         for c in lglod.comparisons:
             for i, cdt in enumerate(c.dts):
                 if cdt not in dates_n_points:
-                    dates_n_points[cdt] = c.points[i]
+                    dates_n_points[cdt] = (c.points[i], c.ampa_valid_range[i])
         dates_n_points = dict(sorted(dates_n_points.items(), key=lambda item: item[0]))
         dates = list(dates_n_points.keys())
-        points = list(dates_n_points.values())
+        points_n_inrange = list(dates_n_points.values())
         quant_dates = len(dates)
         ch_names = [lglod.ch_names[i] for i in index_useful_channel]
         sat_names = [lglod.sat_name for _ in range(quant_dates)]
-        if not isinstance(points[0], SurfacePoint):
+        if not isinstance(points_n_inrange[0][0], SurfacePoint):
             raise Exception("Can't write comparison points with selenographic point.")
         sat_pos_ref = constants.EARTH_FRAME
-        sat_pos = [
-            SatellitePosition(
+        inside_mpa_range = []
+        sat_pos = []
+        for sp, in_range in points_n_inrange:
+            sat_pos_pt = SatellitePosition(
                 *SPICEAdapter.to_rectangular(
                     sp.latitude,
                     sp.longitude,
@@ -685,8 +711,8 @@ def write_comparison(
                     kernels_path.main_kernels_path,
                 )
             )
-            for sp in points
-        ]
+            sat_pos.append(sat_pos_pt)
+            inside_mpa_range.append(in_range)
         sim_data = _NormalSimulationData(
             quant_dates,
             coefficients_version,
@@ -697,7 +723,7 @@ def write_comparison(
             dates,
         )
         fill_value = -999
-        ds = _write_normal_simulations(lglod, path, dt, sim_data)
+        ds = _write_normal_simulations(lglod, path, dt, sim_data, inside_mpa_range)
         ds.is_comparison = 1
         for j, c in enumerate(lglod.comparisons):
             for i, dt in enumerate(dates):
@@ -870,6 +896,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             dts,
             points[indexes],
             mpas[indexes],
+            [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
         )
         comps.append(comp)
     return LGLODComparisonData(comps, ch_names, sat_name)
