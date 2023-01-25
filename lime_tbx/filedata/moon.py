@@ -238,8 +238,6 @@ def _write_normal_simulations(
         dates[:] = np.array([])
     outside_mpa_range = ds.createVariable("outside_mpa_range", "i1", ("number_obs",))
     outside_mpa_range.long_name = "Outside Moon Phase Angle valid range"
-    print(np.array(list(map(lambda x: not x, inside_mpa_range)), dtype=np.int8))
-    print(len(sim_data.sat_pos))
     outside_mpa_range[:] = np.array(
         list(map(lambda x: not x, inside_mpa_range)), dtype=np.int8
     )

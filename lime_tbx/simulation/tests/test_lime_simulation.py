@@ -10,7 +10,7 @@ import unittest
 import numpy as np
 
 """___LIME_TBX Modules___"""
-from ..lime_simulation import ILimeSimulation, LimeSimulation
+from ..lime_simulation import ILimeSimulation, LimeSimulation, is_ampa_valid_range
 from ...datatypes.datatypes import (
     PolarizationCoefficients,
     ReflectanceCoefficients,
@@ -151,6 +151,13 @@ class TestLimeSimulation(unittest.TestCase):
         np.testing.assert_array_equal(
             lglod.observations[0].irrs.data, ls.get_elis()[0].data
         )
+
+    def test_is_ampa_valid_range_vals(self):
+        ampas = [0, 1, 2, 3, 5, 30, 89, 90, 91, 180]
+        vals = [False, False, True, True, True, True, True, True, False, False]
+        for ampa, val in zip(ampas, vals):
+            valcalc = is_ampa_valid_range(ampa)
+            self.assertEqual(valcalc, val)
 
 
 if __name__ == "__main__":
