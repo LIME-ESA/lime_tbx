@@ -226,3 +226,4 @@ def redraw_canvas(
     if svertical_lines and len(svertical_lines) > 0:
         for val in svertical_lines:
             scanvas.axes.axvline(x=val, color="k", label="LIME Spectrum limit")
+    return lines

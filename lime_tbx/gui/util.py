@@ -48,7 +48,10 @@ class CallbackWorker(QtCore.QObject):
                     res = self.callback(*self.args, self.info)
                 else:
                     res = self.callback(*self.args, self.info, self.stopper)
-            self.finished.emit(list(res))
+            if res is not None:
+                self.finished.emit(list(res))
+            else:
+                self.finished.emit([])
         except Exception as e:
             logger.get_logger().exception(e)
             self.exception.emit(e)
@@ -74,10 +77,12 @@ def start_thread(
     worker_th.started.connect(worker.run)
     worker.finished.connect(worker_th.quit)
     worker.finished.connect(worker.deleteLater)
-    worker.finished.connect(finished)
+    if finished:
+        worker.finished.connect(finished)
     worker.exception.connect(worker_th.quit)
     worker.exception.connect(worker.deleteLater)
-    worker.exception.connect(error)
+    if error:
+        worker.exception.connect(error)
     if info:
         worker.info.connect(info)
     worker_th.finished.connect(worker_th.deleteLater)
