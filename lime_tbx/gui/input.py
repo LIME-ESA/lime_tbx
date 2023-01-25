@@ -327,6 +327,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
+            self.callback_check_calculable()
         else:
             if not self.single_datetime:
                 self.change_single_datetime()
@@ -473,6 +474,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
+            self.callback_check_calculable()
         else:
             if not self.single_datetime:
                 self.change_single_datetime()
