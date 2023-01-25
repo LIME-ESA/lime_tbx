@@ -185,6 +185,7 @@ def _write_normal_simulations(
     dt: datetime,
     sim_data: _NormalSimulationData,
     inside_mpa_range: List[bool],
+    mpas: List[float],
 ):
     not_default_srf = True
     if isinstance(lglod, LGLODData):
@@ -241,6 +242,10 @@ def _write_normal_simulations(
     outside_mpa_range[:] = np.array(
         list(map(lambda x: not x, inside_mpa_range)), dtype=np.int8
     )
+    mpa_vals = ds.createVariable("mpa", "f4", ("number_obs",))
+    mpa_vals.long_name = "Moon Phase Angle"
+    mpa_vals[:] = np.array(mpas)
+    mpa_vals.units = "Decimal degrees"
     channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
     channel_name.standard_name = "sensor_band_identifier"
     channel_name.long_name = "channel identifier"
@@ -276,6 +281,7 @@ def write_obs(
     dt: datetime,
     coefficients_version: str,
     inside_mpa_range: Union[bool, List[bool]],
+    mpas: List[float],
 ):
     if not isinstance(inside_mpa_range, list):
         inside_mpa_range = [inside_mpa_range]
@@ -293,7 +299,9 @@ def write_obs(
             [o.sat_pos for o in obs],
             [o.dt for o in obs],
         )
-        ds = _write_normal_simulations(lglod, path, dt, sim_data, inside_mpa_range)
+        ds = _write_normal_simulations(
+            lglod, path, dt, sim_data, inside_mpa_range, mpas
+        )
         ds.is_comparison = 0
         # dims
         wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
@@ -316,10 +324,10 @@ def write_obs(
             selen_sun_lon_rad[:] = np.array(
                 [o.selenographic_data.selen_sun_lon_rad for o in obs]
             )
-            mpa_degrees = ds.createVariable("mpa_degrees", "f4", ("number_obs",))
-            mpa_degrees.long_name = "Moon phase angle"
-            mpa_degrees.units = "Decimal degrees"
-            mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
+            # mpa_degrees = ds.createVariable("mpa_degrees", "f4", ("number_obs",))
+            # mpa_degrees.long_name = "Moon phase angle"
+            # mpa_degrees.units = "Decimal degrees"
+            # mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
         irr_obs = ds.createVariable("irr_obs", "f4", ("number_obs", "chan"))
         irr_obs.units = "W m-2 nm-1"
         irr_obs.long_name = "observed lunar irradiance for each channel"
@@ -552,8 +560,8 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     polar_cimel_unc = [
         list(map(float, data)) for data in ds.variables["polar_cimel_unc"][:].data
     ]
+    mpas = np.array(ds.variables["mpa"][:].data)
     if len(datetimes) == 0:
-        mpa_degrees = ds.variables["mpa_degrees"][:].data
         distance_sun_moon = ds.variables["distance_sun_moon"][:].data
         selen_sun_lon_rad = ds.variables["selen_sun_lon_rad"][:].data
     obss = []
@@ -583,7 +591,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
             dt = datetimes[i]
         else:
             selenographic_data = SelenographicDataWrite(
-                distance_sun_moon[i], selen_sun_lon_rad[i], mpa_degrees[i]
+                distance_sun_moon[i], selen_sun_lon_rad[i], mpas[i]
             )
         obs = LunarObservationWrite(
             channel_names_0,
@@ -687,7 +695,11 @@ def write_comparison(
         for c in lglod.comparisons:
             for i, cdt in enumerate(c.dts):
                 if cdt not in dates_n_points:
-                    dates_n_points[cdt] = (c.points[i], c.ampa_valid_range[i])
+                    dates_n_points[cdt] = (
+                        c.points[i],
+                        c.ampa_valid_range[i],
+                        c.mpas[i],
+                    )
         dates_n_points = dict(sorted(dates_n_points.items(), key=lambda item: item[0]))
         dates = list(dates_n_points.keys())
         points_n_inrange = list(dates_n_points.values())
@@ -699,7 +711,8 @@ def write_comparison(
         sat_pos_ref = constants.EARTH_FRAME
         inside_mpa_range = []
         sat_pos = []
-        for sp, in_range in points_n_inrange:
+        mpas = []
+        for sp, in_range, mpa in points_n_inrange:
             sat_pos_pt = SatellitePosition(
                 *SPICEAdapter.to_rectangular(
                     sp.latitude,
@@ -711,6 +724,7 @@ def write_comparison(
             )
             sat_pos.append(sat_pos_pt)
             inside_mpa_range.append(in_range)
+            mpas.append(mpa)
         sim_data = _NormalSimulationData(
             quant_dates,
             coefficients_version,
@@ -721,7 +735,9 @@ def write_comparison(
             dates,
         )
         fill_value = -999
-        ds = _write_normal_simulations(lglod, path, dt, sim_data, inside_mpa_range)
+        ds = _write_normal_simulations(
+            lglod, path, dt, sim_data, inside_mpa_range, mpas
+        )
         ds.is_comparison = 1
         for j, c in enumerate(lglod.comparisons):
             for i, dt in enumerate(dates):
@@ -836,7 +852,8 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
         *list(map(lambda a: a / d_to_m, xyz))
     )
     fill_value = -999
-    sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
+    # sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
+    sat_poss = list(map(lambda a: a / d_to_m, ds.variables["sat_pos"][:].data))
     irr_obs_data = np.array(ds.variables["irr_obs"][:].data).T
     irr_obs_uncs = np.array(ds.variables["irr_obs_unc"][:].data).T
     irr_comp_data = np.array(ds.variables["irr_comp"][:].data).T
@@ -848,28 +865,21 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     number_samples = np.array(ds.variables["number_samples"][:].data)
     lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
+    mpas = np.array(ds.variables["mpa"][:].data)
+    ds.close()
     comps = []
     points = []
-    mpas = []
-    ds.close()
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
     number_samples = number_samples[number_samples != fill_value]
-    for i, sp in enumerate(sat_poss):
-        sp = SurfacePoint(
-            *SPICEAdapter.to_planetographic(
-                sp.x, sp.y, sp.z, "EARTH", kernels_path.main_kernels_path
-            ),
-            datetimes[i]
-        )
-        points.append(sp)
-        mpa = SPICEAdapter.get_moon_data_from_earth(
-            sp.latitude, sp.longitude, sp.altitude, sp.dt, kernels_path
-        ).mpa_degrees
-        mpas.append(mpa)
 
+    sat_poss = SPICEAdapter.to_planetographic_multiple(
+        sat_poss, "EARTH", kernels_path.main_kernels_path
+    )
+    for i, sp in enumerate(sat_poss):
+        sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
+        points.append(sp)
     points = np.array(points)
-    mpas = np.array(mpas)
     for i in range(len(ch_names)):
         indexes = irr_comp_data[i] != fill_value
         irr_comp_data_i = irr_comp_data[i][irr_comp_data[i] != fill_value]

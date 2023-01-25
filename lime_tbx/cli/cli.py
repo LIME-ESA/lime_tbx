@@ -280,7 +280,11 @@ class CLI:
         now = datetime.now(timezone.utc)
         version = self.settings_manager.get_lime_coef().version
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        moon.write_obs(lglod, output_file, now, version, inside_mpa_range)
+        _mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(_mds, list):
+            _mds = [_mds]
+        mpas = [m.mpa_degrees for m in _mds]
+        moon.write_obs(lglod, output_file, now, version, inside_mpa_range, mpas)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
         from lime_tbx.gui import canvas

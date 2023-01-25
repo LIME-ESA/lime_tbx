@@ -9,7 +9,7 @@ It exports the following classes:
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Tuple
 import os
 
 """___Third-Party Modules___"""
@@ -179,3 +179,28 @@ class SPICEAdapter(ISPICEAdapter):
         while lon > 180:
             lon -= 360
         return lat, lon, alt
+
+    @staticmethod
+    def to_planetographic_multiple(
+        xyz_list: List[Tuple[float]], body: str, kernels_path: str
+    ):  # in meters
+        SPICEAdapter._load_kernels(kernels_path)
+        _, radios = spice.bodvrd(body, "RADII", 3)
+        eq_rad = radios[0]  # Equatorial Radius
+        pol_rad = radios[2]  # Polar radius
+        flattening = (eq_rad - pol_rad) / eq_rad
+        llh_list = []  # alt km
+        for xyz in xyz_list:
+            pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
+            llh_list.append(spice.recpgr(body, pos_iau, eq_rad, flattening))
+        SPICEAdapter._clear_kernels()
+        for i, llh in enumerate(llh_list):
+            lat = llh[0] * spice.dpr()
+            lon = llh[1] * spice.dpr()
+            alt = llh[2] * 1000
+            while lon < -180:
+                lon += 360
+            while lon > 180:
+                lon -= 360
+            llh_list[i] = (lat, lon, alt)
+        return llh_list

@@ -945,6 +945,10 @@ class MainSimulationsWidget(
         )[0]
         version = self.settings_manager.get_lime_coef().version
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        _mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(_mds, list):
+            _mds = [_mds]
+        mpas = [m.mpa_degrees for m in _mds]
         if name is not None and name != "":
             self.worker = CallbackWorker(
                 moon.write_obs,
@@ -954,6 +958,7 @@ class MainSimulationsWidget(
                     datetime.now().astimezone(timezone.utc),
                     version,
                     inside_mpa_range,
+                    mpas,
                 ],
             )
             self._start_thread(self._unblock_gui, self.calculate_all_error)
