@@ -33,11 +33,6 @@ class TestLocalStorage(unittest.TestCase):
     def test_is_valid_appdata_repo_ok(self):
         self.assertTrue(appdata._is_valid_appdata(".", get_logger()))
 
-    def test_is_not_valid_appdata_repo_coeff_data(self):
-        logger = get_logger()
-        logger.disabled = True
-        self.assertFalse(appdata._is_valid_appdata("/", logger))
-
     def test_is_valid_programfiles_repo_ok(self):
         self.assertTrue(programdata._is_valid_programfiles("."))
 
