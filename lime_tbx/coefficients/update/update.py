@@ -26,7 +26,7 @@ __status__ = "Development"
 
 class IUpdate(ABC):
     @abstractmethod
-    def check_for_updates(self) -> bool:
+    def check_for_updates(self, timeout=None) -> bool:
         pass
 
     @abstractmethod
@@ -49,10 +49,10 @@ class Update(IUpdate):
             url = fp.readlines()[0].strip()
         return url
 
-    def check_for_updates(self) -> bool:
+    def check_for_updates(self, timeout=60) -> bool:
         """True if there are updates"""
         urlpath = os.path.join(self.url, "list.txt")
-        version_files = requests.get(urlpath).text.split()
+        version_files = requests.get(urlpath, timeout=timeout).text.split()
         self_files = access_data.get_coefficients_filenames()
         for vf in version_files:
             if vf not in self_files:
@@ -70,7 +70,7 @@ class Update(IUpdate):
         for vf in version_files:
             is_running = stopper_checker(*stopper_args)
             if not is_running:
-                return
+                return (quant_news, quant_fails)
             if vf not in self_files:
                 quant_news += 1
                 fcontent = requests.get(f"{self.url}/versions/{vf}").text
