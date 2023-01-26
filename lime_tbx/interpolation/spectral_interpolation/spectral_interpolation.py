@@ -20,20 +20,16 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 from abc import ABC, abstractmethod
-from ...datatypes.datatypes import MoonData
+from ...datatypes.datatypes import MoonData, SpectralData
 
 
 class ISpectralInterpolation(ABC):
     @abstractmethod
-    def get_best_asd_reference(
-        selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle
-    ):
+    def get_best_asd_reference(self, moon_data: MoonData) -> SpectralData:
         pass
 
     @abstractmethod
-    def get_best_polar_asd_reference(
-        selen_obs_lat, selen_obs_lon, selen_sun_lon, abs_moon_phase_angle
-    ):
+    def get_best_polar_asd_reference(self, moon_data: MoonData) -> SpectralData:
         pass
 
     @abstractmethod
@@ -55,10 +51,10 @@ class SpectralInterpolation(ISpectralInterpolation):
         self.prop = punpy.MCPropagation(MCsteps)
 
     def get_best_asd_reference(self, moon_data: MoonData):
-        return get_asd_data(moon_data.absolute_mpa_degrees)
+        return get_asd_data(moon_data.mpa_degrees)
 
     def get_best_polar_asd_reference(self, moon_data: MoonData):
-        mock = get_asd_data(moon_data.absolute_mpa_degrees)
+        mock = get_asd_data(moon_data.mpa_degrees)
         mock.data.fill(1)
         return mock
 
