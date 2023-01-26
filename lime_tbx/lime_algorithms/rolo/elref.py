@@ -70,7 +70,7 @@ def _measurement_func_elref(
     elrefs: float | np.ndarray of float
         Calculated reflectances.
     """
-    gr_value = math.radians(gd_value)
+    gr_value = np.radians(gd_value)
     d1_value = d_coeffs[0] * np.exp(-gd_value / p_coeffs[0])
     d2_value = d_coeffs[1] * np.exp(-gd_value / p_coeffs[1])
     d3_value = d_coeffs[2] * np.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
