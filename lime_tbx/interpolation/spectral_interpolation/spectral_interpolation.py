@@ -53,27 +53,27 @@ class SpectralInterpolation(ISpectralInterpolation):
         mock.data.fill(1)
         return mock
 
-    def _get_best_apollo_reference(self, moon_data: MoonData):
-        mock = idata.get_best_asd_data(moon_data.mpa_degrees)
-        mock.data.fill(1)
-        return mock
-
-    def _get_best_polar_apollo_reference(self, moon_data: MoonData):
-        mock = idata.get_best_asd_data(moon_data.mpa_degrees)
-        mock.data.fill(1)
-        return mock
-
     def get_best_interp_reference(self, moon_data: MoonData):
         name = idata.get_interpolation_spectrum_name()
-        if name == "apollo":
-            return self._get_best_apollo_reference(moon_data)
+        if name == "Apollo 16":
+            return idata.get_apollo16_data()
+        elif name == "Breccia":
+            return idata.get_breccia_data()
+        elif name == "Composite":
+            return idata.get_apollo16_data()  # TODO CHANGE TO CORRECT ONE
         else:
             return idata.get_best_asd_data(moon_data.mpa_degrees)
 
     def get_best_polar_interp_reference(self, moon_data: MoonData):
+        return self._get_best_polar_asd_reference(moon_data)
+        # TODO WHAT TO DO HERE?
         name = idata.get_interpolation_spectrum_name()
-        if name == "apollo":
-            return self._get_best_polar_apollo_reference(moon_data)
+        if name == "Apollo 16":
+            pass
+        elif name == "Breccia":
+            pass
+        elif name == "Composite":
+            pass
         else:
             return self._get_best_polar_asd_reference(moon_data)
 

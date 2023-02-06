@@ -158,15 +158,18 @@ def redraw_canvas(
             if np.any(cimel_data.data[cimel_data.wlens == 500] == 0):
                 asd_data_final = asd_data.data * 0
             else:
+                scaled_wlen = 500
+                if len(np.where(asd_data.wlens == scaled_wlen)[0]) == 0:
+                    scaled_wlen = 503.017  # Breccia
                 scaling_factor = (
-                    asd_data.data[np.where(asd_data.wlens == 500)]
+                    asd_data.data[np.where(asd_data.wlens == scaled_wlen)]
                     / cimel_data.data[np.where(cimel_data.wlens == 500)]
                 )
                 asd_data_final = asd_data.data / scaling_factor
             lines += scanvas.axes.plot(
                 asd_data.wlens,
                 asd_data_final,
-                label="ASD data points, scaled to LIME at 500nm",
+                label=f"ASD data points, scaled to LIME at 500nm",
             )
 
         data_compare_info = ""

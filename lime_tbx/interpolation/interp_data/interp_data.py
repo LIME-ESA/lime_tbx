@@ -47,7 +47,40 @@ def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
     return spectral_data
 
 
-_VALID_INTERP_SPECTRA = ["ASD", "Apollo"]
+def get_apollo16_data() -> SpectralData:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data = np.genfromtxt(
+        os.path.join(current_dir, "assets/Apollo16.txt"), delimiter=","
+    )
+    wavs = data[:, 0]
+    refl = data[:, 3]  # Maybe its the first
+    wavs = wavs[np.where(np.isfinite(refl))]
+    refl = refl[np.where(np.isfinite(refl))]
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    # TODO: Correct uncertainties from data
+    unc_tot = (
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
+    )
+    spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
+    return spectral_data
+
+
+def get_breccia_data() -> SpectralData:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data = np.genfromtxt(os.path.join(current_dir, "assets/Breccia.txt"), delimiter=",")
+    wavs = data[:, 0]
+    refl = data[:, 1]
+    wavs = wavs[np.where(np.isfinite(refl))]
+    refl = refl[np.where(np.isfinite(refl))]
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    unc_tot = (
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
+    )
+    spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
+    return spectral_data
+
+
+_VALID_INTERP_SPECTRA = ["ASD", "Apollo 16", "Breccia", "Composite"]
 
 
 def _get_interp_path() -> str:
