@@ -17,6 +17,7 @@ from ..datatypes.datatypes import (
 )
 from ..datatypes import constants
 from ..coefficients.access_data import access_data
+from ..interpolation.interp_data import interp_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -86,6 +87,21 @@ class ISettingsManager(ABC):
         """Reload the cimel coefficients from file to the logic instance"""
         pass
 
+    @abstractmethod
+    def get_available_spectra_names(self) -> List[str]:
+        """Obtain a list with all the available spectra names"""
+        pass
+
+    @abstractmethod
+    def get_selected_spectrum_name(self) -> str:
+        """Obtain the currently selected interpolation spectrum name"""
+        pass
+
+    @abstractmethod
+    def select_interp_spectrum(self, name: str):
+        """Select the interpolation spectrum to use"""
+        pass
+
 
 class SettingsManager(ISettingsManager):
     def __init__(self, previous_coeff_name: str = None):
@@ -149,3 +165,12 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[-1]
         self.cimel_coeff = self.coeffs[-1].reflectance
         self.polar_coeff = self.coeffs[-1].polarization
+
+    def get_available_spectra_names(self) -> List[str]:
+        return interp_data.get_available_spectra_names()
+
+    def get_selected_spectrum_name(self) -> str:
+        return interp_data.get_interpolation_spectrum_name()
+
+    def select_interp_spectrum(self, name: str):
+        interp_data.set_interpolation_spectrum_name(name)

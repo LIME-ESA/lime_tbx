@@ -1,9 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from lime_tbx.interpolation.access_data.access_data import (
-    get_asd_data,
-)
+import lime_tbx.interpolation.interp_data.interp_data as idata
 
 """___Third-Party Modules___"""
 
@@ -25,11 +23,11 @@ from ...datatypes.datatypes import MoonData, SpectralData
 
 class ISpectralInterpolation(ABC):
     @abstractmethod
-    def get_best_asd_reference(self, moon_data: MoonData) -> SpectralData:
+    def get_best_interp_reference(self, moon_data: MoonData) -> SpectralData:
         pass
 
     @abstractmethod
-    def get_best_polar_asd_reference(self, moon_data: MoonData) -> SpectralData:
+    def get_best_polar_interp_reference(self, moon_data: MoonData) -> SpectralData:
         pass
 
     @abstractmethod
@@ -50,13 +48,34 @@ class SpectralInterpolation(ISpectralInterpolation):
         )
         self.prop = punpy.MCPropagation(MCsteps)
 
-    def get_best_asd_reference(self, moon_data: MoonData):
-        return get_asd_data(moon_data.mpa_degrees)
-
-    def get_best_polar_asd_reference(self, moon_data: MoonData):
-        mock = get_asd_data(moon_data.mpa_degrees)
+    def _get_best_polar_asd_reference(self, moon_data: MoonData):
+        mock = idata.get_best_asd_data(moon_data.mpa_degrees)
         mock.data.fill(1)
         return mock
+
+    def _get_best_apollo_reference(self, moon_data: MoonData):
+        mock = idata.get_best_asd_data(moon_data.mpa_degrees)
+        mock.data.fill(1)
+        return mock
+
+    def _get_best_polar_apollo_reference(self, moon_data: MoonData):
+        mock = idata.get_best_asd_data(moon_data.mpa_degrees)
+        mock.data.fill(1)
+        return mock
+
+    def get_best_interp_reference(self, moon_data: MoonData):
+        name = idata.get_interpolation_spectrum_name()
+        if name == "apollo":
+            return self._get_best_apollo_reference(moon_data)
+        else:
+            return idata.get_best_asd_data(moon_data.mpa_degrees)
+
+    def get_best_polar_interp_reference(self, moon_data: MoonData):
+        name = idata.get_interpolation_spectrum_name()
+        if name == "apollo":
+            return self._get_best_polar_apollo_reference(moon_data)
+        else:
+            return self._get_best_polar_asd_reference(moon_data)
 
     def get_interpolated_refl(
         self, cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav

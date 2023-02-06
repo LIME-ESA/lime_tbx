@@ -36,6 +36,8 @@ from abc import ABC
 import numpy as np
 import xarray
 import obsarray
+import ruamel.yaml as ruaml
+from ruamel.yaml import yaml_object
 
 
 """___LIME Modules___"""
@@ -799,3 +801,25 @@ class LGLODComparisonData:
 class LimeException(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+
+yaml = ruaml.YAML()
+
+
+@yaml_object(yaml)
+@dataclass
+class InterpolationSettings:
+    interpolation_spectrum: str
+
+    def _save_disk(self, path: str):
+        with open(path, "w") as file:
+            yaml.dump([self], file)
+
+    @staticmethod
+    def _load_yaml(path: str) -> "InterpolationSettings":
+        f = open(path, "r")
+        lines = f.readlines()
+        f.close()
+        yaml_str = "\n".join([line for line in lines])
+        setts: "InterpolationSettings" = yaml.load(yaml_str)[0]
+        return setts

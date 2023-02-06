@@ -439,9 +439,9 @@ class LimeSimulation(ILimeSimulation):
     ]:
         elref_cimel = LimeSimulation._calculate_elref(mds, cimel_coeff)
         if isinstance(mds, list):
-            elref_asd = [intp.get_best_asd_reference(md) for md in mds]
+            elref_asd = [intp.get_best_interp_reference(md) for md in mds]
         else:
-            elref_asd = intp.get_best_asd_reference(mds)
+            elref_asd = intp.get_best_interp_reference(mds)
         elref = LimeSimulation._interpolate_refl(elref_asd, elref_cimel, intp, wlens)
         return elref_cimel, elref_asd, elref
 
@@ -471,9 +471,9 @@ class LimeSimulation(ILimeSimulation):
     ]:
         polar_cimel = LimeSimulation._calculate_polar(mds, polar_coeff)
         if isinstance(mds, list):
-            polar_asd = [intp.get_best_polar_asd_reference(md) for md in mds]
+            polar_asd = [intp.get_best_polar_interp_reference(md) for md in mds]
         else:
-            polar_asd = intp.get_best_polar_asd_reference(mds)
+            polar_asd = intp.get_best_polar_interp_reference(mds)
         polar = LimeSimulation._interpolate_polar(polar_asd, polar_cimel, intp, wlens)
         return polar_cimel, polar_asd, polar
 

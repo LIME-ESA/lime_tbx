@@ -45,12 +45,12 @@ def get_interpolator() -> ISpectralInterpolation:
 class TestSpectralInterpolation(unittest.TestCase):
     def test_get_asd_references_ok(self):
         ip = get_interpolator()
-        asd_ref = ip.get_best_asd_reference(MD1)
-        pol_asd_ref = ip.get_best_polar_asd_reference(MD1)
+        asd_ref = ip.get_best_interp_reference(MD1)
+        pol_asd_ref = ip.get_best_polar_interp_reference(MD1)
         self.assertIsNotNone(asd_ref)
         self.assertIsNotNone(pol_asd_ref)
-        asd_ref = ip.get_best_asd_reference(MD2)
-        pol_asd_ref = ip.get_best_polar_asd_reference(MD2)
+        asd_ref = ip.get_best_interp_reference(MD2)
+        pol_asd_ref = ip.get_best_polar_interp_reference(MD2)
         self.assertIsNotNone(asd_ref)
         self.assertIsNotNone(pol_asd_ref)
 

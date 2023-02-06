@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
-from . import settings, output, input, srf, help
+from . import settings, output, input, srf, help, interpoptions
 from lime_tbx.filedata import moon, srf as srf_loader
 from ..simulation.comparison import comparison
 from ..datatypes.datatypes import (
@@ -1185,6 +1185,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.about_action = QtWidgets.QAction(self)
         self.about_action.setText("&About")
         self.about_action.triggered.connect(self.about)
+        # Settings actions
+        self.interpolation_action = QtWidgets.QAction(self)
+        self.interpolation_action.setText("&Interpolation options")
+        self.interpolation_action.triggered.connect(self.interpol_options)
 
     def _create_menu_bar(self):
         self._create_actions()
@@ -1200,9 +1204,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         coeffs_menu.addAction(self.select_coefficients_action)
         help_menu = QtWidgets.QMenu("&Help", self)
         help_menu.addAction(self.about_action)
+        settings_menu = QtWidgets.QMenu("&Settings", self)
+        settings_menu.addAction(self.interpolation_action)
         self.menu_bar.addMenu(file_menu)
         self.menu_bar.addMenu(coeffs_menu)
         self.menu_bar.addMenu(help_menu)
+        self.menu_bar.addMenu(settings_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         lime_tbx_w = self._get_lime_widget()
@@ -1362,3 +1369,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def about(self):
         about_dialog = help.AboutDialog(self)
         about_dialog.exec_()
+
+    def interpol_options(self):
+        lime_tbx_w = self._get_lime_widget()
+        interpol_opt_dialog = interpoptions.InterpOptionsDialog(
+            lime_tbx_w.settings_manager,
+            lime_tbx_w.lime_simulation,
+            self,
+        )
+        interpol_opt_dialog.exec_()
