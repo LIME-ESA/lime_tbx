@@ -48,6 +48,7 @@ setup(
         "python-dateutil==2.8.2",
         "pytz==2022.2.1",
         "PyYAML==6.0",
+        "ruamel.yaml==0.17.21",
         "requests==2.28.1",
         "scikit-learn==1.1.2",
         "scipy==1.9.1",
