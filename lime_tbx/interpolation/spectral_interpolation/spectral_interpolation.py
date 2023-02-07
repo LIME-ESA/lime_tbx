@@ -60,7 +60,7 @@ class SpectralInterpolation(ISpectralInterpolation):
         elif name == idata.SPECTRUM_NAME_BRECCIA:
             return idata.get_breccia_data()
         elif name == idata.SPECTRUM_NAME_COMPOSITE:
-            return idata.get_apollo16_data()  # TODO CHANGE TO CORRECT ONE
+            return idata.get_composite_data()
         else:
             return idata.get_best_asd_data(moon_data.mpa_degrees)
 

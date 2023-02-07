@@ -80,6 +80,23 @@ def get_breccia_data() -> SpectralData:
     return spectral_data
 
 
+def get_composite_data() -> SpectralData:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data = np.genfromtxt(
+        os.path.join(current_dir, "assets/Composite.txt"), delimiter=","
+    )
+    wavs = data[:, 0]
+    refl = data[:, 1]
+    wavs = wavs[np.where(np.isfinite(refl))]
+    refl = refl[np.where(np.isfinite(refl))]
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    unc_tot = (
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
+    )
+    spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
+    return spectral_data
+
+
 SPECTRUM_NAME_ASD = "ASD"
 SPECTRUM_NAME_APOLLO16 = "Apollo 16"
 SPECTRUM_NAME_BRECCIA = "Breccia"
