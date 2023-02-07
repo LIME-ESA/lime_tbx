@@ -81,7 +81,49 @@ def _write_point(writer, point: Union[Point, None]):
                 writer.writerow(["datetime", str(dt)])
 
 
-def export_csv(
+def export_csv_srf(
+    data: Union[SpectralData, List[SpectralData]],
+    xlabel: str,
+    ylabel: str,
+    name: str,
+):
+    """
+    Export the given data to a csv file
+
+    Parameters
+    ----------
+    data: SpectralData | list of SpectralData
+        Data that will be exported
+    xlabel: str
+        Label of the x_data
+    ylabel: str
+        Label of the y_data
+    name: str
+        CSV file path
+    """
+    try:
+        with open(name, "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            ylabels = []
+            ylabels.append(f"{ylabel}")
+            writer.writerow([xlabel, *ylabels])
+            if not isinstance(data, list) and not isinstance(data, np.ndarray):
+                data = [data]
+            x_data = data[0].wlens
+            y_data = []
+            for i in range(len(x_data)):
+                yd = []
+                for datum in data:
+                    yd.append(datum.data[i])
+                y_data.append(yd)
+            for i in range(len(x_data)):
+                writer.writerow([x_data[i], *y_data[i]])
+    except Exception as e:
+        logger.get_logger().exception(e)
+        raise Exception(_EXPORT_ERROR_STR)
+
+
+def export_csv_simulation(
     data: Union[SpectralData, List[SpectralData]],
     xlabel: str,
     ylabel: str,
@@ -89,6 +131,7 @@ def export_csv(
     name: str,
     coeff_version: str,
     inside_mpa_range: Union[bool, List[bool]],
+    interp_spectrum_name: str,
 ):
     """
     Export the given data to a csv file
@@ -109,11 +152,14 @@ def export_csv(
         Version of the CIMEL coefficients used for calculating the data
     inside_mpa_range: bool | list of bool
         Indication if the point moon phase angle/s were inside the valid LIME range.
+    interp_spectrum_name: str
+        Name of the spectrum used for interpolation.
     """
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)
@@ -168,6 +214,7 @@ def export_csv_comparation(
     name: str,
     coeff_version: str,
     ampa_valid_range: List[bool],
+    interp_spectrum_name: str,
     x_datetime: bool = True,
 ):
     """
@@ -190,6 +237,8 @@ def export_csv_comparation(
         Version of the CIMEL coefficients used for calculating the data
     ampa_valid_range: list of bool
         Indicates if the given points are inside of the valid LIME moon phase angle range.
+    interp_spectrum_name: str
+        Name of the spectrum used for interpolation.
     x_datetime: bool
         True if it used datetimes as the x_axis, False if it used mpa
     """
@@ -200,6 +249,7 @@ def export_csv_comparation(
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             writer.writerow(
@@ -249,6 +299,7 @@ def export_csv_integrated_irradiance(
     point: Point,
     coeff_version: str,
     inside_mpa_range: Union[bool, List[bool]],
+    interp_spectrum_name: str,
 ):
     """
     Export the given integrated signal data to a csv file
@@ -267,11 +318,14 @@ def export_csv_integrated_irradiance(
         Version of the CIMEL coefficients used for calculating the data
     inside_mpa_range: bool | list of bool
         Indication if the point moon phase angle/s were inside the valid LIME range.
+    interp_spectrum_name: str
+        Name of the spectrum used for interpolation.
     """
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)

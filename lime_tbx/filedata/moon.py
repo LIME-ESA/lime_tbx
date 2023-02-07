@@ -125,6 +125,7 @@ def _write_start_dataset(
     min_dt: datetime,
     max_dt: datetime,
     warning_outside_mpa_range: bool,
+    spectrum_name: str,
 ):
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
@@ -165,6 +166,7 @@ def _write_start_dataset(
         ds.time_coverage_end = ""
     ds.reference_model = "LIME2 coefficients version: {}".format(coefficients_version)
     ds.not_default_srf = int(not_default_srf)
+    ds.spectrum_name = spectrum_name
     return ds
 
 
@@ -210,6 +212,7 @@ def _write_normal_simulations(
         min_dt,
         max_dt,
         warning_outside_mpa_range,
+        lglod.spectrum_name,
     )
     # DIMENSIONS
     max_len_strlen = len(max(sim_data.ch_names, key=len))
@@ -565,6 +568,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         distance_sun_moon = ds.variables["distance_sun_moon"][:].data
         selen_sun_lon_rad = ds.variables["selen_sun_lon_rad"][:].data
     obss = []
+    sp_name = ds.spectrum_name
     ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
@@ -624,7 +628,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         for i in range(len(polar_cimel))
     ]
     return LGLODData(
-        obss, signals, not_default_srf, elis_cimel, elrefs_cimel, polars_cimel
+        obss, signals, not_default_srf, elis_cimel, elrefs_cimel, polars_cimel, sp_name
     )
 
 
@@ -866,6 +870,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
     mpas = np.array(ds.variables["mpa"][:].data)
+    sp_name = ds.spectrum_name
     ds.close()
     comps = []
     points = []
@@ -907,7 +912,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
         )
         comps.append(comp)
-    return LGLODComparisonData(comps, ch_names, sat_name)
+    return LGLODComparisonData(comps, ch_names, sat_name, sp_name)
 
 
 def read_lglod_file(

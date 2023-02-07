@@ -53,7 +53,7 @@ def get_apollo16_data() -> SpectralData:
         os.path.join(current_dir, "assets/Apollo16.txt"), delimiter=","
     )
     wavs = data[:, 0]
-    refl = data[:, 3]  # Maybe its the first
+    refl = data[:, 1]
     wavs = wavs[np.where(np.isfinite(refl))]
     refl = refl[np.where(np.isfinite(refl))]
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
@@ -80,7 +80,17 @@ def get_breccia_data() -> SpectralData:
     return spectral_data
 
 
-_VALID_INTERP_SPECTRA = ["ASD", "Apollo 16", "Breccia", "Composite"]
+SPECTRUM_NAME_ASD = "ASD"
+SPECTRUM_NAME_APOLLO16 = "Apollo 16"
+SPECTRUM_NAME_BRECCIA = "Breccia"
+SPECTRUM_NAME_COMPOSITE = "Apollo 16 + Breccia"
+
+_VALID_INTERP_SPECTRA = [
+    SPECTRUM_NAME_ASD,
+    SPECTRUM_NAME_APOLLO16,
+    SPECTRUM_NAME_BRECCIA,
+    SPECTRUM_NAME_COMPOSITE,
+]
 
 
 def _get_interp_path() -> str:
@@ -120,3 +130,7 @@ def set_interpolation_spectrum_name(spectrum: str):
         logger.get_logger().error(
             f"Tried setting unknown interpolation spectrum: {spectrum}"
         )
+
+
+def can_perform_polarization() -> bool:
+    return get_interpolation_spectrum_name() == SPECTRUM_NAME_ASD

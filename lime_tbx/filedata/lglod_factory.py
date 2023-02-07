@@ -36,6 +36,7 @@ def create_lglod_data(
     srf: SpectralResponseFunction,
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
+    spectrum_name: str,
 ) -> LGLODData:
     obs = []
     ch_names = srf.get_channels_names()
@@ -48,16 +49,20 @@ def create_lglod_data(
     elrefs_cimel = lime_simulation.get_elrefs_cimel()
     if not isinstance(elrefs_cimel, list):
         elrefs_cimel = [elrefs_cimel]
-    polars = lime_simulation.get_polars()
-    polars_cimel = lime_simulation.get_polars_cimel()
-    if not isinstance(polars_cimel, list):
-        polars_cimel = [polars_cimel]
     if not isinstance(elis, list):
         elis = [elis]
     if not isinstance(elrefs, list):
         elrefs = [elrefs]
-    if not isinstance(polars, list):
-        polars = [polars]
+    if lime_simulation.is_polarization_updated():
+        polars = lime_simulation.get_polars()
+        polars_cimel = lime_simulation.get_polars_cimel()
+        if not isinstance(polars_cimel, list):
+            polars_cimel = [polars_cimel]
+        if not isinstance(polars, list):
+            polars = [polars]
+    else:
+        polars = [0 for _ in elrefs]
+        polars_cimel = [0 for _ in elrefs_cimel]
     signals = lime_simulation.get_signals()
     if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
         dts = point.dt
@@ -144,5 +149,11 @@ def create_lglod_data(
     ):
         is_not_default_srf = False
     return LGLODData(
-        obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel, polars_cimel
+        obs,
+        signals,
+        is_not_default_srf,
+        elis_cimel,
+        elrefs_cimel,
+        polars_cimel,
+        spectrum_name,
     )

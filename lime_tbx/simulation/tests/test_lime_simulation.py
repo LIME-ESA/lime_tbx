@@ -26,6 +26,7 @@ from ...coefficients.access_data.access_data import (
     _get_demo_cimel_coeffs,
 )
 from ...filedata import moon, srf as srflib
+from lime_tbx.interpolation.interp_data import interp_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -65,6 +66,7 @@ def get_polar_coeffs() -> PolarizationCoefficients:
 
 
 def get_lime_simulation() -> ILimeSimulation:
+    interp_data.set_interpolation_spectrum_name("ASD")
     return LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=False)
 
 

@@ -31,6 +31,7 @@ from ..datatypes.datatypes import (
 )
 from ..eocfi_adapter import eocfi_adapter
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
+from lime_tbx.interpolation.interp_data import interp_data
 from .ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.gui import canvas, coefficients
@@ -267,6 +268,8 @@ def _show_comps_output(
             warning_out_mpa_range = ""
             if False in comps[i].ampa_valid_range:
                 warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+            sp_name = interp_data.get_interpolation_spectrum_name()
+            output.set_interp_spectrum_name(i, sp_name)
             subtitle = f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
             _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
             subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -397,6 +400,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.comps,
             self.srf.get_channels_names(),
             "TODO",
+            self.comparison_spectrum,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
@@ -433,6 +437,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.quant_mos = len(mos)
         self.quant_mos_simulated = 0
+        self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
         self.worker = CallbackWorker(
             compare_callback,
             [mos, srf, cimel_coef, self.lime_simulation, self.kernels_path],
@@ -628,7 +633,7 @@ class MainSimulationsWidget(
         self.input_widget = input.InputWidget(
             self.satellites,
             self._callback_regular_input_changed,
-            self._callback_check_calculable,
+            self.update_calculability,
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
@@ -690,6 +695,7 @@ class MainSimulationsWidget(
         self.lower_stack.setCurrentIndex(1)
         self.main_layout.addLayout(self.lower_stack, 1)
         self.main_layout.addWidget(self.export_lglod_button)
+        self.update_calculability()
 
     def _set_spinner(self, enabled: bool):
         self.loading_spinner.setVisible(enabled)
@@ -720,11 +726,13 @@ class MainSimulationsWidget(
     def _callback_regular_input_changed(self):
         self.lime_simulation.set_simulation_changed()
 
-    def _callback_check_calculable(self):
+    def update_calculability(self):
         calculable = self.input_widget.is_calculable()
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
-        self.polar_button.setEnabled(calculable)
+        self.polar_button.setEnabled(
+            calculable and interp_data.can_perform_polarization()
+        )
         if not self._export_lglod_button_was_disabled:
             self._disable_lglod_export(not calculable)
 
@@ -792,6 +800,8 @@ class MainSimulationsWidget(
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        sp_name = interp_data.get_interpolation_spectrum_name()
+        self.graph.set_interp_spectrum_name(sp_name)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -807,6 +817,9 @@ class MainSimulationsWidget(
             subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[6])
+        self.signal_widget.set_interp_spectrum_name(
+            self.settings_manager.get_selected_spectrum_name()
+        )
         self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
         self.lower_tabs.setTabEnabled(2, True)
@@ -845,6 +858,8 @@ class MainSimulationsWidget(
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        sp_name = interp_data.get_interpolation_spectrum_name()
+        self.graph.set_interp_spectrum_name(sp_name)
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -893,6 +908,8 @@ class MainSimulationsWidget(
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        sp_name = interp_data.get_interpolation_spectrum_name()
+        self.graph.set_interp_spectrum_name(sp_name)
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -939,7 +956,10 @@ class MainSimulationsWidget(
     def calculate_all_finished(self, data):
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
-        lglod = create_lglod_data(point, srf, self.lime_simulation, self.kernels_path)
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        lglod = create_lglod_data(
+            point, srf, self.lime_simulation, self.kernels_path, sp_name
+        )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
@@ -1098,6 +1118,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         srf = data[1]
         self.main_page.srf_widget.set_srf(srf)
         self.lime_simulation.set_observations(lglod, srf)
+        self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
         point = self.lime_simulation.get_point()
         self.main_page.load_observations_finished(point)
         self.main_page._unblock_gui()
@@ -1120,6 +1141,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def _load_comparisons_finished_2(self, data):
         lglod: LGLODComparisonData = data[0]
         srf = data[1]
+        self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
         self.worker = CallbackWorker(
             obtain_sorted_mpa_callback, [lglod.comparisons, self.kernels_path, srf]
         )
@@ -1143,6 +1165,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
     def get_current_page(self) -> Union[MainSimulationsWidget, ComparisonPageWidget]:
         return self.page
+
+    def update_calculability(self):
+        self.main_page.update_calculability()
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
@@ -1369,6 +1394,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def about(self):
         about_dialog = help.AboutDialog(self)
         about_dialog.exec_()
+
+    def update_calculability(self):
+        lime_tbx_w = self._get_lime_widget()
+        lime_tbx_w.update_calculability()
 
     def interpol_options(self):
         lime_tbx_w = self._get_lime_widget()

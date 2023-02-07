@@ -789,6 +789,7 @@ class LGLODData:
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
     polars_cimel: List["SpectralData"]
+    spectrum_name: str  # interpolation spectrum
 
 
 @dataclass
@@ -796,6 +797,7 @@ class LGLODComparisonData:
     comparisons: List[ComparisonData]
     ch_names: List[str]
     sat_name: str
+    spectrum_name: str
 
 
 class LimeException(Exception):

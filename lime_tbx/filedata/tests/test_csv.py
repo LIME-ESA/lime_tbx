@@ -20,13 +20,15 @@ from ...datatypes.datatypes import (
     SurfacePoint,
 )
 from ..csv import (
-    export_csv,
+    export_csv_simulation,
     export_csv_comparation,
     export_csv_integrated_irradiance,
+    export_csv_srf,
     read_datetimes,
     read_lime_coefficients,
     read_lime_coefficients_from_stream,
 )
+from lime_tbx.gui.settings import SettingsManager
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -327,32 +329,52 @@ def get_srf() -> SpectralResponseFunction:
 class TestCSV(unittest.TestCase):
     def test_export_csv_1(self):
         path = "./test_files/csv/export_1.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", SPOINT, path, "test", True)
+        export_csv_simulation(
+            SD1, "Wavelength", "Irradiance", SPOINT, path, "test", True, "ASD"
+        )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
     def test_export_csv_2(self):
         path = "./test_files/csv/export_2.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", CPOINT, path, "test", True)
+        export_csv_simulation(
+            SD1, "Wavelength", "Irradiance", CPOINT, path, "test", True, "ASD"
+        )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
     def test_export_csv_3(self):
         path = "./test_files/csv/export_3.test.csv"
-        export_csv(SD1, "Wavelength", "Irradiance", SATPOINT, path, "test", False)
+        export_csv_simulation(
+            SD1, "Wavelength", "Irradiance", SATPOINT, path, "test", False, "ASD"
+        )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
     def test_export_csv_4(self):
         data = [SD1, SD2]
         path = "./test_files/csv/export_4.test.csv"
-        export_csv(
-            data, "Wavelength", "Irradiance", SPOINT2, path, "test", [True, False]
+        export_csv_simulation(
+            data,
+            "Wavelength",
+            "Irradiance",
+            SPOINT2,
+            path,
+            "test",
+            [True, False],
+            "ASD",
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_4.csv"))
 
     def test_export_csv_5(self):
         data = [SD1, SD2]
         path = "./test_files/csv/export_5.test.csv"
-        export_csv(
-            data, "Wavelength", "Irradiance", SATPOINT2, path, "test", [True, True]
+        export_csv_simulation(
+            data,
+            "Wavelength",
+            "Irradiance",
+            SATPOINT2,
+            path,
+            "test",
+            [True, True],
+            "ASD",
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
@@ -363,7 +385,13 @@ class TestCSV(unittest.TestCase):
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
         export_csv_comparation(
-            data, "Signal", [SPOINT, SPOINT3], path, "test", [True, False]
+            data,
+            "Signal",
+            [SPOINT, SPOINT3],
+            path,
+            "test",
+            [True, False],
+            "ASD",
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 
@@ -377,8 +405,17 @@ class TestCSV(unittest.TestCase):
         )
         data = SpectralData(WLENS, signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
-        export_csv_integrated_irradiance(srf, data, path, SPOINT2, "test", [True, True])
+        export_csv_integrated_irradiance(
+            srf, data, path, SPOINT2, "test", [True, True], "ASD"
+        )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
+
+    def test_export_csv_srf(self):
+        srf = SettingsManager().get_default_srf()
+        data = SpectralData(srf.get_wavelengths(), srf.get_values(), None, None)
+        path = "./test_files/csv/export_srf_1.test.csv"
+        export_csv_srf(data, "Wavelengths (nm)", "Intensity (Fractions of unity)", path)
+        self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_srf_1.csv"))
 
     def test_read_datetimes(self):
         dts = read_datetimes("./test_files/csv/timeseries.csv")

@@ -237,7 +237,8 @@ class CLI:
     ):
         version = self.settings_manager.get_lime_coef().version
         are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        csv.export_csv(
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        csv.export_csv_simulation(
             self.lime_simulation.get_elrefs(),
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
@@ -245,8 +246,9 @@ class CLI:
             ed.o_file_refl,
             version,
             are_mpas_oinside_mpa_range,
+            sp_name,
         )
-        csv.export_csv(
+        csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
@@ -254,8 +256,9 @@ class CLI:
             ed.o_file_irr,
             version,
             are_mpas_oinside_mpa_range,
+            sp_name,
         )
-        csv.export_csv(
+        csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
@@ -263,6 +266,7 @@ class CLI:
             ed.o_file_polar,
             version,
             are_mpas_oinside_mpa_range,
+            sp_name,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -271,11 +275,13 @@ class CLI:
             point,
             version,
             are_mpas_oinside_mpa_range,
+            sp_name,
         )
 
     def _export_lglod(self, point: Point, output_file: str):
+        sp_name = self.settings_manager.get_selected_spectrum_name()
         lglod = create_lglod_data(
-            point, self.srf, self.lime_simulation, self.kernels_path
+            point, self.srf, self.lime_simulation, self.kernels_path, sp_name
         )
         now = datetime.now(timezone.utc)
         version = self.settings_manager.get_lime_coef().version
@@ -536,6 +542,7 @@ class CLI:
                 comps,
                 self.srf.get_channels_names(),
                 "TODO",
+                self.settings_manager.get_selected_spectrum_name(),
             )
             vers = self.settings_manager.get_lime_coef().version
             moon.write_comparison(
@@ -555,6 +562,7 @@ class CLI:
             ch_names = self.srf.get_channels_names()
             file_index = 0
             is_both = ed.comparison_key == ComparisonKey.BOTH
+            sp_name = self.settings_manager.get_selected_spectrum_name()
             if ed.comparison_key != ComparisonKey.MPA:
                 for i, ch in enumerate(ch_names):
                     if len(comps[i].dts) > 0:
@@ -585,6 +593,7 @@ class CLI:
                                 output,
                                 version,
                                 comps[i].ampa_valid_range,
+                                sp_name,
                             )
                         else:
                             xlabel = "UTC datetime"
@@ -627,6 +636,7 @@ class CLI:
                                 output,
                                 version,
                                 mpa_comps[i].ampa_valid_range,
+                                sp_name,
                                 False,
                             )
                         else:

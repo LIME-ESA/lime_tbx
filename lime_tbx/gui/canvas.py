@@ -21,6 +21,7 @@ from ..datatypes.datatypes import (
     SpectralData,
 )
 from . import constants
+from lime_tbx.interpolation.interp_data import interp_data
 
 
 SUBTITLE_DATE_FORMAT = "%Y/%m/%d %H:%M:%S"
@@ -81,6 +82,7 @@ def redraw_canvas(
     sylabel: str,
     svertical_lines: List[float],
     subtitle: str = None,
+    sp_name: str = interp_data.SPECTRUM_NAME_ASD,
 ):
     lines = []
     if sdata is not None:
@@ -169,7 +171,7 @@ def redraw_canvas(
             lines += scanvas.axes.plot(
                 asd_data.wlens,
                 asd_data_final,
-                label=f"ASD data points, scaled to LIME at 500nm",
+                label=f"{sp_name} data, scaled to LIME at 500nm",
             )
 
         data_compare_info = ""

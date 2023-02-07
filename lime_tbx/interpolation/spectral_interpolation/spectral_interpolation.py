@@ -55,27 +55,17 @@ class SpectralInterpolation(ISpectralInterpolation):
 
     def get_best_interp_reference(self, moon_data: MoonData):
         name = idata.get_interpolation_spectrum_name()
-        if name == "Apollo 16":
+        if name == idata.SPECTRUM_NAME_APOLLO16:
             return idata.get_apollo16_data()
-        elif name == "Breccia":
+        elif name == idata.SPECTRUM_NAME_BRECCIA:
             return idata.get_breccia_data()
-        elif name == "Composite":
+        elif name == idata.SPECTRUM_NAME_COMPOSITE:
             return idata.get_apollo16_data()  # TODO CHANGE TO CORRECT ONE
         else:
             return idata.get_best_asd_data(moon_data.mpa_degrees)
 
     def get_best_polar_interp_reference(self, moon_data: MoonData):
         return self._get_best_polar_asd_reference(moon_data)
-        # TODO WHAT TO DO HERE?
-        name = idata.get_interpolation_spectrum_name()
-        if name == "Apollo 16":
-            pass
-        elif name == "Breccia":
-            pass
-        elif name == "Composite":
-            pass
-        else:
-            return self._get_best_polar_asd_reference(moon_data)
 
     def get_interpolated_refl(
         self, cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav

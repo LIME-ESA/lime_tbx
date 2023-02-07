@@ -76,3 +76,9 @@ class InterpOptionsDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def cancel_clicked(self):
         self.close()
+
+    def closeEvent(self, arg__1: QtGui.QCloseEvent) -> None:
+        parent = self.parent()
+        if parent is not None:
+            parent.update_calculability()
+        return super().closeEvent(arg__1)

@@ -68,6 +68,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlim_left = None
         self.xlim_right = None
         self.comparison_x_datetime = comparison_x_datetime
+        self.inside_mpa_range = None
+        self.interp_spectrum_name = None
         self._build_layout()
 
     def _build_layout(self):
@@ -211,6 +213,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.ylabel,
             self.vertical_lines,
             self.subtitle,
+            self.interp_spectrum_name,
         )
         try:
             self.canvas.fig.tight_layout()
@@ -261,6 +264,9 @@ class GraphWidget(QtWidgets.QWidget):
     def set_inside_mpa_range(self, inside_mpa_range):
         self.inside_mpa_range = inside_mpa_range
 
+    def set_interp_spectrum_name(self, interp_spectrum_name: str):
+        self.interp_spectrum_name = interp_spectrum_name
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -279,10 +285,11 @@ class GraphWidget(QtWidgets.QWidget):
                         name,
                         version,
                         self.data_compare.ampa_valid_range,
+                        self.interp_spectrum_name,
                         self.comparison_x_datetime,
                     )
-                else:
-                    csv.export_csv(
+                elif self.inside_mpa_range is not None:
+                    csv.export_csv_simulation(
                         self.data,
                         self.xlabel,
                         self.ylabel,
@@ -290,6 +297,14 @@ class GraphWidget(QtWidgets.QWidget):
                         name,
                         version,
                         self.inside_mpa_range,
+                        self.interp_spectrum_name,
+                    )
+                else:
+                    csv.export_csv_srf(
+                        self.data,
+                        self.xlabel,
+                        self.ylabel,
+                        name,
                     )
             except Exception as e:
                 self.show_error(e)
@@ -445,6 +460,9 @@ for absolute moon phase angles between 2° and 90°"
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
+    def set_interp_spectrum_name(self, interp_spectrum_name: str):
+        self.interp_spectrum_name = interp_spectrum_name
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -462,6 +480,7 @@ for absolute moon phase angles between 2° and 90°"
                     self.point,
                     version,
                     self.inside_mpa_range,
+                    self.interp_spectrum_name,
                 )
             except Exception as e:
                 self.show_error(e)
@@ -563,6 +582,13 @@ for wavelengths between 350 and 2500 nm"
         self.channels[index].update_labels(
             title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
         )
+
+    def set_interp_spectrum_name(
+        self,
+        index: int,
+        sp_name: str,
+    ):
+        self.channels[index].set_interp_spectrum_name(sp_name)
 
     def update_legends(self, index: int, legends: List[List[str]], redraw: bool = True):
         """

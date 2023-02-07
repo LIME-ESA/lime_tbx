@@ -30,6 +30,7 @@ from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
+from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
@@ -319,6 +320,18 @@ class ILimeSimulation(ABC):
         """
         pass
 
+    @abstractmethod
+    def is_polarization_updated(self) -> bool:
+        """Returns if the polarization has been updated. If not, or nothing has been executed,
+        or the spectrum doesn't contain polarization values.
+
+        Returns
+        -------
+        pol_uptodate: bool
+            True if the polarization is updated
+        """
+        pass
+
 
 class LimeSimulation(ILimeSimulation):
     """
@@ -507,6 +520,9 @@ class LimeSimulation(ILimeSimulation):
             if self.verbose:
                 print("signals update done")
 
+    def is_polarization_updated(self) -> bool:
+        return self.pol_uptodate
+
     def update_polarization(
         self,
         srf: SpectralResponseFunction,
@@ -514,6 +530,11 @@ class LimeSimulation(ILimeSimulation):
         polar_coeff: PolarizationCoefficients,
     ):
         self._save_parameters(srf, point)
+        if not interp_data.can_perform_polarization():
+            if self.verbose:
+                print("Skipping polarisation, not available for spectrum")
+            self.pol_uptodate = False
+            return
         if not self.pol_uptodate:
             if self.verbose:
                 print("starting polarisation update")
