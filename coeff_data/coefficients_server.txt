@@ -1,1 +1,1 @@
-http://localhost:8000/
+http://ec2-35-165-69-95.us-west-2.compute.amazonaws.com/

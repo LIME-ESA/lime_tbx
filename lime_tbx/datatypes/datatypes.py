@@ -438,7 +438,7 @@ class ReflectanceCoefficients:
         Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
     """
 
-    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs", "err_corr_coeff"]
 
     @dataclass
     class _WlenReflCoeffs:
@@ -474,6 +474,7 @@ class ReflectanceCoefficients:
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = _ds.u_coeff.values
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
+        self.err_corr_coeff = _ds.err_corr_coeff
 
 
 class PolarizationCoefficients:
@@ -488,8 +489,10 @@ class PolarizationCoefficients:
         wavelengths: List[float],
         pos_coeffs: List[Tuple[float, float, float, float]],
         pos_unc: List[Tuple[float, float, float, float]],
+        p_pos_err_corr_data: List[List[float]],
         neg_coeffs: List[Tuple[float, float, float, float]],
         neg_unc: List[Tuple[float, float, float, float]],
+        p_neg_err_corr_data: List[List[float]],
     ):
         """
         Parameters
@@ -504,8 +507,10 @@ class PolarizationCoefficients:
         self.wlens = wavelengths
         self.pos_coeffs = pos_coeffs
         self.pos_unc = pos_unc
+        self.p_pos_err_corr_data = p_pos_err_corr_data
         self.neg_coeffs = neg_coeffs
         self.neg_unc = neg_unc
+        self.p_neg_err_corr_data = p_neg_err_corr_data
 
     def get_wavelengths(self) -> List[float]:
         """Gets all wavelengths present in the model, in nanometers
@@ -564,6 +569,9 @@ class PolarizationCoefficients:
     ) -> Tuple[float, float, float, float]:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.neg_unc[index]
+
+    def is_calculable(self) -> bool:
+        return not np.isnan(self.pos_coeffs).any()
 
 
 @dataclass

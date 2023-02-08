@@ -41,7 +41,7 @@ class TestAccessData(unittest.TestCase):
         version_files = os.listdir(folder)
         cfs_check = []
         for vf in version_files:
-            cf = lcsv.read_lime_coefficients(os.path.join(folder, vf))
+            cf = lcsv.read_lime_coefficients_csv(os.path.join(folder, vf))
             cfs_check.append(cf)
         for cf, cfc in zip(cfs, cfs_check):
             self.assertEqual(cf.version, cfc.version)

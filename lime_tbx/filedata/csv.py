@@ -442,7 +442,7 @@ def read_lime_coefficients_from_stream(
     return LimeCoefficients(rf, pol, version_name)
 
 
-def read_lime_coefficients(path: str) -> LimeCoefficients:
+def read_lime_coefficients_csv(path: str) -> LimeCoefficients:
     """
     Read a Reflectance Coefficients CSV file.
 

@@ -21,6 +21,7 @@ from lime_tbx.datatypes.datatypes import (
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import csv as lcsv
+from lime_tbx.filedata import coefficients
 
 """___Authorship___"""
 __author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
@@ -52,7 +53,8 @@ class AccessData(IAccessData):
         version_files = os.listdir(folder)
         coeffs = []
         for vf in version_files:
-            cf = lcsv.read_lime_coefficients(os.path.join(folder, vf))
+            cf = coefficients.read_coeff_nc(os.path.join(folder, vf))
+            # cf = lcsv.read_lime_coefficients_csv(os.path.join(folder, vf))
             coeffs.append(cf)
         return coeffs
 

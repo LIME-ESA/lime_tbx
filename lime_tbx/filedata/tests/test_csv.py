@@ -25,7 +25,7 @@ from ..csv import (
     export_csv_integrated_irradiance,
     export_csv_srf,
     read_datetimes,
-    read_lime_coefficients,
+    read_lime_coefficients_csv,
     read_lime_coefficients_from_stream,
 )
 from lime_tbx.gui.settings import SettingsManager
@@ -424,7 +424,7 @@ class TestCSV(unittest.TestCase):
             self.assertEqual(dt, DTS[i])
 
     def test_read_refl_coefficients(self):
-        cf = read_lime_coefficients("./coeff_data/versions/23_01_01.csv")
+        cf = read_lime_coefficients_csv("./coeff_data/versions/23_01_01.csv")
         version = "23.01.01"
         data, u_data = _get_230101_coeff_data()
         self.assertEqual(cf.version, version)
