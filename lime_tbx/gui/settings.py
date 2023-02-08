@@ -103,6 +103,9 @@ class ISettingsManager(ABC):
         pass
 
 
+DEF_SRF_STEP = 2
+
+
 class SettingsManager(ISettingsManager):
     def __init__(self, previous_coeff_name: str = None):
         # generate an arbitrary default srf
@@ -120,7 +123,10 @@ class SettingsManager(ISettingsManager):
 
     def get_default_srf(self) -> SpectralResponseFunction:
         spectral_response = {
-            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
+            i: 1.0
+            for i in np.arange(
+                constants.MIN_WLEN, constants.MAX_WLEN + DEF_SRF_STEP, DEF_SRF_STEP
+            )
         }
         ch = SRFChannel(
             (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
