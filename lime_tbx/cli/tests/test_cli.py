@@ -13,6 +13,7 @@ import unittest
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.interpolation.interp_data import interp_data
 from ..cli import (
     CLI,
     OPTIONS,
@@ -352,6 +353,16 @@ class TestCLI(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 0)
+
+    def test_earth_glod_ok_select_spectrum_apollo(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i 'Apollo 16 + Breccia'"
+            )
+        )
+        self.assertEqual(errcode, 0)
+        interp_data.set_interpolation_spectrum_name("ASD")
 
     def test_earth_timeseries_glod_ok(self):
         cli = get_cli()

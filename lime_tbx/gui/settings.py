@@ -102,6 +102,11 @@ class ISettingsManager(ABC):
         """Select the interpolation spectrum to use"""
         pass
 
+    @abstractmethod
+    def can_perform_polarization(self) -> bool:
+        """Checks if the current settings allow for the performance of polarization."""
+        pass
+
 
 DEF_SRF_STEP = 2
 
@@ -180,3 +185,6 @@ class SettingsManager(ISettingsManager):
 
     def select_interp_spectrum(self, name: str):
         interp_data.set_interpolation_spectrum_name(name)
+
+    def can_perform_polarization(self) -> bool:
+        return interp_data.can_perform_polarization()

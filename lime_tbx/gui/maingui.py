@@ -732,7 +732,9 @@ class MainSimulationsWidget(
         self.elref_button.setEnabled(calculable)
         polar_calculable = self.settings_manager.get_polar_coef().is_calculable()
         self.polar_button.setEnabled(
-            calculable and interp_data.can_perform_polarization() and polar_calculable
+            calculable
+            and self.settings_manager.can_perform_polarization()
+            and polar_calculable
         )
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)

@@ -4,7 +4,7 @@
 # import here
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.simulation.lime_simulation import ILimeSimulation
@@ -21,6 +21,7 @@ from ..datatypes.datatypes import (
     SpectralResponseFunction,
     KernelsPath,
     LGLODData,
+    SpectralData,
 )
 
 """___Authorship___"""
@@ -61,8 +62,18 @@ def create_lglod_data(
         if not isinstance(polars, list):
             polars = [polars]
     else:
-        polars = [0 for _ in elrefs]
-        polars_cimel = [0 for _ in elrefs_cimel]
+        polars = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs
+        ]
+        polars_cimel = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs_cimel
+        ]
     signals = lime_simulation.get_signals()
     if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
         dts = point.dt
