@@ -19,6 +19,7 @@ mkdir -p $dst
 cp -r $assets/* $dst
 chmod 777 $dst/coeff_data/versions
 chmod 777 $dst/coeff_data
+chmod 777 $dst/coeff_data/interp_settings.yml
 printf "#!/usr/bin/env sh\nGTK_THEME=Adwaita XDG_SESSION_TYPE=x11 GDK_BACKEND=x11 $dst/LimeTBX/$executable \$@" >$dst/LimeTBX/$x11_executable
 ln -s $dst/LimeTBX/$x11_executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications

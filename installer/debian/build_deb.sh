@@ -30,6 +30,7 @@ printf "#!/usr/bin/env sh\nGTK_THEME=Adwaita XDG_SESSION_TYPE=x11 GDK_BACKEND=x1
 ln -s /opt/esa/LimeTBX/LimeTBX/LimeTBX.sh $name/usr/bin/lime
 chmod 777 $name/opt/esa/LimeTBX/coeff_data/versions
 chmod 777 $name/opt/esa/LimeTBX/coeff_data
+chmod 777 $name/opt/esa/LimeTBX/coeff_data/interp_settings.yml
 mkdir $name/DEBIAN
 cp control $name/DEBIAN
 cp postinst $name/DEBIAN
