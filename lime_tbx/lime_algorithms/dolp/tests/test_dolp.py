@@ -40,12 +40,18 @@ _NEG_COEFFS = [
 
 _NO_UNCS = [(0, 0, 0, 0) for _ in range(6)]
 
+_nounc_size = len(_NO_UNCS) * len(_NO_UNCS[0])
+
+_NO_ERR_CORR = np.zeros((_nounc_size, _nounc_size))
+
 POL_COEFFS = PolarizationCoefficients(
     _WLENS,
     _POS_COEFFS,
     _NO_UNCS,
+    _NO_ERR_CORR,
     _NEG_COEFFS,
     _NO_UNCS,
+    _NO_ERR_CORR,
 )
 
 

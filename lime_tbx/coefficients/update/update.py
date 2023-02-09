@@ -51,8 +51,14 @@ class Update(IUpdate):
 
     def check_for_updates(self, timeout=60) -> bool:
         """True if there are updates"""
-        urlpath = os.path.join(self.url, "list.txt")
-        version_files = requests.get(urlpath, timeout=timeout).text.split()
+        urlpath = self.url
+        version_files = requests.get(urlpath).text.split()
+        version_files = [
+            tuple(line.split(","))
+            for line in version_files
+            if line not in ("<br>", "<br/>")
+        ]
+        version_files = [vf[1][len(urlpath) :] for vf in version_files]
         self_files = access_data.get_coefficients_filenames()
         for vf in version_files:
             if vf not in self_files:
@@ -72,14 +78,14 @@ class Update(IUpdate):
         self_files = access_data.get_coefficients_filenames()
         quant_news = 0
         quant_fails = 0
-        for index, vf in version_files:
-            vf = vf[len(urlpath) :]
+        for index, vfurl in version_files:
+            vf = vfurl[len(urlpath) :]
             is_running = stopper_checker(*stopper_args)
             if not is_running:
                 return (quant_news, quant_fails)
             if vf not in self_files:
                 quant_news += 1
-                fcontent = requests.get(f"{self.url}/{vf}").content
+                fcontent = requests.get(f"{vfurl}").content
                 filepath = os.path.join(
                     programdata.get_programfiles_folder(),
                     "coeff_data",

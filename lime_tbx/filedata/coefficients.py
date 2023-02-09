@@ -114,9 +114,9 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
     }
     wlens = [440, 500, 675, 870, 1020, 1640]
     version_name = release_date
-    data = np.array(ds.coeff).astype(float)
-    u_data = np.array(ds.u_coeff).astype(float)
-    err_corr_coeff = np.array(ds.err_corr_coeff)
+    data = np.array(ds.coeff.values)
+    u_data = np.array(ds.u_coeff.values)
+    err_corr_coeff = np.array(ds.err_corr_coeff.values)
     # create dataset
     ds_cimel: xr.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
     ds_cimel = ds_cimel.assign_coords(wavelength=wlens)

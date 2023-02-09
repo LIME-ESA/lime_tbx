@@ -30,6 +30,7 @@ class TestTemplates(unittest.TestCase):
         dim_sizes = {
             "wavelength": 6,
             "i_coeff": 18,
+            "i_coeff.wavelength": 18 * 6,
         }
         ds: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
         self.assertIsInstance(ds, xarray.Dataset)

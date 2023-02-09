@@ -22,7 +22,7 @@ __status__ = "Development"
 
 def get_updater() -> IUpdate:
     up = Update()
-    up.url = "http://localhost:8000/"
+    up.url = "http://localhost:8000/listv.txt"
     return up
 
 
@@ -48,7 +48,7 @@ class HTTPServer(BaseHTTPServer):
 class TestUpdateNoServer(unittest.TestCase):
     def test_connection_error(self):
         up = get_updater()
-        up.url = "http://localhost:6969"  # Which is not the same
+        up.url = "http://localhost:6969/listv.txt"  # Which is not the same
         self.assertRaises(requests.exceptions.ConnectionError, up.check_for_updates, 5)
 
 
