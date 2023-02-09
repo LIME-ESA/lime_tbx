@@ -15,6 +15,10 @@ TEMPLATE_CIMEL = {
             {"dim": "wavelength", "form": "random", "params": [], "units": []}
         ],
     },
+    "err_corr_coeff": {
+        "dim": ["i_coeff.wavelength", "i_coeff.wavelength"],
+        "dtype": np.float32,
+    },
 }
 
 TEMPLATE_REFL = {

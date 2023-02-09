@@ -112,12 +112,20 @@ COEF_WLENS = [350, 500, 650]
 POS_COEFFS = [(1, 2, 3, 4), (10, 2, 3, 4), (0.1, 2, 3, 4)]
 NEG_COEFFS = [(-1, -2, -3, -4), (-1, -2, -3, -4), (-1, -2, -3, -4)]
 UNCERTAINTIES = [(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)]
+_nounc_size = len(UNCERTAINTIES) * len(UNCERTAINTIES[0])
+ERR_CORR = np.zeros((_nounc_size, _nounc_size))
 
 
 class TestPolarizationCoefficients(unittest.TestCase):
     def test_func(self):
         coeffs = PolarizationCoefficients(
-            COEF_WLENS, POS_COEFFS, UNCERTAINTIES, NEG_COEFFS, UNCERTAINTIES
+            COEF_WLENS,
+            POS_COEFFS,
+            UNCERTAINTIES,
+            ERR_CORR,
+            NEG_COEFFS,
+            UNCERTAINTIES,
+            ERR_CORR,
         )
         self.assertEqual(coeffs.get_wavelengths(), COEF_WLENS)
         self.assertEqual(coeffs.get_coefficients_positive(COEF_WLENS[0]), POS_COEFFS[0])
@@ -217,6 +225,7 @@ class TestReflectanceCoefficients(unittest.TestCase):
         dim_sizes = {
             "wavelength": 6,
             "i_coeff": 18,
+            "i_coeff.wavelength": 18 * 6,
         }
         ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
         ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])

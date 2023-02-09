@@ -20,7 +20,7 @@ from lime_tbx.datatypes.datatypes import (
 )
 from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
 from lime_tbx.local_storage import programdata
-from lime_tbx.filedata import csv as lcsv
+from lime_tbx.filedata import coefficients
 
 """___Authorship___"""
 __author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
@@ -52,7 +52,7 @@ class AccessData(IAccessData):
         version_files = os.listdir(folder)
         coeffs = []
         for vf in version_files:
-            cf = lcsv.read_lime_coefficients(os.path.join(folder, vf))
+            cf = coefficients.read_coeff_nc(os.path.join(folder, vf))
             coeffs.append(cf)
         return coeffs
 
@@ -144,7 +144,11 @@ def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
     uncs = _DEFAULT_UNCS
-    coeffs = PolarizationCoefficients(wlens, pos_coeffs, uncs, neg_coeffs, uncs)
+    err_corr_size = len(uncs) * len(uncs[0])
+    err_corr = np.zeros((err_corr_size, err_corr_size))
+    coeffs = PolarizationCoefficients(
+        wlens, pos_coeffs, uncs, err_corr, neg_coeffs, uncs, err_corr
+    )
     return coeffs
 
 
@@ -153,6 +157,7 @@ def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoeff
     dim_sizes = {
         "wavelength": 6,
         "i_coeff": 18,
+        "i_coeff.wavelength": 18 * 6,
     }
     # create dataset
     ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
@@ -166,6 +171,7 @@ def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoeff
 
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
+    ds_cimel.err_corr_coeff.values = np.zeros((18 * 6, 18 * 6))
 
     return ReflectanceCoefficients(ds_cimel)
 

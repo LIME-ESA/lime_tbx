@@ -1,1 +1,2 @@
-http://localhost:8000/
+http://localhost:8000/list.txt
+#http://ec2-35-165-69-95.us-west-2.compute.amazonaws.com/
