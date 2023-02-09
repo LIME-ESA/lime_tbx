@@ -20,6 +20,10 @@ from ..datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
 )
+from lime_tbx.gui.util import (
+    CallbackWorker,
+    start_thread as _start_thread,
+)
 from ..filedata import csv, srf
 
 """___Authorship___"""
@@ -30,6 +34,13 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 MAX_PATH_LEN = 35
+
+
+def _callback_read_obs_files(paths: List[str]) -> List[LunarObservation]:
+    obss = []
+    for path in paths:
+        obss.append(moon.read_moon_obs(path))
+    return [obss]
 
 
 class CustomInputWidget(QtWidgets.QWidget):
@@ -677,21 +688,43 @@ class ComparisonInput(QtWidgets.QWidget):
                 self.callback_change()
 
     def show_error(self, error: Exception):
+        self._set_enabled_gui_input(True)
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
+
+    def _start_thread(self, finished: Callable, error: Callable, info: Callable = None):
+        self.worker_th = QtCore.QThread()
+        _start_thread(self.worker, self.worker_th, finished, error, info)
+
+    def _set_enabled_gui_input(self, enabled: bool):
+        self.setEnabled(enabled)
 
     @QtCore.Slot()
     def load_obs_files(self):
         paths = QtWidgets.QFileDialog().getOpenFileNames(self)[0]
-        for path in paths:
-            try:
-                self._add_observation(moon.read_moon_obs(path))
-            except Exception as e:
-                self.show_error(e)
+        self._set_enabled_gui_input(False)
+        self.moon_obs_feedback.setText("Loading...")
+        self.worker = CallbackWorker(
+            _callback_read_obs_files,
+            [paths],
+        )
+        self._start_thread(
+            self.loading_obs_files_finished, self.loading_obs_files_error
+        )
+
+    def loading_obs_files_finished(self, data):
+        obs = data[0]
+        for ob in obs:
+            self._add_observation(ob)
         if len(self.loaded_moons) > 0:
             shown_path = "Loaded {} files".format(len(self.loaded_moons))
             self.moon_obs_feedback.setText(shown_path)
             self.callback_change()
+        self._set_enabled_gui_input(True)
+
+    def loading_obs_files_error(self, e):
+        self.show_error(e)
+        self.clear_obs_files()
 
     def _add_observation(self, obs: LunarObservation):
         for i, pob in enumerate(self.loaded_moons):
