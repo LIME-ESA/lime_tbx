@@ -130,11 +130,10 @@ def get_interpolation_spectrum_name() -> str:
     setts = _load_interp_settings()
     if setts.interpolation_spectrum in _VALID_INTERP_SPECTRA:
         return setts.interpolation_spectrum
-    else:
-        logger.get_logger().error(
-            f"Unknown interpolation spectrum found: {setts.interpolation_spectrum}"
-        )
-        return _VALID_INTERP_SPECTRA[0]
+    logger.get_logger().error(
+        f"Unknown interpolation spectrum found: {setts.interpolation_spectrum}"
+    )
+    return _VALID_INTERP_SPECTRA[0]
 
 
 def set_interpolation_spectrum_name(spectrum: str):
