@@ -35,7 +35,10 @@ if sys.platform == 'linux':
         (src_path + 'coefficients/access_data/assets/coefficients.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/u_coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
-        (src_path + 'interpolation/access_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/access_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Breccia.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Composite.txt', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.ico'
@@ -69,7 +72,10 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'coefficients\\access_data\\assets\\coefficients.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\coefficients_cimel.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\u_coefficients_cimel.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
-        (src_path + 'interpolation\\access_data\\assets\\SomeMoonReflectances.txt', '.\\lime_tbx\\interpolation\\access_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\SomeMoonReflectances.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\Apollo16.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\Breccia.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\Composite.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
         (src_path + 'lime_algorithms\\rolo\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
     ]
     a_icon = src_path + 'gui\\assets\\lime_logo.ico'
@@ -101,7 +107,10 @@ elif sys.platform == 'darwin':
         (src_path + 'coefficients/access_data/assets/coefficients.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/u_coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
-        (src_path + 'interpolation/access_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/access_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Breccia.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Composite.txt', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.icns'

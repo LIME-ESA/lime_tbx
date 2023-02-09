@@ -20,6 +20,7 @@ include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_linux
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_darwin
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_darwin_arm
 include lime_tbx/eocfi_adapter/eocfi_c/bin/get_positions_win64.exe
-include lime_tbx/interpolation/access_data/assets/SomeMoonReflectances.txt
-include lime_tbx/interpolation/access_data/assets/Apollo16.txt
-include lime_tbx/interpolation/access_data/assets/Breccia.txt
+include lime_tbx/interpolation/interp_data/assets/SomeMoonReflectances.txt
+include lime_tbx/interpolation/interp_data/assets/Apollo16.txt
+include lime_tbx/interpolation/interp_data/assets/Breccia.txt
+include lime_tbx/interpolation/interp_data/assets/Composite.txt
