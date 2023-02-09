@@ -35,7 +35,7 @@ setup(
         "kiwisolver==1.4.4",
         "matplotlib==3.6.0",
         "mplcursors==0.5.2",
-        "netCDF4==1.6.0",
+        "netCDF4==1.5.8",
         "numdifftools==0.9.39",
         "numpy==1.23.4",
         "obsarray==0.2.2",
