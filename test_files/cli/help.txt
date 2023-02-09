@@ -27,4 +27,5 @@ Options:
 			   LGLOD (netcdf): -o nc,output_lglod.nc
   -f, --srf		 Select the file that contains the Spectral Response Function in GLOD format.
   -t, --timeseries	 Select a CSV file with multiple datetimes instead of inputing directly only one datetime. Valid only if the main option is -e or -s.
-  -C, --coefficients	 Select the coefficients version used.
+  -C, --coefficients	 Change the coefficients version used by the TBX, for this execution and the next ones until it's changed again.
+  -i, --interpolation	 Change the interpolation spectrum used by the TBX, for this execution and the next ones until it's changed again.

@@ -41,7 +41,7 @@ __status__ = "Development"
 
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
-OPTIONS = "hvude:l:s:c:o:f:t:C:"
+OPTIONS = "hvude:l:s:c:o:f:t:C:i:"
 LONG_OPTIONS = [
     "help",
     "version",
@@ -55,6 +55,7 @@ LONG_OPTIONS = [
     "srf=",
     "timeseries=",
     "coefficients=",
+    "interpolation=",
 ]
 _WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
@@ -187,7 +188,14 @@ in GLOD format."
         "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
 inputing directly only one datetime. Valid only if the main option is -e or -s."
     )
-    print("  -C, --coefficients\t Select the coefficients version used.")
+    print(
+        "  -C, --coefficients\t Change the coefficients version used by the TBX, \
+for this execution and the next ones until it's changed again."
+    )
+    print(
+        "  -i, --interpolation\t Change the interpolation spectrum used by the TBX, \
+for this execution and the next ones until it's changed again."
+    )
 
 
 def print_version():
@@ -800,6 +808,16 @@ class CLI:
                     )
                     return 1
                 self.settings_manager.select_lime_coeff(names.index(arg))
+            elif opt in ("-i", "--interpolation"):
+                names = [
+                    name for name in self.settings_manager.get_available_spectra_names()
+                ]
+                if arg not in names:
+                    eprint(
+                        f"Interpolation spectrum not recognized. Selected: {arg}. Available: {names}."
+                    )
+                    return 1
+                self.settings_manager.select_interp_spectrum(arg)
         if export_data == None:
             eprint("Error: The output flag (-o | --output) must be included.")
             return 1

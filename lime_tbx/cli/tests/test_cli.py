@@ -308,6 +308,18 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    def test_select_spectrum_err_earth_glod(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i inventedspectrum"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_select_spectrum.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
@@ -331,6 +343,15 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(errcode, 0)
         os.remove(os.path.join(".", "coeff_data", "selected.txt"))
+
+    def test_earth_glod_ok_select_spectrum(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i ASD"
+            )
+        )
+        self.assertEqual(errcode, 0)
 
     def test_earth_timeseries_glod_ok(self):
         cli = get_cli()
