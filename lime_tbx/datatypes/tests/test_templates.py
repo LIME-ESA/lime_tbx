@@ -9,7 +9,7 @@ import xarray
 import obsarray
 
 """___LIME_TBX Modules___"""
-from ..templates_digital_effects_table import (
+from ..templates import (
     TEMPLATE_POL,
     TEMPLATE_CIMEL,
     TEMPLATE_IRR,

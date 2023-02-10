@@ -23,7 +23,7 @@ from ..datatypes import (
     SpectralValidity,
 )
 from .. import constants
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
+from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

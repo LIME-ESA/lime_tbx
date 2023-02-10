@@ -13,13 +13,19 @@ from datetime import datetime, timezone
 import os
 import platform
 import subprocess
-
-"""___Third-Party Modules___"""
 import yaml
 
+"""___Third-Party Modules___"""
+# import here
+
 """___NPL Modules___"""
-from ..datatypes.datatypes import KernelsPath, LimeException, OrbitFile, Satellite
-from ..datatypes import logger
+from lime_tbx.datatypes.datatypes import (
+    KernelsPath,
+    LimeException,
+    OrbitFile,
+    Satellite,
+)
+from lime_tbx.datatypes import logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""

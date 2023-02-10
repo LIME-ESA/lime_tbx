@@ -7,7 +7,6 @@ import os
 from enum import Enum
 import glob
 import sys
-from lime_tbx.coefficients.update.update import IUpdate, Update
 
 """___Third-Party Modules___"""
 # import here
@@ -25,12 +24,13 @@ from lime_tbx.datatypes.datatypes import (
     SpectralData,
     SurfacePoint,
 )
+from lime_tbx.datatypes import constants, logger
 from lime_tbx.gui import settings
-from lime_tbx.simulation.lime_simulation import LimeSimulation
+from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
+from lime_tbx.simulation.comparison import comparison
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.simulation.comparison import comparison
-from lime_tbx.datatypes import constants, logger
+from lime_tbx.coefficients.update.update import IUpdate, Update
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -208,7 +208,7 @@ class CLI:
     ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
+        self.lime_simulation: ILimeSimulation = LimeSimulation(eocfi_path, kernels_path)
         self.settings_manager = settings.SettingsManager(selected_version)
         self.srf = self.settings_manager.get_default_srf()
 

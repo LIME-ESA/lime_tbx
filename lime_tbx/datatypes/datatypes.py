@@ -41,8 +41,8 @@ from ruamel.yaml import yaml_object
 
 
 """___LIME Modules___"""
-from . import constants
-from lime_tbx.datatypes.templates_digital_effects_table import (
+from lime_tbx.datatypes import constants
+from lime_tbx.datatypes.templates import (
     TEMPLATE_IRR,
     TEMPLATE_POL,
     TEMPLATE_REFL,

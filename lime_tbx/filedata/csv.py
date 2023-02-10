@@ -9,31 +9,23 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from typing import Union, List, Iterable
+from typing import Union, List
 from datetime import datetime, timezone
 import csv
 
 """___Third-Party Modules___"""
 import numpy as np
-import xarray
-import obsarray
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import (
-    ComparisonData,
-    LimeCoefficients,
+from lime_tbx.datatypes.datatypes import (
     Point,
-    PolarizationCoefficients,
     SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
-    LimeException,
 )
-from ..datatypes import logger
-from ..datatypes.datatypes import ReflectanceCoefficients
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

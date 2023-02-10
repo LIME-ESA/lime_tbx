@@ -6,9 +6,8 @@ from lime_tbx.datatypes.datatypes import (
     LimeCoefficients,
     ReflectanceCoefficients,
     PolarizationCoefficients,
-    LimeException,
 )
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
+from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 
 TEMPLATE_COEFFS = {
     "coeff": {

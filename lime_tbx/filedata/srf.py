@@ -14,11 +14,11 @@ import netCDF4 as nc
 import numpy as np
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     SRFChannel,
     SpectralResponseFunction,
 )
-from ..datatypes import logger
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

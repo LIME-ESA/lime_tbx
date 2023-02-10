@@ -1,4 +1,13 @@
+"""This module contains constant templates for the creation of datasets with obsarray"""
+
+"""___Built-In Modules___"""
+# import here
+
+"""___Third-Party Modules___"""
 import numpy as np
+
+"""___LIME Modules___"""
+# import here
 
 # define ds variables
 TEMPLATE_CIMEL = {

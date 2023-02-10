@@ -18,7 +18,7 @@ from lime_tbx.datatypes.datatypes import (
     PolarizationCoefficients,
     ReflectanceCoefficients,
 )
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
+from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import coefficients
 

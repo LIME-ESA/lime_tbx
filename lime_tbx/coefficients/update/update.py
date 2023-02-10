@@ -5,14 +5,13 @@ import os
 from abc import ABC, abstractmethod
 import requests
 from typing import Callable, Tuple
-from io import StringIO
 
 """___Third-Party Modules___"""
 # import here
 
 """___LIME Modules___"""
-from ..access_data import access_data
-from ...local_storage import programdata
+from lime_tbx.coefficients.access_data import access_data
+from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import coefficients
 from lime_tbx.datatypes import logger
 
