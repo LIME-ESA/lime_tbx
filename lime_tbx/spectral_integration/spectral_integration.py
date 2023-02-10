@@ -17,7 +17,6 @@ import punpy
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
-    SRFChannel,
     SpectralResponseFunction,
     SpectralData,
 )

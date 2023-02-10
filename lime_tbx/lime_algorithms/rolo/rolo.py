@@ -15,14 +15,13 @@ retrieval and comparison with a star photometer.
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from typing import List, Union
 
 """___Third-Party Modules___"""
-import numpy as np
+# import here
 
 """___LIME Modules___"""
-from . import eli, elref
-from ...datatypes.datatypes import (
+from lime_tbx.lime_algorithms.rolo import eli, elref
+from lime_tbx.datatypes.datatypes import (
     MoonData,
     ReflectanceCoefficients,
     SpectralData,

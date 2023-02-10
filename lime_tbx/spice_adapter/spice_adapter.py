@@ -18,7 +18,7 @@ import spiceypy as spice
 import numpy as np
 
 """___LIME_TBX Modules___"""
-from ..datatypes import datatypes
+from lime_tbx.datatypes import datatypes
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

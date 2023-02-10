@@ -8,15 +8,16 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-import math
 from typing import List, Union
 
 """___Third-Party Modules___"""
 import numpy as np
+
+"""___NPL Modules"""
 import punpy
 
 """___LIME Modules___"""
-from ...datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
     MoonData,
 )

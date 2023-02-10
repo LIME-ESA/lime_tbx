@@ -4,8 +4,6 @@
 from typing import List, Union, Tuple
 from abc import ABC, abstractmethod
 
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-
 """___Third-Party Modules___"""
 import numpy as np
 
@@ -13,7 +11,6 @@ import numpy as np
 from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     LGLODData,
-    LunarObservationWrite,
     MoonData,
     Point,
     PolarizationCoefficients,
@@ -33,6 +30,7 @@ from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
 __author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"

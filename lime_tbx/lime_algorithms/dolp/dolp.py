@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 """___NPL Modules___"""
-from ...datatypes.datatypes import PolarizationCoefficients, SpectralData
+from lime_tbx.datatypes.datatypes import PolarizationCoefficients, SpectralData
 
 """___Authorship___"""
 __author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"

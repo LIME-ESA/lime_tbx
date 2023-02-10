@@ -1,14 +1,19 @@
 """describe class"""
 
 """___Built-In Modules___"""
-import lime_tbx.interpolation.interp_data.interp_data as idata
+from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
-
+# import here
 
 """___NPL Modules___"""
 import punpy
 from comet_maths.interpolation.interpolation import Interpolator
+
+"""___LIME TBX Modules___"""
+import lime_tbx.interpolation.interp_data.interp_data as idata
+from lime_tbx.datatypes.datatypes import MoonData, SpectralData
+
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -16,9 +21,6 @@ __created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
-
-from abc import ABC, abstractmethod
-from ...datatypes.datatypes import MoonData, SpectralData
 
 
 class ISpectralInterpolation(ABC):

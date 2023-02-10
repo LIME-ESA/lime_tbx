@@ -6,9 +6,6 @@ from typing import List, Union, Tuple
 """___Third-Party Modules___"""
 # import here
 
-"""___NPL Modules___"""
-import punpy
-
 """___LIME Modules___"""
 from lime_tbx.datatypes.datatypes import (
     MoonData,

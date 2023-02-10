@@ -12,13 +12,11 @@ from abc import ABC, abstractmethod
 import math
 from typing import List, Callable
 
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-
 """___Third-Party Modules___"""
 import numpy as np
 
 """___NPL Modules___"""
-from ...datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     KernelsPath,
     LunarObservation,
@@ -28,9 +26,9 @@ from ...datatypes.datatypes import (
     SurfacePoint,
     SRFChannel,
 )
+from lime_tbx.datatypes import constants
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
-from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
-from ...datatypes import constants
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

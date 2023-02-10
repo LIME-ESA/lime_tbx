@@ -9,8 +9,8 @@ import os
 # import here
 
 """___LIME Modules___"""
-from ..datatypes import logger
-from . import appdata
+from lime_tbx.datatypes import logger
+from lime_tbx.local_storage import appdata
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
