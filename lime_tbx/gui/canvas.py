@@ -16,12 +16,11 @@ import numpy as np
 
 
 """___LIME_TBX Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     SpectralData,
 )
-from . import constants
-from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.gui import constants
 
 
 SUBTITLE_DATE_FORMAT = "%Y/%m/%d %H:%M:%S"
@@ -81,8 +80,8 @@ def redraw_canvas(
     sxlabel: str,
     sylabel: str,
     svertical_lines: List[float],
+    sp_name: str,
     subtitle: str = None,
-    sp_name: str = interp_data.SPECTRUM_NAME_ASD,
 ):
     lines = []
     if sdata is not None:

@@ -12,7 +12,7 @@ import subprocess
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
-from . import constants
+from lime_tbx.gui import constants
 from lime_tbx.datatypes import logger, constants as dtp_constants
 
 """___Authorship___"""

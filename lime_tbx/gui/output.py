@@ -13,7 +13,7 @@ import numpy as np
 import mplcursors
 
 """___LIME_TBX Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     Point,
     SpectralResponseFunction,
@@ -22,9 +22,9 @@ from ..datatypes.datatypes import (
     SpectralData,
 )
 from lime_tbx.gui.settings import ISettingsManager
-from ..filedata import csv
-from .ifaces import IMainSimulationsWidget
-from .canvas import (
+from lime_tbx.filedata import csv
+from lime_tbx.gui.ifaces import IMainSimulationsWidget
+from lime_tbx.gui.canvas import (
     MplCanvas,
     title_font_prop,
     label_font_prop,
@@ -212,8 +212,8 @@ class GraphWidget(QtWidgets.QWidget):
             self.xlabel,
             self.ylabel,
             self.vertical_lines,
-            self.subtitle,
             self.interp_spectrum_name,
+            self.subtitle,
         )
         try:
             self.canvas.fig.tight_layout()

@@ -9,10 +9,26 @@ from datetime import datetime, timezone
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
-from . import settings, output, input, srf, help, interpoptions
+from lime_tbx.gui import (
+    settings,
+    output,
+    input,
+    srf,
+    help,
+    interpoptions,
+    canvas,
+    coefficients,
+)
+from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
+from lime_tbx.gui.spinner import SpinnerPage
+from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
 from lime_tbx.filedata import moon, srf as srf_loader
-from ..simulation.comparison import comparison
-from ..datatypes.datatypes import (
+from lime_tbx.filedata.lglod_factory import create_lglod_data
+from lime_tbx.simulation.comparison import comparison
+from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
+from lime_tbx.eocfi_adapter import eocfi_adapter
+from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     KernelsPath,
     LGLODComparisonData,
@@ -27,17 +43,8 @@ from ..datatypes.datatypes import (
     SurfacePoint,
     ReflectanceCoefficients,
     SpectralData,
-    MoonData,
 )
-from ..eocfi_adapter import eocfi_adapter
-from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
-from lime_tbx.interpolation.interp_data import interp_data
-from .ifaces import IMainSimulationsWidget, noconflict_makecls
-from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.gui import canvas, coefficients
-from lime_tbx.gui.spinner import SpinnerPage
-from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
-from ..datatypes import logger, constants as logic_constants
+from lime_tbx.datatypes import logger, constants as logic_constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

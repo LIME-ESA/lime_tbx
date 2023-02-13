@@ -7,11 +7,11 @@ from typing import Union, Tuple
 from lime_tbx.filedata import moon
 
 """___Third-Party Modules___"""
-from typing import Callable, List, Optional
+from typing import Callable, List
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     LunarObservation,
     Point,
     Satellite,
@@ -24,7 +24,7 @@ from lime_tbx.gui.util import (
     CallbackWorker,
     start_thread as _start_thread,
 )
-from ..filedata import csv, srf
+from lime_tbx.filedata import csv, srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

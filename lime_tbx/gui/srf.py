@@ -8,10 +8,10 @@ from typing import Callable
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
-from ..filedata import srf as file_srf
-from ..datatypes.datatypes import SurfacePoint, CustomPoint, SpectralData
+from lime_tbx.filedata import srf as file_srf
+from lime_tbx.datatypes.datatypes import SpectralData
 from lime_tbx.datatypes import constants
-from . import settings, output
+from lime_tbx.gui import settings, output
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

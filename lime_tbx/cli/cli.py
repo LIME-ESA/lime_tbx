@@ -321,6 +321,7 @@ class CLI:
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
         canv.axes.cla()  # Clear the canvas.
+        sp_name = self.settings_manager.get_selected_spectrum_name()
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elrefs(),
@@ -332,6 +333,7 @@ class CLI:
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
             None,
+            sp_name,
         )
         try:
             canv.print_figure(ed.o_file_refl)
@@ -354,6 +356,7 @@ class CLI:
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
             None,
+            sp_name,
         )
         try:
             canv.print_figure(ed.o_file_irr)
@@ -376,6 +379,7 @@ class CLI:
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
             None,
+            sp_name,
         )
         try:
             canv.print_figure(ed.o_file_polar)
@@ -440,6 +444,7 @@ class CLI:
             xlabel,
             ylabel,
             None,
+            self.settings_manager.get_selected_spectrum_name(),
             subtitle,
         )
         try:
