@@ -193,10 +193,10 @@ def calculate_elref_unc(
             ucfs.c_coeffs,
             ucfs.d_coeffs,
             ucfs.p_coeffs,
-            None,
-            None,
-            None,
-            None,
+            0,  # These were None instead of 0
+            0,
+            0,
+            0,
         ],
         return_samples=True,
     )
