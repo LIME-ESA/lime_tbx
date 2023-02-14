@@ -16,7 +16,7 @@ from typing import Dict, Tuple
 """___Third-Party Modules___"""
 import numpy as np
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 # import here
 
 """___Authorship___"""

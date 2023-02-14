@@ -7,7 +7,7 @@ from typing import List
 """___Third-Party Modules___"""
 import numpy as np
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
     InterpolationSettings,
 )

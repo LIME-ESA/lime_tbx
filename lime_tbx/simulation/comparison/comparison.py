@@ -166,6 +166,8 @@ class Comparison(IComparison):
         callback_observation: Callable = None,
     ) -> List[ComparisonData]:
         """
+        Obtain a list of comparison data, each element corresponding to the comparisons of one channel.
+
         Parameters
         ----------
         observations: list of LunarObservations

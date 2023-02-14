@@ -8,7 +8,7 @@ import os
 """___Third-Party Modules___"""
 # import here
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes import logger
 from lime_tbx.local_storage import appdata
 

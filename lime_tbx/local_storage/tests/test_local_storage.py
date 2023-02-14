@@ -7,7 +7,7 @@ import sys
 """___Third-Party Modules___"""
 import unittest
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 from .. import appdata, programdata
 
 """___Authorship___"""

@@ -9,7 +9,7 @@ from typing import Callable, Tuple
 """___Third-Party Modules___"""
 # import here
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.coefficients.access_data import access_data
 from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import coefficients

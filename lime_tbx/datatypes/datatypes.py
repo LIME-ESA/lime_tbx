@@ -10,16 +10,26 @@ It exports the following classes:
     * SurfacePoint - Point on Earth's surface
     * CustomPoint - Point with custom Moon data.
     * SatellitePoint - Point of a Satellite in a concrete datetime
-    * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
     * OrbitFile - Satellite orbit file.
     * Satellite - ESA Satellite
     * SatellitePosition - A satellite's position
     * LunarObservation - GLOD lunar observation
-    * LunarObservationWrite - Dataclass containing the needed information to create a GLOD file.
+    * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
     * ReflectanceCoefficients - Dataclass containing the cimel coefficients that will be used in the
         reflectance simulation algorithm.
+    * LimeCoefficients - Dataclass containing a PolarizationCoefficients and a ReflectanceCoefficients.
     * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
     * ComparisonData - Dataclass containing the data outputed from a comparison.
+    * KernelsPath - Dataclass containing the needed information in order to find all SPICE kernels.
+    * SelenographicDataWrite - Extra data that allowes to define CustomPoints in the GLOD data file.
+    * LunarObservationWrite - Dataclass containing the needed information to create a Lunar observation
+        in a LGLOD file.
+    * LGLODData - Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format
+        used by the toolbox.
+    * LGLODComparisonData - Dataclass with the data of a LGLOD comparison file. LGLOD is the
+        GLOD-based format used by the toolbox.
+    * LimeException - Exception that is raised by the toolbox that is intended to be shown to the user.
+    * InterpolationSettings - Representation of the YAML file that contains the interpolation settings data.
 
 It exports the following Enums:
     * SpectralValidity - Enum that represents if a channel is inside LIME's spectral range.
@@ -35,12 +45,13 @@ from abc import ABC
 """___Third-Party Modules___"""
 import numpy as np
 import xarray
-import obsarray
 import ruamel.yaml as ruaml
 from ruamel.yaml import yaml_object
 
+"""___NPL Modules___"""
+import obsarray
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes import constants
 from lime_tbx.datatypes.templates import (
     TEMPLATE_IRR,
@@ -576,6 +587,19 @@ class PolarizationCoefficients:
 
 @dataclass
 class LimeCoefficients:
+    """
+    Coefficients used in the LIME algorithms.
+
+    Attributes
+    ----------
+    reflectance: ReflectanceCoefficients
+        Reflectance coefficients for the ROLO/LIME model.
+    polarization: PolatizationCoefficients
+        Polarization coefficients for the DoLP/LIME model.
+    version: str
+        Name of the version that will be shown to the user.
+    """
+
     reflectance: ReflectanceCoefficients
     polarization: PolarizationCoefficients
     version: str
@@ -703,7 +727,38 @@ class SpectralData:
 
 @dataclass
 class ComparisonData:
-    """Dataclass containing the data outputed from a comparison."""
+    """Dataclass containing the data outputed from a comparison.
+
+    The SpectralDatas "wlens" attribute is not a list of float, instead a list
+    of datetimes, corresponding to the measurements datetimes.
+
+    The comparison data corresponds to the compared data for multiple datetimes
+    for a single channel.
+
+    Attributes
+    ----------
+    observed_signal: SpectralData
+        Real data obtained from the GLOD files.
+    simulated_signal: SpectralData
+        Simulated data obtained from the model for the same conditions.
+    diffs_signal: SpectralData
+        Relative differences between the simulated and real data. (sim - real) / real.
+    mean_relative_difference: float
+        The mean of the relative differences (diffs_signals mean).
+    standard_deviation_mrd: float
+        Standard deviation of relative differences.
+    number_samples: int
+        Number of compared instances presnet in the object
+    dts: list of datetime
+        Datetimes of the different samples. They are also used as the "wlens" attribute
+        for the SpectraDatas.
+    points: list of SurfacePoint
+        Point for every datetime.
+    mpas: list of float
+        Moon phase angle in degrees for every datetime.
+    ampa_valid_range: list of bool
+        Flag that indicates if the moon phase angle is in the valid LIME range.
+    """
 
     observed_signal: SpectralData
     simulated_signal: SpectralData
@@ -712,14 +767,22 @@ class ComparisonData:
     standard_deviation_mrd: float
     number_samples: int
     dts: List[datetime]
-    points: List[Point]
+    points: List[SurfacePoint]
     mpas: List[float]
     ampa_valid_range: List[bool]
 
 
 @dataclass
 class KernelsPath:
-    """Dataclass containing the needed information in order to find all SPICE kernels."""
+    """Dataclass containing the needed information in order to find all SPICE kernels.
+
+    Attributes
+    ----------
+    main_kernels_path: str
+        Path where the main SPICE kernels are located (can be read-only).
+    custom_kernel_path: str
+        Path where the custom SPICE kernel will be stored (must be writeable).
+    """
 
     main_kernels_path: str
     custom_kernel_path: str
@@ -755,13 +818,21 @@ class LunarObservationWrite:
         Names of the channels present
     sat_pos_ref: str
         Name of the reference system (usually ITRF93)
-    ch_irrs: dict of str and float
-        Irradiances relative to each channel. The key is the channel name, and the irradiance
-        is given in Wm⁻²nm⁻¹.
     dt: datetime
         Datetime of the observation.
     sat_pos: SatellitePosition
         Satellite position at that moment.
+    irrs: SpectralData
+        Irradiance data
+    refls: SpectralData
+        Reflectance data
+    polars: SpectralData
+        Polarization data
+    sat_name: str | None
+        Name of the satellite. If None or empty, then it's a SurfacePoint
+    selenographic_data: SelenographicDataWrite | None
+        If a CustomPoint, data that allowes to define the point. If None then it's not selenographic
+        (not a CustomPoint).
     """
 
     ch_names: List[str]
@@ -771,8 +842,8 @@ class LunarObservationWrite:
     irrs: "SpectralData"
     refls: "SpectralData"
     polars: "SpectralData"
-    sat_name: str  # if None or empty: SurfacePoint
-    selenographic_data: SelenographicDataWrite  # if None: not selenographic
+    sat_name: str
+    selenographic_data: SelenographicDataWrite
 
     def has_ch_value(self, name: str) -> bool:
         return name in self.ch_names
@@ -791,17 +862,51 @@ class LunarObservationWrite:
 
 @dataclass
 class LGLODData:
+    """Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format used by the toolbox.
+
+    Attributes
+    ----------
+    observations: list of LunarObservationWrite
+        Spectral irradiance, reflectance and polarization for all the datetimes.
+    signals: SpectralData
+        SRF-Integrated irradiance data.
+    not_default_srf: bool
+        Flag that indicates if the spectral response function used is the default one or not (a custom user-selected one).
+    elis_cimel: list of SpectralData
+        Irradiance for the cimel.
+    elrefs_cimel: list of SpectralData
+        Reflectance for the cimel.
+    polars_cimel: list of SpectralData
+        Polarization for the cimel.
+    spectrum_name: str
+        Name of the spectrum used for interpolation.
+    """
+
     observations: List[LunarObservationWrite]
     signals: "SpectralData"
     not_default_srf: bool
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
     polars_cimel: List["SpectralData"]
-    spectrum_name: str  # interpolation spectrum
+    spectrum_name: str
 
 
 @dataclass
 class LGLODComparisonData:
+    """Dataclass with the data of a LGLOD comparison file. LGLOD is the GLOD-based format used by the toolbox.
+
+    Attributes
+    ----------
+    comparisons: list of ComparisonData
+        List of the comparison values.
+    ch_names: list of str
+        List with the names of the channels.
+    sat_name: str
+        Name of the satellite used for comparison.
+    spectrum_name: str
+        Name of the spectrum used for interpolation.
+    """
+
     comparisons: List[ComparisonData]
     ch_names: List[str]
     sat_name: str
@@ -809,6 +914,8 @@ class LGLODComparisonData:
 
 
 class LimeException(Exception):
+    """Exception that is raised by the toolbox that is intended to be shown to the user."""
+
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
@@ -819,6 +926,14 @@ yaml = ruaml.YAML()
 @yaml_object(yaml)
 @dataclass
 class InterpolationSettings:
+    """Representation of the YAML file that contains the interpolation settings data.
+
+    Attributes
+    ----------
+    interpolation_spectrum: str
+        Name (and id) of the spectrum used for interpolation.
+    """
+
     interpolation_spectrum: str
 
     def _save_disk(self, path: str):

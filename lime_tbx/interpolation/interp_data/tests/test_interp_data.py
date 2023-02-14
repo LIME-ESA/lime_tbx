@@ -7,7 +7,7 @@
 import unittest
 import numpy as np
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 from .. import interp_data as ipd
 
 """___Authorship___"""

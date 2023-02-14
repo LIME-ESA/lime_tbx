@@ -6,7 +6,7 @@
 """___Third-Party Modules___"""
 import unittest
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 from ..spectral_interpolation import SpectralInterpolation, ISpectralInterpolation
 from ....datatypes.datatypes import KernelsPath, MoonData
 

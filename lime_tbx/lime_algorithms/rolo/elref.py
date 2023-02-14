@@ -16,7 +16,7 @@ import numpy as np
 """___NPL Modules"""
 import punpy
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
     MoonData,

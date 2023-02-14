@@ -1,3 +1,5 @@
+"""This module contains the values of LIME Toolbox constants."""
+
 MIN_WLEN = 350
 MAX_WLEN = 2500
 CERTAIN_MIN_WLEN = 400

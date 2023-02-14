@@ -15,7 +15,7 @@ from typing import Union
 import numpy as np
 import punpy
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 from . import esi, elref
 from ...datatypes.datatypes import (
     MoonData,

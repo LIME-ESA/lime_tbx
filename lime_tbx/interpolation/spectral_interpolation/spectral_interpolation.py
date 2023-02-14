@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 import punpy
 from comet_maths.interpolation.interpolation import Interpolator
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 import lime_tbx.interpolation.interp_data.interp_data as idata
 from lime_tbx.datatypes.datatypes import MoonData, SpectralData
 

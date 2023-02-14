@@ -9,7 +9,7 @@ from http.server import HTTPServer as BaseHTTPServer, SimpleHTTPRequestHandler
 """___Third-Party Modules___"""
 import unittest
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 from ..update import Update, IUpdate
 
 """___Authorship___"""

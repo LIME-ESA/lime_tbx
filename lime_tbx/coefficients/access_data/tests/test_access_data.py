@@ -6,7 +6,7 @@ import os
 """___Third-Party Modules___"""
 import unittest
 
-"""___LIME TBX Modules___"""
+"""___LIME_TBX Modules___"""
 from ..access_data import AccessData, IAccessData
 from lime_tbx.filedata import coefficients
 
