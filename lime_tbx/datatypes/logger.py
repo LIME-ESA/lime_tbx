@@ -31,6 +31,8 @@ def _get_printout_logger() -> logging.Logger:
     handler.setFormatter(logging.Formatter(_FORMAT, _DATEFORMAT))
     logger = logging.getLogger("printout_logger")
     logger.setLevel(logging.WARNING)
+    for hdlr in logger.handlers:
+        logger.removeHandler(hdlr)
     logger.addHandler(handler)
     return logger
 
