@@ -582,7 +582,7 @@ class PolarizationCoefficients:
         return self.neg_unc[index]
 
     def is_calculable(self) -> bool:
-        return not np.isnan(self.pos_coeffs).any()
+        return not (np.isnan(self.pos_coeffs).any() or np.isnan(self.neg_coeffs).any())
 
 
 @dataclass

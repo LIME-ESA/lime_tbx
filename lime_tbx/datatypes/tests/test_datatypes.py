@@ -23,6 +23,7 @@ from ..datatypes import (
     SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
+    LunarObservationWrite,
 )
 from .. import constants
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
@@ -64,6 +65,12 @@ class TestSRFChannel(unittest.TestCase):
         )
         self.assertEqual(srfc.valid_spectre, SpectralValidity.VALID)
 
+    def test_creation_both_equal_max(self):
+        srfc = SRFChannel(
+            SRF_CENTER, SRF_ID, {MIN_WLEN: 0.5, MAX_WLEN: 0.5}, MIN_WLEN, MAX_WLEN
+        )
+        self.assertEqual(srfc.valid_spectre, SpectralValidity.VALID)
+
     def test_creation_partly(self):
         srfc = SRFChannel(
             SRF_CENTER,
@@ -91,7 +98,7 @@ class TestSpectralResponseFunction(unittest.TestCase):
             SRFChannel(
                 SRF_CENTER,
                 SRF_ID,
-                {MIN_WLEN: 0.5, MAX_WLEN - 1: 0.5},
+                {MIN_WLEN: 0.5, MAX_WLEN: 0.5},
                 MIN_WLEN,
                 MAX_WLEN,
             )
@@ -108,30 +115,6 @@ class TestSpectralResponseFunction(unittest.TestCase):
         ch_wlens = srf.get_wavelengths()
         self.assertEqual(len(ch_wlens), 2)
         self.assertEqual(ch_wlens[0], MIN_WLEN)
-
-
-COEF_WLENS = [350, 500, 650]
-POS_COEFFS = [(1, 2, 3, 4), (10, 2, 3, 4), (0.1, 2, 3, 4)]
-NEG_COEFFS = [(-1, -2, -3, -4), (-1, -2, -3, -4), (-1, -2, -3, -4)]
-UNCERTAINTIES = [(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)]
-_nounc_size = len(UNCERTAINTIES) * len(UNCERTAINTIES[0])
-ERR_CORR = np.zeros((_nounc_size, _nounc_size))
-
-
-class TestPolarizationCoefficients(unittest.TestCase):
-    def test_func(self):
-        coeffs = PolarizationCoefficients(
-            COEF_WLENS,
-            POS_COEFFS,
-            UNCERTAINTIES,
-            ERR_CORR,
-            NEG_COEFFS,
-            UNCERTAINTIES,
-            ERR_CORR,
-        )
-        self.assertEqual(coeffs.get_wavelengths(), COEF_WLENS)
-        self.assertEqual(coeffs.get_coefficients_positive(COEF_WLENS[0]), POS_COEFFS[0])
-        self.assertEqual(coeffs.get_coefficients_negative(COEF_WLENS[0]), NEG_COEFFS[0])
 
 
 DT1 = datetime(2000, 1, 16, 2, tzinfo=timezone.utc)
@@ -174,6 +157,13 @@ class TestLunarObservation(unittest.TestCase):
         self.assertTrue(lo.check_valid_srf(srf))
         srf.channels[0].id = "a"
         self.assertFalse(lo.check_valid_srf(srf))
+
+    def test_lunar_get_ch_irradiance_error(self):
+        stp = SatellitePosition(10000, 10000, 10000)
+        ch_names = ["default"]
+        ch_irrs = {ch_names[0]: 0.003}
+        lo = LunarObservation(ch_names, "ITRF93", ch_irrs, DT2, stp)
+        self.assertRaises(ValueError, lo.get_ch_irradiance, "")
 
 
 COEFF_LINE = np.array(
@@ -242,6 +232,109 @@ class TestReflectanceCoefficients(unittest.TestCase):
             a_coeffs_check = [d[i] for d in data]
             for j, a in enumerate(a_coeffs):
                 self.assertEqual(a, a_coeffs_check[j])
+
+
+COEF_WLENS = [350, 500, 650]
+POS_COEFFS = [(1, 2, 3, 4), (10, 2, 3, 4), (0.1, 2, 3, 4)]
+NEG_COEFFS = [(-1, -2, -3, -4), (-1, -2, -3, -4), (-1, -2, -3, -4)]
+UNCERTAINTIES = np.array([(1, 1, 2, 1), (2, 2, 3, 2), (3, 3, 4, 3)])
+_nounc_size = len(UNCERTAINTIES) * len(UNCERTAINTIES[0])
+ERR_CORR = np.random.random_sample((_nounc_size, _nounc_size))
+
+
+class TestPolarizationCoefficients(unittest.TestCase):
+    def test_polcoeffs_ok(self):
+        coeffs = PolarizationCoefficients(
+            COEF_WLENS,
+            POS_COEFFS,
+            UNCERTAINTIES,
+            ERR_CORR,
+            NEG_COEFFS,
+            UNCERTAINTIES * -1,
+            ERR_CORR * -1,
+        )
+        self.assertEqual(coeffs.get_wavelengths(), COEF_WLENS)
+        self.assertEqual(coeffs.get_coefficients_positive(COEF_WLENS[0]), POS_COEFFS[0])
+        self.assertEqual(coeffs.get_coefficients_negative(COEF_WLENS[0]), NEG_COEFFS[0])
+        np.testing.assert_array_equal(
+            coeffs.get_uncertainties_positive(COEF_WLENS[0]), UNCERTAINTIES[0]
+        )
+        np.testing.assert_array_equal(
+            coeffs.get_uncertainties_negative(COEF_WLENS[0]), -1 * UNCERTAINTIES[0]
+        )
+        self.assertTrue(coeffs.is_calculable())
+
+    def test_polcoeffs_not_calculable(self):
+        pos_coeffs = POS_COEFFS.copy()
+        pos_coeffs[2] = tuple(np.nan for _ in range(4))
+        coeffs = PolarizationCoefficients(
+            COEF_WLENS,
+            pos_coeffs,
+            UNCERTAINTIES,
+            ERR_CORR,
+            NEG_COEFFS,
+            UNCERTAINTIES * -1,
+            ERR_CORR * -1,
+        )
+        self.assertFalse(coeffs.is_calculable())
+        coeffs = PolarizationCoefficients(
+            COEF_WLENS,
+            POS_COEFFS,
+            UNCERTAINTIES,
+            ERR_CORR,
+            pos_coeffs,
+            UNCERTAINTIES * -1,
+            ERR_CORR * -1,
+        )
+        self.assertFalse(coeffs.is_calculable())
+
+
+LOW_WLENS = [350, 400, 500, 700]
+
+
+class TestLunarObservationWrite(unittest.TestCase):
+    def test_low_ok(self):
+        stp = SatellitePosition(10000, 10000, 10000)
+        ch_names = ["default"]
+        irrs = SpectralData(LOW_WLENS, [1, 2, 3, 4], [0, 1, 1, 2], None)
+        refls = SpectralData(LOW_WLENS, [2, 3, 4, 5], [-1, 0, 1, 1], None)
+        polars = SpectralData(LOW_WLENS, [3, 4, 5, 6], [-2, -1, 0, 1], None)
+        low = LunarObservationWrite(
+            ch_names,
+            "ITRF93",
+            DT1,
+            stp,
+            irrs,
+            refls,
+            polars,
+            None,
+            None,
+        )
+        self.assertTrue(low.has_ch_value("default"))
+        self.assertFalse(low.has_ch_value("3w"))
+
+        srfc = [
+            SRFChannel(
+                500,
+                "default",
+                {LOW_WLENS[0]: 0.5, LOW_WLENS[-1]: 0.5},
+                LOW_WLENS[0],
+                LOW_WLENS[-1],
+            )
+        ]
+        srf0 = SpectralResponseFunction("a", srfc)
+        srfc = [
+            SRFChannel(
+                500,
+                "default2",
+                {LOW_WLENS[0]: 0.5, LOW_WLENS[-1]: 0.5},
+                LOW_WLENS[0],
+                LOW_WLENS[-1],
+            )
+        ]
+        srf1 = SpectralResponseFunction("a", srfc)
+        self.assertTrue(low.check_valid_srf(srf0))
+        self.assertFalse(low.check_valid_srf(srf1))
 
 
 SPD_WAVS = np.array([350, 380, 400, 430, 450, 500, 600, 750, 800])
