@@ -39,7 +39,7 @@ class TestAppdata(unittest.TestCase):
 
     def test_is_valid_appdata_repo_not(self):
         self.assertFalse(
-            appdata._is_valid_appdata("./test_files/non_editable", get_logger())
+            appdata._is_valid_appdata("./test_files/non_editable/file", get_logger())
         )
 
     def test_platforms_get_appdata_folder(self):
