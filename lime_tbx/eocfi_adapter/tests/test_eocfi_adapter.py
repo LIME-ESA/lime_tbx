@@ -3,14 +3,13 @@
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-
 """___Third-Party Modules___"""
 import unittest
 
 """___LIME_TBX Modules___"""
 from ..eocfi_adapter import EOCFIConverter, IEOCFIConverter, _get_file_datetimes
-from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.datatypes.datatypes import KernelsPath, LimeException
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 
 """___Authorship___"""
@@ -90,6 +89,28 @@ class TestEOCFIConverter(unittest.TestCase):
                     h, supposed_h
                 )
             )
+
+    def test_get_satellite_position_naive_datetime(self):
+        eo = get_eocfi_converter()
+        self.assertRaises(
+            TypeError,
+            eo.get_satellite_position,
+            "SENTINEL-2A",
+            [datetime(2020, 1, 1, 1, 1, 1)],
+        )
+
+    def test_get_satellite_position_outrange(self):
+        eo = get_eocfi_converter()
+        self.assertRaises(
+            LimeException,
+            eo.get_satellite_position,
+            "SENTINEL-2A",
+            [datetime(2000, 1, 1, 1, 1, 1, tzinfo=timezone.utc)],
+        )
+
+    def test_get_satellite_position_non_existing_exception(self):
+        eo = get_eocfi_converter()
+        self.assertRaises(Exception, eo.get_satellite_position, "MISSINGSAT", [DT1])
 
     def test_get_satellite_position_true_data(self):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)

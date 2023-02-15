@@ -42,18 +42,20 @@ EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
 EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
 EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin_arm"
 
-if platform.system() == "Linux":
-    exe_file_satellite = EXE_FILE_SATELLITE_LINUX
-elif platform.system() == "Windows":
-    exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
-else:  # Darwin
-    if "ARM" in platform.version().upper():
-        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN_ARM
-    else:
-        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
-_current_dir = os.path.dirname(os.path.abspath(__file__))
-_exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
+def _get_exe_path() -> str:
+    if platform.system() == "Linux":
+        exe_file_satellite = EXE_FILE_SATELLITE_LINUX
+    elif platform.system() == "Windows":
+        exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
+    else:  # Darwin
+        if "ARM" in platform.version().upper():
+            exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN  # TODO compile in Mac ARM and add in correct path
+        else:
+            exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
+    _current_dir = os.path.dirname(os.path.abspath(__file__))
+    _exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
+    return _exe_path
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -73,6 +75,15 @@ def _to_mjd2000(dt: datetime) -> float:
 
 
 class IEOCFIConverter(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * get_sat_names() - Obtain the list of satellite names, that are the keys that can be used in
+            get_satellite_position
+        * get_sat_list() - Obtain a list of the satellite data objects that are available in LIME TBX.
+        * get_satellite_position() - Get the geographic satellite position for a concrete datetime.
+    """
+
     @abstractmethod
     def get_sat_names(self) -> List[str]:
         """
@@ -127,6 +138,15 @@ class IEOCFIConverter(ABC):
 
 
 class EOCFIConverter(IEOCFIConverter):
+    """Class that implements the methods of this module.
+
+    It exports the following functions:
+        * get_sat_names() - Obtain the list of satellite names, that are the keys that can be used in
+            get_satellite_position
+        * get_sat_list() - Obtain a list of the satellite data objects that are available in LIME TBX.
+        * get_satellite_position() - Get the geographic satellite position for a concrete datetime.
+    """
+
     def __init__(self, eocfi_path: str, kernels_path: KernelsPath):
         super().__init__()
         self.eocfi_path = eocfi_path
@@ -281,6 +301,7 @@ class EOCFIConverter(IEOCFIConverter):
             if tle_file != "":
                 tle_file = tle_file.replace("/", "\\")
         orbit_path = '"{}"'.format(orbit_path)
+        _exe_path = _get_exe_path()
         if tle_file == "":
             cmd = "{} {} {} {} {}".format(
                 _exe_path,
