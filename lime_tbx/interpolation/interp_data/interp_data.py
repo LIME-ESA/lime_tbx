@@ -1,4 +1,15 @@
-"""describe class"""
+"""Module in charge of retrieving interpolation data (spectra, etc) from storage.
+
+It exports the following functions:
+    * get_best_asd_data() - Retrieve the best ASD reflectance spectrum for the given moon phase angle.
+    * get_apollo16_data() - Retrieve the Apollo 16 spectrum.
+    * get_breccia_data() - Retrieve the Breccia spectrum.
+    * get_composite_data() - Retrieve the composite Apollo 16 + Breccia spectrum.
+    * get_available_spectra_names() - Obtain the spectra names that the user can use.
+    * get_interpolation_spectrum_name() - Obtains the currently chosen interpolation spectrum name.
+    * set_interpolation_spectrum_name() - Sets the spectrum name as the currently selected one.
+    * can_perform_polarization() - Checks if the currently selected spectrum supports polarization.
+"""
 
 """___Built-In Modules___"""
 import os
@@ -10,6 +21,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
     InterpolationSettings,
+    LimeException,
 )
 from lime_tbx.datatypes.datatypes import SpectralData
 from lime_tbx.local_storage import programdata
@@ -24,6 +36,18 @@ __status__ = "Development"
 
 
 def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
+    """Retrieve the best ASD reflectance spectrum for the given moon phase angle.
+
+    Parameters
+    ----------
+    moon_phase_angle: float
+        Moon phase angle in degrees of which the best ASD reflectance will be retrieved.
+
+    Returns
+    -------
+    spectral_data: SpectralData
+        Reflectance spectrum.
+    """
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(
         os.path.join(current_dir, "assets/SomeMoonReflectances.txt"), delimiter=","
@@ -48,6 +72,13 @@ def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
 
 
 def get_apollo16_data() -> SpectralData:
+    """Retrieve the Apollo 16 spectrum.
+
+    Returns
+    -------
+    spectral_data: SpectralData
+        Apollo 16 reflectance spectrum.
+    """
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(
         os.path.join(current_dir, "assets/Apollo16.txt"), delimiter=","
@@ -66,6 +97,13 @@ def get_apollo16_data() -> SpectralData:
 
 
 def get_breccia_data() -> SpectralData:
+    """Retrieve the Breccia spectrum.
+
+    Returns
+    -------
+    spectral_data: SpectralData
+        Apollo 16 reflectance spectrum.
+    """
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(os.path.join(current_dir, "assets/Breccia.txt"), delimiter=",")
     wavs = data[:, 0]
@@ -81,6 +119,14 @@ def get_breccia_data() -> SpectralData:
 
 
 def get_composite_data() -> SpectralData:
+    """Retrieve the composite Apollo 16 + Breccia spectrum.
+    95% Apollo 16 and 5% Breccia.
+
+    Returns
+    -------
+    spectral_data: SpectralData
+        Apollo 16 reflectance spectrum.
+    """
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(
         os.path.join(current_dir, "assets/Composite.txt"), delimiter=","
@@ -123,10 +169,24 @@ def _load_interp_settings() -> InterpolationSettings:
 
 
 def get_available_spectra_names() -> List[str]:
+    """Obtain the spectra names that the user can use.
+
+    Returns
+    -------
+    names: list of str
+        Valid interpolation spectra names.
+    """
     return _VALID_INTERP_SPECTRA.copy()
 
 
 def get_interpolation_spectrum_name() -> str:
+    """Obtains the currently chosen interpolation spectrum name.
+
+    Returns
+    -------
+    name: str
+        Currently chosen interpolation spectrum name.
+    """
     setts = _load_interp_settings()
     if setts.interpolation_spectrum in _VALID_INTERP_SPECTRA:
         return setts.interpolation_spectrum
@@ -137,16 +197,30 @@ def get_interpolation_spectrum_name() -> str:
 
 
 def set_interpolation_spectrum_name(spectrum: str):
+    """Sets the spectrum name as the currently selected one.
+
+    Parameters
+    ----------
+    spectrum: str
+        Spectrum name to set as chosen.
+    """
     setts = _load_interp_settings()
     if spectrum in _VALID_INTERP_SPECTRA:
         path = _get_interp_path()
         setts.interpolation_spectrum = spectrum
         setts._save_disk(path)
     else:
-        logger.get_logger().error(
-            f"Tried setting unknown interpolation spectrum: {spectrum}"
-        )
+        msg = f"Tried setting unknown interpolation spectrum: {spectrum}"
+        logger.get_logger().error(msg)
+        raise LimeException(msg)
 
 
 def can_perform_polarization() -> bool:
+    """Checks if the currently selected spectrum supports polarization.
+
+    Returns
+    -------
+    supports_polarization: bool
+        Indicator of support of polarization of the current spectrum.
+    """
     return get_interpolation_spectrum_name() == SPECTRUM_NAME_ASD
