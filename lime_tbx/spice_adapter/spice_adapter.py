@@ -29,6 +29,17 @@ __status__ = "Development"
 
 
 class ISPICEAdapter(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * get_moon_data_from_earth() - Calculate lunar data for a position on earth
+            surface at a concrete datetime.
+        * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
+        * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
+        * to_planetographic_multiple() - Transforms multiple rectangular coordinates
+            to planetographic coordinates.
+    """
+
     @staticmethod
     @abstractmethod
     def get_moon_data_from_earth(
@@ -145,6 +156,17 @@ class ISPICEAdapter(ABC):
 
 
 class SPICEAdapter(ISPICEAdapter):
+    """Class that implements the methods of this module.
+
+    It exports the following functions:
+        * get_moon_data_from_earth() - Calculate lunar data for a position on earth
+            surface at a concrete datetime.
+        * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
+        * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
+        * to_planetographic_multiple() - Transforms multiple rectangular coordinates
+            to planetographic coordinates.
+    """
+
     @staticmethod
     def get_moon_data_from_earth(
         latitude: float,
