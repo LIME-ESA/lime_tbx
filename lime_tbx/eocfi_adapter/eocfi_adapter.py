@@ -68,7 +68,8 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     return date0, date1
 
 
-def _to_mjd2000(dt: datetime) -> float:
+def _to_mjd2000(dt: datetime) -> float:  # pragma: no cover
+    # No automatic tests, but function conserved because mjd2000 is not well documented online
     mjd = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
     tdelta = dt - mjd
     return tdelta.total_seconds() / 86400
