@@ -1,8 +1,13 @@
-"""Module in charge of obtaining the path for the programfiles folder and the appdata folder"""
+"""Module in charge of obtaining the path for the programfiles folder and the appdata folder.
+
+It exports the following functions:
+    * get_programfiles_folder() - Get the path of the programfiles folder as a string.
+    * get_appdata_folder() - Get the path of the appdata folder as a string.
+"""
 
 """___Built-In Modules___"""
 import sys
-from os import path, environ
+from os import path
 import os
 
 """___Third-Party Modules___"""
@@ -82,7 +87,7 @@ def get_programfiles_folder() -> str:
                     valid = False
         if not valid:
             log.warning("Did not find LimeTBX key in winreg registry.")
-            programfiles = path.join(environ["PROGRAMFILES"], APPNAME)
+            programfiles = path.join(os.environ["PROGRAMFILES"], APPNAME)
     else:
         programfiles = path.join("/opt/esa", APPNAME)
     log.info("Programfiles: {}".format(programfiles))
