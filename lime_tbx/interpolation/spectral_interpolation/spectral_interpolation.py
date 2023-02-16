@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 import numpy as np
+from numpy.typing import NDArray
 
 """___NPL Modules___"""
 import punpy
@@ -84,12 +85,12 @@ class ISpectralInterpolation(ABC):
     @abstractmethod
     def get_interpolated_refl(
         self,
-        cimel_wav: np.ndarray[float],
-        cimel_refl: np.ndarray[float],
-        asd_wav: np.ndarray[float],
-        asd_refl: np.ndarray[float],
-        final_wav: np.ndarray[float],
-    ) -> np.ndarray[float]:
+        cimel_wav: NDArray[np.float_],
+        cimel_refl: NDArray[np.float_],
+        asd_wav: NDArray[np.float_],
+        asd_refl: NDArray[np.float_],
+        final_wav: NDArray[np.float_],
+    ) -> NDArray[np.float_]:
         """Interpolates the cimel_refl values to final_wav using the given interpolation spectrum data as reference.
 
         Parameters
@@ -115,16 +116,16 @@ class ISpectralInterpolation(ABC):
     @abstractmethod
     def get_interpolated_refl_unc(
         self,
-        cimel_wav: np.ndarray[float],
-        cimel_refl: np.ndarray[float],
-        asd_wav: np.ndarray[float],
-        asd_refl: np.ndarray[float],
-        final_wav: np.ndarray[float],
-        u_cimel_refl: np.ndarray[float],
-        u_asd_refl: np.ndarray[float],
+        cimel_wav: NDArray[np.float_],
+        cimel_refl: NDArray[np.float_],
+        asd_wav: NDArray[np.float_],
+        asd_refl: NDArray[np.float_],
+        final_wav: NDArray[np.float_],
+        u_cimel_refl: NDArray[np.float_],
+        u_asd_refl: NDArray[np.float_],
         corr_cimel_refl=None,
         corr_asd_refl=None,
-    ) -> np.ndarray[float]:
+    ) -> NDArray[np.float_]:
         """
         Calculate the uncertainties of the interpolation of the cimel_refl values to final_wav
         using the given interpolation spectrum data as reference.
@@ -196,12 +197,12 @@ class SpectralInterpolation(ISpectralInterpolation):
 
     def get_interpolated_refl(
         self,
-        cimel_wav: np.ndarray[float],
-        cimel_refl: np.ndarray[float],
-        asd_wav: np.ndarray[float],
-        asd_refl: np.ndarray[float],
-        final_wav: np.ndarray[float],
-    ) -> np.ndarray[float]:
+        cimel_wav: NDArray[np.float_],
+        cimel_refl: NDArray[np.float_],
+        asd_wav: NDArray[np.float_],
+        asd_refl: NDArray[np.float_],
+        final_wav: NDArray[np.float_],
+    ) -> NDArray[np.float_]:
         # from scipy import interpolate
         # f = interpolate.interp1d(cimel_wav, cimel_refl, fill_value="extrapolate")
         # yy = f(final_wav)
@@ -213,16 +214,16 @@ class SpectralInterpolation(ISpectralInterpolation):
 
     def get_interpolated_refl_unc(
         self,
-        cimel_wav: np.ndarray[float],
-        cimel_refl: np.ndarray[float],
-        asd_wav: np.ndarray[float],
-        asd_refl: np.ndarray[float],
-        final_wav: np.ndarray[float],
-        u_cimel_refl: np.ndarray[float],
-        u_asd_refl: np.ndarray[float],
+        cimel_wav: NDArray[np.float_],
+        cimel_refl: NDArray[np.float_],
+        asd_wav: NDArray[np.float_],
+        asd_refl: NDArray[np.float_],
+        final_wav: NDArray[np.float_],
+        u_cimel_refl: NDArray[np.float_],
+        u_asd_refl: NDArray[np.float_],
         corr_cimel_refl=None,
         corr_asd_refl=None,
-    ) -> np.ndarray[float]:
+    ) -> NDArray[np.float_]:
         u_yy, corr_yy = self.prop.propagate_random(
             self.intp.interpolate_1d_along_example,
             [cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav],

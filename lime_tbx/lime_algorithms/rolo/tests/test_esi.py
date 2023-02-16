@@ -1,4 +1,4 @@
-"""Tests for classname module"""
+"""Tests for the esi module"""
 
 """___Built-In Modules___"""
 # import here
@@ -8,13 +8,13 @@ import unittest
 import numpy as np
 
 """___LIME_TBX Modules___"""
-from .. import esi, elref, eli, rolo
+from .. import esi
 
 """___Authorship___"""
-__author__ = "Pieter De Vis"
+__author__ = "Javier Gatón Herguedas"
 __created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 WLENS0 = np.array([350, 370, 390, 410, 430, 450])
@@ -61,12 +61,6 @@ class TestESI(unittest.TestCase):
         for wlen in wehrli_first_vals:
             self.assertEqual(wehrli_first_vals[wlen], wehrli[wlen])
 
-
-class TestELRef(unittest.TestCase):
-    pass
-
-
-# TODO MAKE TESTS OF ELREF ELI AND ROLO
 
 if __name__ == "__main__":
     unittest.main()
