@@ -30,12 +30,32 @@ __status__ = "Development"
 
 
 class ISpectralIntegration(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * integrate_elis() - Integrate the irradiances and obtain the signal.
+        * u_integrate_elis() - Calculate the uncertainties of the irradiances integration.
+    """
+
     @abstractmethod
     def integrate_elis(
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         """
         Integrate the irradiances and obtain the signal.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral response function to integrate to
+        elis_lime: SpectralData
+            Data to integrate to the srf
+
+        Returns
+        -------
+        integr_data: list of float or list of list of float
+            Integrated signals. List of float if elis_lime.data values are floats,
+            list of list of float if they are lists or ndarrays.
         """
         pass
 
@@ -45,11 +65,26 @@ class ISpectralIntegration(ABC):
     ) -> Union[List[float], List[List[float]]]:
         """
         Calculate the uncertainties of the irradiances integration.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            Spectral response function to integrate to
+        elis_lime: SpectralData
+            Data to integrate to the srf
+
+        Returns
+        -------
+        u_integr_data: list of float or list of list of float
+            Uncertainties of the integrated signals. List of float if elis_lime.data
+            values are floats, list of list of float if they are lists or ndarrays.
         """
         pass
 
 
 class SpectralIntegration(ISpectralIntegration):
+    """Class that implements the methods exported by this module"""
+
     def __init__(self, MCsteps=1000):
         self.prop = punpy.MCPropagation(MCsteps)
 
