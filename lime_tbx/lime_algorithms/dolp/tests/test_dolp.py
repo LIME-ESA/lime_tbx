@@ -61,6 +61,7 @@ def get_dolp() -> IDOLP:
 
 class TestDolp(unittest.TestCase):
     # TODO Add the uncertainties comparation when implemented
+    # TODO Add comparisons to externally calculated data with the DOLP model.
 
     def test_get_polarized_cimel_10(self):
         d = get_dolp()
