@@ -13,7 +13,10 @@ import obsarray
 
 """___LIME_TBX Modules___"""
 from .. import elref
-from lime_tbx.datatypes.datatypes import ReflectanceCoefficients
+from lime_tbx.datatypes.datatypes import (
+    ReflectanceCoefficients,
+    MoonData,
+)
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 
 """___Authorship___"""
@@ -153,6 +156,21 @@ _UNC_DATA = np.zeros(_COEFFS.shape)
 _ERR_CORR_SIZE = len(WLENS) * len(_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
 
+ELREF_CHECK_DATA = np.array(
+    [
+        0.030732903677862477,
+        0.036489296613340674,
+        0.0492340672567728,
+        0.05826947690460127,
+        0.0642498981188091,
+        0.09576452090114816,
+    ]
+)
+CHECK_MD = MoonData(1, 400000, 1, 40, 30, 50, 50)
+CHECK_UNCS = np.array(
+    [6.9388939039072284e-18, 1.3877787807814457e-17, 1.3877787807814457e-17, 0, 0, 0]
+)
+
 
 def get_coeffs() -> ReflectanceCoefficients:
     dim_sizes = {
@@ -185,24 +203,12 @@ class TestELRef(unittest.TestCase):
             cfc.c_coeffs,
             cfc.d_coeffs,
             cfc.p_coeffs,
-            1,
-            30,
-            40,
-            50,
+            CHECK_MD.long_sun_radians,
+            CHECK_MD.long_obs,
+            CHECK_MD.lat_obs,
+            CHECK_MD.mpa_degrees,
         )
-        # np.set_printoptions(199)
-        # print(elref_val)
-        elref_check = np.array(
-            [
-                0.030732903677862477,
-                0.036489296613340674,
-                0.0492340672567728,
-                0.05826947690460127,
-                0.0642498981188091,
-                0.09576452090114816,
-            ]
-        )
-        np.testing.assert_array_equal(elref_val, elref_check)
+        np.testing.assert_array_equal(elref_val, ELREF_CHECK_DATA)
 
     def test_measurement_func_elref_one_wlen(self):
         cf = get_coeffs()
@@ -213,12 +219,12 @@ class TestELRef(unittest.TestCase):
             cfc.c_coeffs.T[0],
             cfc.d_coeffs.T[0],
             cfc.p_coeffs.T[0],
-            1,
-            30,
-            40,
-            50,
+            CHECK_MD.long_sun_radians,
+            CHECK_MD.long_obs,
+            CHECK_MD.lat_obs,
+            CHECK_MD.mpa_degrees,
         )
-        self.assertEqual(elref_val, 0.030732903677862477)
+        self.assertEqual(elref_val, ELREF_CHECK_DATA[0])
 
     def test_measurement_func_elref_one_multiple_same(self):
         cf = get_coeffs()
@@ -229,10 +235,10 @@ class TestELRef(unittest.TestCase):
             cfc.c_coeffs,
             cfc.d_coeffs,
             cfc.p_coeffs,
-            1,
-            30,
-            40,
-            50,
+            CHECK_MD.long_sun_radians,
+            CHECK_MD.long_obs,
+            CHECK_MD.lat_obs,
+            CHECK_MD.mpa_degrees,
         )
         elref_val = np.array(
             [
@@ -242,15 +248,25 @@ class TestELRef(unittest.TestCase):
                     cfc.c_coeffs.T[i],
                     cfc.d_coeffs.T[i],
                     cfc.p_coeffs.T[i],
-                    1,
-                    30,
-                    40,
-                    50,
+                    CHECK_MD.long_sun_radians,
+                    CHECK_MD.long_obs,
+                    CHECK_MD.lat_obs,
+                    CHECK_MD.mpa_degrees,
                 )
                 for i in range(len(cfc.a_coeffs.T))
             ]
         )
         np.testing.assert_array_equal(elref_val, elref_val_multiple)
+
+    def test_calculate_elref(self):
+        cf = get_coeffs()
+        elrefs = elref.calculate_elref(cf, CHECK_MD)
+        np.testing.assert_array_equal(elrefs, ELREF_CHECK_DATA)
+
+    def test_calculate_elref_unc(self):
+        cf = get_coeffs()
+        unc_elrefs = elref.calculate_elref_unc(cf, CHECK_MD)
+        np.testing.assert_array_equal(unc_elrefs, CHECK_UNCS)
 
 
 if __name__ == "__main__":

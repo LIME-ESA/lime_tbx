@@ -153,8 +153,8 @@ def calculate_elref_unc(
 
     Parameters
     ----------
-    cimel_coef: CimelCoef
-        CimelCoef with the CIMEL coefficients and uncertainties.
+    cimel_coef: ReflectanceCoefficients
+        ReflectanceCoefficients with the CIMEL coefficients and uncertainties.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance
 
