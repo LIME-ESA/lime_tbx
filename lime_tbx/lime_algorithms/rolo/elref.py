@@ -5,6 +5,8 @@ It exports the following functions:
     * calculate_elref - Calculates the expected extra-terrestrial lunar reflectance
     for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020 for the
     irradiance, then divided by the solar irradiance.
+    * calculate_elref_unc - Calculates the uncertainty for the reflectance
+    calculations of empirical data points.
 """
 
 """___Built-In Modules___"""
