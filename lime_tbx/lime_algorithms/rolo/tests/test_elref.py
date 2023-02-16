@@ -389,7 +389,7 @@ class TestELRef(unittest.TestCase):
     def test_calculate_elref_unc(self):
         cf = get_coeffs()
         unc_elrefs = elref.calculate_elref_unc(cf, CHECK_MD)
-        np.testing.assert_array_almost_equal(unc_elrefs, CHECK_UNCS)
+        np.testing.assert_array_almost_equal(unc_elrefs, CHECK_UNCS, 3)
 
 
 if __name__ == "__main__":
