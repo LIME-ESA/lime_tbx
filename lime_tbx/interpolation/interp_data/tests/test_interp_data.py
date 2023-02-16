@@ -1,4 +1,4 @@
-"""Tests for classname module"""
+"""Tests for interp_data module"""
 
 """___Built-In Modules___"""
 # import here
@@ -19,7 +19,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-class TestAccessData(unittest.TestCase):
+class TestInterpData(unittest.TestCase):
     def test_get_asd_data_ok(self):
         asd_data = ipd.get_best_asd_data(19)
         self.assertIsNotNone(asd_data)

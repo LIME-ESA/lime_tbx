@@ -1,10 +1,17 @@
-"""describe class"""
+"""Module in charge of performing spectral interpolation.
+
+It exports the following classes:
+    * ISpectralInterpolation - Interface that contains all the abstract functions
+        exported by this module.
+    * SpectralInterpolation - Class that implements all the functions exported by
+        this module.
+"""
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 import punpy
@@ -24,20 +31,138 @@ __status__ = "Development"
 
 
 class ISpectralInterpolation(ABC):
+    """Interface that contains all the abstract functions exported by this module.
+
+    It exports the following functions:
+        * get_best_interp_reference() - Get the best reflectance interpolation reference
+            for the given data for the currently selected interpolation spectrum.
+        * get_best_polar_interp_reference() - Get the best polarization interpolation
+            reference for the given data for the currently selected interpolation spectrum.
+        * get_interpolated_refl() - Interpolates the cimel values to final_wav using the
+            given spectrum data as reference.
+        * get_interpolated_refl_unc() - Calculate the uncertainties of the interpolation of
+            the cimel_refl values to final_wav using the given interpolation spectrum data
+            as reference.
+    """
+
     @abstractmethod
     def get_best_interp_reference(self, moon_data: MoonData) -> SpectralData:
+        """
+        Get the best reflectance interpolation reference for the given data for the currently
+        selected interpolation spectrum.
+
+        Parameters
+        ----------
+        moon_data: MoonData
+            Moon data for which the best interpolation reference will be returned.
+
+        Returns
+        -------
+        interp_reference: SpectralData
+            Best interpolation reference for the given data.
+        """
         pass
 
     @abstractmethod
     def get_best_polar_interp_reference(self, moon_data: MoonData) -> SpectralData:
+        """
+        Get the best polarization interpolation reference for the given data for the currently
+        selected interpolation spectrum.
+
+        Parameters
+        ----------
+        moon_data: MoonData
+            Moon data for which the best interpolation reference will be returned.
+
+        Returns
+        -------
+        interp_reference: SpectralData
+            Best interpolation reference for the given data.
+        """
         pass
 
     @abstractmethod
-    def get_interpolated_refl(cimel_refl, asd_reference):
+    def get_interpolated_refl(
+        self,
+        cimel_wav: np.ndarray[float],
+        cimel_refl: np.ndarray[float],
+        asd_wav: np.ndarray[float],
+        asd_refl: np.ndarray[float],
+        final_wav: np.ndarray[float],
+    ) -> np.ndarray[float]:
+        """Interpolates the cimel_refl values to final_wav using the given interpolation spectrum data as reference.
+
+        Parameters
+        ----------
+        cimel_wav: np.ndarray of float
+            Cimel wavelengths.
+        cimel_ref: np.ndarray of float
+            Cimel data values.
+        asd_wav: np.ndarray of float
+            Interpolation spectrum wavelengths.
+        asd_refl: np.ndarray of float
+            Interpolation spectrum data values.
+        final_wav: np.ndarray of float
+            Wavelengths at wich the data will be interpolated.
+
+        Returns
+        -------
+        interp_refl: np.ndarray of float
+            Interpolated data values for the final_wav wavelengths.
+        """
+        pass
+
+    @abstractmethod
+    def get_interpolated_refl_unc(
+        self,
+        cimel_wav: np.ndarray[float],
+        cimel_refl: np.ndarray[float],
+        asd_wav: np.ndarray[float],
+        asd_refl: np.ndarray[float],
+        final_wav: np.ndarray[float],
+        u_cimel_refl: np.ndarray[float],
+        u_asd_refl: np.ndarray[float],
+        corr_cimel_refl=None,
+        corr_asd_refl=None,
+    ) -> np.ndarray[float]:
+        """
+        Calculate the uncertainties of the interpolation of the cimel_refl values to final_wav
+        using the given interpolation spectrum data as reference.
+
+        Parameters
+        ----------
+        cimel_wav: np.ndarray of float
+            Cimel wavelengths.
+        cimel_ref: np.ndarray of float
+            Cimel data values.
+        asd_wav: np.ndarray of float
+            Interpolation spectrum wavelengths.
+        asd_refl: np.ndarray of float
+            Interpolation spectrum data values.
+        final_wav: np.ndarray of float
+            Wavelengths at wich the data would be interpolated.
+        u_cimel_refl: np.ndarray of float
+            Uncertainties of the cimel data.
+        u_asd_refl: np.ndarray of float
+            Uncertainties of the interpolation spectrum data.
+        corr_cimel_refl:
+            TODO
+            Error correlation of the cimel data
+        corr_asd_refl:
+            TODO
+            Error correlation of the interpolation spectrum data
+
+        Returns
+        -------
+        interp_refl_unc: np.ndarray of float
+            Uncertainties of the interpolated data values for the final_wav wavelengths.
+        """
         pass
 
 
 class SpectralInterpolation(ISpectralInterpolation):
+    """Class that implements all the functions exported by this module."""
+
     def __init__(
         self, relative=True, method_main="linear", method_hr="linear", MCsteps=1000
     ):
@@ -70,8 +195,13 @@ class SpectralInterpolation(ISpectralInterpolation):
         return self._get_best_polar_asd_reference(moon_data)
 
     def get_interpolated_refl(
-        self, cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav
-    ):
+        self,
+        cimel_wav: np.ndarray[float],
+        cimel_refl: np.ndarray[float],
+        asd_wav: np.ndarray[float],
+        asd_refl: np.ndarray[float],
+        final_wav: np.ndarray[float],
+    ) -> np.ndarray[float]:
         # from scipy import interpolate
         # f = interpolate.interp1d(cimel_wav, cimel_refl, fill_value="extrapolate")
         # yy = f(final_wav)
@@ -83,16 +213,16 @@ class SpectralInterpolation(ISpectralInterpolation):
 
     def get_interpolated_refl_unc(
         self,
-        cimel_wav,
-        cimel_refl,
-        asd_wav,
-        asd_refl,
-        final_wav,
-        u_cimel_refl,
-        u_asd_refl,
+        cimel_wav: np.ndarray[float],
+        cimel_refl: np.ndarray[float],
+        asd_wav: np.ndarray[float],
+        asd_refl: np.ndarray[float],
+        final_wav: np.ndarray[float],
+        u_cimel_refl: np.ndarray[float],
+        u_asd_refl: np.ndarray[float],
         corr_cimel_refl=None,
         corr_asd_refl=None,
-    ):
+    ) -> np.ndarray[float]:
         u_yy, corr_yy = self.prop.propagate_random(
             self.intp.interpolate_1d_along_example,
             [cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav],
