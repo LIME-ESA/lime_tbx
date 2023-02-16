@@ -9,6 +9,7 @@ import numpy as np
 
 """___LIME_TBX Modules___"""
 from .. import interp_data as ipd
+from lime_tbx.datatypes.datatypes import LimeException
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -55,6 +56,11 @@ class TestAccessData(unittest.TestCase):
         self.assertEqual(codata.data[1500], 0.14640)  # 500.00
         self.assertEqual(codata.data[-1], 0.36427)  # Last
 
+    def test_get_available_spectra_names(self):
+        names = ipd.get_available_spectra_names()
+        t_names = ["ASD", "Apollo 16", "Breccia", "Apollo 16 + Breccia"]
+        self.assertEqual(names, t_names)
+
     def test_change_spectrum_persistency(self):
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)
         self.assertEqual(ipd.get_interpolation_spectrum_name(), ipd.SPECTRUM_NAME_ASD)
@@ -73,6 +79,11 @@ class TestAccessData(unittest.TestCase):
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)
         self.assertEqual(ipd.get_interpolation_spectrum_name(), ipd.SPECTRUM_NAME_ASD)
 
+    def test_set_spectrum_non_existing(self):
+        self.assertRaises(
+            LimeException, ipd.set_interpolation_spectrum_name, "FakeSPectrum"
+        )
+
     def test_can_perform_polarization_only_asd(self):
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_APOLLO16)
         self.assertFalse(ipd.can_perform_polarization())
@@ -82,11 +93,6 @@ class TestAccessData(unittest.TestCase):
         self.assertFalse(ipd.can_perform_polarization())
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)
         self.assertTrue(ipd.can_perform_polarization())
-
-    def test_get_available_spectra_names(self):
-        names = ipd.get_available_spectra_names()
-        t_names = ["ASD", "Apollo 16", "Breccia", "Apollo 16 + Breccia"]
-        self.assertEqual(names, t_names)
 
 
 if __name__ == "__main__":
