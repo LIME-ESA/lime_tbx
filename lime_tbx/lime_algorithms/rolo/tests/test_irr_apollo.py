@@ -4,6 +4,8 @@ Cases based on Valladolid coordinates.
 Using RimoApp data so the coefficients are the ROLO ones. The RimoApp output contains only some wavelengths,
 and the only ones that are in the output that are also in the coefficients are 405 and 544 nm, so those are used.
 Before comparison the RimoApp output is divided by the apollo coefficients, so the correct data is compared.
+
+AEMET's RimoApp: https://testbed.aemet.es/rimoapp/
 """
 
 """___Built-In Modules___"""
