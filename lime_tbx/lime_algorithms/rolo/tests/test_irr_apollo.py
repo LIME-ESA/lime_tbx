@@ -11,7 +11,6 @@ AEMET's RimoApp: https://testbed.aemet.es/rimoapp/
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 from typing import List, Union
-import csv
 
 """___Third-Party Modules___"""
 import unittest
@@ -22,11 +21,10 @@ import xarray as xr
 import obsarray
 
 """___LIME_TBX Modules___"""
-from .. import rolo, eli, elref
+from .. import rolo
 from lime_tbx.datatypes.datatypes import (
     MoonData,
     KernelsPath,
-    SpectralData,
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
