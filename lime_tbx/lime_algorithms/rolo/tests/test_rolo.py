@@ -1,4 +1,4 @@
-"""Tests for the elref module"""
+"""Tests for the rolo module. Checking that the output is the same as if calling the submodules."""
 
 """___Built-In Modules___"""
 # import here
@@ -8,26 +8,19 @@ import unittest
 import numpy as np
 import xarray as xr
 
-"""___NPL Modules"""
+"""___NPL Modules___"""
 import obsarray
 
 """___LIME_TBX Modules___"""
-from .. import elref
+from .. import rolo, eli, elref
 from lime_tbx.datatypes.datatypes import (
-    ReflectanceCoefficients,
     MoonData,
+    SpectralData,
+    ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas"
-__created__ = "16/02/2023"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
-
-
-WLENS = [440, 500, 675, 870, 1020, 1640]
+WLENS = np.array([440, 500, 675, 870, 1020, 1640])
 _COEFFS = np.array(
     [
         [
@@ -278,6 +271,7 @@ _UNC_DATA = np.array(
 ).T
 _ERR_CORR_SIZE = len(WLENS) * len(_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
+_ERR_CORR_ONE = np.zeros((len(_COEFFS), len(_COEFFS)))
 
 ELREF_CHECK_DATA = np.array(
     [
@@ -293,6 +287,25 @@ CHECK_MD = MoonData(1, 400000, 1, 40, 30, 50, 50)
 CHECK_UNCS = np.array(
     [0.00028234, 0.00033419, 0.00041053, 0.00050497, 0.00045305, 0.00069454]
 )
+
+
+def get_coeffs_one() -> ReflectanceCoefficients:
+    dim_sizes = {
+        "wavelength": 1,
+        "i_coeff": len(_COEFFS),
+        "i_coeff.wavelength": 1 * len(_COEFFS),
+    }
+    data = _COEFFS.T[0:1].T
+    u_data = _UNC_DATA.T[0:1].T
+    err_corr_coeff = _ERR_CORR_ONE
+    # create dataset
+    ds_cimel: xr.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
+    ds_cimel = ds_cimel.assign_coords(wavelength=[WLENS[0]])
+    ds_cimel.coeff.values = data
+    ds_cimel.u_coeff.values = u_data
+    ds_cimel.err_corr_coeff.values = err_corr_coeff
+    rf = ReflectanceCoefficients(ds_cimel)
+    return rf
 
 
 def get_coeffs() -> ReflectanceCoefficients:
@@ -314,82 +327,46 @@ def get_coeffs() -> ReflectanceCoefficients:
     return rf
 
 
-class TestELRef(unittest.TestCase):
-    # TODO Add tests with values calculated outside this implementation.
+class TestROLO(unittest.TestCase):
+    def test_elref_one(self):
+        rc = get_coeffs_one()
+        elref_vals = elref.calculate_elref(rc, CHECK_MD)
+        elref_uncs = elref.calculate_elref_unc(rc, CHECK_MD)
+        sd = rolo.ROLO().get_elrefs(rc, CHECK_MD)
+        np.testing.assert_array_equal(elref_vals, sd.data)
+        np.testing.assert_array_almost_equal(elref_uncs, sd.uncertainties, 4)
 
-    def test_measurement_func_elref_all_wlens(self):
-        cf = get_coeffs()
-        cfc = cf.coeffs
-        elref_val = elref._measurement_func_elref(
-            cfc.a_coeffs,
-            cfc.b_coeffs,
-            cfc.c_coeffs,
-            cfc.d_coeffs,
-            cfc.p_coeffs,
-            CHECK_MD.long_sun_radians,
-            CHECK_MD.long_obs,
-            CHECK_MD.lat_obs,
-            CHECK_MD.mpa_degrees,
+    def test_elref_multiple(self):
+        rc = get_coeffs()
+        elref_vals = elref.calculate_elref(rc, CHECK_MD)
+        elref_uncs = elref.calculate_elref_unc(rc, CHECK_MD)
+        sd = rolo.ROLO().get_elrefs(rc, CHECK_MD)
+        np.testing.assert_array_equal(elref_vals, sd.data)
+        np.testing.assert_array_almost_equal(elref_uncs, sd.uncertainties, 4)
+
+    def test_eli_one(self):
+        ds = SpectralData.make_reflectance_ds(
+            WLENS[0:1], ELREF_CHECK_DATA[0:1], unc_rand=CHECK_UNCS[0:1]
         )
-        np.testing.assert_array_equal(elref_val, ELREF_CHECK_DATA)
-
-    def test_measurement_func_elref_one_wlen(self):
-        cf = get_coeffs()
-        cfc = cf.coeffs
-        elref_val = elref._measurement_func_elref(
-            cfc.a_coeffs.T[0],
-            cfc.b_coeffs.T[0],
-            cfc.c_coeffs.T[0],
-            cfc.d_coeffs.T[0],
-            cfc.p_coeffs.T[0],
-            CHECK_MD.long_sun_radians,
-            CHECK_MD.long_obs,
-            CHECK_MD.lat_obs,
-            CHECK_MD.mpa_degrees,
+        elref_spectrum = SpectralData(
+            WLENS[0:1], ELREF_CHECK_DATA[0:1], CHECK_UNCS[0:1], ds
         )
-        self.assertEqual(elref_val, ELREF_CHECK_DATA[0])
+        eli_vals = eli.calculate_eli_from_elref(WLENS[0], CHECK_MD, ELREF_CHECK_DATA[0])
+        eli_uncs = eli.calculate_eli_from_elref_unc(elref_spectrum, CHECK_MD)
+        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD)
+        np.testing.assert_array_equal(eli_vals, sd.data)
+        np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 
-    def test_measurement_func_elref_one_multiple_same(self):
-        cf = get_coeffs()
-        cfc = cf.coeffs
-        elref_val_multiple = elref._measurement_func_elref(
-            cfc.a_coeffs,
-            cfc.b_coeffs,
-            cfc.c_coeffs,
-            cfc.d_coeffs,
-            cfc.p_coeffs,
-            CHECK_MD.long_sun_radians,
-            CHECK_MD.long_obs,
-            CHECK_MD.lat_obs,
-            CHECK_MD.mpa_degrees,
+    def test_eli_multiple(self):
+        ds = SpectralData.make_reflectance_ds(
+            WLENS, ELREF_CHECK_DATA, unc_rand=CHECK_UNCS
         )
-        elref_val = np.array(
-            [
-                elref._measurement_func_elref(
-                    cfc.a_coeffs.T[i],
-                    cfc.b_coeffs.T[i],
-                    cfc.c_coeffs.T[i],
-                    cfc.d_coeffs.T[i],
-                    cfc.p_coeffs.T[i],
-                    CHECK_MD.long_sun_radians,
-                    CHECK_MD.long_obs,
-                    CHECK_MD.lat_obs,
-                    CHECK_MD.mpa_degrees,
-                )
-                for i in range(len(cfc.a_coeffs.T))
-            ]
-        )
-        np.testing.assert_array_equal(elref_val, elref_val_multiple)
-
-    def test_calculate_elref(self):
-        cf = get_coeffs()
-        elrefs = elref.calculate_elref(cf, CHECK_MD)
-        np.testing.assert_array_equal(elrefs, ELREF_CHECK_DATA)
-
-    def test_calculate_elref_unc(self):
-        cf = get_coeffs()
-        unc_elrefs = elref.calculate_elref_unc(cf, CHECK_MD)
-        np.testing.assert_array_almost_equal(unc_elrefs, CHECK_UNCS, 4)
+        elref_spectrum = SpectralData(WLENS, ELREF_CHECK_DATA, CHECK_UNCS, ds)
+        eli_vals = eli.calculate_eli_from_elref(WLENS, CHECK_MD, ELREF_CHECK_DATA)
+        eli_uncs = eli.calculate_eli_from_elref_unc(elref_spectrum, CHECK_MD)
+        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD)
+        np.testing.assert_array_equal(eli_vals, sd.data)
+        np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 
 
 if __name__ == "__main__":
