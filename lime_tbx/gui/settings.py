@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from typing import List
+import os
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -127,12 +128,13 @@ class SettingsManager(ISettingsManager):
         self.polar_coeff = self.coeffs[index].polarization
 
     def get_default_srf(self) -> SpectralResponseFunction:
-        spectral_response = {
-            i: 1.0
-            for i in np.arange(
-                constants.MIN_WLEN, constants.MAX_WLEN + DEF_SRF_STEP, DEF_SRF_STEP
-            )
-        }
+        dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        dir_path = os.path.join(dir_path, "spectral_integration", "assets")
+        data = np.genfromtxt(
+            os.path.join(dir_path, "interpolated_model_fwhm.csv"), delimiter=","
+        )
+        wavs = data[:, 0]
+        spectral_response = {i: 1.0 for i in wavs}
         ch = SRFChannel(
             (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
             constants.DEFAULT_SRF_NAME,

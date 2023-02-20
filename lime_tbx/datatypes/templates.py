@@ -21,7 +21,12 @@ TEMPLATE_CIMEL = {
         "dim": ["i_coeff", "wavelength"],
         "attrs": {"units": "%"},
         "err_corr": [
-            {"dim": "wavelength", "form": "random", "params": [], "units": []}
+            {
+                "dim": ["i_coeff", "wavelength"],
+                "form": "err_corr_matrix",
+                "params": ["err_corr_coeff"],
+                "units": [],
+            }
         ],
     },
     "err_corr_coeff": {
@@ -30,27 +35,29 @@ TEMPLATE_CIMEL = {
     },
 }
 
+
 TEMPLATE_REFL = {
     "reflectance": {
         "dtype": np.float32,
         "dim": ["wavelength"],
-        "attrs": {"units": [], "u_components": ["u_coeff"]},
+        "attrs": {"units": [], "u_components": ["u_reflectance"]},
     },
-    "u_ran_reflectance": {
+    "u_reflectance": {
         "dtype": np.float32,
         "dim": ["wavelength"],
         "attrs": {"units": "%"},
         "err_corr": [
-            {"dim": "wavelength", "form": "random", "params": [], "units": []}
+            {
+                "dim": "wavelength",
+                "form": "err_corr_matrix",
+                "params": ["err_corr_reflectance"],
+                "units": [],
+            }
         ],
     },
-    "u_sys_reflectance": {
+    "err_corr_reflectance": {
+        "dim": ["wavelength", "wavelength"],
         "dtype": np.float32,
-        "dim": ["wavelength"],
-        "attrs": {"units": "%"},
-        "err_corr": [
-            {"dim": "wavelength", "form": "systematic", "params": [], "units": []}
-        ],
     },
 }
 
@@ -58,23 +65,24 @@ TEMPLATE_IRR = {
     "irradiance": {
         "dtype": np.float32,
         "dim": ["wavelength"],
-        "attrs": {"units": [], "u_components": ["u_coeff"]},
+        "attrs": {"units": [], "u_components": ["u_irradiance"]},
     },
-    "u_ran_irradiance": {
+    "u_irradiance": {
         "dtype": np.float32,
         "dim": ["wavelength"],
         "attrs": {"units": "%"},
         "err_corr": [
-            {"dim": "wavelength", "form": "random", "params": [], "units": []}
+            {
+                "dim": "wavelength",
+                "form": "err_corr_matrix",
+                "params": ["err_corr_irradiance"],
+                "units": [],
+            }
         ],
     },
-    "u_sys_irradiance": {
+    "err_corr_irradiance": {
+        "dim": ["wavelength", "wavelength"],
         "dtype": np.float32,
-        "dim": ["wavelength"],
-        "attrs": {"units": "%"},
-        "err_corr": [
-            {"dim": "wavelength", "form": "systematic", "params": [], "units": []}
-        ],
     },
 }
 

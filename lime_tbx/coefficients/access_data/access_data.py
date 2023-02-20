@@ -153,19 +153,15 @@ def _get_default_polarization_coefficients() -> PolarizationCoefficients:
 
 
 def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoefficients:
-    # define dim_size_dict to specify size of arrays
-    dim_sizes = {
-        "wavelength": 6,
-        "i_coeff": 18,
-        "i_coeff.wavelength": 18 * 6,
-    }
-    # create dataset
-    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
-
-    # TODO FIX THE EXTRAPOLATION
-    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
+    # TODO FIX THE EXTRAPOLATION ?
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    # read dataset with error correlation info (the error correlations will not be updated)
+    ds_cimel = xarray.open_dataset(
+        os.path.join(current_dir, "assets/ds_cimel_coeff.nc")
+    )
+
+    # read in updates on cimel coeff and uncs
     data = np.genfromtxt(os.path.join(current_dir, filepath), delimiter=",")
     u_data = np.genfromtxt(os.path.join(current_dir, u_filepath), delimiter=",")
 
