@@ -121,31 +121,32 @@ class IComparison(ABC):
     def get_simulations(
         self,
         observations: List[LunarObservation],
-        def_srf: SpectralResponseFunction,
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
+        callback_observation: Callable = None,
     ) -> List[ComparisonData]:
         """
-        Simulate the moon irradiance for the given scenarios.
+        Obtain a list of comparison data for the given observation scenarios,
+        each element corresponding to the comparisons of one channel.
 
         Parameters
         ----------
-        observations: list of MoonObservation
-            MoonObservations read from a GLOD datafile.
-        def_srf: SpectralResponseFunction
-            SpectralResponseFunction that corresponds to the default spectrum.
+        observations: list of LunarObservations
+            LunarObservations read from a GLOD datafile.
         srf: SpectralResponseFunction
-            SpectralResponseFunction that corresponds to the observations file
+            SpectralResponseFunction that is used.
         coefficients: ReflectanceCoefficients
-            Coefficients to be used
+            Coefficients to be used.
         lime_simulation: ILimeSimulation
             Lime simulation instance, storing the current state of the simulation.
+        callback_observation: Callable
+            Function that will be called once for every observation when simulated.
 
         Returns
         -------
         comparisons: list of ComparisonData
-            List containing all comparisons of all channels
+            List of ComparisonData, each element corresponding to the comparisons of one channel.
         """
         pass
 
@@ -178,18 +179,6 @@ class Comparison(IComparison):
         lime_simulation: ILimeSimulation,
         callback_observation: Callable = None,
     ) -> List[ComparisonData]:
-        """
-        Obtain a list of comparison data, each element corresponding to the comparisons of one channel.
-
-        Parameters
-        ----------
-        observations: list of LunarObservations
-        srf: SpectralResponseFunction
-        coefficients: ReflectanceCoefficients
-        lime_simulation: ILimeSimulation
-        callback_observation: Callable
-            Function that will be called once for every observation when simulated.
-        """
         ch_names = srf.get_channels_names()
         comparisons = []
         sigs = [[] for _ in ch_names]

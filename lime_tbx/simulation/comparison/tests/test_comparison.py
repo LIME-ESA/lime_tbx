@@ -41,7 +41,14 @@ CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
 CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 SP = SatellitePosition(3753240, -196698.975, 5138362)
 DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
+DT2 = datetime(2022, 2, 16, 2, tzinfo=timezone.utc)
 OBS1 = LunarObservation(["default"], "ITRF93", {"Default": 0.000001}, DT1, SP)
+OBS2 = LunarObservation(
+    ["first", "second"], "ITRF93", {"First": 0.000001, "Second": 0.000002}, DT1, SP
+)
+OBS3 = LunarObservation(
+    ["first", "second"], "ITRF93", {"First": 0.0000012, "Second": 0.0000025}, DT2, SP
+)
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 
 
@@ -53,6 +60,15 @@ def get_srf() -> SpectralResponseFunction:
     spectral_response = {CH_WLENS[i]: CH_SRF[i] for i in range(len(CH_SRF))}
     ch = SRFChannel((CH_WLENS[-1] - CH_WLENS[0]) / 2, "Default", spectral_response)
     return SpectralResponseFunction("default", [ch])
+
+
+def get_second_srf() -> SpectralResponseFunction:
+    half = len(CH_SRF) // 2
+    spectral_response1 = {CH_WLENS[i]: CH_SRF[i] for i in range(half)}
+    ch1 = SRFChannel((CH_WLENS[half] - CH_WLENS[0]) / 2, "First", spectral_response1)
+    spectral_response2 = {CH_WLENS[i]: CH_SRF[i] for i in range(half, len(CH_SRF))}
+    ch2 = SRFChannel((CH_WLENS[-1] - CH_WLENS[half]) / 2, "Second", spectral_response2)
+    return SpectralResponseFunction("default", [ch1, ch2])
 
 
 def get_cimel_coeffs() -> ReflectanceCoefficients:
@@ -123,6 +139,62 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(comp.dts[0], OBS1.dt)
         self.assertEqual(comp.number_samples, 1)
         self.assertEqual(comp.observed_signal.data[0], OBS1.ch_irrs["Default"])
+
+    def test_get_simulations_multiple_obs_and_channels(self):
+        co = get_comparison()
+        lime = get_lime_simulation()
+        srf = get_second_srf()
+        coeffs = get_cimel_coeffs()
+        comps = co.get_simulations([OBS2, OBS3], srf, coeffs, lime)
+        self.assertEqual(len(comps), 2)
+        comp: ComparisonData = comps[0]
+        self.assertEqual(len(comp.dts), 2)
+        self.assertEqual(comp.dts[0], OBS2.dt)
+        self.assertEqual(comp.number_samples, 2)
+        self.assertEqual(comp.observed_signal.data[0], OBS2.ch_irrs["First"])
+        self.assertEqual(comp.observed_signal.data[1], OBS3.ch_irrs["First"])
+        self.assertEqual(comps[1].observed_signal.data[0], OBS2.ch_irrs["Second"])
+        self.assertEqual(comps[1].observed_signal.data[1], OBS3.ch_irrs["Second"])
+
+    def test_get_simulations_other_srf(self):
+        # Wrong srf in comparisons output empty comparison data instances.
+        co = get_comparison()
+        lime = get_lime_simulation()
+        srf = get_second_srf()
+        coeffs = get_cimel_coeffs()
+        comps = co.get_simulations([OBS1], srf, coeffs, lime)
+        self.assertEqual(len(comps), 2)
+        for comp in comps:
+            self.assertEqual(len(comp.ampa_valid_range), 0)
+            self.assertIsNone(comp.diffs_signal)
+            self.assertEqual(len(comp.dts), 0)
+            self.assertIsNone(comp.mean_relative_difference)
+            self.assertEqual(len(comp.mpas), 0)
+            self.assertIsNone(comp.number_samples)
+            self.assertIsNone(comp.observed_signal)
+            self.assertEqual(len(comp.points), 0)
+            self.assertIsNone(comp.simulated_signal)
+            self.assertIsNone(comp.standard_deviation_mrd)
+
+    def test_get_simulations_empty(self):
+        # No observations input outputs empty comparison data instances.
+        co = get_comparison()
+        lime = get_lime_simulation()
+        srf = get_srf()
+        coeffs = get_cimel_coeffs()
+        comps = co.get_simulations([], srf, coeffs, lime)
+        self.assertEqual(len(comps), 1)
+        for comp in comps:
+            self.assertEqual(len(comp.ampa_valid_range), 0)
+            self.assertIsNone(comp.diffs_signal)
+            self.assertEqual(len(comp.dts), 0)
+            self.assertIsNone(comp.mean_relative_difference)
+            self.assertEqual(len(comp.mpas), 0)
+            self.assertIsNone(comp.number_samples)
+            self.assertIsNone(comp.observed_signal)
+            self.assertEqual(len(comp.points), 0)
+            self.assertIsNone(comp.simulated_signal)
+            self.assertIsNone(comp.standard_deviation_mrd)
 
     # Function sort by mpa
     def test_sort_by_mpa_ok(self):
