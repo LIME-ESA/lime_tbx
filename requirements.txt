@@ -2,6 +2,7 @@ certifi==2022.6.15
 cftime==1.6.1
 comet-maths==0.14
 cycler==0.11.0
+Deprecated==1.2.13
 fonttools==4.37.1
 joblib==1.1.0
 kiwisolver==1.4.4
@@ -30,4 +31,5 @@ sklearn==0.0
 spicedmoon==1.0.3
 spiceypy==5.1.2
 threadpoolctl==3.1.0
+wrapt==1.14.1
 xarray==2022.10.0

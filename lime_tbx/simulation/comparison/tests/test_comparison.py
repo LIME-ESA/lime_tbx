@@ -2,6 +2,8 @@
 
 """___Built-In Modules___"""
 from datetime import datetime, timezone
+import random
+from typing import Tuple
 
 """___Third-Party Modules___"""
 import unittest
@@ -18,6 +20,7 @@ from ....datatypes.datatypes import (
     ReflectanceCoefficients,
     SatellitePoint,
     KernelsPath,
+    SpectralData,
 )
 from ....coefficients.access_data.access_data import _get_demo_cimel_coeffs
 from ...lime_simulation import LimeSimulation, ILimeSimulation
@@ -61,29 +64,48 @@ def get_lime_simulation() -> ILimeSimulation:
     return LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=False)
 
 
+def get_random_spectral_data_dts(
+    n_elems: int = 30,
+) -> Tuple[SpectralData, SpectralData]:
+    dts = list(
+        map(datetime.fromtimestamp, sorted(random.sample(range(1700000000), n_elems)))
+    )
+    data = [random.random() for _ in range(n_elems)]
+    uncerts = [random.random() / 10 for _ in range(n_elems)]
+    data2 = [random.random() for _ in range(n_elems)]
+    uncerts2 = [random.random() / 10 for _ in range(n_elems)]
+    s0 = SpectralData(dts, data, uncerts, None)
+    s1 = SpectralData(dts, data2, uncerts2, None)
+    return s0, s1
+
+
 class TestComparison(unittest.TestCase):
     # Function to_llh
     def test_to_llh_ok(self):
-        lat, lon, h = comparison.to_llh(3196669.145, 3196669.145, 4490530.389)
+        with self.assertWarns(DeprecationWarning):
+            lat, lon, h = comparison._to_llh(3196669.145, 3196669.145, 4490530.389)
         self.assertAlmostEqual(lat, 45)
         self.assertAlmostEqual(lon, 45)
         self.assertAlmostEqual(h, 4500, delta=4)
 
     def test_to_llh_diff_vals_ok(self):
-        lat, lon, h = comparison.to_llh(3753240, -196698.975, 5138362)
+        with self.assertWarns(DeprecationWarning):
+            lat, lon, h = comparison._to_llh(3753240, -196698.975, 5138362)
         self.assertAlmostEqual(lat, 54)
         self.assertAlmostEqual(lon, -3)
         self.assertAlmostEqual(h, 2000, delta=4)
 
     # Function to_xyz
     def test_to_xyz_ok(self):
-        x, y, z = comparison.to_xyz(45, 45, 4500)
+        with self.assertWarns(DeprecationWarning):
+            x, y, z = comparison._to_xyz(45, 45, 4500)
         self.assertAlmostEqual(x, 3196669.145, delta=4)
         self.assertAlmostEqual(y, 3196669.145, delta=4)
         self.assertAlmostEqual(z, 4490530.389, delta=4)
 
     def test_to_xyz_diff_vals_ok(self):
-        x, y, z = comparison.to_xyz(54, -3, 2000)
+        with self.assertWarns(DeprecationWarning):
+            x, y, z = comparison._to_xyz(54, -3, 2000)
         self.assertAlmostEqual(x, 3753240, delta=4)
         self.assertAlmostEqual(y, -196698.975, delta=4)
         self.assertAlmostEqual(z, 5138362, delta=4)
@@ -101,6 +123,142 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(comp.dts[0], OBS1.dt)
         self.assertEqual(comp.number_samples, 1)
         self.assertEqual(comp.observed_signal.data[0], OBS1.ch_irrs["Default"])
+
+    # Function sort by mpa
+    def test_sort_by_mpa_ok(self):
+        co = get_comparison()
+        n_elems = 3
+        comps = []
+        mpas = [
+            [10, 20, 30],
+            [30, 20, 10],
+            [120, 100, 110],
+            [115, 150, -5],
+            [-1, -2, -80],
+        ]
+        for i in range(len(mpas)):
+            sds = get_random_spectral_data_dts(n_elems)
+            comp = ComparisonData(
+                sds[0],
+                sds[1],
+                sds[1],
+                0,
+                0,
+                3,
+                sds[0].wlens,
+                [None, None, None],
+                mpas[i],
+                [True, True, True],
+            )
+            comps.append(comp)
+        new_comps = co.sort_by_mpa(comps)
+        mpas_indexes = np.argsort(mpas)
+        for i in range(len(mpas_indexes)):
+            for j in range(len(mpas_indexes[i])):
+                id = mpas_indexes[i][j]
+                self.assertEqual(
+                    comps[i].observed_signal.data[id],
+                    new_comps[i].observed_signal.data[j],
+                )
+                self.assertEqual(
+                    comps[i].simulated_signal.data[id],
+                    new_comps[i].simulated_signal.data[j],
+                )
+                self.assertEqual(
+                    comps[i].diffs_signal.data[id], new_comps[i].diffs_signal.data[j]
+                )
+
+    def test_sort_by_mpa_already_ordered(self):
+        co = get_comparison()
+        n_elems = 3
+        comps = []
+        mpas = [
+            [10, 20, 30],
+            [10, 20, 30],
+            [100, 110, 120],
+            [-5, 115, 150],
+            [-80, -2, -1],
+        ]
+        for i in range(len(mpas)):
+            sds = get_random_spectral_data_dts(n_elems)
+            comp = ComparisonData(
+                sds[0],
+                sds[1],
+                sds[1],
+                0,
+                0,
+                3,
+                sds[0].wlens,
+                [None, None, None],
+                mpas[i],
+                [True, True, True],
+            )
+            comps.append(comp)
+        new_comps = co.sort_by_mpa(comps)
+        mpas_indexes = np.argsort(mpas)
+        for i in range(len(mpas_indexes)):
+            for j in range(len(mpas_indexes[i])):
+                id = mpas_indexes[i][j]
+                self.assertEqual(
+                    comps[i].observed_signal.data[id],
+                    new_comps[i].observed_signal.data[j],
+                )
+                self.assertEqual(
+                    comps[i].simulated_signal.data[id],
+                    new_comps[i].simulated_signal.data[j],
+                )
+                self.assertEqual(
+                    comps[i].diffs_signal.data[id], new_comps[i].diffs_signal.data[j]
+                )
+
+    def test_sort_by_mpa_empty(self):
+        co = get_comparison()
+        comps = []
+        new_comps = co.sort_by_mpa(comps)
+        self.assertEqual(len(new_comps), 0)
+
+    def test_sort_by_mpa_repeated(self):
+        co = get_comparison()
+        n_elems = 3
+        comps = []
+        mpas = [
+            [10, 10, 10],
+            [20, 20, 20],
+            [110, 110, 110],
+            [115, 115, 115],
+            [-2, -2, -2],
+        ]
+        for i in range(len(mpas)):
+            sds = get_random_spectral_data_dts(n_elems)
+            comp = ComparisonData(
+                sds[0],
+                sds[1],
+                sds[1],
+                0,
+                0,
+                3,
+                sds[0].wlens,
+                [None, None, None],
+                mpas[i],
+                [True, True, True],
+            )
+            comps.append(comp)
+        new_comps = co.sort_by_mpa(comps)
+        mpas_indexes = np.argsort(mpas)
+        for i in range(len(mpas_indexes)):
+            for j in range(len(mpas_indexes[i])):
+                id = mpas_indexes[i][j]
+                self.assertEqual(
+                    comps[i].observed_signal.data[id],
+                    new_comps[i].observed_signal.data[j],
+                )
+                self.assertEqual(
+                    comps[i].simulated_signal.data[id],
+                    new_comps[i].simulated_signal.data[j],
+                )
+                self.assertEqual(
+                    comps[i].diffs_signal.data[id], new_comps[i].diffs_signal.data[j]
+                )
 
 
 if __name__ == "__main__":

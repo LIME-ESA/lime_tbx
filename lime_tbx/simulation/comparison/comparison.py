@@ -11,6 +11,7 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 import math
 from typing import List, Callable
+from deprecated import deprecated
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -38,7 +39,8 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def to_llh(x: float, y: float, z: float):
+@deprecated
+def _to_llh(x: float, y: float, z: float):
     """
     Changes from coordinates to latitude longitude and height
     UNUSED
@@ -81,7 +83,8 @@ def to_llh(x: float, y: float, z: float):
     return lat, lon, h
 
 
-def to_xyz(latitude, longitude, altitude):
+@deprecated
+def _to_xyz(latitude, longitude, altitude):
     # (lat, lon) in WSG-84 degrees
     # altitude in meters
     # unused
@@ -106,6 +109,14 @@ def to_xyz(latitude, longitude, altitude):
 
 
 class IComparison(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * get_simulations - Simulate the moon irradiance for the given scenarios.
+        * sort_by_mpa - Returns a copy of the given list of ComparisonData but sorted by
+            moon phase angle.
+    """
+
     @abstractmethod
     def get_simulations(
         self,
@@ -139,21 +150,23 @@ class IComparison(ABC):
         pass
 
     @abstractmethod
-    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> None:
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> List[ComparisonData]:
+        """Returns a copy of the given list of ComparisonData but sorted by moon phase angle.
+
+        Parameters
+        ----------
+        comparisons: list of ComparisonData
+            List of ComparisonData that will be sorted by mpa.
+
+        Returns
+        -------
+        sorted_comparisons: list of ComparisonData
+            List with the same ComparisonData instances but sorted by the moon phase angle.
+        """
         pass
 
 
 class Comparison(IComparison):
-    def _get_full_srf(self) -> SpectralResponseFunction:
-        spectral_response = {
-            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN)
-        }
-        ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Full", spectral_response
-        )
-        srf = SpectralResponseFunction("Full", [ch])
-        return srf
-
     def __init__(self, kernels_path: KernelsPath):
         self.kernels_path = kernels_path
 
