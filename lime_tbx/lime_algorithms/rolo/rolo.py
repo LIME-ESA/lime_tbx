@@ -114,7 +114,7 @@ class ROLO(IROLO):
         wlens = elref_spectrum.wlens
         elis = eli.calculate_eli_from_elref(wlens, moon_data, elref_spectrum.data)
         unc = eli.calculate_eli_from_elref_unc(elref_spectrum, moon_data)
-        ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc_rand=unc)
+        ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc=unc)
         return SpectralData(wlens, elis, unc, ds_eli)
 
     @staticmethod
@@ -124,5 +124,5 @@ class ROLO(IROLO):
         wlens = coefficients.wlens
         elrefs = elref.calculate_elref(coefficients, moon_data)
         unc = elref.calculate_elref_unc(coefficients, moon_data)
-        ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc_rand=unc)
+        ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc=unc)
         return SpectralData(wlens, elrefs, unc, ds)

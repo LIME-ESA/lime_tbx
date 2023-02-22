@@ -40,8 +40,12 @@ if sys.platform == 'linux':
         (src_path + 'interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'interpolation/interp_data/assets/Breccia.txt', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'interpolation/interp_data/assets/Composite.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/ds_ASD.nc', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'spectral_integration/assets/interpolated_model_fwhm.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/asd_fwhm.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.ico'
     a_hooksconfig = {
@@ -79,8 +83,12 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'interpolation\\interp_data\\assets\\Apollo16.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
         (src_path + 'interpolation\\interp_data\\assets\\Breccia.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
         (src_path + 'interpolation\\interp_data\\assets\\Composite.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\ds_ASD.nc', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
         (src_path + 'spectral_integration\\assets\\interpolated_model_fwhm.csv', '.\\lime_tbx\\spectral_integration\\assets'),
+        (src_path + 'spectral_integration\\assets\\asd_fwhm.csv', '.\\lime_tbx\\spectral_integration\\assets'),
+        (src_path + 'spectral_integration\\assets\\responses_1088_13112020.txt', '.\\lime_tbx\\spectral_integration\\assets'),
         (src_path + 'lime_algorithms\\rolo\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_cimel.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
     ]
     a_icon = src_path + 'gui\\assets\\lime_logo.ico'
     e_console = True
@@ -116,8 +124,12 @@ elif sys.platform == 'darwin':
         (src_path + 'interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'interpolation/interp_data/assets/Breccia.txt', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'interpolation/interp_data/assets/Composite.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/ds_ASD.nc', './lime_tbx/interpolation/interp_data/assets'),
         (src_path + 'spectral_integration/assets/interpolated_model_fwhm.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/asd_fwhm.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.icns'
 runner_file = src_path + 'main.py'

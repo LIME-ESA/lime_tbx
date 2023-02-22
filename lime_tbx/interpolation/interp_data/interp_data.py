@@ -17,6 +17,7 @@ from typing import List
 
 """___Third-Party Modules___"""
 import numpy as np
+import xarray as xr
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -35,6 +36,31 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
+def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data = np.genfromtxt(
+        os.path.join(current_dir, "assets/SomeMoonReflectances.txt"), delimiter=","
+    )
+    wavs = np.arange(350, 2501, 1)
+    phase_angles = data[:, 3]
+
+    best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
+    # Default value was best_id = 5
+    refl = data[best_id, 4:]
+
+    wavs = wavs[np.where(np.isfinite(refl))]
+    refl = refl[np.where(np.isfinite(refl))]
+
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    unc_tot = (
+        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
+    )
+
+    spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
+
+    return spectral_data
+
+
 def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
     """Retrieve the best ASD reflectance spectrum for the given moon phase angle.
 
@@ -49,24 +75,20 @@ def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
         Reflectance spectrum.
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data = np.genfromtxt(
-        os.path.join(current_dir, "assets/SomeMoonReflectances.txt"), delimiter=","
-    )
-    wavs = np.arange(350, 2501, 1)
-    phase_angles = data[:, 3]
-    best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
-    # Default value was best_id = 5
-    refl = data[best_id, 4:]
+    # data = np.genfromtxt(
+    #     os.path.join(current_dir, "assets/SomeMoonReflectances.txt"), delimiter=","
+    # )
 
-    wavs = wavs[np.where(np.isfinite(refl))]
-    refl = refl[np.where(np.isfinite(refl))]
+    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD.nc"))
 
-    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
-    unc_tot = (
-        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
-    )
+    wavs = ds_asd.wavelength.values
+    phase_angles = ds_asd.phase_angle.values
+    best_id = np.argmin(np.abs(np.abs(phase_angles) - moon_phase_angle))
 
-    spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
+    refl = ds_asd.reflectance.values[:, best_id]
+    unc = ds_asd.u_reflectance.values[:, best_id] * refl / 100
+
+    spectral_data = SpectralData(wavs, refl, unc, ds_asd)
 
     return spectral_data
 
@@ -89,9 +111,7 @@ def get_apollo16_data() -> SpectralData:
     refl = refl[np.where(np.isfinite(refl))]
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
     # TODO: Correct uncertainties from data
-    unc_tot = (
-        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
-    )
+    unc_tot = np.zeros(refl.shape)
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
     return spectral_data
 
@@ -111,9 +131,7 @@ def get_breccia_data() -> SpectralData:
     wavs = wavs[np.where(np.isfinite(refl))]
     refl = refl[np.where(np.isfinite(refl))]
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
-    unc_tot = (
-        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
-    )
+    unc_tot = np.zeros(refl.shape)
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
     return spectral_data
 
@@ -136,9 +154,7 @@ def get_composite_data() -> SpectralData:
     wavs = wavs[np.where(np.isfinite(refl))]
     refl = refl[np.where(np.isfinite(refl))]
     ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
-    unc_tot = (
-        ds_asd.u_ran_reflectance.values**2 + ds_asd.u_sys_reflectance.values**2
-    )
+    unc_tot = np.zeros(refl.shape)
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
     return spectral_data
 

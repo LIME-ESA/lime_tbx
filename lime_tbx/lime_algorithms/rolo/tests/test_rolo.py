@@ -346,7 +346,7 @@ class TestROLO(unittest.TestCase):
 
     def test_eli_one(self):
         ds = SpectralData.make_reflectance_ds(
-            WLENS[0:1], ELREF_CHECK_DATA[0:1], unc_rand=CHECK_UNCS[0:1]
+            WLENS[0:1], ELREF_CHECK_DATA[0:1], unc=CHECK_UNCS[0:1]
         )
         elref_spectrum = SpectralData(
             WLENS[0:1], ELREF_CHECK_DATA[0:1], CHECK_UNCS[0:1], ds
@@ -358,9 +358,7 @@ class TestROLO(unittest.TestCase):
         np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 
     def test_eli_multiple(self):
-        ds = SpectralData.make_reflectance_ds(
-            WLENS, ELREF_CHECK_DATA, unc_rand=CHECK_UNCS
-        )
+        ds = SpectralData.make_reflectance_ds(WLENS, ELREF_CHECK_DATA, unc=CHECK_UNCS)
         elref_spectrum = SpectralData(WLENS, ELREF_CHECK_DATA, CHECK_UNCS, ds)
         eli_vals = eli.calculate_eli_from_elref(WLENS, CHECK_MD, ELREF_CHECK_DATA)
         eli_uncs = eli.calculate_eli_from_elref_unc(elref_spectrum, CHECK_MD)

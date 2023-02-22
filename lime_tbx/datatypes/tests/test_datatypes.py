@@ -361,8 +361,8 @@ class TestSpectralData(unittest.TestCase):
         )
 
     def test_make_reflectance_ds_Spectral_Data(self):
-        ds = SpectralData.make_reflectance_ds(SPD_WAVS, SPD_VALS)
-        uncs = ds.u_reflectance.values**2 + ds.err_corr_reflectance.values**2
+        ds = SpectralData.make_reflectance_ds(SPD_WAVS, SPD_VALS, SPD_VALS * 0.05)
+        uncs = ds.u_reflectance.values**2
         _ = SpectralData(SPD_WAVS, SPD_VALS, uncs, ds)
 
     def test_make_irradiance_ds_ok(self):

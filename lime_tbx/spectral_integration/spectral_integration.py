@@ -10,15 +10,19 @@ It exports the following classes:
 """___Built-In Modules___"""
 from typing import List, Union
 from abc import ABC, abstractmethod
+import os
 
 """___Third-Party Modules___"""
 import numpy as np
 import punpy
+from matheo.band_integration import band_integration
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     SpectralData,
+    SRF_fwhm,
+    SRFChannel,
 )
 
 """___Authorship___"""
@@ -27,6 +31,11 @@ __created__ = "01/02/2022"
 __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
+
+
+_ASD_FILE = "assets/asd_fwhm.csv"
+_CIMEL_FILE = "assets/responses_1088_13112020.txt"
+_INTERPOLATED_FILE = "assets/interpolated_model_fwhm.csv"
 
 
 class ISpectralIntegration(ABC):
@@ -86,7 +95,91 @@ class SpectralIntegration(ISpectralIntegration):
     """Class that implements the methods exported by this module"""
 
     def __init__(self, MCsteps=1000):
-        self.prop = punpy.MCPropagation(MCsteps)
+        self.prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
+        self.asd_srf = self._read_srf_asd()
+        self.cimel_srf = self._read_srf_cimel()
+        self.interpolated_srf = self._read_srf_interpolated()
+
+    def _read_srf_asd(self) -> SpectralResponseFunction:
+        """
+        read asd fwhm and make SRF
+        """
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        data = np.genfromtxt(os.path.join(dir_path, _ASD_FILE), delimiter=",")
+        srf = SRF_fwhm("asd", data[:, 0], data[:, 1])
+        return srf
+
+    def _read_srf_interpolated(self) -> SpectralResponseFunction:
+        """
+        read asd fwhm and make SRF
+        """
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        data = np.genfromtxt(os.path.join(dir_path, _INTERPOLATED_FILE), delimiter=",")
+        srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1])
+        return srf
+
+    def _read_srf_cimel(self) -> SpectralResponseFunction:
+        """
+        read asd fwhm and make SRF
+        """
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        data = np.genfromtxt(os.path.join(dir_path, _CIMEL_FILE), delimiter=",")
+        cimel_wavs = [440, 500, 675, 870, 1020, 1640]
+        srflist = [None] * len(cimel_wavs)
+
+        for i in range(len(cimel_wavs)):
+            srf = {
+                data[j, 2 * i]: data[j, 2 * i + 1]
+                for j in range(len(data[:, 2 * i + 1]))
+                if data[j, 2 * i] > 0
+            }
+            channel = SRFChannel(cimel_wavs[i], str(cimel_wavs[i]), srf)
+            srflist[i] = channel
+
+        return SpectralResponseFunction("cimel", srflist)
+
+    def integrate_cimel(self, data: np.ndarray, wlens: np.ndarray) -> np.ndarray:
+        y = self.integrate_elis_xy(self.cimel_srf, data, wlens)
+        return y
+
+    def integrate_solar_asd(self, data: np.ndarray, wlens: np.ndarray) -> np.ndarray:
+        return band_integration.pixel_int(
+            data,
+            wlens,
+            self.asd_srf.get_wavelengths(),
+            (self.asd_srf.get_values() ** 2 - 1) ** 0.5,
+        )
+
+    def integrate_solar_interpolated(
+        self, data: np.ndarray, wlens: np.ndarray
+    ) -> np.ndarray:
+        return band_integration.pixel_int(
+            data,
+            wlens,
+            self.interpolated_srf.get_wavelengths(),
+            (self.interpolated_srf.get_values() ** 2 - 1) ** 0.5,
+        )
+
+    def integrate_elis_xy(
+        self, srf: SpectralResponseFunction, data: np.ndarray, wlens: np.ndarray
+    ) -> np.ndarray:
+        """
+
+        :param srf:
+        :type srf:
+        :param data:
+        :type data:
+        :param wlens:
+        :type wlens:
+        :return:
+        :rtype:
+        """
+        signals = np.zeros(len(srf.channels))
+        for ich, ch in enumerate(srf.channels):
+            ch_wlens = np.array([w for w in ch.spectral_response.keys()])
+            ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
+            signals[ich] = band_integration.band_int(data, wlens, ch_srf, ch_wlens)
+        return signals
 
     def _convolve_srf(
         self, ch_wlens: np.ndarray, ch_srf: np.ndarray, ch_elis: np.ndarray
@@ -149,14 +242,15 @@ class SpectralIntegration(ISpectralIntegration):
             for i, subelis in enumerate(elis):
                 ch_elis = subelis[elis_ids]
                 u_ch_elis = u_elis[i][elis_ids]
-                u_ch_signals.append(
-                    self.prop.propagate_random(
+                u_ch_signal = np.array([])
+                if len(ch_wlens) > 0:
+                    u_ch_signal = self.prop.propagate_random(
                         self._convolve_srf,
                         [ch_wlens, ch_srf, ch_elis],
                         [None, None, u_ch_elis],
                         corr_x=[None, None, None],
                     )
-                )
+                u_ch_signals.append(u_ch_signal)
             u_signals.append(u_ch_signals)
         if wasnt_lists:
             u_signals = [s[0] for s in u_signals]
