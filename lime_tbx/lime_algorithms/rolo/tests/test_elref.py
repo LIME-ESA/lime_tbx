@@ -321,11 +321,7 @@ class TestELRef(unittest.TestCase):
         cf = get_coeffs()
         cfc = cf.coeffs
         elref_val = elref._measurement_func_elref(
-            cfc.a_coeffs,
-            cfc.b_coeffs,
-            cfc.c_coeffs,
-            cfc.d_coeffs,
-            cfc.p_coeffs,
+            cfc._coeffs,
             CHECK_MD.long_sun_radians,
             CHECK_MD.long_obs,
             CHECK_MD.lat_obs,
@@ -337,11 +333,7 @@ class TestELRef(unittest.TestCase):
         cf = get_coeffs()
         cfc = cf.coeffs
         elref_val = elref._measurement_func_elref(
-            cfc.a_coeffs.T[0],
-            cfc.b_coeffs.T[0],
-            cfc.c_coeffs.T[0],
-            cfc.d_coeffs.T[0],
-            cfc.p_coeffs.T[0],
+            cfc._coeffs[:, 0:1],
             CHECK_MD.long_sun_radians,
             CHECK_MD.long_obs,
             CHECK_MD.lat_obs,
@@ -353,11 +345,7 @@ class TestELRef(unittest.TestCase):
         cf = get_coeffs()
         cfc = cf.coeffs
         elref_val_multiple = elref._measurement_func_elref(
-            cfc.a_coeffs,
-            cfc.b_coeffs,
-            cfc.c_coeffs,
-            cfc.d_coeffs,
-            cfc.p_coeffs,
+            cfc._coeffs,
             CHECK_MD.long_sun_radians,
             CHECK_MD.long_obs,
             CHECK_MD.lat_obs,
@@ -366,19 +354,15 @@ class TestELRef(unittest.TestCase):
         elref_val = np.array(
             [
                 elref._measurement_func_elref(
-                    cfc.a_coeffs.T[i],
-                    cfc.b_coeffs.T[i],
-                    cfc.c_coeffs.T[i],
-                    cfc.d_coeffs.T[i],
-                    cfc.p_coeffs.T[i],
+                    cfc._coeffs[:, i : i + 1],
                     CHECK_MD.long_sun_radians,
                     CHECK_MD.long_obs,
                     CHECK_MD.lat_obs,
                     CHECK_MD.mpa_degrees,
                 )
-                for i in range(len(cfc.a_coeffs.T))
+                for i in range(len(cfc._coeffs[0]))
             ]
-        )
+        ).T[0]
         np.testing.assert_array_equal(elref_val, elref_val_multiple)
 
     def test_calculate_elref(self):

@@ -10,7 +10,7 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from typing import List, Union
+from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -33,11 +33,7 @@ __status__ = "Development"
 
 
 def _measurement_func_elref(
-    a_coeffs: Union[List[float], np.ndarray],
-    b_coeffs: Union[List[float], np.ndarray],
-    c_coeffs: Union[List[float], np.ndarray],
-    d_coeffs: Union[List[float], np.ndarray],
-    p_coeffs: Union[List[float], np.ndarray],
+    coeffs: Union[List[float], np.ndarray],
     phi: float,
     l_phi: float,
     l_theta: float,
@@ -49,16 +45,8 @@ def _measurement_func_elref(
 
     Parameters
     ----------
-    a_coeffs: list of float | np.ndarray of np.ndarray of float
-        A Coefficients for a wavelength, or all the A coefficients for all wavelengths (matrix)
-    b_coeffs: list of float | np.ndarray of np.ndarray of float
-        B Coefficients for a wavelength, or all the B coefficients for all wavelengths (matrix)
-    c_coeffs: list of float | np.ndarray of np.ndarray of float
-        C Coefficients for a wavelength, or all the C coefficients for all wavelengths (matrix)
-    d_coeffs: list of float | np.ndarray of np.ndarray of float
-        D Coefficients for a wavelength, or all the D coefficients for all wavelengths (matrix)
-    p_coeffs: list of float | np.ndarray of np.ndarray of float
-        P Coefficients for a wavelength, or all the P coefficients for all wavelengths (matrix)
+    coeffs: list of float | np.ndarray of np.ndarray of float
+        Coefficients for a wavelength, or all coefficients for all wavelengths (matrix)
     phi: float
         Selenographic longitude of the sun (radians)
     l_phi: float
@@ -73,6 +61,24 @@ def _measurement_func_elref(
     elrefs: float | np.ndarray of float
         Calculated reflectances.
     """
+
+    # a_coeffs: list of float | np.ndarray of np.ndarray of float
+    # A Coefficients for a wavelength, or all the A coefficients for all wavelengths (matrix)
+    # b_coeffs: list of float | np.ndarray of np.ndarray of float
+    # B Coefficients for a wavelength, or all the B coefficients for all wavelengths (matrix)
+    # c_coeffs: list of float | np.ndarray of np.ndarray of float
+    # C Coefficients for a wavelength, or all the C coefficients for all wavelengths (matrix)
+    # d_coeffs: list of float | np.ndarray of np.ndarray of float
+    # D Coefficients for a wavelength, or all the D coefficients for all wavelengths (matrix)
+    # p_coeffs: list of float | np.ndarray of np.ndarray of float
+    # P Coefficients for a wavelength, or all the P coefficients for all wavelengths (matrix)
+
+    a_coeffs = coeffs[0:4, :]
+    b_coeffs = coeffs[4:7, :]
+    c_coeffs = coeffs[7:11, :]
+    d_coeffs = coeffs[11:14, :]
+    p_coeffs = coeffs[14::, :]
+
     gr_value = np.radians(gd_value)
     d1_value = d_coeffs[0] * np.exp(-gd_value / p_coeffs[0])
     d2_value = d_coeffs[1] * np.exp(-gd_value / p_coeffs[1])
@@ -123,18 +129,13 @@ def calculate_elref(
         reflectance coefficient matrix.
     """
     cfs = refl_coeffs.coeffs
-
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
     gd_value = moon_data.absolute_mpa_degrees
 
     result = _measurement_func_elref(
-        cfs.a_coeffs,
-        cfs.b_coeffs,
-        cfs.c_coeffs,
-        cfs.d_coeffs,
-        cfs.p_coeffs,
+        cfs._coeffs,
         phi,
         l_phi,
         l_theta,
@@ -147,7 +148,7 @@ def calculate_elref(
 def calculate_elref_unc(
     cimel_coef: ReflectanceCoefficients,
     moon_data: MoonData,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calculates the uncertainty for the reflectance calculations of empirical data points.
 
@@ -162,12 +163,13 @@ def calculate_elref_unc(
 
     Returns
     -------
-    np.ndarray of float
+    uncs: np.ndarray of float
         The uncertainties calculated
     """
 
     cfs = cimel_coef.coeffs
     ucfs = cimel_coef.unc_coeffs
+    corrcfs = cimel_coef._ds.err_corr_coeff.values
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs
@@ -179,22 +181,14 @@ def calculate_elref_unc(
     unc, samples_y, samples_x = prop.propagate_random(
         _measurement_func_elref,
         [
-            cfs.a_coeffs,
-            cfs.b_coeffs,
-            cfs.c_coeffs,
-            cfs.d_coeffs,
-            cfs.p_coeffs,
+            cfs._coeffs,
             phi,
             l_phi,
             l_theta,
             gd_value,
         ],
         [
-            ucfs.a_coeffs,
-            ucfs.b_coeffs,
-            ucfs.c_coeffs,
-            ucfs.d_coeffs,
-            ucfs.p_coeffs,
+            ucfs._coeffs,
             0,  # These were None instead of 0
             0,
             0,
