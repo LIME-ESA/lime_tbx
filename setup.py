@@ -28,7 +28,7 @@ setup(
     install_requires=[
         "certifi==2022.6.15",
         "cftime==1.6.1",
-        "comet-maths==0.19.3",
+        "comet-maths==0.19.4",
         "cycler==0.11.0",
         "Deprecated==1.2.13",
         "fonttools==4.37.1",
@@ -44,7 +44,7 @@ setup(
         "packaging==21.3",
         "pandas==1.4.4",
         "Pillow==9.2.0",
-        "punpy==0.39.3",
+        "punpy==0.39.5",
         "pyparsing==3.0.9",
         "PySide2==5.15.2.1",
         "python-dateutil==2.8.2",
