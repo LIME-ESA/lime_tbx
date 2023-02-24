@@ -24,6 +24,7 @@ from lime_tbx.datatypes.datatypes import (
     SRF_fwhm,
     SRFChannel,
 )
+from lime_tbx.datatypes import constants
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -36,6 +37,23 @@ __status__ = "Development"
 _ASD_FILE = "assets/asd_fwhm.csv"
 _CIMEL_FILE = "assets/responses_1088_13112020.txt"
 _INTERPOLATED_FILE = "assets/interpolated_model_fwhm.csv"
+
+
+def get_default_srf():
+    dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    dir_path = os.path.join(dir_path, "spectral_integration", "assets")
+    data = np.genfromtxt(
+        os.path.join(dir_path, "interpolated_model_fwhm.csv"), delimiter=","
+    )
+    wavs = data[:, 0]
+    spectral_response = {i: 1.0 for i in wavs}
+    ch = SRFChannel(
+        (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
+        constants.DEFAULT_SRF_NAME,
+        spectral_response,
+    )
+    srf = SpectralResponseFunction(constants.DEFAULT_SRF_NAME, [ch])
+    return srf
 
 
 class ISpectralIntegration(ABC):
@@ -195,6 +213,16 @@ class SpectralIntegration(ISpectralIntegration):
         ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens) / divider
         return ch_signal
 
+    def _interpolate_and_convolve_srf(
+        self,
+        ch_wlens: np.ndarray,
+        ch_srf: np.ndarray,
+        elis_wlens: np.ndarray,
+        elis: np.ndarray,
+    ) -> Union[float, np.ndarray]:
+        ch_elis = np.interp(ch_wlens, elis_wlens, elis)
+        return self._convolve_srf(ch_wlens, ch_srf, ch_elis)
+
     def integrate_elis(
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
@@ -214,7 +242,10 @@ class SpectralIntegration(ISpectralIntegration):
             ch_signals = []
             for subelis in elis:
                 ch_elis = subelis[elis_ids]
-                ch_signals.append(self._convolve_srf(ch_wlens, ch_srf, ch_elis))
+                ch_signals.append(
+                    self._interpolate_and_convolve_srf(ch_wlens, ch_srf, wlens, subelis)
+                )
+                # ch_signals.append(self._convolve_srf(ch_wlens, ch_srf, ch_elis))
             signals.append(ch_signals)
         if wasnt_lists:
             signals = [s[0] for s in signals]
@@ -245,10 +276,10 @@ class SpectralIntegration(ISpectralIntegration):
                 u_ch_signal = np.array([])
                 if len(ch_wlens) > 0:
                     u_ch_signal = self.prop.propagate_random(
-                        self._convolve_srf,
-                        [ch_wlens, ch_srf, ch_elis],
-                        [None, None, u_ch_elis],
-                        corr_x=[None, None, None],
+                        self._interpolate_and_convolve_srf,
+                        [ch_wlens, ch_srf, wlens, subelis],
+                        [None, None, None, u_elis[i]],
+                        corr_x=[None, None, None, None],
                     )
                 u_ch_signals.append(u_ch_signal)
             u_signals.append(u_ch_signals)

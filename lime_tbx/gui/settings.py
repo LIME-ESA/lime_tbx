@@ -16,9 +16,9 @@ from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     ReflectanceCoefficients,
 )
-from lime_tbx.datatypes import constants
 from lime_tbx.coefficients.access_data import access_data
 from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -128,20 +128,7 @@ class SettingsManager(ISettingsManager):
         self.polar_coeff = self.coeffs[index].polarization
 
     def get_default_srf(self) -> SpectralResponseFunction:
-        dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        dir_path = os.path.join(dir_path, "spectral_integration", "assets")
-        data = np.genfromtxt(
-            os.path.join(dir_path, "interpolated_model_fwhm.csv"), delimiter=","
-        )
-        wavs = data[:, 0]
-        spectral_response = {i: 1.0 for i in wavs}
-        ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
-            constants.DEFAULT_SRF_NAME,
-            spectral_response,
-        )
-        srf = SpectralResponseFunction(constants.DEFAULT_SRF_NAME, [ch])
-        return srf
+        return get_default_srf()
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf

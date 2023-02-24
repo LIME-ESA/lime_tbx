@@ -97,6 +97,7 @@ class ILimeSimulation(ABC):
     def update_irradiance(
         self,
         srf: SpectralResponseFunction,
+        signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
     ):
@@ -106,7 +107,9 @@ class ILimeSimulation(ABC):
         Parameters
         ----------
         srf: SpectralResponseFunction
-            SRF for which the reflectance, irradiance and integrated signal will be calculated.
+            SRF for which the reflectance and irradiance will be calculated.
+        srf: SpectralResponseFunction
+            SRF for which the integrated signal will be calculated.
         point: Point
             Point (location) for which the irradiance will be calculated.
         cimel_coeff: ReflectanceCoefficients
@@ -491,6 +494,7 @@ class LimeSimulation(ILimeSimulation):
     def update_irradiance(
         self,
         srf: SpectralResponseFunction,
+        signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
     ):
@@ -513,7 +517,7 @@ class LimeSimulation(ILimeSimulation):
                 print("irradiance update done")
 
         if not self.signals_uptodate:
-            self.signals = self._calculate_signals(srf)
+            self.signals = self._calculate_signals(signals_srf)
             self.signals_uptodate = True
             if self.verbose:
                 print("signals update done")

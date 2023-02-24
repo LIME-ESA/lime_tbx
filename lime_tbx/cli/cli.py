@@ -31,6 +31,7 @@ from lime_tbx.simulation.comparison import comparison
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.coefficients.update.update import IUpdate, Update
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -219,18 +220,21 @@ class CLI:
             self.srf = srflib.read_srf(srf_file)
 
     def _calculate_irradiance(self, point: Point):
+        def_srf = get_default_srf()
         self.lime_simulation.update_irradiance(
-            self.srf, point, self.settings_manager.get_cimel_coef()
+            def_srf, self.srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_reflectance(self, point: Point):
+        def_srf = get_default_srf()
         self.lime_simulation.update_reflectance(
-            self.srf, point, self.settings_manager.get_cimel_coef()
+            def_srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_polarization(self, point: Point):
+        def_srf = get_default_srf()
         self.lime_simulation.update_polarization(
-            self.srf, point, self.settings_manager.get_polar_coef()
+            def_srf, point, self.settings_manager.get_polar_coef()
         )
 
     def _calculate_all(self, point: Point):

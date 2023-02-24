@@ -16,8 +16,7 @@ from numpy.typing import NDArray
 import comet_maths as cm
 
 """___NPL Modules___"""
-import punpy
-from comet_maths.interpolation.interpolation import Interpolator
+# import here
 
 """___LIME_TBX Modules___"""
 import lime_tbx.interpolation.interp_data.interp_data as idata
@@ -169,8 +168,8 @@ class ISpectralInterpolation(ABC):
 class SpectralInterpolation(ISpectralInterpolation):
     """Class that implements all the functions exported by this module."""
 
-    def __init__(self, MCsteps=1000):
-        self.si: ISpectralIntegration = SpectralIntegration(MCsteps)
+    def __init__(self, MCsteps=100):
+        self.si: ISpectralIntegration = SpectralIntegration()
         self.MCsteps = MCsteps
 
     def _get_best_polar_asd_reference(self, moon_data: MoonData):

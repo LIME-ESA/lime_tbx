@@ -27,9 +27,9 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     SRFChannel,
 )
-from lime_tbx.datatypes import constants
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -201,7 +201,8 @@ class Comparison(IComparison):
                 lat, lon, h, dt, self.kernels_path
             ).mpa_degrees
             lime_simulation.set_simulation_changed()
-            lime_simulation.update_irradiance(srf, sp, coefficients)
+            def_srf = get_default_srf()
+            lime_simulation.update_irradiance(def_srf, srf, sp, coefficients)
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
