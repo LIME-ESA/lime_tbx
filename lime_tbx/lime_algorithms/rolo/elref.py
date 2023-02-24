@@ -165,6 +165,8 @@ def calculate_elref_unc(
     -------
     uncs: np.ndarray of float
         The uncertainties calculated
+    corr: np.ndarray of float
+        The error correlation matrix calculated
     """
 
     cfs = cimel_coef.coeffs
@@ -175,6 +177,37 @@ def calculate_elref_unc(
     l_theta = moon_data.lat_obs
     l_phi = moon_data.long_obs
     gd_value = moon_data.absolute_mpa_degrees
+
+    prop = punpy.MCPropagation(100, MCdimlast=True)
+
+    unc, corr = prop.propagate_random(
+        _measurement_func_elref,
+        [
+            cfs._coeffs,
+            phi,
+            l_phi,
+            l_theta,
+            gd_value,
+        ],
+        [
+            ucfs._coeffs,
+            None,
+            None,
+            None,
+            None,
+        ],
+        corr_x=[
+            corrcfs,
+            None,
+            None,
+            None,
+            None,
+        ],
+        return_corr=True,
+        allow_some_nans=False,
+    )
+
+    return unc, corr
 
     prop = punpy.MCPropagation(1000, dtype=np.float64)
 

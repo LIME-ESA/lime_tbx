@@ -278,6 +278,7 @@ _UNC_DATA = np.array(
 ).T
 _ERR_CORR_SIZE = len(WLENS) * len(_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
+np.fill_diagonal(_ERR_CORR, 1)
 
 ELREF_CHECK_DATA = np.array(
     [
@@ -372,7 +373,7 @@ class TestELRef(unittest.TestCase):
 
     def test_calculate_elref_unc(self):
         cf = get_coeffs()
-        unc_elrefs = elref.calculate_elref_unc(cf, CHECK_MD)
+        unc_elrefs, corr = elref.calculate_elref_unc(cf, CHECK_MD)
         np.testing.assert_array_almost_equal(unc_elrefs, CHECK_UNCS, 4)
 
 

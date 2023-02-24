@@ -271,7 +271,11 @@ _UNC_DATA = np.array(
 ).T
 _ERR_CORR_SIZE = len(WLENS) * len(_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
+np.fill_diagonal(_ERR_CORR, 1)
 _ERR_CORR_ONE = np.zeros((len(_COEFFS), len(_COEFFS)))
+np.fill_diagonal(_ERR_CORR_ONE, 1)
+ELREF_ERR_COEFF = np.zeros((len(WLENS), len(WLENS)))
+np.fill_diagonal(ELREF_ERR_COEFF, 1)
 
 ELREF_CHECK_DATA = np.array(
     [
@@ -331,7 +335,7 @@ class TestROLO(unittest.TestCase):
     def test_elref_one(self):
         rc = get_coeffs_one()
         elref_vals = elref.calculate_elref(rc, CHECK_MD)
-        elref_uncs = elref.calculate_elref_unc(rc, CHECK_MD)
+        elref_uncs, corr = elref.calculate_elref_unc(rc, CHECK_MD)
         sd = rolo.ROLO().get_elrefs(rc, CHECK_MD)
         np.testing.assert_array_equal(elref_vals, sd.data)
         np.testing.assert_array_almost_equal(elref_uncs, sd.uncertainties, 4)
@@ -339,30 +343,43 @@ class TestROLO(unittest.TestCase):
     def test_elref_multiple(self):
         rc = get_coeffs()
         elref_vals = elref.calculate_elref(rc, CHECK_MD)
-        elref_uncs = elref.calculate_elref_unc(rc, CHECK_MD)
+        elref_uncs, corr = elref.calculate_elref_unc(rc, CHECK_MD)
         sd = rolo.ROLO().get_elrefs(rc, CHECK_MD)
         np.testing.assert_array_equal(elref_vals, sd.data)
         np.testing.assert_array_almost_equal(elref_uncs, sd.uncertainties, 4)
 
     def test_eli_one(self):
         ds = SpectralData.make_reflectance_ds(
-            WLENS[0:1], ELREF_CHECK_DATA[0:1], unc=CHECK_UNCS[0:1]
+            WLENS[0:1],
+            ELREF_CHECK_DATA[0:1],
+            unc=CHECK_UNCS[0:1],
+            corr=ELREF_ERR_COEFF,
         )
         elref_spectrum = SpectralData(
             WLENS[0:1], ELREF_CHECK_DATA[0:1], CHECK_UNCS[0:1], ds
         )
-        eli_vals = eli.calculate_eli_from_elref(WLENS[0], CHECK_MD, ELREF_CHECK_DATA[0])
-        eli_uncs = eli.calculate_eli_from_elref_unc(elref_spectrum, CHECK_MD)
-        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD)
+        eli_vals = eli.calculate_eli_from_elref(
+            WLENS[0], CHECK_MD, ELREF_CHECK_DATA[0], "cimel"
+        )
+        eli_uncs, corr = eli.calculate_eli_from_elref_unc(
+            elref_spectrum, CHECK_MD, "cimel"
+        )
+        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD, "cimel")
         np.testing.assert_array_equal(eli_vals, sd.data)
         np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 
     def test_eli_multiple(self):
-        ds = SpectralData.make_reflectance_ds(WLENS, ELREF_CHECK_DATA, unc=CHECK_UNCS)
+        ds = SpectralData.make_reflectance_ds(
+            WLENS, ELREF_CHECK_DATA, unc=CHECK_UNCS, corr=ELREF_ERR_COEFF
+        )
         elref_spectrum = SpectralData(WLENS, ELREF_CHECK_DATA, CHECK_UNCS, ds)
-        eli_vals = eli.calculate_eli_from_elref(WLENS, CHECK_MD, ELREF_CHECK_DATA)
-        eli_uncs = eli.calculate_eli_from_elref_unc(elref_spectrum, CHECK_MD)
-        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD)
+        eli_vals = eli.calculate_eli_from_elref(
+            WLENS, CHECK_MD, ELREF_CHECK_DATA, "cimel"
+        )
+        eli_uncs, corr = eli.calculate_eli_from_elref_unc(
+            elref_spectrum, CHECK_MD, "cimel"
+        )
+        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD, "cimel")
         np.testing.assert_array_equal(eli_vals, sd.data)
         np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 

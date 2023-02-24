@@ -46,6 +46,8 @@ if sys.platform == 'linux':
         (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
         (src_path + 'lime_algorithms/rolo/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_asd.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_intp.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.ico'
     a_hooksconfig = {
@@ -89,6 +91,8 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'spectral_integration\\assets\\responses_1088_13112020.txt', '.\\lime_tbx\\spectral_integration\\assets'),
         (src_path + 'lime_algorithms\\rolo\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
         (src_path + 'lime_algorithms\\rolo\\assets\\tsis_cimel.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_asd.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_intp.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
     ]
     a_icon = src_path + 'gui\\assets\\lime_logo.ico'
     e_console = True
@@ -130,6 +134,8 @@ elif sys.platform == 'darwin':
         (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
         (src_path + 'lime_algorithms/rolo/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_intp.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_asd.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.icns'
 runner_file = src_path + 'main.py'

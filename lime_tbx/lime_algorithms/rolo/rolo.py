@@ -49,7 +49,9 @@ class IROLO(ABC):
     @staticmethod
     @abstractmethod
     def get_elis_from_elrefs(
-        elref_spectrum: SpectralData, moon_data: MoonData
+        elref_spectrum: SpectralData,
+        moon_data: MoonData,
+        srf_type: str,
     ) -> SpectralData:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020,
         without using the Apollo Coefficients.
@@ -65,6 +67,8 @@ class IROLO(ABC):
             Reflectance data.
         moon_data : MoonData
             Moon data needed to calculate Moon's irradiance.
+        srf_type: str
+            SRF type that is going to be used. Can be 'cimel', 'asd' or 'interpolated'.
 
         Returns
         -------
@@ -109,12 +113,18 @@ class ROLO(IROLO):
 
     @staticmethod
     def get_elis_from_elrefs(
-        elref_spectrum: SpectralData, moon_data: MoonData
+        elref_spectrum: SpectralData,
+        moon_data: MoonData,
+        srf_type: str,
     ) -> SpectralData:
         wlens = elref_spectrum.wlens
-        elis = eli.calculate_eli_from_elref(wlens, moon_data, elref_spectrum.data)
-        unc = eli.calculate_eli_from_elref_unc(elref_spectrum, moon_data)
-        ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc=unc)
+        elis = eli.calculate_eli_from_elref(
+            wlens, moon_data, elref_spectrum.data, srf_type
+        )
+        unc, corr = eli.calculate_eli_from_elref_unc(
+            elref_spectrum, moon_data, srf_type
+        )
+        ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc, corr)
         return SpectralData(wlens, elis, unc, ds_eli)
 
     @staticmethod
@@ -123,6 +133,6 @@ class ROLO(IROLO):
     ) -> SpectralData:
         wlens = coefficients.wlens
         elrefs = elref.calculate_elref(coefficients, moon_data)
-        unc = elref.calculate_elref_unc(coefficients, moon_data)
-        ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc=unc)
+        unc, corr = elref.calculate_elref_unc(coefficients, moon_data)
+        ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc, corr)
         return SpectralData(wlens, elrefs, unc, ds)

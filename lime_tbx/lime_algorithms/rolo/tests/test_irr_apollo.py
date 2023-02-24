@@ -149,6 +149,7 @@ _ROLO_COEFFS = np.array(
 _ROLO_UNCS = np.zeros(_ROLO_COEFFS.shape)
 _ERR_CORR_SIZE = len(ROLO_WLENS) * len(_ROLO_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
+np.fill_diagonal(_ERR_CORR, 1)
 
 
 def read_rimoapp(path: str):
@@ -207,7 +208,7 @@ class TestIrrApollo(unittest.TestCase):
         mds = create_vall_moondata(dts)
         for irrs, md in zip(rimodata.values(), mds):
             elrefs = rl.get_elrefs(rc, md)
-            elis = rl.get_elis_from_elrefs(elrefs, md)
+            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated")
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
     def test_Valladolid_202202_fullmonth(self):
@@ -218,7 +219,7 @@ class TestIrrApollo(unittest.TestCase):
         mds = create_vall_moondata(dts)
         for irrs, md in zip(rimodata.values(), mds):
             elrefs = rl.get_elrefs(rc, md)
-            elis = rl.get_elis_from_elrefs(elrefs, md)
+            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated")
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
 

@@ -109,9 +109,11 @@ def get_apollo16_data() -> SpectralData:
     refl = data[:, 1]
     wavs = wavs[np.where(np.isfinite(refl))]
     refl = refl[np.where(np.isfinite(refl))]
-    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
     # TODO: Correct uncertainties from data
     unc_tot = np.zeros(refl.shape)
+    corr = np.zeros((len(refl), len(refl)))
+    np.fill_diagonal(corr, 1)
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl, unc_tot, corr)
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
     return spectral_data
 
@@ -130,8 +132,11 @@ def get_breccia_data() -> SpectralData:
     refl = data[:, 1]
     wavs = wavs[np.where(np.isfinite(refl))]
     refl = refl[np.where(np.isfinite(refl))]
-    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    # TODO: Correct uncertainties from data
     unc_tot = np.zeros(refl.shape)
+    corr = np.zeros((len(refl), len(refl)))
+    np.fill_diagonal(corr, 1)
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl, unc_tot, corr)
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
     return spectral_data
 
@@ -153,8 +158,15 @@ def get_composite_data() -> SpectralData:
     refl = data[:, 1]
     wavs = wavs[np.where(np.isfinite(refl))]
     refl = refl[np.where(np.isfinite(refl))]
-    ds_asd = SpectralData.make_reflectance_ds(wavs, refl)
+    valid_wavs = [i for i in range(350, 2501)]
+    valid_ids = np.where(np.in1d(wavs, valid_wavs))[0]
+    wavs = wavs[valid_ids]
+    refl = refl[valid_ids]
+    # TODO: Correct uncertainties from data
     unc_tot = np.zeros(refl.shape)
+    corr = np.zeros((len(refl), len(refl)))
+    np.fill_diagonal(corr, 1)
+    ds_asd = SpectralData.make_reflectance_ds(wavs, refl, unc_tot, corr)
     spectral_data = SpectralData(wavs, refl, unc_tot, ds_asd)
     return spectral_data
 
@@ -166,8 +178,8 @@ SPECTRUM_NAME_COMPOSITE = "Apollo 16 + Breccia"
 
 _VALID_INTERP_SPECTRA = [
     SPECTRUM_NAME_ASD,
-    SPECTRUM_NAME_APOLLO16,
-    SPECTRUM_NAME_BRECCIA,
+    #    SPECTRUM_NAME_APOLLO16,
+    #    SPECTRUM_NAME_BRECCIA,
     SPECTRUM_NAME_COMPOSITE,
 ]
 

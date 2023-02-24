@@ -1,13 +1,7 @@
 """Tests for tsis module"""
 
 """___Built-In Modules___"""
-from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
-    _get_tsis_data,
-    tsis_cimel,
-    tsis_asd,
-    tsis_intp,
-)
-from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
+import os
 
 """___Third-Party Modules___"""
 import unittest
@@ -15,6 +9,16 @@ import numpy as np
 import numpy.testing as npt
 
 """___NPL Modules___"""
+
+"""___LIME_TBX Modules"""
+from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
+    _get_tsis_data,
+    tsis_cimel,
+    tsis_asd,
+    tsis_intp,
+    _gen_files,
+)
+from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -26,8 +30,7 @@ __status__ = "Development"
 
 class Test_TSIS(unittest.TestCase):
     def test_tsis_irradiance(self):
-        # TODO what is this
-        self.skipTest("This tsis doesn't work")
+        _current_dir = os.path.dirname(os.path.abspath(__file__))
         solar_data = _get_tsis_data()
         solar_x = np.array(list(solar_data.keys()))
         solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
@@ -36,9 +39,13 @@ class Test_TSIS(unittest.TestCase):
             solar_y, solar_x, u_solar_y, MCsteps=10
         )
         # asd_wavs,asd_esi,u_asd_esi=tsis_asd(solar_y,solar_x,u_solar_y,MCsteps=2)
-        dat = np.genfromtxt("../assets/tsis_asd.csv", delimiter=",")
+        dat = np.genfromtxt(
+            os.path.join(_current_dir, "../assets/tsis_asd.csv"), delimiter=","
+        )
         asd_wavs, asd_esi, u_asd_esi = dat[:, 0], dat[:, 1], dat[:, 2]
-        dat = np.genfromtxt("../assets/tsis_intp.csv", delimiter=",")
+        dat = np.genfromtxt(
+            os.path.join(_current_dir, "../assets/tsis_intp.csv"), delimiter=","
+        )
         intp_wavs, intp_esi, u_intp_esi = dat[:, 0], dat[:, 1], dat[:, 2]
         si = SpectralIntegration()
         cimel_esi_asd = si.integrate_cimel(asd_esi, asd_wavs)
