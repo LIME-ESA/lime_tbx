@@ -52,18 +52,19 @@ class TestInterpData(unittest.TestCase):
     def test_get_composite_data(self):
         codata = ipd.get_composite_data()
         self.assertEqual(codata.data[0], 0.09966)  # First
-        self.assertEqual(codata.data[700], 0.12451)  # 420.00
-        self.assertEqual(codata.data[1500], 0.14640)  # 500.00
-        self.assertEqual(codata.data[-1], 0.36427)  # Last
+        self.assertEqual(codata.data[70], 0.12451)  # 420.00
+        self.assertEqual(codata.data[150], 0.14640)  # 500.00
+        self.assertEqual(codata.data[-1], 0.35871)  # Last (2500).
 
     def test_get_available_spectra_names(self):
         names = ipd.get_available_spectra_names()
-        t_names = ["ASD", "Apollo 16", "Breccia", "Apollo 16 + Breccia"]
+        t_names = ["ASD", "Apollo 16 + Breccia"]
         self.assertEqual(names, t_names)
 
     def test_change_spectrum_persistency(self):
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)
         self.assertEqual(ipd.get_interpolation_spectrum_name(), ipd.SPECTRUM_NAME_ASD)
+        """
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_APOLLO16)
         self.assertEqual(
             ipd.get_interpolation_spectrum_name(), ipd.SPECTRUM_NAME_APOLLO16
@@ -72,6 +73,7 @@ class TestInterpData(unittest.TestCase):
         self.assertEqual(
             ipd.get_interpolation_spectrum_name(), ipd.SPECTRUM_NAME_BRECCIA
         )
+        """
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_COMPOSITE)
         self.assertEqual(
             ipd.get_interpolation_spectrum_name(), ipd.SPECTRUM_NAME_COMPOSITE
@@ -85,10 +87,12 @@ class TestInterpData(unittest.TestCase):
         )
 
     def test_can_perform_polarization_only_asd(self):
+        """
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_APOLLO16)
         self.assertFalse(ipd.can_perform_polarization())
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_BRECCIA)
         self.assertFalse(ipd.can_perform_polarization())
+        """
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_COMPOSITE)
         self.assertFalse(ipd.can_perform_polarization())
         ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)

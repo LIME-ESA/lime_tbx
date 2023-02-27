@@ -7,6 +7,7 @@ import sys
 import io
 import shlex
 import locale
+import warnings
 
 """___Third-Party Modules___"""
 import unittest
@@ -69,12 +70,14 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         locale.setlocale(locale.LC_ALL, cls._prev_lang)
 
     def setUp(self):
+        warnings.filterwarnings("ignore")
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
         sys.stderr = self.capturedErr
 
     def tearDown(self):
+        warnings.resetwarnings()
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 

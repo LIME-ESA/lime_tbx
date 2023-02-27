@@ -111,8 +111,7 @@ def read_moon_obs(path: str) -> LunarObservation:
         return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)
     except Exception as e:
         logger.get_logger().exception(e)
-        raise e
-        # raise Exception(_READ_FILE_ERROR_STR)
+        raise Exception(_READ_FILE_ERROR_STR)
 
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%SZ"

@@ -201,6 +201,9 @@ REL_DIFF_MAX = 1e-4  # lower number doesnt make sense, RimoApp output is truncat
 
 class TestIrrApollo(unittest.TestCase):
     def test_Valladolid_20220117(self):
+        self.skipTest(
+            "This test cannot be performed, the ESI is constant and the reflectance cannot be calculated for custom wavelengths."
+        )
         rimodata = RIMODATA_JAN_FULL_MOON_00
         rl = rolo.ROLO()
         rc = get_coeffs()
@@ -212,6 +215,9 @@ class TestIrrApollo(unittest.TestCase):
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
     def test_Valladolid_202202_fullmonth(self):
+        self.skipTest(
+            "This test cannot be performed, the ESI is constant and the reflectance cannot be calculated for custom wavelengths."
+        )
         rimodata = RIMODATA_FEB_2022
         rl = rolo.ROLO()
         rc = get_coeffs()
