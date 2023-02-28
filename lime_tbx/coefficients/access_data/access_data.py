@@ -146,6 +146,7 @@ def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     uncs = _DEFAULT_UNCS
     err_corr_size = len(uncs) * len(uncs[0])
     err_corr = np.zeros((err_corr_size, err_corr_size))
+    np.fill_diagonal(err_corr, 1)
     coeffs = PolarizationCoefficients(
         wlens, pos_coeffs, uncs, err_corr, neg_coeffs, uncs, err_corr
     )
@@ -168,6 +169,7 @@ def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoeff
     ds_cimel.coeff.values = data.T
     ds_cimel.u_coeff.values = u_data.T
     ds_cimel.err_corr_coeff.values = np.zeros((18 * 6, 18 * 6))
+    np.fill_diagonal(ds_cimel.err_corr_coeff.values, 1)
 
     return ReflectanceCoefficients(ds_cimel)
 

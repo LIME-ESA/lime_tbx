@@ -108,7 +108,7 @@ def redraw_canvas(
                 marker=marker,
                 label=label,
             )
-            if data.uncertainties is not None:
+            if data.uncertainties is not None and data.uncertainties.size > 0:
                 scanvas.axes.fill_between(
                     data.wlens,
                     data.data - 2 * data.uncertainties,
@@ -189,7 +189,7 @@ def redraw_canvas(
                 "k{}".format(marker),
                 label=label,
             )
-            if data_comp.uncertainties is not None:
+            if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
                 ax2.fill_between(
                     data_comp.wlens,
                     data_comp.data - 2 * data_comp.uncertainties,
@@ -197,12 +197,8 @@ def redraw_canvas(
                     color="pink",
                     alpha=0.3,
                 )
-            ax2.set_ylim(
-                (
-                    min(-0.05, min(data_comp.data) - 0.05),
-                    max(0.05, max(data_comp.data) + 0.05),
-                )
-            )
+            ylim = max(list(map(abs, ax2.get_ylim())))
+            ax2.set_ylim((-ylim - 0.05, ylim + 0.05))
             data_compare_info = "MRD: {:.4f}\nσ: {:.4f}\n".format(
                 sdata_compare.mean_relative_difference,
                 sdata_compare.standard_deviation_mrd,

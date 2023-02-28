@@ -521,7 +521,8 @@ class ComparisonOutput(QtWidgets.QWidget):
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
         # Remove range warning content
-        self.range_warning.setText("")
+        if self.range_warning:
+            self.range_warning.setText("")
         # if self.range_warning:
         #    self.range_warning.setParent(None)
         #    self.range_warning = None
