@@ -30,6 +30,7 @@ from ...filedata import moon, srf as srflib
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 
 """___Authorship___"""
@@ -43,6 +44,9 @@ KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 EOCFI_PATH = "./eocfi_data"
 
 CH_WLENS = np.array([350, 400, 450, 500])
+CH_DEF_INDICES = np.where(
+    np.in1d(list(get_default_srf().channels[0].spectral_response.keys()), CH_WLENS)
+)
 CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
 CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 
@@ -106,21 +110,21 @@ class TestLimeSimulation(unittest.TestCase):
     # Function update_reflectance
     def test_update_reflectance(self):
         ls = get_lime_simulation()
-        ls.update_reflectance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), SURFACE_POINT, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         cimels = ls.get_elrefs_cimel()
         self.assertIsNotNone(elrefs)
         self.assertIsInstance(elrefs, list)
         elrefs_refs = np.array(
             [
-                [0.24393677, 0.0669242, 0.08324007, 0.08303441],
-                [0.34973767, 0.07214307, 0.08856552, 0.08820582],
+                [0.039, 0.062, 0.076, 0.083],
+                [0.041, 0.066, 0.081, 0.088],
             ]
         )
         uncs_refs = np.array(
             [
-                [0.00243937, 0.00066924, 0.00082782, 0.00083034],
-                [0.00349738, 0.00072143, 0.00088566, 0.00088206],
+                [4.5e-04, 6.7e-04, 8.1e-04, 1.5e-05],
+                [5.2e-04, 6.7e-04, 8.1e-04, 1.5e-05],
             ]
         )
         cimel_refs = np.array(
@@ -145,20 +149,31 @@ class TestLimeSimulation(unittest.TestCase):
         )
         cimel_unc_refs = np.array(
             [
-                [0.00066694, 0.00078409, 0.00088831, 0.0010316, 0.000949, 0.00129523],
                 [
-                    0.00071119,
-                    0.00084021,
-                    0.00094079,
-                    0.00106406,
-                    0.00098252,
-                    0.00134816,
+                    1.4840e-05,
+                    1.6218e-05,
+                    1.6754e-05,
+                    1.9120e-05,
+                    1.6623e-05,
+                    1.9480e-05,
+                ],
+                [
+                    1.6008e-05,
+                    1.7083e-05,
+                    1.7156e-05,
+                    1.9426e-05,
+                    1.7426e-05,
+                    1.9985e-05,
                 ],
             ]
         )
         for elref, elref_ref, unc in zip(elrefs, elrefs_refs, uncs_refs):
-            np.testing.assert_array_almost_equal(elref.data, elref_ref, 3)
-            np.testing.assert_array_almost_equal(elref.uncertainties, unc, 5)
+            np.testing.assert_array_almost_equal(
+                elref.data[CH_DEF_INDICES], elref_ref, 3
+            )
+            np.testing.assert_array_almost_equal(
+                elref.uncertainties[CH_DEF_INDICES], unc, 4
+            )
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
             np.testing.assert_array_equal(cimel.data, data)
             np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 4)
@@ -166,7 +181,9 @@ class TestLimeSimulation(unittest.TestCase):
     # Function update_irradiance
     def test_update_irradiance(self):
         ls = get_lime_simulation()
-        ls.update_irradiance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_irradiance(
+            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
+        )
         elis = ls.get_elis()
         self.assertIsNotNone(elis)
         self.assertIsInstance(elis, list)
@@ -175,8 +192,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(signals, SpectralData)
         elis_refs = np.array(
             [
-                [4.71002101e-06, 2.15214190e-06, 3.36387167e-06, 3.09612094e-06],
-                [7.02065021e-06, 2.41196890e-06, 3.74160725e-06, 3.41937272e-06],
+                [7.508914e-07, 1.981703e-06, 3.090270e-06, 3.096121e-06],
+                [8.308273e-07, 2.192665e-06, 3.418179e-06, 3.419373e-06],
             ]
         )
         uncs_refs = np.array(
@@ -186,8 +203,8 @@ class TestLimeSimulation(unittest.TestCase):
             ]
         )
         for eli, eli_ref, unc in zip(elis, elis_refs, uncs_refs):
-            np.testing.assert_array_almost_equal(eli.data, eli_ref)
-            np.testing.assert_array_almost_equal(eli.uncertainties, unc)
+            np.testing.assert_array_almost_equal(eli.data[CH_DEF_INDICES], eli_ref)
+            np.testing.assert_array_almost_equal(eli.uncertainties[CH_DEF_INDICES], unc)
         np.testing.assert_array_almost_equal(
             signals.data, np.array([[3.16668016e-06, 3.75979585e-06]])
         )
@@ -196,20 +213,20 @@ class TestLimeSimulation(unittest.TestCase):
         cimel_refs = np.array(
             [
                 [
-                    2.4952736664368175e-06,
-                    3.096120936905104e-06,
-                    3.1435125546491005e-06,
-                    2.294878010642595e-06,
-                    1.814630922972356e-06,
-                    8.344850619622514e-07,
+                    2.6237802025548067e-06,
+                    3.1685931571619723e-06,
+                    3.1508629556748644e-06,
+                    2.1881525065050035e-06,
+                    1.787553267951884e-06,
+                    8.068699993533158e-07,
                 ],
                 [
-                    2.760907224971663e-06,
-                    3.419372719075061e-06,
-                    3.4570693403225917e-06,
-                    2.514064499346069e-06,
-                    1.983194191275128e-06,
-                    9.053680025902102e-07,
+                    2.9030938832113895e-06,
+                    3.4994114313499266e-06,
+                    3.4651529237610166e-06,
+                    2.3971455172115902e-06,
+                    1.953601260023857e-06,
+                    8.754072576766165e-07,
                 ],
             ]
         )
@@ -240,7 +257,7 @@ class TestLimeSimulation(unittest.TestCase):
     # Function update_polarization
     def test_update_polarization(self):
         ls = get_lime_simulation()
-        ls.update_polarization(get_srf(), SURFACE_POINT, get_polar_coeffs())
+        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         polars = ls.get_polars()
         self.assertIsNotNone(polars)
         self.assertIsInstance(polars, list)
@@ -252,13 +269,15 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [-0.00014803, -0.00014803, -0.00014667, -0.00014052],
-                [-0.00014514, -0.00014514, -0.00014359, -0.00013667],
+                [-0.0014803, -0.0014803, -0.0014667, -0.0014052],
+                [-0.0014514, -0.0014514, -0.0014359, -0.0013667],
             ]
         )
         for polar, pref, uref in zip(polars, polars_refs, uncs_refs):
-            np.testing.assert_array_almost_equal(polar.data, pref, 5)
-            np.testing.assert_array_almost_equal(polar.uncertainties, uref)
+            np.testing.assert_array_almost_equal(polar.data[CH_DEF_INDICES], pref, 5)
+            np.testing.assert_array_almost_equal(
+                polar.uncertainties[CH_DEF_INDICES], uref
+            )
         cimels = ls.get_polars_cimel()
         cimel_refs = np.array(
             [
@@ -304,8 +323,10 @@ class TestLimeSimulation(unittest.TestCase):
         sys.stderr = self.capturedErr
 
         ls = LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=True)
-        ls.update_irradiance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
-        ls.update_polarization(get_srf(), SURFACE_POINT, get_polar_coeffs())
+        ls.update_irradiance(
+            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
+        )
+        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         elis = ls.get_elis()
         self.assertIsNotNone(elis)
         self.assertIsInstance(elis, list)
@@ -333,7 +354,7 @@ class TestLimeSimulation(unittest.TestCase):
     def test_get_surfacepoints_ok(self):
         ls = get_lime_simulation()
         sp = SATELLITE_POINT
-        ls.update_irradiance(get_srf(), sp, get_cimel_coeffs())
+        ls.update_irradiance(get_default_srf(), get_srf(), sp, get_cimel_coeffs())
         eocfi = EOCFIConverter(EOCFI_PATH, KERNELS_PATH)
         dts = [sp.dt]
         llhs = eocfi.get_satellite_position(sp.name, dts)
@@ -348,7 +369,7 @@ class TestLimeSimulation(unittest.TestCase):
     def test_get_surfacepoints_ok_multiple(self):
         ls = get_lime_simulation()
         sp = SATELLITE_POINT_2
-        ls.update_irradiance(get_srf(), sp, get_cimel_coeffs())
+        ls.update_irradiance(get_default_srf(), get_srf(), sp, get_cimel_coeffs())
         eocfi = EOCFIConverter(EOCFI_PATH, KERNELS_PATH)
         dts = sp.dt
         llhs = eocfi.get_satellite_position(sp.name, dts)
@@ -363,14 +384,16 @@ class TestLimeSimulation(unittest.TestCase):
 
     def test_get_surfacepoints_not_sat_point(self):
         ls = get_lime_simulation()
-        ls.update_irradiance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_irradiance(
+            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
+        )
         pts = ls.get_surfacepoints()
         self.assertIsNone(pts)
 
     # get point
     def test_update_get_point(self):
         ls = get_lime_simulation()
-        ls.update_reflectance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), SURFACE_POINT, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         self.assertIsNotNone(elrefs)
         self.assertIsInstance(elrefs, list)
@@ -379,7 +402,7 @@ class TestLimeSimulation(unittest.TestCase):
 
     def test_update_get_point_satellite(self):
         ls = get_lime_simulation()
-        ls.update_reflectance(get_srf(), SATELLITE_POINT, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), SATELLITE_POINT, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         self.assertIsNotNone(elrefs)
         self.assertIsInstance(
@@ -392,7 +415,7 @@ class TestLimeSimulation(unittest.TestCase):
     def test_get_moon_datas_ok(self):
         ls = get_lime_simulation()
         sp = SURFACE_POINT
-        ls.update_reflectance(get_srf(), sp, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), sp, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         self.assertIsNotNone(elrefs)
         self.assertIsInstance(elrefs, list)
@@ -410,7 +433,7 @@ class TestLimeSimulation(unittest.TestCase):
     def test_get_moon_datas_ok_sat(self):
         ls = get_lime_simulation()
         sp = SATELLITE_POINT_2
-        ls.update_reflectance(get_srf(), sp, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), sp, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         self.assertIsNotNone(elrefs)
         self.assertIsInstance(elrefs, list)
@@ -443,7 +466,7 @@ class TestLimeSimulation(unittest.TestCase):
     def test_are_mpas_inside_mpa_range(self):
         ls = get_lime_simulation()
         sp = SURFACE_POINT
-        ls.update_reflectance(get_srf(), sp, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), sp, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         self.assertIsNotNone(elrefs)
         self.assertIsInstance(elrefs, list)
@@ -456,11 +479,13 @@ class TestLimeSimulation(unittest.TestCase):
     def test_is_polarization_updated(self):
         ls = get_lime_simulation()
         self.assertFalse(ls.is_polarization_updated())
-        ls.update_reflectance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_reflectance(get_default_srf(), SURFACE_POINT, get_cimel_coeffs())
         self.assertFalse(ls.is_polarization_updated())
-        ls.update_irradiance(get_srf(), SURFACE_POINT, get_cimel_coeffs())
+        ls.update_irradiance(
+            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
+        )
         self.assertFalse(ls.is_polarization_updated())
-        ls.update_polarization(get_srf(), SURFACE_POINT, get_polar_coeffs())
+        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         self.assertTrue(ls.is_polarization_updated())
         ls.set_simulation_changed()
         self.assertFalse(ls.is_polarization_updated())

@@ -43,7 +43,7 @@ MD = MoonData(1, 400000, 1, 40, 30, 50, 50)
 SOLID_ANGLE_MOON: float = 6.4177e-05
 DIST_EARTH_MOON_KM: int = 384400
 
-ELIS_CHECK_DATA = np.array(
+ELIS_CHECK_DATA_WEHRLI = np.array(
     [
         1.0268298152854062e-06,
         1.3186330679696958e-06,
@@ -53,7 +53,23 @@ ELIS_CHECK_DATA = np.array(
         4.2556319749134344e-07,
     ]
 )
+ELIS_CHECK_DATA = np.array(
+    [
+        1.0797115270270405e-06,
+        1.349498873307202e-06,
+        1.4076935974170986e-06,
+        1.0233894777590921e-06,
+        8.503963982841415e-07,
+        4.1148031586953454e-07,
+    ]
+)
+
 ELIS_CHECK_UNCS = np.array([2.69357809e-22, 5.69153199e-22, 5.74017174e-22, 0, 0, 0])
+
+ELREF_CORR = np.zeros((len(ELIS_CHECK_UNCS), len(ELIS_CHECK_UNCS)))
+np.fill_diagonal(ELREF_CORR, 1)
+
+ELREF_DS = SpectralData.make_reflectance_ds(WLENS, ELREF_DATA, ELREF_UNCS, ELREF_CORR)
 
 
 class TestELRef(unittest.TestCase):
@@ -68,7 +84,7 @@ class TestELRef(unittest.TestCase):
             DIST_EARTH_MOON_KM,
             MD.distance_observer_moon,
         )
-        np.testing.assert_array_equal(elis, ELIS_CHECK_DATA)
+        np.testing.assert_array_equal(elis, ELIS_CHECK_DATA_WEHRLI)
 
     def test_measurement_func_eli_one_wlen(self):
         eli_val = eli._measurement_func_eli(
@@ -79,7 +95,7 @@ class TestELRef(unittest.TestCase):
             DIST_EARTH_MOON_KM,
             MD.distance_observer_moon,
         )
-        self.assertEqual(eli_val, ELIS_CHECK_DATA[0])
+        self.assertEqual(eli_val, ELIS_CHECK_DATA_WEHRLI[0])
 
     def test_measurement_func_eli_one_multiple_same(self):
         elis = eli._measurement_func_eli(
@@ -106,12 +122,12 @@ class TestELRef(unittest.TestCase):
         np.testing.assert_array_equal(eli_ones, elis)
 
     def test_calculate_eli_from_elref(self):
-        elis = eli.calculate_eli_from_elref(WLENS, MD, ELREF_DATA)
+        elis = eli.calculate_eli_from_elref(WLENS, MD, ELREF_DATA, "cimel")
         np.testing.assert_array_equal(elis, ELIS_CHECK_DATA)
 
     def test_calculate_eli_unc(self):
-        elref_spectrum = SpectralData(WLENS, ELREF_DATA, ELREF_UNCS, None)
-        u_elis = eli.calculate_eli_from_elref_unc(elref_spectrum, MD)
+        elref_spectrum = SpectralData(WLENS, ELREF_DATA, ELREF_UNCS, ELREF_DS)
+        u_elis, corr = eli.calculate_eli_from_elref_unc(elref_spectrum, MD, "cimel")
         np.testing.assert_array_almost_equal(u_elis, ELIS_CHECK_UNCS)
 
 

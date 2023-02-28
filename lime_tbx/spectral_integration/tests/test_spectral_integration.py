@@ -10,6 +10,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from ..spectral_integration import ISpectralIntegration, SpectralIntegration
 from ...datatypes.datatypes import SRFChannel, SpectralData, SpectralResponseFunction
+from lime_tbx.lime_algorithms.rolo.tsis_irradiance import _get_tsis_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -54,7 +55,22 @@ class TestSpectralIntegration(unittest.TestCase):
     def test_u_integrate_elis_ok(self):
         si = get_spectral_integrator()
         uncertainties = si.u_integrate_elis(get_srf(), ELIS_LIME)
-        self.assertEqual(uncertainties, [0])
+        self.assertIsInstance(uncertainties, list)
+        self.assertAlmostEqual(uncertainties[0], 0.0012, 4)
+
+    def test_integrate_cimel_ok(self):
+        solar_data = _get_tsis_data()
+        solar_x = np.array(list(solar_data.keys()))
+        solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
+        si = get_spectral_integrator()
+        esi_cimel = si.integrate_cimel(solar_y, solar_x)
+        np.testing.assert_allclose(
+            esi_cimel, [1.862, 1.960, 1.515, 0.9309, 0.7016, 0.2278], rtol=0.01
+        )
+        zeros_cimel = si.integrate_cimel(np.zeros(3000), np.arange(0, 3000, 1))
+        np.testing.assert_allclose(zeros_cimel, np.zeros_like(esi_cimel), atol=0.01)
+        ones_cimel = si.integrate_cimel(np.ones(3000), np.arange(0, 3000, 1))
+        np.testing.assert_allclose(ones_cimel, np.ones_like(ones_cimel), rtol=0.01)
 
 
 if __name__ == "__main__":

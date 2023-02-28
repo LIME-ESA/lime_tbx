@@ -1,1 +1,1 @@
-Interpolation spectrum not recognized. Selected: inventedspectrum. Available: ['ASD', 'Apollo 16', 'Breccia', 'Apollo 16 + Breccia'].
+Interpolation spectrum not recognized. Selected: inventedspectrum. Available: ['ASD', 'Apollo 16 + Breccia'].

@@ -12,6 +12,7 @@ It exports the following functions:
 from typing import Union, List
 from datetime import datetime, timezone
 import csv
+import os
 
 """___Third-Party Modules___"""
 import numpy as np

@@ -13,14 +13,18 @@ from abc import ABC, abstractmethod
 """___Third-Party Modules___"""
 import numpy as np
 from numpy.typing import NDArray
+import comet_maths as cm
 
 """___NPL Modules___"""
-import punpy
-from comet_maths.interpolation.interpolation import Interpolator
+# import here
 
 """___LIME_TBX Modules___"""
 import lime_tbx.interpolation.interp_data.interp_data as idata
 from lime_tbx.datatypes.datatypes import MoonData, SpectralData
+from lime_tbx.spectral_integration.spectral_integration import (
+    SpectralIntegration,
+    ISpectralIntegration,
+)
 
 
 """___Authorship___"""
@@ -164,17 +168,9 @@ class ISpectralInterpolation(ABC):
 class SpectralInterpolation(ISpectralInterpolation):
     """Class that implements all the functions exported by this module."""
 
-    def __init__(
-        self, relative=True, method_main="linear", method_hr="linear", MCsteps=1000
-    ):
-        self.intp = Interpolator(
-            relative=relative,
-            method=method_main,
-            method_hr=method_hr,
-            min_scale=0.3,
-            # plot_residuals=True,
-        )
-        self.prop = punpy.MCPropagation(MCsteps)
+    def __init__(self, MCsteps=100):
+        self.si: ISpectralIntegration = SpectralIntegration()
+        self.MCsteps = MCsteps
 
     def _get_best_polar_asd_reference(self, moon_data: MoonData):
         mock = idata.get_best_asd_data(moon_data.mpa_degrees)
@@ -203,14 +199,24 @@ class SpectralInterpolation(ISpectralInterpolation):
         asd_refl: NDArray[np.float_],
         final_wav: NDArray[np.float_],
     ) -> NDArray[np.float_]:
+        integr_cimel = self.si.integrate_cimel(asd_refl, asd_wav)
+        interp_asd_cimel = cm.interpolate_1d(
+            asd_wav, asd_refl, cimel_wav, method="linear"
+        )
+        corr_srf_cimel = integr_cimel - interp_asd_cimel
+        return cm.interpolate_1d_along_example(
+            cimel_wav,
+            cimel_refl - corr_srf_cimel,
+            asd_wav,
+            asd_refl,
+            final_wav,
+            method="linear",
+            method_hr="linear",
+        )
         # from scipy import interpolate
         # f = interpolate.interp1d(cimel_wav, cimel_refl, fill_value="extrapolate")
         # yy = f(final_wav)
         # return yy
-        yy = self.intp.interpolate_1d_along_example(
-            cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav
-        )
-        return yy
 
     def get_interpolated_refl_unc(
         self,
@@ -224,11 +230,24 @@ class SpectralInterpolation(ISpectralInterpolation):
         corr_cimel_refl=None,
         corr_asd_refl=None,
     ) -> NDArray[np.float_]:
-        u_yy, corr_yy = self.prop.propagate_random(
-            self.intp.interpolate_1d_along_example,
-            [cimel_wav, cimel_refl, asd_wav, asd_refl, final_wav],
-            [None, u_cimel_refl, None, u_asd_refl, None],
-            corr_x=[None, corr_cimel_refl, None, corr_asd_refl, None],
-            return_corr=True,
+        corr_srf_cimel = self.si.integrate_cimel(asd_refl, asd_wav) - cm.interpolate_1d(
+            asd_wav, asd_refl, cimel_wav, method="linear"
         )
-        return u_yy, corr_yy
+        return cm.interpolate_1d_along_example(
+            cimel_wav,
+            cimel_refl - corr_srf_cimel,
+            asd_wav,
+            asd_refl,
+            final_wav,
+            method="linear",
+            method_hr="linear",
+            u_y_i=u_cimel_refl,
+            u_y_hr=u_asd_refl,
+            unc_methods=["linear", "quadratic"],
+            corr_y_i=corr_cimel_refl,
+            corr_y_hr=corr_asd_refl,
+            return_uncertainties=True,
+            return_corr=True,
+            parallel_cores=1,
+            MCsteps=self.MCsteps,
+        )

@@ -97,6 +97,7 @@ class ILimeSimulation(ABC):
     def update_irradiance(
         self,
         srf: SpectralResponseFunction,
+        signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
     ):
@@ -106,7 +107,9 @@ class ILimeSimulation(ABC):
         Parameters
         ----------
         srf: SpectralResponseFunction
-            SRF for which the reflectance, irradiance and integrated signal will be calculated.
+            SRF for which the reflectance and irradiance will be calculated.
+        srf: SpectralResponseFunction
+            SRF for which the integrated signal will be calculated.
         point: Point
             Point (location) for which the irradiance will be calculated.
         cimel_coeff: ReflectanceCoefficients
@@ -464,9 +467,9 @@ class LimeSimulation(ILimeSimulation):
         Union[SpectralData, List[SpectralData]],
         Union[SpectralData, List[SpectralData]],
     ]:
-        elis = LimeSimulation._calculate_eli_from_elref(mds, elrefs)
-        elis_cimel = LimeSimulation._calculate_eli_from_elref(mds, elref_cimel)
-        elis_asd = LimeSimulation._calculate_eli_from_elref(mds, elref_asd)
+        elis = LimeSimulation._calculate_eli_from_elref(mds, elrefs, "interpolated")
+        elis_cimel = LimeSimulation._calculate_eli_from_elref(mds, elref_cimel, "cimel")
+        elis_asd = LimeSimulation._calculate_eli_from_elref(mds, elref_asd, "asd")
         return elis, elis_cimel, elis_asd
 
     @staticmethod
@@ -491,6 +494,7 @@ class LimeSimulation(ILimeSimulation):
     def update_irradiance(
         self,
         srf: SpectralResponseFunction,
+        signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
     ):
@@ -513,7 +517,7 @@ class LimeSimulation(ILimeSimulation):
                 print("irradiance update done")
 
         if not self.signals_uptodate:
-            self.signals = self._calculate_signals(srf)
+            self.signals = self._calculate_signals(signals_srf)
             self.signals_uptodate = True
             if self.verbose:
                 print("signals update done")
@@ -555,45 +559,34 @@ class LimeSimulation(ILimeSimulation):
         wlens: List[float],
     ) -> Union[SpectralData, List[SpectralData]]:
 
+        wlens = np.array(wlens)
         is_list = isinstance(cimel_data, list)
         if not is_list:
             cimel_data = [cimel_data]
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
         for i, cf in enumerate(cimel_data):
-            # wlens_valid = [
-            #     wlen
-            #     for wlen in wlens
-            #     if wlen >= min(cf.wlens) and wlen <= max(cf.wlens)
-            # ]
-            # inf_wlens = [wlen for wlen in wlens if wlen < min(cf.wlens)]
-            # sup_wlens = [wlen for wlen in wlens if wlen > max(cf.wlens)]
-            elrefs_intp = intp.get_interpolated_refl(
+            (
+                elrefs_intp,
+                u_elrefs_intp,
+                corr_elrefs_intp,
+            ) = intp.get_interpolated_refl_unc(
                 cf.wlens,
                 cf.data,
                 asd_data[i].wlens,
                 asd_data[i].data,
                 wlens,
+                cf.uncertainties,
+                asd_data[i].uncertainties,
+                cf.ds.err_corr_reflectance.values,
+                asd_data[i].ds.err_corr_reflectance.values,
             )
-            # # 0s when the points cant be interpolated
-            # elrefs_intp = np.concatenate(
-            #     [
-            #         np.zeros(len(inf_wlens), np.float64),
-            #         elrefs_intp,
-            #         np.zeros(len(sup_wlens), np.float64),
-            #     ]
-            # )
-
-            u_elrefs_intp = None
-            u_elrefs_intp = (
-                elrefs_intp * 0.01
-            )  # intp.get_interpolated_refl_unc(wlen_cimel,elrefs_cimel,wlen_asd,elrefs_asd,wlens,u_elrefs_cimel,u_elrefs_asd)
 
             ds_intp = SpectralData.make_reflectance_ds(
-                wlens, elrefs_intp, u_elrefs_intp
+                wlens, elrefs_intp, u_elrefs_intp, corr_elrefs_intp
             )
-
             specs.append(SpectralData(wlens, elrefs_intp, u_elrefs_intp, ds_intp))
+
         if not is_list:
             specs = specs[0]
         return specs
@@ -619,10 +612,14 @@ class LimeSimulation(ILimeSimulation):
                 asd_data[i].data,
                 wlens,
             )
-            u_polars_intp = None
-            u_polars_intp = polars_intp * 0.01
+            u_polars_intp = polars_intp * 0.1
+            corr = np.zeros((len(polars_intp), len(polars_intp)))
+            np.fill_diagonal(corr, 1)
             ds_intp = SpectralData.make_reflectance_ds(
-                wlens, polars_intp, u_polars_intp
+                wlens,
+                polars_intp,
+                u_polars_intp,
+                corr,
             )
 
             specs.append(SpectralData(wlens, polars_intp, u_polars_intp, ds_intp))
@@ -647,6 +644,7 @@ class LimeSimulation(ILimeSimulation):
     def _calculate_eli_from_elref(
         mds: Union[MoonData, List[MoonData]],
         elrefs: Union[SpectralData, List[SpectralData]],
+        srf_type: str,
     ) -> Union[SpectralData, List[SpectralData]]:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
@@ -659,6 +657,8 @@ class LimeSimulation(ILimeSimulation):
             moon datas
         elrefs: SpectralData | list of SpectralData
             elrefs previously calculated
+        srf_type: str
+            SRF type that is going to be used. Can be 'cimel', 'asd' or 'interpolated'.
 
         Returns
         -------
@@ -667,10 +667,10 @@ class LimeSimulation(ILimeSimulation):
         """
         rl = rolo.ROLO()
         if not isinstance(mds, list):
-            return rl.get_elis_from_elrefs(elrefs, mds)
+            return rl.get_elis_from_elrefs(elrefs, mds, srf_type)
         specs = []
         for i, m in enumerate(mds):
-            specs.append(rl.get_elis_from_elrefs(elrefs[i], m))
+            specs.append(rl.get_elis_from_elrefs(elrefs[i], m, srf_type))
         return specs
 
     @staticmethod

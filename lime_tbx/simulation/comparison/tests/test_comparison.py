@@ -139,8 +139,10 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(comp.dts[0], OBS1.dt)
         self.assertEqual(comp.number_samples, 1)
         self.assertEqual(comp.observed_signal.data[0], OBS1.ch_irrs["Default"])
-        self.assertAlmostEqual(comp.simulated_signal.data[0], 3.2482260857877954e-06)
-        self.assertEqual(comp.simulated_signal.uncertainties[0], 0)
+        self.assertAlmostEqual(comp.simulated_signal.data[0], 2.54180198915401e-06)
+        self.assertAlmostEqual(
+            comp.simulated_signal.uncertainties[0], 1.5069602623384797e-08
+        )
 
     def test_get_simulations_multiple_obs_and_channels(self):
         co = get_comparison()
@@ -156,16 +158,19 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(comp.observed_signal.data[0], OBS2.ch_irrs["First"])
         self.assertEqual(comp.observed_signal.data[1], OBS3.ch_irrs["First"])
         np.testing.assert_array_almost_equal(
-            comp.simulated_signal.data, np.array([3.51188246e-06, 4.82822335e-06])
+            comp.simulated_signal.data, np.array([1.398473e-06, 1.547618e-06])
         )
-        np.testing.assert_array_equal(comp.simulated_signal.uncertainties, np.zeros(2))
+        np.testing.assert_array_almost_equal(
+            comp.simulated_signal.uncertainties, np.array([1.016344e-08, 1.118738e-08])
+        )
         self.assertEqual(comps[1].observed_signal.data[0], OBS2.ch_irrs["Second"])
         self.assertEqual(comps[1].observed_signal.data[1], OBS3.ch_irrs["Second"])
         np.testing.assert_array_almost_equal(
             comps[1].simulated_signal.data, np.array([3.30473368e-06, 3.66841620e-06])
         )
-        np.testing.assert_array_equal(
-            comps[1].simulated_signal.uncertainties, np.zeros(2)
+        np.testing.assert_array_almost_equal(
+            comps[1].simulated_signal.uncertainties,
+            np.array([2.290940e-08, 2.594562e-08]),
         )
 
     def test_get_simulations_other_srf(self):

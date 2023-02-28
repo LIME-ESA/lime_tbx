@@ -6,11 +6,21 @@
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
+import comet_maths as cm
 
 """___LIME_TBX Modules___"""
 from ..spectral_interpolation import SpectralInterpolation, ISpectralInterpolation
 from ...interp_data import interp_data as idata
 from ....datatypes.datatypes import KernelsPath, MoonData
+from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
+    SpectralInterpolation,
+)
+from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
+    _get_tsis_data,
+    tsis_cimel,
+    tsis_intp,
+)
+
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -39,8 +49,8 @@ MD2 = MoonData(
     -9.11726084520294,
 )
 
-CIMEL_WAV = np.array([400, 500, 600, 700, 800])
-CIMEL_DATA = np.array([0.4, 0.5, 0.6, 0.7, 0.8])
+CIMEL_WAV = np.array([440, 500, 675, 870, 1020, 1640])
+CIMEL_DATA = np.array([0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
 ASD_WAV = np.array([v for v in range(300, 1000)])
 ASD_DATA = np.array([1 for v in range(300, 1000)])
 U_CIMEL = np.array([0.1 * v for v in CIMEL_DATA])
@@ -95,11 +105,36 @@ class TestSpectralInterpolation(unittest.TestCase):
     def test_get_interp_ref_unc(self):
         # TODO
         # This one fails so it's skipped until this is implemented (it's not used in code)
-        return
+        self.skipTest("")
         ip = get_interpolator()
         iunc = ip.get_interpolated_refl_unc(
             CIMEL_WAV, CIMEL_DATA, ASD_WAV, ASD_DATA, CIMEL_WAV, U_CIMEL, U_ASD
         )
+
+    def test_interpolate_refl(self):
+        sin = SpectralInterpolation()
+        solar_data = _get_tsis_data()
+        solar_x = np.array(list(solar_data.keys()))
+        solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
+        u_solar_y = np.array(list(map(lambda x: x[1], solar_data.values())))
+        wlens = np.arange(350, 2500, 1)
+        si = ()
+        cimel_wavs, cimel_esi, u_cimel_esi = tsis_cimel(solar_y, solar_x, u_solar_y)
+
+        esi_intp = cm.interpolate_1d(solar_x, solar_y, wlens)
+        modified_solar_y = solar_y / np.arange(1, 5, 4 / len(solar_y))
+        elrefs_intp, u_elrefs_intp, corr_elrefs_intp = sin.get_interpolated_refl_unc(
+            cimel_wavs,
+            cimel_esi,
+            solar_x,
+            modified_solar_y,
+            wlens,
+            u_cimel_esi,
+            u_solar_y,
+            "syst",
+            "syst",
+        )
+        np.testing.assert_allclose(elrefs_intp, esi_intp, rtol=0.10, atol=0.10)
 
 
 if __name__ == "__main__":

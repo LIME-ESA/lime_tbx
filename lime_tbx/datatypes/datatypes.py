@@ -6,6 +6,7 @@ It exports the following classes:
     * MoonData - Moon data used in the calculations of the Moon's irradiance.
     * SRFChannel - Spectral responses and metadata for a SRF Channel
     * SpectralResponseFunction - The spectral response function, a set of channels with their data.
+    * SRF_fwhm - Dataclass containing the spectral response function, a set of channels with their data.
     * Point - Superclass for all point classes.
     * SurfacePoint - Point on Earth's surface
     * CustomPoint - Point with custom Moon data.
@@ -182,6 +183,30 @@ class SpectralResponseFunction:
         if len(chs) == 0:
             return None
         return chs[0]
+
+
+@dataclass
+class SRF_fwhm:
+    """
+    Dataclass containing the spectral response function, a set of channels with their data.
+
+    Attributes
+    ----------
+    name : str
+        Name of the SRF, the identifier.
+    channels: list of SRFChannel
+        List of the SRF channels.
+    """
+
+    name: str
+    wav_centre: np.ndarray
+    fwhm: np.ndarray
+
+    def get_wavelengths(self) -> List[float]:
+        return self.wav_centre
+
+    def get_values(self) -> List[float]:
+        return self.fwhm
 
 
 class Point(ABC):
@@ -483,7 +508,7 @@ class ReflectanceCoefficients:
         self.wlens: np.ndarray = _ds.wavelength.values
         coeffs: np.ndarray = _ds.coeff.values
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
-        u_coeff_cimel: np.ndarray = _ds.u_coeff.values
+        u_coeff_cimel: np.ndarray = _ds.u_coeff.values * coeffs / 100
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
         self.err_corr_coeff = _ds.err_corr_coeff
 
@@ -629,31 +654,36 @@ class SpectralData:
 
     @staticmethod
     def make_reflectance_ds(
-        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+        wavs: np.ndarray,
+        refl: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
+        if (
+            corr is not None
+            and not isinstance(corr, np.ndarray)
+            and not isinstance(corr, list)
+        ):
+            corr = np.array([[corr]])
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
-
         ds_refl = ds_refl.assign_coords(wavelength=wavs)
 
         ds_refl.reflectance.values = refl
-
-        if unc_rand is not None:
-            ds_refl.u_ran_reflectance.values = unc_rand
-        else:
-            ds_refl.u_ran_reflectance.values = refl * 0.01
-
-        if unc_syst is not None:
-            ds_refl.u_sys_reflectance.values = unc_syst
-        else:
-            ds_refl.u_sys_reflectance.values = refl * 0.05
+        if unc is not None:
+            ds_refl.u_reflectance.values = unc
+        if corr is not None:
+            ds_refl.err_corr_reflectance.values = corr
 
         return ds_refl
 
     @staticmethod
     def make_irradiance_ds(
-        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+        wavs: np.ndarray,
+        refl: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
@@ -663,15 +693,10 @@ class SpectralData:
 
         ds_irr.irradiance.values = refl
 
-        if unc_rand is not None:
-            ds_irr.u_ran_irradiance.values = unc_rand
-        else:
-            ds_irr.u_ran_irradiance.values = refl * 0.01
-
-        if unc_syst is not None:
-            ds_irr.u_sys_irradiance.values = unc_syst
-        else:
-            ds_irr.u_sys_irradiance.values = refl * 0.05
+        if unc is not None:
+            ds_irr.u_irradiance.values = unc
+        if corr is not None:
+            ds_irr.err_corr_irradiance.values = corr
 
         return ds_irr
 

@@ -11,6 +11,7 @@ It exports the following functions:
 import pkgutil
 import csv
 from io import StringIO
+import os
 from typing import Dict, Tuple
 
 """___Third-Party Modules___"""
@@ -27,6 +28,9 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 _WEHRLI_FILE = "assets/wehrli_asc.csv"
+_TSIS_CIMEL_FILE = "assets/tsis_cimel.csv"
+_TSIS_ASD_FILE = "assets/tsis_asd.csv"
+_TSIS_INTP_FILE = "assets/tsis_intp.csv"
 
 _loaded_data = {}
 
@@ -77,3 +81,89 @@ def get_esi_per_nms(wavelengths_nm: np.ndarray) -> np.ndarray:
     wehrli_x = list(wehrli_data.keys())
     wehrli_y = list(map(lambda x: x[0], wehrli_data.values()))
     return np.interp(wavelengths_nm, wehrli_x, wehrli_y)
+
+
+def get_esi(srf_type: str) -> np.ndarray:
+    """Gets the expected extraterrestrial solar irradiance of a concrete SRF.
+    Returns the data in Wm⁻²/nm.
+
+    It uses Wehrli 1985 data passed through different filters, the same data used in
+    AEMET's RimoApp and others.
+
+    Parameters
+    ----------
+    srf_type : str
+        Name of the srf. Can be 'cimel', 'asd' or 'interpolated'.
+
+    Returns
+    -------
+    np.ndarray of float
+        The expected extraterrestrial solar irradiance in Wm⁻²/nm
+    """
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    if srf_type == "cimel":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_CIMEL_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    elif srf_type == "asd":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_ASD_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_INTP_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    else:
+        raise ValueError("srf_type must be `cimel', `asd' or `interpolated'")
+
+
+def get_u_esi(srf_type: str) -> np.ndarray:
+    """Gets the expected extraterrestrial solar irradiance uncertainties of a concrete SRF.
+    Returns the data in Wm⁻²/nm.
+
+    It uses Wehrli 1985 data passed through different filters, the same data used in
+    AEMET's RimoApp and others.
+
+    Parameters
+    ----------
+    srf_type : str
+        Name of the srf. Can be 'cimel', 'asd' or 'interpolated'.
+
+    Returns
+    -------
+    np.ndarray of float
+        The expected extraterrestrial solar irradiance in Wm⁻²/nm
+    """
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    if srf_type == "cimel":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_CIMEL_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    elif srf_type == "asd":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_ASD_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_INTP_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    else:
+        raise ValueError("srf_type must be `cimel', `asd' or `interpolated'")

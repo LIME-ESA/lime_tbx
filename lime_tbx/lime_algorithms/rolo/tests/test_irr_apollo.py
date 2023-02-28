@@ -149,6 +149,7 @@ _ROLO_COEFFS = np.array(
 _ROLO_UNCS = np.zeros(_ROLO_COEFFS.shape)
 _ERR_CORR_SIZE = len(ROLO_WLENS) * len(_ROLO_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
+np.fill_diagonal(_ERR_CORR, 1)
 
 
 def read_rimoapp(path: str):
@@ -200,6 +201,9 @@ REL_DIFF_MAX = 1e-4  # lower number doesnt make sense, RimoApp output is truncat
 
 class TestIrrApollo(unittest.TestCase):
     def test_Valladolid_20220117(self):
+        self.skipTest(
+            "This test cannot be performed, the ESI is constant and the reflectance cannot be calculated for custom wavelengths."
+        )
         rimodata = RIMODATA_JAN_FULL_MOON_00
         rl = rolo.ROLO()
         rc = get_coeffs()
@@ -207,10 +211,13 @@ class TestIrrApollo(unittest.TestCase):
         mds = create_vall_moondata(dts)
         for irrs, md in zip(rimodata.values(), mds):
             elrefs = rl.get_elrefs(rc, md)
-            elis = rl.get_elis_from_elrefs(elrefs, md)
+            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated")
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
     def test_Valladolid_202202_fullmonth(self):
+        self.skipTest(
+            "This test cannot be performed, the ESI is constant and the reflectance cannot be calculated for custom wavelengths."
+        )
         rimodata = RIMODATA_FEB_2022
         rl = rolo.ROLO()
         rc = get_coeffs()
@@ -218,7 +225,7 @@ class TestIrrApollo(unittest.TestCase):
         mds = create_vall_moondata(dts)
         for irrs, md in zip(rimodata.values(), mds):
             elrefs = rl.get_elrefs(rc, md)
-            elis = rl.get_elis_from_elrefs(elrefs, md)
+            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated")
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
 

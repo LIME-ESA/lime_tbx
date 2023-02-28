@@ -12,7 +12,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 import math
-from typing import Union
+from typing import Union, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -58,8 +58,43 @@ def _measurement_func_eli(
     return lunar_irr
 
 
+def J_eli(
+    a_l: Union[float, np.ndarray],
+    omega: float,
+    esk: Union[float, np.ndarray],
+    dsm: float,
+    distance_earth_moon_km: float,
+    dom: float,
+):
+
+    Jac_x1 = np.diag(
+        ((omega * esk) / math.pi)
+        * ((1 / dsm) ** 2)
+        * (distance_earth_moon_km / dom) ** 2
+    )
+    Jac_x3 = np.diag(
+        ((omega * a_l) / math.pi)
+        * ((1 / dsm) ** 2)
+        * (distance_earth_moon_km / dom) ** 2
+    )
+    Jac = np.concatenate(
+        (
+            Jac_x1,
+            np.zeros((1, len(Jac_x1))),
+            Jac_x3,
+            np.zeros((1, len(Jac_x1))),
+            np.zeros((1, len(Jac_x1))),
+            np.zeros((1, len(Jac_x1))),
+        )
+    ).T
+    return Jac
+
+
 def calculate_eli_from_elref(
-    wavelengths_nm: np.ndarray, moon_data: MoonData, elrefs: np.ndarray
+    wavelengths_nm: np.ndarray,
+    moon_data: MoonData,
+    elrefs: np.ndarray,
+    srf_type: str,
 ) -> np.ndarray:
     """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
@@ -75,13 +110,15 @@ def calculate_eli_from_elref(
         Moon data needed to calculate Moon's irradiance
     elrefs : np.ndarray of float
         Reflectances previously calculated
+    srf_type: str
+        SRF type that wants to be used.
 
     Returns
     -------
     np.ndarray of float
         The extraterrestrial lunar irradiance calculated
     """
-    esk = esi.get_esi_per_nms(wavelengths_nm)
+    esk = esi.get_esi(srf_type)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
@@ -92,8 +129,10 @@ def calculate_eli_from_elref(
 
 
 def calculate_eli_from_elref_unc(
-    elref_spectrum: SpectralData, moon_data: MoonData
-) -> np.ndarray:
+    elref_spectrum: SpectralData,
+    moon_data: MoonData,
+    srf_type: str,
+) -> Tuple[np.ndarray, np.ndarray]:
     """Uncertainties of the calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020
 
     Simulates a lunar observation for a wavelength for any observer/solar selenographic
@@ -105,12 +144,53 @@ def calculate_eli_from_elref_unc(
         Previously calculated reflectance data.
     moon_data : MoonData
         Moon data needed to calculate Moon's irradiance.
+    srf_type: str
+        SRF type that wants to be used. Can be 'cimel', 'asd' or 'interpolated'.
 
     Returns
     -------
     np.ndarray of float
         The uncertainties calculated
+    corr: np.ndarray of float
+        The error correlation matrix calculated
     """
+    esk = esi.get_esi(srf_type)
+    u_esk = esi.get_u_esi(srf_type)
+    # esk = esi.get_esi_per_nms(elref_spectrum.wlens)
+    # u_esk = np.zeros(esk.shape)
+    dsm = moon_data.distance_sun_moon
+    dom = moon_data.distance_observer_moon
+
+    Jx = J_eli(elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom)
+    prop = punpy.LPUPropagation()
+
+    unc, corr = prop.propagate_standard(
+        _measurement_func_eli,
+        [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
+        [elref_spectrum.uncertainties, None, u_esk, None, None, None],
+        corr_x=[
+            elref_spectrum.ds.err_corr_reflectance.values,
+            None,
+            "syst",
+            None,
+            None,
+            None,
+        ],
+        return_corr=True,
+        Jx=Jx,
+    )
+
+    # prop = punpy.MCPropagation(100, dtype=np.float64, verbose=True)
+    # unc, corr = prop.propagate_standard(
+    #     measurement_func_eli,
+    #     [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
+    #     [elref_spectrum.uncertainties, None, u_esk, None, None, None],
+    #     corr_x=[elref_spectrum.ds.err_corr_reflectance.values, None, "syst", None, None, None], return_corr=True
+    # )
+    del prop
+
+    return unc, corr
+
     esk = esi.get_esi_per_nms(elref_spectrum.wlens)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon

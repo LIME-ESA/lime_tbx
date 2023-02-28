@@ -278,6 +278,7 @@ _UNC_DATA = np.array(
 ).T
 _ERR_CORR_SIZE = len(WLENS) * len(_COEFFS)
 _ERR_CORR = np.zeros((_ERR_CORR_SIZE, _ERR_CORR_SIZE))
+np.fill_diagonal(_ERR_CORR, 1)
 
 ELREF_CHECK_DATA = np.array(
     [
@@ -291,7 +292,7 @@ ELREF_CHECK_DATA = np.array(
 )
 CHECK_MD = MoonData(1, 400000, 1, 40, 30, 50, 50)
 CHECK_UNCS = np.array(
-    [0.00028234, 0.00033419, 0.00041053, 0.00050497, 0.00045305, 0.00069454]
+    [6.2591e-06, 7.4265e-06, 7.7568e-06, 9.4509e-06, 8.1534e-06, 1.0008e-05]
 )
 
 
@@ -321,11 +322,7 @@ class TestELRef(unittest.TestCase):
         cf = get_coeffs()
         cfc = cf.coeffs
         elref_val = elref._measurement_func_elref(
-            cfc.a_coeffs,
-            cfc.b_coeffs,
-            cfc.c_coeffs,
-            cfc.d_coeffs,
-            cfc.p_coeffs,
+            cfc._coeffs,
             CHECK_MD.long_sun_radians,
             CHECK_MD.long_obs,
             CHECK_MD.lat_obs,
@@ -337,11 +334,7 @@ class TestELRef(unittest.TestCase):
         cf = get_coeffs()
         cfc = cf.coeffs
         elref_val = elref._measurement_func_elref(
-            cfc.a_coeffs.T[0],
-            cfc.b_coeffs.T[0],
-            cfc.c_coeffs.T[0],
-            cfc.d_coeffs.T[0],
-            cfc.p_coeffs.T[0],
+            cfc._coeffs[:, 0:1],
             CHECK_MD.long_sun_radians,
             CHECK_MD.long_obs,
             CHECK_MD.lat_obs,
@@ -353,11 +346,7 @@ class TestELRef(unittest.TestCase):
         cf = get_coeffs()
         cfc = cf.coeffs
         elref_val_multiple = elref._measurement_func_elref(
-            cfc.a_coeffs,
-            cfc.b_coeffs,
-            cfc.c_coeffs,
-            cfc.d_coeffs,
-            cfc.p_coeffs,
+            cfc._coeffs,
             CHECK_MD.long_sun_radians,
             CHECK_MD.long_obs,
             CHECK_MD.lat_obs,
@@ -366,19 +355,15 @@ class TestELRef(unittest.TestCase):
         elref_val = np.array(
             [
                 elref._measurement_func_elref(
-                    cfc.a_coeffs.T[i],
-                    cfc.b_coeffs.T[i],
-                    cfc.c_coeffs.T[i],
-                    cfc.d_coeffs.T[i],
-                    cfc.p_coeffs.T[i],
+                    cfc._coeffs[:, i : i + 1],
                     CHECK_MD.long_sun_radians,
                     CHECK_MD.long_obs,
                     CHECK_MD.lat_obs,
                     CHECK_MD.mpa_degrees,
                 )
-                for i in range(len(cfc.a_coeffs.T))
+                for i in range(len(cfc._coeffs[0]))
             ]
-        )
+        ).T[0]
         np.testing.assert_array_equal(elref_val, elref_val_multiple)
 
     def test_calculate_elref(self):
@@ -388,7 +373,7 @@ class TestELRef(unittest.TestCase):
 
     def test_calculate_elref_unc(self):
         cf = get_coeffs()
-        unc_elrefs = elref.calculate_elref_unc(cf, CHECK_MD)
+        unc_elrefs, corr = elref.calculate_elref_unc(cf, CHECK_MD)
         np.testing.assert_array_almost_equal(unc_elrefs, CHECK_UNCS, 4)
 
 

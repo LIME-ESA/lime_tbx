@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from typing import List
+import os
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -15,9 +16,9 @@ from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     ReflectanceCoefficients,
 )
-from lime_tbx.datatypes import constants
 from lime_tbx.coefficients.access_data import access_data
 from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -127,19 +128,7 @@ class SettingsManager(ISettingsManager):
         self.polar_coeff = self.coeffs[index].polarization
 
     def get_default_srf(self) -> SpectralResponseFunction:
-        spectral_response = {
-            i: 1.0
-            for i in np.arange(
-                constants.MIN_WLEN, constants.MAX_WLEN + DEF_SRF_STEP, DEF_SRF_STEP
-            )
-        }
-        ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
-            constants.DEFAULT_SRF_NAME,
-            spectral_response,
-        )
-        srf = SpectralResponseFunction(constants.DEFAULT_SRF_NAME, [ch])
-        return srf
+        return get_default_srf()
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf

@@ -45,6 +45,7 @@ from lime_tbx.datatypes.datatypes import (
     SpectralData,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -111,7 +112,8 @@ def eli_callback(
     inside_mpa_range: bool or list of bool
         Indicates if the different point locations/s are inside the valid mpa range.
     """
-    lime_simulation.update_irradiance(srf, point, cimel_coef)
+    def_srf = get_default_srf()
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     return (
         point,
         srf,
@@ -161,7 +163,8 @@ def elref_callback(
     inside_mpa_range: bool or list of bool
         Indicates if the different point locations/s are inside the valid mpa range.
     """
-    lime_simulation.update_reflectance(srf, point, cimel_coef)
+    def_srf = get_default_srf()
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     return (
         point,
         lime_simulation.get_elrefs(),
@@ -183,8 +186,8 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
 ]:
-
-    lime_simulation.update_polarization(srf, point, coeffs)
+    def_srf = get_default_srf()
+    lime_simulation.update_polarization(def_srf, point, coeffs)
     return (
         point,
         lime_simulation.get_polars(),
@@ -235,9 +238,10 @@ def calculate_all_callback(
     p_coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
 ):
-    lime_simulation.update_reflectance(srf, point, cimel_coef)
-    lime_simulation.update_irradiance(srf, point, cimel_coef)
-    lime_simulation.update_polarization(srf, point, p_coeffs)
+    def_srf = get_default_srf()
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    lime_simulation.update_polarization(def_srf, point, p_coeffs)
     return (point, srf)
 
 
@@ -383,6 +387,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.spinner.movie_start()
             self.stack_layout.setCurrentIndex(0)
         else:
+            self.spinner.set_text("")
             self.spinner.movie_stop()
             if self.comparing_dts:
                 self.stack_layout.setCurrentIndex(1)
