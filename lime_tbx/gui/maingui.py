@@ -387,6 +387,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.spinner.movie_start()
             self.stack_layout.setCurrentIndex(0)
         else:
+            self.spinner.set_text("")
             self.spinner.movie_stop()
             if self.comparing_dts:
                 self.stack_layout.setCurrentIndex(1)

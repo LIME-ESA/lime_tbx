@@ -236,7 +236,13 @@ class SpectralIntegration(ISpectralIntegration):
             wasnt_lists = True
             elis = np.array([elis])
         for ch in srf.channels:
-            ch_wlens = np.array([w for w in ch.spectral_response.keys() if w in wlens])
+            ch_wlens = np.array(
+                [
+                    w
+                    for w in ch.spectral_response.keys()
+                    if min(wlens) <= w <= max(wlens)
+                ]
+            )
             ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
             elis_ids = np.where(np.in1d(wlens, ch_wlens))[0]
             ch_signals = []
@@ -266,7 +272,13 @@ class SpectralIntegration(ISpectralIntegration):
             elis = np.array([elis])
             u_elis = np.array([u_elis])
         for ch in srf.channels:
-            ch_wlens = np.array([w for w in ch.spectral_response.keys() if w in wlens])
+            ch_wlens = np.array(
+                [
+                    w
+                    for w in ch.spectral_response.keys()
+                    if min(wlens) <= w <= max(wlens)
+                ]
+            )
             ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
             elis_ids = np.where(np.in1d(wlens, ch_wlens))[0]
             u_ch_signals = []
