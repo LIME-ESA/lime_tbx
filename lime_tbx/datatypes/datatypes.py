@@ -660,7 +660,11 @@ class SpectralData:
         corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
-        if not isinstance(corr, np.ndarray) and not isinstance(corr, list):
+        if (
+            corr is not None
+            and not isinstance(corr, np.ndarray)
+            and not isinstance(corr, list)
+        ):
             corr = np.array([[corr]])
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)

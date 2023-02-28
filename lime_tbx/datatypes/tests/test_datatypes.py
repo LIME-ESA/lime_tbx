@@ -339,6 +339,8 @@ class TestLunarObservationWrite(unittest.TestCase):
 
 SPD_WAVS = np.array([350, 380, 400, 430, 450, 500, 600, 750, 800])
 SPD_VALS = np.array([0.002, 0.0048, 0.0043, 0.004, 0.0007, 0.0067, 0.0001, 0.7, 0.08])
+SPD_CORR = np.zeros((len(SPD_WAVS), len(SPD_WAVS)))
+np.fill_diagonal(SPD_CORR, 1)
 CH_IDS = np.array(["a", "b", "c", "d", "e"])
 SIGNALS_DATA = np.array(
     [[0, 0.01], [0.01, 0.01], [0.01, 0.02], [0.04, 0.004], [0.06, 0.01]]
@@ -361,7 +363,9 @@ class TestSpectralData(unittest.TestCase):
         )
 
     def test_make_reflectance_ds_Spectral_Data(self):
-        ds = SpectralData.make_reflectance_ds(SPD_WAVS, SPD_VALS, SPD_VALS * 0.05)
+        ds = SpectralData.make_reflectance_ds(
+            SPD_WAVS, SPD_VALS, SPD_VALS * 0.05, SPD_CORR
+        )
         uncs = ds.u_reflectance.values**2
         _ = SpectralData(SPD_WAVS, SPD_VALS, uncs, ds)
 
