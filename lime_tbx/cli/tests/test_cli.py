@@ -324,6 +324,136 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    def test_timeseries_fake(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000 -t fakefilefakefile.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_no_timeseries.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_timeseries_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000 -t test_files/csv/export_srf_1.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_timeseries_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_multiple_simops(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02  -o nc,./test_files/cli/cliglod.test.nc -c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,/root'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        with open("./test_files/cli/err_multiple_simops.txt", "r") as f:
+            self.assertEqual(self.capturedErr.getvalue(), f.read())
+        with open("./test_files/cli/out_multiple_simops.txt", "r") as f:
+            self.assertEqual(self.capturedOutput.getvalue(), f.read())
+
+    def test_no_simop(self):
+        cli = get_cli()
+        errcode = cli.handle_input(get_opts("-o nc,./test_files/cli/cliglod.test.nc"))
+        self.assertEqual(errcode, 1)
+        with open("./test_files/cli/err_no_simop.txt", "r") as f:
+            self.assertEqual(self.capturedErr.getvalue(), f.read())
+        with open("./test_files/cli/out_no_simop.txt", "r") as f:
+            self.assertEqual(self.capturedOutput.getvalue(), f.read())
+
+    def test_srf_fake(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f fakefile.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_srf_fake.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_srf_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f test_files/moon/comparison.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_srf_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_few_args(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_few.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,ascii,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_comp_few_args(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,test_files/cli/chan1.test'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_comp_few.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_comp_img_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,ascii,MPA,test_files/cli/chan1.test'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_comp_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_comp_type_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,LUCK,test_files/cli/chan1.test'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_comp_type_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
@@ -441,6 +571,15 @@ class TestCLI(unittest.TestCase):
         errcode = cli.handle_input(
             get_opts(
                 '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_graph_both_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg,test_files/cli/out_comp_chann4.test.jpg'
             )
         )
         self.assertEqual(errcode, 0)

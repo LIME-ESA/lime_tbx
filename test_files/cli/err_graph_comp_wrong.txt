@@ -1,0 +1,1 @@
+Error: Graph format not detected. It must be one of the following: pdf,jpg,png,svg.

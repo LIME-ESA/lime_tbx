@@ -922,9 +922,6 @@ class CLI:
                     break
                 elif opt in ("-c", "--comparison"):  # Comparison
                     params = arg.split(" ")
-                    if len(params) < 1:
-                        eprint("Error: Wrong number of arguments for -c")
-                        return 1
                     input_files = []
                     for param in params:
                         input_files += glob.glob(param)
