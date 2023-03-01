@@ -253,12 +253,12 @@ def show_comparisons_callback(
     mpa_comps: List[ComparisonData],
     srf: SpectralResponseFunction,
     version: str,
-):
-    _show_comps_output(output, comps, "datetimes", srf, version)
-    _show_comps_output(
+) -> Tuple[List[str], List[str]]:
+    to_remove = _show_comps_output(output, comps, "datetimes", srf, version)
+    to_remove_comps = _show_comps_output(
         output_mpa, mpa_comps, "Moon Phase Angle (degrees)", srf, version
     )
-    return []
+    return (to_remove, to_remove_comps)
 
 
 def _show_comps_output(
@@ -267,7 +267,7 @@ def _show_comps_output(
     y_label: str,
     srf: SpectralResponseFunction,
     version: str,
-):
+) -> List[str]:
     ch_names = srf.get_channels_names()
     to_remove = []
     for i, ch in enumerate(ch_names):
@@ -308,9 +308,11 @@ def _show_comps_output(
         else:
             to_remove.append(ch)
     for chsrf in srf.channels:
+        if chsrf.id in to_remove:
+            continue
         if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
             output.set_as_partly(chsrf.id)
-    output.remove_channels(to_remove)
+    return to_remove
 
 
 class ComparisonPageWidget(QtWidgets.QWidget):
@@ -590,6 +592,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._start_thread(self._load_lglod_comparisons_finished, self.compare_error)
 
     def _load_lglod_comparisons_finished(self, data):
+        self.output.remove_channels(data[0])
+        self.output_mpa.remove_channels(data[1])
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()

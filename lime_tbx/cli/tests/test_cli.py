@@ -579,7 +579,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg,test_files/cli/out_comp_chann4.test.jpg'
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg'
             )
         )
         self.assertEqual(errcode, 0)

@@ -533,7 +533,9 @@ class CLI:
             raise LimeException("No observations given. Aborting.")
         mos = self.loaded_moons
         if isinstance(ed, ExportComparisonCSV) or isinstance(ed, ExportComparisonGraph):
-            ch_names_obs = {ch_name for mo in mos for ch_name in mo.ch_names}
+            ch_names_obs = {
+                ch_name for mo in mos for ch_name in list(mo.ch_irrs.keys())
+            }
             if len(ch_names_obs) > len(ed.output_files):
                 raise LimeException(
                     "The amount of export files given is not enough. There are more channels."
