@@ -43,7 +43,7 @@ EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
 EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin_arm"
 
 
-def _get_exe_path() -> str:
+def _get_exe_path() -> str:  # pragma: no cover
     if platform.system() == "Linux":
         exe_file_satellite = EXE_FILE_SATELLITE_LINUX
     elif platform.system() == "Windows":
@@ -297,7 +297,7 @@ class EOCFIConverter(IEOCFIConverter):
                 sat.time_file,
             )
         # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
-        if platform.system() == "Windows":
+        if platform.system() == "Windows":  # pragma: no cover
             orbit_path = orbit_path.replace("/", "\\")
             if tle_file != "":
                 tle_file = tle_file.replace("/", "\\")

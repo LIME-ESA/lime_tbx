@@ -1,4 +1,4 @@
-"""describe class"""
+"""Module in charge of downloading the updated coefficients"""
 
 """___Built-In Modules___"""
 import os

@@ -102,5 +102,39 @@ class TestUpdate(unittest.TestCase):
         self.assertEqual(0, fails)
 
 
+class TestTrueUpdate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        dirname = os.path.join(
+            os.path.dirname(__file__), "../../../../test_files/update/coeff_data"
+        )
+        cls.httpd = HTTPServer(dirname, ("localhost", 8000))
+        cls.t = threading.Thread(
+            name="test server proc", target=cls.httpd.serve_forever
+        )
+        cls.t.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.t.join()
+        os.remove("coeff_data/versions/LIME_MODEL_COEFS_20221201_V02.nc")
+
+    def test_download_working(self):
+        check_val = object()
+
+        def _callback_stopper_check_is_running(obj: TestUpdate, val: object):
+            obj.assertEqual(val, check_val)
+            return True
+
+        up = get_updater()
+        news, fails = up.download_coefficients(
+            _callback_stopper_check_is_running, [self, check_val]
+        )
+        self.assertEqual(2, news)
+        self.assertEqual(1, fails)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -36,7 +36,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 
-def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:
+def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:  # pragma: no cover
     current_dir = os.path.dirname(os.path.abspath(__file__))
     data = np.genfromtxt(
         os.path.join(current_dir, "assets/SomeMoonReflectances.txt"), delimiter=","
