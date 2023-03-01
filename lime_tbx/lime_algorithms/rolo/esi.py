@@ -5,6 +5,10 @@ It exports the following functions:
     * get_esi_per_nms - Calculates the expected solar extra-terrestrial irradiance
     for a given wavelengths in nanometers. Based on Wehrli 1985 data, passed through
     some filters.
+    * get_esi - Calculates the expected solar extra-terrestrial irradiance
+    for a specific SRF, based in the TSIS spectrum.
+    * get_esi - Calculates the expected uncertainties of the calculation of the
+    expected solar extra-terrestrial irradiance for a specific SRF, based in the TSIS spectrum.
 """
 
 """___Built-In Modules___"""
@@ -87,8 +91,7 @@ def get_esi(srf_type: str) -> np.ndarray:
     """Gets the expected extraterrestrial solar irradiance of a concrete SRF.
     Returns the data in Wm⁻²/nm.
 
-    It uses Wehrli 1985 data passed through different filters, the same data used in
-    AEMET's RimoApp and others.
+    It uses TSIS data.
 
     Parameters
     ----------
@@ -130,8 +133,7 @@ def get_u_esi(srf_type: str) -> np.ndarray:
     """Gets the expected extraterrestrial solar irradiance uncertainties of a concrete SRF.
     Returns the data in Wm⁻²/nm.
 
-    It uses Wehrli 1985 data passed through different filters, the same data used in
-    AEMET's RimoApp and others.
+    It uses TSIS data.
 
     Parameters
     ----------

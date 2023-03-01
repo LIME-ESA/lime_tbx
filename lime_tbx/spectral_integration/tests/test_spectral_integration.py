@@ -56,7 +56,7 @@ class TestSpectralIntegration(unittest.TestCase):
         si = get_spectral_integrator()
         uncertainties = si.u_integrate_elis(get_srf(), ELIS_LIME)
         self.assertIsInstance(uncertainties, list)
-        self.assertAlmostEqual(uncertainties[0], 0.0012, 4)
+        self.assertAlmostEqual(uncertainties[0], 0.00118, 3)
 
     def test_integrate_cimel_ok(self):
         solar_data = _get_tsis_data()

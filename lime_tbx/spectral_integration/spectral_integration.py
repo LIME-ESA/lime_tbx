@@ -1,5 +1,5 @@
 """
-This module performs spectral intetgrations over spectral response functions and
+This module performs spectral integrations over spectral response functions and
 more data.
 
 It exports the following classes:
