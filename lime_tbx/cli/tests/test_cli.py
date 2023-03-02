@@ -576,6 +576,8 @@ class TestCLI(unittest.TestCase):
         self.assertEqual(errcode, 0)
 
     def test_comparison_glob_graph_both_ok(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
