@@ -280,8 +280,9 @@ def _show_comps_output(
             if False in comps[i].ampa_valid_range:
                 warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
             sp_name = interp_data.get_interpolation_spectrum_name()
+            spectrum_info = f" | Interp. spectrum: {sp_name}"
             output.set_interp_spectrum_name(i, sp_name)
-            subtitle = f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
+            subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
             _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
             subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
                 subtitle,
@@ -820,6 +821,7 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         sp_name = interp_data.get_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
@@ -833,7 +835,7 @@ class MainSimulationsWidget(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
-            subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
+            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[6])
         self.signal_widget.set_interp_spectrum_name(
@@ -878,6 +880,7 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         sp_name = interp_data.get_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
@@ -891,7 +894,7 @@ class MainSimulationsWidget(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
+            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
@@ -928,6 +931,7 @@ class MainSimulationsWidget(
         self._unblock_gui()
         self._set_graph_dts(data[0])
         sp_name = interp_data.get_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
@@ -941,7 +945,7 @@ class MainSimulationsWidget(
             "Lunar polarization",
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}{warning_out_mpa_range}",
+            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()

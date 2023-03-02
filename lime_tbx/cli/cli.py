@@ -320,7 +320,9 @@ class CLI:
         warning_out_mpa_range = ""
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-        subtitle = f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
@@ -411,7 +413,6 @@ class CLI:
         canv = canvas.MplCanvas(width=15, height=10, dpi=200)
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
-        subtitle = "LIME2 coefficients version: {}".format(version)
         n_comp_points = len(comparison.diffs_signal.wlens)
         data_start = min(comparison.dts)
         data_end = max(comparison.dts)
@@ -419,8 +420,9 @@ class CLI:
         warning_out_mpa_range = ""
         if False in comparison.ampa_valid_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-        subtitle = f"LIME2 coefficients version: {version}{warning_out_mpa_range}"
-        subtitle = "LIME2 coefficients version: {}".format(version)
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
         subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
             subtitle,
