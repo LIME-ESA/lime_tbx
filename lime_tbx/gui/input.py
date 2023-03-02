@@ -702,6 +702,8 @@ class ComparisonInput(QtWidgets.QWidget):
     @QtCore.Slot()
     def load_obs_files(self):
         paths = QtWidgets.QFileDialog().getOpenFileNames(self)[0]
+        if len(paths) == 0:
+            return
         self._set_enabled_gui_input(False)
         self.moon_obs_feedback.setText("Loading...")
         self.worker = CallbackWorker(
