@@ -1364,7 +1364,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
             self.save_simulation_action.setText(
                 "&Save comparison to LIME GLOD format file."
             )
-            self.comparison_action.setText("Perform &simulations")
+            self.comparison_action.setText("&Perform simulations")
             self.comparison_action.triggered.connect(self.simulations)
             lime_tbx_w = self._get_lime_widget()
             lime_tbx_w.lime_simulation.set_simulation_changed()
