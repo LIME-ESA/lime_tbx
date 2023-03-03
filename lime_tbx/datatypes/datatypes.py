@@ -960,6 +960,7 @@ class InterpolationSettings:
     """
 
     interpolation_spectrum: str
+    show_interp_spectrum: bool
 
     def _save_disk(self, path: str):
         with open(path, "w") as file:

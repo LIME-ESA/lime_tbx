@@ -108,6 +108,28 @@ class ISettingsManager(ABC):
         """Checks if the current settings allow for the performance of polarization."""
         pass
 
+    @abstractmethod
+    def is_show_interp_spectrum(self) -> bool:
+        """Checks if the UI should show the spectrum used for interpolation.
+
+        Returns
+        -------
+        should_show: bool
+            True if the spectrum should be shown.
+        """
+        pass
+
+    @abstractmethod
+    def set_show_interp_spectrum(self, show: bool):
+        """Sets the interpolation spectrum visibility as <show>.
+
+        Parameters
+        ----------
+        show: bool
+            Visibility of the interpolation spectrum.
+        """
+        pass
+
 
 DEF_SRF_STEP = 2
 
@@ -177,3 +199,9 @@ class SettingsManager(ISettingsManager):
 
     def can_perform_polarization(self) -> bool:
         return interp_data.can_perform_polarization()
+
+    def is_show_interp_spectrum(self) -> bool:
+        return interp_data.is_show_interpolation_spectrum()
+
+    def set_show_interp_spectrum(self, show: bool):
+        interp_data.set_show_interpolation_spectrum(show)

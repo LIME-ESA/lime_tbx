@@ -469,7 +469,9 @@ class LimeSimulation(ILimeSimulation):
     ]:
         elis = LimeSimulation._calculate_eli_from_elref(mds, elrefs, "interpolated")
         elis_cimel = LimeSimulation._calculate_eli_from_elref(mds, elref_cimel, "cimel")
-        elis_asd = LimeSimulation._calculate_eli_from_elref(mds, elref_asd, "asd")
+        elis_asd = None
+        if interp_data.is_show_interpolation_spectrum():
+            elis_asd = LimeSimulation._calculate_eli_from_elref(mds, elref_asd, "asd")
         return elis, elis_cimel, elis_asd
 
     @staticmethod
@@ -809,9 +811,13 @@ class LimeSimulation(ILimeSimulation):
         return self.elis_cimel
 
     def get_elrefs_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        if not interp_data.is_show_interpolation_spectrum():
+            return None
         return self.elref_asd
 
     def get_elis_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        if not interp_data.is_show_interpolation_spectrum():
+            return None
         return self.elis_asd
 
     def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
@@ -821,6 +827,8 @@ class LimeSimulation(ILimeSimulation):
         return self.polars_cimel
 
     def get_polars_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        if not interp_data.is_show_interpolation_spectrum():
+            return None
         return self.polars_asd
 
     def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:

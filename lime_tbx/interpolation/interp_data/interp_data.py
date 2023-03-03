@@ -224,6 +224,18 @@ def get_interpolation_spectrum_name() -> str:
     return _VALID_INTERP_SPECTRA[0]
 
 
+def is_show_interpolation_spectrum() -> bool:
+    """Checks if the UI should show the spectrum used for interpolation.
+
+    Returns
+    -------
+    should_show: bool
+        True if the spectrum should be shown.
+    """
+    setts = _load_interp_settings()
+    return setts.show_interp_spectrum
+
+
 def set_interpolation_spectrum_name(spectrum: str):
     """Sets the spectrum name as the currently selected one.
 
@@ -241,6 +253,20 @@ def set_interpolation_spectrum_name(spectrum: str):
         msg = f"Tried setting unknown interpolation spectrum: {spectrum}"
         logger.get_logger().error(msg)
         raise LimeException(msg)
+
+
+def set_show_interpolation_spectrum(show: bool):
+    """Sets the interpolation spectrum visibility as <show>.
+
+    Parameters
+    ----------
+    show: bool
+        Visibility of the interpolation spectrum.
+    """
+    setts = _load_interp_settings()
+    setts.show_interp_spectrum = show
+    path = _get_interp_path()
+    setts._save_disk(path)
 
 
 def can_perform_polarization() -> bool:

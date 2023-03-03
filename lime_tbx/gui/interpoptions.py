@@ -39,6 +39,19 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.main_layout.addWidget(self.title_label)
         self.combo_versions = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_versions)
+        self.form_layout = QtWidgets.QFormLayout()
+        self.label_show_interp = QtWidgets.QLabel("Show interpolation spectrum:")
+        self.checkbox_show_interp = QtWidgets.QCheckBox()
+        self.checkbox_show_interp.setChecked(
+            self.settings_manager.is_show_interp_spectrum()
+        )
+        self.form_layout.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.label_show_interp
+        )
+        self.form_layout.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.checkbox_show_interp
+        )
+        self.main_layout.addLayout(self.form_layout)
         self.update_combo_versions()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.save_button = QtWidgets.QPushButton("Save")
@@ -65,6 +78,9 @@ class InterpOptionsDialog(QtWidgets.QDialog):
     def update_from_combobox(self, name: str):
         if self.combobox_listen:
             self.settings_manager.select_interp_spectrum(name)
+            self.settings_manager.set_show_interp_spectrum(
+                self.checkbox_show_interp.isChecked()
+            )
             self.lime_simulation.set_simulation_changed()
 
     @QtCore.Slot()
