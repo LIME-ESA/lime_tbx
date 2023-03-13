@@ -562,7 +562,7 @@ class CLI:
             lglod = LGLODComparisonData(
                 comps,
                 self.srf.get_channels_names(),
-                "TODO",
+                mos[0].data_source,
                 self.settings_manager.get_selected_spectrum_name(),
             )
             vers = self.settings_manager.get_lime_coef().version

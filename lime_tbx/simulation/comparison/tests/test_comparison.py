@@ -42,12 +42,22 @@ CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
 SP = SatellitePosition(3753240, -196698.975, 5138362)
 DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
 DT2 = datetime(2022, 2, 16, 2, tzinfo=timezone.utc)
-OBS1 = LunarObservation(["default"], "ITRF93", {"Default": 0.000001}, DT1, SP)
+OBS1 = LunarObservation(["default"], "ITRF93", {"Default": 0.000001}, DT1, SP, "Test")
 OBS2 = LunarObservation(
-    ["first", "second"], "ITRF93", {"First": 0.000001, "Second": 0.000002}, DT1, SP
+    ["first", "second"],
+    "ITRF93",
+    {"First": 0.000001, "Second": 0.000002},
+    DT1,
+    SP,
+    "Test",
 )
 OBS3 = LunarObservation(
-    ["first", "second"], "ITRF93", {"First": 0.0000012, "Second": 0.0000025}, DT2, SP
+    ["first", "second"],
+    "ITRF93",
+    {"First": 0.0000012, "Second": 0.0000025},
+    DT2,
+    SP,
+    "Test",
 )
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 

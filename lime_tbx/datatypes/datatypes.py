@@ -429,6 +429,8 @@ class LunarObservation:
         Datetime of the observation.
     sat_pos: SatellitePosition
         Satellite position at that moment.
+    data_source: str
+        Data source of the lunar observation.
     """
 
     ch_names: List[str]
@@ -436,6 +438,7 @@ class LunarObservation:
     ch_irrs: Dict[str, float]
     dt: datetime
     sat_pos: SatellitePosition
+    data_source: str
 
     def get_ch_irradiance(self, name: str) -> float:
         if name not in self.ch_irrs:
@@ -858,6 +861,8 @@ class LunarObservationWrite:
     selenographic_data: SelenographicDataWrite | None
         If a CustomPoint, data that allowes to define the point. If None then it's not selenographic
         (not a CustomPoint).
+    data_source: str
+        Data source of the lunar observation.
     """
 
     ch_names: List[str]
@@ -869,6 +874,7 @@ class LunarObservationWrite:
     polars: "SpectralData"
     sat_name: str
     selenographic_data: SelenographicDataWrite
+    data_source: str
 
     def has_ch_value(self, name: str) -> bool:
         return name in self.ch_names

@@ -121,6 +121,7 @@ def create_lglod_data(
                 polars[i],
                 sat_name,
                 None,
+                constants.LIME_TBX_DATA_SOURCE,
             )
             obs.append(ob)
     elif isinstance(point, CustomPoint):
@@ -150,6 +151,7 @@ def create_lglod_data(
                     point.selen_sun_lon,
                     point.moon_phase_angle,
                 ),
+                constants.LIME_TBX_DATA_SOURCE,
             )
         ]
     is_not_default_srf = True

@@ -414,7 +414,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         lglod = LGLODComparisonData(
             self.comps,
             self.srf.get_channels_names(),
-            "TODO",
+            self.data_source,
             self.comparison_spectrum,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -517,6 +517,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         mos = data[2]
         srf = data[3]
         self.comps = comps
+        self.data_source = mos[0].data_source
         self.mpa_comps = mpa_comps
         self.srf = srf
         version = self.settings_manager.get_lime_coef().version
@@ -568,12 +569,14 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         comps: List[ComparisonData],
         mpa_comps: List[ComparisonData],
         srf: SpectralResponseFunction,
+        data_source: str,
     ):
         self.set_show_comparison_input(False)
         self.input.clear_input()
         self.compare_button.setDisabled(True)
         srf = srf
         self.comps = comps
+        self.data_source = data_source
         self.mpa_comps = mpa_comps
         self.srf = srf
         version = self.settings_manager.get_lime_coef().version
@@ -1040,7 +1043,7 @@ def check_srf_observation_callback(lglod: LGLODData, srf: SpectralResponseFuncti
 
 
 def check_srf_comparison_callback(
-    lglod: LGLODComparisonData, srf: SpectralResponseFunction
+    lglod: LGLODComparisonData, srf: SpectralResponseFunction, data_source: str
 ):
     valid = True
     srf_chans = srf.get_channels_names()
@@ -1056,14 +1059,14 @@ def check_srf_comparison_callback(
         if chan in lglod.ch_names:
             new_channels.append(srf.get_channel_from_name(chan))
     new_srf = SpectralResponseFunction(srf.name, new_channels)
-    return [lglod, new_srf]
+    return [lglod, new_srf, data_source]
 
 
 def obtain_sorted_mpa_callback(
-    comps: List[ComparisonData], kernels_path: KernelsPath, srf
+    comps: List[ComparisonData], kernels_path: KernelsPath, srf, data_source
 ):
     mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
-    return comps, mpa_comps, srf
+    return comps, mpa_comps, srf, data_source
 
 
 def return_args_callback(*args):
@@ -1166,7 +1169,8 @@ class LimeTBXWidget(QtWidgets.QWidget):
         srf = data[1]
         self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
         self.worker = CallbackWorker(
-            obtain_sorted_mpa_callback, [lglod.comparisons, self.kernels_path, srf]
+            obtain_sorted_mpa_callback,
+            [lglod.comparisons, self.kernels_path, srf, lglod.sat_name],
         )
         self._start_thread(
             self._load_comparisons_finished_3, self._load_comparisons_finished_error
@@ -1176,7 +1180,8 @@ class LimeTBXWidget(QtWidgets.QWidget):
         comps = data[0]
         mpa_comps = data[1]
         srf = data[2]
-        self.comparison_page.load_lglod_comparisons(comps, mpa_comps, srf)
+        data_source = data[3]
+        self.comparison_page.load_lglod_comparisons(comps, mpa_comps, srf, data_source)
 
     def _load_comparisons_finished_error(self, error: Exception):
         logger.get_logger().critical(error)

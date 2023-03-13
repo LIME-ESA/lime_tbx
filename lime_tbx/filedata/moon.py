@@ -107,8 +107,11 @@ def read_moon_obs(path: str) -> LunarObservation:
         for i, ch_irr in enumerate(irr_obs):
             if not isinstance(ch_irr, np.ma.core.MaskedConstant):
                 ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
+        data_source = ds.data_source
         ds.close()
-        return LunarObservation(ch_names, sat_pos_ref, ch_irrs, dt, sat_pos)
+        return LunarObservation(
+            ch_names, sat_pos_ref, ch_irrs, dt, sat_pos, data_source
+        )
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)
@@ -492,6 +495,7 @@ def write_obs(
         polar_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.polars_cimel]
         )
+        ds.data_source = obs[0].data_source
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
@@ -569,6 +573,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         selen_sun_lon_rad = ds.variables["selen_sun_lon_rad"][:].data
     obss = []
     sp_name = ds.spectrum_name
+    data_source = ds.data_source
     ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
@@ -607,6 +612,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
             polars,
             sat_name_0,
             selenographic_data,
+            data_source,
         )
         obss.append(obs)
     elis_cimel = [
