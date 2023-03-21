@@ -401,8 +401,6 @@ QGroupBox::title::disabled
 /*-----QCheckBox-----*/
 QCheckBox
 {
-    background-color: transparent;
-
 }
 
 QCheckBox::indicator:unchecked
