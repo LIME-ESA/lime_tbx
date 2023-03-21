@@ -116,9 +116,13 @@ class DOLP(IDOLP):
         # TODO add uncertainties correctly
         # TODO add skip uncertainties correctly
         ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None)
+        if not skip_uncs:
+            uncs = ds_pol.u_ran_polarization.values
+        else:
+            uncs = np.zeros(polarizations.shape)
         return SpectralData(
             np.array(wavelengths),
             polarizations,
-            ds_pol.u_ran_polarization.values,
+            uncs,
             ds_pol,
         )

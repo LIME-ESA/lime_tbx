@@ -6,7 +6,7 @@ distance sun moon,0.9
 selenographic latitude of observer,30
 selenographic longitude of observer,30
 selenographic longitude of sun,1
-Wavelength,Irradiance
+Wavelength,Irradiance,uncertainties
 350,0.0001,0
 370,0.0002,0
 390,0.0001,0
