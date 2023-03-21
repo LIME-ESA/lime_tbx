@@ -80,21 +80,21 @@ class TestCSV(unittest.TestCase):
     def test_export_csv_1(self):
         path = "./test_files/csv/export_1.test.csv"
         export_csv_simulation(
-            SD1, "Wavelength", "Irradiance", SPOINT, path, "test", True, "ASD"
+            SD1, "Wavelength", "Irradiance", SPOINT, path, "test", True, "ASD", False
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
     def test_export_csv_2(self):
         path = "./test_files/csv/export_2.test.csv"
         export_csv_simulation(
-            SD1, "Wavelength", "Irradiance", CPOINT, path, "test", True, "ASD"
+            SD1, "Wavelength", "Irradiance", CPOINT, path, "test", True, "ASD", False
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
     def test_export_csv_3(self):
         path = "./test_files/csv/export_3.test.csv"
         export_csv_simulation(
-            SD1, "Wavelength", "Irradiance", SATPOINT, path, "test", False, "ASD"
+            SD1, "Wavelength", "Irradiance", SATPOINT, path, "test", False, "ASD", False
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
@@ -110,6 +110,7 @@ class TestCSV(unittest.TestCase):
             "test",
             [True, False],
             "ASD",
+            False,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_4.csv"))
 
@@ -125,6 +126,7 @@ class TestCSV(unittest.TestCase):
             "test",
             [True, True],
             "ASD",
+            False,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
@@ -142,6 +144,7 @@ class TestCSV(unittest.TestCase):
             "test",
             [True, False],
             "ASD",
+            False,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 
@@ -156,7 +159,14 @@ class TestCSV(unittest.TestCase):
         data = SpectralData(WLENS, signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
         export_csv_integrated_irradiance(
-            srf, data, path, SPOINT2, "test", [True, True], "ASD"
+            srf,
+            data,
+            path,
+            SPOINT2,
+            "test",
+            [True, True],
+            "ASD",
+            False,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
 

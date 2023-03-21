@@ -70,6 +70,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.comparison_x_datetime = comparison_x_datetime
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
+        self.skip_uncs = None
         self._build_layout()
 
     def _build_layout(self):
@@ -267,6 +268,9 @@ class GraphWidget(QtWidgets.QWidget):
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
 
+    def set_skipped_uncertainties(self, skip: bool):
+        self.skip_uncs = skip
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -286,6 +290,7 @@ class GraphWidget(QtWidgets.QWidget):
                         version,
                         self.data_compare.ampa_valid_range,
                         self.interp_spectrum_name,
+                        self.skip_uncs,
                         self.comparison_x_datetime,
                     )
                 elif self.inside_mpa_range is not None:
@@ -298,6 +303,7 @@ class GraphWidget(QtWidgets.QWidget):
                         version,
                         self.inside_mpa_range,
                         self.interp_spectrum_name,
+                        self.skip_uncs,
                     )
                 else:
                     csv.export_csv_srf(
@@ -481,6 +487,7 @@ for absolute moon phase angles between 2° and 90°"
                     version,
                     self.inside_mpa_range,
                     self.interp_spectrum_name,
+                    self.skip_uncs,
                 )
             except Exception as e:
                 self.show_error(e)
@@ -594,6 +601,13 @@ for wavelengths between 350 and 2500 nm"
         sp_name: str,
     ):
         self.channels[index].set_interp_spectrum_name(sp_name)
+
+    def set_skipped_uncertainties(
+        self,
+        index: int,
+        skip: bool,
+    ):
+        self.channels[index].set_skipped_uncertainties(skip)
 
     def update_legends(self, index: int, legends: List[List[str]], redraw: bool = True):
         """

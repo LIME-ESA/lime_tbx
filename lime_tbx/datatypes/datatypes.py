@@ -911,6 +911,8 @@ class LGLODData:
         Polarization for the cimel.
     spectrum_name: str
         Name of the spectrum used for interpolation.
+    skipped_uncs: bool
+        Flag that indicates if the uncertainties calculation was skipped or not.
     """
 
     observations: List[LunarObservationWrite]
@@ -920,6 +922,7 @@ class LGLODData:
     elrefs_cimel: List["SpectralData"]
     polars_cimel: List["SpectralData"]
     spectrum_name: str
+    skipped_uncs: bool
 
 
 @dataclass
@@ -936,12 +939,15 @@ class LGLODComparisonData:
         Name of the satellite used for comparison.
     spectrum_name: str
         Name of the spectrum used for interpolation.
+    skipped_uncs: bool
+        Flag that indicates if the uncertainties calculation was skipped or not.
     """
 
     comparisons: List[ComparisonData]
     ch_names: List[str]
     sat_name: str
     spectrum_name: str
+    skipped_uncs: bool
 
 
 class LimeException(Exception):
@@ -967,6 +973,7 @@ class InterpolationSettings:
 
     interpolation_spectrum: str
     show_interp_spectrum: bool
+    skip_uncertainties: bool
 
     def _save_disk(self, path: str):
         with open(path, "w") as file:

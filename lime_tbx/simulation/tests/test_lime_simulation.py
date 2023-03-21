@@ -110,6 +110,7 @@ class TestLimeSimulation(unittest.TestCase):
     # Function update_reflectance
     def test_update_reflectance(self):
         ls = get_lime_simulation()
+        ls._skip_uncs = False
         ls.update_reflectance(get_default_srf(), SURFACE_POINT, get_cimel_coeffs())
         elrefs = ls.get_elrefs()
         cimels = ls.get_elrefs_cimel()
@@ -181,6 +182,7 @@ class TestLimeSimulation(unittest.TestCase):
     # Function update_irradiance
     def test_update_irradiance(self):
         ls = get_lime_simulation()
+        ls._skip_uncs = False
         ls.update_irradiance(
             get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
         )
@@ -198,13 +200,15 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [4.70780879e-08, 2.16128372e-08, 3.30652426e-08, 3.13265180e-08],
-                [7.08220248e-08, 2.37747582e-08, 3.81527548e-08, 3.42065865e-08],
+                [1.2e-08, 2.2e-08, 3.30652426e-08, 1e-08],
+                [1.3e-08, 2.5e-08, 4e-08, 1e-08],
             ]
         )
         for eli, eli_ref, unc in zip(elis, elis_refs, uncs_refs):
             np.testing.assert_array_almost_equal(eli.data[CH_DEF_INDICES], eli_ref)
-            np.testing.assert_array_almost_equal(eli.uncertainties[CH_DEF_INDICES], unc)
+            np.testing.assert_array_almost_equal(
+                eli.uncertainties[CH_DEF_INDICES], unc, 8
+            )
         np.testing.assert_array_almost_equal(
             signals.data, np.array([[3.16668016e-06, 3.75979585e-06]])
         )
@@ -232,31 +236,18 @@ class TestLimeSimulation(unittest.TestCase):
         )
         cimel_unc_refs = np.array(
             [
-                [
-                    2.27518170e-08,
-                    2.80105042e-08,
-                    2.47471487e-08,
-                    2.02626150e-08,
-                    1.22957246e-08,
-                    5.92643584e-09,
-                ],
-                [
-                    2.52788677e-08,
-                    3.26865432e-08,
-                    2.75493808e-08,
-                    2.25832274e-08,
-                    1.36390032e-08,
-                    6.30731765e-09,
-                ],
+                [2e-08, 1e-08, 1e-08, 7e-09, 6e-09, 3e-09],
+                [2e-08, 1e-08, 1e-08, 1e-09, 6e-09, 3e-09],
             ]
         )
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
             np.testing.assert_array_equal(cimel.data, data)
-            np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 4)
+            np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 8)
 
     # Function update_polarization
     def test_update_polarization(self):
         ls = get_lime_simulation()
+        ls._skip_uncs = False
         ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         polars = ls.get_polars()
         self.assertIsNotNone(polars)

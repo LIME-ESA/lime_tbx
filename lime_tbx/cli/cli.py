@@ -250,6 +250,7 @@ class CLI:
         version = self.settings_manager.get_lime_coef().version
         are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        skip_uncs = self.settings_manager.is_skip_uncertainties()
         csv.export_csv_simulation(
             self.lime_simulation.get_elrefs(),
             "Wavelengths (nm)",
@@ -259,6 +260,7 @@ class CLI:
             version,
             are_mpas_oinside_mpa_range,
             sp_name,
+            skip_uncs,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
@@ -269,6 +271,7 @@ class CLI:
             version,
             are_mpas_oinside_mpa_range,
             sp_name,
+            skip_uncs,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
@@ -279,6 +282,7 @@ class CLI:
             version,
             are_mpas_oinside_mpa_range,
             sp_name,
+            skip_uncs,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -288,6 +292,7 @@ class CLI:
             version,
             are_mpas_oinside_mpa_range,
             sp_name,
+            skip_uncs,
         )
 
     def _export_lglod(self, point: Point, output_file: str):
@@ -558,12 +563,14 @@ class CLI:
         cimel_coef = self.settings_manager.get_cimel_coef()
         comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
         # EXPORT
+        skip_uncs = self.settings_manager.is_skip_uncertainties()
         if isinstance(ed, ExportNetCDF):
             lglod = LGLODComparisonData(
                 comps,
                 self.srf.get_channels_names(),
                 mos[0].data_source,
                 self.settings_manager.get_selected_spectrum_name(),
+                skip_uncs,
             )
             vers = self.settings_manager.get_lime_coef().version
             moon.write_comparison(
@@ -615,6 +622,7 @@ class CLI:
                                 version,
                                 comps[i].ampa_valid_range,
                                 sp_name,
+                                skip_uncs,
                             )
                         else:
                             xlabel = "UTC datetime"
@@ -658,6 +666,7 @@ class CLI:
                                 version,
                                 mpa_comps[i].ampa_valid_range,
                                 sp_name,
+                                skip_uncs,
                                 False,
                             )
                         else:

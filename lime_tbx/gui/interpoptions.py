@@ -40,6 +40,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.combo_versions = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_versions)
         self.form_layout = QtWidgets.QFormLayout()
+        # show interp
         self.label_show_interp = QtWidgets.QLabel("Show interpolation spectrum:")
         self.checkbox_show_interp = QtWidgets.QCheckBox()
         self.checkbox_show_interp.setChecked(
@@ -50,6 +51,18 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         )
         self.form_layout.setWidget(
             0, QtWidgets.QFormLayout.FieldRole, self.checkbox_show_interp
+        )
+        # skip uncertainties
+        self.label_skip_uncerts = QtWidgets.QLabel("Skip uncertainties calculation:")
+        self.checkbox_skip_uncerts = QtWidgets.QCheckBox()
+        self.checkbox_skip_uncerts.setChecked(
+            self.settings_manager.is_skip_uncertainties()
+        )
+        self.form_layout.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.label_skip_uncerts
+        )
+        self.form_layout.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.checkbox_skip_uncerts
         )
         self.main_layout.addLayout(self.form_layout)
         self.update_combo_versions()
@@ -80,6 +93,9 @@ class InterpOptionsDialog(QtWidgets.QDialog):
             self.settings_manager.select_interp_spectrum(name)
             self.settings_manager.set_show_interp_spectrum(
                 self.checkbox_show_interp.isChecked()
+            )
+            self.settings_manager.set_skip_uncertainties(
+                self.checkbox_skip_uncerts.isChecked()
             )
             self.lime_simulation.set_simulation_changed()
 

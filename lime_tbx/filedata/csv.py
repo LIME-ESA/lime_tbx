@@ -125,6 +125,7 @@ def export_csv_simulation(
     coeff_version: str,
     inside_mpa_range: Union[bool, List[bool]],
     interp_spectrum_name: str,
+    skip_uncs: bool,
 ):
     """
     Export the given data to a csv file
@@ -171,17 +172,16 @@ def export_csv_simulation(
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    ylabels.append(
-                        "{} {}{}".format(str(dt), ylabel, warn_out_mpa_range)
-                    )
-                    ylabels.append(
-                        "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
-                    )
+                    ylabels.append(f"{str(dt)} {ylabel}{warn_out_mpa_range}")
+                    if not skip_uncs:
+                        ylabels.append(f"{str(dt)} uncertainties{warn_out_mpa_range}")
             else:
                 warn_out_mpa_range = ""
                 if some_out_mpa_range:
                     warn_out_mpa_range = " **"
                 ylabels.append(f"{ylabel}{warn_out_mpa_range}")
+                if not skip_uncs:
+                    ylabels.append(f"uncertainties{warn_out_mpa_range}")
             writer.writerow([xlabel, *ylabels])
             if not isinstance(data, list) and not isinstance(data, np.ndarray):
                 data = [data]
@@ -191,7 +191,8 @@ def export_csv_simulation(
                 yd = []
                 for datum in data:
                     yd.append(datum.data[i])
-                    yd.append(datum.uncertainties[i])
+                    if not skip_uncs:
+                        yd.append(datum.uncertainties[i])
                 y_data.append(yd)
             for i in range(len(x_data)):
                 writer.writerow([x_data[i], *y_data[i]])
@@ -208,6 +209,7 @@ def export_csv_comparation(
     coeff_version: str,
     ampa_valid_range: List[bool],
     interp_spectrum_name: str,
+    skip_uncs: bool,
     x_datetime: bool = True,
 ):
     """
@@ -245,18 +247,20 @@ def export_csv_comparation(
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            writer.writerow(
-                [
-                    x_label,
-                    "latitude",
-                    "longitude",
-                    "altitude(m)",
-                    "Observed {}".format(ylabel),
-                    "Simulated {}".format(ylabel),
+            header = [
+                x_label,
+                "latitude",
+                "longitude",
+                "altitude(m)",
+                "Observed {}".format(ylabel),
+                "Simulated {}".format(ylabel),
+            ]
+            if not skip_uncs:
+                header += [
                     "Observation uncertainties",
                     "Simulation uncertainties",
                 ]
-            )
+            writer.writerow(header)
             x_data = data[0].wlens
             for i in range(len(x_data)):
                 pt = points[i]
@@ -268,18 +272,20 @@ def export_csv_comparation(
                 if not ampa_valid_range[i]:
                     warn_out_mpa_range = " **"
                 x_val = f"{x_val}{warn_out_mpa_range}"
-                writer.writerow(
-                    [
-                        x_val,
-                        pt.latitude,
-                        pt.longitude,
-                        pt.altitude,
-                        data[0].data[i],
-                        data[1].data[i],
+                datarow = [
+                    x_val,
+                    pt.latitude,
+                    pt.longitude,
+                    pt.altitude,
+                    data[0].data[i],
+                    data[1].data[i],
+                ]
+                if not skip_uncs:
+                    datarow += [
                         data[0].uncertainties[i],
                         data[1].uncertainties[i],
                     ]
-                )
+                writer.writerow(datarow)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
@@ -293,6 +299,7 @@ def export_csv_integrated_irradiance(
     coeff_version: str,
     inside_mpa_range: Union[bool, List[bool]],
     interp_spectrum_name: str,
+    skip_uncs: bool,
 ):
     """
     Export the given integrated signal data to a csv file
@@ -343,12 +350,14 @@ def export_csv_integrated_irradiance(
                             str(dt), warn_out_mpa_range
                         )
                     )
-                    irr_titles.append(
-                        "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
-                    )
+                    if not skip_uncs:
+                        irr_titles.append(
+                            "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
+                        )
             else:
                 irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
-                irr_titles.append("uncertainties")
+                if not skip_uncs:
+                    irr_titles.append("uncertainties")
             writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
             for i, ch in enumerate(srf.channels):
                 if ch.valid_spectre == SpectralValidity.VALID:
@@ -360,7 +369,8 @@ def export_csv_integrated_irradiance(
                 print_data = []
                 for j in range(len(signals.data[i])):
                     print_data.append(signals.data[i][j])
-                    print_data.append(signals.uncertainties[i][j])
+                    if not skip_uncs:
+                        print_data.append(signals.uncertainties[i][j])
 
                 writer.writerow([ch.id, ch.center, validity, *print_data])
     except Exception as e:

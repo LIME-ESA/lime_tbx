@@ -22,6 +22,7 @@ from lime_tbx.gui import (
 from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.gui.spinner import SpinnerPage
 from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
+from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import moon, srf as srf_loader
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
@@ -253,10 +254,18 @@ def show_comparisons_callback(
     mpa_comps: List[ComparisonData],
     srf: SpectralResponseFunction,
     version: str,
+    settings_manager: ISettingsManager,
 ) -> Tuple[List[str], List[str]]:
-    to_remove = _show_comps_output(output, comps, "datetimes", srf, version)
+    to_remove = _show_comps_output(
+        output, comps, "datetimes", srf, version, settings_manager
+    )
     to_remove_comps = _show_comps_output(
-        output_mpa, mpa_comps, "Moon Phase Angle (degrees)", srf, version
+        output_mpa,
+        mpa_comps,
+        "Moon Phase Angle (degrees)",
+        srf,
+        version,
+        settings_manager,
     )
     return (to_remove, to_remove_comps)
 
@@ -267,6 +276,7 @@ def _show_comps_output(
     y_label: str,
     srf: SpectralResponseFunction,
     version: str,
+    settings_manager: ISettingsManager,
 ) -> List[str]:
     ch_names = srf.get_channels_names()
     to_remove = []
@@ -279,9 +289,11 @@ def _show_comps_output(
             warning_out_mpa_range = ""
             if False in comps[i].ampa_valid_range:
                 warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-            sp_name = interp_data.get_interpolation_spectrum_name()
+            sp_name = settings_manager.get_interpolation_spectrum_name()
+            skip = settings_manager.is_skip_uncertainties()
             spectrum_info = f" | Interp. spectrum: {sp_name}"
             output.set_interp_spectrum_name(i, sp_name)
+            output.set_skipped_uncertainties(i, skip)
             subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
             _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
             subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -416,6 +428,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.srf.get_channels_names(),
             self.data_source,
             self.comparison_spectrum,
+            self.skipped_uncs,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
@@ -518,6 +531,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf = data[3]
         self.comps = comps
         self.data_source = mos[0].data_source
+        self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
         self.mpa_comps = mpa_comps
         self.srf = srf
         version = self.settings_manager.get_lime_coef().version
@@ -528,6 +542,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.mpa_comps,
             self.srf,
             version,
+            self.settings_manager,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         ch_names = srf.get_channels_names()
@@ -570,6 +585,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         mpa_comps: List[ComparisonData],
         srf: SpectralResponseFunction,
         data_source: str,
+        skipped_uncs: bool,
     ):
         self.set_show_comparison_input(False)
         self.input.clear_input()
@@ -577,6 +593,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf = srf
         self.comps = comps
         self.data_source = data_source
+        self.skipped_uncs = skipped_uncs
         self.mpa_comps = mpa_comps
         self.srf = srf
         version = self.settings_manager.get_lime_coef().version
@@ -587,6 +604,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.mpa_comps,
             self.srf,
             version,
+            self.settings_manager,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         ch_names = srf.get_channels_names()
@@ -826,6 +844,7 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -885,6 +904,7 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -936,6 +956,7 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -1043,7 +1064,7 @@ def check_srf_observation_callback(lglod: LGLODData, srf: SpectralResponseFuncti
 
 
 def check_srf_comparison_callback(
-    lglod: LGLODComparisonData, srf: SpectralResponseFunction, data_source: str
+    lglod: LGLODComparisonData, srf: SpectralResponseFunction
 ):
     valid = True
     srf_chans = srf.get_channels_names()
@@ -1059,14 +1080,18 @@ def check_srf_comparison_callback(
         if chan in lglod.ch_names:
             new_channels.append(srf.get_channel_from_name(chan))
     new_srf = SpectralResponseFunction(srf.name, new_channels)
-    return [lglod, new_srf, data_source]
+    return [lglod, new_srf]
 
 
 def obtain_sorted_mpa_callback(
-    comps: List[ComparisonData], kernels_path: KernelsPath, srf, data_source
+    comps: List[ComparisonData],
+    kernels_path: KernelsPath,
+    srf,
+    data_source,
+    skipped_uncs,
 ):
     mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
-    return comps, mpa_comps, srf, data_source
+    return comps, mpa_comps, srf, data_source, skipped_uncs
 
 
 def return_args_callback(*args):
@@ -1140,11 +1165,12 @@ class LimeTBXWidget(QtWidgets.QWidget):
         )
 
     def _load_observations_finished_2(self, data):
-        lglod = data[0]
+        lglod: LGLODData = data[0]
         srf = data[1]
         self.main_page.srf_widget.set_srf(srf)
         self.lime_simulation.set_observations(lglod, srf)
         self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
+        self.settings_manager.set_skip_uncertainties(lglod.skipped_uncs)
         point = self.lime_simulation.get_point()
         self.main_page.load_observations_finished(point)
         self.main_page._unblock_gui()
@@ -1168,9 +1194,16 @@ class LimeTBXWidget(QtWidgets.QWidget):
         lglod: LGLODComparisonData = data[0]
         srf = data[1]
         self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
+        self.settings_manager.set_skip_uncertainties(lglod.skipped_uncs)
         self.worker = CallbackWorker(
             obtain_sorted_mpa_callback,
-            [lglod.comparisons, self.kernels_path, srf, lglod.sat_name],
+            [
+                lglod.comparisons,
+                self.kernels_path,
+                srf,
+                lglod.sat_name,
+                lglod.skipped_uncs,
+            ],
         )
         self._start_thread(
             self._load_comparisons_finished_3, self._load_comparisons_finished_error
@@ -1181,7 +1214,10 @@ class LimeTBXWidget(QtWidgets.QWidget):
         mpa_comps = data[1]
         srf = data[2]
         data_source = data[3]
-        self.comparison_page.load_lglod_comparisons(comps, mpa_comps, srf, data_source)
+        skipped_uncs = data[4]
+        self.comparison_page.load_lglod_comparisons(
+            comps, mpa_comps, srf, data_source, skipped_uncs
+        )
 
     def _load_comparisons_finished_error(self, error: Exception):
         logger.get_logger().critical(error)

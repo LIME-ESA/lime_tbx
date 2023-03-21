@@ -405,7 +405,7 @@ QCheckBox
 
 QCheckBox::indicator:unchecked
 {
-	background-color: @neutralSpace
+	background-color: @neutralSpace;
 }
 
 QCheckBox::indicator:unchecked:hover

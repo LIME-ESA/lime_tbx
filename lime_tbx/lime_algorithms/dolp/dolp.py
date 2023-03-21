@@ -42,6 +42,7 @@ class IDOLP(ABC):
         self,
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
+        skip_uncs: bool = False,
     ) -> SpectralData:
         """
         Calculation of the degree of linear polarization.
@@ -52,6 +53,8 @@ class IDOLP(ABC):
             Moon phase angle in degrees.
         coefficients: PolarizationCoefficients
             Coefficients needed in the dolp algorithm
+        skip_uncs: bool
+            Flag for skipping the calculation of uncertainties.
 
         Returns
         -------
@@ -84,6 +87,7 @@ class DOLP(IDOLP):
         self,
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
+        skip_uncs: bool = False,
     ) -> SpectralData:
         """
         Calculation of the degree of linear polarization.
@@ -94,6 +98,8 @@ class DOLP(IDOLP):
             Moon phase angle in degrees.
         coefficients: PolarizationCoefficients
             Coefficients needed in the dolp algorithm
+        skip_uncs: bool
+            Flag for skipping the calculation of uncertainties.
 
         Returns
         -------
@@ -108,6 +114,7 @@ class DOLP(IDOLP):
             polarizations.append(result)
         polarizations = np.array(polarizations)
         # TODO add uncertainties correctly
+        # TODO add skip uncertainties correctly
         ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None)
         return SpectralData(
             np.array(wavelengths),

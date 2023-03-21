@@ -130,6 +130,27 @@ class ISettingsManager(ABC):
         """
         pass
 
+    @abstractmethod
+    def is_skip_uncertainties(self) -> bool:
+        """Checks if the user settings are set to skip the uncertainties calculation.
+
+        Returns
+        -------
+        should_skip: bool
+            True if the uncertainties calculation should be skipped."""
+        pass
+
+    @abstractmethod
+    def set_skip_uncertainties(self, skip: bool):
+        """Sets if the uncertainties should be calculated.
+
+        Parameters
+        ----------
+        skip: bool
+            True if the uncertainties should be skipped.
+        """
+        pass
+
 
 DEF_SRF_STEP = 2
 
@@ -205,3 +226,9 @@ class SettingsManager(ISettingsManager):
 
     def set_show_interp_spectrum(self, show: bool):
         interp_data.set_show_interpolation_spectrum(show)
+
+    def is_skip_uncertainties(self) -> bool:
+        return interp_data.is_skip_uncertainties()
+
+    def set_skip_uncertainties(self, skip: bool):
+        interp_data.set_skip_uncertainties(skip)

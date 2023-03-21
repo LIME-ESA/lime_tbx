@@ -236,11 +236,13 @@ class Comparison(IComparison):
                     rel_dif = (sim - ref) / ref
                     tot_rel_diff += rel_dif
                     rel_diffs.append(rel_dif)
-                    unc_sim = specs[1].uncertainties[j]
-                    unc_ref = specs[0].uncertainties[j]
-                    uncs_r.append(
-                        (unc_sim + unc_ref) + unc_ref
-                    )  # i dont know if this is the correct way of propagating the uncertainty
+                    unc_r = 0
+                    if not lime_simulation.is_skipping_uncs():
+                        unc_sim = specs[1].uncertainties[j]
+                        unc_ref = specs[0].uncertainties[j]
+                        unc_r = (unc_sim + unc_ref) + unc_ref
+                    uncs_r.append(unc_r)
+                    # i dont know if this is the correct way of propagating the uncertainty
                 mean_rel_diff = tot_rel_diff / num_samples
                 std = np.std(rel_diffs)
                 ratio_spec = SpectralData(

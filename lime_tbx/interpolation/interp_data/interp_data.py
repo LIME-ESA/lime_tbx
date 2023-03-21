@@ -236,6 +236,17 @@ def is_show_interpolation_spectrum() -> bool:
     return setts.show_interp_spectrum
 
 
+def is_skip_uncertainties() -> bool:
+    """Checks if the user settings are set to skip the uncertainties calculation.
+
+    Returns
+    -------
+    should_skip: bool
+        True if the uncertainties calculation should be skipped."""
+    setts = _load_interp_settings()
+    return setts.skip_uncertainties
+
+
 def set_interpolation_spectrum_name(spectrum: str):
     """Sets the spectrum name as the currently selected one.
 
@@ -265,6 +276,20 @@ def set_show_interpolation_spectrum(show: bool):
     """
     setts = _load_interp_settings()
     setts.show_interp_spectrum = show
+    path = _get_interp_path()
+    setts._save_disk(path)
+
+
+def set_skip_uncertainties(skip: bool):
+    """Sets if the uncertainties should be calculated.
+
+    Parameters
+    ----------
+    skip: bool
+        True if the uncertainties should be skipped.
+    """
+    setts = _load_interp_settings()
+    setts.skip_uncertainties = skip
     path = _get_interp_path()
     setts._save_disk(path)
 

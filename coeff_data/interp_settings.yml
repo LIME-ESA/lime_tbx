@@ -1,3 +1,4 @@
 - !InterpolationSettings
   interpolation_spectrum: ASD
   show_interp_spectrum: true
+  skip_uncertainties: false

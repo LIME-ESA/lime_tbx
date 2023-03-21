@@ -17,7 +17,7 @@ retrieval and comparison with a star photometer.
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.lime_algorithms.rolo import eli, elref
@@ -52,6 +52,7 @@ class IROLO(ABC):
         elref_spectrum: SpectralData,
         moon_data: MoonData,
         srf_type: str,
+        skip_uncs: bool = False,
     ) -> SpectralData:
         """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020,
         without using the Apollo Coefficients.
@@ -69,6 +70,8 @@ class IROLO(ABC):
             Moon data needed to calculate Moon's irradiance.
         srf_type: str
             SRF type that is going to be used. Can be 'cimel', 'asd' or 'interpolated'.
+        skip_uncs: bool
+            Flag for skipping the calculation of uncertainties.
 
         Returns
         -------
@@ -82,6 +85,7 @@ class IROLO(ABC):
     def get_elrefs(
         coefficients: ReflectanceCoefficients,
         moon_data: MoonData,
+        skip_uncs: bool = False,
     ) -> SpectralData:
         """Calculation of Extraterrestrial Lunar Reflectance following Eq 3 in Roman et al., 2020
         for the calculation of the irradiance, without using the Apollo Coefficients.
@@ -96,7 +100,9 @@ class IROLO(ABC):
         coefficients : ReflectanceCoefficients
             Needed coefficients for the simulation
         moon_data : MoonData
-            Moon data needed to calculate Moon's irradiance..
+            Moon data needed to calculate Moon's irradiance.
+        skip_uncs: bool
+            Flag for skipping the calculation of uncertainties.
 
         Returns
         -------
@@ -116,23 +122,38 @@ class ROLO(IROLO):
         elref_spectrum: SpectralData,
         moon_data: MoonData,
         srf_type: str,
+        skip_uncs: bool = False,
     ) -> SpectralData:
         wlens = elref_spectrum.wlens
         elis = eli.calculate_eli_from_elref(
             wlens, moon_data, elref_spectrum.data, srf_type
         )
-        unc, corr = eli.calculate_eli_from_elref_unc(
-            elref_spectrum, moon_data, srf_type
-        )
+        if not skip_uncs:
+            unc, corr = eli.calculate_eli_from_elref_unc(
+                elref_spectrum, moon_data, srf_type
+            )
+        else:
+            unc = np.zeros(elis.shape)
+            err_corr_side = len(unc)
+            corr = np.zeros((err_corr_side, err_corr_side))
+            np.fill_diagonal(corr, 1)
         ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc, corr)
         return SpectralData(wlens, elis, unc, ds_eli)
 
     @staticmethod
     def get_elrefs(
-        coefficients: ReflectanceCoefficients, moon_data: MoonData
+        coefficients: ReflectanceCoefficients,
+        moon_data: MoonData,
+        skip_uncs: bool = False,
     ) -> SpectralData:
         wlens = coefficients.wlens
         elrefs = elref.calculate_elref(coefficients, moon_data)
-        unc, corr = elref.calculate_elref_unc(coefficients, moon_data)
+        if not skip_uncs:
+            unc, corr = elref.calculate_elref_unc(coefficients, moon_data)
+        else:
+            unc = np.zeros(elrefs.shape)
+            err_corr_side = len(unc)
+            corr = np.zeros((err_corr_side, err_corr_side))
+            np.fill_diagonal(corr, 1)
         ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc, corr)
         return SpectralData(wlens, elrefs, unc, ds)

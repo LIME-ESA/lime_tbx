@@ -40,6 +40,7 @@ def create_lglod_data(
     spectrum_name: str,
 ) -> LGLODData:
     obs = []
+    skipped_uncs = lime_simulation.is_skipping_uncs()
     ch_names = srf.get_channels_names()
     sat_pos_ref = constants.EARTH_FRAME
     elis = lime_simulation.get_elis()
@@ -169,4 +170,5 @@ def create_lglod_data(
         elrefs_cimel,
         polars_cimel,
         spectrum_name,
+        skipped_uncs,
     )

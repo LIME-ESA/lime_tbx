@@ -129,6 +129,7 @@ def _write_start_dataset(
     max_dt: datetime,
     warning_outside_mpa_range: bool,
     spectrum_name: str,
+    skipped_uncs: bool,
 ):
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
@@ -170,6 +171,7 @@ def _write_start_dataset(
     ds.reference_model = "LIME2 coefficients version: {}".format(coefficients_version)
     ds.not_default_srf = int(not_default_srf)
     ds.spectrum_name = spectrum_name
+    ds.skipped_uncertainties = int(skipped_uncs)
     return ds
 
 
@@ -216,6 +218,7 @@ def _write_normal_simulations(
         max_dt,
         warning_outside_mpa_range,
         lglod.spectrum_name,
+        lglod.skipped_uncs,
     )
     # DIMENSIONS
     max_len_strlen = len(max(sim_data.ch_names, key=len))
@@ -574,6 +577,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     obss = []
     sp_name = ds.spectrum_name
     data_source = ds.data_source
+    skipped_uncs = bool(ds.skipped_uncertainties)
     ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
@@ -634,7 +638,14 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         for i in range(len(polar_cimel))
     ]
     return LGLODData(
-        obss, signals, not_default_srf, elis_cimel, elrefs_cimel, polars_cimel, sp_name
+        obss,
+        signals,
+        not_default_srf,
+        elis_cimel,
+        elrefs_cimel,
+        polars_cimel,
+        sp_name,
+        skipped_uncs,
     )
 
 
@@ -877,6 +888,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
     mpas = np.array(ds.variables["mpa"][:].data)
     sp_name = ds.spectrum_name
+    skipped_uncs = bool(ds.skipped_uncertainties)
     ds.close()
     comps = []
     points = []
@@ -918,7 +930,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
         )
         comps.append(comp)
-    return LGLODComparisonData(comps, ch_names, sat_name, sp_name)
+    return LGLODComparisonData(comps, ch_names, sat_name, sp_name, skipped_uncs)
 
 
 def read_lglod_file(
