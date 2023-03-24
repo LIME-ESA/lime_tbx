@@ -289,7 +289,7 @@ def _show_comps_output(
             warning_out_mpa_range = ""
             if False in comps[i].ampa_valid_range:
                 warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-            sp_name = settings_manager.get_interpolation_spectrum_name()
+            sp_name = settings_manager.get_selected_spectrum_name()
             skip = settings_manager.is_skip_uncertainties()
             spectrum_info = f" | Interp. spectrum: {sp_name}"
             output.set_interp_spectrum_name(i, sp_name)
