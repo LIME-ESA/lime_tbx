@@ -35,10 +35,17 @@ class InterpOptionsDialog(QtWidgets.QDialog):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.setWindowTitle(constants.APPLICATION_NAME)
+        # select interpolation reference
         self.title_label = QtWidgets.QLabel("Select the interpolation reference")
         self.main_layout.addWidget(self.title_label)
         self.combo_versions = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_versions)
+        self.form_layout = QtWidgets.QFormLayout()
+        # select output SRF
+        self.title_label_SRF = QtWidgets.QLabel("Select the output SRF")
+        self.main_layout.addWidget(self.title_label_SRF)
+        self.combo_SRF = QtWidgets.QComboBox()
+        self.main_layout.addWidget(self.combo_SRF)
         self.form_layout = QtWidgets.QFormLayout()
         # show interp
         self.label_show_interp = QtWidgets.QLabel("Show interpolation spectrum:")
@@ -66,6 +73,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         )
         self.main_layout.addLayout(self.form_layout)
         self.update_combo_versions()
+        self.update_combo_SRF()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.save_button = QtWidgets.QPushButton("Save")
         self.save_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -87,10 +95,22 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.combo_versions.setCurrentIndex(index)
         self.combobox_listen = True
 
+    def update_combo_SRF(self):
+        self.combobox_listen = False
+        self.SRF_names = self.settings_manager.get_available_interp_SRFs()
+        self.combo_SRF.clear()
+        print(self.SRF_names)
+        self.combo_SRF.addItems(self.SRF_names)
+        spname = self.settings_manager.get_selected_interp_SRF()
+        index = self.SRF_names.index(spname)
+        self.combo_SRF.setCurrentIndex(index)
+        self.combobox_listen = True
+
     @QtCore.Slot()
-    def update_from_combobox(self, name: str):
+    def update_from_combobox(self, name: str, name_SRF: str):
         if self.combobox_listen:
             self.settings_manager.select_interp_spectrum(name)
+            self.settings_manager.select_interp_SRF(name_SRF)
             self.settings_manager.set_show_interp_spectrum(
                 self.checkbox_show_interp.isChecked()
             )
@@ -102,7 +122,8 @@ class InterpOptionsDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def save_clicked(self):
         name = self.combo_versions.currentText()
-        self.update_from_combobox(name)
+        name_SRF = self.combo_SRF.currentText()
+        self.update_from_combobox(name,name_SRF)
         self.close()
 
     @QtCore.Slot()

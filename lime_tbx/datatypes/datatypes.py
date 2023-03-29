@@ -201,12 +201,16 @@ class SRF_fwhm:
     name: str
     wav_centre: np.ndarray
     fwhm: np.ndarray
+    shape: str
 
     def get_wavelengths(self) -> List[float]:
         return self.wav_centre
 
     def get_values(self) -> List[float]:
         return self.fwhm
+
+    def get_shape(self) -> str:
+        return self.shape
 
 
 class Point(ABC):

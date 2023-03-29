@@ -678,17 +678,34 @@ class LimeSimulation(ILimeSimulation):
             if not skip_uncs:
                 # TODO interpolate correlations correctly
                 u_polars_intp = polars_intp * 0.1
-                corr = np.zeros((len(polars_intp), len(polars_intp)))
-                np.fill_diagonal(corr, 1)
+                corr_polars_intp = np.zeros((len(polars_intp), len(polars_intp)))
+                np.fill_diagonal(corr_polars_intp, 1)
+
+                (
+                    polars_intp,
+                    u_polars_intp,
+                    corr_polars_intp,
+                ) = intp.get_interpolated_refl_unc(
+                    cf.wlens,
+                    cf.data,
+                    asd_data[i].wlens,
+                    asd_data[i].data,
+                    wlens,
+                    cf.uncertainties,
+                    asd_data[i].uncertainties,
+                    cf.ds.err_corr_reflectance.values,
+                    asd_data[i].ds.err_corr_reflectance.values,
+                )
             else:
                 u_polars_intp = np.zeros(polars_intp.shape)
                 corr = np.zeros((len(polars_intp), len(polars_intp)))
                 np.fill_diagonal(corr, 1)
+
             ds_intp = SpectralData.make_reflectance_ds(
                 wlens,
                 polars_intp,
                 u_polars_intp,
-                corr,
+                corr_polars_intp,
             )
 
             specs.append(SpectralData(wlens, polars_intp, u_polars_intp, ds_intp))

@@ -104,6 +104,21 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
+    def get_available_interp_SRFs(self) -> List[str]:
+        """Obtain a list with all the available spectra names"""
+        pass
+
+    @abstractmethod
+    def get_selected_interp_SRF(self) -> str:
+        """Obtain the currently selected interpolation spectrum name"""
+        pass
+
+    @abstractmethod
+    def select_interp_SRF(self, name: str):
+        """Select the interpolation spectrum to use"""
+        pass
+
+    @abstractmethod
     def can_perform_polarization(self) -> bool:
         """Checks if the current settings allow for the performance of polarization."""
         pass
@@ -208,6 +223,15 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[-1]
         self.cimel_coeff = self.coeffs[-1].reflectance
         self.polar_coeff = self.coeffs[-1].polarization
+
+    def get_available_interp_SRFs(self) -> List[str]:
+        return interp_data.get_available_interp_SRFs()
+
+    def get_selected_interp_SRF(self) -> str:
+        return interp_data.get_interpolation_SRF()
+
+    def select_interp_SRF(self, name: str):
+        interp_data.set_interpolation_SRF(name)
 
     def get_available_spectra_names(self) -> List[str]:
         return interp_data.get_available_spectra_names()

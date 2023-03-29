@@ -150,11 +150,9 @@ class ISpectralInterpolation(ABC):
             Uncertainties of the cimel data.
         u_asd_refl: np.ndarray of float
             Uncertainties of the interpolation spectrum data.
-        corr_cimel_refl:
-            TODO
+        corr_cimel_refl: np.ndarray of float
             Error correlation of the cimel data
-        corr_asd_refl:
-            TODO
+        corr_asd_refl: np.ndarray of float
             Error correlation of the interpolation spectrum data
 
         Returns
@@ -227,8 +225,8 @@ class SpectralInterpolation(ISpectralInterpolation):
         final_wav: NDArray[np.float_],
         u_cimel_refl: NDArray[np.float_],
         u_asd_refl: NDArray[np.float_],
-        corr_cimel_refl=None,
-        corr_asd_refl=None,
+        corr_cimel_refl: NDArray[np.float_] = None,
+        corr_asd_refl: NDArray[np.float_] = None,
     ) -> NDArray[np.float_]:
         corr_srf_cimel = self.si.integrate_cimel(asd_refl, asd_wav) - cm.interpolate_1d(
             asd_wav, asd_refl, cimel_wav, method="linear"

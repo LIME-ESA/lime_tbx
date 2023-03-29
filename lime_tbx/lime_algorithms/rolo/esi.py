@@ -34,7 +34,7 @@ __status__ = "Development"
 _WEHRLI_FILE = "assets/wehrli_asc.csv"
 _TSIS_CIMEL_FILE = "assets/tsis_cimel.csv"
 _TSIS_ASD_FILE = "assets/tsis_asd.csv"
-_TSIS_INTP_FILE = "assets/tsis_intp.csv"
+_TSIS_INTP_FILE = "../../../coeff_data/tsis_intp.csv"
 
 _loaded_data = {}
 

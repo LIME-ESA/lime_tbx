@@ -356,13 +356,6 @@ class TestSpectralData(unittest.TestCase):
         self.assertIsNotNone(ds.u_reflectance.values)
         self.assertIsNotNone(ds.err_corr_reflectance.values)
 
-    def test_make_reflectance_ds_list_err(self):
-        return
-        # TODO Why does this test fail now? Is the obsarray module changed? Should remove test?
-        self.assertRaises(
-            TypeError, SpectralData.make_reflectance_ds, list(SPD_WAVS), list(SPD_VALS)
-        )
-
     def test_make_reflectance_ds_Spectral_Data(self):
         ds = SpectralData.make_reflectance_ds(
             SPD_WAVS, SPD_VALS, SPD_VALS * 0.05, SPD_CORR

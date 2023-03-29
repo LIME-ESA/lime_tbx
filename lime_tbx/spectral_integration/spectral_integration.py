@@ -116,7 +116,7 @@ class SpectralIntegration(ISpectralIntegration):
         self.prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
         self.asd_srf = self._read_srf_asd()
         self.cimel_srf = self._read_srf_cimel()
-        self.interpolated_srf = self._read_srf_interpolated()
+        self.interpolated_srf = self._read_default_srf_interpolated()
 
     def _read_srf_asd(self) -> SpectralResponseFunction:
         """
@@ -124,17 +124,31 @@ class SpectralIntegration(ISpectralIntegration):
         """
         dir_path = os.path.dirname(os.path.realpath(__file__))
         data = np.genfromtxt(os.path.join(dir_path, _ASD_FILE), delimiter=",")
-        srf = SRF_fwhm("asd", data[:, 0], data[:, 1])
+        srf = SRF_fwhm("asd", data[:, 0], data[:, 1], "gaussian")
         return srf
 
-    def _read_srf_interpolated(self) -> SpectralResponseFunction:
+    def _read_default_srf_interpolated(self) -> SpectralResponseFunction:
         """
         read asd fwhm and make SRF
         """
         dir_path = os.path.dirname(os.path.realpath(__file__))
         data = np.genfromtxt(os.path.join(dir_path, _INTERPOLATED_FILE), delimiter=",")
-        srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1])
+        srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "gaussian")
         return srf
+
+    def set_srf_interpolated(self, fwhm, sampling, shape, write=False) -> SpectralResponseFunction:
+        """
+        read asd fwhm and make SRF
+        """
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        wavs = np.arange(constants.MIN_WLEN, constants.MAX_WLEN+sampling, sampling)
+        fwhms = fwhm * np.ones_like(wavs)
+        if write:
+            id_str=("%s_%s_%s"% (fwhm,sampling, shape)).replace(".","p")
+            with open(os.path.join(dir_path,"assets/interpolated_model_fwhm_"+id_str+".csv"), "w") as f:
+                for i in range(len(wavs)):
+                    f.write("%s,%s\n" % (wavs[i], fwhms[i]))
+        self.interpolated_srf = SRF_fwhm("interpolated", wavs, fwhms, shape)
 
     def _read_srf_cimel(self) -> SpectralResponseFunction:
         """
@@ -160,22 +174,47 @@ class SpectralIntegration(ISpectralIntegration):
         y = self.integrate_elis_xy(self.cimel_srf, data, wlens)
         return y
 
-    def integrate_solar_asd(self, data: np.ndarray, wlens: np.ndarray) -> np.ndarray:
+    def integrate_solar_asd(self, data: np.ndarray, wlens: np.ndarray, ) -> np.ndarray:
         return band_integration.pixel_int(
             data,
             wlens,
             self.asd_srf.get_wavelengths(),
-            (self.asd_srf.get_values() ** 2 - 1) ** 0.5,
+            (self.asd_srf.get_values() ** 2 - 0.01) ** 0.5,
+            band_shape=self.asd_srf.get_shape()
         )
 
-    def integrate_solar_interpolated(
+    def integrate_solar_interpolated_default(
         self, data: np.ndarray, wlens: np.ndarray
     ) -> np.ndarray:
         return band_integration.pixel_int(
             data,
             wlens,
             self.interpolated_srf.get_wavelengths(),
-            (self.interpolated_srf.get_values() ** 2 - 1) ** 0.5,
+            (self.interpolated_srf.get_values() ** 2 - 0.01) ** 0.5,
+            band_shape=self.interpolated_srf.get_shape()
+        )
+
+    def integrate_solar_interpolated_gaussian(
+            self, data: np.ndarray, wlens: np.ndarray
+    ) -> np.ndarray:
+        # subtracting a fwhm of 0.1 in quadrature to account for fwhm of TSIS solar irradiance
+        return band_integration.pixel_int(
+            data,
+            wlens,
+            self.interpolated_srf.get_wavelengths(),
+            (self.interpolated_srf.get_values() ** 2 - 0.01) ** 0.5,
+            band_shape="gaussian"
+        )
+
+    def integrate_solar_interpolated_triangle(
+        self, data: np.ndarray, wlens: np.ndarray
+    ) -> np.ndarray:
+        return band_integration.pixel_int(
+            data,
+            wlens,
+            self.interpolated_srf.get_wavelengths(),
+            (self.interpolated_srf.get_values() ** 2 - 0.01) ** 0.5,
+            band_shape="triangle"
         )
 
     def integrate_elis_xy(

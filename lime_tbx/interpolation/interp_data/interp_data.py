@@ -176,11 +176,25 @@ SPECTRUM_NAME_APOLLO16 = "Apollo 16"
 SPECTRUM_NAME_BRECCIA = "Breccia"
 SPECTRUM_NAME_COMPOSITE = "Apollo 16 + Breccia"
 
+SRF_NAME_ASD = "ASD"
+SRF_NAME_GAUSSIAN_1NM_3NM = "Gaussian SRF with 1nm spectral sampling and 3nm resolution"
+SRF_NAME_TRIANGULAR_1NM_1NM = "Triangular SRF with 1nm spectral sampling and 1nm resolution"
+SRF_NAME_GAUSSIAN_P1NM_P3NM = "Gaussian SRF with 0.1nm spectral sampling and 0.3nm resolution"
+SRF_NAME_GAUSSIAN_P1NM_P3NM = "Triangular SRF with 0.1nm spectral sampling and 0.1nm resolution"
+
 _VALID_INTERP_SPECTRA = [
     SPECTRUM_NAME_ASD,
     #    SPECTRUM_NAME_APOLLO16,
     #    SPECTRUM_NAME_BRECCIA,
     SPECTRUM_NAME_COMPOSITE,
+]
+
+_VALID_INTERP_SRFS = [
+    SRF_NAME_ASD,
+    SRF_NAME_GAUSSIAN_1NM_3NM,
+    SRF_NAME_TRIANGULAR_1NM_1NM,
+    SRF_NAME_GAUSSIAN_P1NM_P3NM,
+    SRF_NAME_GAUSSIAN_P1NM_P3NM,
 ]
 
 
@@ -223,6 +237,33 @@ def get_interpolation_spectrum_name() -> str:
     )
     return _VALID_INTERP_SPECTRA[0]
 
+def get_available_interp_SRFs() -> List[str]:
+    """Obtain the spectra names that the user can use.
+
+    Returns
+    -------
+    names: list of str
+        Valid interpolation spectra names.
+    """
+    return _VALID_INTERP_SRFS.copy()
+
+
+def get_interpolation_SRF() -> str:
+    """Obtains the currently chosen interpolation spectrum name.
+
+    Returns
+    -------
+    name: str
+        Currently chosen interpolation spectrum name.
+    """
+    setts = _load_interp_settings()
+    if setts.interpolation_SRF in _VALID_INTERP_SRFS:
+        return setts.interpolation_SRF
+    logger.get_logger().error(
+        f"Unknown interpolation spectrum found: {setts.interpolation_SRF}"
+    )
+    return _VALID_INTERP_SRFS[0]
+
 
 def is_show_interpolation_spectrum() -> bool:
     """Checks if the UI should show the spectrum used for interpolation.
@@ -262,6 +303,24 @@ def set_interpolation_spectrum_name(spectrum: str):
         setts._save_disk(path)
     else:
         msg = f"Tried setting unknown interpolation spectrum: {spectrum}"
+        logger.get_logger().error(msg)
+        raise LimeException(msg)
+
+def set_interpolation_SRF(intp_srf: str):
+    """Sets the spectrum name as the currently selected one.
+
+    Parameters
+    ----------
+    spectrum: str
+        Spectrum name to set as chosen.
+    """
+    setts = _load_interp_settings()
+    if intp_srf in _VALID_INTERP_SRFS:
+        path = _get_interp_path()
+        setts.interpolation_spectrum = intp_srf
+        setts._save_disk(path)
+    else:
+        msg = f"Tried setting unknown interpolation spectrum: {intp_srf}"
         logger.get_logger().error(msg)
         raise LimeException(msg)
 

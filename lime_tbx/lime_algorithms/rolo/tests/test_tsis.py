@@ -44,7 +44,7 @@ class Test_TSIS(unittest.TestCase):
         )
         asd_wavs, asd_esi, u_asd_esi = dat[:, 0], dat[:, 1], dat[:, 2]
         dat = np.genfromtxt(
-            os.path.join(_current_dir, "../assets/tsis_intp.csv"), delimiter=","
+            os.path.join(_current_dir, "../../../../coeff_data/tsis_intp.csv"), delimiter=","
         )
         intp_wavs, intp_esi, u_intp_esi = dat[:, 0], dat[:, 1], dat[:, 2]
         si = SpectralIntegration()
