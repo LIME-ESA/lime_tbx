@@ -96,13 +96,13 @@ def tsis_fwhm(
     fwhm: float,
     sampling: float,
     shape: str,
-    MCsteps=3,
+    MCsteps=100,
 ):
     """
     Calculate TSIS solar irradiances and uncertainties, band integrated to bands with specified FWHM and shape
     """
     si = SpectralIntegration()
-    prop = punpy.MCPropagation(MCsteps, parallel_cores=100)
+    prop = punpy.MCPropagation(MCsteps, parallel_cores=20)
     si.set_srf_interpolated(fwhm, sampling, shape, write=True)
     intp_wavs = np.array(si.interpolated_srf.get_wavelengths())
     if shape=="gaussian":
