@@ -976,6 +976,7 @@ class InterpolationSettings:
     """
 
     interpolation_spectrum: str
+    interpolation_SRF: str
     show_interp_spectrum: bool
     skip_uncertainties: bool
 

@@ -178,9 +178,15 @@ SPECTRUM_NAME_COMPOSITE = "Apollo 16 + Breccia"
 
 SRF_NAME_ASD = "ASD"
 SRF_NAME_GAUSSIAN_1NM_3NM = "Gaussian SRF with 1nm spectral sampling and 3nm resolution"
-SRF_NAME_TRIANGULAR_1NM_1NM = "Triangular SRF with 1nm spectral sampling and 1nm resolution"
-SRF_NAME_GAUSSIAN_P1NM_P3NM = "Gaussian SRF with 0.1nm spectral sampling and 0.3nm resolution"
-SRF_NAME_GAUSSIAN_P1NM_P3NM = "Triangular SRF with 0.1nm spectral sampling and 0.1nm resolution"
+SRF_NAME_TRIANGULAR_1NM_1NM = (
+    "Triangular SRF with 1nm spectral sampling and 1nm resolution"
+)
+SRF_NAME_GAUSSIAN_P1NM_P3NM = (
+    "Gaussian SRF with 0.1nm spectral sampling and 0.3nm resolution"
+)
+SRF_NAME_GAUSSIAN_P1NM_P3NM = (
+    "Triangular SRF with 0.1nm spectral sampling and 0.1nm resolution"
+)
 
 _VALID_INTERP_SPECTRA = [
     SPECTRUM_NAME_ASD,
@@ -237,6 +243,7 @@ def get_interpolation_spectrum_name() -> str:
     )
     return _VALID_INTERP_SPECTRA[0]
 
+
 def get_available_interp_SRFs() -> List[str]:
     """Obtain the spectra names that the user can use.
 
@@ -257,6 +264,7 @@ def get_interpolation_SRF() -> str:
         Currently chosen interpolation spectrum name.
     """
     setts = _load_interp_settings()
+    print(setts)
     if setts.interpolation_SRF in _VALID_INTERP_SRFS:
         return setts.interpolation_SRF
     logger.get_logger().error(
@@ -306,18 +314,19 @@ def set_interpolation_spectrum_name(spectrum: str):
         logger.get_logger().error(msg)
         raise LimeException(msg)
 
+
 def set_interpolation_SRF(intp_srf: str):
-    """Sets the spectrum name as the currently selected one.
+    """Sets the SRF as the currently selected one.
 
     Parameters
     ----------
     spectrum: str
-        Spectrum name to set as chosen.
+        SRF name to set as chosen.
     """
     setts = _load_interp_settings()
     if intp_srf in _VALID_INTERP_SRFS:
         path = _get_interp_path()
-        setts.interpolation_spectrum = intp_srf
+        setts.interpolation_SRF = intp_srf
         setts._save_disk(path)
     else:
         msg = f"Tried setting unknown interpolation spectrum: {intp_srf}"

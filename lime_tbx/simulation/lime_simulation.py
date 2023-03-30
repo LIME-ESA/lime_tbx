@@ -698,8 +698,8 @@ class LimeSimulation(ILimeSimulation):
                 )
             else:
                 u_polars_intp = np.zeros(polars_intp.shape)
-                corr = np.zeros((len(polars_intp), len(polars_intp)))
-                np.fill_diagonal(corr, 1)
+                corr_polars_intp = np.zeros((len(polars_intp), len(polars_intp)))
+                np.fill_diagonal(corr_polars_intp, 1)
 
             ds_intp = SpectralData.make_reflectance_ds(
                 wlens,
