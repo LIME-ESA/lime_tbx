@@ -156,8 +156,6 @@ def calculate_eli_from_elref_unc(
     """
     esk = esi.get_esi(srf_type)
     u_esk = esi.get_u_esi(srf_type)
-    # esk = esi.get_esi_per_nms(elref_spectrum.wlens)
-    # u_esk = np.zeros(esk.shape)
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
@@ -179,27 +177,6 @@ def calculate_eli_from_elref_unc(
         return_corr=True,
         Jx=Jx,
     )
-
-    # prop = punpy.MCPropagation(100, dtype=np.float64, verbose=True)
-    # unc, corr = prop.propagate_standard(
-    #     measurement_func_eli,
-    #     [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
-    #     [elref_spectrum.uncertainties, None, u_esk, None, None, None],
-    #     corr_x=[elref_spectrum.ds.err_corr_reflectance.values, None, "syst", None, None, None], return_corr=True
-    # )
     del prop
 
     return unc, corr
-
-    esk = esi.get_esi_per_nms(elref_spectrum.wlens)
-    dsm = moon_data.distance_sun_moon
-    dom = moon_data.distance_observer_moon
-
-    prop = punpy.MCPropagation(1000, dtype=np.float64)
-    unc = prop.propagate_random(
-        _measurement_func_eli,
-        [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
-        [elref_spectrum.uncertainties, 0, np.zeros(esk.shape), 0, 0, 0],
-    )
-
-    return unc

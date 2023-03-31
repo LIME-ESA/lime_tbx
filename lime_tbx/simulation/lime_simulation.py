@@ -807,8 +807,8 @@ class LimeSimulation(ILimeSimulation):
             uncs_list.append(siguncs)
         signals = np.array(signals_list).T
         uncs = np.array(uncs_list).T
-        ds_pol = SpectralData.make_signals_ds(channel_ids, signals, uncs)
-        sp_d = SpectralData(channel_ids, signals, uncs, ds_pol)
+        ds_sig = SpectralData.make_signals_ds(channel_ids, signals, uncs)
+        sp_d = SpectralData(channel_ids, signals, uncs, ds_sig)
         return sp_d
 
     def set_observations(self, lglod: LGLODData, srf: SpectralResponseFunction):

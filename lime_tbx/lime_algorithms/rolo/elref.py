@@ -208,26 +208,3 @@ def calculate_elref_unc(
     )
 
     return unc, corr
-
-    prop = punpy.MCPropagation(1000, dtype=np.float64)
-
-    unc, samples_y, samples_x = prop.propagate_random(
-        _measurement_func_elref,
-        [
-            cfs._coeffs,
-            phi,
-            l_phi,
-            l_theta,
-            gd_value,
-        ],
-        [
-            ucfs._coeffs,
-            0,  # These were None instead of 0
-            0,
-            0,
-            0,
-        ],
-        return_samples=True,
-    )
-
-    return unc

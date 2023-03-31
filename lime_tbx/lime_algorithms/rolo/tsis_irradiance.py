@@ -62,7 +62,7 @@ def tsis_cimel(
     prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
     cimel_wavs = np.array([440, 500, 675, 870, 1020, 1640])
     cimel_esi = si.integrate_cimel(solar_y, solar_x)
-    u_cimel_esi = prop.propagate_systematic(
+    u_cimel_esi = prop.propagate_random(
         si.integrate_cimel, [solar_y, solar_x], [u_solar_y, None], return_corr=False
     )
 
@@ -82,7 +82,7 @@ def tsis_asd(
     prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
     asd_wavs = np.array(si.asd_srf.get_wavelengths())
     asd_esi = si.integrate_solar_asd(solar_y, solar_x)
-    u_asd_esi = prop.propagate_systematic(
+    u_asd_esi = prop.propagate_random(
         si.integrate_solar_asd, [solar_y, solar_x], [u_solar_y, None]
     )
 
@@ -107,14 +107,14 @@ def tsis_fwhm(
     intp_wavs = np.array(si.interpolated_srf.get_wavelengths())
     if shape=="gaussian":
         intp_esi = si.integrate_solar_interpolated_gaussian(solar_y, solar_x)
-        u_intp_esi = prop.propagate_systematic(
+        u_intp_esi = prop.propagate_random(
             si.integrate_solar_interpolated_gaussian,
             [solar_y, solar_x],
             [u_solar_y, None],
         )
     elif shape=="triangle":
         intp_esi = si.integrate_solar_interpolated_triangle(solar_y, solar_x)
-        u_intp_esi = prop.propagate_systematic(
+        u_intp_esi = prop.propagate_random(
             si.integrate_solar_interpolated_triangle,
             [solar_y, solar_x],
             [u_solar_y, None],

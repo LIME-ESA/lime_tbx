@@ -119,19 +119,29 @@ TEMPLATE_SIGNALS = {
     },
     "u_signals": {
         "dtype": np.float32,
-        "dim": ["wavelength"],
+        "dim": ["channels", "dts"],
         "attrs": {"units": "%"},
         "err_corr": [
             {
-                "dim": "wavelength",
+                "dim": "channels",
                 "form": "err_corr_matrix",
-                "params": ["err_corr_signals"],
+                "params": ["err_corr_signals_channels"],
+                "units": [],
+            },
+{
+                "dim": "dts",
+                "form": "err_corr_matrix",
+                "params": ["err_corr_signals_dts"],
                 "units": [],
             }
         ],
     },
-    "err_corr_signals": {
-            "dim": ["wavelength", "wavelength"],
+    "err_corr_signals_channels": {
+            "dim": ["channels", "channels"],
+            "dtype": np.float32,
+        },
+    "err_corr_signals_dts": {
+            "dim": ["dts", "dts"],
             "dtype": np.float32,
         },
 }

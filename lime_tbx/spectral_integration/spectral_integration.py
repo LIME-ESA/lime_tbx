@@ -304,6 +304,7 @@ class SpectralIntegration(ISpectralIntegration):
         wlens = elis_lime.wlens
         elis = elis_lime.data
         u_elis = elis_lime.uncertainties
+        corr_elis = elis_lime.ds.err_corr_irradiance.values
         if len(elis) == 0:
             return []
         wasnt_lists = False
@@ -331,7 +332,7 @@ class SpectralIntegration(ISpectralIntegration):
                         self._interpolate_and_convolve_srf,
                         [ch_wlens, ch_srf, wlens, subelis],
                         [None, None, None, u_elis[i]],
-                        corr_x=[None, None, None, None],
+                        corr_x=[None, None, None, corr_elis],
                     )
                 u_ch_signals.append(u_ch_signal)
             u_signals.append(u_ch_signals)

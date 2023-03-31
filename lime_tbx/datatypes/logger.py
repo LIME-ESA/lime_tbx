@@ -63,4 +63,7 @@ def get_logger() -> logging.Logger:
             _logger.setLevel(logging.DEBUG)
         else:
             _logger.setLevel(logging.INFO)
+
+        _logger.addHandler(logging.StreamHandler())
+
     return _logger

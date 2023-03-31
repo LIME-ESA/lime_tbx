@@ -736,7 +736,10 @@ class SpectralData:
 
     @staticmethod
     def make_signals_ds(
-        channel_ids, signals, unc_rand=None, unc_syst=None
+        channel_ids: np.ndarray,
+        signals: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"channels": len(channel_ids), "dts": len(signals[0])}
         # create dataset
@@ -746,15 +749,10 @@ class SpectralData:
 
         ds_refl.signals.values = signals
 
-        if unc_rand is not None:
-            ds_refl.u_ran_signals.values = unc_rand
+        if unc is not None:
+            ds_refl.u_signals.values = unc
         else:
-            ds_refl.u_ran_signals.values = signals * 0.01
-
-        if unc_syst is not None:
-            ds_refl.u_sys_signals.values = unc_syst
-        else:
-            ds_refl.u_sys_signals.values = signals * 0.05
+            ds_refl.u_signals.values = signals * 0.05
 
         return ds_refl
 

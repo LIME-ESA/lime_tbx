@@ -113,8 +113,6 @@ class DOLP(IDOLP):
             result = self._get_direct_polarized(wlen, mpa, coefficients)
             polarizations.append(result)
         polarizations = np.array(polarizations)
-        # TODO add uncertainties correctly
-        # TODO add skip uncertainties correctly
         ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None, None)
         if not skip_uncs:
             uncs = ds_pol.u_polarization.values
