@@ -90,44 +90,49 @@ TEMPLATE_POL = {
     "polarization": {
         "dtype": np.float32,
         "dim": ["wavelength"],
-        "attrs": {"units": [], "u_components": ["u_coeff"]},
+        "attrs": {"units": [], "u_components": ["u_polarization"]},
     },
-    "u_ran_polarization": {
+    "u_polarization": {
         "dtype": np.float32,
         "dim": ["wavelength"],
         "attrs": {"units": "%"},
         "err_corr": [
-            {"dim": "wavelength", "form": "random", "params": [], "units": []}
+            {
+                "dim": "wavelength",
+                "form": "err_corr_matrix",
+                "params": ["err_corr_polarization"],
+                "units": [],
+            }
         ],
     },
-    "u_sys_polarization": {
-        "dtype": np.float32,
-        "dim": ["wavelength"],
-        "attrs": {"units": "%"},
-        "err_corr": [
-            {"dim": "wavelength", "form": "systematic", "params": [], "units": []}
-        ],
-    },
+    "err_corr_polarization": {
+            "dim": ["wavelength", "wavelength"],
+            "dtype": np.float32,
+        },
 }
 
 TEMPLATE_SIGNALS = {
     "signals": {
         "dtype": np.float32,
         "dim": ["channels", "dts"],
-        "attrs": {"units": [], "u_components": ["u_coeff"]},
+        "attrs": {"units": [], "u_components": ["u_signals"]},
     },
-    "u_ran_signals": {
+    "u_signals": {
         "dtype": np.float32,
-        "dim": ["channels", "dts"],
-        "attrs": {"units": "%"},
-        "err_corr": [{"dim": "channels", "form": "random", "params": [], "units": []}],
-    },
-    "u_sys_signals": {
-        "dtype": np.float32,
-        "dim": ["channels", "dts"],
+        "dim": ["wavelength"],
         "attrs": {"units": "%"},
         "err_corr": [
-            {"dim": "channels", "form": "systematic", "params": [], "units": []}
+            {
+                "dim": "wavelength",
+                "form": "err_corr_matrix",
+                "params": ["err_corr_signals"],
+                "units": [],
+            }
         ],
     },
+    "err_corr_signals": {
+            "dim": ["wavelength", "wavelength"],
+            "dtype": np.float32,
+        },
 }
+

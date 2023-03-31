@@ -99,7 +99,6 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.combobox_listen = False
         self.SRF_names = self.settings_manager.get_available_interp_SRFs()
         self.combo_SRF.clear()
-        print(self.SRF_names)
         self.combo_SRF.addItems(self.SRF_names)
         spname = self.settings_manager.get_selected_interp_SRF()
         index = self.SRF_names.index(spname)

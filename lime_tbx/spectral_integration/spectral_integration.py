@@ -36,12 +36,13 @@ __status__ = "Development"
 
 _ASD_FILE = "assets/asd_fwhm.csv"
 _CIMEL_FILE = "assets/responses_1088_13112020.txt"
-_INTERPOLATED_FILE = "assets/interpolated_model_fwhm.csv"
+_INTERPOLATED_FILE = "../../coeff_data/interpolated_model_fwhm.csv"
 
 
 def get_default_srf():
-    dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    dir_path = os.path.join(dir_path, "spectral_integration", "assets")
+    dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    dir_path = os.path.join(dir_path, "coeff_data")
+    # dir_path = os.path.join(dir_path, "lime_tbx", "spectral_integration", "assets")
     data = np.genfromtxt(
         os.path.join(dir_path, "interpolated_model_fwhm.csv"), delimiter=","
     )

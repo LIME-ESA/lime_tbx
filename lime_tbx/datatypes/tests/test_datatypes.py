@@ -374,8 +374,8 @@ class TestSpectralData(unittest.TestCase):
         ds = SpectralData.make_polarization_ds(SPD_WAVS, SPD_VALS)
         for i, val in enumerate(ds.polarization.values):
             self.assertEqual(val, SPD_VALS[i])
-        self.assertIsNotNone(ds.u_ran_polarization.values)
-        self.assertIsNotNone(ds.u_sys_polarization.values)
+        self.assertIsNotNone(ds.u_polarization.values)
+        self.assertIsNotNone(ds.err_corr_polarization.values)
 
     def test_make_signals_ds_ok(self):
         ds = SpectralData.make_signals_ds(CH_IDS, SIGNALS_DATA)

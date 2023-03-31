@@ -1,5 +1,5 @@
 - !InterpolationSettings
-  interpolation_spectrum: Gaussian SRF with 1nm spectral sampling and 3nm resolution
-  interpolation_SRF: ASD
+  interpolation_spectrum: ASD
+  interpolation_SRF: Gaussian SRF with 1nm spectral sampling and 3nm resolution
   show_interp_spectrum: false
   skip_uncertainties: false

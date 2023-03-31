@@ -709,7 +709,10 @@ class SpectralData:
 
     @staticmethod
     def make_polarization_ds(
-        wavs: np.ndarray, polarization: np.ndarray, unc_rand=None, unc_syst=None
+        wavs: np.ndarray,
+        polarization: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
@@ -719,16 +722,15 @@ class SpectralData:
 
         ds_pol.polarization.values = polarization
 
-        if unc_rand is not None:
-            ds_pol.u_ran_polarization.values = unc_rand
+        if unc is not None:
+            ds_pol.u_polarization.values = unc
         else:
-            ds_pol.u_ran_polarization.values = np.abs(polarization) * 0.01
+            ds_pol.u_polarization.values = np.abs(polarization) * 0.05
 
-        if unc_syst is not None:
-            ds_pol.u_sys_polarization.values = unc_syst
+        if corr is not None:
+            ds_pol.err_corr_polarization.values = corr
         else:
-            ds_pol.u_sys_polarization.values = np.abs(polarization) * 0.05
-        # Doing the abs of the polarization because the dolp model may output negative values.
+            ds_pol.err_corr_polarization.values = np.ones((len(polarization),len(polarization)))
 
         return ds_pol
 
@@ -976,6 +978,7 @@ class InterpolationSettings:
     """
 
     interpolation_spectrum: str
+    interpolation_SRF: str
     show_interp_spectrum: bool
     skip_uncertainties: bool
 

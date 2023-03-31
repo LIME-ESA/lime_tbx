@@ -18,7 +18,7 @@ from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import
 from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
     _get_tsis_data,
     tsis_cimel,
-    tsis_intp,
+    tsis_fwhm,
 )
 
 
@@ -103,9 +103,6 @@ class TestSpectralInterpolation(unittest.TestCase):
         np.testing.assert_array_almost_equal(supposed_irefl, irefl)
 
     def test_get_interp_ref_unc(self):
-        # TODO
-        # This one fails so it's skipped until this is implemented (it's not used in code)
-        self.skipTest("")
         ip = get_interpolator()
         iunc = ip.get_interpolated_refl_unc(
             CIMEL_WAV, CIMEL_DATA, ASD_WAV, ASD_DATA, CIMEL_WAV, U_CIMEL, U_ASD

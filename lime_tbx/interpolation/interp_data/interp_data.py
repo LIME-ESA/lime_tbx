@@ -14,6 +14,7 @@ It exports the following functions:
 """___Built-In Modules___"""
 import os
 from typing import List
+import shutil
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -190,12 +191,28 @@ _VALID_INTERP_SPECTRA = [
 ]
 
 _VALID_INTERP_SRFS = [
-    SRF_NAME_ASD,
     SRF_NAME_GAUSSIAN_1NM_3NM,
     SRF_NAME_TRIANGULAR_1NM_1NM,
-    SRF_NAME_GAUSSIAN_P1NM_P3NM,
-    SRF_NAME_GAUSSIAN_P1NM_P3NM,
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM,
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM,
+    SRF_NAME_ASD,
 ]
+
+SRF_DICT_FWHM_FILES = {
+    SRF_NAME_ASD: "asd_fwhm.csv",
+    SRF_NAME_GAUSSIAN_1NM_3NM: "interpolated_model_fwhm_3_1_gaussian.csv",
+    SRF_NAME_TRIANGULAR_1NM_1NM: "interpolated_model_fwhm_1_1_triangle.csv",
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM: "interpolated_model_fwhm_0p3_0p1_gaussian.csv",
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM: "interpolated_model_fwhm_0p1_0p1_triangle.csv",
+}
+
+SRF_DICT_SOLAR_FILES = {
+    SRF_NAME_ASD: "tsis_asd.csv",
+    SRF_NAME_GAUSSIAN_1NM_3NM: "tsis_fwhm_3_1_gaussian.csv",
+    SRF_NAME_TRIANGULAR_1NM_1NM: "tsis_fwhm_1_1_triangle.csv",
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM: "tsis_fwhm_0p3_0p1_gaussian.csv",
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM: "tsis_fwhm_0p1_0p1_triangle.csv",
+}
 
 
 def _get_interp_path() -> str:
@@ -317,8 +334,14 @@ def set_interpolation_SRF(intp_srf: str):
     setts = _load_interp_settings()
     if intp_srf in _VALID_INTERP_SRFS:
         path = _get_interp_path()
-        setts.interpolation_spectrum = intp_srf
+        setts.interpolation_SRF = intp_srf
         setts._save_disk(path)
+        lime_tbx_dir=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+        source_dir_fwhm=os.path.join(lime_tbx_dir,"lime_tbx","spectral_integration","assets")
+        source_dir_tsis=os.path.join(lime_tbx_dir,"lime_tbx","lime_algorithms","rolo","assets")
+        target_dir=os.path.join(lime_tbx_dir,"coeff_data")
+        shutil.copyfile(os.path.join(source_dir_fwhm,SRF_DICT_FWHM_FILES[intp_srf]), os.path.join(target_dir,"interpolated_model_fwhm.csv"))
+        shutil.copyfile(os.path.join(source_dir_tsis,SRF_DICT_SOLAR_FILES[intp_srf]), os.path.join(target_dir,"tsis_intp.csv"))
     else:
         msg = f"Tried setting unknown interpolation spectrum: {intp_srf}"
         logger.get_logger().error(msg)
