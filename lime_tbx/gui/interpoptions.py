@@ -72,8 +72,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
             1, QtWidgets.QFormLayout.FieldRole, self.checkbox_skip_uncerts
         )
         self.main_layout.addLayout(self.form_layout)
-        self.update_combo_versions()
-        self.update_combo_SRF()
+        self.update_combos()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.save_button = QtWidgets.QPushButton("Save")
         self.save_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -85,22 +84,21 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.buttons_layout.addWidget(self.cancel_button)
         self.main_layout.addLayout(self.buttons_layout)
 
-    def update_combo_versions(self):
+    def update_combos(self):
         self.combobox_listen = False
+        # combo interp spectrum
         self.spectra_names = self.settings_manager.get_available_spectra_names()
         self.combo_versions.clear()
         self.combo_versions.addItems(self.spectra_names)
         spname = self.settings_manager.get_selected_spectrum_name()
         index = self.spectra_names.index(spname)
         self.combo_versions.setCurrentIndex(index)
-        self.combobox_listen = True
-
-    def update_combo_SRF(self):
-        self.combobox_listen = False
+        # combo srf
         self.SRF_names = self.settings_manager.get_available_interp_SRFs()
         self.combo_SRF.clear()
         self.combo_SRF.addItems(self.SRF_names)
         spname = self.settings_manager.get_selected_interp_SRF()
+        print(spname)
         index = self.SRF_names.index(spname)
         self.combo_SRF.setCurrentIndex(index)
         self.combobox_listen = True
@@ -122,7 +120,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
     def save_clicked(self):
         name = self.combo_versions.currentText()
         name_SRF = self.combo_SRF.currentText()
-        self.update_from_combobox(name,name_SRF)
+        self.update_from_combobox(name, name_SRF)
         self.close()
 
     @QtCore.Slot()

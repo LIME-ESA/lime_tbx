@@ -110,12 +110,12 @@ class ISettingsManager(ABC):
 
     @abstractmethod
     def get_selected_interp_SRF(self) -> str:
-        """Obtain the currently selected interpolation spectrum name"""
+        """Obtain the currently selected interpolation SRF name"""
         pass
 
     @abstractmethod
     def select_interp_SRF(self, name: str):
-        """Select the interpolation spectrum to use"""
+        """Select the interpolation spectrum to use as SRF"""
         pass
 
     @abstractmethod
