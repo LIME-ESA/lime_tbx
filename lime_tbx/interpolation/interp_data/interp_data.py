@@ -220,6 +220,14 @@ SRF_DICT_SOLAR_FILES = {
     # SRF_NAME_GAUSSIAN_P1NM_P3NM: "tsis_fwhm_0p1_0p1_triangle.csv",
 }
 
+SRF_DICT_SOLAR_DIALOG_SRF_TYPE = {
+    SRF_NAME_ASD: "asd",
+    SRF_NAME_GAUSSIAN_1NM_3NM: "interpolated_gaussian",
+    SRF_NAME_TRIANGULAR_1NM_1NM: "interpolated_triangle",
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM: "tsis_fwhm_0p3_0p1_gaussian.csv",
+    # SRF_NAME_GAUSSIAN_P1NM_P3NM: "tsis_fwhm_0p1_0p1_triangle.csv",
+}
+
 
 def _get_interp_path() -> str:
     path = os.path.join(
@@ -290,6 +298,11 @@ def get_interpolation_SRF() -> str:
     return _VALID_INTERP_SRFS[0]
 
 
+def get_interpolation_srf_as_srf_type() -> str:
+    srf_str = get_interpolation_SRF()
+    return SRF_DICT_SOLAR_DIALOG_SRF_TYPE[srf_str]
+
+
 def is_show_interpolation_spectrum() -> bool:
     """Checks if the UI should show the spectrum used for interpolation.
 
@@ -345,12 +358,14 @@ def set_interpolation_SRF(intp_srf: str):
         path = _get_interp_path()
         setts.interpolation_SRF = intp_srf
         setts._save_disk(path)
+        _ = """
         lime_tbx_dir=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
         source_dir_fwhm=os.path.join(lime_tbx_dir,"lime_tbx","spectral_integration","assets")
         source_dir_tsis=os.path.join(lime_tbx_dir,"lime_tbx","lime_algorithms","rolo","assets")
         target_dir=os.path.join(lime_tbx_dir,"coeff_data")
         shutil.copyfile(os.path.join(source_dir_fwhm,SRF_DICT_FWHM_FILES[intp_srf]), os.path.join(target_dir,"interpolated_model_fwhm.csv"))
         shutil.copyfile(os.path.join(source_dir_tsis,SRF_DICT_SOLAR_FILES[intp_srf]), os.path.join(target_dir,"tsis_intp.csv"))
+        """
     else:
         msg = f"Tried setting unknown interpolation spectrum: {intp_srf}"
         logger.get_logger().error(msg)

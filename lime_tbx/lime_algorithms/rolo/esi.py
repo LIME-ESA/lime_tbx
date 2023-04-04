@@ -34,7 +34,8 @@ __status__ = "Development"
 _WEHRLI_FILE = "assets/wehrli_asc.csv"
 _TSIS_CIMEL_FILE = "assets/tsis_cimel.csv"
 _TSIS_ASD_FILE = "assets/tsis_asd.csv"
-_TSIS_INTP_FILE = "../../../coeff_data/tsis_intp.csv"
+_TSIS_GAUSS_1_3_FILE = "assets/tsis_fwhm_3_1_gaussian.csv"
+_TSIS_TRIANGULAR_1_1_FILE = "assets/tsis_fwhm_1_1_triangle.csv"
 
 _loaded_data = {}
 
@@ -96,7 +97,7 @@ def get_esi(srf_type: str) -> np.ndarray:
     Parameters
     ----------
     srf_type : str
-        Name of the srf. Can be 'cimel', 'asd' or 'interpolated'.
+        Name of the srf. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'.
 
     Returns
     -------
@@ -118,15 +119,24 @@ def get_esi(srf_type: str) -> np.ndarray:
             usecols=1,
             dtype=np.float32,
         )
-    elif srf_type == "interpolated":
+    elif srf_type == "interpolated_gaussian":
         return np.genfromtxt(
-            os.path.join(dir_path, _TSIS_INTP_FILE),
+            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated_triangle":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_TRIANGULAR_1_1_FILE),
             delimiter=",",
             usecols=1,
             dtype=np.float32,
         )
     else:
-        raise ValueError("srf_type must be `cimel', `asd' or `interpolated'")
+        raise ValueError(
+            f"srf_type was {srf_type} and must be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'"
+        )
 
 
 def get_u_esi(srf_type: str) -> np.ndarray:
@@ -138,7 +148,7 @@ def get_u_esi(srf_type: str) -> np.ndarray:
     Parameters
     ----------
     srf_type : str
-        Name of the srf. Can be 'cimel', 'asd' or 'interpolated'.
+        Name of the srf. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'.
 
     Returns
     -------
@@ -160,12 +170,21 @@ def get_u_esi(srf_type: str) -> np.ndarray:
             usecols=2,
             dtype=np.float32,
         )
-    elif srf_type == "interpolated":
+    elif srf_type == "interpolated_gaussian":
         return np.genfromtxt(
-            os.path.join(dir_path, _TSIS_INTP_FILE),
+            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated_triangle":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
             delimiter=",",
             usecols=2,
             dtype=np.float32,
         )
     else:
-        raise ValueError("srf_type must be `cimel', `asd' or `interpolated'")
+        raise ValueError(
+            f"srf_type was {srf_type} and must be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'"
+        )

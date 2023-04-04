@@ -18,13 +18,14 @@ import punpy
 from matheo.band_integration import band_integration
 
 """___LIME_TBX Modules___"""
+from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     SpectralData,
     SRF_fwhm,
     SRFChannel,
 )
-from lime_tbx.datatypes import constants
+from lime_tbx.datatypes import constants, logger
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -36,15 +37,18 @@ __status__ = "Development"
 
 _ASD_FILE = "assets/asd_fwhm.csv"
 _CIMEL_FILE = "assets/responses_1088_13112020.txt"
-_INTERPOLATED_FILE = "../../coeff_data/interpolated_model_fwhm.csv"
+_INTERPOLATED_GAUSSIAN_FILE = "assets/interpolated_model_fwhm_3_1_gaussian.csv"
+_INTERPOLATED_TRIANGULAR_FILE = "assets/interpolated_model_fwhm_1_1_triangle.csv"
 
 
 def get_default_srf():
-    dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    dir_path = os.path.join(dir_path, "coeff_data")
-    # dir_path = os.path.join(dir_path, "lime_tbx", "spectral_integration", "assets")
+    dir_path = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    )
+    dir_path = os.path.join(dir_path, "lime_tbx", "spectral_integration", "assets")
     data = np.genfromtxt(
-        os.path.join(dir_path, "interpolated_model_fwhm.csv"), delimiter=","
+        os.path.join(dir_path, "interpolated_model_fwhm_3_1_gaussian.csv"),
+        delimiter=",",
     )
     wavs = data[:, 0]
     spectral_response = {i: 1.0 for i in wavs}
@@ -117,7 +121,7 @@ class SpectralIntegration(ISpectralIntegration):
         self.prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
         self.asd_srf = self._read_srf_asd()
         self.cimel_srf = self._read_srf_cimel()
-        self.interpolated_srf = self._read_default_srf_interpolated()
+        self.interpolated_srf = self._read_srf_interpolated()
 
     def _read_srf_asd(self) -> SpectralResponseFunction:
         """
@@ -128,25 +132,50 @@ class SpectralIntegration(ISpectralIntegration):
         srf = SRF_fwhm("asd", data[:, 0], data[:, 1], "gaussian")
         return srf
 
-    def _read_default_srf_interpolated(self) -> SpectralResponseFunction:
+    def _read_srf_interpolated(self) -> SpectralResponseFunction:
         """
         read asd fwhm and make SRF
         """
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        data = np.genfromtxt(os.path.join(dir_path, _INTERPOLATED_FILE), delimiter=",")
-        srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "gaussian")
+        srf_type = interp_data.get_interpolation_srf_as_srf_type()
+        if srf_type == "interpolated_gaussian":
+            data = np.genfromtxt(
+                os.path.join(dir_path, _INTERPOLATED_GAUSSIAN_FILE), delimiter=","
+            )
+            srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "gaussian")
+        elif srf_type == "interpolated_triangle":
+            data = np.genfromtxt(
+                os.path.join(dir_path, _INTERPOLATED_TRIANGULAR_FILE), delimiter=","
+            )
+            srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "triangle")
+        else:
+            logger.get_logger().error(
+                "The selected interpolated SRF file for spectral integration wasn't valid."
+                + "Selecting the default gaussian one."
+            )
+            data = np.genfromtxt(
+                os.path.join(dir_path, _INTERPOLATED_GAUSSIAN_FILE), delimiter=","
+            )
+            srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "gaussian")
         return srf
 
-    def set_srf_interpolated(self, fwhm, sampling, shape, write=False) -> SpectralResponseFunction:
+    def set_srf_interpolated(
+        self, fwhm, sampling, shape, write=False
+    ) -> SpectralResponseFunction:
         """
         read asd fwhm and make SRF
         """
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        wavs = np.arange(constants.MIN_WLEN, constants.MAX_WLEN+sampling, sampling)
+        wavs = np.arange(constants.MIN_WLEN, constants.MAX_WLEN + sampling, sampling)
         fwhms = fwhm * np.ones_like(wavs)
         if write:
-            id_str=("%s_%s_%s"% (fwhm,sampling, shape)).replace(".","p")
-            with open(os.path.join(dir_path,"assets/interpolated_model_fwhm_"+id_str+".csv"), "w") as f:
+            id_str = ("%s_%s_%s" % (fwhm, sampling, shape)).replace(".", "p")
+            with open(
+                os.path.join(
+                    dir_path, "assets/interpolated_model_fwhm_" + id_str + ".csv"
+                ),
+                "w",
+            ) as f:
                 for i in range(len(wavs)):
                     f.write("%s,%s\n" % (wavs[i], fwhms[i]))
         self.interpolated_srf = SRF_fwhm("interpolated", wavs, fwhms, shape)
@@ -175,13 +204,17 @@ class SpectralIntegration(ISpectralIntegration):
         y = self.integrate_elis_xy(self.cimel_srf, data, wlens)
         return y
 
-    def integrate_solar_asd(self, data: np.ndarray, wlens: np.ndarray, ) -> np.ndarray:
+    def integrate_solar_asd(
+        self,
+        data: np.ndarray,
+        wlens: np.ndarray,
+    ) -> np.ndarray:
         return band_integration.pixel_int(
             data,
             wlens,
             self.asd_srf.get_wavelengths(),
             (self.asd_srf.get_values() ** 2 - 0.01) ** 0.5,
-            band_shape=self.asd_srf.get_shape()
+            band_shape=self.asd_srf.get_shape(),
         )
 
     def integrate_solar_interpolated_default(
@@ -192,11 +225,11 @@ class SpectralIntegration(ISpectralIntegration):
             wlens,
             self.interpolated_srf.get_wavelengths(),
             (self.interpolated_srf.get_values() ** 2 - 0.01) ** 0.5,
-            band_shape=self.interpolated_srf.get_shape()
+            band_shape=self.interpolated_srf.get_shape(),
         )
 
     def integrate_solar_interpolated_gaussian(
-            self, data: np.ndarray, wlens: np.ndarray
+        self, data: np.ndarray, wlens: np.ndarray
     ) -> np.ndarray:
         # subtracting a fwhm of 0.1 in quadrature to account for fwhm of TSIS solar irradiance
         return band_integration.pixel_int(
@@ -204,7 +237,7 @@ class SpectralIntegration(ISpectralIntegration):
             wlens,
             self.interpolated_srf.get_wavelengths(),
             (self.interpolated_srf.get_values() ** 2 - 0.01) ** 0.5,
-            band_shape="gaussian"
+            band_shape="gaussian",
         )
 
     def integrate_solar_interpolated_triangle(
@@ -215,7 +248,7 @@ class SpectralIntegration(ISpectralIntegration):
             wlens,
             self.interpolated_srf.get_wavelengths(),
             (self.interpolated_srf.get_values() ** 2 - 0.01) ** 0.5,
-            band_shape="triangle"
+            band_shape="triangle",
         )
 
     def integrate_elis_xy(

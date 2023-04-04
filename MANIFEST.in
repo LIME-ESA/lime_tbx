@@ -2,7 +2,8 @@ include versioneer.py
 include lime_tbx/_version.py
 include lime_tbx/lime_algorithms/rolo/assets/wehrli_asc.csv
 include lime_tbx/lime_algorithms/rolo/assets/tsis_cimel.csv
-include lime_tbx/lime_algorithms/rolo/assets/tsis_intp.csv
+include lime_tbx/lime_algorithms/rolo/assets/tsis_fwhm_1_1_triangle.csv
+include lime_tbx/lime_algorithms/rolo/assets/tsis_fwhm_3_1_gaussian.csv
 include lime_tbx/lime_algorithms/rolo/assets/tsis_asd.csv
 include lime_tbx/coefficients/access_data/assets/coefficients.csv
 include lime_tbx/coefficients/access_data/assets/coefficients_cimel.csv
@@ -29,6 +30,7 @@ include lime_tbx/interpolation/interp_data/assets/Apollo16.txt
 include lime_tbx/interpolation/interp_data/assets/Breccia.txt
 include lime_tbx/interpolation/interp_data/assets/Composite.txt
 include lime_tbx/interpolation/interp_data/assets/ds_ASD.nc
-include lime_tbx/spectral_integration/assets/interpolated_model_fwhm.csv
+include lime_tbx/spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv
+include lime_tbx/spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv
 include lime_tbx/spectral_integration/assets/asd_fwhm.csv
 include lime_tbx/spectral_integration/assets/responses_1088_13112020.txt

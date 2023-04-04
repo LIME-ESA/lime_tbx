@@ -396,6 +396,7 @@ class LimeSimulation(ILimeSimulation):
         self.int = SpectralIntegration(MCsteps=MCsteps)
         self.verbose = verbose
         self._skip_uncs: bool = None
+        self._interp_srf_name: str = None
 
     def set_simulation_changed(self):
         self.refl_uptodate = False
@@ -405,6 +406,7 @@ class LimeSimulation(ILimeSimulation):
         self.srf_updtodate = False
         self.mds_uptodate = False
         self._skip_uncs = None
+        self._interp_srf_name = None
 
     def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
         if not self.mds_uptodate:
@@ -436,6 +438,11 @@ class LimeSimulation(ILimeSimulation):
         if self._skip_uncs is None:
             self._skip_uncs = interp_data.is_skip_uncertainties()
         return self._skip_uncs
+
+    def get_interp_srf_name(self) -> str:
+        if self._interp_srf_name is None:
+            self._interp_srf_name = interp_data.get_interpolation_srf_as_srf_type()
+        return self._interp_srf_name
 
     def update_reflectance(
         self,
@@ -493,13 +500,14 @@ class LimeSimulation(ILimeSimulation):
         elref_cimel,
         elref_asd,
         skip_uncs: bool,
+        interp_srf_type: str,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
         Union[SpectralData, List[SpectralData]],
         Union[SpectralData, List[SpectralData]],
     ]:
         elis = LimeSimulation._calculate_eli_from_elref(
-            mds, elrefs, "interpolated", skip_uncs
+            mds, elrefs, interp_srf_type, skip_uncs
         )
         elis_cimel = LimeSimulation._calculate_eli_from_elref(
             mds, elref_cimel, "cimel", skip_uncs
@@ -544,7 +552,7 @@ class LimeSimulation(ILimeSimulation):
         skip_uncs = self.is_skipping_uncs()
         if not self.refl_uptodate:
             self.update_reflectance(self.srf, point, cimel_coeff)
-
+        interp_srf_name = self.get_interp_srf_name()
         if not self.irr_uptodate:
             if self.verbose:
                 print("starting irradiance update")
@@ -553,7 +561,12 @@ class LimeSimulation(ILimeSimulation):
                 self.elis_cimel,
                 self.elis_asd,
             ) = LimeSimulation._calculate_irradiances_values(
-                self.mds, self.elref, self.elref_cimel, self.elref_asd, skip_uncs
+                self.mds,
+                self.elref,
+                self.elref_cimel,
+                self.elref_asd,
+                skip_uncs,
+                interp_srf_name,
             )
             self.irr_uptodate = True
             if self.verbose:

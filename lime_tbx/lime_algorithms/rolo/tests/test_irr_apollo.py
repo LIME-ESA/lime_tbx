@@ -211,7 +211,7 @@ class TestIrrApollo(unittest.TestCase):
         mds = create_vall_moondata(dts)
         for irrs, md in zip(rimodata.values(), mds):
             elrefs = rl.get_elrefs(rc, md)
-            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated")
+            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated_gaussian")
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
     def test_Valladolid_202202_fullmonth(self):
@@ -225,7 +225,7 @@ class TestIrrApollo(unittest.TestCase):
         mds = create_vall_moondata(dts)
         for irrs, md in zip(rimodata.values(), mds):
             elrefs = rl.get_elrefs(rc, md)
-            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated")
+            elis = rl.get_elis_from_elrefs(elrefs, md, "interpolated_gaussian")
             np.testing.assert_allclose(elis.data, irrs, REL_DIFF_MAX)
 
 

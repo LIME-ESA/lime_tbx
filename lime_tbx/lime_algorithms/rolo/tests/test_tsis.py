@@ -44,14 +44,22 @@ class Test_TSIS(unittest.TestCase):
         )
         asd_wavs, asd_esi, u_asd_esi = dat[:, 0], dat[:, 1], dat[:, 2]
         dat = np.genfromtxt(
-            os.path.join(_current_dir, "../../../../coeff_data/tsis_intp.csv"), delimiter=","
+            os.path.join(_current_dir, "../assets/tsis_fwhm_3_1_gaussian.csv"),
+            delimiter=",",
         )
-        intp_wavs, intp_esi, u_intp_esi = dat[:, 0], dat[:, 1], dat[:, 2]
+        gauss_wavs, gauss_esi, u_gauss_esi = dat[:, 0], dat[:, 1], dat[:, 2]
+        dat = np.genfromtxt(
+            os.path.join(_current_dir, "../assets/tsis_fwhm_1_1_triangle.csv"),
+            delimiter=",",
+        )
+        tria_wavs, tria_esi, u_tria_esi = dat[:, 0], dat[:, 1], dat[:, 2]
         si = SpectralIntegration()
         cimel_esi_asd = si.integrate_cimel(asd_esi, asd_wavs)
-        cimel_esi_intp = si.integrate_cimel(intp_esi, intp_wavs)
+        cimel_esi_gauss = si.integrate_cimel(gauss_esi, gauss_wavs)
+        cimel_esi_tria = si.integrate_cimel(tria_esi, tria_wavs)
         npt.assert_allclose(cimel_esi, cimel_esi_asd, rtol=0.01, atol=0.01)
-        npt.assert_allclose(cimel_esi, cimel_esi_intp, rtol=0.01, atol=0.01)
+        npt.assert_allclose(cimel_esi, cimel_esi_gauss, rtol=0.01, atol=0.01)
+        npt.assert_allclose(cimel_esi, cimel_esi_tria, rtol=0.01, atol=0.01)
 
 
 if __name__ == "__main__":
