@@ -170,7 +170,7 @@ class SpectralInterpolation(ISpectralInterpolation):
         self.si: ISpectralIntegration = SpectralIntegration()
         self.MCsteps = MCsteps
 
-    def _get_best_polar_asd_reference(self, moon_data: MoonData):
+    def _get_mock_asd_reference(self, moon_data: MoonData):
         mock = idata.get_best_asd_data(moon_data.mpa_degrees)
         mock.data.fill(1)
         return mock
@@ -187,7 +187,7 @@ class SpectralInterpolation(ISpectralInterpolation):
             return idata.get_best_asd_data(moon_data.mpa_degrees)
 
     def get_best_polar_interp_reference(self, moon_data: MoonData):
-        return self._get_best_polar_asd_reference(moon_data)
+        return idata.get_best_polar_asd_data(moon_data.mpa_degrees)
 
     def get_interpolated_refl(
         self,

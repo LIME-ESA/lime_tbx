@@ -10,15 +10,19 @@ It follows equations described in the following documents:
 """
 
 """___Built-In Modules___"""
-from typing import List
+from typing import List, Tuple
 import math
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 import numpy as np
 
-"""___NPL Modules___"""
+"""___NPL Modules"""
+import punpy
+
+"""___LIME TBX Modules___"""
 from lime_tbx.datatypes.datatypes import PolarizationCoefficients, SpectralData
+
 
 """___Authorship___"""
 __author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
@@ -64,14 +68,35 @@ class IDOLP(ABC):
         pass
 
 
+def _measurement_func_polarization(mpa: float, a_coeffs: np.ndarray) -> np.ndarray:
+    result = (
+        a_coeffs[:, 0] * mpa
+        + a_coeffs[:, 1] * mpa**2
+        + a_coeffs[:, 2] * mpa**3
+        + a_coeffs[:, 3] * mpa**4
+    )
+    return result
+
+
 class DOLP(IDOLP):
     def _get_direct_polarized(
+        self,
+        mpa: float,
+        coefficients: PolarizationCoefficients,
+    ) -> float:
+        if mpa > 0:  # is this sign ok?
+            a_coeffs = np.array(coefficients.pos_coeffs)
+        else:
+            a_coeffs = np.array(coefficients.neg_coeffs)
+        return _measurement_func_polarization(mpa, a_coeffs)
+
+    def _get_direct_polarized_individual(
         self,
         wlen: float,
         mpa: float,
         coefficients: PolarizationCoefficients,
     ) -> float:
-        if mpa < 0:
+        if mpa > 0:  # is this sign ok?
             a_coeffs = coefficients.get_coefficients_positive(wlen)
         else:
             a_coeffs = coefficients.get_coefficients_negative(wlen)
@@ -82,6 +107,40 @@ class DOLP(IDOLP):
             + a_coeffs[3] * mpa**4
         )
         return result
+
+    def _calculate_polar_unc(
+        self,
+        mpa_degrees: float,
+        coefficients: PolarizationCoefficients,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        prop = punpy.MCPropagation(100, MCdimlast=True)
+        if mpa_degrees > 0:  # is this sign ok?
+            a_coeffs = np.array(coefficients.pos_coeffs)
+            unc_coeffs = np.array(coefficients.pos_unc)
+            corr_coeffs = np.array(coefficients.p_pos_err_corr_data)
+        else:
+            a_coeffs = np.array(coefficients.neg_coeffs)
+            unc_coeffs = np.array(coefficients.neg_unc)
+            corr_coeffs = np.array(coefficients.p_neg_err_corr_data)
+        unc, corr = prop.propagate_random(
+            _measurement_func_polarization,
+            [
+                mpa_degrees,
+                a_coeffs,
+            ],
+            [
+                None,
+                unc_coeffs,
+            ],
+            corr_x=[
+                None,
+                corr_coeffs,
+            ],
+            return_corr=True,
+            allow_some_nans=False,
+        )
+
+        return unc, corr
 
     def get_polarized(
         self,
@@ -107,17 +166,18 @@ class DOLP(IDOLP):
             List with the degrees of polarization for each given wavelength.
         """
         polarizations = []
-        mpa = mpa_degrees
         wavelengths = coefficients.get_wavelengths()
-        for wlen in wavelengths:
-            result = self._get_direct_polarized(wlen, mpa, coefficients)
-            polarizations.append(result)
-        polarizations = np.array(polarizations)
-        ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None, None)
+        polarizations = self._get_direct_polarized(mpa_degrees, coefficients)
+        # ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None, None)
         if not skip_uncs:
-            uncs = ds_pol.u_polarization.values
+            uncs, corr = self._calculate_polar_unc(mpa_degrees, coefficients)
+            # uncs = ds_pol.u_polarization.values
         else:
             uncs = np.zeros(polarizations.shape)
+        print(uncs)
+        ds_pol = SpectralData.make_polarization_ds(
+            wavelengths, polarizations, uncs, corr
+        )
         return SpectralData(
             np.array(wavelengths),
             polarizations,

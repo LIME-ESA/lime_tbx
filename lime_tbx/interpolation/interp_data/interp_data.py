@@ -62,6 +62,35 @@ def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:  # pragma: n
     return spectral_data
 
 
+def get_best_polar_asd_data(moon_phase_angle: float) -> SpectralData:
+    """Retrieve the best ASD polarization spectrum for the given moon phase angle.
+
+    Parameters
+    ----------
+    moon_phase_angle: float
+        Moon phase angle in degrees of which the best ASD polarization will be retrieved.
+
+    Returns
+    -------
+    spectral_data: SpectralData
+        ASD polarization spectrum.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD.nc"))
+
+    wavs = ds_asd.wavelength.values
+    phase_angles = ds_asd.phase_angle.values
+    best_id = np.argmin(np.abs(np.abs(phase_angles) - moon_phase_angle))
+
+    pol = ds_asd.polarization.values[:, best_id]
+    unc = ds_asd.u_polarization.values[:, best_id] * pol / 100
+
+    spectral_data = SpectralData(wavs, pol, unc, ds_asd)
+
+    return spectral_data
+
+
 def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
     """Retrieve the best ASD reflectance spectrum for the given moon phase angle.
 
