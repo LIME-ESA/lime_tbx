@@ -15,7 +15,7 @@ from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
     _get_tsis_data,
     tsis_cimel,
     tsis_asd,
-    tsis_intp,
+    tsis_fwhm,
     _gen_files,
 )
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
