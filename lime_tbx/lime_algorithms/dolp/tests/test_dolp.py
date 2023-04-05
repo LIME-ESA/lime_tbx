@@ -38,11 +38,14 @@ _NEG_COEFFS = [
     (-0.002726077195, 0.000171190004, -0.000002850707, 0.000000015473),
 ]
 
-_NO_UNCS = [(0, 0, 0, 0) for _ in range(6)]
+_UNC_DEF_VAL = 0.000000001
+
+_NO_UNCS = [(_UNC_DEF_VAL, _UNC_DEF_VAL, _UNC_DEF_VAL, _UNC_DEF_VAL) for _ in range(6)]
 
 _nounc_size = len(_NO_UNCS) * len(_NO_UNCS[0])
 
 _NO_ERR_CORR = np.zeros((_nounc_size, _nounc_size))
+np.fill_diagonal(_NO_ERR_CORR, 1)
 
 POL_COEFFS = PolarizationCoefficients(
     _WLENS,
@@ -68,7 +71,8 @@ class TestDolp(unittest.TestCase):
         vals = d.get_polarized(10, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [-0.014408, -0.012844, -0.012077, -0.011769, -0.01199, -0.012838]
+            vals.data,
+            [0.050584, 0.04638, 0.040802, 0.042755, 0.04214, 0.035939],
         )
         # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
 
@@ -78,7 +82,7 @@ class TestDolp(unittest.TestCase):
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
             vals.data,
-            [-0.014755, -0.013934, -0.012584, -0.012452, -0.011961, -0.010545],
+            [0.059037, 0.050511, 0.046414, 0.043565, 0.043875, 0.047385],
         )
         # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
 
@@ -87,7 +91,8 @@ class TestDolp(unittest.TestCase):
         vals = d.get_polarized(30, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [0.021137, 0.016467, 0.012997, 0.010285, 0.009554, 0.007853]
+            vals.data,
+            [0.330222, 0.300473, 0.262398, 0.280463, 0.278439, 0.235869],
         )
         # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
 
@@ -96,7 +101,7 @@ class TestDolp(unittest.TestCase):
         vals = d.get_polarized(60, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [0.089065, 0.073535, 0.05837, 0.049985, 0.047542, 0.037497]
+            vals.data, [1.541132, 1.395328, 1.21195, 1.314517, 1.311322, 1.107726]
         )
         # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
 
@@ -105,7 +110,8 @@ class TestDolp(unittest.TestCase):
         vals = d.get_polarized(90, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [0.175848, 0.138807, 0.106244, 0.089099, 0.083585, 0.07831]
+            vals.data,
+            [4.416912, 3.988085, 3.452278, 3.774924, 3.775245, 3.186777],
         )
         # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
 
@@ -114,27 +120,30 @@ class TestDolp(unittest.TestCase):
         vals = d.get_polarized(-40, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [0.031216, 0.025885, 0.02038, 0.023562, 0.024717, 0.018717]
+            vals.data,
+            [0.75402, 0.63511, 0.583718, 0.542429, 0.545374, 0.605003],
         )
-        # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
+        # np.testing.assert_array_almost_equal(vals.uncertainties, [0.0025, 0.0025, 0.0024, 0.0023, 0.0026, 0.0025], 3)
 
     def test_get_polarized_cimel_minus80(self):
         d = get_dolp()
         vals = d.get_polarized(-80, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [0.090438, 0.072653, 0.052161, 0.05284, 0.05485, 0.041777]
+            vals.data,
+            [4.188898, 3.496043, 3.222261, 2.982856, 2.999234, 3.407038],
         )
-        # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
+        # np.testing.assert_array_almost_equal(vals.uncertainties, [0.04, 0.04, 0.04, 0.045, 0.035, 0.04], 2)
 
     def test_get_polarized_cimel_minus90(self):
         d = get_dolp()
         vals = d.get_polarized(-90, POL_COEFFS)
         np.testing.assert_array_equal(vals.wlens, _WLENS)
         np.testing.assert_array_almost_equal(
-            vals.data, [0.112096, 0.088307, 0.060378, 0.061275, 0.064195, 0.049222]
+            vals.data,
+            [5.793021, 4.827414, 4.451872, 4.118937, 4.141786, 4.725335],
         )
-        # np.testing.assert_array_almost_equal(vals.uncertainties, [0, 0, 0, 0, 0, 0])
+        # np.testing.assert_array_almost_equal(vals.uncertainties, [0.065, 0.062, 0.068, 0.065, 0.067, 0.066], 2)
 
 
 if __name__ == "__main__":

@@ -113,6 +113,7 @@ class DOLP(IDOLP):
         mpa_degrees: float,
         coefficients: PolarizationCoefficients,
     ) -> Tuple[np.ndarray, np.ndarray]:
+        # it fails if unc_coeffs == zeros
         prop = punpy.MCPropagation(100, MCdimlast=True)
         if mpa_degrees > 0:  # is this sign ok?
             a_coeffs = np.array(coefficients.pos_coeffs)
