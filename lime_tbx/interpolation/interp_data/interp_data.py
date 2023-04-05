@@ -318,7 +318,6 @@ def get_interpolation_SRF() -> str:
         Currently chosen interpolation spectrum name.
     """
     setts = _load_interp_settings()
-    print(setts)
     if setts.interpolation_SRF in _VALID_INTERP_SRFS:
         return setts.interpolation_SRF
     logger.get_logger().error(

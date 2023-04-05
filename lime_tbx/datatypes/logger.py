@@ -63,7 +63,8 @@ def get_logger() -> logging.Logger:
             _logger.setLevel(logging.DEBUG)
         else:
             _logger.setLevel(logging.INFO)
-
-        _logger.addHandler(logging.StreamHandler())
+        if constants.DEV_LOGOUT_ENV_NAME in os.environ:
+            # to print logs in terminal screen add environment variable named "LIME_DEVELOPER_LOGGING"
+            _logger.addHandler(logging.StreamHandler())
 
     return _logger

@@ -22,8 +22,15 @@ __status__ = "Development"
 CH_WLENS = np.array([350, 400, 450, 500])
 CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
 CH_ELIS = np.array([0.005, 0.0002, 0.3, 0.0001])
+CH_CORR = np.zeros((4, 4))
+np.fill_diagonal(CH_CORR, 1)
 
-ELIS_LIME = SpectralData(CH_WLENS, CH_ELIS, CH_ELIS * 0.01, None)
+ELIS_LIME = SpectralData(
+    CH_WLENS,
+    CH_ELIS,
+    CH_ELIS * 0.01,
+    SpectralData.make_irradiance_ds(CH_WLENS, CH_ELIS, CH_ELIS * 0.01, CH_CORR),
+)
 
 
 def get_spectral_integrator() -> ISpectralIntegration:

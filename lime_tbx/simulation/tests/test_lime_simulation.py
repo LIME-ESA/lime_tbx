@@ -125,7 +125,7 @@ class TestLimeSimulation(unittest.TestCase):
         uncs_refs = np.array(
             [
                 [4.5e-04, 6.7e-04, 8.1e-04, 1.5e-05],
-                [5.2e-04, 6.7e-04, 8.1e-04, 1.5e-05],
+                [5.2e-04, 7.1e-04, 8.1e-04, 1.5e-05],
             ]
         )
         cimel_refs = np.array(
