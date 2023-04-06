@@ -382,8 +382,9 @@ class TestSpectralData(unittest.TestCase):
         for i, arr in enumerate(ds.signals.values):
             for j, val in enumerate(arr):
                 self.assertEqual(val, SIGNALS_DATA[i][j])
-        self.assertIsNotNone(ds.u_ran_signals.values)
-        self.assertIsNotNone(ds.u_sys_signals.values)
+        self.assertIsNotNone(ds.u_signals.values)
+        self.assertIsNotNone(ds.err_corr_signals_channels.values)
+        self.assertIsNotNone(ds.err_corr_signals_dts.values)
 
     def test_make_signals_ds_invalid_signals_transposed(self):
         self.assertRaises(

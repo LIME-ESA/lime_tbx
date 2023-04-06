@@ -175,6 +175,8 @@ class DOLP(IDOLP):
             # uncs = ds_pol.u_polarization.values
         else:
             uncs = np.zeros(polarizations.shape)
+            corr = np.zeros((len(uncs), len(uncs)))
+            np.fill_diagonal(corr, 1)
         ds_pol = SpectralData.make_polarization_ds(
             wavelengths, polarizations, uncs, corr
         )
