@@ -7,6 +7,7 @@ import os
 from enum import Enum
 import glob
 import sys
+import json
 
 """___Third-Party Modules___"""
 # import here
@@ -32,6 +33,7 @@ from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.coefficients.update.update import IUpdate, Update
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
+from lime_tbx.interpolation.interp_data import interp_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -194,8 +196,24 @@ inputing directly only one datetime. Valid only if the main option is -e or -s."
 for this execution and the next ones until it's changed again."
     )
     print(
-        "  -i, --interpolation\t Change the interpolation spectrum used by the TBX, \
-for this execution and the next ones until it's changed again."
+        "  -i, --interpolation-settings\t Change the interpolation settings. The \
+input data shall be a json string containing at least one of the following parameters:"
+    )
+    print(
+        "\t\t\t   interp_spectrum: Sets the interpolation spectrum. The valid \
+values are 'ASD' and 'Apollo 16 + Breccia'."
+    )
+    print(
+        "\t\t\t   interp_srf: Sets the output SRF. The valid values are 'asd', \
+'interpolated_gaussian' and 'interpolated_triangle'."
+    )
+    print(
+        "\t\t\t   show_interp_spectrum: Sets if the graphs should show the spectrum \
+used for interpolation. The valid values are 'True' and 'False'."
+    )
+    print(
+        "\t\t\t   skip_uncertainties: Sets if the ToolBox should skip the \
+uncertainties calculations. The valid values are 'True' and 'False'."
     )
 
 
@@ -704,12 +722,63 @@ class CLI:
             self.settings_manager.reload_coeffs()
         return 0
 
+    def parse_interp_settings(self, arg: str) -> int:
+        # example: -i '{"interp_spectrum": "ASD", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
+        try:
+            interp_settings = json.loads(arg)
+        except Exception as e:
+            eprint(f"Error parsing the interpolation settings {arg}. Error: {e}")
+            return 1
+        if "interp_spectrum" in interp_settings:
+            interp_spectrum = interp_settings["interp_spectrum"]
+            names = [
+                name for name in self.settings_manager.get_available_spectra_names()
+            ]
+            if interp_spectrum not in names:
+                eprint(
+                    f"Interpolation spectrum not recognized. Selected: {interp_spectrum}. Available: {names}."
+                )
+                return 1
+            self.settings_manager.select_interp_spectrum(interp_spectrum)
+        if "interp_srf" in interp_settings:
+            interp_srf = interp_settings["interp_srf"]
+            srf_translator = {
+                v: k for k, v in interp_data.SRF_DICT_SOLAR_DIALOG_SRF_TYPE.items()
+            }
+            names = list(srf_translator.keys())
+            if interp_srf not in names:
+                eprint(
+                    f"Interpolation settings output SRF not recognized. Selected: {interp_srf}. Available: {names}."
+                )
+                return 1
+            self.settings_manager.select_interp_SRF(srf_translator[interp_srf])
+        if "show_interp_spectrum" in interp_settings:
+            show_interp_spectrum = interp_settings["show_interp_spectrum"]
+            if show_interp_spectrum not in ("True", "False"):
+                eprint(
+                    f'Interpolation settings show_interp_spectrum value {show_interp_spectrum} not valid. Must be "True" or "False"'
+                )
+                return 1
+            show_interp_spectrum = show_interp_spectrum == "True"
+            self.settings_manager.set_show_interp_spectrum(show_interp_spectrum)
+        if "skip_uncertainties" in interp_settings:
+            skip_uncertainties = interp_settings["skip_uncertainties"]
+            if skip_uncertainties not in ("True", "False"):
+                eprint(
+                    f'Interpolation settings skip_uncertainties value {skip_uncertainties} not valid. Must be "True" or "False"'
+                )
+                return 1
+            skip_uncertainties = skip_uncertainties == "True"
+            self.settings_manager.set_skip_uncertainties(skip_uncertainties)
+        return 0
+
     def handle_input(self, opts: List[Tuple[str, str]]) -> int:
         srf_file = ""
         export_data: ExportData = None
         timeseries_file: str = None
         # Check if it's comparison
         is_comparison = any(item[0] in ("-c", "--comparison") for item in opts)
+        mod_interp_settings = False
         # find settings data
         for opt, arg in opts:
             if opt in ("-h", "--help"):
@@ -830,30 +899,11 @@ class CLI:
                     )
                     return 1
                 self.settings_manager.select_lime_coeff(names.index(arg))
-            elif opt in ("-i", "--interpolation"):
-                names = [
-                    name for name in self.settings_manager.get_available_spectra_names()
-                ]
-                if arg not in names:
-                    eprint(
-                        f"Interpolation spectrum not recognized. Selected: {arg}. Available: {names}."
-                    )
-                    return 1
-                self.settings_manager.select_interp_spectrum(arg)
-        if export_data == None:
-            eprint("Error: The output flag (-o | --output) must be included.")
-            return 1
-        if srf_file == "" or os.path.exists(srf_file):
-            try:
-                self.load_srf(srf_file)
-            except Exception as e:
-                eprint(
-                    "Error: Error loading Spectral Response Function. {}".format(str(e))
-                )
-                return 1
-        else:
-            eprint("Error: The given srf path does not exist.")
-            return 1
+            elif opt in ("-i", "--interpolation-settings"):
+                ret = self.parse_interp_settings(arg)
+                if ret != 0:
+                    return ret
+                mod_interp_settings = True
 
         # Simulation input
         sim_opts = (
@@ -867,8 +917,26 @@ class CLI:
             "--comparison",
         )
         num_sim_ops = sum(item[0] in sim_opts for item in opts)
+        if mod_interp_settings and num_sim_ops == 0:
+            return 0
+
+        if srf_file == "" or os.path.exists(srf_file):
+            try:
+                self.load_srf(srf_file)
+            except Exception as e:
+                eprint(
+                    "Error: Error loading Spectral Response Function. {}".format(str(e))
+                )
+                return 1
+        else:
+            eprint("Error: The given srf path does not exist.")
+            return 1
+
+        if export_data == None:
+            eprint("Error: The output flag (-o | --output) must be included.")
+            return 1
         if num_sim_ops == 0:
-            eprint("Error: There must be one of the following flags: (-e|-s|-l|-c).")
+            eprint("Error: There must be one of the following flags: (-e|-s|-l|-c|-i).")
             print_help()
             return 1
         elif num_sim_ops > 1:

@@ -75,11 +75,14 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
         sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
 
     def tearDown(self):
         warnings.resetwarnings()
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
 
     def test_get_help(self):
         cli = get_cli()
@@ -316,7 +319,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i inventedspectrum"
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "inventedspectrum"}\''
             )
         )
         self.assertEqual(errcode, 1)
@@ -457,7 +460,14 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
 
 class TestCLI(unittest.TestCase):
 
-    # Cant compare output as interpolation gives different results each time
+    # Cant compare output as interpolation gives different results each time, and its too slow to perform always
+
+    def setUp(self):
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        interp_data.set_skip_uncertainties(self._prev_skip)
 
     def test_earth_glod_ok(self):
         cli = get_cli()
@@ -482,7 +492,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i ASD"
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "ASD"}\''
             )
         )
         self.assertEqual(errcode, 0)
@@ -491,7 +501,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i 'Apollo 16 + Breccia'"
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "Apollo 16 + Breccia"}\''
             )
         )
         self.assertEqual(errcode, 0)
