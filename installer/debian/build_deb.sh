@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 echo "Building lime .deb package."
-# 0.0.5 Comment so the search for the version a.b.c appears (here it is a.b-c)
+# 0.1.0 Comment so the search for the version a.b.c appears (here it is a.b-c)
 # Change it in the control file too!
-version="0.0-5"
+version="0.1-0"
 name="lime_"$version
 [ -d $name ] && rm -rf $name
 [ -f $name".deb" ] && rm -f $name".deb"
