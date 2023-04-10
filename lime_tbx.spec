@@ -60,9 +60,10 @@ if sys.platform == 'linux':
     }
 elif sys.platform == 'win32' or sys.platform == 'win64':
     src_path = 'lime_tbx\\'
-    a_pathex = ['.\\.venv\\Lib\\site-packages\\']
+    venv_path = '.venv_win' # '.venv'
+    a_pathex = [f'.\\{venv_path}\\Lib\\site-packages\\']
     a_binaries = [
-        ('.venv\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
+        (f'{venv_path}\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.exe', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\msvcr100.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\pthreadVC2.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),

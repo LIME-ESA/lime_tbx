@@ -5,6 +5,8 @@
 #define MyAppVersion "0.1.0"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX.exe"
+#define MyAppDevPath "Y:\"
+;"C:\Users\Javier\Repositorios\lime_tbx"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -18,9 +20,9 @@ DefaultDirName={autopf64}\{#MyAppName}
 DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64
 PrivilegesRequired=admin
-OutputDir=C:\Users\Javier\Repositorios\lime_tbx\installer\windows
+OutputDir={#MyAppDevPath}\installer\windows
 OutputBaseFilename=LimeTBX installer
-SetupIconFile=C:\Users\Javier\Repositorios\lime_tbx\lime_tbx\gui\assets\lime_logo.ico
+SetupIconFile={#MyAppDevPath}\lime_tbx\gui\assets\lime_logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -35,11 +37,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "{app}\coeff_data"; Permissions: everyone-full
 
 [Files]
-;Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Javier\Repositorios\lime_tbx\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\Javier\Repositorios\lime_tbx\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Users\Javier\Repositorios\lime_tbx\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
-Source: "C:\Users\Javier\Repositorios\lime_tbx\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "{#MyAppDevPath}\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppDevPath}\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
+Source: "{#MyAppDevPath}\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
