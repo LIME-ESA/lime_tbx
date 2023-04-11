@@ -9,7 +9,7 @@ It exports the following classes:
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Tuple
 import os
 
 """___Third-Party Modules___"""
@@ -18,7 +18,7 @@ import spiceypy as spice
 import numpy as np
 
 """___LIME_TBX Modules___"""
-from ..datatypes import datatypes
+from lime_tbx.datatypes import datatypes
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -29,6 +29,17 @@ __status__ = "Development"
 
 
 class ISPICEAdapter(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * get_moon_data_from_earth() - Calculate lunar data for a position on earth
+            surface at a concrete datetime.
+        * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
+        * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
+        * to_planetographic_multiple() - Transforms multiple rectangular coordinates
+            to planetographic coordinates.
+    """
+
     @staticmethod
     @abstractmethod
     def get_moon_data_from_earth(
@@ -63,8 +74,99 @@ class ISPICEAdapter(ABC):
         """
         pass
 
+    @staticmethod
+    @abstractmethod
+    def to_rectangular(
+        lat: float, lon: float, alt_meters: float, body: str, kernels_path: str
+    ) -> Tuple[float, float, float]:
+        """Transforms planetographic coordinates to rectangular coordinates.
+
+        Parameters
+        ----------
+        lat: float
+            Latitude in degrees.
+        lon: float
+            Longitude in degrees.
+        alt_meters: float
+            Altitude in meters.
+        body: str
+            Name of the body. For example 'MOON' or 'EARTH'.
+        kernels_path: str
+            Path to the directory of the main kernels.
+
+        Returns
+        -------
+        xyz: tuple of 3 floats
+            Rectangular coordinates in meters
+        """
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def to_planetographic(
+        x: float, y: float, z: float, body: str, kernels_path: str
+    ) -> Tuple[float, float, float]:
+        """Transforms rectangular coordinates to planetographic coordinates.
+
+        Parameters
+        ----------
+        x: float
+            x coordinate in meters.
+        y: float
+            y coordinate in meters.
+        z: float
+            z coordinate in meters.
+        body: str
+            Name of the body. For example 'MOON' or 'EARTH'.
+        kernels_path: str
+            Path to the directory of the main kernels.
+
+        Returns
+        -------
+        lat: float
+            Latitude in degrees.
+        lon: float
+            Longitude in degrees.
+        alt: float
+            Altitude in meters.
+        """
+
+    @staticmethod
+    @abstractmethod
+    def to_planetographic_multiple(
+        xyz_list: List[Tuple[float]], body: str, kernels_path: str
+    ) -> List[Tuple[float, float, float]]:
+        """Transforms multiple rectangular coordinates to planetographic coordinates.
+
+        Parameters
+        ----------
+        xyz_list: list of tuples of 3 floats
+            List of xyz coordinates in meters.
+        body: str
+            Name of the body. For example 'MOON' or 'EARTH'.
+        kernels_path: str
+            Path to the directory of the main kernels.
+
+        Returns
+        -------
+        llhs: list of tuples of 3 floats
+            List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.
+        """
+        pass
+
 
 class SPICEAdapter(ISPICEAdapter):
+    """Class that implements the methods of this module.
+
+    It exports the following functions:
+        * get_moon_data_from_earth() - Calculate lunar data for a position on earth
+            surface at a concrete datetime.
+        * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
+        * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
+        * to_planetographic_multiple() - Transforms multiple rectangular coordinates
+            to planetographic coordinates.
+    """
+
     @staticmethod
     def get_moon_data_from_earth(
         latitude: float,
@@ -179,3 +281,29 @@ class SPICEAdapter(ISPICEAdapter):
         while lon > 180:
             lon -= 360
         return lat, lon, alt
+
+    @staticmethod
+    def to_planetographic_multiple(
+        xyz_list: List[Tuple[float]], body: str, kernels_path: str
+    ):  # in meters
+        SPICEAdapter._load_kernels(kernels_path)
+        _, radios = spice.bodvrd(body, "RADII", 3)
+        eq_rad = radios[0]  # Equatorial Radius
+        pol_rad = radios[2]  # Polar radius
+        flattening = (eq_rad - pol_rad) / eq_rad
+        llh_list = []  # alt km
+        for xyz in xyz_list:
+            pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
+            llh = spice.recpgr(body, pos_iau, eq_rad, flattening)
+            llh_list.append(llh)
+        SPICEAdapter._clear_kernels()
+        for i, llh in enumerate(llh_list):
+            lat = llh[1] * spice.dpr()
+            lon = llh[0] * spice.dpr()
+            alt = llh[2] * 1000
+            while lon < -180:
+                lon += 360
+            while lon > 180:
+                lon -= 360
+            llh_list[i] = (lat, lon, alt)
+        return llh_list

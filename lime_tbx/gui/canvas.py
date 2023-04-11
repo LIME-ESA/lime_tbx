@@ -16,11 +16,11 @@ import numpy as np
 
 
 """___LIME_TBX Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     SpectralData,
 )
-from . import constants
+from lime_tbx.gui import constants
 
 
 SUBTITLE_DATE_FORMAT = "%Y/%m/%d %H:%M:%S"
@@ -80,6 +80,7 @@ def redraw_canvas(
     sxlabel: str,
     sylabel: str,
     svertical_lines: List[float],
+    sp_name: str,
     subtitle: str = None,
 ):
     lines = []
@@ -107,7 +108,7 @@ def redraw_canvas(
                 marker=marker,
                 label=label,
             )
-            if data.uncertainties is not None:
+            if data.uncertainties is not None and data.uncertainties.size > 0:
                 scanvas.axes.fill_between(
                     data.wlens,
                     data.data - 2 * data.uncertainties,
@@ -158,15 +159,18 @@ def redraw_canvas(
             if np.any(cimel_data.data[cimel_data.wlens == 500] == 0):
                 asd_data_final = asd_data.data * 0
             else:
+                scaled_wlen = 500
+                if len(np.where(asd_data.wlens == scaled_wlen)[0]) == 0:
+                    scaled_wlen = 503.017  # Breccia
                 scaling_factor = (
-                    asd_data.data[np.where(asd_data.wlens == 500)]
+                    asd_data.data[np.where(asd_data.wlens == scaled_wlen)]
                     / cimel_data.data[np.where(cimel_data.wlens == 500)]
                 )
                 asd_data_final = asd_data.data / scaling_factor
             lines += scanvas.axes.plot(
                 asd_data.wlens,
                 asd_data_final,
-                label="ASD data points, scaled to LIME at 500nm",
+                label=f"{sp_name} data, scaled to LIME at 500nm",
             )
 
         data_compare_info = ""
@@ -185,7 +189,7 @@ def redraw_canvas(
                 "k{}".format(marker),
                 label=label,
             )
-            if data_comp.uncertainties is not None:
+            if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
                 ax2.fill_between(
                     data_comp.wlens,
                     data_comp.data - 2 * data_comp.uncertainties,
@@ -193,12 +197,8 @@ def redraw_canvas(
                     color="pink",
                     alpha=0.3,
                 )
-            ax2.set_ylim(
-                (
-                    min(-0.05, min(data_comp.data) - 0.05),
-                    max(0.05, max(data_comp.data) + 0.05),
-                )
-            )
+            ylim = max(list(map(abs, ax2.get_ylim())))
+            ax2.set_ylim((-ylim - 0.05, ylim + 0.05))
             data_compare_info = "MRD: {:.4f}\nσ: {:.4f}\n".format(
                 sdata_compare.mean_relative_difference,
                 sdata_compare.standard_deviation_mrd,
@@ -226,3 +226,4 @@ def redraw_canvas(
     if svertical_lines and len(svertical_lines) > 0:
         for val in svertical_lines:
             scanvas.axes.axvline(x=val, color="k", label="LIME Spectrum limit")
+    return lines

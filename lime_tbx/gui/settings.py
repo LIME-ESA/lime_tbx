@@ -3,20 +3,22 @@
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from typing import List
+import os
 
 """___Third-Party Modules___"""
 import numpy as np
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     LimeCoefficients,
     PolarizationCoefficients,
     SRFChannel,
     SpectralResponseFunction,
     ReflectanceCoefficients,
 )
-from ..datatypes import constants
-from ..coefficients.access_data import access_data
+from lime_tbx.coefficients.access_data import access_data
+from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -86,6 +88,87 @@ class ISettingsManager(ABC):
         """Reload the cimel coefficients from file to the logic instance"""
         pass
 
+    @abstractmethod
+    def get_available_spectra_names(self) -> List[str]:
+        """Obtain a list with all the available spectra names"""
+        pass
+
+    @abstractmethod
+    def get_selected_spectrum_name(self) -> str:
+        """Obtain the currently selected interpolation spectrum name"""
+        pass
+
+    @abstractmethod
+    def select_interp_spectrum(self, name: str):
+        """Select the interpolation spectrum to use"""
+        pass
+
+    @abstractmethod
+    def get_available_interp_SRFs(self) -> List[str]:
+        """Obtain a list with all the available spectra names"""
+        pass
+
+    @abstractmethod
+    def get_selected_interp_SRF(self) -> str:
+        """Obtain the currently selected interpolation SRF name"""
+        pass
+
+    @abstractmethod
+    def select_interp_SRF(self, name: str):
+        """Select the interpolation spectrum to use as SRF"""
+        pass
+
+    @abstractmethod
+    def can_perform_polarization(self) -> bool:
+        """Checks if the current settings allow for the performance of polarization."""
+        pass
+
+    @abstractmethod
+    def is_show_interp_spectrum(self) -> bool:
+        """Checks if the UI should show the spectrum used for interpolation.
+
+        Returns
+        -------
+        should_show: bool
+            True if the spectrum should be shown.
+        """
+        pass
+
+    @abstractmethod
+    def set_show_interp_spectrum(self, show: bool):
+        """Sets the interpolation spectrum visibility as <show>.
+
+        Parameters
+        ----------
+        show: bool
+            Visibility of the interpolation spectrum.
+        """
+        pass
+
+    @abstractmethod
+    def is_skip_uncertainties(self) -> bool:
+        """Checks if the user settings are set to skip the uncertainties calculation.
+
+        Returns
+        -------
+        should_skip: bool
+            True if the uncertainties calculation should be skipped."""
+        pass
+
+    @abstractmethod
+    def set_skip_uncertainties(self, skip: bool):
+        """Sets if the uncertainties should be calculated.
+
+        Parameters
+        ----------
+        skip: bool
+            True if the uncertainties should be skipped.
+        """
+        pass
+
+
+DEF_SRF_STEP = 2
+
 
 class SettingsManager(ISettingsManager):
     def __init__(self, previous_coeff_name: str = None):
@@ -103,16 +186,7 @@ class SettingsManager(ISettingsManager):
         self.polar_coeff = self.coeffs[index].polarization
 
     def get_default_srf(self) -> SpectralResponseFunction:
-        spectral_response = {
-            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN, 2)
-        }
-        ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
-            constants.DEFAULT_SRF_NAME,
-            spectral_response,
-        )
-        srf = SpectralResponseFunction(constants.DEFAULT_SRF_NAME, [ch])
-        return srf
+        return get_default_srf()
 
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
@@ -149,3 +223,36 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[-1]
         self.cimel_coeff = self.coeffs[-1].reflectance
         self.polar_coeff = self.coeffs[-1].polarization
+
+    def get_available_interp_SRFs(self) -> List[str]:
+        return interp_data.get_available_interp_SRFs()
+
+    def get_selected_interp_SRF(self) -> str:
+        return interp_data.get_interpolation_SRF()
+
+    def select_interp_SRF(self, name: str):
+        interp_data.set_interpolation_SRF(name)
+
+    def get_available_spectra_names(self) -> List[str]:
+        return interp_data.get_available_spectra_names()
+
+    def get_selected_spectrum_name(self) -> str:
+        return interp_data.get_interpolation_spectrum_name()
+
+    def select_interp_spectrum(self, name: str):
+        interp_data.set_interpolation_spectrum_name(name)
+
+    def can_perform_polarization(self) -> bool:
+        return interp_data.can_perform_polarization()
+
+    def is_show_interp_spectrum(self) -> bool:
+        return interp_data.is_show_interpolation_spectrum()
+
+    def set_show_interp_spectrum(self, show: bool):
+        interp_data.set_show_interpolation_spectrum(show)
+
+    def is_skip_uncertainties(self) -> bool:
+        return interp_data.is_skip_uncertainties()
+
+    def set_skip_uncertainties(self, skip: bool):
+        interp_data.set_skip_uncertainties(skip)

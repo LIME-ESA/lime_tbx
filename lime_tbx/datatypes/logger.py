@@ -1,4 +1,8 @@
-"""This module is in charge of logging the output data."""
+"""This module is in charge of logging the output data.
+
+It exports the following functions:
+    * get_logger() - Returns the toolbox logger, used for logging messages.
+"""
 
 """___Built-In Modules___"""
 import logging
@@ -9,8 +13,7 @@ import sys
 """___Third-Party Modules___"""
 # import here
 
-
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.local_storage import appdata
 from lime_tbx.datatypes import constants
 
@@ -22,15 +25,25 @@ _DATEFORMAT = "%H:%M:%S"
 
 
 def _get_printout_logger() -> logging.Logger:
+    """Creates basic logger that prints out the messages.
+    Useful for when a logger is needed but the lime logger can't be instanced yet."""
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(logging.Formatter(_FORMAT, _DATEFORMAT))
     logger = logging.getLogger("printout_logger")
     logger.setLevel(logging.WARNING)
+    for hdlr in logger.handlers:
+        logger.removeHandler(hdlr)
     logger.addHandler(handler)
     return logger
 
 
 def get_logger() -> logging.Logger:
+    """Returns the toolbox logger, used for logging messages.
+
+    Returns:
+    logger: logging.Logger
+        LIME Toolbox logger.
+    """
     global _logger
     if _logger == None:
         dtnow = datetime.utcnow()
@@ -50,4 +63,8 @@ def get_logger() -> logging.Logger:
             _logger.setLevel(logging.DEBUG)
         else:
             _logger.setLevel(logging.INFO)
+        if constants.DEV_LOGOUT_ENV_NAME in os.environ:
+            # to print logs in terminal screen add environment variable named "LIME_DEVELOPER_LOGGING"
+            _logger.addHandler(logging.StreamHandler())
+
     return _logger

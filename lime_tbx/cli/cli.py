@@ -7,6 +7,7 @@ import os
 from enum import Enum
 import glob
 import sys
+import json
 
 """___Third-Party Modules___"""
 # import here
@@ -24,12 +25,15 @@ from lime_tbx.datatypes.datatypes import (
     SpectralData,
     SurfacePoint,
 )
+from lime_tbx.datatypes import constants, logger
 from lime_tbx.gui import settings
-from lime_tbx.simulation.lime_simulation import LimeSimulation
+from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
+from lime_tbx.simulation.comparison import comparison
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.simulation.comparison import comparison
-from lime_tbx.datatypes import constants
+from lime_tbx.coefficients.update.update import IUpdate, Update
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
+from lime_tbx.interpolation.interp_data import interp_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -40,10 +44,11 @@ __status__ = "Development"
 
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
-OPTIONS = "hvde:l:s:c:o:f:t:"
+OPTIONS = "hvude:l:s:c:o:f:t:C:i:"
 LONG_OPTIONS = [
     "help",
     "version",
+    "update",
     "debug",
     "earth=",
     "lunar=",
@@ -52,7 +57,11 @@ LONG_OPTIONS = [
     "output=",
     "srf=",
     "timeseries=",
+    "coefficients=",
+    "interpolation=",
 ]
+_WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
 
 
 def eprint(*args, **kwargs):
@@ -137,6 +146,7 @@ observations files in GLOD format.\n"
     print("Options:")
     print("  -h, --help\t\t Displays the help message.")
     print("  -v, --version\t\t Displays the version name.")
+    print("  -u, --update\t\t Updates the coefficients.")
     print("  -e, --earth\t\t Performs simulations from a geographic point.")
     print("\t\t\t -e lat_deg,lon_deg,height_m,{}".format(_DT_FORMAT))
     print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
@@ -181,6 +191,30 @@ in GLOD format."
         "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
 inputing directly only one datetime. Valid only if the main option is -e or -s."
     )
+    print(
+        "  -C, --coefficients\t Change the coefficients version used by the TBX, \
+for this execution and the next ones until it's changed again."
+    )
+    print(
+        "  -i, --interpolation-settings\t Change the interpolation settings. The \
+input data shall be a json string containing at least one of the following parameters:"
+    )
+    print(
+        "\t\t\t   interp_spectrum: Sets the interpolation spectrum. The valid \
+values are 'ASD' and 'Apollo 16 + Breccia'."
+    )
+    print(
+        "\t\t\t   interp_srf: Sets the output SRF. The valid values are 'asd', \
+'interpolated_gaussian' and 'interpolated_triangle'."
+    )
+    print(
+        "\t\t\t   show_interp_spectrum: Sets if the graphs should show the spectrum \
+used for interpolation. The valid values are 'True' and 'False'."
+    )
+    print(
+        "\t\t\t   skip_uncertainties: Sets if the ToolBox should skip the \
+uncertainties calculations. The valid values are 'True' and 'False'."
+    )
 
 
 def print_version():
@@ -193,7 +227,7 @@ class CLI:
     ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
+        self.lime_simulation: ILimeSimulation = LimeSimulation(eocfi_path, kernels_path)
         self.settings_manager = settings.SettingsManager(selected_version)
         self.srf = self.settings_manager.get_default_srf()
 
@@ -204,18 +238,21 @@ class CLI:
             self.srf = srflib.read_srf(srf_file)
 
     def _calculate_irradiance(self, point: Point):
+        def_srf = get_default_srf()
         self.lime_simulation.update_irradiance(
-            self.srf, point, self.settings_manager.get_cimel_coef()
+            def_srf, self.srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_reflectance(self, point: Point):
+        def_srf = get_default_srf()
         self.lime_simulation.update_reflectance(
-            self.srf, point, self.settings_manager.get_cimel_coef()
+            def_srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_polarization(self, point: Point):
+        def_srf = get_default_srf()
         self.lime_simulation.update_polarization(
-            self.srf, point, self.settings_manager.get_polar_coef()
+            def_srf, point, self.settings_manager.get_polar_coef()
         )
 
     def _calculate_all(self, point: Point):
@@ -229,29 +266,41 @@ class CLI:
         ed: ExportCSV,
     ):
         version = self.settings_manager.get_lime_coef().version
-        csv.export_csv(
+        are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        skip_uncs = self.settings_manager.is_skip_uncertainties()
+        csv.export_csv_simulation(
             self.lime_simulation.get_elrefs(),
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
             point,
             ed.o_file_refl,
             version,
+            are_mpas_oinside_mpa_range,
+            sp_name,
+            skip_uncs,
         )
-        csv.export_csv(
+        csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
             point,
             ed.o_file_irr,
             version,
+            are_mpas_oinside_mpa_range,
+            sp_name,
+            skip_uncs,
         )
-        csv.export_csv(
+        csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
             point,
             ed.o_file_polar,
             version,
+            are_mpas_oinside_mpa_range,
+            sp_name,
+            skip_uncs,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -259,15 +308,24 @@ class CLI:
             ed.o_file_integrated_irr,
             point,
             version,
+            are_mpas_oinside_mpa_range,
+            sp_name,
+            skip_uncs,
         )
 
     def _export_lglod(self, point: Point, output_file: str):
+        sp_name = self.settings_manager.get_selected_spectrum_name()
         lglod = create_lglod_data(
-            point, self.srf, self.lime_simulation, self.kernels_path
+            point, self.srf, self.lime_simulation, self.kernels_path, sp_name
         )
         now = datetime.now(timezone.utc)
         version = self.settings_manager.get_lime_coef().version
-        moon.write_obs(lglod, output_file, now, version)
+        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        _mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(_mds, list):
+            _mds = [_mds]
+        mpas = [m.mpa_degrees for m in _mds]
+        moon.write_obs(lglod, output_file, now, version, inside_mpa_range, mpas)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
         from lime_tbx.gui import canvas
@@ -276,11 +334,23 @@ class CLI:
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_lime_coef().version
-        subtitle = "LIME2 coefficients version: {}".format(version)
+        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        is_out_mpa_range = (
+            not inside_mpa_range
+            if not isinstance(inside_mpa_range, list)
+            else False in inside_mpa_range
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
         canv.axes.cla()  # Clear the canvas.
+        sp_name = self.settings_manager.get_selected_spectrum_name()
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elrefs(),
@@ -292,6 +362,7 @@ class CLI:
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
             None,
+            sp_name,
         )
         try:
             canv.print_figure(ed.o_file_refl)
@@ -314,6 +385,7 @@ class CLI:
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
             None,
+            sp_name,
         )
         try:
             canv.print_figure(ed.o_file_irr)
@@ -336,6 +408,7 @@ class CLI:
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
             None,
+            sp_name,
         )
         try:
             canv.print_figure(ed.o_file_polar)
@@ -363,12 +436,16 @@ class CLI:
         canv = canvas.MplCanvas(width=15, height=10, dpi=200)
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
-        subtitle = "LIME2 coefficients version: {}".format(version)
         n_comp_points = len(comparison.diffs_signal.wlens)
         data_start = min(comparison.dts)
         data_end = max(comparison.dts)
         version = self.settings_manager.get_lime_coef().version
-        subtitle = "LIME2 coefficients version: {}".format(version)
+        warning_out_mpa_range = ""
+        if False in comparison.ampa_valid_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
         subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
             subtitle,
@@ -396,6 +473,7 @@ class CLI:
             xlabel,
             ylabel,
             None,
+            self.settings_manager.get_selected_spectrum_name(),
             subtitle,
         )
         try:
@@ -480,7 +558,9 @@ class CLI:
             raise LimeException("No observations given. Aborting.")
         mos = self.loaded_moons
         if isinstance(ed, ExportComparisonCSV) or isinstance(ed, ExportComparisonGraph):
-            ch_names_obs = {ch_name for mo in mos for ch_name in mo.ch_names}
+            ch_names_obs = {
+                ch_name for mo in mos for ch_name in list(mo.ch_irrs.keys())
+            }
             if len(ch_names_obs) > len(ed.output_files):
                 raise LimeException(
                     "The amount of export files given is not enough. There are more channels."
@@ -501,11 +581,14 @@ class CLI:
         cimel_coef = self.settings_manager.get_cimel_coef()
         comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
         # EXPORT
+        skip_uncs = self.settings_manager.is_skip_uncertainties()
         if isinstance(ed, ExportNetCDF):
             lglod = LGLODComparisonData(
                 comps,
                 self.srf.get_channels_names(),
-                "TODO",
+                mos[0].data_source,
+                self.settings_manager.get_selected_spectrum_name(),
+                skip_uncs,
             )
             vers = self.settings_manager.get_lime_coef().version
             moon.write_comparison(
@@ -525,6 +608,7 @@ class CLI:
             ch_names = self.srf.get_channels_names()
             file_index = 0
             is_both = ed.comparison_key == ComparisonKey.BOTH
+            sp_name = self.settings_manager.get_selected_spectrum_name()
             if ed.comparison_key != ComparisonKey.MPA:
                 for i, ch in enumerate(ch_names):
                     if len(comps[i].dts) > 0:
@@ -554,6 +638,9 @@ class CLI:
                                 points,
                                 output,
                                 version,
+                                comps[i].ampa_valid_range,
+                                sp_name,
+                                skip_uncs,
                             )
                         else:
                             xlabel = "UTC datetime"
@@ -595,6 +682,9 @@ class CLI:
                                 points,
                                 output,
                                 version,
+                                mpa_comps[i].ampa_valid_range,
+                                sp_name,
+                                skip_uncs,
                                 False,
                             )
                         else:
@@ -604,12 +694,91 @@ class CLI:
                             )
                         file_index += 1
 
+    def update_coefficients(self) -> int:
+        updater: IUpdate = Update()
+        stopper_checker_true = lambda *_: True
+        updates = False
+        try:
+            if updater.check_for_updates():
+                news, fails = updater.download_coefficients(stopper_checker_true, [])
+                updates = True
+        except Exception as error:
+            print("Error connecting to the server.\nCheck log for details.")
+            logger.get_logger().error(str(error))
+            return 1
+        msg = "Download finished.\nThere were no updates."
+        if updates:
+            newsstring = f"There was 1 update"
+            failsstring = f"it failed"
+            if news > 1:
+                newsstring = f"There were {news} updates"
+                failsstring = f"{fails} of them failed"
+            if fails == 0:
+                msg = f"Download finished.\n{newsstring}."
+            else:
+                msg = f"Download finished with errors.\n{newsstring}, {failsstring}."
+        print(msg)
+        if updates:
+            self.settings_manager.reload_coeffs()
+        return 0
+
+    def parse_interp_settings(self, arg: str) -> int:
+        # example: -i '{"interp_spectrum": "ASD", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
+        try:
+            interp_settings = json.loads(arg)
+        except Exception as e:
+            eprint(f"Error parsing the interpolation settings {arg}. Error: {e}")
+            return 1
+        if "interp_spectrum" in interp_settings:
+            interp_spectrum = interp_settings["interp_spectrum"]
+            names = [
+                name for name in self.settings_manager.get_available_spectra_names()
+            ]
+            if interp_spectrum not in names:
+                eprint(
+                    f"Interpolation spectrum not recognized. Selected: {interp_spectrum}. Available: {names}."
+                )
+                return 1
+            self.settings_manager.select_interp_spectrum(interp_spectrum)
+        if "interp_srf" in interp_settings:
+            interp_srf = interp_settings["interp_srf"]
+            srf_translator = {
+                v: k for k, v in interp_data.SRF_DICT_SOLAR_DIALOG_SRF_TYPE.items()
+            }
+            names = list(srf_translator.keys())
+            if interp_srf not in names:
+                eprint(
+                    f"Interpolation settings output SRF not recognized. Selected: {interp_srf}. Available: {names}."
+                )
+                return 1
+            self.settings_manager.select_interp_SRF(srf_translator[interp_srf])
+        if "show_interp_spectrum" in interp_settings:
+            show_interp_spectrum = interp_settings["show_interp_spectrum"]
+            if show_interp_spectrum not in ("True", "False"):
+                eprint(
+                    f'Interpolation settings show_interp_spectrum value {show_interp_spectrum} not valid. Must be "True" or "False"'
+                )
+                return 1
+            show_interp_spectrum = show_interp_spectrum == "True"
+            self.settings_manager.set_show_interp_spectrum(show_interp_spectrum)
+        if "skip_uncertainties" in interp_settings:
+            skip_uncertainties = interp_settings["skip_uncertainties"]
+            if skip_uncertainties not in ("True", "False"):
+                eprint(
+                    f'Interpolation settings skip_uncertainties value {skip_uncertainties} not valid. Must be "True" or "False"'
+                )
+                return 1
+            skip_uncertainties = skip_uncertainties == "True"
+            self.settings_manager.set_skip_uncertainties(skip_uncertainties)
+        return 0
+
     def handle_input(self, opts: List[Tuple[str, str]]) -> int:
         srf_file = ""
         export_data: ExportData = None
         timeseries_file: str = None
         # Check if it's comparison
         is_comparison = any(item[0] in ("-c", "--comparison") for item in opts)
+        mod_interp_settings = False
         # find settings data
         for opt, arg in opts:
             if opt in ("-h", "--help"):
@@ -618,6 +787,8 @@ class CLI:
             if opt in ("-v", "--version"):
                 print_version()
                 return 0
+            if opt in ("-u", "--update"):
+                return self.update_coefficients()
             if opt in ("-o", "--output"):  # Output
                 splitted = arg.split(",")
                 o_type = splitted[0]
@@ -717,20 +888,22 @@ class CLI:
                 srf_file = arg
             elif opt in ("-t", "--timeseries"):
                 timeseries_file = arg
-        if export_data == None:
-            eprint("Error: The output flag (-o | --output) must be included.")
-            return 1
-        if srf_file == "" or os.path.exists(srf_file):
-            try:
-                self.load_srf(srf_file)
-            except Exception as e:
-                eprint(
-                    "Error: Error loading Spectral Response Function. {}".format(str(e))
-                )
-                return 1
-        else:
-            eprint("Error: The given srf path does not exist.")
-            return 1
+            elif opt in ("-C", "--coefficients"):
+                names = [
+                    coef.version
+                    for coef in self.settings_manager.get_available_coeffs()
+                ]
+                if arg not in names:
+                    eprint(
+                        f"Coefficients version not recognized. Selected: {arg}. Available: {names}."
+                    )
+                    return 1
+                self.settings_manager.select_lime_coeff(names.index(arg))
+            elif opt in ("-i", "--interpolation-settings"):
+                ret = self.parse_interp_settings(arg)
+                if ret != 0:
+                    return ret
+                mod_interp_settings = True
 
         # Simulation input
         sim_opts = (
@@ -744,8 +917,26 @@ class CLI:
             "--comparison",
         )
         num_sim_ops = sum(item[0] in sim_opts for item in opts)
+        if mod_interp_settings and num_sim_ops == 0:
+            return 0
+
+        if srf_file == "" or os.path.exists(srf_file):
+            try:
+                self.load_srf(srf_file)
+            except Exception as e:
+                eprint(
+                    "Error: Error loading Spectral Response Function. {}".format(str(e))
+                )
+                return 1
+        else:
+            eprint("Error: The given srf path does not exist.")
+            return 1
+
+        if export_data == None:
+            eprint("Error: The output flag (-o | --output) must be included.")
+            return 1
         if num_sim_ops == 0:
-            eprint("Error: There must be one of the following flags: (-e|-s|-l|-c).")
+            eprint("Error: There must be one of the following flags: (-e|-s|-l|-c|-i).")
             print_help()
             return 1
         elif num_sim_ops > 1:
@@ -812,9 +1003,6 @@ class CLI:
                     break
                 elif opt in ("-c", "--comparison"):  # Comparison
                     params = arg.split(" ")
-                    if len(params) < 1:
-                        eprint("Error: Wrong number of arguments for -c")
-                        return 1
                     input_files = []
                     for param in params:
                         input_files += glob.glob(param)

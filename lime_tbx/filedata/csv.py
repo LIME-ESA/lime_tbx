@@ -9,30 +9,24 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from typing import Union, List, Iterable
+from typing import Union, List
 from datetime import datetime, timezone
 import csv
+import os
 
 """___Third-Party Modules___"""
 import numpy as np
-import xarray
-import obsarray
 
 """___NPL Modules___"""
-from ..datatypes.datatypes import (
-    LimeCoefficients,
+from lime_tbx.datatypes.datatypes import (
     Point,
-    PolarizationCoefficients,
     SpectralData,
     SpectralResponseFunction,
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
-    LimeException,
 )
-from ..datatypes import logger
-from ..datatypes.datatypes import ReflectanceCoefficients
-from lime_tbx.datatypes.templates_digital_effects_table import TEMPLATE_CIMEL
+from lime_tbx.datatypes import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -45,6 +39,8 @@ _EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
 _READ_FILE_ERROR_STR = (
     "There was a problem while loading the file. See log for details."
 )
+_WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
 
 
 def _write_point(writer, point: Union[Point, None]):
@@ -78,13 +74,58 @@ def _write_point(writer, point: Union[Point, None]):
                 writer.writerow(["datetime", str(dt)])
 
 
-def export_csv(
+def export_csv_srf(
+    data: Union[SpectralData, List[SpectralData]],
+    xlabel: str,
+    ylabel: str,
+    name: str,
+):
+    """
+    Export the given data to a csv file
+
+    Parameters
+    ----------
+    data: SpectralData | list of SpectralData
+        Data that will be exported
+    xlabel: str
+        Label of the x_data
+    ylabel: str
+        Label of the y_data
+    name: str
+        CSV file path
+    """
+    try:
+        with open(name, "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            ylabels = []
+            ylabels.append(f"{ylabel}")
+            writer.writerow([xlabel, *ylabels])
+            if not isinstance(data, list) and not isinstance(data, np.ndarray):
+                data = [data]
+            x_data = data[0].wlens
+            y_data = []
+            for i in range(len(x_data)):
+                yd = []
+                for datum in data:
+                    yd.append(datum.data[i])
+                y_data.append(yd)
+            for i in range(len(x_data)):
+                writer.writerow([x_data[i], *y_data[i]])
+    except Exception as e:
+        logger.get_logger().exception(e)
+        raise Exception(_EXPORT_ERROR_STR)
+
+
+def export_csv_simulation(
     data: Union[SpectralData, List[SpectralData]],
     xlabel: str,
     ylabel: str,
     point: Union[Point, None],
     name: str,
     coeff_version: str,
+    inside_mpa_range: Union[bool, List[bool]],
+    interp_spectrum_name: str,
+    skip_uncs: bool,
 ):
     """
     Export the given data to a csv file
@@ -103,22 +144,44 @@ def export_csv(
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    inside_mpa_range: bool | list of bool
+        Indication if the point moon phase angle/s were inside the valid LIME range.
+    interp_spectrum_name: str
+        Name of the spectrum used for interpolation.
     """
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+            some_out_mpa_range = (
+                not inside_mpa_range
+                if not isinstance(inside_mpa_range, list)
+                else False in inside_mpa_range
+            )
+            if some_out_mpa_range:
+                writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             _write_point(writer, point)
             ylabels = []
             if not isinstance(point, CustomPoint) and point != None:
                 dts = point.dt
                 if not isinstance(dts, list):
                     dts = [dts]
-                for dt in dts:
-                    ylabels.append("{} {}".format(str(dt), ylabel))
-                    ylabels.append("{} uncertainties".format(str(dt)))
+                    inside_mpa_range = [inside_mpa_range]
+                for dt, inside_mpa in zip(dts, inside_mpa_range):
+                    warn_out_mpa_range = ""
+                    if not inside_mpa:
+                        warn_out_mpa_range = " **"
+                    ylabels.append(f"{str(dt)} {ylabel}{warn_out_mpa_range}")
+                    if not skip_uncs:
+                        ylabels.append(f"{str(dt)} uncertainties{warn_out_mpa_range}")
             else:
-                ylabels.append(ylabel)
+                warn_out_mpa_range = ""
+                if some_out_mpa_range:
+                    warn_out_mpa_range = " **"
+                ylabels.append(f"{ylabel}{warn_out_mpa_range}")
+                if not skip_uncs:
+                    ylabels.append(f"uncertainties{warn_out_mpa_range}")
             writer.writerow([xlabel, *ylabels])
             if not isinstance(data, list) and not isinstance(data, np.ndarray):
                 data = [data]
@@ -128,7 +191,8 @@ def export_csv(
                 yd = []
                 for datum in data:
                     yd.append(datum.data[i])
-                    yd.append(datum.uncertainties[i])
+                    if not skip_uncs:
+                        yd.append(datum.uncertainties[i])
                 y_data.append(yd)
             for i in range(len(x_data)):
                 writer.writerow([x_data[i], *y_data[i]])
@@ -143,6 +207,9 @@ def export_csv_comparation(
     points: List[SurfacePoint],
     name: str,
     coeff_version: str,
+    ampa_valid_range: List[bool],
+    interp_spectrum_name: str,
+    skip_uncs: bool,
     x_datetime: bool = True,
 ):
     """
@@ -163,6 +230,10 @@ def export_csv_comparation(
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    ampa_valid_range: list of bool
+        Indicates if the given points are inside of the valid LIME moon phase angle range.
+    interp_spectrum_name: str
+        Name of the spectrum used for interpolation.
     x_datetime: bool
         True if it used datetimes as the x_axis, False if it used mpa
     """
@@ -173,18 +244,23 @@ def export_csv_comparation(
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
-            writer.writerow(
-                [
-                    x_label,
-                    "latitude",
-                    "longitude",
-                    "altitude(m)",
-                    "Observed {}".format(ylabel),
-                    "Simulated {}".format(ylabel),
+            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+            if False in ampa_valid_range:
+                writer.writerow(["**", _WARN_OUT_MPA_RANGE])
+            header = [
+                x_label,
+                "latitude",
+                "longitude",
+                "altitude(m)",
+                "Observed {}".format(ylabel),
+                "Simulated {}".format(ylabel),
+            ]
+            if not skip_uncs:
+                header += [
                     "Observation uncertainties",
                     "Simulation uncertainties",
                 ]
-            )
+            writer.writerow(header)
             x_data = data[0].wlens
             for i in range(len(x_data)):
                 pt = points[i]
@@ -192,18 +268,24 @@ def export_csv_comparation(
                     x_val = pt.dt.strftime("%Y-%m-%d %H:%M:%S")
                 else:
                     x_val = x_data[i]
-                writer.writerow(
-                    [
-                        x_val,
-                        pt.latitude,
-                        pt.longitude,
-                        pt.altitude,
-                        data[0].data[i],
-                        data[1].data[i],
+                warn_out_mpa_range = ""
+                if not ampa_valid_range[i]:
+                    warn_out_mpa_range = " **"
+                x_val = f"{x_val}{warn_out_mpa_range}"
+                datarow = [
+                    x_val,
+                    pt.latitude,
+                    pt.longitude,
+                    pt.altitude,
+                    data[0].data[i],
+                    data[1].data[i],
+                ]
+                if not skip_uncs:
+                    datarow += [
                         data[0].uncertainties[i],
                         data[1].uncertainties[i],
                     ]
-                )
+                writer.writerow(datarow)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
@@ -215,6 +297,9 @@ def export_csv_integrated_irradiance(
     name: str,
     point: Point,
     coeff_version: str,
+    inside_mpa_range: Union[bool, List[bool]],
+    interp_spectrum_name: str,
+    skip_uncs: bool,
 ):
     """
     Export the given integrated signal data to a csv file
@@ -231,11 +316,23 @@ def export_csv_integrated_irradiance(
         Point from which the data is generated. In case it's None, no metadata will be printed.
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
+    inside_mpa_range: bool | list of bool
+        Indication if the point moon phase angle/s were inside the valid LIME range.
+    interp_spectrum_name: str
+        Name of the spectrum used for interpolation.
     """
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+            some_out_mpa_range = (
+                not inside_mpa_range
+                if not isinstance(inside_mpa_range, list)
+                else False in inside_mpa_range
+            )
+            if some_out_mpa_range:
+                writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             _write_point(writer, point)
             writer.writerow(["srf name", srf.name])
             irr_titles = []
@@ -243,12 +340,24 @@ def export_csv_integrated_irradiance(
                 dts = point.dt
                 if not isinstance(dts, list):
                     dts = [dts]
-                for dt in dts:
-                    irr_titles.append("{} irradiances (Wm⁻²nm⁻¹)".format(str(dt)))
-                    irr_titles.append("{} uncertainties".format(str(dt)))
+                    inside_mpa_range = [inside_mpa_range]
+                for dt, inside_mpa in zip(dts, inside_mpa_range):
+                    warn_out_mpa_range = ""
+                    if not inside_mpa:
+                        warn_out_mpa_range = " **"
+                    irr_titles.append(
+                        "{} irradiances (Wm⁻²nm⁻¹){}".format(
+                            str(dt), warn_out_mpa_range
+                        )
+                    )
+                    if not skip_uncs:
+                        irr_titles.append(
+                            "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
+                        )
             else:
                 irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
-                irr_titles.append("uncertainties")
+                if not skip_uncs:
+                    irr_titles.append("uncertainties")
             writer.writerow(["id", "center (nm)", "inside LIME range", *irr_titles])
             for i, ch in enumerate(srf.channels):
                 if ch.valid_spectre == SpectralValidity.VALID:
@@ -260,7 +369,8 @@ def export_csv_integrated_irradiance(
                 print_data = []
                 for j in range(len(signals.data[i])):
                     print_data.append(signals.data[i][j])
-                    print_data.append(signals.uncertainties[i][j])
+                    if not skip_uncs:
+                        print_data.append(signals.uncertainties[i][j])
 
                 writer.writerow([ch.id, ch.center, validity, *print_data])
     except Exception as e:
@@ -291,67 +401,6 @@ def read_datetimes(path: str) -> List[datetime]:
                 dt = datetime(*irow, tzinfo=timezone.utc)
                 datetimes.append(dt)
             return datetimes
-    except Exception as e:
-        logger.get_logger().exception(e)
-        raise Exception(_READ_FILE_ERROR_STR)
-
-
-def read_lime_coefficients_from_stream(
-    stream: Iterable[str],
-) -> LimeCoefficients:
-    # define dim_size_dict to specify size of arrays
-    dim_sizes = {
-        "wavelength": 6,
-        "i_coeff": 18,
-    }
-    reader = csv.reader(stream)
-    rows = []
-    for row in reader:
-        if len(row) > 0 and len(row[0]) > 0 and row[0][0] != "#":
-            rows.append(row)
-    if len(rows) != 37:
-        raise LimeException(
-            f"Wrong format in the coefficients update file. There should be 37 uncommented lines, found {len(rows)}."
-        )
-    wlens = [440, 500, 675, 870, 1020, 1640]
-    version_name = rows[0][0]
-    data = np.array(rows[1:7]).astype(float)
-    u_data = np.array(rows[7:13]).astype(float)
-    # create dataset
-    ds_cimel: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
-    ds_cimel = ds_cimel.assign_coords(wavelength=wlens)
-    ds_cimel.coeff.values = data.T
-    ds_cimel.u_coeff.values = u_data.T
-
-    rf = ReflectanceCoefficients(ds_cimel)
-
-    p_pos_data = np.array(rows[13:19]).astype(float)
-    p_pos_u_data = np.array(rows[19:25]).astype(float)
-    p_neg_data = np.array(rows[25:31]).astype(float)
-    p_neg_u_data = np.array(rows[31:37]).astype(float)
-    pol = PolarizationCoefficients(
-        wlens, p_pos_data, p_pos_u_data, p_neg_data, p_neg_u_data
-    )
-    return LimeCoefficients(rf, pol, version_name)
-
-
-def read_lime_coefficients(path: str) -> LimeCoefficients:
-    """
-    Read a Reflectance Coefficients CSV file.
-
-    Parameters
-    ----------
-    path: str
-        Path where the file is stored.
-
-    Returns
-    -------
-    lc: LimeCoefficients
-        LimeCoefficients read.
-    """
-    try:
-        with open(path, "r") as file:
-            return read_lime_coefficients_from_stream(file)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)

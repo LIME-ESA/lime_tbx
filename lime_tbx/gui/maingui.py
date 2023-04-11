@@ -9,10 +9,27 @@ from datetime import datetime, timezone
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
-from . import settings, output, input, srf, help
+from lime_tbx.gui import (
+    settings,
+    output,
+    input,
+    srf,
+    help,
+    interpoptions,
+    canvas,
+    coefficients,
+)
+from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
+from lime_tbx.gui.spinner import SpinnerPage
+from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
+from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import moon, srf as srf_loader
-from ..simulation.comparison import comparison
-from ..datatypes.datatypes import (
+from lime_tbx.filedata.lglod_factory import create_lglod_data
+from lime_tbx.simulation.comparison import comparison
+from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
+from lime_tbx.eocfi_adapter import eocfi_adapter
+from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     KernelsPath,
     LGLODComparisonData,
@@ -28,14 +45,8 @@ from ..datatypes.datatypes import (
     ReflectanceCoefficients,
     SpectralData,
 )
-from ..eocfi_adapter import eocfi_adapter
-from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
-from .ifaces import IMainSimulationsWidget, noconflict_makecls
-from lime_tbx.filedata.lglod_factory import create_lglod_data
-from lime_tbx.gui import canvas, coefficients
-from lime_tbx.gui.spinner import SpinnerPage
-from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
-from ..datatypes import logger, constants as logic_constants
+from lime_tbx.datatypes import logger, constants as logic_constants
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -48,6 +59,9 @@ __status__ = "Development"
 _INTERNAL_ERROR_MSG = (
     "Something went wrong while performing the operation. See log for more detail."
 )
+
+_WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
 
 
 def eli_callback(
@@ -62,7 +76,7 @@ def eli_callback(
     Point,
     List[float],
     SpectralResponseFunction,
-    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData], Union[bool, List[bool]]],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -96,8 +110,11 @@ def eli_callback(
         SRF used for the integrated irradiance signal calculation.
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
+    inside_mpa_range: bool or list of bool
+        Indicates if the different point locations/s are inside the valid mpa range.
     """
-    lime_simulation.update_irradiance(srf, point, cimel_coef)
+    def_srf = get_default_srf()
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     return (
         point,
         srf,
@@ -105,6 +122,7 @@ def eli_callback(
         lime_simulation.get_elis_cimel(),
         lime_simulation.get_elis_asd(),
         lime_simulation.get_signals(),
+        lime_simulation.are_mpas_inside_mpa_range(),
     )
 
 
@@ -113,7 +131,13 @@ def elref_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
-) -> Tuple[List[float], List[float], Point, Union[SpectralData, List[SpectralData]],]:
+) -> Tuple[
+    List[float],
+    List[float],
+    Point,
+    Union[SpectralData, List[SpectralData]],
+    Union[bool, List[bool]],
+]:
     """Callback that performs the Reflectance operations.
 
     Parameters
@@ -137,13 +161,17 @@ def elref_callback(
         Point that was used in the calculations.
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
+    inside_mpa_range: bool or list of bool
+        Indicates if the different point locations/s are inside the valid mpa range.
     """
-    lime_simulation.update_reflectance(srf, point, cimel_coef)
+    def_srf = get_default_srf()
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     return (
         point,
         lime_simulation.get_elrefs(),
         lime_simulation.get_elrefs_cimel(),
         lime_simulation.get_elrefs_asd(),
+        lime_simulation.are_mpas_inside_mpa_range(),
     )
 
 
@@ -157,14 +185,16 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
+    Union[bool, List[bool]],
 ]:
-
-    lime_simulation.update_polarization(srf, point, coeffs)
+    def_srf = get_default_srf()
+    lime_simulation.update_polarization(def_srf, point, coeffs)
     return (
         point,
         lime_simulation.get_polars(),
         lime_simulation.get_polars_cimel(),
         lime_simulation.get_polars_asd(),
+        lime_simulation.are_mpas_inside_mpa_range(),
     )
 
 
@@ -209,10 +239,93 @@ def calculate_all_callback(
     p_coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
 ):
-    lime_simulation.update_reflectance(srf, point, cimel_coef)
-    lime_simulation.update_irradiance(srf, point, cimel_coef)
-    lime_simulation.update_polarization(srf, point, p_coeffs)
+    def_srf = get_default_srf()
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    lime_simulation.update_polarization(def_srf, point, p_coeffs)
     return (point, srf)
+
+
+#  self.settings_manager.get_lime_coef().version
+def show_comparisons_callback(
+    output: output.ComparisonOutput,
+    output_mpa: output.ComparisonOutput,
+    comps: List[ComparisonData],
+    mpa_comps: List[ComparisonData],
+    srf: SpectralResponseFunction,
+    version: str,
+    settings_manager: ISettingsManager,
+) -> Tuple[List[str], List[str]]:
+    to_remove = _show_comps_output(
+        output, comps, "datetimes", srf, version, settings_manager
+    )
+    to_remove_comps = _show_comps_output(
+        output_mpa,
+        mpa_comps,
+        "Moon Phase Angle (degrees)",
+        srf,
+        version,
+        settings_manager,
+    )
+    return (to_remove, to_remove_comps)
+
+
+def _show_comps_output(
+    output: output.ComparisonOutput,
+    comps: List[ComparisonData],
+    y_label: str,
+    srf: SpectralResponseFunction,
+    version: str,
+    settings_manager: ISettingsManager,
+) -> List[str]:
+    ch_names = srf.get_channels_names()
+    to_remove = []
+    for i, ch in enumerate(ch_names):
+        if len(comps[i].dts) > 0:
+            output.update_plot(i, comps[i])
+            n_comp_points = len(comps[i].diffs_signal.wlens)
+            data_start = min(comps[i].dts)
+            data_end = max(comps[i].dts)
+            warning_out_mpa_range = ""
+            if False in comps[i].ampa_valid_range:
+                warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+            sp_name = settings_manager.get_selected_spectrum_name()
+            skip = settings_manager.is_skip_uncertainties()
+            spectrum_info = f" | Interp. spectrum: {sp_name}"
+            output.set_interp_spectrum_name(i, sp_name)
+            output.set_skipped_uncertainties(i, skip)
+            subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+            _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
+            subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
+                subtitle,
+                data_start.strftime(_subtitle_date_format),
+                data_end.strftime(_subtitle_date_format),
+                n_comp_points,
+            )
+            output.update_labels(
+                i,
+                "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
+                y_label,
+                "Irradiance (Wm⁻²nm⁻¹)",
+                subtitle=subtitle,
+            )
+            output.update_legends(
+                i,
+                [
+                    ["Observed Irradiance", "Simulated Irradiance"],
+                    [],
+                    [],
+                    ["Relative Differences"],
+                ],
+            )
+        else:
+            to_remove.append(ch)
+    for chsrf in srf.channels:
+        if chsrf.id in to_remove:
+            continue
+        if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
+            output.set_as_partly(chsrf.id)
+    return to_remove
 
 
 class ComparisonPageWidget(QtWidgets.QWidget):
@@ -289,6 +402,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.spinner.movie_start()
             self.stack_layout.setCurrentIndex(0)
         else:
+            self.spinner.set_text("")
             self.spinner.movie_stop()
             if self.comparing_dts:
                 self.stack_layout.setCurrentIndex(1)
@@ -308,26 +422,36 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def export_to_lglod(self) -> None:
+        self._block_gui_loading()
         lglod = LGLODComparisonData(
             self.comps,
             self.srf.get_channels_names(),
-            "TODO",
+            self.data_source,
+            self.comparison_spectrum,
+            self.skipped_uncs,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
         vers = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
-            try:
-                moon.write_comparison(
+            self.worker = CallbackWorker(
+                moon.write_comparison,
+                [
                     lglod,
                     name,
                     datetime.now().astimezone(timezone.utc),
                     vers,
                     self.kernels_path,
-                )
-            except Exception as e:
-                self.show_error(e)
+                ],
+            )
+            self._start_thread(lambda _: self._unblock_gui(), self.export_to_lglod_err)
+        else:
+            self._unblock_gui()
+
+    def export_to_lglod_err(self, error: Exception):
+        self.handle_operation_error(error)
+        self._unblock_gui()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -341,6 +465,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         cimel_coef = self.settings_manager.get_cimel_coef()
         self.quant_mos = len(mos)
         self.quant_mos_simulated = 0
+        self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
         self.worker = CallbackWorker(
             compare_callback,
             [mos, srf, cimel_coef, self.lime_simulation, self.kernels_path],
@@ -383,7 +508,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.clear_comp_dialog.close()
         if not self.comparing_dts:
             self.switch_show_compare_mpa_dts()
-            self.change_mpa_dts_button.setVisible(False)
+        self.export_lglod_button.setEnabled(False)
+        self.change_mpa_dts_button.setVisible(False)
 
     @QtCore.Slot()
     def clear_comparison_rejected(self):
@@ -404,14 +530,26 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         mos = data[2]
         srf = data[3]
         self.comps = comps
+        self.data_source = mos[0].data_source
+        self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
         self.mpa_comps = mpa_comps
         self.srf = srf
-        self.show_comparisons()
-        self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
-        window: LimeTBXWindow = self.parentWidget().parentWidget()
-        window.set_save_simulation_action_disabled(False)
-        self.change_mpa_dts_button.setVisible(True)
+        version = self.settings_manager.get_lime_coef().version
+        params = [
+            self.output,
+            self.output_mpa,
+            self.comps,
+            self.mpa_comps,
+            self.srf,
+            version,
+            self.settings_manager,
+        ]
+        # Channels are set to the output here, as that needs to be done in the main qt thread.
+        ch_names = srf.get_channels_names()
+        self.output.set_channels(ch_names)
+        self.output_mpa.set_channels(ch_names)
+        self.worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(self._load_lglod_comparisons_finished, self.compare_error)
 
     def switch_show_compare_mpa_dts(self):
         if self.comparing_dts:
@@ -441,74 +579,43 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.stack_layout.setCurrentIndex(2)
         self._unblock_gui()
 
-    def show_comparisons(self):
-        self._show_comps_output()
-        self._show_comps_output(True)
-
-    def _show_comps_output(self, comps_mpa: bool = False):
-        if comps_mpa:
-            comps = self.mpa_comps
-            y_label = "Moon Phase Angle (degrees)"
-            output = self.output_mpa
-        else:
-            comps = self.comps
-            y_label = "datetimes"
-            output = self.output
-        ch_names = self.srf.get_channels_names()
-        output.set_channels(ch_names)
-        to_remove = []
-        for i, ch in enumerate(ch_names):
-            if len(comps[i].dts) > 0:
-                output.update_plot(i, comps[i])
-                n_comp_points = len(comps[i].diffs_signal.wlens)
-                data_start = min(comps[i].dts)
-                data_end = max(comps[i].dts)
-                version = self.settings_manager.get_lime_coef().version
-                subtitle = "LIME2 coefficients version: {}".format(version)
-                _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
-                subtitle = (
-                    "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
-                        subtitle,
-                        data_start.strftime(_subtitle_date_format),
-                        data_end.strftime(_subtitle_date_format),
-                        n_comp_points,
-                    )
-                )
-                output.update_labels(
-                    i,
-                    "{} ({} nm)".format(ch, self.srf.get_channel_from_name(ch).center),
-                    y_label,
-                    "Irradiance (Wm⁻²nm⁻¹)",
-                    subtitle=subtitle,
-                )
-                output.update_legends(
-                    i,
-                    [
-                        ["Observed Irradiance", "Simulated Irradiance"],
-                        [],
-                        [],
-                        ["Relative Differences"],
-                    ],
-                )
-            else:
-                to_remove.append(ch)
-        for chsrf in self.srf.channels:
-            if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
-                output.set_as_partly(chsrf.id)
-        output.remove_channels(to_remove)
-
     def load_lglod_comparisons(
-        self, lglod: LGLODComparisonData, srf: SpectralResponseFunction
+        self,
+        comps: List[ComparisonData],
+        mpa_comps: List[ComparisonData],
+        srf: SpectralResponseFunction,
+        data_source: str,
+        skipped_uncs: bool,
     ):
         self.set_show_comparison_input(False)
         self.input.clear_input()
         self.compare_button.setDisabled(True)
-        comps = lglod.comparisons
         srf = srf
         self.comps = comps
-        self.mpa_comps = comparison.Comparison(self.kernels_path).sort_by_mpa(comps)
+        self.data_source = data_source
+        self.skipped_uncs = skipped_uncs
+        self.mpa_comps = mpa_comps
         self.srf = srf
-        self.show_comparisons()
+        version = self.settings_manager.get_lime_coef().version
+        params = [
+            self.output,
+            self.output_mpa,
+            self.comps,
+            self.mpa_comps,
+            self.srf,
+            version,
+            self.settings_manager,
+        ]
+        # Channels are set to the output here, as that needs to be done in the main qt thread.
+        ch_names = srf.get_channels_names()
+        self.output.set_channels(ch_names)
+        self.output_mpa.set_channels(ch_names)
+        self.worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(self._load_lglod_comparisons_finished, self.compare_error)
+
+    def _load_lglod_comparisons_finished(self, data):
+        self.output.remove_channels(data[0])
+        self.output_mpa.remove_channels(data[1])
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
@@ -564,7 +671,7 @@ class MainSimulationsWidget(
         self.input_widget = input.InputWidget(
             self.satellites,
             self._callback_regular_input_changed,
-            self._callback_check_calculable,
+            self.update_calculability,
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
@@ -626,6 +733,7 @@ class MainSimulationsWidget(
         self.lower_stack.setCurrentIndex(1)
         self.main_layout.addLayout(self.lower_stack, 1)
         self.main_layout.addWidget(self.export_lglod_button)
+        self.update_calculability()
 
     def _set_spinner(self, enabled: bool):
         self.loading_spinner.setVisible(enabled)
@@ -656,12 +764,17 @@ class MainSimulationsWidget(
     def _callback_regular_input_changed(self):
         self.lime_simulation.set_simulation_changed()
 
-    def _callback_check_calculable(self):
+    def update_calculability(self):
         calculable = self.input_widget.is_calculable()
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
-        self.polar_button.setEnabled(calculable)
-        if not self._export_lglod_button_was_disabled:
+        polar_calculable = self.settings_manager.get_polar_coef().is_calculable()
+        self.polar_button.setEnabled(
+            calculable
+            and self.settings_manager.can_perform_polarization()
+            and polar_calculable
+        )
+        if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
     def _start_thread(self, finished: Callable, error: Callable):
@@ -723,19 +836,34 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             SpectralData,
+            Union[bool, List[bool]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        sp_name = interp_data.get_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
+        is_out_mpa_range = (
+            not data[6] if not isinstance(data[6], list) else False in data[6]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
-            subtitle=f"LIME2 coefficients version: {version}",
+            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
-        self.signal_widget.update_signals(data[0], data[1], data[5])
+        self.graph.set_inside_mpa_range(data[6])
+        self.signal_widget.set_interp_spectrum_name(
+            self.settings_manager.get_selected_spectrum_name()
+        )
+        self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
         self.lower_tabs.setTabEnabled(2, True)
 
@@ -768,18 +896,30 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
+            Union[bool, List[bool]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        sp_name = interp_data.get_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
+        is_out_mpa_range = (
+            not data[4] if not isinstance(data[4], list) else False in data[4]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}",
+            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
+        self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
 
@@ -808,18 +948,30 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
+            Union[bool, List[bool]],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        sp_name = interp_data.get_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
+        is_out_mpa_range = (
+            not data[4] if not isinstance(data[4], list) else False in data[4]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}",
+            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
+        self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
 
@@ -849,21 +1001,36 @@ class MainSimulationsWidget(
         self._start_thread(self.calculate_all_finished, self.calculate_all_error)
 
     def calculate_all_finished(self, data):
-        self._unblock_gui()
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
-        lglod = create_lglod_data(point, srf, self.lime_simulation, self.kernels_path)
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        lglod = create_lglod_data(
+            point, srf, self.lime_simulation, self.kernels_path, sp_name
+        )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
         version = self.settings_manager.get_lime_coef().version
+        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
+        _mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(_mds, list):
+            _mds = [_mds]
+        mpas = [m.mpa_degrees for m in _mds]
         if name is not None and name != "":
-            try:
-                moon.write_obs(
-                    lglod, name, datetime.now().astimezone(timezone.utc), version
-                )
-            except Exception as e:
-                self.show_error(e)
+            self.worker = CallbackWorker(
+                moon.write_obs,
+                [
+                    lglod,
+                    name,
+                    datetime.now().astimezone(timezone.utc),
+                    version,
+                    inside_mpa_range,
+                    mpas,
+                ],
+            )
+            self._start_thread(self._unblock_gui, self.calculate_all_error)
+        else:
+            self._unblock_gui()
 
     def calculate_all_error(self, error: Exception):
         self.handle_operation_error(error)
@@ -908,7 +1075,23 @@ def check_srf_comparison_callback(
         error_msg = "SRF file not valid for the observation file."
         error = Exception(error_msg)
         raise error
-    return [lglod, srf]
+    new_channels = []
+    for chan in srf_chans:
+        if chan in lglod.ch_names:
+            new_channels.append(srf.get_channel_from_name(chan))
+    new_srf = SpectralResponseFunction(srf.name, new_channels)
+    return [lglod, new_srf]
+
+
+def obtain_sorted_mpa_callback(
+    comps: List[ComparisonData],
+    kernels_path: KernelsPath,
+    srf,
+    data_source,
+    skipped_uncs,
+):
+    mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
+    return comps, mpa_comps, srf, data_source, skipped_uncs
 
 
 def return_args_callback(*args):
@@ -982,10 +1165,12 @@ class LimeTBXWidget(QtWidgets.QWidget):
         )
 
     def _load_observations_finished_2(self, data):
-        lglod = data[0]
+        lglod: LGLODData = data[0]
         srf = data[1]
         self.main_page.srf_widget.set_srf(srf)
         self.lime_simulation.set_observations(lglod, srf)
+        self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
+        self.settings_manager.set_skip_uncertainties(lglod.skipped_uncs)
         point = self.lime_simulation.get_point()
         self.main_page.load_observations_finished(point)
         self.main_page._unblock_gui()
@@ -1006,10 +1191,33 @@ class LimeTBXWidget(QtWidgets.QWidget):
         )
 
     def _load_comparisons_finished_2(self, data):
-        lglod = data[0]
+        lglod: LGLODComparisonData = data[0]
         srf = data[1]
-        self.comparison_page.load_lglod_comparisons(lglod, srf)
-        self.comparison_page._unblock_gui()
+        self.settings_manager.select_interp_spectrum(lglod.spectrum_name)
+        self.settings_manager.set_skip_uncertainties(lglod.skipped_uncs)
+        self.worker = CallbackWorker(
+            obtain_sorted_mpa_callback,
+            [
+                lglod.comparisons,
+                self.kernels_path,
+                srf,
+                lglod.sat_name,
+                lglod.skipped_uncs,
+            ],
+        )
+        self._start_thread(
+            self._load_comparisons_finished_3, self._load_comparisons_finished_error
+        )
+
+    def _load_comparisons_finished_3(self, data):
+        comps = data[0]
+        mpa_comps = data[1]
+        srf = data[2]
+        data_source = data[3]
+        skipped_uncs = data[4]
+        self.comparison_page.load_lglod_comparisons(
+            comps, mpa_comps, srf, data_source, skipped_uncs
+        )
 
     def _load_comparisons_finished_error(self, error: Exception):
         logger.get_logger().critical(error)
@@ -1021,6 +1229,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
 
     def get_current_page(self) -> Union[MainSimulationsWidget, ComparisonPageWidget]:
         return self.page
+
+    def update_calculability(self):
+        self.main_page.update_calculability()
 
 
 class LimeTBXWindow(QtWidgets.QMainWindow):
@@ -1063,6 +1274,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.about_action = QtWidgets.QAction(self)
         self.about_action.setText("&About")
         self.about_action.triggered.connect(self.about)
+        # Settings actions
+        self.interpolation_action = QtWidgets.QAction(self)
+        self.interpolation_action.setText("&Interpolation options")
+        self.interpolation_action.triggered.connect(self.interpol_options)
 
     def _create_menu_bar(self):
         self._create_actions()
@@ -1078,9 +1293,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         coeffs_menu.addAction(self.select_coefficients_action)
         help_menu = QtWidgets.QMenu("&Help", self)
         help_menu.addAction(self.about_action)
+        settings_menu = QtWidgets.QMenu("&Settings", self)
+        settings_menu.addAction(self.interpolation_action)
         self.menu_bar.addMenu(file_menu)
         self.menu_bar.addMenu(coeffs_menu)
         self.menu_bar.addMenu(help_menu)
+        self.menu_bar.addMenu(settings_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         lime_tbx_w = self._get_lime_widget()
@@ -1191,7 +1409,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
             self.save_simulation_action.setText(
                 "&Save comparison to LIME GLOD format file."
             )
-            self.comparison_action.setText("Perform &simulations")
+            self.comparison_action.setText("&Perform simulations")
             self.comparison_action.triggered.connect(self.simulations)
             lime_tbx_w = self._get_lime_widget()
             lime_tbx_w.lime_simulation.set_simulation_changed()
@@ -1240,3 +1458,16 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def about(self):
         about_dialog = help.AboutDialog(self)
         about_dialog.exec_()
+
+    def update_calculability(self):
+        lime_tbx_w = self._get_lime_widget()
+        lime_tbx_w.update_calculability()
+
+    def interpol_options(self):
+        lime_tbx_w = self._get_lime_widget()
+        interpol_opt_dialog = interpoptions.InterpOptionsDialog(
+            lime_tbx_w.settings_manager,
+            lime_tbx_w.lime_simulation,
+            self,
+        )
+        interpol_opt_dialog.exec_()

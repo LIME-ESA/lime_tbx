@@ -5,6 +5,7 @@ It won't work unless given only one of the options (-h|-e|-l|-s|-c).
 Options:
   -h, --help		 Displays the help message.
   -v, --version		 Displays the version name.
+  -u, --update		 Updates the coefficients.
   -e, --earth		 Performs simulations from a geographic point.
 			 -e lat_deg,lon_deg,height_m,%Y-%m-%dT%H:%M:%S
   -l, --lunar		 Performs a simulation from a selenographic point.
@@ -26,3 +27,9 @@ Options:
 			   LGLOD (netcdf): -o nc,output_lglod.nc
   -f, --srf		 Select the file that contains the Spectral Response Function in GLOD format.
   -t, --timeseries	 Select a CSV file with multiple datetimes instead of inputing directly only one datetime. Valid only if the main option is -e or -s.
+  -C, --coefficients	 Change the coefficients version used by the TBX, for this execution and the next ones until it's changed again.
+  -i, --interpolation-settings	 Change the interpolation settings. The input data shall be a json string containing at least one of the following parameters:
+			   interp_spectrum: Sets the interpolation spectrum. The valid values are 'ASD' and 'Apollo 16 + Breccia'.
+			   interp_srf: Sets the output SRF. The valid values are 'asd', 'interpolated_gaussian' and 'interpolated_triangle'.
+			   show_interp_spectrum: Sets if the graphs should show the spectrum used for interpolation. The valid values are 'True' and 'False'.
+			   skip_uncertainties: Sets if the ToolBox should skip the uncertainties calculations. The valid values are 'True' and 'False'.

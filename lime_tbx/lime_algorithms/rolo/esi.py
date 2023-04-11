@@ -5,18 +5,23 @@ It exports the following functions:
     * get_esi_per_nms - Calculates the expected solar extra-terrestrial irradiance
     for a given wavelengths in nanometers. Based on Wehrli 1985 data, passed through
     some filters.
+    * get_esi - Calculates the expected solar extra-terrestrial irradiance
+    for a specific SRF, based in the TSIS spectrum.
+    * get_esi - Calculates the expected uncertainties of the calculation of the
+    expected solar extra-terrestrial irradiance for a specific SRF, based in the TSIS spectrum.
 """
 
 """___Built-In Modules___"""
 import pkgutil
 import csv
 from io import StringIO
+import os
 from typing import Dict, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
 
-"""___LIME Modules___"""
+"""___LIME_TBX Modules___"""
 # import here
 
 """___Authorship___"""
@@ -27,6 +32,10 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 _WEHRLI_FILE = "assets/wehrli_asc.csv"
+_TSIS_CIMEL_FILE = "assets/tsis_cimel.csv"
+_TSIS_ASD_FILE = "assets/tsis_asd.csv"
+_TSIS_GAUSS_1_3_FILE = "assets/tsis_fwhm_3_1_gaussian.csv"
+_TSIS_TRIANGULAR_1_1_FILE = "assets/tsis_fwhm_1_1_triangle.csv"
 
 _loaded_data = {}
 
@@ -77,3 +86,105 @@ def get_esi_per_nms(wavelengths_nm: np.ndarray) -> np.ndarray:
     wehrli_x = list(wehrli_data.keys())
     wehrli_y = list(map(lambda x: x[0], wehrli_data.values()))
     return np.interp(wavelengths_nm, wehrli_x, wehrli_y)
+
+
+def get_esi(srf_type: str) -> np.ndarray:
+    """Gets the expected extraterrestrial solar irradiance of a concrete SRF.
+    Returns the data in Wm⁻²/nm.
+
+    It uses TSIS data.
+
+    Parameters
+    ----------
+    srf_type : str
+        Name of the srf. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'.
+
+    Returns
+    -------
+    np.ndarray of float
+        The expected extraterrestrial solar irradiance in Wm⁻²/nm
+    """
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    if srf_type == "cimel":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_CIMEL_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    elif srf_type == "asd":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_ASD_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated_gaussian":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated_triangle":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_TRIANGULAR_1_1_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
+    else:
+        raise ValueError(
+            f"srf_type was {srf_type} and must be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'"
+        )
+
+
+def get_u_esi(srf_type: str) -> np.ndarray:
+    """Gets the expected extraterrestrial solar irradiance uncertainties of a concrete SRF.
+    Returns the data in Wm⁻²/nm.
+
+    It uses TSIS data.
+
+    Parameters
+    ----------
+    srf_type : str
+        Name of the srf. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'.
+
+    Returns
+    -------
+    np.ndarray of float
+        The expected extraterrestrial solar irradiance in Wm⁻²/nm
+    """
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    if srf_type == "cimel":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_CIMEL_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    elif srf_type == "asd":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_ASD_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated_gaussian":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    elif srf_type == "interpolated_triangle":
+        return np.genfromtxt(
+            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
+            delimiter=",",
+            usecols=2,
+            dtype=np.float32,
+        )
+    else:
+        raise ValueError(
+            f"srf_type was {srf_type} and must be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'"
+        )

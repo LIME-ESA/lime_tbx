@@ -1,0 +1,1 @@
+Something went wrong while exporting comparison graph. [Errno 13] Permission denied: '/root/VIS006.dt.png'

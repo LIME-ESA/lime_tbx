@@ -91,6 +91,8 @@ celerybeat-schedule
 
 # virtualenv
 .venv
+.venv_win
+.venv_py310
 venv/
 ENV/
 

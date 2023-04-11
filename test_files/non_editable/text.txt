@@ -1,0 +1,1 @@
+This directory is used when a non writable folder is needed for testing.

@@ -4,7 +4,7 @@
 # import here
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.simulation.lime_simulation import ILimeSimulation
@@ -21,6 +21,7 @@ from ..datatypes.datatypes import (
     SpectralResponseFunction,
     KernelsPath,
     LGLODData,
+    SpectralData,
 )
 
 """___Authorship___"""
@@ -36,8 +37,10 @@ def create_lglod_data(
     srf: SpectralResponseFunction,
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
+    spectrum_name: str,
 ) -> LGLODData:
     obs = []
+    skipped_uncs = lime_simulation.is_skipping_uncs()
     ch_names = srf.get_channels_names()
     sat_pos_ref = constants.EARTH_FRAME
     elis = lime_simulation.get_elis()
@@ -48,16 +51,30 @@ def create_lglod_data(
     elrefs_cimel = lime_simulation.get_elrefs_cimel()
     if not isinstance(elrefs_cimel, list):
         elrefs_cimel = [elrefs_cimel]
-    polars = lime_simulation.get_polars()
-    polars_cimel = lime_simulation.get_polars_cimel()
-    if not isinstance(polars_cimel, list):
-        polars_cimel = [polars_cimel]
     if not isinstance(elis, list):
         elis = [elis]
     if not isinstance(elrefs, list):
         elrefs = [elrefs]
-    if not isinstance(polars, list):
-        polars = [polars]
+    if lime_simulation.is_polarization_updated():
+        polars = lime_simulation.get_polars()
+        polars_cimel = lime_simulation.get_polars_cimel()
+        if not isinstance(polars_cimel, list):
+            polars_cimel = [polars_cimel]
+        if not isinstance(polars, list):
+            polars = [polars]
+    else:
+        polars = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs
+        ]
+        polars_cimel = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs_cimel
+        ]
     signals = lime_simulation.get_signals()
     if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
         dts = point.dt
@@ -105,6 +122,7 @@ def create_lglod_data(
                 polars[i],
                 sat_name,
                 None,
+                constants.LIME_TBX_DATA_SOURCE,
             )
             obs.append(ob)
     elif isinstance(point, CustomPoint):
@@ -134,6 +152,7 @@ def create_lglod_data(
                     point.selen_sun_lon,
                     point.moon_phase_angle,
                 ),
+                constants.LIME_TBX_DATA_SOURCE,
             )
         ]
     is_not_default_srf = True
@@ -144,5 +163,12 @@ def create_lglod_data(
     ):
         is_not_default_srf = False
     return LGLODData(
-        obs, signals, is_not_default_srf, elis_cimel, elrefs_cimel, polars_cimel
+        obs,
+        signals,
+        is_not_default_srf,
+        elis_cimel,
+        elrefs_cimel,
+        polars_cimel,
+        spectrum_name,
+        skipped_uncs,
     )

@@ -6,10 +6,10 @@ import pkgutil
 import os
 
 """___Third-Party Modules___"""
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets, QtGui
 
 """___LIME_TBX Modules___"""
-from . import constants, maingui
+from lime_tbx.gui import constants, maingui
 from lime_tbx.datatypes.datatypes import KernelsPath
 
 """___Authorship___"""

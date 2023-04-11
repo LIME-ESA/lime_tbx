@@ -9,6 +9,7 @@ a_pathex = []
 a_binaries = []
 a_datas = []
 a_icon = ''
+a_hooksconfig = {}
 e_console = False
 deploy_name = "LimeTBX"
 
@@ -32,17 +33,37 @@ if sys.platform == 'linux':
         (src_path + 'gui/assets/NotesEsaBol.otf', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/NotesEsaReg.otf', './lime_tbx/gui/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients.csv', './lime_tbx/coefficients/access_data/assets'),
+        (src_path + 'coefficients/access_data/assets/ds_cimel_coeff.nc', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/u_coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
-        (src_path + 'interpolation/access_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/access_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Breccia.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Composite.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/ds_ASD.nc', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/asd_fwhm.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_asd.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_fwhm_3_1_gaussian.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_fwhm_1_1_triangle.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.ico'
+    a_hooksconfig = {
+        "gi": {
+            "icons": ["Adwaita"],
+            "themes": ["Adwaita"],
+        },
+    }
 elif sys.platform == 'win32' or sys.platform == 'win64':
     src_path = 'lime_tbx\\'
-    a_pathex = ['.\\.venv\\Lib\\site-packages\\']
+    venv_path = '.venv_win' # '.venv'
+    a_pathex = [f'.\\{venv_path}\\Lib\\site-packages\\']
     a_binaries = [
-        ('.venv\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
+        (f'{venv_path}\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.exe', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\msvcr100.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'eocfi_adapter\\eocfi_c\\bin\\pthreadVC2.dll', '.\\lime_tbx\\eocfi_adapter\\eocfi_c\\bin'),
@@ -60,10 +81,23 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'gui\\assets\\NotesEsaBol.otf', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'gui\\assets\\NotesEsaReg.otf', '.\\lime_tbx\\gui\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\coefficients.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
+        (src_path + 'coefficients\\access_data\\assets\\ds_cimel_coeff.nc', '.\\lime_tbx\\coefficients\\access_data\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\coefficients_cimel.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
         (src_path + 'coefficients\\access_data\\assets\\u_coefficients_cimel.csv', '.\\lime_tbx\\coefficients\\access_data\\assets'),
-        (src_path + 'interpolation\\access_data\\assets\\SomeMoonReflectances.txt', '.\\lime_tbx\\interpolation\\access_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\SomeMoonReflectances.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\Apollo16.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\Breccia.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\Composite.txt', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'interpolation\\interp_data\\assets\\ds_ASD.nc', '.\\lime_tbx\\interpolation\\interp_data\\assets'),
+        (src_path + 'spectral_integration\\assets\\interpolated_model_fwhm_1_1_triangle.csv', '.\\lime_tbx\\spectral_integration\\assets'),
+        (src_path + 'spectral_integration\\assets\\interpolated_model_fwhm_3_1_gaussian.csv', '.\\lime_tbx\\spectral_integration\\assets'),
+        (src_path + 'spectral_integration\\assets\\asd_fwhm.csv', '.\\lime_tbx\\spectral_integration\\assets'),
+        (src_path + 'spectral_integration\\assets\\responses_1088_13112020.txt', '.\\lime_tbx\\spectral_integration\\assets'),
         (src_path + 'lime_algorithms\\rolo\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_cimel.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_asd.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_fwhm_3_1_gaussian.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
+        (src_path + 'lime_algorithms\\rolo\\assets\\tsis_fwhm_1_1_triangle.csv', '.\\lime_tbx\\lime_algorithms\\rolo\\assets'),
     ]
     a_icon = src_path + 'gui\\assets\\lime_logo.ico'
     e_console = True
@@ -92,10 +126,23 @@ elif sys.platform == 'darwin':
         (src_path + 'gui/assets/NotesEsaBol.otf', './lime_tbx/gui/assets'),
         (src_path + 'gui/assets/NotesEsaReg.otf', './lime_tbx/gui/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients.csv', './lime_tbx/coefficients/access_data/assets'),
+        (src_path + 'coefficients/access_data/assets/ds_cimel_coeff.nc', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
         (src_path + 'coefficients/access_data/assets/u_coefficients_cimel.csv', './lime_tbx/coefficients/access_data/assets'),
-        (src_path + 'interpolation/access_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/access_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/SomeMoonReflectances.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Breccia.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/Composite.txt', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'interpolation/interp_data/assets/ds_ASD.nc', './lime_tbx/interpolation/interp_data/assets'),
+        (src_path + 'spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/asd_fwhm.csv', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/rolo/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_asd.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_fwhm_3_1_gaussian.csv', './lime_tbx/lime_algorithms/rolo/assets'),
+        (src_path + 'lime_algorithms/rolo/assets/tsis_fwhm_1_1_triangle.csv', './lime_tbx/lime_algorithms/rolo/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.icns'
 runner_file = src_path + 'main.py'
@@ -107,7 +154,7 @@ a = Analysis(
     datas=a_datas,
     hiddenimports=["sklearn.utils._typedefs", "sklearn.utils._heap", "sklearn.utils._sorting", "sklearn.utils._vector_sentinel"],
     hookspath=[],
-    hooksconfig={},
+    hooksconfig=a_hooksconfig,
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,

@@ -11,14 +11,13 @@ It exports the following classes:
 from abc import ABC, abstractmethod
 import math
 from typing import List, Callable
-
-from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+from deprecated import deprecated
 
 """___Third-Party Modules___"""
 import numpy as np
 
 """___NPL Modules___"""
-from ...datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     KernelsPath,
     LunarObservation,
@@ -28,9 +27,9 @@ from ...datatypes.datatypes import (
     SurfacePoint,
     SRFChannel,
 )
-from lime_tbx.simulation.lime_simulation import ILimeSimulation
-from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
-from ...datatypes import constants
+from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
+from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -40,7 +39,8 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def to_llh(x: float, y: float, z: float):
+@deprecated
+def _to_llh(x: float, y: float, z: float):
     """
     Changes from coordinates to latitude longitude and height
     UNUSED
@@ -83,7 +83,8 @@ def to_llh(x: float, y: float, z: float):
     return lat, lon, h
 
 
-def to_xyz(latitude, longitude, altitude):
+@deprecated
+def _to_xyz(latitude, longitude, altitude):
     # (lat, lon) in WSG-84 degrees
     # altitude in meters
     # unused
@@ -108,54 +109,65 @@ def to_xyz(latitude, longitude, altitude):
 
 
 class IComparison(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * get_simulations - Simulate the moon irradiance for the given scenarios.
+        * sort_by_mpa - Returns a copy of the given list of ComparisonData but sorted by
+            moon phase angle.
+    """
+
     @abstractmethod
     def get_simulations(
         self,
         observations: List[LunarObservation],
-        def_srf: SpectralResponseFunction,
         srf: SpectralResponseFunction,
         coefficients: ReflectanceCoefficients,
         lime_simulation: ILimeSimulation,
+        callback_observation: Callable = None,
     ) -> List[ComparisonData]:
         """
-        Simulate the moon irradiance for the given scenarios.
+        Obtain a list of comparison data for the given observation scenarios,
+        each element corresponding to the comparisons of one channel.
 
         Parameters
         ----------
-        observations: list of MoonObservation
-            MoonObservations read from a GLOD datafile.
-        def_srf: SpectralResponseFunction
-            SpectralResponseFunction that corresponds to the default spectrum.
+        observations: list of LunarObservations
+            LunarObservations read from a GLOD datafile.
         srf: SpectralResponseFunction
-            SpectralResponseFunction that corresponds to the observations file
+            SpectralResponseFunction that is used.
         coefficients: ReflectanceCoefficients
-            Coefficients to be used
+            Coefficients to be used.
         lime_simulation: ILimeSimulation
             Lime simulation instance, storing the current state of the simulation.
+        callback_observation: Callable
+            Function that will be called once for every observation when simulated.
 
         Returns
         -------
         comparisons: list of ComparisonData
-            List containing all comparisons of all channels
+            List of ComparisonData, each element corresponding to the comparisons of one channel.
         """
         pass
 
     @abstractmethod
-    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> None:
+    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> List[ComparisonData]:
+        """Returns a copy of the given list of ComparisonData but sorted by moon phase angle.
+
+        Parameters
+        ----------
+        comparisons: list of ComparisonData
+            List of ComparisonData that will be sorted by mpa.
+
+        Returns
+        -------
+        sorted_comparisons: list of ComparisonData
+            List with the same ComparisonData instances but sorted by the moon phase angle.
+        """
         pass
 
 
 class Comparison(IComparison):
-    def _get_full_srf(self) -> SpectralResponseFunction:
-        spectral_response = {
-            i: 1.0 for i in np.arange(constants.MIN_WLEN, constants.MAX_WLEN)
-        }
-        ch = SRFChannel(
-            (constants.MAX_WLEN - constants.MIN_WLEN) / 2, "Full", spectral_response
-        )
-        srf = SpectralResponseFunction("Full", [ch])
-        return srf
-
     def __init__(self, kernels_path: KernelsPath):
         self.kernels_path = kernels_path
 
@@ -167,16 +179,6 @@ class Comparison(IComparison):
         lime_simulation: ILimeSimulation,
         callback_observation: Callable = None,
     ) -> List[ComparisonData]:
-        """
-        Parameters
-        ----------
-        observations: list of LunarObservations
-        srf: SpectralResponseFunction
-        coefficients: ReflectanceCoefficients
-        lime_simulation: ILimeSimulation
-        callback_observation: Callable
-            Function that will be called once for every observation when simulated.
-        """
         ch_names = srf.get_channels_names()
         comparisons = []
         sigs = [[] for _ in ch_names]
@@ -199,7 +201,8 @@ class Comparison(IComparison):
                 lat, lon, h, dt, self.kernels_path
             ).mpa_degrees
             lime_simulation.set_simulation_changed()
-            lime_simulation.update_irradiance(srf, sp, coefficients)
+            def_srf = get_default_srf()
+            lime_simulation.update_irradiance(def_srf, srf, sp, coefficients)
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
@@ -233,16 +236,19 @@ class Comparison(IComparison):
                     rel_dif = (sim - ref) / ref
                     tot_rel_diff += rel_dif
                     rel_diffs.append(rel_dif)
-                    unc_sim = specs[1].uncertainties[j]
-                    unc_ref = specs[0].uncertainties[j]
-                    uncs_r.append(
-                        (unc_sim + unc_ref) + unc_ref
-                    )  # i dont know if this is the correct way of propagating the uncertainty
+                    unc_r = 0
+                    if not lime_simulation.is_skipping_uncs():
+                        unc_sim = specs[1].uncertainties[j]
+                        unc_ref = specs[0].uncertainties[j]
+                        unc_r = (unc_sim + unc_ref) + unc_ref
+                    uncs_r.append(unc_r)
+                    # i dont know if this is the correct way of propagating the uncertainty
                 mean_rel_diff = tot_rel_diff / num_samples
                 std = np.std(rel_diffs)
                 ratio_spec = SpectralData(
                     specs[0].wlens, np.array(rel_diffs), np.array(uncs_r), None
                 )
+                ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas[i]]
                 cp = ComparisonData(
                     specs[0],
                     specs[1],
@@ -253,11 +259,12 @@ class Comparison(IComparison):
                     ch_dates[i],
                     sps[i],
                     mpas[i],
+                    ampa_valid_range,
                 )
                 comparisons.append(cp)
             else:
                 comparisons.append(
-                    ComparisonData(None, None, None, None, None, None, [], [], [])
+                    ComparisonData(None, None, None, None, None, None, [], [], [], [])
                 )
         return comparisons
 
@@ -276,6 +283,7 @@ class Comparison(IComparison):
             vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
             vals.sort(key=lambda v: v[-1])
             mpas = [v[-1] for v in vals]
+            ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas]
             new_spectrals = []
             index = 0
             for i, spectr in enumerate(spectrals):
@@ -299,6 +307,7 @@ class Comparison(IComparison):
                 dts,
                 points,
                 mpas,
+                ampa_valid_range,
             )
             new_comparisons.append(nc)
         return new_comparisons

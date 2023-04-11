@@ -1,0 +1,27 @@
+[run]
+branch = True
+source =
+        ./lime_tbx
+omit =
+        */tests/*
+        *__init__*
+        lime_tbx/main.py
+        lime_tbx/gui/*.py
+        lime_tbx/_version.py
+        lime_tbx/local_storage/*.py
+        lime_tbx/lime_algorithms/rolo/tsis_irradiance.py
+
+[report]
+exclude_lines =
+        # Skip any pass lines such as may be used for @abstractmethod
+        pass
+        # Have to re-enable the standard pragma
+        pragma: no cover
+omit =
+        */tests/*
+        *__init__*
+        lime_tbx/main.py
+        lime_tbx/gui/*.py
+        lime_tbx/_version.py
+        lime_tbx/local_storage/*.py
+        lime_tbx/lime_algorithms/rolo/tsis_irradiance.py

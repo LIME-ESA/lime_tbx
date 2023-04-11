@@ -199,6 +199,13 @@
  *               +--------------------------------------------------------------------------------+
  *               |   4.23  |23/06/22| DEIMOS Space S.L.U| Maintenance release                     |
  *               +--------------------------------------------------------------------------------+
+ *               |   4.24  |29/11/22| DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |        |                   | New features:                           |
+ *               |         |        |                   | + Support storing pre-computed maximum  |
+ *               |         |        |                   |   altitude per tile in Generic DEM      |
+ *               |         |        |                   | + Allow the use of multiple AEM files   |
+ *               |         |        |                   |   to initialize Attitude                |
+ *               +--------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 #ifndef EXPLORER_POINTING_H
@@ -1971,7 +1978,7 @@ extern "C"
                              xp_target_id_data* data);
 
   /* AN-492: Generate maximum altitude files */
-  long xp_gen_dem_max_altitude_file(char* dem_file,
+  long xp_gen_dem_max_altitude_file(const char* dem_cfg_file,
                                     /* output */
                                     long ierr[XP_NUM_ERR_DEM_MAX_ALT_FILE]);
 
@@ -2740,7 +2747,6 @@ typedef enum /* error codes list of "xp_sat_nominal_att_init_file"  */
   XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_READ_ATT_FILES_ERR,
   XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_TIME_CONV_ERR,
   XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_WRONG_FILE_FORMAT_ERR, // AN-835
-  XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_ONLY_SEGMENT0_WARN
 } XP_CFI_Sat_nom_att_init_file_err_enum;
 
 typedef enum /* error codes list of "xp_sat_nominal_att_close"  */
@@ -2777,7 +2783,6 @@ typedef enum /* error codes list of "xp_sat_att_init_file"  */
   XP_CFI_SAT_ATT_INIT_FILE_TIME_REF_ERR,
   XP_CFI_SAT_ATT_INIT_FILE_READ_STR_ID_ERR,
   XP_CFI_SAT_ATT_INIT_FILE_QUAT_UNITARY_ERR,
-  XP_CFI_SAT_ATT_INIT_FILE_ONLY_SEGMENT0_WARN
 } XP_CFI_Sat_att_init_file_err_enum;
 
 typedef enum /* error codes list of "xp_sat_att_quat_plus_matrix_init"  */
@@ -2824,7 +2829,6 @@ typedef enum /* error codes list of "xp_instr_att_init_file"  */
   XP_CFI_INSTR_ATT_INIT_FILE_READ_ATT_FILES_ERR,
   XP_CFI_INSTR_ATT_INIT_FILE_TIME_CONV_ERR,
   XP_CFI_INSTR_ATT_INIT_FILE_WRONG_FILE_FORMAT_ERR, // AN-836
-  XP_CFI_INSTR_ATT_INIT_FILE_ONLY_SEGMENT0_WARN
 } XP_CFI_Instr_att_init_file_err_enum;
 
 typedef enum /* error codes list of "xp_instr_att_close"  */
@@ -2921,8 +2925,8 @@ typedef enum /* error codes list of "xp_dem_init"  */
   XP_CFI_DEM_INIT_TILE_DB_ERR, /* AN-487 */
   XP_CFI_DEM_INIT_READ_POLES_ERR,
   XP_CFI_DEM_INIT_READ_POLES_WARN,
-  XP_CFI_DEM_INIT_MINI_TILE_LON_SIZE_WARN, /* AN-492 */
-  XP_CFI_DEM_INIT_MINI_TILE_LAT_SIZE_WARN, /* AN-492 */
+  XP_CFI_DEM_INIT_MINI_TILE_LON_SIZE_ERR, /* AN-492 */
+  XP_CFI_DEM_INIT_MINI_TILE_LAT_SIZE_ERR, /* AN-492 */
   XP_CFI_DEM_INIT_OPEN_MAX_ALT_FILE_ERR, /* AN-492 */
   XP_CFI_DEM_INIT_READ_MAX_ALT_FILE_ERR /* AN-492 */
 } XP_CFI_DEM_init_err_enum;

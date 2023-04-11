@@ -1,8 +1,8 @@
 /*!
     @file   explorer_file_handling.h
     @brief  Public header file for the explorer_file_handling library.
-    @version  4.23
-    @date   23/06/2022
+    @version  4.24
+    @date   29/11/2022
 
     <b>Copyright DEIMOS SPACE S.L.U</b>
 
@@ -19,9 +19,9 @@
 
     <center><b>Software User Manual
 
-    EE-MA-DMS-GS-008 Issue 4.23
+    EE-MA-DMS-GS-008 Issue 4.24
 
-    23/06/2022</b></center>
+    29/11/2022</b></center>
 
 
     @htmlinclude usage_guide.html

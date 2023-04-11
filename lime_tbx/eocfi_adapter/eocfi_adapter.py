@@ -13,13 +13,19 @@ from datetime import datetime, timezone
 import os
 import platform
 import subprocess
-
-"""___Third-Party Modules___"""
 import yaml
 
+"""___Third-Party Modules___"""
+# import here
+
 """___NPL Modules___"""
-from ..datatypes.datatypes import KernelsPath, LimeException, OrbitFile, Satellite
-from ..datatypes import logger
+from lime_tbx.datatypes.datatypes import (
+    KernelsPath,
+    LimeException,
+    OrbitFile,
+    Satellite,
+)
+from lime_tbx.datatypes import logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
@@ -36,18 +42,20 @@ EXE_FILE_SATELLITE_WINDOWS = "eocfi_c\\bin\\get_positions_win64.exe"
 EXE_FILE_SATELLLITE_DARWIN = "eocfi_c/bin/get_positions_darwin"
 EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin_arm"
 
-if platform.system() == "Linux":
-    exe_file_satellite = EXE_FILE_SATELLITE_LINUX
-elif platform.system() == "Windows":
-    exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
-else:  # Darwin
-    if "ARM" in platform.version().upper():
-        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN_ARM
-    else:
-        exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
 
-_current_dir = os.path.dirname(os.path.abspath(__file__))
-_exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
+def _get_exe_path() -> str:  # pragma: no cover
+    if platform.system() == "Linux":
+        exe_file_satellite = EXE_FILE_SATELLITE_LINUX
+    elif platform.system() == "Windows":
+        exe_file_satellite = EXE_FILE_SATELLITE_WINDOWS
+    else:  # Darwin
+        if "ARM" in platform.version().upper():
+            exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN  # TODO compile in Mac ARM and add in correct path
+        else:
+            exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
+    _current_dir = os.path.dirname(os.path.abspath(__file__))
+    _exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
+    return _exe_path
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
@@ -60,13 +68,23 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     return date0, date1
 
 
-def _to_mjd2000(dt: datetime) -> float:
+def _to_mjd2000(dt: datetime) -> float:  # pragma: no cover
+    # No automatic tests, but function conserved because mjd2000 is not well documented online
     mjd = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
     tdelta = dt - mjd
     return tdelta.total_seconds() / 86400
 
 
 class IEOCFIConverter(ABC):
+    """Interface that contains the methods of this module.
+
+    It exports the following functions:
+        * get_sat_names() - Obtain the list of satellite names, that are the keys that can be used in
+            get_satellite_position
+        * get_sat_list() - Obtain a list of the satellite data objects that are available in LIME TBX.
+        * get_satellite_position() - Get the geographic satellite position for a concrete datetime.
+    """
+
     @abstractmethod
     def get_sat_names(self) -> List[str]:
         """
@@ -121,6 +139,15 @@ class IEOCFIConverter(ABC):
 
 
 class EOCFIConverter(IEOCFIConverter):
+    """Class that implements the methods of this module.
+
+    It exports the following functions:
+        * get_sat_names() - Obtain the list of satellite names, that are the keys that can be used in
+            get_satellite_position
+        * get_sat_list() - Obtain a list of the satellite data objects that are available in LIME TBX.
+        * get_satellite_position() - Get the geographic satellite position for a concrete datetime.
+    """
+
     def __init__(self, eocfi_path: str, kernels_path: KernelsPath):
         super().__init__()
         self.eocfi_path = eocfi_path
@@ -270,11 +297,12 @@ class EOCFIConverter(IEOCFIConverter):
                 sat.time_file,
             )
         # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
-        if platform.system() == "Windows":
+        if platform.system() == "Windows":  # pragma: no cover
             orbit_path = orbit_path.replace("/", "\\")
             if tle_file != "":
                 tle_file = tle_file.replace("/", "\\")
         orbit_path = '"{}"'.format(orbit_path)
+        _exe_path = _get_exe_path()
         if tle_file == "":
             cmd = "{} {} {} {} {}".format(
                 _exe_path,

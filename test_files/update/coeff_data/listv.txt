@@ -1,0 +1,3 @@
+1,http://localhost:8000/versions/LIME_MODEL_COEFS_20221201_V01.nc
+2,http://localhost:8000/versions/LIME_MODEL_COEFS_20221201_V02.nc
+3,http://localhost:8000/versions/LIME_MODEL_CORRUPT.nc

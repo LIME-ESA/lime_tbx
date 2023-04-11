@@ -6,12 +6,15 @@ import os
 import sys
 import io
 import shlex
+import locale
+import warnings
 
 """___Third-Party Modules___"""
 import unittest
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.interpolation.interp_data import interp_data
 from ..cli import (
     CLI,
     OPTIONS,
@@ -32,6 +35,8 @@ EOCFI_PATH = "./eocfi_data"
 GITLAB_CI = "GITLAB_CI"
 GITLAB_CI_VALUE = "GITLAB_CI"
 
+NOT_FORBIDDEN_ROOTROOT_WARN = "Not in a unix env with a protected /root path"
+
 
 def get_cli():
     cli = CLI(KERNELS_PATH, EOCFI_PATH)
@@ -44,16 +49,40 @@ def get_opts(args_str: str):
     return opts
 
 
+def forbidden_rootroot():
+    if os.path.exists("/root") and not os.access("/root", os.W_OK):
+        return True
+    return False
+
+
 class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+
     def setUp(self):
+        warnings.filterwarnings("ignore")
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
         sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
 
     def tearDown(self):
+        warnings.resetwarnings()
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
 
     def test_get_help(self):
         cli = get_cli()
@@ -85,6 +114,48 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         )
         self.assertEqual(errcode, 1)
         f = open("./test_files/cli/sat_err_date.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
+    def test_sat_err_forbidden_path_refl(self):
+        cli = get_cli()
+        with self.assertRaises(SystemExit) as cm:
+            cli.handle_input(
+                get_opts(
+                    "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar"
+                )
+            )
+        self.assertEqual(cm.exception.code, 1)
+        f = open("./test_files/cli/sat_err_forb_path_refl.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
+    def test_sat_err_forbidden_path_irr(self):
+        cli = get_cli()
+        with self.assertRaises(SystemExit) as cm:
+            cli.handle_input(
+                get_opts(
+                    "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar"
+                )
+            )
+        self.assertEqual(cm.exception.code, 1)
+        f = open("./test_files/cli/sat_err_forb_path_irr.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
+    def test_sat_err_forbidden_path_polar(self):
+        cli = get_cli()
+        with self.assertRaises(SystemExit) as cm:
+            cli.handle_input(
+                get_opts(
+                    "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root"
+                )
+            )
+        self.assertEqual(cm.exception.code, 1)
+        f = open("./test_files/cli/sat_err_forb_path_polar.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
@@ -170,6 +241,17 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
+    def test_lunar_forbidden_path(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts("-l 0.98,420000,20.5,-30.2,0.69,15 -o nc,/root")
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_l_forbidden_path.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
     def test_comparison_no_observations(self):
         cli = get_cli()
         errcode = cli.handle_input(
@@ -194,10 +276,198 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
+    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
+    def test_comparison_glob_graphd_forbidden_path(self):
+        cli = get_cli()
+        with self.assertRaises(SystemExit) as cm:
+            cli.handle_input(
+                get_opts(
+                    '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,/root'
+                )
+            )
+        self.assertEqual(cm.exception.code, 1)
+        f = open("./test_files/cli/err_g_forbidden_path.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_get_version_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(get_opts("-v"))
+        self.assertEqual(errcode, 0)
+
+    def test_update_err_connection(self):
+        cli = get_cli()
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_update_connection.txt")
+        self.assertEqual(self.capturedOutput.getvalue(), f.read())
+        f.close()
+
+    def test_select_coeff_err_earth_glod(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C inventedcoeffs"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_select_coeffs.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_select_spectrum_err_earth_glod(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "inventedspectrum"}\''
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_select_spectrum.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_timeseries_fake(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000 -t fakefilefakefile.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_no_timeseries.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_timeseries_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000 -t test_files/csv/export_srf_1.csv -o nc,./test_files/cli/cliglod.test.nc"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_timeseries_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_multiple_simops(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02  -o nc,./test_files/cli/cliglod.test.nc -c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,/root'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        with open("./test_files/cli/err_multiple_simops.txt", "r") as f:
+            self.assertEqual(self.capturedErr.getvalue(), f.read())
+        with open("./test_files/cli/out_multiple_simops.txt", "r") as f:
+            self.assertEqual(self.capturedOutput.getvalue(), f.read())
+
+    def test_no_simop(self):
+        cli = get_cli()
+        errcode = cli.handle_input(get_opts("-o nc,./test_files/cli/cliglod.test.nc"))
+        self.assertEqual(errcode, 1)
+        with open("./test_files/cli/err_no_simop.txt", "r") as f:
+            self.assertEqual(self.capturedErr.getvalue(), f.read())
+        with open("./test_files/cli/out_no_simop.txt", "r") as f:
+            self.assertEqual(self.capturedOutput.getvalue(), f.read())
+
+    def test_srf_fake(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f fakefile.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_srf_fake.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_srf_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f test_files/moon/comparison.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_srf_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_few_args(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_few.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,ascii,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_comp_few_args(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,test_files/cli/chan1.test'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_comp_few.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_comp_img_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,ascii,MPA,test_files/cli/chan1.test'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_comp_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_graph_comp_type_wrong(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,LUCK,test_files/cli/chan1.test'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_graph_comp_type_wrong.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
 
 class TestCLI(unittest.TestCase):
 
-    # Cant compare output as interpolation gives different results each time
+    # Cant compare output as interpolation gives different results each time, and its too slow to perform always
+
+    def setUp(self):
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        interp_data.set_skip_uncertainties(self._prev_skip)
 
     def test_earth_glod_ok(self):
         cli = get_cli()
@@ -207,6 +477,35 @@ class TestCLI(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 0)
+
+    def test_earth_glod_ok_select_coeff(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C 23012023"
+            )
+        )
+        self.assertEqual(errcode, 0)
+        os.remove(os.path.join(".", "coeff_data", "selected.txt"))
+
+    def test_earth_glod_ok_select_spectrum(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "ASD"}\''
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_earth_glod_ok_select_spectrum_apollo(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "Apollo 16 + Breccia"}\''
+            )
+        )
+        self.assertEqual(errcode, 0)
+        interp_data.set_interpolation_spectrum_name("ASD")
 
     def test_earth_timeseries_glod_ok(self):
         cli = get_cli()
@@ -282,6 +581,26 @@ class TestCLI(unittest.TestCase):
         errcode = cli.handle_input(
             get_opts(
                 '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_graph_both_ok(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_nc_both_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o nc,test_files/cli/compcli.test.nc'
             )
         )
         self.assertEqual(errcode, 0)

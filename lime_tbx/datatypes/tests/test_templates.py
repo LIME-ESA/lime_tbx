@@ -6,10 +6,12 @@
 """___Third-Party Modules___"""
 import unittest
 import xarray
+
+"""___NPL Modules___"""
 import obsarray
 
 """___LIME_TBX Modules___"""
-from ..templates_digital_effects_table import (
+from ..templates import (
     TEMPLATE_POL,
     TEMPLATE_CIMEL,
     TEMPLATE_IRR,
@@ -30,6 +32,7 @@ class TestTemplates(unittest.TestCase):
         dim_sizes = {
             "wavelength": 6,
             "i_coeff": 18,
+            "i_coeff.wavelength": 18 * 6,
         }
         ds: xarray.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
         self.assertIsInstance(ds, xarray.Dataset)

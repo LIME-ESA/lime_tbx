@@ -401,33 +401,16 @@ QGroupBox::title::disabled
 /*-----QCheckBox-----*/
 QCheckBox
 {
-    background-color: transparent;
-
 }
 
-
-QCheckBox::indicator
+QCheckBox::indicator:unchecked
 {
-    color: #b1b1b1;
-    background-color: #1f2b2b;
-    border: 1px solid #2aaaa8;
-    width: 12px;
-    height: 12px;
-
+	background-color: @neutralSpace;
 }
-
-
-QCheckBox::indicator:checked
-{
-	background-color: #1f2b2b;
-    border: 1px solid #2aaaa8;
-
-}
-
 
 QCheckBox::indicator:unchecked:hover
 {
-    border: 1px solid #2aaaa8;
+    border: 1px solid @pureTeal;
 
 }
 

@@ -1,16 +1,21 @@
-"""Module in charge of obtaining the path for the programfiles folder and the appdata folder"""
+"""Module in charge of obtaining the path for the programfiles folder and the appdata folder.
+
+It exports the following functions:
+    * get_programfiles_folder() - Get the path of the programfiles folder as a string.
+    * get_appdata_folder() - Get the path of the appdata folder as a string.
+"""
 
 """___Built-In Modules___"""
 import sys
-from os import path, environ
+from os import path
 import os
 
 """___Third-Party Modules___"""
 # import here
 
-"""___LIME Modules___"""
-from ..datatypes import logger
-from . import appdata
+"""___LIME_TBX Modules___"""
+from lime_tbx.datatypes import logger
+from lime_tbx.local_storage import appdata
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -23,8 +28,9 @@ APPNAME = "LimeTBX"
 
 
 def _is_valid_programfiles(programdata: str) -> bool:
-    if path.exists(path.join(programdata, "kernels")) and path.exists(
-        path.join(programdata, "eocfi_data")
+    if (
+        path.exists(path.join(programdata, "kernels"))
+        and path.exists(path.join(programdata, "eocfi_data"))
         and path.exists(path.join(programdata, "coeff_data"))
     ):
         return True
@@ -81,13 +87,14 @@ def get_programfiles_folder() -> str:
                     valid = False
         if not valid:
             log.warning("Did not find LimeTBX key in winreg registry.")
-            programfiles = path.join(environ["PROGRAMFILES"], APPNAME)
+            programfiles = path.join(os.environ["PROGRAMFILES"], APPNAME)
     else:
         programfiles = path.join("/opt/esa", APPNAME)
     log.info("Programfiles: {}".format(programfiles))
     if not _is_valid_programfiles(programfiles):
         log.warning("Programfiles directory not valid. Using current dir.")
-        programfiles = "."
+        programfiles = "."  # os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
     return programfiles
 
 

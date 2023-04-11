@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 from typing import List
+import random
 
 """___Third-Party Modules___"""
 import unittest
@@ -20,7 +21,9 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 LAT = 21
+LAT2 = 41
 LON = 21
+LON2 = -40
 ALT = 2400
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 DT1 = datetime(2022, 1, 17, 2, tzinfo=timezone.utc)
@@ -107,6 +110,9 @@ class TestSPICEAdapter(unittest.TestCase):
         x, y, z = SPICEAdapter.to_rectangular(
             LAT, LON, ALT, "EARTH", KERNELS_PATH.main_kernels_path
         )
+        x2, y2, z2 = SPICEAdapter.to_rectangular(
+            LAT2, LON2, ALT, "EARTH", KERNELS_PATH.main_kernels_path
+        )
         # Compared data obtained using library pyproj
         """
         import pyproj
@@ -114,19 +120,27 @@ class TestSPICEAdapter(unittest.TestCase):
             {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
         )
-        x2, y2, z2 = transformer.transform(LON, LAT, ALT/1000, radians=False)
-        print("PYPROJ XYZ: ", x2, y2, z2)
+        xp, yp, zp = transformer.transform(LON, LAT, ALT, radians=False)
+        print("PYPROJ XYZ: ", xp, yp, zp)
         """
-        x2, y2, z2 = (5561401.547028502, 2134822.038294565, 2271395.8792928336)
-        self.assertAlmostEqual(x, x2, -4)
-        self.assertAlmostEqual(y, y2, -4)
-        self.assertAlmostEqual(z, z2, -4)
+        xp, yp, zp = (5563491.229045285, 2135624.1920654676, 2272255.1022886634)
+        self.assertAlmostEqual(x, xp, 0)
+        self.assertAlmostEqual(y, yp, 0)
+        self.assertAlmostEqual(z, zp, 0)
+        x2p, y2p, z2p = (3694174.4986328664, -3099780.459307351, 4163997.7423554775)
+        self.assertAlmostEqual(x2, x2p, 0)
+        self.assertAlmostEqual(y2, y2p, 0)
+        self.assertAlmostEqual(z2, z2p, 0)
 
     def test_to_planetographic(self):
-        x, y, z = (5563490.882007386, 2135624.0588501, 2272254.9494123333)
+        x, y, z = (5563491.229045285, 2135624.1920654676, 2272255.1022886634)
+        x2, y2, z2 = (3694174.4986328664, -3099780.459307351, 4163997.7423554775)
         lat, lon, hhh = SPICEAdapter.to_planetographic(
             x, y, z, "EARTH", KERNELS_PATH.main_kernels_path
         )
+        lat2, lon2, hhh2 = SPICEAdapter.to_planetographic(
+            x2, y2, z2, "EARTH", KERNELS_PATH.main_kernels_path
+        )
         # Compared data obtained using library pyproj
         """
         import pyproj
@@ -134,13 +148,73 @@ class TestSPICEAdapter(unittest.TestCase):
             {"proj": "geocent", "ellps": "WGS84", "datum": "WGS84"},
             {"proj": "latlong", "ellps": "WGS84", "datum": "WGS84"},
         )
-        lon2, lat2, hhh2 = transformer.transform(x, y, z, radians=False)
-        print("PYPROJ DATA: ", lon2, lat2, hhh2)
+        lonp, latp, hhhp = transformer.transform(x, y, z, radians=False)
+        print("PYPROJ DATA: ", lonp, latp, hhhp)
         """
-        lon2, lat2, hhh2 = (21.000000000000004, 20.999999914165222, 2399.598176131025)
-        self.assertAlmostEqual(lat, lat2, 6)
-        self.assertAlmostEqual(lon, lon2)
-        self.assertAlmostEqual(hhh, hhh2, 0)
+        self.assertAlmostEqual(lat, LAT, 6)
+        self.assertAlmostEqual(lon, LON)
+        self.assertAlmostEqual(hhh, ALT, 0)
+        self.assertAlmostEqual(lat2, LAT2, 6)
+        self.assertAlmostEqual(lon2, LON2)
+        self.assertAlmostEqual(hhh2, ALT, 0)
+
+    def test_to_planetographic_multiple(self):
+        xyz = [
+            (5563491.229045285, 2135624.1920654676, 2272255.1022886634),
+            (3694174.4986328664, -3099780.459307351, 4163997.7423554775),
+        ]
+        llhs = SPICEAdapter.to_planetographic_multiple(
+            xyz, "EARTH", KERNELS_PATH.main_kernels_path
+        )
+        llhps = [(LAT, LON, ALT), (LAT2, LON2, ALT)]
+        for llh, llhp in zip(llhs, llhps):
+            self.assertAlmostEqual(llh[0], llhp[0], 6)
+            self.assertAlmostEqual(llh[1], llhp[1])
+            self.assertAlmostEqual(llh[2], llhp[2], 0)
+
+    def test_to_planetographic_same_multiple(self):
+        xyzs = [
+            tuple(random.randint(-1000000, 1000000) for _ in range(3)) for _ in range(5)
+        ]
+        llhs = SPICEAdapter.to_planetographic_multiple(
+            xyzs, "EARTH", KERNELS_PATH.main_kernels_path
+        )
+        llhsmanual = [
+            SPICEAdapter.to_planetographic(
+                xyz[0], xyz[1], xyz[2], "EARTH", KERNELS_PATH.main_kernels_path
+            )
+            for xyz in xyzs
+        ]
+        for llh, llhm in zip(llhs, llhsmanual):
+            self.assertEqual(
+                llh,
+                llhm,
+                f"Seed used for generation: {random.seed}. Lists: {llh} and {llhm}.",
+            )
+
+    def test_to_planetographic_to_rectangular_same(self):
+        xyzs = [
+            tuple(random.randint(-1000000, 1000000) for _ in range(3)) for _ in range(5)
+        ]
+        llhs = [
+            SPICEAdapter.to_planetographic(
+                xyz[0], xyz[1], xyz[2], "EARTH", KERNELS_PATH.main_kernels_path
+            )
+            for xyz in xyzs
+        ]
+        xyzs_back = [
+            SPICEAdapter.to_rectangular(
+                llh[0], llh[1], llh[2], "EARTH", KERNELS_PATH.main_kernels_path
+            )
+            for llh in llhs
+        ]
+        for xyz, xyzb in zip(xyzs, xyzs_back):
+            err_msg = (
+                f"Seed used for generation: {random.seed}. Lists: {xyz} and {xyzb}."
+            )
+            self.assertAlmostEqual(xyz[0], xyzb[0], msg=err_msg)
+            self.assertAlmostEqual(xyz[1], xyzb[1], msg=err_msg)
+            self.assertAlmostEqual(xyz[2], xyzb[2], msg=err_msg)
 
 
 if __name__ == "__main__":

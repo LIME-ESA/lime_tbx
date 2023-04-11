@@ -13,7 +13,7 @@ import numpy as np
 import mplcursors
 
 """___LIME_TBX Modules___"""
-from ..datatypes.datatypes import (
+from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     Point,
     SpectralResponseFunction,
@@ -22,9 +22,9 @@ from ..datatypes.datatypes import (
     SpectralData,
 )
 from lime_tbx.gui.settings import ISettingsManager
-from ..filedata import csv
-from .ifaces import IMainSimulationsWidget
-from .canvas import (
+from lime_tbx.filedata import csv
+from lime_tbx.gui.ifaces import IMainSimulationsWidget
+from lime_tbx.gui.canvas import (
     MplCanvas,
     title_font_prop,
     label_font_prop,
@@ -68,6 +68,9 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlim_left = None
         self.xlim_right = None
         self.comparison_x_datetime = comparison_x_datetime
+        self.inside_mpa_range = None
+        self.interp_spectrum_name = None
+        self.skip_uncs = None
         self._build_layout()
 
     def _build_layout(self):
@@ -210,6 +213,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.xlabel,
             self.ylabel,
             self.vertical_lines,
+            self.interp_spectrum_name,
             self.subtitle,
         )
         try:
@@ -258,6 +262,15 @@ class GraphWidget(QtWidgets.QWidget):
         self.disable_buttons(False)
         self.parentWidget().setDisabled(False)
 
+    def set_inside_mpa_range(self, inside_mpa_range):
+        self.inside_mpa_range = inside_mpa_range
+
+    def set_interp_spectrum_name(self, interp_spectrum_name: str):
+        self.interp_spectrum_name = interp_spectrum_name
+
+    def set_skipped_uncertainties(self, skip: bool):
+        self.skip_uncs = skip
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -275,16 +288,29 @@ class GraphWidget(QtWidgets.QWidget):
                         self.point,
                         name,
                         version,
+                        self.data_compare.ampa_valid_range,
+                        self.interp_spectrum_name,
+                        self.skip_uncs,
                         self.comparison_x_datetime,
                     )
-                else:
-                    csv.export_csv(
+                elif self.inside_mpa_range is not None:
+                    csv.export_csv_simulation(
                         self.data,
                         self.xlabel,
                         self.ylabel,
                         self.point,
                         name,
                         version,
+                        self.inside_mpa_range,
+                        self.interp_spectrum_name,
+                        self.skip_uncs,
+                    )
+                else:
+                    csv.export_csv_srf(
+                        self.data,
+                        self.xlabel,
+                        self.ylabel,
+                        name,
                     )
             except Exception as e:
                 self.show_error(e)
@@ -336,34 +362,55 @@ class SignalWidget(QtWidgets.QWidget):
         point: Point,
         srf: SpectralResponseFunction,
         signals: SpectralData,
+        inside_mpa_range: Union[bool, List[bool]],
     ):
         self._clear_layout()
-        show_range_info = False
+        show_range_wlens_info = False
+        show_range_mpa_info = False
         self.srf = srf
         self.signals = signals
+        self.inside_mpa_range = inside_mpa_range
 
         self.point = point
         head_id_item = QtWidgets.QTableWidgetItem("ID")
         head_center_item = QtWidgets.QTableWidgetItem("Center (nm)")
         self.table.setRowCount(1 + len(signals.data))
         if isinstance(point, CustomPoint):
+            asterisk_if_mpa_out = ""
+            if not inside_mpa_range:
+                show_range_mpa_info = True
+                asterisk_if_mpa_out = " **"
             self.table.setColumnCount(2 + 2)
             self.table.setItem(
-                0, 2, QtWidgets.QTableWidgetItem("Irradiance (Wm⁻²nm⁻¹)")
+                0,
+                2,
+                QtWidgets.QTableWidgetItem(
+                    f"Irradiance (Wm⁻²nm⁻¹){asterisk_if_mpa_out}"
+                ),
             )
-            self.table.setItem(0, 3, QtWidgets.QTableWidgetItem("Uncertainties"))
+            self.table.setItem(
+                0, 3, QtWidgets.QTableWidgetItem(f"Uncertainties{asterisk_if_mpa_out}")
+            )
         else:
             dts = point.dt
             if not isinstance(dts, list):
                 dts = [dts]
+                inside_mpa_range = [inside_mpa_range]
             self.table.setColumnCount(len(dts) * 2 + 2)
             for i, dt in enumerate(dts):
+                asterisk_if_mpa_out = ""
+                if not inside_mpa_range[i]:
+                    show_range_mpa_info = True
+                    asterisk_if_mpa_out = " **"
                 item_title_value = QtWidgets.QTableWidgetItem(
-                    "Irradiance (Wm⁻²nm⁻¹) on {}".format(
-                        dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                    "Irradiance (Wm⁻²nm⁻¹) on {}{}".format(
+                        dt.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                        asterisk_if_mpa_out,
                     )
                 )
-                item_title_uncert = QtWidgets.QTableWidgetItem("Uncertainties")
+                item_title_uncert = QtWidgets.QTableWidgetItem(
+                    f"Uncertainties{asterisk_if_mpa_out}"
+                )
                 self.table.setItem(0, i * 2 + 2, item_title_value)
                 self.table.setItem(0, i * 2 + 3, item_title_uncert)
         self.table.setItem(0, 0, head_id_item)
@@ -385,22 +432,26 @@ class SignalWidget(QtWidgets.QWidget):
                 elif ch.valid_spectre == SpectralValidity.PARTLY_OUT:
                     value = "{} *".format(str(signal))
                     unc = "{} *".format(str(ch_uncs[j]))
-                    show_range_info = True
+                    show_range_wlens_info = True
                 else:
                     value = "Not available *"
                     unc = "Not available *"
-                    show_range_info = True
+                    show_range_wlens_info = True
                 value_item = QtWidgets.QTableWidgetItem(value)
                 unc_item = QtWidgets.QTableWidgetItem(unc)
                 self.table.setItem(i + 1, j * 2 + 2, value_item)
                 self.table.setItem(i + 1, j * 2 + 3, unc_item)
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
-        if show_range_info:
-            self.range_warning = QtWidgets.QLabel(
-                "* The LIME can only give a reliable simulation \
-for wavelengths between 350 and 2500 nm"
-            )
+        warning_msg = ""
+        if show_range_wlens_info:
+            warning_msg = "* The LIME can only give a reliable simulation \
+for wavelengths between 350 and 2500 nm\n"
+        if show_range_mpa_info:
+            warning_msg += "** The LIME can only give a reliable simulation \
+for absolute moon phase angles between 2° and 90°"
+        if show_range_wlens_info or show_range_mpa_info:
+            self.range_warning = QtWidgets.QLabel(warning_msg)
             self.range_warning.setWordWrap(True)
             self.container_layout.addWidget(self.range_warning)
         self.disable_buttons(False)
@@ -415,6 +466,9 @@ for wavelengths between 350 and 2500 nm"
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
+    def set_interp_spectrum_name(self, interp_spectrum_name: str):
+        self.interp_spectrum_name = interp_spectrum_name
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -426,7 +480,14 @@ for wavelengths between 350 and 2500 nm"
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(
-                    self.srf, self.signals, name, self.point, version
+                    self.srf,
+                    self.signals,
+                    name,
+                    self.point,
+                    version,
+                    self.inside_mpa_range,
+                    self.interp_spectrum_name,
+                    self.skip_uncs,
                 )
             except Exception as e:
                 self.show_error(e)
@@ -447,8 +508,10 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.channel_tabs = QtWidgets.QTabWidget()
         self.channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
-        self.range_warning = None
         self.main_layout.addWidget(self.channel_tabs)
+        self.range_warning = QtWidgets.QLabel("")
+        self.range_warning.setWordWrap(True)
+        self.main_layout.addWidget(self.range_warning)
 
     def set_channels(self, channels: List[str]):
         while self.channel_tabs.count() > 0:
@@ -464,22 +527,25 @@ class ComparisonOutput(QtWidgets.QWidget):
             self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
-        # Remove range warning
+        # Remove range warning content
         if self.range_warning:
-            self.range_warning.setParent(None)
-            self.range_warning = None
+            self.range_warning.setText("")
+        # if self.range_warning:
+        #    self.range_warning.setParent(None)
+        #    self.range_warning = None
 
     def set_as_partly(self, ch_name: str):
         if ch_name in self.ch_names:
             index = self.ch_names.index(ch_name)
             self.channel_tabs.setTabText(index, "{} *".format(ch_name))
-            if self.range_warning == None:
-                self.range_warning = QtWidgets.QLabel(
-                    "* The LIME can only give a reliable simulation \
+            msg = "* The LIME can only give a reliable simulation \
 for wavelengths between 350 and 2500 nm"
-                )
+            if self.range_warning == None:
+                self.range_warning = QtWidgets.QLabel(msg)
                 self.range_warning.setWordWrap(True)
                 self.main_layout.addWidget(self.range_warning)
+            else:
+                self.range_warning.setText(msg)
 
     def _check_range_warning_needed(self):
         for i in range(len(self.ch_names)):
@@ -528,6 +594,20 @@ for wavelengths between 350 and 2500 nm"
         self.channels[index].update_labels(
             title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
         )
+
+    def set_interp_spectrum_name(
+        self,
+        index: int,
+        sp_name: str,
+    ):
+        self.channels[index].set_interp_spectrum_name(sp_name)
+
+    def set_skipped_uncertainties(
+        self,
+        index: int,
+        skip: bool,
+    ):
+        self.channels[index].set_skipped_uncertainties(skip)
 
     def update_legends(self, index: int, legends: List[List[str]], redraw: bool = True):
         """

@@ -6,20 +6,31 @@ It exports the following classes:
     * MoonData - Moon data used in the calculations of the Moon's irradiance.
     * SRFChannel - Spectral responses and metadata for a SRF Channel
     * SpectralResponseFunction - The spectral response function, a set of channels with their data.
+    * SRF_fwhm - Dataclass containing the spectral response function, a set of channels with their data.
     * Point - Superclass for all point classes.
     * SurfacePoint - Point on Earth's surface
     * CustomPoint - Point with custom Moon data.
     * SatellitePoint - Point of a Satellite in a concrete datetime
-    * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
     * OrbitFile - Satellite orbit file.
     * Satellite - ESA Satellite
     * SatellitePosition - A satellite's position
     * LunarObservation - GLOD lunar observation
-    * LunarObservationWrite - Dataclass containing the needed information to create a GLOD file.
+    * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
     * ReflectanceCoefficients - Dataclass containing the cimel coefficients that will be used in the
         reflectance simulation algorithm.
+    * LimeCoefficients - Dataclass containing a PolarizationCoefficients and a ReflectanceCoefficients.
     * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
     * ComparisonData - Dataclass containing the data outputed from a comparison.
+    * KernelsPath - Dataclass containing the needed information in order to find all SPICE kernels.
+    * SelenographicDataWrite - Extra data that allowes to define CustomPoints in the GLOD data file.
+    * LunarObservationWrite - Dataclass containing the needed information to create a Lunar observation
+        in a LGLOD file.
+    * LGLODData - Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format
+        used by the toolbox.
+    * LGLODComparisonData - Dataclass with the data of a LGLOD comparison file. LGLOD is the
+        GLOD-based format used by the toolbox.
+    * LimeException - Exception that is raised by the toolbox that is intended to be shown to the user.
+    * InterpolationSettings - Representation of the YAML file that contains the interpolation settings data.
 
 It exports the following Enums:
     * SpectralValidity - Enum that represents if a channel is inside LIME's spectral range.
@@ -35,12 +46,15 @@ from abc import ABC
 """___Third-Party Modules___"""
 import numpy as np
 import xarray
+import ruamel.yaml as ruaml
+from ruamel.yaml import yaml_object
+
+"""___NPL Modules___"""
 import obsarray
 
-
-"""___LIME Modules___"""
-from . import constants
-from lime_tbx.datatypes.templates_digital_effects_table import (
+"""___LIME_TBX Modules___"""
+from lime_tbx.datatypes import constants
+from lime_tbx.datatypes.templates import (
     TEMPLATE_IRR,
     TEMPLATE_POL,
     TEMPLATE_REFL,
@@ -169,6 +183,34 @@ class SpectralResponseFunction:
         if len(chs) == 0:
             return None
         return chs[0]
+
+
+@dataclass
+class SRF_fwhm:
+    """
+    Dataclass containing the spectral response function, a set of channels with their data.
+
+    Attributes
+    ----------
+    name : str
+        Name of the SRF, the identifier.
+    channels: list of SRFChannel
+        List of the SRF channels.
+    """
+
+    name: str
+    wav_centre: np.ndarray
+    fwhm: np.ndarray
+    shape: str
+
+    def get_wavelengths(self) -> List[float]:
+        return self.wav_centre
+
+    def get_values(self) -> List[float]:
+        return self.fwhm
+
+    def get_shape(self) -> str:
+        return self.shape
 
 
 class Point(ABC):
@@ -391,6 +433,8 @@ class LunarObservation:
         Datetime of the observation.
     sat_pos: SatellitePosition
         Satellite position at that moment.
+    data_source: str
+        Data source of the lunar observation.
     """
 
     ch_names: List[str]
@@ -398,6 +442,7 @@ class LunarObservation:
     ch_irrs: Dict[str, float]
     dt: datetime
     sat_pos: SatellitePosition
+    data_source: str
 
     def get_ch_irradiance(self, name: str) -> float:
         if name not in self.ch_irrs:
@@ -436,7 +481,7 @@ class ReflectanceCoefficients:
         Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.
     """
 
-    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs"]
+    __slots__ = ["_ds", "wlens", "coeffs", "unc_coeffs", "err_corr_coeff"]
 
     @dataclass
     class _WlenReflCoeffs:
@@ -470,8 +515,9 @@ class ReflectanceCoefficients:
         self.wlens: np.ndarray = _ds.wavelength.values
         coeffs: np.ndarray = _ds.coeff.values
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
-        u_coeff_cimel: np.ndarray = _ds.u_coeff.values
+        u_coeff_cimel: np.ndarray = _ds.u_coeff.values * coeffs / 100
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
+        self.err_corr_coeff = _ds.err_corr_coeff
 
 
 class PolarizationCoefficients:
@@ -486,8 +532,10 @@ class PolarizationCoefficients:
         wavelengths: List[float],
         pos_coeffs: List[Tuple[float, float, float, float]],
         pos_unc: List[Tuple[float, float, float, float]],
+        p_pos_err_corr_data: List[List[float]],
         neg_coeffs: List[Tuple[float, float, float, float]],
         neg_unc: List[Tuple[float, float, float, float]],
+        p_neg_err_corr_data: List[List[float]],
     ):
         """
         Parameters
@@ -502,8 +550,10 @@ class PolarizationCoefficients:
         self.wlens = wavelengths
         self.pos_coeffs = pos_coeffs
         self.pos_unc = pos_unc
+        self.p_pos_err_corr_data = p_pos_err_corr_data
         self.neg_coeffs = neg_coeffs
         self.neg_unc = neg_unc
+        self.p_neg_err_corr_data = p_neg_err_corr_data
 
     def get_wavelengths(self) -> List[float]:
         """Gets all wavelengths present in the model, in nanometers
@@ -563,9 +613,25 @@ class PolarizationCoefficients:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.neg_unc[index]
 
+    def is_calculable(self) -> bool:
+        return not (np.isnan(self.pos_coeffs).any() or np.isnan(self.neg_coeffs).any())
+
 
 @dataclass
 class LimeCoefficients:
+    """
+    Coefficients used in the LIME algorithms.
+
+    Attributes
+    ----------
+    reflectance: ReflectanceCoefficients
+        Reflectance coefficients for the ROLO/LIME model.
+    polarization: PolatizationCoefficients
+        Polarization coefficients for the DoLP/LIME model.
+    version: str
+        Name of the version that will be shown to the user.
+    """
+
     reflectance: ReflectanceCoefficients
     polarization: PolarizationCoefficients
     version: str
@@ -595,31 +661,36 @@ class SpectralData:
 
     @staticmethod
     def make_reflectance_ds(
-        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+        wavs: np.ndarray,
+        refl: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
+        if (
+            corr is not None
+            and not isinstance(corr, np.ndarray)
+            and not isinstance(corr, list)
+        ):
+            corr = np.array([[corr]])
         # create dataset
         ds_refl = obsarray.create_ds(TEMPLATE_REFL, dim_sizes)
-
         ds_refl = ds_refl.assign_coords(wavelength=wavs)
 
         ds_refl.reflectance.values = refl
-
-        if unc_rand is not None:
-            ds_refl.u_ran_reflectance.values = unc_rand
-        else:
-            ds_refl.u_ran_reflectance.values = refl * 0.01
-
-        if unc_syst is not None:
-            ds_refl.u_sys_reflectance.values = unc_syst
-        else:
-            ds_refl.u_sys_reflectance.values = refl * 0.05
+        if unc is not None:
+            ds_refl.u_reflectance.values = unc
+        if corr is not None:
+            ds_refl.err_corr_reflectance.values = corr
 
         return ds_refl
 
     @staticmethod
     def make_irradiance_ds(
-        wavs: np.ndarray, refl: np.ndarray, unc_rand=None, unc_syst=None
+        wavs: np.ndarray,
+        refl: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
@@ -629,21 +700,19 @@ class SpectralData:
 
         ds_irr.irradiance.values = refl
 
-        if unc_rand is not None:
-            ds_irr.u_ran_irradiance.values = unc_rand
-        else:
-            ds_irr.u_ran_irradiance.values = refl * 0.01
-
-        if unc_syst is not None:
-            ds_irr.u_sys_irradiance.values = unc_syst
-        else:
-            ds_irr.u_sys_irradiance.values = refl * 0.05
+        if unc is not None:
+            ds_irr.u_irradiance.values = unc
+        if corr is not None:
+            ds_irr.err_corr_irradiance.values = corr
 
         return ds_irr
 
     @staticmethod
     def make_polarization_ds(
-        wavs: np.ndarray, polarization: np.ndarray, unc_rand=None, unc_syst=None
+        wavs: np.ndarray,
+        polarization: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"wavelength": len(wavs)}
         # create dataset
@@ -653,21 +722,24 @@ class SpectralData:
 
         ds_pol.polarization.values = polarization
 
-        if unc_rand is not None:
-            ds_pol.u_ran_polarization.values = unc_rand
+        if unc is not None:
+            ds_pol.u_polarization.values = unc
         else:
-            ds_pol.u_ran_polarization.values = polarization * 0.01
+            ds_pol.u_polarization.values = np.abs(polarization) * 0.05
 
-        if unc_syst is not None:
-            ds_pol.u_sys_polarization.values = unc_syst
+        if corr is not None:
+            ds_pol.err_corr_polarization.values = corr
         else:
-            ds_pol.u_sys_polarization.values = polarization * 0.05
+            ds_pol.err_corr_polarization.values = np.ones((len(polarization),len(polarization)))
 
         return ds_pol
 
     @staticmethod
     def make_signals_ds(
-        channel_ids, signals, unc_rand=None, unc_syst=None
+        channel_ids: np.ndarray,
+        signals: np.ndarray,
+        unc: np.ndarray = None,
+        corr: np.ndarray = None,
     ) -> xarray.Dataset:
         dim_sizes = {"channels": len(channel_ids), "dts": len(signals[0])}
         # create dataset
@@ -677,22 +749,48 @@ class SpectralData:
 
         ds_refl.signals.values = signals
 
-        if unc_rand is not None:
-            ds_refl.u_ran_signals.values = unc_rand
+        if unc is not None:
+            ds_refl.u_signals.values = unc
         else:
-            ds_refl.u_ran_signals.values = signals * 0.01
-
-        if unc_syst is not None:
-            ds_refl.u_sys_signals.values = unc_syst
-        else:
-            ds_refl.u_sys_signals.values = signals * 0.05
+            ds_refl.u_signals.values = signals * 0.05
 
         return ds_refl
 
 
 @dataclass
 class ComparisonData:
-    """Dataclass containing the data outputed from a comparison."""
+    """Dataclass containing the data outputed from a comparison.
+
+    The SpectralDatas "wlens" attribute is not a list of float, instead a list
+    of datetimes, corresponding to the measurements datetimes.
+
+    The comparison data corresponds to the compared data for multiple datetimes
+    for a single channel.
+
+    Attributes
+    ----------
+    observed_signal: SpectralData
+        Real data obtained from the GLOD files.
+    simulated_signal: SpectralData
+        Simulated data obtained from the model for the same conditions.
+    diffs_signal: SpectralData
+        Relative differences between the simulated and real data. (sim - real) / real.
+    mean_relative_difference: float
+        The mean of the relative differences (diffs_signals mean).
+    standard_deviation_mrd: float
+        Standard deviation of relative differences.
+    number_samples: int
+        Number of compared instances presnet in the object
+    dts: list of datetime
+        Datetimes of the different samples. They are also used as the "wlens" attribute
+        for the SpectraDatas.
+    points: list of SurfacePoint
+        Point for every datetime.
+    mpas: list of float
+        Moon phase angle in degrees for every datetime.
+    ampa_valid_range: list of bool
+        Flag that indicates if the moon phase angle is in the valid LIME range.
+    """
 
     observed_signal: SpectralData
     simulated_signal: SpectralData
@@ -701,13 +799,22 @@ class ComparisonData:
     standard_deviation_mrd: float
     number_samples: int
     dts: List[datetime]
-    points: List[Point]
+    points: List[SurfacePoint]
     mpas: List[float]
+    ampa_valid_range: List[bool]
 
 
 @dataclass
 class KernelsPath:
-    """Dataclass containing the needed information in order to find all SPICE kernels."""
+    """Dataclass containing the needed information in order to find all SPICE kernels.
+
+    Attributes
+    ----------
+    main_kernels_path: str
+        Path where the main SPICE kernels are located (can be read-only).
+    custom_kernel_path: str
+        Path where the custom SPICE kernel will be stored (must be writeable).
+    """
 
     main_kernels_path: str
     custom_kernel_path: str
@@ -743,13 +850,23 @@ class LunarObservationWrite:
         Names of the channels present
     sat_pos_ref: str
         Name of the reference system (usually ITRF93)
-    ch_irrs: dict of str and float
-        Irradiances relative to each channel. The key is the channel name, and the irradiance
-        is given in Wm⁻²nm⁻¹.
     dt: datetime
         Datetime of the observation.
     sat_pos: SatellitePosition
         Satellite position at that moment.
+    irrs: SpectralData
+        Irradiance data
+    refls: SpectralData
+        Reflectance data
+    polars: SpectralData
+        Polarization data
+    sat_name: str | None
+        Name of the satellite. If None or empty, then it's a SurfacePoint
+    selenographic_data: SelenographicDataWrite | None
+        If a CustomPoint, data that allowes to define the point. If None then it's not selenographic
+        (not a CustomPoint).
+    data_source: str
+        Data source of the lunar observation.
     """
 
     ch_names: List[str]
@@ -759,8 +876,9 @@ class LunarObservationWrite:
     irrs: "SpectralData"
     refls: "SpectralData"
     polars: "SpectralData"
-    sat_name: str  # if None or empty: SurfacePoint
-    selenographic_data: SelenographicDataWrite  # if None: not selenographic
+    sat_name: str
+    selenographic_data: SelenographicDataWrite
+    data_source: str
 
     def has_ch_value(self, name: str) -> bool:
         return name in self.ch_names
@@ -779,21 +897,98 @@ class LunarObservationWrite:
 
 @dataclass
 class LGLODData:
+    """Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format used by the toolbox.
+
+    Attributes
+    ----------
+    observations: list of LunarObservationWrite
+        Spectral irradiance, reflectance and polarization for all the datetimes.
+    signals: SpectralData
+        SRF-Integrated irradiance data.
+    not_default_srf: bool
+        Flag that indicates if the spectral response function used is the default one or not (a custom user-selected one).
+    elis_cimel: list of SpectralData
+        Irradiance for the cimel.
+    elrefs_cimel: list of SpectralData
+        Reflectance for the cimel.
+    polars_cimel: list of SpectralData
+        Polarization for the cimel.
+    spectrum_name: str
+        Name of the spectrum used for interpolation.
+    skipped_uncs: bool
+        Flag that indicates if the uncertainties calculation was skipped or not.
+    """
+
     observations: List[LunarObservationWrite]
     signals: "SpectralData"
     not_default_srf: bool
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
     polars_cimel: List["SpectralData"]
+    spectrum_name: str
+    skipped_uncs: bool
 
 
 @dataclass
 class LGLODComparisonData:
+    """Dataclass with the data of a LGLOD comparison file. LGLOD is the GLOD-based format used by the toolbox.
+
+    Attributes
+    ----------
+    comparisons: list of ComparisonData
+        List of the comparison values.
+    ch_names: list of str
+        List with the names of the channels.
+    sat_name: str
+        Name of the satellite used for comparison.
+    spectrum_name: str
+        Name of the spectrum used for interpolation.
+    skipped_uncs: bool
+        Flag that indicates if the uncertainties calculation was skipped or not.
+    """
+
     comparisons: List[ComparisonData]
     ch_names: List[str]
     sat_name: str
+    spectrum_name: str
+    skipped_uncs: bool
 
 
 class LimeException(Exception):
+    """Exception that is raised by the toolbox that is intended to be shown to the user."""
+
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+
+yaml = ruaml.YAML()
+
+
+@yaml_object(yaml)
+@dataclass
+class InterpolationSettings:
+    """Representation of the YAML file that contains the interpolation settings data.
+
+    Attributes
+    ----------
+    interpolation_spectrum: str
+        Name (and id) of the spectrum used for interpolation.
+    """
+
+    interpolation_spectrum: str
+    interpolation_SRF: str
+    show_interp_spectrum: bool
+    skip_uncertainties: bool
+
+    def _save_disk(self, path: str):
+        with open(path, "w") as file:
+            yaml.dump([self], file)
+
+    @staticmethod
+    def _load_yaml(path: str) -> "InterpolationSettings":
+        f = open(path, "r")
+        lines = f.readlines()
+        f.close()
+        yaml_str = "\n".join([line for line in lines])
+        setts: "InterpolationSettings" = yaml.load(yaml_str)[0]
+        return setts
