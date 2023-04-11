@@ -4,6 +4,7 @@
 from enum import Enum
 from typing import List, Callable, Union, Tuple
 from datetime import datetime, timezone
+import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -1319,6 +1320,8 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         lime_tbx_w = self._get_lime_widget()
         lime_tbx_w.propagate_close_event()
+        QtCore.QCoreApplication.quit()
+        os.kill(os.getpid(), 9)
         return super().closeEvent(event)
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
