@@ -844,7 +844,8 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
+        is_skip_uncs = self.lime_simulation.is_skipping_uncs()
+        self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
         version = self.settings_manager.get_lime_coef().version
         is_out_mpa_range = (
@@ -863,6 +864,7 @@ class MainSimulationsWidget(
         self.signal_widget.set_interp_spectrum_name(
             self.settings_manager.get_selected_spectrum_name()
         )
+        self.signal_widget.set_skipped_uncertainties(is_skip_uncs)
         self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
         self.lower_tabs.setTabEnabled(2, True)
