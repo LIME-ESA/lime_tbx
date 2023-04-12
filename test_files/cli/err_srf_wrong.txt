@@ -1,1 +1,1 @@
-Error: Error loading Spectral Response Function. There was a problem while loading the file. See log for details.
+Error: Error loading Spectral Response Function. There was a problem while loading the SRF file. See log for details.
