@@ -85,7 +85,7 @@ def _get_appdata_folder(logger: Logger, platform: str) -> str:
         )
     else:
         appdata = path.expanduser(path.join("~", "." + APPNAME))
-    logger.info(f"Appdata folder: {appdata}")
+    logger.debug(f"Appdata folder: {appdata}")
     return appdata
 
 
