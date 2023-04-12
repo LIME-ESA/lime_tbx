@@ -1112,14 +1112,15 @@ def check_srf_comparison_callback(
 
 
 def obtain_sorted_mpa_callback(
-    comps: List[ComparisonData],
+    lglod: LGLODComparisonData,
     kernels_path: KernelsPath,
     srf,
-    data_source,
-    skipped_uncs,
 ):
+    comps = lglod.comparisons
+    data_source = lglod.sat_name
+    skipped_uncs = lglod.skipped_uncs
     mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
-    return comps, mpa_comps, srf, data_source, skipped_uncs
+    return comps, mpa_comps, srf, data_source, skipped_uncs, lglod.version
 
 
 def return_args_callback(*args):
@@ -1238,11 +1239,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
         worker = CallbackWorker(
             obtain_sorted_mpa_callback,
             [
-                lglod.comparisons,
+                lglod,
                 self.kernels_path,
                 srf,
-                lglod.sat_name,
-                lglod.skipped_uncs,
             ],
         )
         self._start_thread(
@@ -1257,6 +1256,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         srf = data[2]
         data_source = data[3]
         skipped_uncs = data[4]
+        version = data[5]
         self.comparison_page.load_lglod_comparisons(
             comps, mpa_comps, srf, data_source, skipped_uncs, version
         )
