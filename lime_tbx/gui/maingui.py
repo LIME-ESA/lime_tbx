@@ -395,11 +395,17 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         else:
             self.compare_button.setDisabled(False)
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self,
+        worker: CallbackWorker,
+        finished: Callable,
+        error: Callable,
+        info: Callable = None,
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
-        _start_thread(worker, worker_th, finished, error)
+        _start_thread(worker, worker_th, finished, error, info)
 
     def _set_spinner(self, enabled: bool):
         self.spinner.setVisible(enabled)
@@ -450,7 +456,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     self.kernels_path,
                 ],
             )
-            self._start_thread(worker, lambda _: self._unblock_gui(), self.export_to_lglod_err)
+            self._start_thread(
+                worker, lambda _: self._unblock_gui(), self.export_to_lglod_err
+            )
         else:
             self._unblock_gui()
 
@@ -476,7 +484,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             [mos, srf, cimel_coef, self.lime_simulation, self.kernels_path],
             True,
         )
-        self._start_thread(worker, self.compare_finished, self.compare_error, self.compare_info)
+        self._start_thread(
+            worker, self.compare_finished, self.compare_error, self.compare_info
+        )
 
     def compare_info(self, data: str):
         self.quant_mos_simulated += 1
@@ -554,7 +564,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.output.set_channels(ch_names)
         self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
-        self._start_thread(worker, self._load_lglod_comparisons_finished, self.compare_error)
+        self._start_thread(
+            worker, self._load_lglod_comparisons_finished, self.compare_error
+        )
 
     def switch_show_compare_mpa_dts(self):
         if self.comparing_dts:
@@ -616,7 +628,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.output.set_channels(ch_names)
         self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
-        self._start_thread(worker, self._load_lglod_comparisons_finished, self.compare_error)
+        self._start_thread(
+            worker, self._load_lglod_comparisons_finished, self.compare_error
+        )
 
     def _load_lglod_comparisons_finished(self, data):
         self.output.remove_channels(data[0])
@@ -784,7 +798,9 @@ class MainSimulationsWidget(
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
@@ -1009,7 +1025,9 @@ class MainSimulationsWidget(
             calculate_all_callback,
             [srf, point, cimel_coef, p_coeffs, self.lime_simulation],
         )
-        self._start_thread(worker, self.calculate_all_finished, self.calculate_all_error)
+        self._start_thread(
+            worker, self.calculate_all_finished, self.calculate_all_error
+        )
 
     def calculate_all_finished(self, data):
         point: Point = data[0]
@@ -1163,7 +1181,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
@@ -1176,7 +1196,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_observation_callback, [lglod, srf])
         self._start_thread(
-            worker, self._load_observations_finished_2, self._load_observations_finished_error
+            worker,
+            self._load_observations_finished_2,
+            self._load_observations_finished_error,
         )
 
     def _load_observations_finished_2(self, data):
@@ -1202,7 +1224,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_comparison_callback, [lglod, srf])
         self._start_thread(
-            worker, self._load_comparisons_finished_2, self._load_comparisons_finished_error
+            worker,
+            self._load_comparisons_finished_2,
+            self._load_comparisons_finished_error,
         )
 
     def _load_comparisons_finished_2(self, data):
@@ -1221,7 +1245,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
             ],
         )
         self._start_thread(
-            worker, self._load_comparisons_finished_3, self._load_comparisons_finished_error
+            worker,
+            self._load_comparisons_finished_3,
+            self._load_comparisons_finished_error,
         )
 
     def _load_comparisons_finished_3(self, data):
@@ -1327,7 +1353,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
@@ -1394,7 +1422,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                 else:
                     worker = CallbackWorker(return_args_callback, [lglod, srf])
                     self._start_thread(
-                        worker, self._load_comparisons_finished, self.load_simulation_error
+                        worker,
+                        self._load_comparisons_finished,
+                        self.load_simulation_error,
                     )
 
     def _load_observations_finished(self, data):
@@ -1418,9 +1448,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         page = lime_tbx_w.get_current_page()
         if path != "":
             page._block_gui_loading()
-            worker = CallbackWorker(
-                load_simulation_callback, [path, self.kernels_path]
-            )
+            worker = CallbackWorker(load_simulation_callback, [path, self.kernels_path])
             self._start_thread(
                 worker, self.load_simulation_finished, self.load_simulation_error
             )
