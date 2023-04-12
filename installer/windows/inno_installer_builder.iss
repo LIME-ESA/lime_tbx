@@ -23,6 +23,7 @@ PrivilegesRequired=admin
 OutputDir={#MyAppDevPath}\installer\windows
 OutputBaseFilename=LimeTBX installer
 SetupIconFile={#MyAppDevPath}\lime_tbx\gui\assets\lime_logo.ico
+UninstallDisplayIcon={app}\LimeTBX\{#MyAppExeName}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
