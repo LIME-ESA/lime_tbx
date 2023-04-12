@@ -71,6 +71,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
         self.skip_uncs = None
+        self.ch_names = []
         self._build_layout()
 
     def _build_layout(self):
@@ -271,6 +272,9 @@ class GraphWidget(QtWidgets.QWidget):
     def set_skipped_uncertainties(self, skip: bool):
         self.skip_uncs = skip
 
+    def set_srf_channel_names(self, ch_names: List[str]):
+        self.ch_names = ch_names
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -308,6 +312,7 @@ class GraphWidget(QtWidgets.QWidget):
                 else:
                     csv.export_csv_srf(
                         self.data,
+                        self.ch_names,
                         self.xlabel,
                         self.ylabel,
                         name,
