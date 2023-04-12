@@ -247,7 +247,6 @@ def calculate_all_callback(
     return (point, srf)
 
 
-#  self.settings_manager.get_lime_coef().version
 def show_comparisons_callback(
     output: output.ComparisonOutput,
     output_mpa: output.ComparisonOutput,
@@ -434,17 +433,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def export_to_lglod(self) -> None:
         self._block_gui_loading()
+        vers = self.settings_manager.get_coef_version_name()
         lglod = LGLODComparisonData(
             self.comps,
             self.srf.get_channels_names(),
             self.data_source,
             self.comparison_spectrum,
             self.skipped_uncs,
+            vers,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        vers = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             worker = CallbackWorker(
                 moon.write_comparison,
@@ -452,7 +452,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     lglod,
                     name,
                     datetime.now().astimezone(timezone.utc),
-                    vers,
                     self.kernels_path,
                 ],
             )
@@ -549,7 +548,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
         self.mpa_comps = mpa_comps
         self.srf = srf
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         params = [
             self.output,
             self.output_mpa,
@@ -603,6 +602,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf: SpectralResponseFunction,
         data_source: str,
         skipped_uncs: bool,
+        version: str,
     ):
         self.set_show_comparison_input(False)
         self.input.clear_input()
@@ -613,7 +613,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.skipped_uncs = skipped_uncs
         self.mpa_comps = mpa_comps
         self.srf = srf
-        version = self.settings_manager.get_lime_coef().version
+        self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
         params = [
             self.output,
             self.output_mpa,
@@ -872,7 +872,7 @@ class MainSimulationsWidget(
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[6] if not isinstance(data[6], list) else False in data[6]
         )
@@ -933,7 +933,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
         )
@@ -985,7 +985,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
         )
@@ -1033,13 +1033,13 @@ class MainSimulationsWidget(
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        version = self.settings_manager.get_coef_version_name()
         lglod = create_lglod_data(
-            point, srf, self.lime_simulation, self.kernels_path, sp_name
+            point, srf, self.lime_simulation, self.kernels_path, sp_name, version
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        version = self.settings_manager.get_lime_coef().version
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         _mds = self.lime_simulation.get_moon_datas()
         if not isinstance(_mds, list):
@@ -1052,7 +1052,6 @@ class MainSimulationsWidget(
                     lglod,
                     name,
                     datetime.now().astimezone(timezone.utc),
-                    version,
                     inside_mpa_range,
                     mpas,
                 ],
@@ -1139,8 +1138,10 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.setLocale("English")
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
         self.settings_manager = settings.SettingsManager(selected_version)
+        self.lime_simulation = LimeSimulation(
+            eocfi_path, kernels_path, self.settings_manager
+        )
         self.workers = []
         self.worker_ths = []
         self._build_layout()
@@ -1257,7 +1258,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         data_source = data[3]
         skipped_uncs = data[4]
         self.comparison_page.load_lglod_comparisons(
-            comps, mpa_comps, srf, data_source, skipped_uncs
+            comps, mpa_comps, srf, data_source, skipped_uncs, version
         )
 
     def _load_comparisons_finished_error(self, error: Exception):

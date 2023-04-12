@@ -929,6 +929,7 @@ class LGLODData:
     polars_cimel: List["SpectralData"]
     spectrum_name: str
     skipped_uncs: bool
+    version: str
 
 
 @dataclass
@@ -954,6 +955,7 @@ class LGLODComparisonData:
     sat_name: str
     spectrum_name: str
     skipped_uncs: bool
+    version: str
 
 
 class LimeException(Exception):

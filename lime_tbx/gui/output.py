@@ -80,7 +80,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas = MplCanvas(self)
         self.canvas.set_title(self.title, fontproperties=title_font_prop)
         self.canvas.axes.tick_params(labelsize=8)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         subtitle = "LIME2 coefficients version: {}".format(version)
         self.subtitle = subtitle
         self.canvas.set_subtitle(subtitle, fontproperties=font_prop)
@@ -282,7 +282,7 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
@@ -485,7 +485,7 @@ for absolute moon phase angles between 2° and 90°"
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(

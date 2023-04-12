@@ -25,6 +25,7 @@ from ....datatypes.datatypes import (
 from ....coefficients.access_data.access_data import _get_demo_cimel_coeffs
 from ...lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.gui.settings import SettingsManager
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -87,7 +88,7 @@ def get_cimel_coeffs() -> ReflectanceCoefficients:
 
 def get_lime_simulation() -> ILimeSimulation:
     interp_data.set_interpolation_spectrum_name("ASD")
-    return LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=False)
+    return LimeSimulation(EOCFI_PATH, KERNELS_PATH, SettingsManager(), verbose=False)
 
 
 def get_random_spectral_data_dts(

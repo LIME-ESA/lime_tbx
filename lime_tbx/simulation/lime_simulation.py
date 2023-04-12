@@ -31,6 +31,7 @@ from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.simulation.moon_data_factory import MoonDataFactory
 from lime_tbx.spectral_integration.spectral_integration import SpectralIntegration
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
+from lime_tbx.gui.settings import ISettingsManager
 
 """___Authorship___"""
 __author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
@@ -357,6 +358,7 @@ class LimeSimulation(ILimeSimulation):
         self,
         eocfi_path: str,
         kernels_path: KernelsPath,
+        settings_manager: ISettingsManager,
         MCsteps: int = 100,
         verbose: bool = False,
     ):
@@ -370,6 +372,7 @@ class LimeSimulation(ILimeSimulation):
         """
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
+        self.settings_manager = settings_manager
 
         self.mds: Union[MoonData, List[MoonData]] = []
         self.wlens: List[float] = []
@@ -407,6 +410,7 @@ class LimeSimulation(ILimeSimulation):
         self.mds_uptodate = False
         self._skip_uncs = None
         self._interp_srf_name = None
+        self.settings_manager.set_coef_version_name(None)
 
     def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
         if not self.mds_uptodate:
@@ -814,6 +818,7 @@ class LimeSimulation(ILimeSimulation):
 
     def set_observations(self, lglod: LGLODData, srf: SpectralResponseFunction):
         obss = lglod.observations
+        self.settings_manager.set_coef_version_name(lglod.version)
         self.elref = [obs.refls for obs in obss]
         self.elref_cimel = lglod.elrefs_cimel
         self.elref_asd = None

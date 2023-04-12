@@ -38,6 +38,7 @@ def create_lglod_data(
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
     spectrum_name: str,
+    coeff_version: str,
 ) -> LGLODData:
     obs = []
     skipped_uncs = lime_simulation.is_skipping_uncs()
@@ -171,4 +172,5 @@ def create_lglod_data(
         polars_cimel,
         spectrum_name,
         skipped_uncs,
+        coeff_version,
     )

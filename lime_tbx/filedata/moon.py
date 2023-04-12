@@ -288,10 +288,10 @@ def write_obs(
     lglod: LGLODData,
     path: str,
     dt: datetime,
-    coefficients_version: str,
     inside_mpa_range: Union[bool, List[bool]],
     mpas: List[float],
 ):
+    coefficients_version = lglod.version
     if not isinstance(inside_mpa_range, list):
         inside_mpa_range = [inside_mpa_range]
     try:
@@ -578,6 +578,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     sp_name = ds.spectrum_name
     data_source = ds.data_source
     skipped_uncs = bool(ds.skipped_uncertainties)
+    vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
     ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
@@ -646,6 +647,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         polars_cimel,
         sp_name,
         skipped_uncs,
+        vers,
     )
 
 
@@ -653,67 +655,36 @@ def write_comparison(
     lglod: LGLODComparisonData,
     path: str,
     dt: datetime,
-    coefficients_version: str,
     kernels_path: KernelsPath,
 ):
+    coefficients_version: str = lglod.version
     try:
         dates_n_points = dict()
         index_useful_channel = [
             i for i, c in enumerate(lglod.comparisons) if c.simulated_signal is not None
         ]
-        irr_obs_data = [
-            c.simulated_signal.data
-            for c in lglod.comparisons
-            if c.simulated_signal is not None
+        filtered_comps = [
+            c for c in lglod.comparisons if c.simulated_signal is not None
         ]
-        irr_obs_data_unc = [
-            c.simulated_signal.uncertainties
-            for c in lglod.comparisons
-            if c.simulated_signal is not None
-        ]
-        irr_comp_data = [
-            c.observed_signal.data
-            for c in lglod.comparisons
-            if c.observed_signal is not None
-        ]
-        irr_comp_data_unc = [
-            c.observed_signal.uncertainties
-            for c in lglod.comparisons
-            if c.observed_signal is not None
-        ]
-        irr_diff_data = [
-            c.diffs_signal.data for c in lglod.comparisons if c.diffs_signal is not None
-        ]
-        irr_diff_data_unc = [
-            c.diffs_signal.uncertainties
-            for c in lglod.comparisons
-            if c.diffs_signal is not None
-        ]
+        irr_obs_data = [c.simulated_signal.data for c in filtered_comps]
+        irr_obs_data_unc = [c.simulated_signal.uncertainties for c in filtered_comps]
+        irr_comp_data = [c.observed_signal.data for c in filtered_comps]
+        irr_comp_data_unc = [c.observed_signal.uncertainties for c in filtered_comps]
+        irr_diff_data = [c.diffs_signal.data for c in filtered_comps]
+        irr_diff_data_unc = [c.diffs_signal.uncertainties for c in filtered_comps]
         mrd_data = np.array(
-            [
-                c.mean_relative_difference
-                for c in lglod.comparisons
-                if c.mean_relative_difference is not None
-            ],
+            [c.mean_relative_difference for c in filtered_comps],
             dtype=object,
         )
         number_samples_data = np.array(
-            [
-                c.number_samples
-                for c in lglod.comparisons
-                if c.number_samples is not None
-            ],
+            [c.number_samples for c in filtered_comps],
             dtype=object,
         )
         std_mrd_data = np.array(
-            [
-                c.standard_deviation_mrd
-                for c in lglod.comparisons
-                if c.standard_deviation_mrd is not None
-            ],
+            [c.standard_deviation_mrd for c in filtered_comps],
             dtype=object,
         )
-        for c in lglod.comparisons:
+        for c in filtered_comps:
             for i, cdt in enumerate(c.dts):
                 if cdt not in dates_n_points:
                     dates_n_points[cdt] = (
@@ -760,7 +731,7 @@ def write_comparison(
             lglod, path, dt, sim_data, inside_mpa_range, mpas
         )
         ds.is_comparison = 1
-        for j, c in enumerate(lglod.comparisons):
+        for j, c in enumerate(filtered_comps):
             for i, dt in enumerate(dates):
                 if dt not in c.dts and c.dts != []:
                     irr_obs_data[j] = np.insert(irr_obs_data[j], i, fill_value, axis=0)
@@ -889,6 +860,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mpas = np.array(ds.variables["mpa"][:].data)
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
+    vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
     ds.close()
     comps = []
     points = []
@@ -930,7 +902,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
         )
         comps.append(comp)
-    return LGLODComparisonData(comps, ch_names, sat_name, sp_name, skipped_uncs)
+    return LGLODComparisonData(comps, ch_names, sat_name, sp_name, skipped_uncs, vers)
 
 
 def read_lglod_file(

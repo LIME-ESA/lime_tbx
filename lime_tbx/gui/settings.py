@@ -166,6 +166,28 @@ class ISettingsManager(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_coef_version_name(self) -> str:
+        """Gets the current coefficient version of the current simulation.
+        (If the simulation is loaded, it won't be the same as of the settings)
+
+        Returns
+        ----------
+        coef_version_name: str
+            Coefficients version."""
+        pass
+
+    @abstractmethod
+    def set_coef_version_name(self, coef_version_name: str):
+        """Sets the current coefficient version of the current simulation status (not of the settings).
+
+        Parameters
+        ----------
+        coef_version_name: str
+            Coefficients version. None if reset.
+        """
+        pass
+
 
 DEF_SRF_STEP = 2
 
@@ -184,6 +206,7 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
         self.polar_coeff = self.coeffs[index].polarization
+        self.coef_version_name = None
 
     def get_default_srf(self) -> SpectralResponseFunction:
         return get_default_srf()
@@ -256,3 +279,11 @@ class SettingsManager(ISettingsManager):
 
     def set_skip_uncertainties(self, skip: bool):
         interp_data.set_skip_uncertainties(skip)
+
+    def get_coef_version_name(self) -> str:
+        if self.coef_version_name is None:
+            return self.get_lime_coef().version
+        return self.coef_version_name
+
+    def set_coef_version_name(self, coef_version_name: str):
+        self.coef_version_name = coef_version_name

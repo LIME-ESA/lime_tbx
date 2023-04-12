@@ -227,8 +227,10 @@ class CLI:
     ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.lime_simulation: ILimeSimulation = LimeSimulation(eocfi_path, kernels_path)
         self.settings_manager = settings.SettingsManager(selected_version)
+        self.lime_simulation: ILimeSimulation = LimeSimulation(
+            eocfi_path, kernels_path, self.settings_manager
+        )
         self.srf = self.settings_manager.get_default_srf()
 
     def load_srf(self, srf_file: str):
@@ -315,17 +317,17 @@ class CLI:
 
     def _export_lglod(self, point: Point, output_file: str):
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        version = self.settings_manager.get_lime_coef().version
         lglod = create_lglod_data(
-            point, self.srf, self.lime_simulation, self.kernels_path, sp_name
+            point, self.srf, self.lime_simulation, self.kernels_path, sp_name, version
         )
         now = datetime.now(timezone.utc)
-        version = self.settings_manager.get_lime_coef().version
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         _mds = self.lime_simulation.get_moon_datas()
         if not isinstance(_mds, list):
             _mds = [_mds]
         mpas = [m.mpa_degrees for m in _mds]
-        moon.write_obs(lglod, output_file, now, version, inside_mpa_range, mpas)
+        moon.write_obs(lglod, output_file, now, inside_mpa_range, mpas)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
         from lime_tbx.gui import canvas
@@ -583,19 +585,19 @@ class CLI:
         # EXPORT
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         if isinstance(ed, ExportNetCDF):
+            vers = self.settings_manager.get_lime_coef().version
             lglod = LGLODComparisonData(
                 comps,
                 self.srf.get_channels_names(),
                 mos[0].data_source,
                 self.settings_manager.get_selected_spectrum_name(),
                 skip_uncs,
+                vers,
             )
-            vers = self.settings_manager.get_lime_coef().version
             moon.write_comparison(
                 lglod,
                 ed.output_file,
                 datetime.now().astimezone(timezone.utc),
-                vers,
                 self.kernels_path,
             )
         else:
