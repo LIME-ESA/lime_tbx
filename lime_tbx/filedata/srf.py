@@ -33,11 +33,11 @@ _READ_FILE_ERROR_STR = (
 
 
 def _calc_factor_to_nm(units: str) -> float:
-    if units == "m":
+    if units in ("m", "meter", "meters"):
         f_to_nm = 1000000000
-    elif units == "mm":
+    elif units in ("mm", "millimeter", "millimeters"):
         f_to_nm = 1000000
-    elif units == "um" or units == "μm":
+    elif units in ("um", "μm", "micrometer", "micrometers"):
         f_to_nm = 1000
     else:  # wlen_units == 'nm':
         f_to_nm = 1

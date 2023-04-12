@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LimeTBX"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.1.1"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX.exe"
 #define MyAppDevPath "Y:\"
@@ -23,6 +23,7 @@ PrivilegesRequired=admin
 OutputDir={#MyAppDevPath}\installer\windows
 OutputBaseFilename=LimeTBX installer
 SetupIconFile={#MyAppDevPath}\lime_tbx\gui\assets\lime_logo.ico
+UninstallDisplayIcon={app}\LimeTBX\{#MyAppExeName}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

@@ -37,6 +37,9 @@ def main():
     warnings.filterwarnings("ignore", ".*Fontconfig warning.*")
     programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
+    logger.get_logger().info(
+        f"Appdata folder: {appdata}. Programfiles folder: {programfiles}."
+    )
     kernels_path = KernelsPath(
         os.path.join(programfiles, "kernels"), os.path.join(appdata, "kernels")
     )

@@ -517,7 +517,7 @@ class ReflectanceCoefficients:
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
         u_coeff_cimel: np.ndarray = _ds.u_coeff.values * coeffs / 100
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
-        self.err_corr_coeff = _ds.err_corr_coeff
+        self.err_corr_coeff = _ds.err_corr_coeff.values
 
 
 class PolarizationCoefficients:
@@ -730,7 +730,9 @@ class SpectralData:
         if corr is not None:
             ds_pol.err_corr_polarization.values = corr
         else:
-            ds_pol.err_corr_polarization.values = np.ones((len(polarization),len(polarization)))
+            ds_pol.err_corr_polarization.values = np.ones(
+                (len(polarization), len(polarization))
+            )
 
         return ds_pol
 

@@ -171,7 +171,7 @@ def calculate_elref_unc(
 
     cfs = cimel_coef.coeffs
     ucfs = cimel_coef.unc_coeffs
-    corrcfs = cimel_coef._ds.err_corr_coeff.values
+    corrcfs = cimel_coef.err_corr_coeff
 
     phi = moon_data.long_sun_radians
     l_theta = moon_data.lat_obs

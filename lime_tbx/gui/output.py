@@ -322,6 +322,7 @@ class SignalWidget(QtWidgets.QWidget):
     def __init__(self, settings_manager: ISettingsManager, parent=None):
         super().__init__(parent)
         self.settings_manager = settings_manager
+        self.skip_uncs = None
         self._build_layout()
 
     def _build_layout(self):
@@ -356,6 +357,9 @@ class SignalWidget(QtWidgets.QWidget):
             self.range_warning.setParent(None)
             self.range_warning = None
         self.disable_buttons(True)
+
+    def set_skipped_uncertainties(self, skip: bool):
+        self.skip_uncs = skip
 
     def update_signals(
         self,

@@ -49,7 +49,7 @@ for absolute moon phase angles between 2° and 90°"
 
 
 def _calc_divisor_to_m(units: str) -> float:
-    if units == "km":
+    if units in ("km", "kilometer", "kilometers"):
         return 0.001
     # if units == "m":
     return 1
