@@ -295,6 +295,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         errcode = cli.handle_input(get_opts("-v"))
         self.assertEqual(errcode, 0)
 
+    @unittest.skip("Now doesn't make sense to check against real server.")
     def test_update_err_connection(self):
         cli = get_cli()
         errcode = cli.handle_input(get_opts("-u"))
