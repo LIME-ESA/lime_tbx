@@ -462,8 +462,11 @@ class SatelliteInputWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def show_datetimes(self):
+        self.datetimes_window = QtWidgets.QMainWindow(self)
         self.datetimes_widget = ShowDatetimeWidget(self.loaded_datetimes)
-        self.datetimes_widget.show()
+        self.datetimes_window.setCentralWidget(self.datetimes_widget)
+        self.datetimes_window.show()
+        self.datetimes_window.resize(660, 230)
 
     def get_satellite(self) -> str:
         return self.sat_names[self.combo_sats.currentIndex()]
