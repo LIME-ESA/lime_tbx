@@ -726,7 +726,7 @@ def write_comparison(
             sat_pos,
             dates,
         )
-        fill_value = -999
+        fill_value = -1999999
         ds = _write_normal_simulations(
             lglod, path, dt, sim_data, inside_mpa_range, mpas
         )
@@ -799,7 +799,7 @@ def write_comparison(
         )
         irr_diff.units = "W m-2 nm-1"
         irr_diff.long_name = "lunar irradiance comparison difference for each channel"
-        irr_diff.valid_min = 0.0
+        irr_diff.valid_min = -1000000.0
         irr_diff.valid_max = 1000000.0
         irr_diff[:] = irr_diff_data.T
         irr_diff_unc = ds.createVariable(
@@ -807,7 +807,7 @@ def write_comparison(
         )
         irr_diff_unc.units = "W m-2 nm-1"
         irr_diff_unc.long_name = "uncertainties of the lunar irradiance comparison difference for each channel"
-        irr_diff_unc.valid_min = 0.0
+        irr_diff_unc.valid_min = -1000000.0
         irr_diff_unc.valid_max = 1000000.0
         irr_diff_unc[:] = irr_diff_data_unc.T
 
