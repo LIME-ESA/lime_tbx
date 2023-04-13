@@ -488,8 +488,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def compare_info(self, data: str):
-        self.quant_mos_simulated += 1
-        self.spinner.set_text("{}/{}".format(self.quant_mos_simulated, self.quant_mos))
+        if self.quant_mos_simulated < self.quant_mos:
+            self.spinner.set_text(f"{self.quant_mos_simulated}/{self.quant_mos}")
+            self.quant_mos_simulated += 1
+        else:
+            self.spinner.set_text(f"Finishing comparisons...")
 
     def set_show_comparison_input(self, show: bool):
         self.input.setVisible(show)

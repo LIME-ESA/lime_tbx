@@ -187,6 +187,8 @@ class Comparison(IComparison):
         mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
         for obs in observations:
+            if callback_observation:
+                callback_observation()
             sat_pos = obs.sat_pos
             dt = obs.dt
             lat, lon, h = SPICEAdapter.to_planetographic(
@@ -212,8 +214,8 @@ class Comparison(IComparison):
                     sps[j].append(sp)
                     mpas[j].append(mpa)
                     obs_irrs[j].append(obs.ch_irrs[ch])
-            if callback_observation:
-                callback_observation()
+        if callback_observation:
+            callback_observation()
         for i, ch in enumerate(ch_names):
             if len(ch_dates[i]) > 0:
                 irrs = np.array([s[0] for s in sigs[i]])
