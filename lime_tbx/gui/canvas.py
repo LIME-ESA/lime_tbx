@@ -6,6 +6,7 @@ import os
 
 """___Third-Party Modules___"""
 from matplotlib.axes import Axes
+import matplotlib.backends.backend_pdf  # important import for exporting as pdf
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas,
 )

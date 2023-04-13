@@ -6,6 +6,7 @@ from datetime import datetime
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import matplotlib.backends.backend_pdf  # important import for exporting as pdf
 from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
