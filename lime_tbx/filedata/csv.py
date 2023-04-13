@@ -76,6 +76,7 @@ def _write_point(writer, point: Union[Point, None]):
 
 def export_csv_srf(
     data: Union[SpectralData, List[SpectralData]],
+    ch_names: List[str],
     xlabel: str,
     ylabel: str,
     name: str,
@@ -87,6 +88,8 @@ def export_csv_srf(
     ----------
     data: SpectralData | list of SpectralData
         Data that will be exported
+    ch_names: list of str
+        Ordered list of names of the srf channels
     xlabel: str
         Label of the x_data
     ylabel: str
@@ -99,18 +102,14 @@ def export_csv_srf(
             writer = csv.writer(file)
             ylabels = []
             ylabels.append(f"{ylabel}")
-            writer.writerow([xlabel, *ylabels])
+            writer.writerow(["Channel ID", xlabel, *ylabels])
             if not isinstance(data, list) and not isinstance(data, np.ndarray):
                 data = [data]
-            x_data = data[0].wlens
-            y_data = []
-            for i in range(len(x_data)):
-                yd = []
-                for datum in data:
-                    yd.append(datum.data[i])
-                y_data.append(yd)
-            for i in range(len(x_data)):
-                writer.writerow([x_data[i], *y_data[i]])
+            for i, spd in enumerate(data):
+                wlens = spd.wlens
+                vals = spd.data
+                for wlen, val in zip(wlens, vals):
+                    writer.writerow([ch_names[i], wlen, val])
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)

@@ -28,7 +28,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 _READ_FILE_ERROR_STR = (
-    "There was a problem while loading the file. See log for details."
+    "There was a problem while loading the SRF file. See log for details."
 )
 
 
@@ -71,7 +71,9 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
         n_channels = len(ds["channel"])
         wvlens = [[] for _ in range(n_channels)]
         factors = [[] for _ in range(n_channels)]
-        wlen_units: str = ds["wavelength"].units
+        wlen_units = "nm"
+        if hasattr(ds["wavelength"], "units"):
+            wlen_units: str = ds["wavelength"].units
         f_to_nm = _calc_factor_to_nm(wlen_units)
         for wvlen_arr in ds["wavelength"]:
             for i in range(len(wvlen_arr)):
@@ -80,7 +82,9 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
             for i in range(len(factor_arr)):
                 _append_if_not_masked(factors[i], factor_arr[i])
         channels = []
-        ch_units: str = ds["channel"].units
+        ch_units = "nm"
+        if hasattr(ds["channel"], "units"):
+            ch_units: str = ds["channel"].units
         ch_f_to_nm = _calc_factor_to_nm(ch_units)
         for i in range(n_channels):
             channel_spec_resp = dict(zip(wvlens[i], factors[i]))

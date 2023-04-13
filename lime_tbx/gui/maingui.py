@@ -247,7 +247,6 @@ def calculate_all_callback(
     return (point, srf)
 
 
-#  self.settings_manager.get_lime_coef().version
 def show_comparisons_callback(
     output: output.ComparisonOutput,
     output_mpa: output.ComparisonOutput,
@@ -395,11 +394,17 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         else:
             self.compare_button.setDisabled(False)
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self,
+        worker: CallbackWorker,
+        finished: Callable,
+        error: Callable,
+        info: Callable = None,
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
-        _start_thread(worker, worker_th, finished, error)
+        _start_thread(worker, worker_th, finished, error, info)
 
     def _set_spinner(self, enabled: bool):
         self.spinner.setVisible(enabled)
@@ -428,17 +433,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def export_to_lglod(self) -> None:
         self._block_gui_loading()
+        vers = self.settings_manager.get_coef_version_name()
         lglod = LGLODComparisonData(
             self.comps,
             self.srf.get_channels_names(),
             self.data_source,
             self.comparison_spectrum,
             self.skipped_uncs,
+            vers,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        vers = self.settings_manager.get_lime_coef().version
         if name is not None and name != "":
             worker = CallbackWorker(
                 moon.write_comparison,
@@ -446,11 +452,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                     lglod,
                     name,
                     datetime.now().astimezone(timezone.utc),
-                    vers,
                     self.kernels_path,
                 ],
             )
-            self._start_thread(worker, lambda _: self._unblock_gui(), self.export_to_lglod_err)
+            self._start_thread(
+                worker, lambda _: self._unblock_gui(), self.export_to_lglod_err
+            )
         else:
             self._unblock_gui()
 
@@ -476,7 +483,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             [mos, srf, cimel_coef, self.lime_simulation, self.kernels_path],
             True,
         )
-        self._start_thread(worker, self.compare_finished, self.compare_error, self.compare_info)
+        self._start_thread(
+            worker, self.compare_finished, self.compare_error, self.compare_info
+        )
 
     def compare_info(self, data: str):
         self.quant_mos_simulated += 1
@@ -539,7 +548,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
         self.mpa_comps = mpa_comps
         self.srf = srf
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         params = [
             self.output,
             self.output_mpa,
@@ -554,7 +563,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.output.set_channels(ch_names)
         self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
-        self._start_thread(worker, self._load_lglod_comparisons_finished, self.compare_error)
+        self._start_thread(
+            worker, self._load_lglod_comparisons_finished, self.compare_error
+        )
 
     def switch_show_compare_mpa_dts(self):
         if self.comparing_dts:
@@ -591,6 +602,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         srf: SpectralResponseFunction,
         data_source: str,
         skipped_uncs: bool,
+        version: str,
     ):
         self.set_show_comparison_input(False)
         self.input.clear_input()
@@ -601,7 +613,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.skipped_uncs = skipped_uncs
         self.mpa_comps = mpa_comps
         self.srf = srf
-        version = self.settings_manager.get_lime_coef().version
+        self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
         params = [
             self.output,
             self.output_mpa,
@@ -616,7 +628,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.output.set_channels(ch_names)
         self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
-        self._start_thread(worker, self._load_lglod_comparisons_finished, self.compare_error)
+        self._start_thread(
+            worker, self._load_lglod_comparisons_finished, self.compare_error
+        )
 
     def _load_lglod_comparisons_finished(self, data):
         self.output.remove_channels(data[0])
@@ -784,7 +798,9 @@ class MainSimulationsWidget(
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
@@ -856,7 +872,7 @@ class MainSimulationsWidget(
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[6] if not isinstance(data[6], list) else False in data[6]
         )
@@ -917,7 +933,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
         )
@@ -969,7 +985,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
         )
@@ -1009,19 +1025,21 @@ class MainSimulationsWidget(
             calculate_all_callback,
             [srf, point, cimel_coef, p_coeffs, self.lime_simulation],
         )
-        self._start_thread(worker, self.calculate_all_finished, self.calculate_all_error)
+        self._start_thread(
+            worker, self.calculate_all_finished, self.calculate_all_error
+        )
 
     def calculate_all_finished(self, data):
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        version = self.settings_manager.get_coef_version_name()
         lglod = create_lglod_data(
-            point, srf, self.lime_simulation, self.kernels_path, sp_name
+            point, srf, self.lime_simulation, self.kernels_path, sp_name, version
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
-        version = self.settings_manager.get_lime_coef().version
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         _mds = self.lime_simulation.get_moon_datas()
         if not isinstance(_mds, list):
@@ -1034,7 +1052,6 @@ class MainSimulationsWidget(
                     lglod,
                     name,
                     datetime.now().astimezone(timezone.utc),
-                    version,
                     inside_mpa_range,
                     mpas,
                 ],
@@ -1095,14 +1112,15 @@ def check_srf_comparison_callback(
 
 
 def obtain_sorted_mpa_callback(
-    comps: List[ComparisonData],
+    lglod: LGLODComparisonData,
     kernels_path: KernelsPath,
     srf,
-    data_source,
-    skipped_uncs,
 ):
+    comps = lglod.comparisons
+    data_source = lglod.sat_name
+    skipped_uncs = lglod.skipped_uncs
     mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
-    return comps, mpa_comps, srf, data_source, skipped_uncs
+    return comps, mpa_comps, srf, data_source, skipped_uncs, lglod.version
 
 
 def return_args_callback(*args):
@@ -1121,8 +1139,10 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.setLocale("English")
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.lime_simulation = LimeSimulation(eocfi_path, kernels_path)
         self.settings_manager = settings.SettingsManager(selected_version)
+        self.lime_simulation = LimeSimulation(
+            eocfi_path, kernels_path, self.settings_manager
+        )
         self.workers = []
         self.worker_ths = []
         self._build_layout()
@@ -1163,7 +1183,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
@@ -1176,7 +1198,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_observation_callback, [lglod, srf])
         self._start_thread(
-            worker, self._load_observations_finished_2, self._load_observations_finished_error
+            worker,
+            self._load_observations_finished_2,
+            self._load_observations_finished_error,
         )
 
     def _load_observations_finished_2(self, data):
@@ -1202,7 +1226,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_comparison_callback, [lglod, srf])
         self._start_thread(
-            worker, self._load_comparisons_finished_2, self._load_comparisons_finished_error
+            worker,
+            self._load_comparisons_finished_2,
+            self._load_comparisons_finished_error,
         )
 
     def _load_comparisons_finished_2(self, data):
@@ -1213,15 +1239,15 @@ class LimeTBXWidget(QtWidgets.QWidget):
         worker = CallbackWorker(
             obtain_sorted_mpa_callback,
             [
-                lglod.comparisons,
+                lglod,
                 self.kernels_path,
                 srf,
-                lglod.sat_name,
-                lglod.skipped_uncs,
             ],
         )
         self._start_thread(
-            worker, self._load_comparisons_finished_3, self._load_comparisons_finished_error
+            worker,
+            self._load_comparisons_finished_3,
+            self._load_comparisons_finished_error,
         )
 
     def _load_comparisons_finished_3(self, data):
@@ -1230,8 +1256,9 @@ class LimeTBXWidget(QtWidgets.QWidget):
         srf = data[2]
         data_source = data[3]
         skipped_uncs = data[4]
+        version = data[5]
         self.comparison_page.load_lglod_comparisons(
-            comps, mpa_comps, srf, data_source, skipped_uncs
+            comps, mpa_comps, srf, data_source, skipped_uncs, version
         )
 
     def _load_comparisons_finished_error(self, error: Exception):
@@ -1327,7 +1354,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
 
-    def _start_thread(self, worker: CallbackWorker, finished: Callable, error: Callable):
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
@@ -1394,7 +1423,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                 else:
                     worker = CallbackWorker(return_args_callback, [lglod, srf])
                     self._start_thread(
-                        worker, self._load_comparisons_finished, self.load_simulation_error
+                        worker,
+                        self._load_comparisons_finished,
+                        self.load_simulation_error,
                     )
 
     def _load_observations_finished(self, data):
@@ -1418,9 +1449,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         page = lime_tbx_w.get_current_page()
         if path != "":
             page._block_gui_loading()
-            worker = CallbackWorker(
-                load_simulation_callback, [path, self.kernels_path]
-            )
+            worker = CallbackWorker(load_simulation_callback, [path, self.kernels_path])
             self._start_thread(
                 worker, self.load_simulation_finished, self.load_simulation_error
             )

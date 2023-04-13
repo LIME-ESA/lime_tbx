@@ -174,7 +174,13 @@ class TestCSV(unittest.TestCase):
         srf = SettingsManager().get_default_srf()
         data = SpectralData(srf.get_wavelengths(), srf.get_values(), None, None)
         path = "./test_files/csv/export_srf_1.test.csv"
-        export_csv_srf(data, "Wavelengths (nm)", "Intensity (Fractions of unity)", path)
+        export_csv_srf(
+            data,
+            srf.get_channels_names(),
+            "Wavelengths (nm)",
+            "Intensity (Fractions of unity)",
+            path,
+        )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_srf_1.csv"))
 
     def test_read_datetimes(self):

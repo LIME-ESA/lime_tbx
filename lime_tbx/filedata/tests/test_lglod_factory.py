@@ -19,13 +19,14 @@ from lime_tbx.datatypes.datatypes import (
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 from lime_tbx.lime_algorithms.rolo.tests.test_elref import get_coeffs
 from lime_tbx.lime_algorithms.dolp.tests.test_dolp import POL_COEFFS
+from lime_tbx.gui.settings import SettingsManager
 
 EOCFI_PATH = "eocfi_data"
 KERNELS_PATH = KernelsPath("kernels", "kernels")
 
 
 def get_lime_simulation() -> LimeSimulation:
-    return LimeSimulation(EOCFI_PATH, KERNELS_PATH)
+    return LimeSimulation(EOCFI_PATH, KERNELS_PATH, SettingsManager())
 
 
 class TestLGLODFactory(unittest.TestCase):
@@ -37,7 +38,9 @@ class TestLGLODFactory(unittest.TestCase):
         )
         ls.update_irradiance(srf, srf, pt, get_coeffs())
         ls.update_polarization(srf, pt, POL_COEFFS)
-        lglod = lglod_factory.create_lglod_data(pt, srf, ls, KERNELS_PATH, "test")
+        lglod = lglod_factory.create_lglod_data(
+            pt, srf, ls, KERNELS_PATH, "test", "test"
+        )
         self.assertEqual(lglod.spectrum_name, "test")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data
@@ -51,7 +54,9 @@ class TestLGLODFactory(unittest.TestCase):
         )
         ls.update_irradiance(srf, srf, pt, get_coeffs())
         ls.update_polarization(srf, pt, POL_COEFFS)
-        lglod = lglod_factory.create_lglod_data(pt, srf, ls, KERNELS_PATH, "test")
+        lglod = lglod_factory.create_lglod_data(
+            pt, srf, ls, KERNELS_PATH, "test", "test"
+        )
         self.assertEqual(lglod.spectrum_name, "test")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data
@@ -63,7 +68,9 @@ class TestLGLODFactory(unittest.TestCase):
         pt = CustomPoint(1, 400000, 30, 30, 1, 40, -40)
         ls.update_irradiance(srf, srf, pt, get_coeffs())
         ls.update_polarization(srf, pt, POL_COEFFS)
-        lglod = lglod_factory.create_lglod_data(pt, srf, ls, KERNELS_PATH, "test")
+        lglod = lglod_factory.create_lglod_data(
+            pt, srf, ls, KERNELS_PATH, "test", "test"
+        )
         self.assertEqual(lglod.spectrum_name, "test")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data

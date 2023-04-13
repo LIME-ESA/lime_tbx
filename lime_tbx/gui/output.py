@@ -71,6 +71,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
         self.skip_uncs = None
+        self.ch_names = []
         self._build_layout()
 
     def _build_layout(self):
@@ -79,7 +80,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas = MplCanvas(self)
         self.canvas.set_title(self.title, fontproperties=title_font_prop)
         self.canvas.axes.tick_params(labelsize=8)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         subtitle = "LIME2 coefficients version: {}".format(version)
         self.subtitle = subtitle
         self.canvas.set_subtitle(subtitle, fontproperties=font_prop)
@@ -271,6 +272,9 @@ class GraphWidget(QtWidgets.QWidget):
     def set_skipped_uncertainties(self, skip: bool):
         self.skip_uncs = skip
 
+    def set_srf_channel_names(self, ch_names: List[str]):
+        self.ch_names = ch_names
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -278,7 +282,7 @@ class GraphWidget(QtWidgets.QWidget):
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
@@ -308,6 +312,7 @@ class GraphWidget(QtWidgets.QWidget):
                 else:
                     csv.export_csv_srf(
                         self.data,
+                        self.ch_names,
                         self.xlabel,
                         self.ylabel,
                         name,
@@ -480,7 +485,7 @@ for absolute moon phase angles between 2° and 90°"
         )[0]
         self.parentWidget().setDisabled(True)
         self.disable_buttons(True)
-        version = self.settings_manager.get_lime_coef().version
+        version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
                 csv.export_csv_integrated_irradiance(

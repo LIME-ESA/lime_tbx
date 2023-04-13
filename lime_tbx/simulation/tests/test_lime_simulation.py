@@ -31,6 +31,7 @@ from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
+from lime_tbx.gui.settings import SettingsManager
 
 
 """___Authorship___"""
@@ -77,7 +78,7 @@ def get_polar_coeffs() -> PolarizationCoefficients:
 
 def get_lime_simulation() -> ILimeSimulation:
     interp_data.set_interpolation_spectrum_name("ASD")
-    return LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=False)
+    return LimeSimulation(EOCFI_PATH, KERNELS_PATH, SettingsManager(), verbose=False)
 
 
 class TestLimeSimulation(unittest.TestCase):
@@ -446,7 +447,7 @@ class TestLimeSimulation(unittest.TestCase):
         sys.stdout = self.capturedOutput
         sys.stderr = self.capturedErr
 
-        ls = LimeSimulation(EOCFI_PATH, KERNELS_PATH, verbose=True)
+        ls = LimeSimulation(EOCFI_PATH, KERNELS_PATH, SettingsManager(), verbose=True)
         ls.update_irradiance(
             get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
         )
