@@ -342,7 +342,7 @@ def write_obs(
         irr_obs.long_name = "observed lunar irradiance for each channel"
         irr_obs.valid_min = 0.0
         irr_obs.valid_max = 1000000.0
-        irr_obs[:] = lglod.signals.data
+        irr_obs[:] = lglod.signals.data.T
         irr_obs_unc = ds.createVariable("irr_obs_unc", "f8", ("number_obs", "chan"))
         irr_obs_unc.units = "W m-2 nm-1"
         irr_obs_unc.long_name = (
@@ -350,7 +350,7 @@ def write_obs(
         )
         irr_obs_unc.valid_min = 0.0
         irr_obs_unc.valid_max = 1000000.0
-        irr_obs_unc[:] = lglod.signals.uncertainties
+        irr_obs_unc[:] = lglod.signals.uncertainties.T
         wlens = ds.createVariable("wlens", "f8", ("wlens",))
         wlens.units = "nm"
         wlens.long_name = (
