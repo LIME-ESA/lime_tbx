@@ -339,14 +339,14 @@ def write_obs(
             # mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
         irr_obs = ds.createVariable("irr_obs", "f8", ("number_obs", "chan"))
         irr_obs.units = "W m-2 nm-1"
-        irr_obs.long_name = "observed lunar irradiance for each channel"
+        irr_obs.long_name = "simulated lunar irradiance for each channel"
         irr_obs.valid_min = 0.0
         irr_obs.valid_max = 1000000.0
         irr_obs[:] = lglod.signals.data.T
         irr_obs_unc = ds.createVariable("irr_obs_unc", "f8", ("number_obs", "chan"))
         irr_obs_unc.units = "W m-2 nm-1"
         irr_obs_unc.long_name = (
-            "uncertainties of the observed lunar irradiance for each channel"
+            "uncertainties of the simulated lunar irradiance for each channel"
         )
         irr_obs_unc.valid_min = 0.0
         irr_obs_unc.valid_max = 1000000.0
@@ -452,33 +452,29 @@ def write_obs(
         )
         cimel_wlens = ds.createVariable("cimel_wlens", "f8", ("wlens_cimel",))
         cimel_wlens.units = "nm"
-        cimel_wlens.long_name = "Cimel wavelengths"
+        cimel_wlens.long_name = "CIMEL wavelengths"
         cimel_wlens[:] = lglod.elis_cimel[0].wlens
         irr_cimel = ds.createVariable("irr_cimel", "f8", ("number_obs", "wlens_cimel"))
         irr_cimel.units = "W m-2 nm-1"
-        irr_cimel.long_name = "Simulated irradiance for the cimel wavelengths."
+        irr_cimel.long_name = "Simulated lunar irradiance for the CIMEL wavelengths."
         irr_cimel[:] = np.array([cimel.data for cimel in lglod.elis_cimel])
         irr_cimel_unc = ds.createVariable(
             "irr_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         irr_cimel_unc.units = "W m-2 nm-1"
-        irr_cimel_unc.long_name = (
-            "Uncertainties for the simulated irradiance for the cimel wavelengths."
-        )
+        irr_cimel_unc.long_name = "Uncertainties for the simulated lunar irradiance for the CIMEL wavelengths."
         irr_cimel_unc[:] = np.array([cimel.uncertainties for cimel in lglod.elis_cimel])
         refl_cimel = ds.createVariable(
             "refl_cimel", "f8", ("number_obs", "wlens_cimel")
         )
         refl_cimel.units = "Fractions of unity"
-        refl_cimel.long_name = "Simulated reflectance for the cimel wavelengths."
+        refl_cimel.long_name = "Simulated lunar reflectance for the CIMEL wavelengths."
         refl_cimel[:] = np.array([cimel.data for cimel in lglod.elrefs_cimel])
         refl_cimel_unc = ds.createVariable(
             "refl_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         refl_cimel_unc.units = "Fractions of unity"
-        refl_cimel_unc.long_name = (
-            "Uncertainties for the simulated reflectance for the cimel wavelengths."
-        )
+        refl_cimel_unc.long_name = "Uncertainties for the simulated lunar reflectance for the CIMEL wavelengths."
         refl_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.elrefs_cimel]
         )
@@ -486,15 +482,15 @@ def write_obs(
             "polar_cimel", "f8", ("number_obs", "wlens_cimel")
         )
         polar_cimel.units = "Fractions of unity"
-        polar_cimel.long_name = "Simulated polarization for the cimel wavelengths."
+        polar_cimel.long_name = (
+            "Simulated lunar degree of polarization for the CIMEL wavelengths."
+        )
         polar_cimel[:] = np.array([cimel.data for cimel in lglod.polars_cimel])
         polar_cimel_unc = ds.createVariable(
             "polar_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         polar_cimel_unc.units = "Fractions of unity"
-        polar_cimel_unc.long_name = (
-            "Uncertainties for the simulated polarization for the cimel wavelengths."
-        )
+        polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths."
         polar_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.polars_cimel]
         )
@@ -762,7 +758,7 @@ def write_comparison(
             "irr_obs", "f8", ("number_obs", "chan"), fill_value=fill_value
         )
         irr_obs.units = "W m-2 nm-1"
-        irr_obs.long_name = "observed lunar irradiance for each channel"
+        irr_obs.long_name = "simulated lunar irradiance for each channel"
         irr_obs.valid_min = 0.0
         irr_obs.valid_max = 1000000.0
         irr_obs[:] = irr_obs_data.T
@@ -771,7 +767,7 @@ def write_comparison(
         )
         irr_obs_unc.units = "W m-2 nm-1"
         irr_obs_unc.long_name = (
-            "uncertainties of the observed lunar irradiance for each channel"
+            "uncertainties of the simulated lunar irradiance for each channel"
         )
         irr_obs_unc.valid_min = 0.0
         irr_obs_unc.valid_max = 1000000.0
@@ -812,13 +808,20 @@ def write_comparison(
         irr_diff_unc[:] = irr_diff_data_unc.T
 
         mrd = ds.createVariable("mrd", "f8", ("chan",), fill_value=fill_value)
+        mrd.long_name = "Mean relative difference."
+        mrd.valid_max = 1.0
         mrd[:] = mrd_data
+        std_mrd = ds.createVariable("std_mrd", "f8", ("chan",), fill_value=fill_value)
+        std_mrd.long_name = "Standard deviation of the mean relative difference."
+        std_mrd.valid_min = 0.0
+        std_mrd[:] = std_mrd_data
+
         number_samples = ds.createVariable(
             "number_samples", "f8", ("chan",), fill_value=fill_value
         )
+        number_samples.long_name = "Number of comparisons for each channel"
+        number_samples.valid_min = 0.0
         number_samples[:] = number_samples_data
-        std_mrd = ds.createVariable("std_mrd", "f8", ("chan",), fill_value=fill_value)
-        std_mrd[:] = std_mrd_data
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
@@ -843,7 +846,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     lambda_to_satpos = lambda xyz: SatellitePosition(
         *list(map(lambda a: a / d_to_m, xyz))
     )
-    fill_value = -999
+    fill_value = -1999999
     # sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
     sat_poss = list(map(lambda a: a / d_to_m, ds.variables["sat_pos"][:].data))
     irr_obs_data = np.array(ds.variables["irr_obs"][:].data).T

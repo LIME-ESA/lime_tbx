@@ -1411,6 +1411,8 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                 self._start_thread(
                     worker, self._load_observations_finished, self.load_simulation_error
                 )
+            else:
+                lime_tbx_w.get_current_page()._unblock_gui()
         else:
             self.comparison()
             lime_tbx_w.get_current_page()._block_gui_loading()
@@ -1430,6 +1432,8 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                         self._load_comparisons_finished,
                         self.load_simulation_error,
                     )
+            else:
+                lime_tbx_w.get_current_page()._unblock_gui()
 
     def _load_observations_finished(self, data):
         lglod = data[0]
