@@ -40,14 +40,20 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.main_layout.addWidget(self.title_label)
         self.combo_versions = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_versions)
-        self.form_layout = QtWidgets.QFormLayout()
+        # Select dolp interpolation reference
+        self.title_label_dolp = QtWidgets.QLabel(
+            "Select the polarisation interpolation reference"
+        )
+        self.main_layout.addWidget(self.title_label_dolp)
+        self.combo_versions_dolp = QtWidgets.QComboBox()
+        self.main_layout.addWidget(self.combo_versions_dolp)
         # select output SRF
         self.title_label_SRF = QtWidgets.QLabel("Select the output SRF")
         self.main_layout.addWidget(self.title_label_SRF)
         self.combo_SRF = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_SRF)
-        self.form_layout = QtWidgets.QFormLayout()
         # show interp
+        self.form_layout = QtWidgets.QFormLayout()
         self.label_show_interp = QtWidgets.QLabel("Show interpolation spectrum:")
         self.checkbox_show_interp = QtWidgets.QCheckBox()
         self.checkbox_show_interp.setChecked(
@@ -93,6 +99,13 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         spname = self.settings_manager.get_selected_spectrum_name()
         index = self.spectra_names.index(spname)
         self.combo_versions.setCurrentIndex(index)
+        # combo dolp interp spectrum
+        spectra_names = self.settings_manager.get_available_dolp_spectra_names()
+        self.combo_versions_dolp.clear()
+        self.combo_versions_dolp.addItems(spectra_names)
+        spname = self.settings_manager.get_selected_polar_spectrum_name()
+        index = spectra_names.index(spname)
+        self.combo_versions_dolp.setCurrentIndex(index)
         # combo srf
         self.SRF_names = self.settings_manager.get_available_interp_SRFs()
         self.combo_SRF.clear()
@@ -103,9 +116,10 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.combobox_listen = True
 
     @QtCore.Slot()
-    def update_from_combobox(self, name: str, name_SRF: str):
+    def update_from_combobox(self, name: str, name_dolp: str, name_SRF: str):
         if self.combobox_listen:
             self.settings_manager.select_interp_spectrum(name)
+            self.settings_manager.select_interp_polar_spectrum(name_dolp)
             self.settings_manager.select_interp_SRF(name_SRF)
             self.settings_manager.set_show_interp_spectrum(
                 self.checkbox_show_interp.isChecked()
@@ -118,8 +132,9 @@ class InterpOptionsDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def save_clicked(self):
         name = self.combo_versions.currentText()
+        name_dolp = self.combo_versions_dolp.currentText()
         name_SRF = self.combo_SRF.currentText()
-        self.update_from_combobox(name, name_SRF)
+        self.update_from_combobox(name, name_dolp, name_SRF)
         self.close()
 
     @QtCore.Slot()

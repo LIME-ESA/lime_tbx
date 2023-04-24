@@ -919,6 +919,8 @@ class LGLODData:
         Name of the spectrum used for interpolation.
     skipped_uncs: bool
         Flag that indicates if the uncertainties calculation was skipped or not.
+    dolp_spectrum_name: str
+        Name of the spectrum used for polarisation interpolation.
     """
 
     observations: List[LunarObservationWrite]
@@ -930,6 +932,7 @@ class LGLODData:
     spectrum_name: str
     skipped_uncs: bool
     version: str
+    dolp_spectrum_name: str
 
 
 @dataclass
@@ -977,9 +980,18 @@ class InterpolationSettings:
     ----------
     interpolation_spectrum: str
         Name (and id) of the spectrum used for interpolation.
+    interpolation_spectrum_polarization: str
+        Name (and id) of the spectrum used for interpolation for polarization.
+    interpolation_SRF: str
+        Name (and id) of the spectrum used for SRF interpolation.
+    show_interp_spectrum: bool
+        Flag that indicates if the interpolation spectrum used is going to be shown in graphs.
+    skip_uncertainties: bool
+        Flag that indicates if the uncertainties calculation should be skipped.
     """
 
     interpolation_spectrum: str
+    interpolation_spectrum_polarization: str
     interpolation_SRF: str
     show_interp_spectrum: bool
     skip_uncertainties: bool

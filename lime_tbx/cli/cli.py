@@ -204,6 +204,10 @@ input data shall be a json string containing at least one of the following param
 values are 'ASD' and 'Apollo 16 + Breccia'."
     )
     print(
+        "\t\t\t   interp_spectrum_polarization: Sets the polarization interpolation \
+spectrum. The valid values are 'ASD' and 'Linear'."
+    )
+    print(
         "\t\t\t   interp_srf: Sets the output SRF. The valid values are 'asd', \
 'interpolated_gaussian' and 'interpolated_triangle'."
     )
@@ -270,6 +274,7 @@ class CLI:
         version = self.settings_manager.get_lime_coef().version
         are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         csv.export_csv_simulation(
             self.lime_simulation.get_elrefs(),
@@ -301,7 +306,7 @@ class CLI:
             ed.o_file_polar,
             version,
             are_mpas_oinside_mpa_range,
-            sp_name,
+            dolp_sp_name,
             skip_uncs,
         )
         csv.export_csv_integrated_irradiance(
@@ -317,9 +322,16 @@ class CLI:
 
     def _export_lglod(self, point: Point, output_file: str):
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_lime_coef().version
         lglod = create_lglod_data(
-            point, self.srf, self.lime_simulation, self.kernels_path, sp_name, version
+            point,
+            self.srf,
+            self.lime_simulation,
+            self.kernels_path,
+            sp_name,
+            dolp_sp_name,
+            version,
         )
         now = datetime.now(timezone.utc)
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
@@ -353,6 +365,7 @@ class CLI:
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
         canv.axes.cla()  # Clear the canvas.
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elrefs(),
@@ -399,6 +412,10 @@ class CLI:
             )
             sys.exit(1)
         canv.axes.cla()  # Clear the canvas.
+        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}"
+        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
+        canv.axes.cla()  # Clear the canvas.
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_polars(),
@@ -410,7 +427,7 @@ class CLI:
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
             None,
-            sp_name,
+            dolp_sp_name,
         )
         try:
             canv.print_figure(ed.o_file_polar)
@@ -725,7 +742,7 @@ class CLI:
         return 0
 
     def parse_interp_settings(self, arg: str) -> int:
-        # example: -i '{"interp_spectrum": "ASD", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
+        # example: -i '{"interp_spectrum": "ASD", "interp_spectrum_polarization": "Linear", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
         try:
             interp_settings = json.loads(arg)
         except Exception as e:
@@ -733,15 +750,22 @@ class CLI:
             return 1
         if "interp_spectrum" in interp_settings:
             interp_spectrum = interp_settings["interp_spectrum"]
-            names = [
-                name for name in self.settings_manager.get_available_spectra_names()
-            ]
+            names = self.settings_manager.get_available_spectra_names()
             if interp_spectrum not in names:
                 eprint(
                     f"Interpolation spectrum not recognized. Selected: {interp_spectrum}. Available: {names}."
                 )
                 return 1
             self.settings_manager.select_interp_spectrum(interp_spectrum)
+        if "interp_spectrum_polarization" in interp_settings:
+            interp_spectrum_polar = interp_settings["interp_spectrum_polarization"]
+            names = self.settings_manager.get_available_dolp_spectra_names()
+            if interp_spectrum_polar not in names:
+                eprint(
+                    f"Interpolation spectrum for polarization not recognized. Selected: {interp_spectrum_polar}. Available: {names}."
+                )
+                return 1
+            self.settings_manager.select_interp_polar_spectrum(interp_spectrum_polar)
         if "interp_srf" in interp_settings:
             interp_srf = interp_settings["interp_srf"]
             srf_translator = {

@@ -793,11 +793,7 @@ class MainSimulationsWidget(
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
         polar_calculable = self.settings_manager.get_polar_coef().is_calculable()
-        self.polar_button.setEnabled(
-            calculable
-            and self.settings_manager.can_perform_polarization()
-            and polar_calculable
-        )
+        self.polar_button.setEnabled(calculable and polar_calculable)
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
@@ -983,7 +979,7 @@ class MainSimulationsWidget(
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
-        sp_name = interp_data.get_interpolation_spectrum_name()
+        sp_name = interp_data.get_dolp_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
@@ -1036,9 +1032,16 @@ class MainSimulationsWidget(
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        polar_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_coef_version_name()
         lglod = create_lglod_data(
-            point, srf, self.lime_simulation, self.kernels_path, sp_name, version
+            point,
+            srf,
+            self.lime_simulation,
+            self.kernels_path,
+            sp_name,
+            polar_sp_name,
+            version,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")

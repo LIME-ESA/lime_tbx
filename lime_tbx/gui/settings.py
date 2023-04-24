@@ -94,13 +94,28 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
+    def get_available_dolp_spectra_names(self) -> List[str]:
+        """Obtain a list with all the available dolp spectra names"""
+        pass
+
+    @abstractmethod
     def get_selected_spectrum_name(self) -> str:
         """Obtain the currently selected interpolation spectrum name"""
         pass
 
     @abstractmethod
+    def get_selected_polar_spectrum_name(self) -> str:
+        """Obtain the currently selected polarization interpolation spectrum name"""
+        pass
+
+    @abstractmethod
     def select_interp_spectrum(self, name: str):
         """Select the interpolation spectrum to use"""
+        pass
+
+    @abstractmethod
+    def select_interp_polar_spectrum(self, name: str):
+        """Select the polarisation interpolation spectrum to use"""
         pass
 
     @abstractmethod
@@ -116,11 +131,6 @@ class ISettingsManager(ABC):
     @abstractmethod
     def select_interp_SRF(self, name: str):
         """Select the interpolation spectrum to use as SRF"""
-        pass
-
-    @abstractmethod
-    def can_perform_polarization(self) -> bool:
-        """Checks if the current settings allow for the performance of polarization."""
         pass
 
     @abstractmethod
@@ -259,14 +269,20 @@ class SettingsManager(ISettingsManager):
     def get_available_spectra_names(self) -> List[str]:
         return interp_data.get_available_spectra_names()
 
+    def get_available_dolp_spectra_names(self) -> List[str]:
+        return interp_data.get_available_dolp_spectra_names()
+
     def get_selected_spectrum_name(self) -> str:
         return interp_data.get_interpolation_spectrum_name()
+
+    def get_selected_polar_spectrum_name(self) -> str:
+        return interp_data.get_dolp_interpolation_spectrum_name()
 
     def select_interp_spectrum(self, name: str):
         interp_data.set_interpolation_spectrum_name(name)
 
-    def can_perform_polarization(self) -> bool:
-        return interp_data.can_perform_polarization()
+    def select_interp_polar_spectrum(self, name: str):
+        interp_data.set_dolp_interpolation_spectrum_name(name)
 
     def is_show_interp_spectrum(self) -> bool:
         return interp_data.is_show_interpolation_spectrum()

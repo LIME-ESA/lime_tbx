@@ -86,18 +86,6 @@ class TestInterpData(unittest.TestCase):
             LimeException, ipd.set_interpolation_spectrum_name, "FakeSPectrum"
         )
 
-    def test_can_perform_polarization_only_asd(self):
-        """
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_APOLLO16)
-        self.assertFalse(ipd.can_perform_polarization())
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_BRECCIA)
-        self.assertFalse(ipd.can_perform_polarization())
-        """
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_COMPOSITE)
-        self.assertFalse(ipd.can_perform_polarization())
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)
-        self.assertTrue(ipd.can_perform_polarization())
-
 
 if __name__ == "__main__":
     unittest.main()

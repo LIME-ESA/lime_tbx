@@ -593,11 +593,6 @@ class LimeSimulation(ILimeSimulation):
     ):
         skip_uncs = self.is_skipping_uncs()
         self._save_parameters(srf, point)
-        if not interp_data.can_perform_polarization():
-            if self.verbose:
-                print("Skipping polarisation, not available for spectrum")
-            self.pol_uptodate = False
-            return
         if not self.pol_uptodate:
             if self.verbose:
                 print("starting polarisation update")

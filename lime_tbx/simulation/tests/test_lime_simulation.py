@@ -358,7 +358,7 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [6e-11, 5.9e-11, 1.94e-04, 1e-16],
+                [3.5e-11, 3.5e-11, 1.94e-04, 1e-16],
                 [4e-11, 3.8e-11, 1.4e-04, 6.5e-17],
             ]
         )

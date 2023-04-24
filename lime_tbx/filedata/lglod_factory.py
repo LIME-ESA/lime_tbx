@@ -38,6 +38,7 @@ def create_lglod_data(
     lime_simulation: ILimeSimulation,
     kernels_path: KernelsPath,
     spectrum_name: str,
+    dolp_spectrum_name: str,
     coeff_version: str,
 ) -> LGLODData:
     obs = []
@@ -173,4 +174,5 @@ def create_lglod_data(
         spectrum_name,
         skipped_uncs,
         coeff_version,
+        dolp_spectrum_name,
     )
