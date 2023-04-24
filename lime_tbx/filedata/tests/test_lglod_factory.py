@@ -17,7 +17,7 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
 )
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
-from lime_tbx.lime_algorithms.rolo.tests.test_elref import get_coeffs
+from lime_tbx.lime_algorithms.lime.tests.test_elref import get_coeffs
 from lime_tbx.lime_algorithms.dolp.tests.test_dolp import POL_COEFFS
 from lime_tbx.gui.settings import SettingsManager
 

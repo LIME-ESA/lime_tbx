@@ -625,7 +625,7 @@ class LimeCoefficients:
     Attributes
     ----------
     reflectance: ReflectanceCoefficients
-        Reflectance coefficients for the ROLO/LIME model.
+        Reflectance coefficients for the LIME model.
     polarization: PolatizationCoefficients
         Polarization coefficients for the DoLP/LIME model.
     version: str

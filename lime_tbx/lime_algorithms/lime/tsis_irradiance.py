@@ -105,14 +105,14 @@ def tsis_fwhm(
     prop = punpy.MCPropagation(MCsteps, parallel_cores=20)
     si.set_srf_interpolated(fwhm, sampling, shape, write=True)
     intp_wavs = np.array(si.interpolated_srf.get_wavelengths())
-    if shape=="gaussian":
+    if shape == "gaussian":
         intp_esi = si.integrate_solar_interpolated_gaussian(solar_y, solar_x)
         u_intp_esi = prop.propagate_random(
             si.integrate_solar_interpolated_gaussian,
             [solar_y, solar_x],
             [u_solar_y, None],
         )
-    elif shape=="triangle":
+    elif shape == "triangle":
         intp_esi = si.integrate_solar_interpolated_triangle(solar_y, solar_x)
         u_intp_esi = prop.propagate_random(
             si.integrate_solar_interpolated_triangle,
@@ -128,6 +128,7 @@ def tsis_fwhm(
 _AVAILABLE_FWHM = [3, 1, 0.3, 0.1]
 _AVAILABLE_FWHM_SAMPLING = [1, 1, 0.1, 0.1]
 _AVAILABLE_FWHM_SHAPE = ["gaussian", "triangle", "gaussian", "triangle"]
+
 
 def _gen_files():
     """
@@ -156,10 +157,15 @@ def _gen_files():
             _AVAILABLE_FWHM_SAMPLING[ifwhm],
             _AVAILABLE_FWHM_SHAPE[ifwhm],
         )
-        id_str = ("%s_%s_%s" % (_AVAILABLE_FWHM[ifwhm],
-            _AVAILABLE_FWHM_SAMPLING[ifwhm],
-            _AVAILABLE_FWHM_SHAPE[ifwhm])).replace(".", "p")
-        with open("assets/tsis_fwhm_%s.csv"%id_str, "w") as f:
+        id_str = (
+            "%s_%s_%s"
+            % (
+                _AVAILABLE_FWHM[ifwhm],
+                _AVAILABLE_FWHM_SAMPLING[ifwhm],
+                _AVAILABLE_FWHM_SHAPE[ifwhm],
+            )
+        ).replace(".", "p")
+        with open("assets/tsis_fwhm_%s.csv" % id_str, "w") as f:
             for i in range(len(intp_wavs)):
                 f.write("%s,%s,%s\n" % (intp_wavs[i], intp_esi[i], u_intp_esi[i]))
 

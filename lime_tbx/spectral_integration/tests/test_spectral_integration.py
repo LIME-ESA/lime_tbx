@@ -10,7 +10,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from ..spectral_integration import ISpectralIntegration, SpectralIntegration
 from ...datatypes.datatypes import SRFChannel, SpectralData, SpectralResponseFunction
-from lime_tbx.lime_algorithms.rolo.tsis_irradiance import _get_tsis_data
+from lime_tbx.lime_algorithms.lime.tsis_irradiance import _get_tsis_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"

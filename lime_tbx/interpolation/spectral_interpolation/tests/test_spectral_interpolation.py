@@ -15,7 +15,7 @@ from ....datatypes.datatypes import KernelsPath, MoonData
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
-from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
+from lime_tbx.lime_algorithms.lime.tsis_irradiance import (
     _get_tsis_data,
     tsis_cimel,
     tsis_fwhm,

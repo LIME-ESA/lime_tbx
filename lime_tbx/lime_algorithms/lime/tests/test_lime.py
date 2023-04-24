@@ -1,4 +1,4 @@
-"""Tests for the rolo module. Checking that the output is the same as if calling the submodules."""
+"""Tests for the lime module. Checking that the output is the same as if calling the submodules."""
 
 """___Built-In Modules___"""
 # import here
@@ -12,7 +12,7 @@ import xarray as xr
 import obsarray
 
 """___LIME_TBX Modules___"""
-from .. import rolo, eli, elref
+from .. import lime, eli, elref
 from lime_tbx.datatypes.datatypes import (
     MoonData,
     SpectralData,
@@ -331,12 +331,12 @@ def get_coeffs() -> ReflectanceCoefficients:
     return rf
 
 
-class TestROLO(unittest.TestCase):
+class TestLIME(unittest.TestCase):
     def test_elref_one(self):
         rc = get_coeffs_one()
         elref_vals = elref.calculate_elref(rc, CHECK_MD)
         elref_uncs, corr = elref.calculate_elref_unc(rc, CHECK_MD)
-        sd = rolo.ROLO().get_elrefs(rc, CHECK_MD)
+        sd = lime.LIME().get_elrefs(rc, CHECK_MD)
         np.testing.assert_array_equal(elref_vals, sd.data)
         np.testing.assert_array_almost_equal(elref_uncs, sd.uncertainties, 4)
 
@@ -344,7 +344,7 @@ class TestROLO(unittest.TestCase):
         rc = get_coeffs()
         elref_vals = elref.calculate_elref(rc, CHECK_MD)
         elref_uncs, corr = elref.calculate_elref_unc(rc, CHECK_MD)
-        sd = rolo.ROLO().get_elrefs(rc, CHECK_MD)
+        sd = lime.LIME().get_elrefs(rc, CHECK_MD)
         np.testing.assert_array_equal(elref_vals, sd.data)
         np.testing.assert_array_almost_equal(elref_uncs, sd.uncertainties, 4)
 
@@ -367,7 +367,7 @@ class TestROLO(unittest.TestCase):
         eli_uncs, corr = eli.calculate_eli_from_elref_unc(
             elref_spectrum, CHECK_MD, "cimel"
         )
-        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD, "cimel")
+        sd = lime.LIME().get_elis_from_elrefs(elref_spectrum, CHECK_MD, "cimel")
         np.testing.assert_array_equal(eli_vals, sd.data)
         np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 
@@ -382,7 +382,7 @@ class TestROLO(unittest.TestCase):
         eli_uncs, corr = eli.calculate_eli_from_elref_unc(
             elref_spectrum, CHECK_MD, "cimel"
         )
-        sd = rolo.ROLO().get_elis_from_elrefs(elref_spectrum, CHECK_MD, "cimel")
+        sd = lime.LIME().get_elis_from_elrefs(elref_spectrum, CHECK_MD, "cimel")
         np.testing.assert_array_equal(eli_vals, sd.data)
         np.testing.assert_array_almost_equal(eli_uncs, sd.uncertainties)
 

@@ -11,7 +11,7 @@ import numpy.testing as npt
 """___NPL Modules___"""
 
 """___LIME_TBX Modules"""
-from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
+from lime_tbx.lime_algorithms.lime.tsis_irradiance import (
     _get_tsis_data,
     tsis_cimel,
     tsis_asd,

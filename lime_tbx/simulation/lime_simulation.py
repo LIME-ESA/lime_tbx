@@ -22,7 +22,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
 )
 from lime_tbx.datatypes import constants
-from lime_tbx.lime_algorithms.rolo import rolo
+from lime_tbx.lime_algorithms.lime import lime
 from lime_tbx.lime_algorithms.dolp import dolp
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
@@ -732,7 +732,7 @@ class LimeSimulation(ILimeSimulation):
         skip_uncs: bool,
     ) -> Union[SpectralData, List[SpectralData]]:
         """ """
-        rl = rolo.ROLO()
+        rl = lime.LIME()
         if not isinstance(mds, list):
             return rl.get_elrefs(cimel_coeff, mds, skip_uncs)
         specs = []
@@ -767,7 +767,7 @@ class LimeSimulation(ILimeSimulation):
         elis: SpectralData | list of SpectralData
             The extraterrestrial lunar irradiance calculated, a list if self.mds is a list
         """
-        rl = rolo.ROLO()
+        rl = lime.LIME()
         if not isinstance(mds, list):
             return rl.get_elis_from_elrefs(elrefs, mds, srf_type, skip_uncs)
         specs = []

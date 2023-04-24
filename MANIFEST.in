@@ -1,10 +1,10 @@
 include versioneer.py
 include lime_tbx/_version.py
-include lime_tbx/lime_algorithms/rolo/assets/wehrli_asc.csv
-include lime_tbx/lime_algorithms/rolo/assets/tsis_cimel.csv
-include lime_tbx/lime_algorithms/rolo/assets/tsis_fwhm_1_1_triangle.csv
-include lime_tbx/lime_algorithms/rolo/assets/tsis_fwhm_3_1_gaussian.csv
-include lime_tbx/lime_algorithms/rolo/assets/tsis_asd.csv
+include lime_tbx/lime_algorithms/lime/assets/wehrli_asc.csv
+include lime_tbx/lime_algorithms/lime/assets/tsis_cimel.csv
+include lime_tbx/lime_algorithms/lime/assets/tsis_fwhm_1_1_triangle.csv
+include lime_tbx/lime_algorithms/lime/assets/tsis_fwhm_3_1_gaussian.csv
+include lime_tbx/lime_algorithms/lime/assets/tsis_asd.csv
 include lime_tbx/coefficients/access_data/assets/coefficients.csv
 include lime_tbx/coefficients/access_data/assets/coefficients_cimel.csv
 include lime_tbx/coefficients/access_data/assets/u_coefficients_cimel.csv

@@ -21,7 +21,7 @@ import numpy as np
 import punpy
 
 """___LIME_TBX Modules___"""
-from lime_tbx.lime_algorithms.rolo import esi
+from lime_tbx.lime_algorithms.lime import esi
 from lime_tbx.datatypes.datatypes import (
     MoonData,
     SpectralData,

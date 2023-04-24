@@ -9,7 +9,7 @@ omit =
         lime_tbx/gui/*.py
         lime_tbx/_version.py
         lime_tbx/local_storage/*.py
-        lime_tbx/lime_algorithms/rolo/tsis_irradiance.py
+        lime_tbx/lime_algorithms/lime/tsis_irradiance.py
 
 [report]
 exclude_lines =
@@ -24,4 +24,4 @@ omit =
         lime_tbx/gui/*.py
         lime_tbx/_version.py
         lime_tbx/local_storage/*.py
-        lime_tbx/lime_algorithms/rolo/tsis_irradiance.py
+        lime_tbx/lime_algorithms/lime/tsis_irradiance.py

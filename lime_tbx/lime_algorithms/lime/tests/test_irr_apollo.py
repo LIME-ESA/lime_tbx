@@ -21,7 +21,7 @@ import xarray as xr
 import obsarray
 
 """___LIME_TBX Modules___"""
-from .. import rolo
+from .. import lime
 from lime_tbx.datatypes.datatypes import (
     MoonData,
     KernelsPath,
@@ -205,7 +205,7 @@ class TestIrrApollo(unittest.TestCase):
             "This test cannot be performed, the ESI is constant and the reflectance cannot be calculated for custom wavelengths."
         )
         rimodata = RIMODATA_JAN_FULL_MOON_00
-        rl = rolo.ROLO()
+        rl = lime.LIME()
         rc = get_coeffs()
         dts = list(rimodata.keys())
         mds = create_vall_moondata(dts)
@@ -219,7 +219,7 @@ class TestIrrApollo(unittest.TestCase):
             "This test cannot be performed, the ESI is constant and the reflectance cannot be calculated for custom wavelengths."
         )
         rimodata = RIMODATA_FEB_2022
-        rl = rolo.ROLO()
+        rl = lime.LIME()
         rc = get_coeffs()
         dts = list(rimodata.keys())
         mds = create_vall_moondata(dts)

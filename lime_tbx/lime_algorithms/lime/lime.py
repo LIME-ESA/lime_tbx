@@ -2,8 +2,8 @@
 This module calculates the extra-terrestrial lunar disk irradiance.
 
 It exports the following classes:
-    * IROLO - Interface that contains the methods of this module.
-    * ROLO - Class that implements the methods exported by this module.
+    * ILIME - Interface that contains the methods of this module.
+    * LIME - Class that implements the methods exported by this module.
 
 It follows equations described in the following papers:
 - Kieffer and Stone, 2005: The spectral irradiance of the Moon.
@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 """___LIME_TBX Modules___"""
-from lime_tbx.lime_algorithms.rolo import eli, elref
+from lime_tbx.lime_algorithms.lime import eli, elref
 from lime_tbx.datatypes.datatypes import (
     MoonData,
     ReflectanceCoefficients,
@@ -35,7 +35,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-class IROLO(ABC):
+class ILIME(ABC):
     """
     Interface that contains the methods of this module.
 
@@ -112,7 +112,7 @@ class IROLO(ABC):
         pass
 
 
-class ROLO(IROLO):
+class LIME(ILIME):
     """
     Class that implements the methods of this module.
     """

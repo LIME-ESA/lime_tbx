@@ -389,7 +389,7 @@ def set_interpolation_SRF(intp_srf: str):
         _ = """
         lime_tbx_dir=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
         source_dir_fwhm=os.path.join(lime_tbx_dir,"lime_tbx","spectral_integration","assets")
-        source_dir_tsis=os.path.join(lime_tbx_dir,"lime_tbx","lime_algorithms","rolo","assets")
+        source_dir_tsis=os.path.join(lime_tbx_dir,"lime_tbx","lime_algorithms","lime","assets")
         target_dir=os.path.join(lime_tbx_dir,"coeff_data")
         shutil.copyfile(os.path.join(source_dir_fwhm,SRF_DICT_FWHM_FILES[intp_srf]), os.path.join(target_dir,"interpolated_model_fwhm.csv"))
         shutil.copyfile(os.path.join(source_dir_tsis,SRF_DICT_SOLAR_FILES[intp_srf]), os.path.join(target_dir,"tsis_intp.csv"))
