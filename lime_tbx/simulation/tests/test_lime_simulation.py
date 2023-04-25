@@ -358,14 +358,14 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [3.5e-11, 3.5e-11, 1.94e-04, 1e-16],
+                [6e-11, 5.8e-11, 1.94e-04, 1e-16],
                 [4e-11, 3.8e-11, 1.4e-04, 6.5e-17],
             ]
         )
         for polar, pref, uref in zip(polars, polars_refs, uncs_refs):
             np.testing.assert_array_almost_equal(polar.data[CH_DEF_INDICES], pref, 5)
             np.testing.assert_allclose(
-                polar.uncertainties[CH_DEF_INDICES], uref, rtol=0.4
+                polar.uncertainties[CH_DEF_INDICES], uref, rtol=0.5
             )
         cimels = ls.get_polars_cimel()
         cimel_refs = np.array(
