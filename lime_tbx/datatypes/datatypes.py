@@ -138,6 +138,9 @@ class SRFChannel:
         self.center = center
         self.id = id
         self.spectral_response = spectral_response
+        self.spectral_response_inrange = {
+            k: v for k, v in spectral_response.items() if min_wlen <= k <= max_wlen
+        }
         spec = list(self.spectral_response.keys())
         if spec[-1] < min_wlen or spec[0] > max_wlen:
             self.valid_spectre = SpectralValidity.OUT
