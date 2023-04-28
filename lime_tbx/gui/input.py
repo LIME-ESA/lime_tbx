@@ -43,6 +43,11 @@ def _callback_read_obs_files(paths: List[str]) -> List[LunarObservation]:
     return [obss]
 
 
+def _callback_read_srf(path: str) -> Tuple[SpectralResponseFunction, str]:
+    read_srf = srf.read_srf(path)
+    return (read_srf, path)
+
+
 class CustomInputWidget(QtWidgets.QWidget):
     """
     Input widget that contains the GUI elements for the input of the needed parameters for
@@ -675,20 +680,31 @@ class ComparisonInput(QtWidgets.QWidget):
         self.main_layout.addLayout(self.moon_obs_layout)
         self.main_layout.addLayout(self.srf_layout)
 
+    def _load_srf_file_finished(self, data):
+        self.loaded_srf = data[0]
+        path = data[1]
+        shown_path = path
+        if len(shown_path) > MAX_PATH_LEN:
+            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+        self.srf_feedback.setText(shown_path)
+        self.callback_change()
+        self._set_enabled_gui_input(True)
+
+    def _load_srf_file_error(self, e):
+        self.show_error(e)
+        self.clear_srf()
+
     @QtCore.Slot()
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         if path != "":
-            try:
-                self.loaded_srf = srf.read_srf(path)
-            except Exception as e:
-                self.show_error(e)
-            else:
-                shown_path = path
-                if len(shown_path) > MAX_PATH_LEN:
-                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-                self.srf_feedback.setText(shown_path)
-                self.callback_change()
+            self._set_enabled_gui_input(False)
+            self.srf_feedback.setText("Loading...")
+            self.worker = CallbackWorker(
+                _callback_read_srf,
+                [path],
+            )
+            self._start_thread(self._load_srf_file_finished, self._load_srf_file_error)
 
     def show_error(self, error: Exception):
         self._set_enabled_gui_input(True)
@@ -744,6 +760,11 @@ class ComparisonInput(QtWidgets.QWidget):
         self.moon_obs_feedback.setText("No files loaded")
         self.callback_change()
 
+    def clear_srf(self):
+        self.loaded_srf = None
+        self.srf_feedback.setText("No file loaded")
+        self.callback_change()
+
     def get_srf(self) -> Union[SpectralResponseFunction, None]:
         return self.loaded_srf
 
@@ -751,6 +772,5 @@ class ComparisonInput(QtWidgets.QWidget):
         return self.loaded_moons
 
     def clear_input(self) -> None:
-        self.loaded_srf = None
-        self.srf_feedback.setText("No file loaded")
+        self.clear_srf()
         self.clear_obs_files()

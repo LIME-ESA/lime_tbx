@@ -270,6 +270,13 @@ def show_comparisons_callback(
     return (to_remove, to_remove_comps)
 
 
+def _callback_read_srf(
+    path: str, lglod: Union[LGLODData, LGLODComparisonData]
+) -> Tuple[SpectralResponseFunction, Union[LGLODData, LGLODComparisonData]]:
+    srf = srf_loader.read_srf(path)
+    return (srf, lglod)
+
+
 def _show_comps_output(
     output: output.ComparisonOutput,
     comps: List[ComparisonData],
@@ -730,7 +737,9 @@ class MainSimulationsWidget(
         self.graph.set_xlim(logic_constants.CERTAIN_MIN_WLEN)
         # srf widget
         self.srf_widget = srf.SRFEditWidget(
-            self.settings_manager, self._callback_regular_input_changed
+            self.settings_manager,
+            self._callback_regular_input_changed,
+            self._callback_set_enabled,
         )
         # signal widget
         self.signal_widget = output.SignalWidget(self.settings_manager)
@@ -758,6 +767,12 @@ class MainSimulationsWidget(
         self.main_layout.addLayout(self.lower_stack, 1)
         self.main_layout.addWidget(self.export_lglod_button)
         self.update_calculability()
+
+    def _callback_set_enabled(self, enabled: bool):
+        if enabled:
+            self._unblock_gui()
+        else:
+            self._block_gui_loading()
 
     def _set_spinner(self, enabled: bool):
         self.loading_spinner.setVisible(enabled)
@@ -1387,6 +1402,29 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         else:
             lime_tbx_w.main_page.export_glod()
 
+    def load_simulation_read_srf_finished(self, data):
+        srf = data[0]
+        lglod = data[1]
+        worker = CallbackWorker(return_args_callback, [lglod, srf])
+        self._start_thread(
+            worker, self._load_observations_finished, self.load_simulation_error
+        )
+
+    def load_comparisons_read_srf_finished(self, data):
+        srf = data[0]
+        lglod = data[1]
+        worker = CallbackWorker(return_args_callback, [lglod, srf])
+        self._start_thread(
+            worker,
+            self._load_comparisons_finished,
+            self.load_simulation_error,
+        )
+
+    def load_simulation_read_srf_error(self, e):
+        self.show_error(e)
+        lime_tbx_w = self._get_lime_widget()
+        lime_tbx_w.get_current_page()._unblock_gui()
+
     def load_simulation_finished(self, data):
         lglod = data[0]
         lime_tbx_w = self._get_lime_widget()
@@ -1395,46 +1433,38 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         if isinstance(lglod, LGLODData):
             self.simulations()
             lime_tbx_w.get_current_page()._block_gui_loading()
-            srf = None
-            cancel = False
             if lglod.not_default_srf:
                 srf_path = QtWidgets.QFileDialog().getOpenFileName(
                     self, "Select SpectralResponseFunction file"
                 )[0]
                 if srf_path == "":
-                    cancel = True
+                    lime_tbx_w.get_current_page()._unblock_gui()
                 else:
-                    try:
-                        srf = srf_loader.read_srf(srf_path)
-                    except Exception as e:
-                        cancel = True
-                        self.show_error(e)
-            if not cancel:
-                worker = CallbackWorker(return_args_callback, [lglod, srf])
-                self._start_thread(
-                    worker, self._load_observations_finished, self.load_simulation_error
-                )
-            else:
-                lime_tbx_w.get_current_page()._unblock_gui()
+                    worker = CallbackWorker(
+                        _callback_read_srf,
+                        [srf_path, lglod],
+                    )
+                    self._start_thread(
+                        worker,
+                        self.load_simulation_read_srf_finished,
+                        self.load_simulation_read_srf_error,
+                    )
         else:
             self.comparison()
             lime_tbx_w.get_current_page()._block_gui_loading()
-            srf = None
             srf_path = QtWidgets.QFileDialog().getOpenFileName(
                 self, "Select SpectralResponseFunction file"
             )[0]
             if srf_path != "":
-                try:
-                    srf = srf_loader.read_srf(srf_path)
-                except Exception as e:
-                    self.show_error(e)
-                else:
-                    worker = CallbackWorker(return_args_callback, [lglod, srf])
-                    self._start_thread(
-                        worker,
-                        self._load_comparisons_finished,
-                        self.load_simulation_error,
-                    )
+                worker = CallbackWorker(
+                    _callback_read_srf,
+                    [srf_path, lglod],
+                )
+                self._start_thread(
+                    worker,
+                    self.load_comparisons_read_srf_finished,
+                    self.load_simulation_read_srf_error,
+                )
             else:
                 lime_tbx_w.get_current_page()._unblock_gui()
 

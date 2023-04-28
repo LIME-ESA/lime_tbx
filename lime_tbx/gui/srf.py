@@ -4,14 +4,18 @@
 # import here
 
 """___Third-Party Modules___"""
-from typing import Callable
+from typing import Callable, Tuple
 from PySide2 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from lime_tbx.filedata import srf as file_srf
-from lime_tbx.datatypes.datatypes import SpectralData
+from lime_tbx.datatypes.datatypes import SpectralData, SpectralResponseFunction
 from lime_tbx.datatypes import constants
 from lime_tbx.gui import settings, output
+from lime_tbx.gui.util import (
+    CallbackWorker,
+    start_thread as _start_thread,
+)
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -21,15 +25,26 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
+def _callback_read_srf(path: str) -> Tuple[SpectralResponseFunction]:
+    srf = file_srf.read_srf(path)
+    return (srf,)
+
+
 class SRFEditWidget(QtWidgets.QWidget):
     def __init__(
-        self, settings_manager: settings.ISettingsManager, changed_callback: Callable
+        self,
+        settings_manager: settings.ISettingsManager,
+        changed_callback: Callable,
+        enabled_callback: Callable,
     ):
         super().__init__()
         self.combobox_listen = False
         self.settings_manager = settings_manager
         self.loaded_srf = None
         self.changed_callback = changed_callback
+        self.enabled_callback = enabled_callback
+        self.worker_ths = []
+        self.workers = []
         self._build_layout()
         self.update_output_data()
         self.combobox_listen = True
@@ -89,16 +104,33 @@ class SRFEditWidget(QtWidgets.QWidget):
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
 
+    def _start_thread(
+        self, worker: CallbackWorker, finished: Callable, error: Callable
+    ):
+        worker_th = QtCore.QThread()
+        self.worker_ths.append(worker_th)
+        self.workers.append(worker)
+        _start_thread(worker, worker_th, finished, error)
+
+    def _load_srf_finished(self, data):
+        srf = data[0]
+        self.set_srf(srf)
+        self.enabled_callback(True)
+
+    def _load_srf_error(self, e):
+        self.enabled_callback(True)
+        self.show_error(e)
+
     @QtCore.Slot()
     def load_srf(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         if path != "":
-            try:
-                srf = file_srf.read_srf(path)
-            except Exception as e:
-                self.show_error(e)
-            else:
-                self.set_srf(srf)
+            self.enabled_callback(False)
+            worker = CallbackWorker(
+                _callback_read_srf,
+                [path],
+            )
+            self._start_thread(worker, self._load_srf_finished, self._load_srf_error)
 
     @QtCore.Slot()
     def set_srf(self, srf):
