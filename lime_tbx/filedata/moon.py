@@ -28,6 +28,8 @@ from ..datatypes.datatypes import (
     SelenographicDataWrite,
     SpectralData,
     SurfacePoint,
+    SatellitePoint,
+    CustomPoint,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -697,22 +699,39 @@ def write_comparison(
         quant_dates = len(dates)
         ch_names = [lglod.ch_names[i] for i in index_useful_channel]
         sat_names = [lglod.sat_name for _ in range(quant_dates)]
-        if not isinstance(points_n_inrange[0][0], SurfacePoint):
-            raise Exception("Can't write comparison points with selenographic point.")
-        sat_pos_ref = constants.EARTH_FRAME
+        if isinstance(points_n_inrange[0][0], CustomPoint):
+            seleno = True
+            sat_pos_ref = constants.MOON_FRAME
+        elif isinstance(points_n_inrange[0][0], SurfacePoint):
+            seleno = False
+            sat_pos_ref = constants.EARTH_FRAME
+        else:
+            raise Exception("Can't write comparison points with satellital point.")
         inside_mpa_range = []
         sat_pos = []
         mpas = []
         for sp, in_range, mpa in points_n_inrange:
-            sat_pos_pt = SatellitePosition(
-                *SPICEAdapter.to_rectangular(
-                    sp.latitude,
-                    sp.longitude,
-                    sp.altitude,
-                    "EARTH",
-                    kernels_path.main_kernels_path,
+            if not seleno:
+                sat_pos_pt = SatellitePosition(
+                    *SPICEAdapter.to_rectangular(
+                        sp.latitude,
+                        sp.longitude,
+                        sp.altitude,
+                        "EARTH",
+                        kernels_path.main_kernels_path,
+                    )
                 )
-            )
+            else:
+                cp: CustomPoint = sp
+                sat_pos_pt = SatellitePosition(
+                    *SPICEAdapter.to_rectangular(
+                        cp.selen_obs_lat,
+                        cp.selen_obs_lon,
+                        cp.distance_observer_moon * 1000,
+                        "MOON",
+                        kernels_path.main_kernels_path,
+                    )
+                )
             sat_pos.append(sat_pos_pt)
             inside_mpa_range.append(in_range)
             mpas.append(mpa)

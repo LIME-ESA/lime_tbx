@@ -25,7 +25,9 @@ from lime_tbx.datatypes.datatypes import (
     SpectralData,
     SpectralResponseFunction,
     SurfacePoint,
+    CustomPoint,
     SRFChannel,
+    LimeException,
 )
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -186,22 +188,58 @@ class Comparison(IComparison):
         sps = [[] for _ in ch_names]
         mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
+        doing_earth = None
         for obs in observations:
             if callback_observation:
                 callback_observation()
             sat_pos = obs.sat_pos
             dt = obs.dt
-            lat, lon, h = SPICEAdapter.to_planetographic(
-                sat_pos.x,
-                sat_pos.y,
-                sat_pos.z,
-                "EARTH",
-                self.kernels_path.main_kernels_path,
-            )
-            sp = SurfacePoint(lat, lon, h, dt)
-            mpa = SPICEAdapter.get_moon_data_from_earth(
-                lat, lon, h, dt, self.kernels_path
-            ).mpa_degrees
+            if obs.sat_pos_ref in ("IAU_MOON", "MOON_ME", "MOON"):
+                if doing_earth == None:
+                    doing_earth = False
+                elif doing_earth:
+                    # TODO fix this and allow multiple different sat_pos_ref
+                    raise LimeException(
+                        "Observations must have the same satellite reference position."
+                    )
+                solat, solon, dom_m = SPICEAdapter.to_planetographic(
+                    sat_pos.x,
+                    sat_pos.y,
+                    sat_pos.z,
+                    "MOON",
+                    self.kernels_path.main_kernels_path,
+                )
+                mdam = SPICEAdapter.get_moon_data_from_moon(
+                    solat, solon, dom_m, dt, self.kernels_path
+                )
+                mpa = mdam.mpa_degrees
+                sp = CustomPoint(
+                    mdam.distance_sun_moon,
+                    mdam.distance_observer_moon,
+                    solat,
+                    solon,
+                    mdam.long_sun_radians,
+                    mdam.absolute_mpa_degrees,
+                    mdam.mpa_degrees,
+                )
+            else:
+                if doing_earth == None:
+                    doing_earth = True
+                elif not doing_earth:
+                    raise LimeException(
+                        "Observations must have the same satellite reference position."
+                    )
+                lat, lon, h = SPICEAdapter.to_planetographic(
+                    sat_pos.x,
+                    sat_pos.y,
+                    sat_pos.z,
+                    "EARTH",
+                    self.kernels_path.main_kernels_path,
+                )
+                sp = SurfacePoint(lat, lon, h, dt)
+                mpa = SPICEAdapter.get_moon_data_from_earth(
+                    lat, lon, h, dt, self.kernels_path
+                ).mpa_degrees
             lime_simulation.set_simulation_changed()
             def_srf = get_default_srf()
             lime_simulation.update_irradiance(def_srf, srf, sp, coefficients)
