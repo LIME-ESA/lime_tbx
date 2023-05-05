@@ -188,20 +188,12 @@ class Comparison(IComparison):
         sps = [[] for _ in ch_names]
         mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
-        doing_earth = None
         for obs in observations:
             if callback_observation:
                 callback_observation()
             sat_pos = obs.sat_pos
             dt = obs.dt
             if obs.sat_pos_ref in ("IAU_MOON", "MOON_ME", "MOON"):
-                if doing_earth == None:
-                    doing_earth = False
-                elif doing_earth:
-                    # TODO fix this and allow multiple different sat_pos_ref
-                    raise LimeException(
-                        "Observations must have the same satellite reference position."
-                    )
                 solat, solon, dom_m = SPICEAdapter.to_planetographic(
                     sat_pos.x,
                     sat_pos.y,
@@ -223,12 +215,6 @@ class Comparison(IComparison):
                     mdam.mpa_degrees,
                 )
             else:
-                if doing_earth == None:
-                    doing_earth = True
-                elif not doing_earth:
-                    raise LimeException(
-                        "Observations must have the same satellite reference position."
-                    )
                 lat, lon, h = SPICEAdapter.to_planetographic(
                     sat_pos.x,
                     sat_pos.y,
