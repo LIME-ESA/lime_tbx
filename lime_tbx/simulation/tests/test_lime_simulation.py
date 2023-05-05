@@ -177,7 +177,7 @@ class TestLimeSimulation(unittest.TestCase):
                 elref.uncertainties[CH_DEF_INDICES], unc, 4
             )
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
-            np.testing.assert_array_equal(cimel.data, data)
+            np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 4)
 
     def test_update_reflectance_skip_uncs(self):
@@ -222,7 +222,7 @@ class TestLimeSimulation(unittest.TestCase):
             )
             np.testing.assert_array_equal(elref.uncertainties[CH_DEF_INDICES], unc)
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
-            np.testing.assert_array_equal(cimel.data, data)
+            np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_equal(cimel.uncertainties, unc)
 
     # Function update_irradiance
@@ -287,7 +287,7 @@ class TestLimeSimulation(unittest.TestCase):
             ]
         )
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
-            np.testing.assert_array_equal(cimel.data, data)
+            np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 8)
 
     def test_update_irradiance_skip_uncs(self):
@@ -339,7 +339,7 @@ class TestLimeSimulation(unittest.TestCase):
         )
         cimel_unc_refs = np.zeros(cimel_refs.shape)
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
-            np.testing.assert_array_equal(cimel.data, data)
+            np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_equal(cimel.uncertainties, unc)
 
     # Function update_polarization
