@@ -28,6 +28,8 @@ from ..datatypes.datatypes import (
     SelenographicDataWrite,
     SpectralData,
     SurfacePoint,
+    SatellitePoint,
+    CustomPoint,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -180,7 +182,7 @@ class _NormalSimulationData:
     quant_dates: int
     coefficients_version: str
     ch_names: List[str]
-    sat_pos_ref: str
+    sat_pos_refs: List[str]
     sat_names: List[str]
     sat_pos: List[SatellitePosition]
     dates: List[datetime]
@@ -223,7 +225,7 @@ def _write_normal_simulations(
     # DIMENSIONS
     max_len_strlen = len(max(sim_data.ch_names, key=len))
     chan_st_type = "S{}".format(max_len_strlen)
-    max_len_sat_pos_ref = len(max(sim_data.sat_pos_ref, key=len))
+    max_len_sat_pos_ref = len(max(sim_data.sat_pos_refs, key=len))
     sat_pos_ref_st_type = "S{}".format(max_len_sat_pos_ref)
     max_len_sat_name = len(max(sim_data.sat_names, key=len))
     sat_name_st_type = "S{}".format(max_len_sat_name)
@@ -272,10 +274,15 @@ def _write_normal_simulations(
             for sat_pos in sim_data.sat_pos
         ]
     )  # divided by 1000 because they were in meters
-    sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
+    sat_pos_ref = ds.createVariable(
+        "sat_pos_ref", "S1", ("number_obs", "sat_ref_strlen")
+    )
     sat_pos_ref.long_name = "reference frame of satellite position"
-    sat_pos_ref[:] = nc.stringtochar(
-        np.array([sim_data.sat_pos_ref], sat_pos_ref_st_type)
+    sat_pos_ref[:] = np.array(
+        [
+            nc.stringtochar(np.array([spr], sat_pos_ref_st_type))
+            for spr in sim_data.sat_pos_refs
+        ]
     )
     sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
     sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
@@ -303,7 +310,7 @@ def write_obs(
             quant_dates,
             coefficients_version,
             obs[0].ch_names,
-            obs[0].sat_pos_ref,
+            [o.sat_pos_ref for o in obs],
             [o.sat_name for o in obs],
             [o.sat_pos for o in obs],
             [o.dt for o in obs],
@@ -520,20 +527,15 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         *list(map(lambda a: a / d_to_m, xyz))
     )
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
-    sat_pos_ref_0 = (
-        ds.variables["sat_pos_ref"][:]
-        .data.tobytes()
-        .decode("utf-8")
-        .replace("\x00", "")
-    )
+    lambda_to_str = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+    sat_pos_ref_0 = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))[0]
     signals_data = np.array(ds.variables["irr_obs"][:].data)
     signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data)
     signals = SpectralData(
         np.array(channel_names_0), signals_data, np.array(signals_uncs), None
     )
     wlens = list(map(float, ds.variables["wlens"][:].data))
-    lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
-    sat_name_0 = lambda_to_satname(ds.variables["sat_name"][:].data)
+    sat_name_0 = lambda_to_str(ds.variables["sat_name"][:].data)
     irr_spectrum = [
         list(map(float, data)) for data in ds.variables["irr_spectrum"][:].data
     ]
@@ -697,30 +699,44 @@ def write_comparison(
         quant_dates = len(dates)
         ch_names = [lglod.ch_names[i] for i in index_useful_channel]
         sat_names = [lglod.sat_name for _ in range(quant_dates)]
-        if not isinstance(points_n_inrange[0][0], SurfacePoint):
-            raise Exception("Can't write comparison points with selenographic point.")
-        sat_pos_ref = constants.EARTH_FRAME
         inside_mpa_range = []
         sat_pos = []
+        sat_pos_refs = []
         mpas = []
         for sp, in_range, mpa in points_n_inrange:
-            sat_pos_pt = SatellitePosition(
-                *SPICEAdapter.to_rectangular(
-                    sp.latitude,
-                    sp.longitude,
-                    sp.altitude,
-                    "EARTH",
-                    kernels_path.main_kernels_path,
+            if isinstance(sp, CustomPoint):
+                sat_pos_pt = SatellitePosition(
+                    *SPICEAdapter.to_rectangular(
+                        sp.selen_obs_lat,
+                        sp.selen_obs_lon,
+                        sp.distance_observer_moon * 1000,
+                        "MOON",
+                        kernels_path.main_kernels_path,
+                    )
                 )
-            )
+                sat_pos_ref = constants.MOON_FRAME
+            elif isinstance(sp, SurfacePoint):
+                sat_pos_pt = SatellitePosition(
+                    *SPICEAdapter.to_rectangular(
+                        sp.latitude,
+                        sp.longitude,
+                        sp.altitude,
+                        "EARTH",
+                        kernels_path.main_kernels_path,
+                    )
+                )
+                sat_pos_ref = constants.EARTH_FRAME
+            else:
+                raise Exception("Can't write comparison points with satellital point.")
             sat_pos.append(sat_pos_pt)
+            sat_pos_refs.append(sat_pos_ref)
             inside_mpa_range.append(in_range)
             mpas.append(mpa)
         sim_data = _NormalSimulationData(
             quant_dates,
             coefficients_version,
             ch_names,
-            sat_pos_ref,
+            sat_pos_refs,
             sat_names,
             sat_pos,
             dates,
@@ -861,8 +877,9 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mrd = np.array(ds.variables["mrd"][:].data)
     std_mrd = np.array(ds.variables["std_mrd"][:].data)
     number_samples = np.array(ds.variables["number_samples"][:].data)
-    lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
-    sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
+    lambda_to_str = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+    sat_name = lambda_to_str(ds.variables["sat_name"][:].data)
+    sat_pos_refs = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))
     mpas = np.array(ds.variables["mpa"][:].data)
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
@@ -873,12 +890,37 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
     number_samples = number_samples[number_samples != fill_value]
-
-    sat_poss = SPICEAdapter.to_planetographic_multiple(
-        sat_poss, "EARTH", kernels_path.main_kernels_path
-    )
-    for i, sp in enumerate(sat_poss):
-        sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
+    kp = kernels_path.main_kernels_path
+    for i, (satpos, satposref) in enumerate(zip(sat_poss, sat_pos_refs)):
+        if satposref in ("MOON", "MOON_ME", "IAU_MOON"):
+            sp = SPICEAdapter.to_planetographic(
+                satpos[0],
+                satpos[1],
+                satpos[2],
+                "MOON",
+                kp,
+            )
+            mdam = SPICEAdapter.get_moon_data_from_moon(
+                sp[0], sp[1], sp[2], datetimes[i], kernels_path
+            )
+            sp = CustomPoint(
+                mdam.distance_sun_moon,
+                mdam.distance_observer_moon,
+                sp[0],
+                sp[1],
+                mdam.long_sun_radians,
+                mdam.absolute_mpa_degrees,
+                mdam.mpa_degrees,
+            )
+        else:
+            sp = SPICEAdapter.to_planetographic(
+                satpos[0],
+                satpos[1],
+                satpos[2],
+                "EARTH",
+                kp,
+            )
+            sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
         points.append(sp)
     points = np.array(points)
     for i in range(len(ch_names)):

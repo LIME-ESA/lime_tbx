@@ -9,7 +9,7 @@ It exports the following classes:
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Callable
 import os
 
 """___Third-Party Modules___"""
@@ -33,6 +33,8 @@ class ISPICEAdapter(ABC):
 
     It exports the following functions:
         * get_moon_data_from_earth() - Calculate lunar data for a position on earth
+            surface at a concrete datetime.
+        * get_moon_data_from_moon() - Calculate lunar data for a position on Moon's
             surface at a concrete datetime.
         * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
         * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
@@ -60,6 +62,40 @@ class ISPICEAdapter(ABC):
             Geographic longitude in decimal degrees.
         altitude: float
             Altitude over the sea level in meters.
+        dt: datetime | list of datetimes
+            Time or time series at which the lunar data will be calculated.
+        kernels_path: str
+            Path where the needed SPICE kernels are located.
+            The user must have write access to that directory.
+
+        Returns
+        -------
+        md: MoonData | list of MoonData
+            Lunar data for the given parameters. If the parameter dt was a list,
+            this will be a list. Otherwise not.
+        """
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def get_moon_data_from_moon(
+        latitude: float,
+        longitude: float,
+        altitude: float,
+        dt: Union[datetime, List[datetime]],
+        kernels_path: datatypes.KernelsPath,
+    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
+        """
+        Calculate lunar data for a position on moon surface at a concrete datetime.
+
+        Parameters
+        ----------
+        latitude: float
+            Selenographic latitude in decimal degrees.
+        longitude: float
+            Selenographic longitude in decimal degrees.
+        altitude: float
+            Altitude in meters.
         dt: datetime | list of datetimes
             Time or time series at which the lunar data will be calculated.
         kernels_path: str
@@ -154,12 +190,34 @@ class ISPICEAdapter(ABC):
         """
         pass
 
+    @staticmethod
+    @abstractmethod
+    def get_solar_moon_datas(
+        dts: List[datetime],
+        kernels_path: str,
+    ):
+        """
+        Obtain solar selenographic coordinates of at multiple times.
+
+        times : list of str | list of datetime
+            Times at which the lunar data will be calculated.
+            If they are str, they must be in a valid UTC format allowed by SPICE, such as
+            %Y-%m-%d %H:%M:%S.
+            If they are datetimes they must be timezone aware, or they will be understood
+            as computer local time.
+        kernels_path : str
+            Path where the SPICE kernels are stored
+        """
+        pass
+
 
 class SPICEAdapter(ISPICEAdapter):
     """Class that implements the methods of this module.
 
     It exports the following functions:
         * get_moon_data_from_earth() - Calculate lunar data for a position on earth
+            surface at a concrete datetime.
+        * get_moon_data_from_moon() - Calculate lunar data for a position on moon's
             surface at a concrete datetime.
         * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
         * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
@@ -168,15 +226,16 @@ class SPICEAdapter(ISPICEAdapter):
     """
 
     @staticmethod
-    def get_moon_data_from_earth(
+    def _get_moon_data_from_callback(
         latitude: float,
         longitude: float,
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        callback: Callable,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         if isinstance(dt, list):
-            mds = spicedmoon.get_moon_datas(
+            mds = callback(
                 latitude,
                 longitude,
                 altitude,
@@ -197,7 +256,7 @@ class SPICEAdapter(ISPICEAdapter):
                 )
                 mds2.append(md2)
             return mds2
-        md = spicedmoon.get_moon_datas(
+        md = callback(
             latitude,
             longitude,
             altitude,
@@ -213,6 +272,35 @@ class SPICEAdapter(ISPICEAdapter):
             md.lon_obs,
             abs(md.mpa_deg),
             md.mpa_deg,
+        )
+
+    @staticmethod
+    def get_moon_data_from_earth(
+        latitude: float,
+        longitude: float,
+        altitude: float,
+        dt: Union[datetime, List[datetime]],
+        kernels_path: datatypes.KernelsPath,
+    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
+        return SPICEAdapter._get_moon_data_from_callback(
+            latitude, longitude, altitude, dt, kernels_path, spicedmoon.get_moon_datas
+        )
+
+    @staticmethod
+    def get_moon_data_from_moon(
+        latitude: float,
+        longitude: float,
+        altitude: float,
+        dt: Union[datetime, List[datetime]],
+        kernels_path: datatypes.KernelsPath,
+    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
+        return SPICEAdapter._get_moon_data_from_callback(
+            latitude,
+            longitude,
+            altitude,
+            dt,
+            kernels_path,
+            spicedmoon.get_moon_datas_from_moon,
         )
 
     @staticmethod
@@ -307,3 +395,10 @@ class SPICEAdapter(ISPICEAdapter):
                 lon -= 360
             llh_list[i] = (lat, lon, alt)
         return llh_list
+
+    @staticmethod
+    def get_solar_moon_datas(
+        dts: List[datetime],
+        kernels_path: str,
+    ):
+        return spicedmoon.get_sun_moon_datas(dts, kernels_path)

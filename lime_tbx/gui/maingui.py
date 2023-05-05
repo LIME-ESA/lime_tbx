@@ -1449,6 +1449,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                         self.load_simulation_read_srf_finished,
                         self.load_simulation_read_srf_error,
                     )
+            else:
+                lime_tbx_w = self._get_lime_widget()
+                lime_tbx_w.load_observations_finished(lglod, None)
         else:
             self.comparison()
             lime_tbx_w.get_current_page()._block_gui_loading()
