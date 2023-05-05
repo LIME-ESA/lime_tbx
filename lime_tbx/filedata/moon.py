@@ -891,7 +891,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     std_mrd = std_mrd[std_mrd != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     kp = kernels_path.main_kernels_path
-    for i, satpos, satposref in enumerate(zip(sat_poss, sat_pos_refs)):
+    for i, (satpos, satposref) in enumerate(zip(sat_poss, sat_pos_refs)):
         if satposref in ("MOON", "MOON_ME", "IAU_MOON"):
             sp = SPICEAdapter.to_planetographic(
                 satpos[0],
