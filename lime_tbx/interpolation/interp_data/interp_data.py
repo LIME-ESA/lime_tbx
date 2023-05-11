@@ -80,7 +80,7 @@ def get_best_polar_asd_data(moon_phase_angle: float) -> SpectralData:
 
     wavs = ds_asd.wavelength.values
     phase_angles = ds_asd.phase_angle.values
-    best_id = np.argmin(np.abs(np.abs(phase_angles) - moon_phase_angle))
+    best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
 
     pol = ds_asd.polarization.values[:, best_id]
     unc = ds_asd.u_polarization.values[:, best_id] * pol / 100
@@ -136,7 +136,7 @@ def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
 
     wavs = ds_asd.wavelength.values
     phase_angles = ds_asd.phase_angle.values
-    best_id = np.argmin(np.abs(np.abs(phase_angles) - moon_phase_angle))
+    best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
 
     refl = ds_asd.reflectance.values[:, best_id]
     unc = ds_asd.u_reflectance.values[:, best_id] * refl / 100
