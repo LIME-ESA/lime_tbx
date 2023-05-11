@@ -734,7 +734,9 @@ class MainSimulationsWidget(
         self.graph.update_legend(
             [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
         )
-        self.graph.set_xlim(logic_constants.CERTAIN_MIN_WLEN)
+        self.graph.set_xlim(
+            logic_constants.CERTAIN_MIN_WLEN, logic_constants.CERTAIN_MAX_WLEN
+        )
         # srf widget
         self.srf_widget = srf.SRFEditWidget(
             self.settings_manager,

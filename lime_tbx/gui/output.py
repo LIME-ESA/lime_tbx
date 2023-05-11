@@ -243,6 +243,7 @@ class GraphWidget(QtWidgets.QWidget):
                 sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
+        self.toolbar.update()
         self.canvas.draw()
 
     def show_error(self, error: Exception):

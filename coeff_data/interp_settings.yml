@@ -2,5 +2,5 @@
   interpolation_spectrum: ASD
   interpolation_spectrum_polarization: ASD
   interpolation_SRF: Gaussian SRF with 1nm spectral sampling and 3nm resolution
-  show_interp_spectrum: false
-  skip_uncertainties: false
+  show_interp_spectrum: true
+  skip_uncertainties: true
