@@ -163,6 +163,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.disable_buttons(True)
         if redraw:
             self._redraw()
+        self.toolbar.update()
 
     def update_labels(
         self,
@@ -179,6 +180,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.subtitle = subtitle
         if redraw:
             self._redraw()
+        self.toolbar.update()
 
     def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
@@ -195,6 +197,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.legend = legend
         if redraw:
             self._redraw()
+        self.toolbar.update()
 
     def update_size(self):
         self._redraw()
@@ -243,7 +246,6 @@ class GraphWidget(QtWidgets.QWidget):
                 sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
-        self.toolbar.update()
         self.canvas.draw()
 
     def show_error(self, error: Exception):
