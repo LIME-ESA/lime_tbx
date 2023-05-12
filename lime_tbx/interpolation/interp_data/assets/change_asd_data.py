@@ -146,11 +146,10 @@ def main():
         ini = int(b[0])
         stop = int(b[1] + 1)
         if ini > 0 and stop < len(wlens):
-            pass
-            # interpolate(ini, stop, wlens, refl)
-            # interpolate(ini, stop, wlens, dolp, False)
+            interpolate(ini, stop, wlens, refl)
+            interpolate(ini, stop, wlens, dolp, False)
         else:
-            # extrapolate(ini, stop, wlens, refl)
+            extrapolate(ini, stop, wlens, refl)
             extrapolate_constant(ini, stop, wlens, dolp)
     ds["reflectance"][:] = refl
     ds["polarization"][:] = dolp
