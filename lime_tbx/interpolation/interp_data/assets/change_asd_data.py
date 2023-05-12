@@ -33,6 +33,7 @@ BANDS = np.array(
         (1307, 1508),
         # (1800, 1960),
         (1785, 1980),
+        # (2480, 2500),
         (2480, 2500),
     ]
 )
@@ -86,16 +87,18 @@ def extrapolate_apollo(dini, dstop, ini, stop, wlens, xp, fp):
     return ie
 
 
-def interpolate(ini, stop, wlens, refl):
+def interpolate(ini, stop, wlens, refl, use_apollo=True):
     xp = np.concatenate([wlens[:ini], wlens[stop:]])
     fps = np.concatenate([refl[:ini], refl[stop:]]).T
-    # refl[ini:stop] = np.array([np.interp(wlens[ini:stop], xp, fp) for fp in fps]).T
-    refl[ini:stop] = np.array(
-        [interpolate_apollo(ini, stop, wlens, xp, fp) for fp in fps]
-    ).T
+    if not use_apollo:
+        refl[ini:stop] = np.array([np.interp(wlens[ini:stop], xp, fp) for fp in fps]).T
+    else:
+        refl[ini:stop] = np.array(
+            [interpolate_apollo(ini, stop, wlens, xp, fp) for fp in fps]
+        ).T
 
 
-def extrapolate(ini, stop, wlens, refl):
+def extrapolate(ini, stop, wlens, refl, use_apollo=True):
     if ini > 0:
         xp = wlens[:ini]
         fps = refl[:ini].T
@@ -106,11 +109,22 @@ def extrapolate(ini, stop, wlens, refl):
         fps = refl[stop:].T
         dini = stop
         dstop = len(wlens)
-    # interps = [interp1d(xp, fp, 'linear', fill_value='extrapolate') for fp in fps]
-    # refl[ini:stop] = np.array([interp(wlens[ini:stop]) for interp in interps]).T
-    refl[ini:stop] = np.array(
-        [extrapolate_apollo(dini, dstop, ini, stop, wlens, xp, fp) for fp in fps]
-    ).T
+    if not use_apollo:
+        interps = [interp1d(xp, fp, "linear", fill_value="extrapolate") for fp in fps]
+        refl[ini:stop] = np.array([interp(wlens[ini:stop]) for interp in interps]).T
+    else:
+        refl[ini:stop] = np.array(
+            [extrapolate_apollo(dini, dstop, ini, stop, wlens, xp, fp) for fp in fps]
+        ).T
+
+
+def extrapolate_constant(ini, stop, wlens, refl):
+    if ini > 0:
+        val = np.mean(refl[max(0, ini - 25) : ini].T, axis=1)
+    else:
+        val = np.mean(refl[stop : min(len(wlens), stop + 25)].T, axis=1)
+    vals = np.array([val for _ in range(ini, stop)])
+    refl[ini:stop] = vals
 
 
 def drift_refl(wlens, refl):
@@ -125,16 +139,21 @@ def main():
     ds = nc.Dataset(DS_PATH, "r+")
     wlens = ds["wavelength"][:].data
     refl = ds["reflectance"][:].data
+    dolp = ds["polarization"][:].data
     refl = drift_refl(wlens, refl)
     bands = BANDS - wlens[0]
     for b in bands:
         ini = int(b[0])
         stop = int(b[1] + 1)
         if ini > 0 and stop < len(wlens):
-            interpolate(ini, stop, wlens, refl)
+            pass
+            # interpolate(ini, stop, wlens, refl)
+            # interpolate(ini, stop, wlens, dolp, False)
         else:
-            extrapolate(ini, stop, wlens, refl)
+            # extrapolate(ini, stop, wlens, refl)
+            extrapolate_constant(ini, stop, wlens, dolp)
     ds["reflectance"][:] = refl
+    ds["polarization"][:] = dolp
     ds.close()
 
 
