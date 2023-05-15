@@ -81,11 +81,14 @@ class SRFEditWidget(QtWidgets.QWidget):
     def update_output_data(self):
         srf = self.settings_manager.get_srf()
         srf_data = []
+        ch_names = []
         for ch in srf.channels:
             x_data = list(ch.spectral_response.keys())
             y_data = list(ch.spectral_response.values())
             ch_data = SpectralData(x_data, y_data, None, None)
+            ch_names.append(ch.id)
             srf_data.append(ch_data)
+        self.graph.set_cursor_names(ch_names)
         self.graph.update_plot(srf_data)
         self.graph.set_srf_channel_names(srf.get_channels_names())
         self.changed_callback()

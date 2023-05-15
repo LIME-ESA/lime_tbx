@@ -65,6 +65,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.data_compare = None
         self.vertical_lines = []
         self.dts = []
+        self.cursor_names = []
         self.mpl_cursor = None
         self.xlim_left = None
         self.xlim_right = None
@@ -202,8 +203,13 @@ class GraphWidget(QtWidgets.QWidget):
     def update_size(self):
         self._redraw()
 
+    def set_cursor_names(self, labels: List[str]):
+        self.dts = None
+        self.cursor_names = labels.copy()
+
     def set_dts(self, dts: List[datetime]):
         self.dts = dts
+        self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
@@ -225,7 +231,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.fig.tight_layout()
         except:
             pass
-        if self.dts:
+        if self.cursor_names:
             cursor_lines = [
                 l
                 for l in lines
@@ -233,6 +239,9 @@ class GraphWidget(QtWidgets.QWidget):
                 or l.get_label() == self.legend[0][0]
             ]
             self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
+            func_num_from_label = lambda label: int(int(label[6:]))
+            if self.dts:
+                func_num_from_label = lambda label: int(int(label[6:]) / 2)
 
             @self.mpl_cursor.connect("add")
             def _(sel):
@@ -240,9 +249,8 @@ class GraphWidget(QtWidgets.QWidget):
                 label = sel.artist.get_label()
                 num = 0
                 if label.startswith("_child"):
-                    num = int(int(label[6:]) / 2)
-                dt: datetime = self.dts[num]
-                label = dt.strftime("%Y/%m/%d %H:%M:%S")
+                    num = func_num_from_label(label)
+                label = self.cursor_names[num]
                 sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
