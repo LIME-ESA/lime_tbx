@@ -22,6 +22,7 @@ from lime_tbx.gui import (
 )
 from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.gui.spinner import SpinnerPage
+from lime_tbx.gui import constants
 from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
 from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import moon, srf as srf_loader
@@ -732,7 +733,11 @@ class MainSimulationsWidget(
             parent=self,
         )
         self.graph.update_legend(
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
+            [
+                [constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ]
         )
         self.graph.set_xlim(
             logic_constants.CERTAIN_MIN_WLEN, logic_constants.CERTAIN_MAX_WLEN

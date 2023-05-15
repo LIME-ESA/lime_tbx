@@ -26,7 +26,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
 )
 from lime_tbx.datatypes import constants, logger
-from lime_tbx.gui import settings
+from lime_tbx.gui import settings, constants as gui_constants
 from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.filedata import moon, srf as srflib, csv
@@ -369,7 +369,11 @@ class CLI:
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elrefs(),
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]],
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ],
             self.lime_simulation.get_elrefs_cimel(),
             self.lime_simulation.get_elrefs_asd(),
             None,
@@ -392,7 +396,11 @@ class CLI:
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elis(),
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]],
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ],
             self.lime_simulation.get_elis_cimel(),
             self.lime_simulation.get_elis_asd(),
             None,
@@ -419,7 +427,11 @@ class CLI:
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_polars(),
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]],
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ],
             self.lime_simulation.get_polars_cimel(),
             self.lime_simulation.get_polars_asd(),
             None,

@@ -32,6 +32,7 @@ from lime_tbx.gui.canvas import (
     font_prop,
     redraw_canvas,
 )
+from lime_tbx.gui import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -243,14 +244,21 @@ class GraphWidget(QtWidgets.QWidget):
             if self.dts:
                 func_num_from_label = lambda label: int(int(label[6:]) / 2)
 
+            for l in cursor_lines:
+                lab = l.get_label()
+                if lab.startswith("_child"):
+                    num = func_num_from_label(lab)
+                    l.set_label(self.cursor_names[num])
+
             @self.mpl_cursor.connect("add")
             def _(sel):
                 sel.annotation.get_bbox_patch().set(fc="white")
                 label = sel.artist.get_label()
-                num = 0
                 if label.startswith("_child"):
                     num = func_num_from_label(label)
-                label = self.cursor_names[num]
+                    label = self.cursor_names[num]
+                elif label == constants.INTERPOLATED_DATA_LABEL:
+                    label = self.cursor_names[0]
                 sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)

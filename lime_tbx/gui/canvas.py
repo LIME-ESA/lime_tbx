@@ -14,6 +14,7 @@ from matplotlib import font_manager as fm
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 import numpy as np
+import mplcursors
 
 
 """___LIME_TBX Modules___"""
@@ -225,6 +226,19 @@ def redraw_canvas(
     scanvas.axes.set_xlabel(sxlabel, fontproperties=label_font_prop)
     scanvas.axes.set_ylabel(sylabel, fontproperties=label_font_prop)
     if svertical_lines and len(svertical_lines) > 0:
+        svlines = []
         for val in svertical_lines:
-            scanvas.axes.axvline(x=val, color="k", label="LIME Spectrum limit")
+            svlines.append(
+                scanvas.axes.axvline(
+                    x=val, color="k", label=constants.LIME_SPECTRUM_LIMIT_LABEL
+                )
+            )
+        scanvas.mpl_cursor = mplcursors.cursor(svlines, hover=2)
+
+        @scanvas.mpl_cursor.connect("add")
+        def _(sel):
+            sel.annotation.get_bbox_patch().set(fc="white")
+            label = sel.artist.get_label()
+            sel.annotation.set_text(label)
+
     return lines
