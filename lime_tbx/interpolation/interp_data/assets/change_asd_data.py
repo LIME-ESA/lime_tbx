@@ -150,16 +150,27 @@ def fix_pos_spec_errors(wlens, refl):
         if "interps" in fix:
             finterps = np.array(fix["interps"]) - int(wlens[0])
             for wlen in finterps:
-                print(refl[wlen, e0 : ef + 1])
-                print((refl[wlen - 1, e0 : ef + 1] + refl[wlen + 1, e0 : ef + 1]) / 2)
                 refl[wlen, e0 : ef + 1] = (
                     refl[wlen - 1, e0 : ef + 1] + refl[wlen + 1, e0 : ef + 1]
                 ) / 2
         if "drifts" in fix:
             for drpair in fix["drifts"]:
-                # print(refl[drpair[0]-1:drpair[1]+2, e0:ef+1])
                 refl = drift_refl(wlens, refl, drpair[1])
-                # print(refl[drpair[0]-1:drpair[1]+2, e0:ef+1])
+    return refl
+
+
+def replace_too_corrupted_mpas(wlens, refl):
+    replacers = {
+        3: (4, 10),
+        16: (11, 15),
+        44: (45, 59),
+    }
+    extra_replacers = {-i: (i, i) for i in range(60, 90)}
+    replacers = {**replacers, **extra_replacers}
+    for rep in replacers:
+        exts = replacers[rep]
+        for ext in range(exts[0], exts[1] + 1):
+            refl[:, ext + 90] = refl[:, rep + 90]
     return refl
 
 
@@ -168,7 +179,7 @@ def main():
     wlens = ds["wavelength"][:].data
     refl = ds["reflectance"][:].data
     dolp = ds["polarization"][:].data
-    refl = fix_pos_spec_errors(wlens, refl)
+    refl = replace_too_corrupted_mpas(wlens, refl)
     ds["reflectance"][:] = refl
     return
     refl = drift_refl(wlens, refl, 1001)
