@@ -127,11 +127,39 @@ def extrapolate_constant(ini, stop, wlens, refl):
     refl[ini:stop] = vals
 
 
-def drift_refl(wlens, refl):
-    sep = int(1001 - wlens[0])
+def drift_refl(wlens, refl, wlen_drift):
+    sep = int(wlen_drift - wlens[0])
     reflt = refl
     diff = reflt[sep, :] - reflt[sep - 1, :]
     refl[sep:, :] = refl[sep:, :] - diff
+    return refl
+
+
+def fix_pos_spec_errors(wlens, refl):
+    fixes = {
+        (17, 32): {"interps": [1098]},
+        (31, 44): {
+            "interps": [646, 657, 749, 753, 790, 858, 862, 888],
+            "drifts": [(620, 621)],
+        },
+    }
+    for extrs in fixes:
+        fix = fixes[extrs]
+        e0 = extrs[0] + 90
+        ef = extrs[1] + 90
+        if "interps" in fix:
+            finterps = np.array(fix["interps"]) - int(wlens[0])
+            for wlen in finterps:
+                print(refl[wlen, e0 : ef + 1])
+                print((refl[wlen - 1, e0 : ef + 1] + refl[wlen + 1, e0 : ef + 1]) / 2)
+                refl[wlen, e0 : ef + 1] = (
+                    refl[wlen - 1, e0 : ef + 1] + refl[wlen + 1, e0 : ef + 1]
+                ) / 2
+        if "drifts" in fix:
+            for drpair in fix["drifts"]:
+                # print(refl[drpair[0]-1:drpair[1]+2, e0:ef+1])
+                refl = drift_refl(wlens, refl, drpair[1])
+                # print(refl[drpair[0]-1:drpair[1]+2, e0:ef+1])
     return refl
 
 
@@ -140,7 +168,10 @@ def main():
     wlens = ds["wavelength"][:].data
     refl = ds["reflectance"][:].data
     dolp = ds["polarization"][:].data
-    refl = drift_refl(wlens, refl)
+    refl = fix_pos_spec_errors(wlens, refl)
+    ds["reflectance"][:] = refl
+    return
+    refl = drift_refl(wlens, refl, 1001)
     bands = BANDS - wlens[0]
     for b in bands:
         ini = int(b[0])
