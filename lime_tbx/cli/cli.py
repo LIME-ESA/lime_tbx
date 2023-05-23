@@ -286,6 +286,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             sp_name,
             skip_uncs,
+            self.lime_simulation.get_elrefs_cimel(),
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
@@ -297,6 +298,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             sp_name,
             skip_uncs,
+            self.lime_simulation.get_elis_cimel(),
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
@@ -308,6 +310,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             dolp_sp_name,
             skip_uncs,
+            self.lime_simulation.get_polars_cimel(),
         )
         csv.export_csv_integrated_irradiance(
             self.srf,

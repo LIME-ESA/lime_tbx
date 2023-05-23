@@ -6,6 +6,9 @@ distance sun moon,0.9
 selenographic latitude of observer,30
 selenographic longitude of observer,30
 selenographic longitude of sun,1
+CIMEL Wavelength,Irradiance,uncertainties
+314,0.01,1e-07
+420,0.01,0
 Wavelength,Irradiance,uncertainties
 350,0.0001,0
 370,0.0002,0

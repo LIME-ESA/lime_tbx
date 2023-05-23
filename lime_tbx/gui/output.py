@@ -145,6 +145,9 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlim_left = left
         self.xlim_right = right
 
+    def _update_toolbar(self):
+        self.toolbar.update()
+
     def update_plot(
         self,
         data: Union[SpectralData, List[SpectralData]] = None,
@@ -165,7 +168,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.disable_buttons(True)
         if redraw:
             self._redraw()
-        self.toolbar.update()
+            self._update_toolbar()
 
     def update_labels(
         self,
@@ -182,7 +185,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.subtitle = subtitle
         if redraw:
             self._redraw()
-        self.toolbar.update()
+        self._update_toolbar()
 
     def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
@@ -199,7 +202,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.legend = legend
         if redraw:
             self._redraw()
-        self.toolbar.update()
+        self._update_toolbar()
 
     def update_size(self):
         self._redraw()
@@ -273,15 +276,11 @@ class GraphWidget(QtWidgets.QWidget):
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
         )[0]
-        self.parentWidget().setDisabled(True)
-        self.disable_buttons(True)
         if name is not None and name != "":
             try:
                 self.canvas.print_figure(name)
             except Exception as e:
                 self.show_error(e)
-        self.disable_buttons(False)
-        self.parentWidget().setDisabled(False)
 
     def set_inside_mpa_range(self, inside_mpa_range):
         self.inside_mpa_range = inside_mpa_range
@@ -300,8 +299,6 @@ class GraphWidget(QtWidgets.QWidget):
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export CSV", "{}.csv".format(self.title)
         )[0]
-        self.parentWidget().setDisabled(True)
-        self.disable_buttons(True)
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
@@ -328,6 +325,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.inside_mpa_range,
                         self.interp_spectrum_name,
                         self.skip_uncs,
+                        self.cimel_data,
                     )
                 else:
                     csv.export_csv_srf(
@@ -339,8 +337,6 @@ class GraphWidget(QtWidgets.QWidget):
                     )
             except Exception as e:
                 self.show_error(e)
-        self.disable_buttons(False)
-        self.parentWidget().setDisabled(False)
 
 
 class SignalWidget(QtWidgets.QWidget):

@@ -125,6 +125,7 @@ def export_csv_simulation(
     inside_mpa_range: Union[bool, List[bool]],
     interp_spectrum_name: str,
     skip_uncs: bool,
+    cimel_data: Union[SpectralData, List[SpectralData]],
 ):
     """
     Export the given data to a csv file
@@ -181,6 +182,20 @@ def export_csv_simulation(
                 ylabels.append(f"{ylabel}{warn_out_mpa_range}")
                 if not skip_uncs:
                     ylabels.append(f"uncertainties{warn_out_mpa_range}")
+            if cimel_data:
+                writer.writerow([f"CIMEL {xlabel}", *ylabels])
+                if not isinstance(cimel_data, list) and not isinstance(
+                    cimel_data, np.ndarray
+                ):
+                    cimel_data = [cimel_data]
+                x_data = cimel_data[0].wlens
+                for i, cimel_w in enumerate(x_data):
+                    y_data = []
+                    for cdata in cimel_data:
+                        y_data.append(cdata.data[i])
+                        if not skip_uncs:
+                            y_data.append(cdata.uncertainties[i])
+                    writer.writerow([cimel_w, *y_data])
             writer.writerow([xlabel, *ylabels])
             if not isinstance(data, list) and not isinstance(data, np.ndarray):
                 data = [data]

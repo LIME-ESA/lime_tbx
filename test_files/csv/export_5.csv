@@ -2,6 +2,9 @@ LIME2 coefficients version,test
 Interpolation spectrum,ASD
 satellite,BIOMASS
 datetimes,2018-02-27 02:00:00+00:00,2019-02-23 02:00:00+00:00
+CIMEL Wavelength,2018-02-27 02:00:00+00:00 Irradiance,2018-02-27 02:00:00+00:00 uncertainties,2019-02-23 02:00:00+00:00 Irradiance,2019-02-23 02:00:00+00:00 uncertainties
+314,0.01,1e-07
+420,0.01,0
 Wavelength,2018-02-27 02:00:00+00:00 Irradiance,2018-02-27 02:00:00+00:00 uncertainties,2019-02-23 02:00:00+00:00 Irradiance,2019-02-23 02:00:00+00:00 uncertainties
 350,0.0001,0,0.0002,2e-06
 370,0.0002,0,0.0001,0
