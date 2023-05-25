@@ -119,8 +119,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(elrefs, list)
         elrefs_refs = np.array(
             [
-                [0.039, 0.062, 0.076, 0.083],
-                [0.041, 0.066, 0.081, 0.088],
+                [0.033, 0.059, 0.076, 0.083],
+                [0.036, 0.063, 0.081, 0.088],
             ]
         )
         uncs_refs = np.array(
@@ -190,8 +190,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(elrefs, list)
         elrefs_refs = np.array(
             [
-                [0.039, 0.062, 0.076, 0.083],
-                [0.041, 0.066, 0.081, 0.088],
+                [0.033, 0.059, 0.076, 0.083],
+                [0.036, 0.063, 0.081, 0.088],
             ]
         )
         uncs_refs = np.zeros(elrefs_refs.shape)
@@ -352,14 +352,14 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(polars, list)
         polars_refs = np.array(
             [
-                [0.07129744, 0.07129744, 0.06956987, 0.06093203],
-                [0.05147481, 0.05147481, 0.05024157, 0.04407537],
+                [0.08249, 0.08154, 0.06838, 0.06093],
+                [0.05846, 0.05787, 0.0495, 0.04407],
             ]
         )
         uncs_refs = np.array(
             [
-                [6e-11, 5.8e-11, 1.94e-04, 1e-16],
-                [4e-11, 3.8e-11, 1.4e-04, 6.5e-17],
+                [8.91e-10, 1.06e-9, 4.74e-05, 1e-16],
+                [4.82e-10, 5.28e-10, 2.7e-06, 7.25e-17],
             ]
         )
         for polar, pref, uref in zip(polars, polars_refs, uncs_refs):
@@ -407,8 +407,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(polars, list)
         polars_refs = np.array(
             [
-                [0.07129744, 0.07129744, 0.06956987, 0.06093203],
-                [0.05147481, 0.05147481, 0.05024157, 0.04407537],
+                [0.08249, 0.08154, 0.06838, 0.06093],
+                [0.05846, 0.05787, 0.0495, 0.04407],
             ]
         )
         uncs_refs = np.zeros(polars_refs.shape)
