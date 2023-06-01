@@ -204,10 +204,6 @@ input data shall be a json string containing at least one of the following param
 values are 'ASD' and 'Apollo 16 + Breccia'."
     )
     print(
-        "\t\t\t   interp_spectrum_polarization: Sets the polarization interpolation \
-spectrum. The valid values are 'ASD' and 'Linear'."
-    )
-    print(
         "\t\t\t   interp_srf: Sets the output SRF. The valid values are 'asd', \
 'interpolated_gaussian' and 'interpolated_triangle'."
     )
@@ -757,7 +753,7 @@ class CLI:
         return 0
 
     def parse_interp_settings(self, arg: str) -> int:
-        # example: -i '{"interp_spectrum": "ASD", "interp_spectrum_polarization": "Linear", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
+        # example: -i '{"interp_spectrum": "ASD", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
         try:
             interp_settings = json.loads(arg)
         except Exception as e:
@@ -772,15 +768,6 @@ class CLI:
                 )
                 return 1
             self.settings_manager.select_interp_spectrum(interp_spectrum)
-        if "interp_spectrum_polarization" in interp_settings:
-            interp_spectrum_polar = interp_settings["interp_spectrum_polarization"]
-            names = self.settings_manager.get_available_dolp_spectra_names()
-            if interp_spectrum_polar not in names:
-                eprint(
-                    f"Interpolation spectrum for polarization not recognized. Selected: {interp_spectrum_polar}. Available: {names}."
-                )
-                return 1
-            self.settings_manager.select_interp_polar_spectrum(interp_spectrum_polar)
         if "interp_srf" in interp_settings:
             interp_srf = interp_settings["interp_srf"]
             srf_translator = {

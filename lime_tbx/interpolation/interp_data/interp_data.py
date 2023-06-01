@@ -61,8 +61,11 @@ def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:  # pragma: n
     return spectral_data
 
 
-def get_best_polar_asd_data(moon_phase_angle: float) -> SpectralData:
+def get_best_polar_asd_data(
+    moon_phase_angle: float,
+) -> SpectralData:  # pragma: no cover
     """Retrieve the best ASD polarization spectrum for the given moon phase angle.
+    This is not used in the end, the ASD polarization spectrum wasn't good enough.
 
     Parameters
     ----------
@@ -251,7 +254,6 @@ _VALID_INTERP_SPECTRA = [
 ]
 
 _VALID_DOLP_INTERP_SPECTRA = [
-    SPECTRUM_NAME_ASD,
     SPECTRUM_NAME_LINEAR,
 ]
 

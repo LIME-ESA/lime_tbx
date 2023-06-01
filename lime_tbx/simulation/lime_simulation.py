@@ -541,8 +541,9 @@ class LimeSimulation(ILimeSimulation):
         else:
             polar_asd = intp.get_best_polar_interp_reference(mds)
         polar = LimeSimulation._interpolate_polar(
-            polar_asd, polar_cimel, intp, wlens, skip_uncs
+            polar_asd, polar_cimel, intp, wlens, True
         )
+        # TODO confirm that we should skip polar uncertainties in interpolation if we do always linear
         return polar_cimel, polar_asd, polar
 
     def update_irradiance(

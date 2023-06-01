@@ -187,11 +187,7 @@ class SpectralInterpolation(ISpectralInterpolation):
             return idata.get_best_asd_data(moon_data.mpa_degrees)
 
     def get_best_polar_interp_reference(self, moon_data: MoonData):
-        name = idata.get_dolp_interpolation_spectrum_name()
-        if name == idata.SPECTRUM_NAME_LINEAR:
-            return idata.get_linear_polar_data()
-        else:
-            return idata.get_best_polar_asd_data(moon_data.mpa_degrees)
+        return idata.get_linear_polar_data()
 
     def get_interpolated_refl(
         self,

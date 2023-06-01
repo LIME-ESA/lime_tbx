@@ -30,7 +30,6 @@ Options:
   -C, --coefficients	 Change the coefficients version used by the TBX, for this execution and the next ones until it's changed again.
   -i, --interpolation-settings	 Change the interpolation settings. The input data shall be a json string containing at least one of the following parameters:
 			   interp_spectrum: Sets the interpolation spectrum. The valid values are 'ASD' and 'Apollo 16 + Breccia'.
-			   interp_spectrum_polarization: Sets the polarization interpolation spectrum. The valid values are 'ASD' and 'Linear'.
 			   interp_srf: Sets the output SRF. The valid values are 'asd', 'interpolated_gaussian' and 'interpolated_triangle'.
 			   show_interp_spectrum: Sets if the graphs should show the spectrum used for interpolation. The valid values are 'True' and 'False'.
 			   skip_uncertainties: Sets if the ToolBox should skip the uncertainties calculations. The valid values are 'True' and 'False'.
