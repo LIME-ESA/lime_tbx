@@ -370,6 +370,8 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.sat_names = [s.name for s in self.satellites]
         self._build_layout()
         self.callback_check_calculable = callback_check_calculable
+        self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_max_date = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self.update_from_combobox(0)
 
     def _build_layout(self):
@@ -414,6 +416,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         )
         self.load_datetimes_button.clicked.connect(self.load_datetimes)
         self.loaded_datetimes_label = QtWidgets.QLabel("")
+        self.loaded_datetimes_label.setWordWrap(True)
         self.datetimes_layout.addWidget(self.load_datetimes_button)
         self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
         self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
@@ -422,8 +425,17 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
+        self.warning_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxWarning
+        )  # QtGui.QIcon.fromTheme('dialog-warning')
+        self.warning_pixmap = self.warning_icon.pixmap(32)
+        self.warn_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
+        self.warn_hidden_datetimes_invalid.setPixmap(self.warning_pixmap)
+        self.warn_hidden_datetimes_invalid.setWordWrap(True)
+        self.warn_hidden_datetimes_invalid.hide()
         self.switch_layout = QtWidgets.QHBoxLayout()
         self.switch_layout.addWidget(self.show_datetimes_button)
+        self.switch_layout.addWidget(self.warn_hidden_datetimes_invalid)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
@@ -457,6 +469,8 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         if path != "":
             try:
                 self.loaded_datetimes = csv.read_datetimes(path)
+                self.all_loaded_datetimes = self.loaded_datetimes
+                self.update_dates_with_limits()
             except Exception as e:
                 self.show_error(e)
             else:
@@ -492,8 +506,10 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         if isinstance(dt, list):
             if self.single_datetime:
                 self.change_multiple_datetime()
+            self.all_loaded_datetimes = dt
             self.loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
+            self.update_dates_with_limits()
             self.callback_check_calculable()
         else:
             if not self.single_datetime:
@@ -504,23 +520,54 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                 )
             )
 
+    def update_dates_with_limits(self):
+        self.loaded_datetimes = [
+            dt
+            for dt in self.all_loaded_datetimes
+            if self.current_min_date < dt < self.current_max_date
+        ]
+        if len(self.loaded_datetimes) != len(self.all_loaded_datetimes):
+            missing_dts = [
+                dt
+                for dt in self.all_loaded_datetimes
+                if dt not in self.loaded_datetimes
+            ]
+            missing_dts_msg = ",".join(
+                [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in missing_dts]
+            )
+            self.warn_hidden_datetimes_invalid.show()
+            self.warn_hidden_datetimes_invalid.setToolTip(
+                f"The following datetimes are not available for the selected satellite: {missing_dts_msg}"
+            )
+        else:
+            self.warn_hidden_datetimes_invalid.hide()
+            self.warn_hidden_datetimes_invalid.setToolTip("")
+
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         sat = self.satellites[i]
+        d0, df = sat.get_datetime_range()
+        if d0 == None:
+            d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_min_date = d0
+        if df == None:
+            df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_max_date = df
         if self.single_datetime:
-            d0, df = sat.get_datetime_range()
-            if d0 == None:
-                d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
             dt0 = QtCore.QDateTime(
                 d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
             )
             self.datetime_edit.setMinimumDateTime(dt0)
-            if df == None:
-                df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
             dtf = QtCore.QDateTime(
                 df.year, df.month, df.day, df.hour, df.minute, df.second
             )
             self.datetime_edit.setMaximumDateTime(dtf)
+        else:
+            self.update_dates_with_limits()
+            self.callback_check_calculable()
+
+    def get_current_min_max_dates(self) -> Tuple[datetime, datetime]:
+        return self.current_min_date, self.current_max_date
 
     def is_calculable(self) -> bool:
         if self.single_datetime:
