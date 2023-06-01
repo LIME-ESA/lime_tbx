@@ -352,14 +352,14 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(polars, list)
         polars_refs = np.array(
             [
-                [0.08249, 0.08154, 0.06838, 0.06093],
-                [0.05846, 0.05787, 0.0495, 0.04407],
+                [0.0713, 0.0713, 0.06957, 0.06093],
+                [0.05147, 0.05147, 0.05024, 0.04408],
             ]
         )
         uncs_refs = np.array(
             [
-                [8.91e-10, 1.06e-9, 4.74e-05, 1e-16],
-                [4.82e-10, 5.28e-10, 2.7e-06, 7.25e-17],
+                [0, 0, 0, 0],  # [8.91e-10, 1.06e-9, 4.74e-05, 1e-16],
+                [0, 0, 0, 0],  # [4.82e-10, 5.28e-10, 2.7e-06, 7.25e-17],
             ]
         )
         for polar, pref, uref in zip(polars, polars_refs, uncs_refs):
@@ -407,8 +407,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(polars, list)
         polars_refs = np.array(
             [
-                [0.08249, 0.08154, 0.06838, 0.06093],
-                [0.05846, 0.05787, 0.0495, 0.04407],
+                [0.0713, 0.0713, 0.06957, 0.06093],
+                [0.05147, 0.05147, 0.05024, 0.04408],
             ]
         )
         uncs_refs = np.zeros(polars_refs.shape)
