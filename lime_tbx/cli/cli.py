@@ -63,6 +63,11 @@ LONG_OPTIONS = [
 _WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
 
+_ERROR_RINDEX_BOTH_DOT = "When creating output as CSV or GRAPH files for both DT and MPA, \
+the full CSV/GRAPH filepaths must be explictly written, including the extension \
+(.csv, .png, ...).\nAnother solution is to select the CSVD/GRAPHD option where one \
+only has to specify the output directory path.\nProblematic filepath: "
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -657,6 +662,8 @@ class CLI:
                                 os.path.join(ed.output_dir, ch), ed.extension
                             )
                         if is_both:
+                            if "." not in output:
+                                raise LimeException(_ERROR_RINDEX_BOTH_DOT + output)
                             idx = output.rindex(".")
                             output = output[:idx] + ".dt" + output[idx:]
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
@@ -701,6 +708,8 @@ class CLI:
                                 os.path.join(ed.output_dir, ch), ed.extension
                             )
                         if is_both:
+                            if "." not in output:
+                                raise LimeException(_ERROR_RINDEX_BOTH_DOT + output)
                             idx = output.rindex(".")
                             output = output[:idx] + ".mpa" + output[idx:]
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
@@ -798,6 +807,27 @@ class CLI:
                 return 1
             skip_uncertainties = skip_uncertainties == "True"
             self.settings_manager.set_skip_uncertainties(skip_uncertainties)
+        return 0
+
+    def check_sys_args(self, sysargs: List[str]) -> int:
+        # Check if the user has forgotten one dash, or has set one dash but all together
+        if any(
+            item.startswith("-") and not item.startswith("--") and len(item) > 2
+            for item in sysargs
+        ):
+            problem_flags = [
+                item
+                for item in sysargs
+                if item.startswith("-")
+                and not item[0].startswith("--")
+                and len(item) > 2
+            ]
+            eprint(
+                f"The flags must be separated from their argument/s by at least one blank space, \
+and the flags set with only one dash '-' only have one letter. Problematic flags: {problem_flags}.\n\
+Run 'lime -h' for help."
+            )
+            return 1
         return 0
 
     def handle_input(self, opts: List[Tuple[str, str]]) -> int:

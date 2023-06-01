@@ -44,12 +44,12 @@ def main():
         os.path.join(programfiles, "kernels"), os.path.join(appdata, "kernels")
     )
     eocfi_path = os.path.join(programfiles, "eocfi_data")
-    args = sys.argv[1:]
+    sysargs = sys.argv[1:]
     options = OPTIONS
     long_options = LONG_OPTIONS
     selected_version = AccessData().get_previously_selected_version()
     try:
-        opts, args = getopt.getopt(args, options, long_options)
+        opts, args = getopt.getopt(sysargs, options, long_options)
     except getopt.GetoptError as e:
         print("Error parsing input parameters: " + str(e))
         print_help()
@@ -66,7 +66,9 @@ def main():
         gui = GUI(kernels_path, eocfi_path, selected_version)
     else:
         cli = CLI(kernels_path, eocfi_path, selected_version)
-        status = cli.handle_input(opts)
+        status = cli.check_sys_args(sysargs)
+        if status == 0:
+            status = cli.handle_input(opts)
         sys.exit(status)
 
 
