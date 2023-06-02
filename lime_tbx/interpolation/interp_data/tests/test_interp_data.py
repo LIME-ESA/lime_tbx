@@ -25,8 +25,8 @@ class TestInterpData(unittest.TestCase):
         self.assertIsNotNone(asd_data)
 
     def test_get_asd_data_not_mpa_absolute(self):
-        asd_data_neg = ipd.get_best_asd_data(-80)
-        asd_data_pos = ipd.get_best_asd_data(80)
+        asd_data_neg = ipd.get_best_asd_data(-20)
+        asd_data_pos = ipd.get_best_asd_data(20)
         self.assertTrue(np.not_equal(asd_data_neg.data, asd_data_pos.data).any())
 
     def test_get_asd_data_consistent(self):
