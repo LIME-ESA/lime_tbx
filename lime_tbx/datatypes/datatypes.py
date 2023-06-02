@@ -691,7 +691,7 @@ class SpectralData:
     @staticmethod
     def make_irradiance_ds(
         wavs: np.ndarray,
-        refl: np.ndarray,
+        irr: np.ndarray,
         unc: np.ndarray = None,
         corr: np.ndarray = None,
     ) -> xarray.Dataset:
@@ -701,7 +701,7 @@ class SpectralData:
 
         ds_irr = ds_irr.assign_coords(wavelength=wavs)
 
-        ds_irr.irradiance.values = refl
+        ds_irr.irradiance.values = irr
 
         if unc is not None:
             ds_irr.u_irradiance.values = unc

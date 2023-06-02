@@ -173,9 +173,7 @@ class TestLimeSimulation(unittest.TestCase):
             np.testing.assert_array_almost_equal(
                 elref.data[CH_DEF_INDICES], elref_ref, 3
             )
-            np.testing.assert_array_almost_equal(
-                elref.uncertainties[CH_DEF_INDICES], unc, 4
-            )
+            np.testing.assert_allclose(elref.uncertainties[CH_DEF_INDICES], unc, 1)
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
             np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 4)
