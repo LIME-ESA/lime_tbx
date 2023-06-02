@@ -1,1 +1,2 @@
-Error reading timeseries file: There was a problem while loading the file. See log for details.
+Error reading timeseries file: There was a problem while loading datetimes csv file.
+Check that every row has the correct format and see log for details.

@@ -36,9 +36,8 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 _EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
-_READ_FILE_ERROR_STR = (
-    "There was a problem while loading the file. See log for details."
-)
+_READ_FILE_DTS_ERROR_STR = "There was a problem while loading datetimes csv file.\n\
+Check that every row has the correct format and see log for details."
 _WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
 
@@ -411,10 +410,12 @@ def read_datetimes(path: str) -> List[datetime]:
             reader = csv.reader(file)
             datetimes = []
             for row in reader:
+                if not row:
+                    continue
                 irow = map(int, row)
                 dt = datetime(*irow, tzinfo=timezone.utc)
                 datetimes.append(dt)
             return datetimes
     except Exception as e:
         logger.get_logger().exception(e)
-        raise Exception(_READ_FILE_ERROR_STR)
+        raise Exception(_READ_FILE_DTS_ERROR_STR)
