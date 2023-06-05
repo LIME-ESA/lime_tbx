@@ -15,6 +15,7 @@ retrieval and comparison with a star photometer.
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
+from typing import Tuple, Union, List
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -25,7 +26,9 @@ from lime_tbx.datatypes.datatypes import (
     MoonData,
     ReflectanceCoefficients,
     SpectralData,
+    SpectralResponseFunction,
 )
+from lime_tbx.spectral_integration.spectral_integration import ISpectralIntegration
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -82,6 +85,54 @@ class ILIME(ABC):
 
     @staticmethod
     @abstractmethod
+    def get_elis_from_elrefs_and_integrate(
+        elref_spectrum: SpectralData,
+        moon_data: MoonData,
+        srf_type: str,
+        int: ISpectralIntegration,
+        srf: SpectralResponseFunction,
+        skip_uncs: bool = False,
+    ) -> Tuple[
+        SpectralData,
+        Union[List[float], List[List[float]]],
+        Union[List[float], List[List[float]]],
+    ]:
+        """Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020,
+        without using the Apollo Coefficients. It also calculates the integrated irradiance.
+
+        Allow users to simulate lunar observation for any observer/solar selenographic
+        latitude and longitude.
+
+        Returns the data in Wm⁻²/nm
+
+        Parameters
+        ----------
+        elref_spectrum : SpectralData
+            Reflectance data.
+        moon_data : MoonData
+            Moon data needed to calculate Moon's irradiance.
+        srf_type: str
+            SRF type that is going to be used. Can be 'cimel', 'asd' or 'interpolated'.
+        int: ISpectralIntegration
+            Spectral integrator that will be used for integration.
+        srf: SpectralResponseFunction
+            Spectral response function that will be used for integration.
+        skip_uncs: bool
+            Flag for skipping the calculation of uncertainties.
+
+        Returns
+        -------
+        elis: SpectralData
+            The extraterrestrial lunar irradiances calculated.
+        signals: List of float | List of list of float
+            Signals calculated
+        unc_signals: List of float | List of list of float
+            Uncertainties of the calculated signals
+        """
+        pass
+
+    @staticmethod
+    @abstractmethod
     def get_elrefs(
         coefficients: ReflectanceCoefficients,
         moon_data: MoonData,
@@ -129,16 +180,43 @@ class LIME(ILIME):
             wlens, moon_data, elref_spectrum.data, srf_type
         )
         if not skip_uncs:
-            unc, corr = eli.calculate_eli_from_elref_unc(
+            unc, _ = eli.calculate_eli_from_elref_unc(
                 elref_spectrum, moon_data, srf_type
             )
         else:
             unc = np.zeros(elis.shape)
-            err_corr_side = len(unc)
-            corr = np.zeros((err_corr_side, err_corr_side))
-            np.fill_diagonal(corr, 1)
-        ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc, corr)
-        return SpectralData(wlens, elis, unc, ds_eli)
+        return SpectralData(wlens, elis, unc, None)
+
+    @staticmethod
+    def get_elis_from_elrefs_and_integrate(
+        elref_spectrum: SpectralData,
+        moon_data: MoonData,
+        srf_type: str,
+        int: ISpectralIntegration,
+        srf: SpectralResponseFunction,
+        skip_uncs: bool = False,
+    ) -> Tuple[
+        SpectralData,
+        Union[List[float], List[List[float]]],
+        Union[List[float], List[List[float]]],
+    ]:
+        wlens = elref_spectrum.wlens
+        elis = eli.calculate_eli_from_elref(
+            wlens, moon_data, elref_spectrum.data, srf_type
+        )
+        simple_dseli = SpectralData(wlens, elis, None, None)
+        sigs = int.integrate_elis(srf, simple_dseli)
+        if not skip_uncs:
+            unc, corr = eli.calculate_eli_from_elref_unc(
+                elref_spectrum, moon_data, srf_type
+            )
+            ds_eli = SpectralData.make_irradiance_ds(wlens, elis, unc, corr)
+            dseli = SpectralData(wlens, elis, unc, ds_eli)
+            siguncs = int.u_integrate_elis(srf, dseli)
+        else:
+            unc = np.zeros(elis.shape)
+            siguncs = np.zeros(np.array(sigs).shape)
+        return SpectralData(wlens, elis, unc, None), sigs, siguncs
 
     @staticmethod
     def get_elrefs(
