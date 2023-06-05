@@ -1,7 +1,7 @@
 """Module containing the class that contains the state of the simulation."""
 
 """___Built-In Modules___"""
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Iterable
 from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
@@ -484,18 +484,20 @@ class LimeSimulation(ILimeSimulation):
         skip_uncs: bool,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
-        Union[SpectralData, List[SpectralData]],
+        SpectralData,
         Union[SpectralData, List[SpectralData]],
     ]:
         elref_cimel = LimeSimulation._calculate_elref(mds, cimel_coeff, skip_uncs)
         if isinstance(mds, list):
-            elref_asd = [intp.get_best_interp_reference(md) for md in mds]
+            elref_asd = (intp.get_best_interp_reference(md) for md in mds)
+            ret_asd = intp.get_best_interp_reference(mds[0])
         else:
             elref_asd = intp.get_best_interp_reference(mds)
+            ret_asd = elref_asd
         elref = LimeSimulation._interpolate_refl(
             elref_asd, elref_cimel, intp, wlens, skip_uncs
         )
-        return elref_cimel, elref_asd, elref
+        return elref_cimel, ret_asd, elref
 
     @staticmethod
     def _calculate_irradiances_values(
@@ -518,8 +520,11 @@ class LimeSimulation(ILimeSimulation):
         )
         elis_asd = None
         if interp_data.is_show_interpolation_spectrum():
+            md = mds
+            if isinstance(md, list):
+                md = md[0]
             elis_asd = LimeSimulation._calculate_eli_from_elref(
-                mds, elref_asd, "asd", skip_uncs
+                md, elref_asd, "asd", skip_uncs
             )
         return elis, elis_cimel, elis_asd
 
@@ -532,19 +537,21 @@ class LimeSimulation(ILimeSimulation):
         skip_uncs: bool,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
-        Union[SpectralData, List[SpectralData]],
+        SpectralData,
         Union[SpectralData, List[SpectralData]],
     ]:
         polar_cimel = LimeSimulation._calculate_polar(mds, polar_coeff, skip_uncs)
         if isinstance(mds, list):
-            polar_asd = [intp.get_best_polar_interp_reference(md) for md in mds]
+            polar_asd = (intp.get_best_polar_interp_reference(md) for md in mds)
+            ret_polar_asd = intp.get_best_polar_interp_reference(mds[0])
         else:
             polar_asd = intp.get_best_polar_interp_reference(mds)
+            ret_polar_asd = polar_asd
         polar = LimeSimulation._interpolate_polar(
             polar_asd, polar_cimel, intp, wlens, True
         )
         # TODO confirm that we should skip polar uncertainties in interpolation if we do always linear
-        return polar_cimel, polar_asd, polar
+        return polar_cimel, ret_polar_asd, polar
 
     def update_irradiance(
         self,
@@ -614,7 +621,7 @@ class LimeSimulation(ILimeSimulation):
 
     @staticmethod
     def _interpolate_refl(
-        asd_data: Union[SpectralData, List[SpectralData]],
+        asd_data: Union[SpectralData, Iterable[SpectralData]],
         cimel_data: Union[SpectralData, List[SpectralData]],
         intp: SpectralInterpolation,
         wlens: List[float],
@@ -627,7 +634,7 @@ class LimeSimulation(ILimeSimulation):
             cimel_data = [cimel_data]
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
-        for i, cf in enumerate(cimel_data):
+        for cf, asdd in zip(cimel_data, asd_data):
             if not skip_uncs:
                 (
                     elrefs_intp,
@@ -636,20 +643,20 @@ class LimeSimulation(ILimeSimulation):
                 ) = intp.get_interpolated_refl_unc(
                     cf.wlens,
                     cf.data,
-                    asd_data[i].wlens,
-                    asd_data[i].data,
+                    asdd.wlens,
+                    asdd.data,
                     wlens,
                     cf.uncertainties,
-                    asd_data[i].uncertainties,
+                    asdd.uncertainties,
                     cf.ds.err_corr_reflectance.values,
-                    asd_data[i].ds.err_corr_reflectance.values,
+                    asdd.ds.err_corr_reflectance.values,
                 )
             else:
                 elrefs_intp = intp.get_interpolated_refl(
                     cf.wlens,
                     cf.data,
-                    asd_data[i].wlens,
-                    asd_data[i].data,
+                    asdd.wlens,
+                    asdd.data,
                     wlens,
                 )
                 u_elrefs_intp = np.zeros(elrefs_intp.shape)
@@ -668,7 +675,7 @@ class LimeSimulation(ILimeSimulation):
 
     @staticmethod
     def _interpolate_polar(
-        asd_data: Union[SpectralData, List[SpectralData]],
+        asd_data: Union[SpectralData, Iterable[SpectralData]],
         cimel_data: Union[SpectralData, List[SpectralData]],
         intp: SpectralInterpolation,
         wlens: List[float],
@@ -680,7 +687,7 @@ class LimeSimulation(ILimeSimulation):
             cimel_data = [cimel_data]
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
-        for i, cf in enumerate(cimel_data):
+        for cf, asdd in zip(cimel_data, asd_data):
             if not skip_uncs:
                 (
                     polars_intp,
@@ -689,20 +696,20 @@ class LimeSimulation(ILimeSimulation):
                 ) = intp.get_interpolated_refl_unc(
                     cf.wlens,
                     cf.data,
-                    asd_data[i].wlens,
-                    asd_data[i].data,
+                    asdd.wlens,
+                    asdd.data,
                     np.array(wlens),
                     cf.uncertainties,
-                    asd_data[i].uncertainties,
+                    asdd.uncertainties,
                     cf.ds.err_corr_polarization.values,
-                    asd_data[i].ds.err_corr_polarization.values,
+                    asdd.ds.err_corr_polarization.values,
                 )
             else:
                 polars_intp = intp.get_interpolated_refl(
                     cf.wlens,
                     cf.data,
-                    asd_data[i].wlens,
-                    asd_data[i].data,
+                    asdd.wlens,
+                    asdd.data,
                     wlens,
                 )
                 u_polars_intp = np.zeros(polars_intp.shape)
