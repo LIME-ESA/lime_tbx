@@ -463,8 +463,8 @@ class TestLimeSimulation(unittest.TestCase):
             "starting reflectance update",
             "reflectance update done",
             "starting irradiance update",
-            "irradiance update done",
-            "signals update done",
+            "auxiliar irradiance update done",
+            "irradiance & signals update done",
             "starting polarisation update",
             "polarisation update done\n",
         ]
