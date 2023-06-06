@@ -1,7 +1,7 @@
 """Module containing the class that contains the state of the simulation."""
 
 """___Built-In Modules___"""
-from typing import List, Union, Tuple, Iterable
+from typing import List, Union, Tuple, Iterable, Callable
 from abc import ABC, abstractmethod
 import gc
 
@@ -92,6 +92,7 @@ class ILimeSimulation(ABC):
         srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
+        callback_observation: Callable = None,
     ):
         """
         Updates the reflectance values if the stored values are not valid, using the given parameters.
@@ -104,6 +105,8 @@ class ILimeSimulation(ABC):
             Point (location) for which the reflectance will be calculated.
         cimel_coeff: ReflectanceCoefficients
             Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance.
+        callback_observation: Callable
+            Callback that will emit a signal when a simulation is done
         """
         pass
 
@@ -114,6 +117,7 @@ class ILimeSimulation(ABC):
         signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
+        callback_observation: Callable = None,
     ):
         """
         Updates the irradiance values if the stored value are not valid, using the given parameters.
@@ -137,6 +141,7 @@ class ILimeSimulation(ABC):
         srf: SpectralResponseFunction,
         point: Point,
         polar_coeff: PolarizationCoefficients,
+        callback_observation: Callable = None,
     ):
         """
         Updates the polarization values if the stored values are not valid, using the given parameters.
@@ -336,6 +341,18 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
+    def will_irradiance_calculate_reflectance(self) -> bool:
+        """Returns if the irradiance calculation function would perform the reflectance
+        calculation or not given the current state.
+
+        Returns
+        -------
+        will_calculate: bool
+            True if the reflectance would be calculated.
+        """
+        pass
+
+    @abstractmethod
     def is_polarization_updated(self) -> bool:
         """Returns if the polarization has been updated. If not, or nothing has been executed,
         or the spectrum doesn't contain polarization values.
@@ -454,6 +471,7 @@ class LimeSimulation(ILimeSimulation):
         srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
+        callback_observation: Callable = None,
     ):
         self._save_parameters(srf, point)
         skip_uncs = self.is_skipping_uncs()
@@ -471,6 +489,7 @@ class LimeSimulation(ILimeSimulation):
                 self.intp,
                 self.wlens,
                 skip_uncs,
+                callback_observation,
             )
             self.refl_uptodate = True
             if self.verbose:
@@ -483,6 +502,7 @@ class LimeSimulation(ILimeSimulation):
         intp: SpectralInterpolation,
         wlens: List[float],
         skip_uncs: bool,
+        callback_observation: Callable,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
         SpectralData,
@@ -496,7 +516,12 @@ class LimeSimulation(ILimeSimulation):
             elref_asd = intp.get_best_interp_reference(mds)
             ret_asd = elref_asd
         elref = LimeSimulation._interpolate_refl(
-            elref_asd, elref_cimel, intp, wlens, skip_uncs
+            elref_asd,
+            elref_cimel,
+            intp,
+            wlens,
+            skip_uncs,
+            callback_observation,
         )
         return elref_cimel, ret_asd, elref
 
@@ -530,6 +555,7 @@ class LimeSimulation(ILimeSimulation):
         intp: SpectralInterpolation,
         wlens: List[float],
         skip_uncs: bool,
+        callback_observation: Callable,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
         SpectralData,
@@ -543,7 +569,12 @@ class LimeSimulation(ILimeSimulation):
             polar_asd = intp.get_best_polar_interp_reference(mds)
             ret_polar_asd = polar_asd
         polar = LimeSimulation._interpolate_polar(
-            polar_asd, polar_cimel, intp, wlens, True
+            polar_asd,
+            polar_cimel,
+            intp,
+            wlens,
+            True,
+            callback_observation,
         )
         # TODO confirm that we should skip polar uncertainties in interpolation if we do always linear
         return polar_cimel, ret_polar_asd, polar
@@ -554,11 +585,12 @@ class LimeSimulation(ILimeSimulation):
         signals_srf: SpectralResponseFunction,
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
+        callback_observation: Callable = None,
     ):
         self._save_parameters(srf, point)
         skip_uncs = self.is_skipping_uncs()
         if not self.refl_uptodate:
-            self.update_reflectance(self.srf, point, cimel_coeff)
+            self.update_reflectance(self.srf, point, cimel_coeff, callback_observation)
         interp_srf_name = self.get_interp_srf_name()
         if not self.irr_uptodate or not self.signals_uptodate:
             if self.verbose:
@@ -582,10 +614,14 @@ class LimeSimulation(ILimeSimulation):
                 interp_srf_name,
                 signals_srf,
                 skip_uncs,
+                callback_observation,
             )
             self.signals_uptodate = True
             if self.verbose:
                 print("irradiance & signals update done")
+
+    def will_irradiance_calculate_reflectance(self) -> bool:
+        return not self.refl_uptodate
 
     def is_polarization_updated(self) -> bool:
         return self.pol_uptodate
@@ -595,6 +631,7 @@ class LimeSimulation(ILimeSimulation):
         srf: SpectralResponseFunction,
         point: Point,
         polar_coeff: PolarizationCoefficients,
+        callback_observation: Callable = None,
     ):
         skip_uncs = self.is_skipping_uncs()
         self._save_parameters(srf, point)
@@ -612,6 +649,7 @@ class LimeSimulation(ILimeSimulation):
                 self.intp,
                 self.wlens,
                 skip_uncs,
+                callback_observation,
             )
             self.pol_uptodate = True
             if self.verbose:
@@ -624,6 +662,7 @@ class LimeSimulation(ILimeSimulation):
         intp: SpectralInterpolation,
         wlens: List[float],
         skip_uncs: bool,
+        callback_observation: Callable,
     ) -> Union[SpectralData, List[SpectralData]]:
 
         wlens = np.array(wlens)
@@ -633,6 +672,8 @@ class LimeSimulation(ILimeSimulation):
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
         for cf, asdd in zip(cimel_data, asd_data):
+            if callback_observation:
+                callback_observation()
             if not skip_uncs:
                 (
                     elrefs_intp,
@@ -646,8 +687,8 @@ class LimeSimulation(ILimeSimulation):
                     wlens,
                     cf.uncertainties,
                     asdd.uncertainties,
-                    cf.ds.err_corr_reflectance.values,
-                    asdd.ds.err_corr_reflectance.values,
+                    cf.err_corr,
+                    asdd.err_corr,
                 )
                 ds_intp = SpectralData.make_reflectance_ds(
                     wlens, elrefs_intp, u_elrefs_intp, corr_elrefs_intp
@@ -661,12 +702,10 @@ class LimeSimulation(ILimeSimulation):
                     wlens,
                 )
                 u_elrefs_intp = np.zeros(elrefs_intp.shape)
-                corr_elrefs_intp = np.zeros((len(u_elrefs_intp), len(u_elrefs_intp)))
-                np.fill_diagonal(corr_elrefs_intp, 1)
                 ds_intp = None
-
             specs.append(SpectralData(wlens, elrefs_intp, u_elrefs_intp, ds_intp))
-
+        if callback_observation:
+            callback_observation()
         if not is_list:
             specs = specs[0]
         return specs
@@ -678,6 +717,7 @@ class LimeSimulation(ILimeSimulation):
         intp: SpectralInterpolation,
         wlens: List[float],
         skip_uncs: bool,
+        callback_observation: Callable,
     ) -> Union[SpectralData, List[SpectralData]]:
 
         is_list = isinstance(cimel_data, list)
@@ -686,6 +726,8 @@ class LimeSimulation(ILimeSimulation):
             asd_data = [asd_data]  # both same length
         specs: Union[SpectralData, List[SpectralData]] = []
         for cf, asdd in zip(cimel_data, asd_data):
+            if callback_observation:
+                callback_observation()
             if not skip_uncs:
                 (polars_intp, u_polars_intp, _,) = intp.get_interpolated_refl_unc(
                     cf.wlens,
@@ -695,8 +737,8 @@ class LimeSimulation(ILimeSimulation):
                     np.array(wlens),
                     cf.uncertainties,
                     asdd.uncertainties,
-                    cf.ds.err_corr_polarization.values,
-                    asdd.ds.err_corr_polarization.values,
+                    cf.err_corr,
+                    asdd.err_corr,
                 )
             else:
                 polars_intp = intp.get_interpolated_refl(
@@ -709,6 +751,8 @@ class LimeSimulation(ILimeSimulation):
                 u_polars_intp = np.zeros(polars_intp.shape)
             # The Dataset is not needed later, and the corr_matrix is very big so we ignore it to save up space
             specs.append(SpectralData(wlens, polars_intp, u_polars_intp, None))
+        if callback_observation:
+            callback_observation()
         if not is_list:
             specs = specs[0]
         return specs
@@ -786,6 +830,7 @@ class LimeSimulation(ILimeSimulation):
         srf_type: str,
         srf: SpectralResponseFunction,
         skip_uncs: bool,
+        callback_observation: Callable,
     ):
         rl = lime.LIME()
         channel_ids = [srf.channels[i].id for i in range(len(srf.channels))]
@@ -801,12 +846,16 @@ class LimeSimulation(ILimeSimulation):
         signals = []
         uncs = []
         for i, m in enumerate(mds):
+            if callback_observation:
+                callback_observation()
             spec, sig, sigunc = rl.get_elis_from_elrefs_and_integrate(
                 elrefs[i], m, srf_type, self.int, srf, skip_uncs
             )
             specs.append(spec)
             signals.append(sig)
             uncs.append(sigunc)
+        if callback_observation:
+            callback_observation()
         signals = np.array(signals).T
         uncs = np.array(uncs).T
         sp_d = SpectralData(channel_ids, signals, uncs, None)

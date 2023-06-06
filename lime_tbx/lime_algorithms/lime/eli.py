@@ -167,7 +167,7 @@ def calculate_eli_from_elref_unc(
         [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
         [elref_spectrum.uncertainties, None, u_esk, None, None, None],
         corr_x=[
-            elref_spectrum.ds.err_corr_reflectance.values,
+            elref_spectrum.err_corr,
             None,
             "syst",
             None,

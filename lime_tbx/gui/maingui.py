@@ -71,6 +71,7 @@ def eli_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
 ) -> Tuple[
     List[float],
     List[float],
@@ -116,7 +117,8 @@ def eli_callback(
         Indicates if the different point locations/s are inside the valid mpa range.
     """
     def_srf = get_default_srf()
-    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    callback_obs = lambda: signal_info.emit("another_refl_irr_simulated")
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef, callback_obs)
     return (
         point,
         srf,
@@ -133,6 +135,7 @@ def elref_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
 ) -> Tuple[
     List[float],
     List[float],
@@ -167,7 +170,8 @@ def elref_callback(
         Indicates if the different point locations/s are inside the valid mpa range.
     """
     def_srf = get_default_srf()
-    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
+    callback_obs = lambda: signal_info.emit("another_refl_simulated")
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef, callback_obs)
     return (
         point,
         lime_simulation.get_elrefs(),
@@ -182,6 +186,7 @@ def polar_callback(
     point: Point,
     coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
 ) -> Tuple[
     Point,
     Union[SpectralData, List[SpectralData]],
@@ -190,7 +195,8 @@ def polar_callback(
     Union[bool, List[bool]],
 ]:
     def_srf = get_default_srf()
-    lime_simulation.update_polarization(def_srf, point, coeffs)
+    callback_obs = lambda: signal_info.emit("another_pol_simulated")
+    lime_simulation.update_polarization(def_srf, point, coeffs, callback_obs)
     return (
         point,
         lime_simulation.get_polars(),
@@ -787,6 +793,7 @@ class MainSimulationsWidget(
             self.loading_spinner.movie_start()
             self.lower_stack.setCurrentIndex(0)
         else:
+            self.loading_spinner.set_text("")
             self.loading_spinner.movie_stop()
             self.lower_stack.setCurrentIndex(1)
 
@@ -820,12 +827,16 @@ class MainSimulationsWidget(
             self._disable_lglod_export(not calculable)
 
     def _start_thread(
-        self, worker: CallbackWorker, finished: Callable, error: Callable
+        self,
+        worker: CallbackWorker,
+        finished: Callable,
+        error: Callable,
+        info: Callable = None,
     ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
-        _start_thread(worker, worker_th, finished, error)
+        _start_thread(worker, worker_th, finished, error, info)
 
     def set_export_button_disabled(self, disabled: bool):
         if not self._finished_building:
@@ -861,11 +872,34 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
+        self.quant_elis = 1
+        self.quant_elis_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_elis = len(point.dt)
+        self.will_calc_reflectance = (
+            self.lime_simulation.will_irradiance_calculate_reflectance()
+        )
+        if self.will_calc_reflectance:
+            self.quant_elrefs = self.quant_elis
+            self.quant_elrefs_sim = self.quant_elis_sim
         worker = CallbackWorker(
             eli_callback,
             [srf, point, cimel_coef, self.lime_simulation],
+            True,
         )
-        self._start_thread(worker, self.eli_finished, self.eli_error)
+        self._start_thread(worker, self.eli_finished, self.eli_error, self.eli_info)
+
+    def eli_info(self, data: str):
+        if self.will_calc_reflectance and self.quant_elrefs_sim < self.quant_elrefs:
+            self.loading_spinner.set_text(
+                f"{self.quant_elrefs_sim}/{self.quant_elrefs} (reflectances)"
+            )
+            self.quant_elrefs_sim += 1
+        elif self.quant_elis_sim < self.quant_elis:
+            self.loading_spinner.set_text(f"{self.quant_elis_sim}/{self.quant_elis}")
+            self.quant_elis_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
 
     def _set_graph_dts(self, pt: Point):
         self.graph.set_dts([])
@@ -928,14 +962,31 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
+        self.quant_elrefs = 1
+        self.quant_elrefs_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_elrefs = len(point.dt)
         worker = CallbackWorker(
-            elref_callback, [srf, point, cimel_coef, self.lime_simulation]
+            elref_callback,
+            [srf, point, cimel_coef, self.lime_simulation],
+            True,
         )
-        self._start_thread(worker, self.elref_finished, self.elref_error)
+        self._start_thread(
+            worker, self.elref_finished, self.elref_error, self.elref_info
+        )
 
     def clear_signals(self):
         self.signal_widget.clear_signals()
         self.lower_tabs.setTabEnabled(2, False)
+
+    def elref_info(self, data: str):
+        if self.quant_elrefs_sim < self.quant_elrefs:
+            self.loading_spinner.set_text(
+                f"{self.quant_elrefs_sim}/{self.quant_elrefs}"
+            )
+            self.quant_elrefs_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
 
     def elref_finished(
         self,
@@ -984,10 +1035,27 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coef()
+        self.quant_polars = 1
+        self.quant_polars_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_polars = len(point.dt)
         worker = CallbackWorker(
-            polar_callback, [srf, point, coeffs, self.lime_simulation]
+            polar_callback,
+            [srf, point, coeffs, self.lime_simulation],
+            True,
         )
-        self._start_thread(worker, self.polar_finished, self.polar_error)
+        self._start_thread(
+            worker, self.polar_finished, self.polar_error, self.polar_info
+        )
+
+    def polar_info(self, data: str):
+        if self.quant_polars_sim < self.quant_polars:
+            self.loading_spinner.set_text(
+                f"{self.quant_polars_sim}/{self.quant_polars}"
+            )
+            self.quant_polars_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
 
     def polar_finished(
         self,

@@ -325,16 +325,12 @@ class SpectralIntegration(ISpectralIntegration):
         wlens = np.array(elis_lime.wlens)
         elis = np.array(elis_lime.data)
         u_elis = np.array(elis_lime.uncertainties)
-        corr_elis = np.array(elis_lime.ds.err_corr_irradiance.values)
-        # ch_wlenss = []
-        # ch_srfs = []
+        corr_elis = np.array(elis_lime.err_corr)
         ch_wlensrfs = []
         all_wlens = np.sort(np.unique(srf.get_wavelengths()))
         for ch in srf.channels:
             ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.keys())))
             ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.values())))
-            # ch_wlenss.append(np.array(list(ch.spectral_response_inrange.keys())))
-            # ch_srfs.append(np.array(list(ch.spectral_response_inrange.values())))
         u_signals = self.prop.propagate_random(
             self._integrate_elis,
             [elis, wlens, all_wlens, *ch_wlensrfs],

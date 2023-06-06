@@ -42,6 +42,7 @@ from typing import Dict, List, Union, Tuple
 from datetime import datetime
 from enum import Enum
 from abc import ABC
+import sys
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -640,7 +641,6 @@ class LimeCoefficients:
     version: str
 
 
-@dataclass
 class SpectralData:
     """
     Data for a spectrum of wavelengths, with an associated uncertainty each.
@@ -648,19 +648,44 @@ class SpectralData:
     Attributes
     ----------
     wlens: np.ndarray
-        Spectrum of wavelengths
+        Spectrum of wavelengths.
     data: np.ndarray
-        Data associated to the wavelengths (irradiance, reflectance, etc)
+        Data associated to the wavelengths (irradiance, reflectance, etc).
     uncertainties: np.ndarray
-        Uncertainties associated to the data
-    ds: xarray.Dataset
-        Dataset used in data generation
+        Uncertainties associated to the data.
+    err_corr: None | np.ndarray
+        Error correlation matrix, if included.
     """
 
-    wlens: np.ndarray
-    data: np.ndarray
-    uncertainties: np.ndarray
-    ds: xarray.Dataset
+    def __init__(
+        self,
+        wlens: np.ndarray,
+        data: np.ndarray,
+        uncertainties: np.ndarray,
+        ds: xarray.Dataset,
+    ):
+        """
+        Parameters
+        ----------
+        wlens: np.ndarray
+            Spectrum of wavelengths
+        data: np.ndarray
+            Data associated to the wavelengths (irradiance, reflectance, etc)
+        uncertainties: np.ndarray
+            Uncertainties associated to the data
+        ds: xarray.Dataset
+            Dataset used in data generation
+        """
+        self.wlens = wlens
+        self.data = data
+        self.uncertainties = uncertainties
+        self.err_corr = None
+        if hasattr(ds, "err_corr_reflectance"):
+            self.err_corr = ds.err_corr_reflectance.values.astype(np.float32)
+        elif hasattr(ds, "err_corr_polarization"):
+            self.err_corr = ds.err_corr_polarization.values.astype(np.float32)
+        elif hasattr(ds, "err_corr_irradiance"):
+            self.err_corr = ds.err_corr_irradiance.values.astype(np.float32)
 
     @staticmethod
     def make_reflectance_ds(
