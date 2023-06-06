@@ -223,12 +223,15 @@ class LIME(ILIME):
         coefficients: ReflectanceCoefficients,
         moon_data: MoonData,
         skip_uncs: bool = False,
+        keep_err_corr_mats: bool = True,
     ) -> SpectralData:
         wlens = coefficients.wlens
         elrefs = elref.calculate_elref(coefficients, moon_data)
         if not skip_uncs:
             unc, corr = elref.calculate_elref_unc(coefficients, moon_data)
-            ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc, corr)
+            ds = None
+            if keep_err_corr_mats:
+                ds = SpectralData.make_reflectance_ds(wlens, elrefs, unc, corr)
         else:
             unc = np.zeros(elrefs.shape)
             ds = None

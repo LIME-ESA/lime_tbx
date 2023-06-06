@@ -248,8 +248,8 @@ def calculate_all_callback(
     lime_simulation: ILimeSimulation,
 ):
     def_srf = get_default_srf()
-    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     lime_simulation.update_polarization(def_srf, point, p_coeffs)
     return (point, srf)
 
@@ -876,10 +876,10 @@ class MainSimulationsWidget(
         self.quant_elis_sim = 0
         if hasattr(point, "dt") and isinstance(point.dt, list):
             self.quant_elis = len(point.dt)
-        self.will_calc_reflectance = (
-            self.lime_simulation.will_irradiance_calculate_reflectance()
+        self.will_calc_reflectance_prev = (
+            self.lime_simulation.will_irradiance_calculate_reflectance_previously(point)
         )
-        if self.will_calc_reflectance:
+        if self.will_calc_reflectance_prev:
             self.quant_elrefs = self.quant_elis
             self.quant_elrefs_sim = self.quant_elis_sim
         worker = CallbackWorker(
@@ -890,7 +890,10 @@ class MainSimulationsWidget(
         self._start_thread(worker, self.eli_finished, self.eli_error, self.eli_info)
 
     def eli_info(self, data: str):
-        if self.will_calc_reflectance and self.quant_elrefs_sim < self.quant_elrefs:
+        if (
+            self.will_calc_reflectance_prev
+            and self.quant_elrefs_sim < self.quant_elrefs
+        ):
             self.loading_spinner.set_text(
                 f"{self.quant_elrefs_sim}/{self.quant_elrefs} (reflectances)"
             )
