@@ -559,7 +559,7 @@ class LimeSimulation(ILimeSimulation):
             ret_asd,
             skip_uncs,
         )
-        elref = LimeSimulation._interpolate_refl_calc_irr_signal(
+        elref, elis, signals = LimeSimulation._interpolate_refl_calc_irr_signal(
             elref_asd,
             elref_cimel,
             intp,
@@ -571,7 +571,7 @@ class LimeSimulation(ILimeSimulation):
             skip_uncs,
             callback_observation,
         )
-        return elref_cimel, ret_asd, elref, elis_cimel, elis_asd
+        return elref_cimel, ret_asd, elref, elis_cimel, elis_asd, elis, signals
 
     @staticmethod
     def _calculate_reflectances_values(
