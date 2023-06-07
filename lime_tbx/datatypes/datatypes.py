@@ -687,6 +687,10 @@ class SpectralData:
         elif hasattr(ds, "err_corr_irradiance"):
             self.err_corr = ds.err_corr_irradiance.values.astype(np.float32)
 
+    def clear_err_corr(self):
+        """Dereference the error correlation matrix from the object."""
+        self.err_corr = None
+
     @staticmethod
     def make_reflectance_ds(
         wavs: np.ndarray,

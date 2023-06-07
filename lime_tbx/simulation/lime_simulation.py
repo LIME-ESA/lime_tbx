@@ -745,6 +745,13 @@ class LimeSimulation(ILimeSimulation):
                     skip_uncs,
                     callback_observation,
                 )
+                # Free up space
+                elrefclearer = self.elref
+                if not isinstance(elrefclearer, list):
+                    elrefclearer = [elrefclearer]
+                for elr in elrefclearer:
+                    elr.clear_err_corr()
+                #
                 self.signals_uptodate = True
                 if self.verbose:
                     print("irradiance & signals update done")
