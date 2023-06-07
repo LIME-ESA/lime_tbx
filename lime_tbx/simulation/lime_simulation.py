@@ -42,9 +42,6 @@ __email__ = "pieter.de.vis@npl.co.uk, gaton@goa.uva.es"
 __status__ = "Development"
 
 
-_MAX_LIMIT_REFL_ERR_CORR_ARE_STORED = 30
-
-
 def is_ampa_valid_range(ampa: float) -> bool:
     """
     Checks if the value of the absolute moon phase angle is inside the valid range for the simulation.
@@ -770,7 +767,7 @@ class LimeSimulation(ILimeSimulation):
         if not self.is_skipping_uncs() and hasattr(pt, "dt"):
             if (
                 isinstance(pt.dt, list)
-                and len(pt.dt) > _MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+                and len(pt.dt) > constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
             ):
                 return True
         return False

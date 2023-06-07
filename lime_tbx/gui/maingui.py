@@ -710,6 +710,7 @@ class MainSimulationsWidget(
             self.satellites,
             self._callback_regular_input_changed,
             self.update_calculability,
+            self.settings_manager.is_skip_uncertainties(),
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
@@ -1639,6 +1640,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         interpol_opt_dialog = interpoptions.InterpOptionsDialog(
             lime_tbx_w.settings_manager,
             lime_tbx_w.lime_simulation,
+            self._get_lime_widget().main_page.input_widget,
             self,
         )
         interpol_opt_dialog.exec_()

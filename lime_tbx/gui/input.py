@@ -20,6 +20,7 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
 )
+from lime_tbx.datatypes import constants
 from lime_tbx.gui.util import (
     CallbackWorker,
     start_thread as _start_thread,
@@ -34,6 +35,12 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 MAX_PATH_LEN = 35
+
+_A_LOT_DATETIMES_MSG = f"Usually, calculated reflectance values are used to obtain irradiances. \
+However, due to the large size of the error correlation matrices, these matrices are not \
+stored in memory for more than {constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED} datetimes. \
+This requires recalculating reflectances whenever irradiances are computed. Therefore, \
+if you want both values in this case, it is advisable to choose to calculate irradiances first."
 
 
 def _callback_read_obs_files(paths: List[str]) -> List[LunarObservation]:
@@ -200,10 +207,11 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     the simulation of lunar values for a geographic position at a concrete time.
     """
 
-    def __init__(self, callback_check_calculable: Callable):
+    def __init__(self, callback_check_calculable: Callable, skip_uncs: bool):
         super().__init__()
         self._build_layout()
         self.callback_check_calculable = callback_check_calculable
+        self._skip_uncs = skip_uncs
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QFormLayout(self)
@@ -260,14 +268,24 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
+        self.info_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxInformation
+        )
+        self.info_pixmap = self.info_icon.pixmap(32)
+        self.info_hidden_datetimes_a_lot = QtWidgets.QLabel(" ")
+        self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
+        self.info_hidden_datetimes_a_lot.setWordWrap(True)
+        self.info_hidden_datetimes_a_lot.hide()
         self.switch_layout = QtWidgets.QHBoxLayout()
         self.switch_layout.addWidget(self.show_datetimes_button)
+        self.switch_layout.addWidget(self.info_hidden_datetimes_a_lot)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
         self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_single_datetime)
         self.show_datetimes_button.clicked.connect(self.show_datetimes)
+        self._check_if_a_lot_dts_and_update_msg()
 
     def _clear_form_rows(self):
         self.main_layout.removeRow(4)
@@ -303,6 +321,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
                 self.loaded_datetimes_label.setText(shown_path)
                 self.callback_check_calculable()
+        self._check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -353,6 +372,18 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
+        self._check_if_a_lot_dts_and_update_msg()
+
+    def _check_if_a_lot_dts_and_update_msg(self):
+        if self.single_datetime:
+            return
+        max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+        if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
+            self.info_hidden_datetimes_a_lot.show()
+            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
+        else:
+            self.info_hidden_datetimes_a_lot.hide()
+            self.info_hidden_datetimes_a_lot.setToolTip("")
 
     def is_calculable(self) -> bool:
         if self.single_datetime:
@@ -360,10 +391,17 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         else:
             return len(self.loaded_datetimes) > 0
 
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self._skip_uncs = skip_uncs
+        self._check_if_a_lot_dts_and_update_msg()
+
 
 class SatelliteInputWidget(QtWidgets.QWidget):
     def __init__(
-        self, satellites: List[Satellite], callback_check_calculable: Callable
+        self,
+        satellites: List[Satellite],
+        callback_check_calculable: Callable,
+        skip_uncs: bool,
     ) -> None:
         super().__init__()
         self.satellites = satellites
@@ -372,6 +410,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.callback_check_calculable = callback_check_calculable
         self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self.current_max_date = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self._skip_uncs = skip_uncs
         self.update_from_combobox(0)
 
     def _build_layout(self):
@@ -425,6 +464,16 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
+        # info
+        self.info_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxInformation
+        )
+        self.info_pixmap = self.info_icon.pixmap(32)
+        self.info_hidden_datetimes_a_lot = QtWidgets.QLabel(" ")
+        self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
+        self.info_hidden_datetimes_a_lot.setWordWrap(True)
+        self.info_hidden_datetimes_a_lot.hide()
+        # warning
         self.warning_icon = self.style().standardIcon(
             QtWidgets.QStyle.SP_MessageBoxWarning
         )  # QtGui.QIcon.fromTheme('dialog-warning')
@@ -435,6 +484,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.warn_hidden_datetimes_invalid.hide()
         self.switch_layout = QtWidgets.QHBoxLayout()
         self.switch_layout.addWidget(self.show_datetimes_button)
+        self.switch_layout.addWidget(self.info_hidden_datetimes_a_lot)
         self.switch_layout.addWidget(self.warn_hidden_datetimes_invalid)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
@@ -442,6 +492,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_single_datetime)
         self.show_datetimes_button.clicked.connect(self.show_datetimes)
+        self._check_if_a_lot_dts_and_update_msg()
 
     def _clear_form_rows(self):
         self.main_layout.removeRow(2)
@@ -479,6 +530,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                     shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
                 self.loaded_datetimes_label.setText(path)
                 self.callback_check_calculable()
+        self._check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -519,6 +571,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
+        self._check_if_a_lot_dts_and_update_msg()
 
     def update_dates_with_limits(self):
         self.loaded_datetimes = [
@@ -542,6 +595,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         else:
             self.warn_hidden_datetimes_invalid.hide()
             self.warn_hidden_datetimes_invalid.setToolTip("")
+        self._check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
@@ -566,6 +620,17 @@ class SatelliteInputWidget(QtWidgets.QWidget):
             self.update_dates_with_limits()
             self.callback_check_calculable()
 
+    def _check_if_a_lot_dts_and_update_msg(self):
+        if self.single_datetime:
+            return
+        max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+        if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
+            self.info_hidden_datetimes_a_lot.show()
+            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
+        else:
+            self.info_hidden_datetimes_a_lot.hide()
+            self.info_hidden_datetimes_a_lot.setToolTip("")
+
     def get_current_min_max_dates(self) -> Tuple[datetime, datetime]:
         return self.current_min_date, self.current_max_date
 
@@ -575,6 +640,10 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         else:
             return len(self.loaded_datetimes) > 0
 
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self._skip_uncs = skip_uncs
+        self._check_if_a_lot_dts_and_update_msg()
+
 
 class InputWidget(QtWidgets.QWidget):
     def __init__(
@@ -582,24 +651,28 @@ class InputWidget(QtWidgets.QWidget):
         satellites: List[Satellite],
         change_callback: Callable,
         callback_check_calculable: Callable,
+        skip_uncs: bool,
     ):
         super().__init__()
         self.satellites = satellites
         self.change_callback = change_callback
         self.last_point: Point = None
         self.callback_check_calculable = callback_check_calculable
+        self.skip_uncs = skip_uncs
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
-        self.surface = SurfaceInputWidget(self.callback_check_calculable)
+        self.surface = SurfaceInputWidget(
+            self.callback_check_calculable, self.skip_uncs
+        )
         self.tabs.addTab(self.surface, "Geographic")
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Selenographic")
         self.satellite = SatelliteInputWidget(
-            self.satellites, self.callback_check_calculable
+            self.satellites, self.callback_check_calculable, self.skip_uncs
         )
         self.tabs.addTab(self.satellite, "Satellite")
         self.tabs.currentChanged.connect(self.callback_check_calculable)
@@ -680,6 +753,11 @@ class InputWidget(QtWidgets.QWidget):
         point = self._get_point()
         self._check_last_point(point)
         return point
+
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self.skip_uncs = skip_uncs
+        self.surface.set_is_skipping_uncs(skip_uncs)
+        self.satellite.set_is_skipping_uncs(skip_uncs)
 
 
 class ComparisonInput(QtWidgets.QWidget):
