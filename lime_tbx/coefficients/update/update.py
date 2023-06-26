@@ -82,11 +82,7 @@ class Update(IUpdate):
 
     def check_for_updates(self, timeout=60) -> bool:
         urlpath = self.url
-        try:
-            version_files = requests.get(urlpath, timeout=timeout).text.split()
-        except Exception as e:
-            logger.get_logger().warning(f"Couldn't check for updates: {e}")
-            return False
+        version_files = requests.get(urlpath, timeout=timeout).text.split()
         version_files = [
             tuple(line.split(","))
             for line in version_files
