@@ -25,13 +25,45 @@ __status__ = "Development"
 
 class IUpdate(ABC):
     @abstractmethod
-    def check_for_updates(self, timeout=None) -> bool:
+    def check_for_updates(self, timeout=60) -> bool:
+        """
+        Checks for any coefficient updates in the server
+
+        Parameters
+        ----------
+        timeout: int
+            Timeout in seconds for the request that will be sent to the server. The default is 60.
+
+        Returns
+        -------
+        are_there_updates: bool
+            True if there are updates
+        """
         pass
 
     @abstractmethod
     def download_coefficients(
         self, stopper_checker: Callable, stopper_args: list
     ) -> Tuple[int, int]:
+        """
+        Download and update the toolbox coefficients from the server.
+
+        Parameters
+        ----------
+        stopper_checker: callable
+            Function that receives '*stopper_args' as the parameters, and returns
+            a boolean value that indicates if the update is still running (True) or if
+            it has been stopped (False).
+        stopper_args: list
+            Arguments of the stopper_checker function.
+
+        Returns
+        -------
+        quant_news: int
+            Amount of new coefficients succesfully downloaded.
+        quant_fails: int
+            Amount of coefficients that couldn't be downloaded or updated correctly.
+        """
         pass
 
 
@@ -49,9 +81,12 @@ class Update(IUpdate):
         return url
 
     def check_for_updates(self, timeout=60) -> bool:
-        """True if there are updates"""
         urlpath = self.url
-        version_files = requests.get(urlpath).text.split()
+        try:
+            version_files = requests.get(urlpath, timeout=timeout).text.split()
+        except Exception as e:
+            logger.get_logger().warning(f"Couldn't check for updates: {e}")
+            return False
         version_files = [
             tuple(line.split(","))
             for line in version_files

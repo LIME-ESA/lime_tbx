@@ -41,6 +41,27 @@ def create_lglod_data(
     dolp_spectrum_name: str,
     coeff_version: str,
 ) -> LGLODData:
+    """
+    Creates a LGLOD object
+
+    Parameters
+    ----------
+    point: Point
+    srf: SpectralResponseFunction
+    lime_simulation: ILimeSimulation
+    kernels_path: KernelsPath
+    spectrum_name: str
+        Name of the spectrum used to interpolate Reflectance & Irradiance ('ASD', 'linear')
+    dolp_spectrum_name: str
+        Name of the spectrum used to interpolate DoLP (usually 'linear')
+    coeff_version: str
+        Coefficients version name
+
+    Returns
+    -------
+    lglod: LGLODData
+        Lglod data object with the information given and generated.
+    """
     obs = []
     skipped_uncs = lime_simulation.is_skipping_uncs()
     ch_names = srf.get_channels_names()
