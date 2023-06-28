@@ -42,6 +42,12 @@ The project dependencies can be installed with::
 
     pip install -r requirements.txt
 
+The project composite structure is explained in quality_documentation/uml/composite_structure.png:
+
+.. image:: ./quality_documentation/uml/composite_structure.png
+  :width: 650
+  :alt: UML diagram of the composite structure of lime_tbx.
+
 
 Testing
 -------
