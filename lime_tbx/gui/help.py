@@ -45,7 +45,7 @@ sensing instrument (pre-stored in GLOD format files) to the LIME model output.
 
 _CONTACT: str = """
 To communicate any problem or error please contact:
-<a style=\"color: #00ae9d\" href=\"mailto:gaton@goa.uva.es\">lime@uva.es</a>
+<a style=\"color: #00ae9d\" href=\"mailto:lime_tbx@goa.uva.es\">lime_tbx@goa.uva.es</a>
 """.replace(
     "\n", " "
 ).strip()
