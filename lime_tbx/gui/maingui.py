@@ -1376,6 +1376,14 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.main_page.update_calculability()
 
 
+def _set_all_messagebox_buttons_pointing_hands():
+    """Function that sets qmessage buttons with pointing hands"""
+    for w in QtWidgets.QApplication.topLevelWidgets():
+        if isinstance(w, QtWidgets.QMessageBox):
+            for button in w.buttons():
+                button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+
+
 class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self, kernels_path: KernelsPath):
         super().__init__()
@@ -1445,11 +1453,22 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.menu_bar.addMenu(settings_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
-        lime_tbx_w = self._get_lime_widget()
-        lime_tbx_w.propagate_close_event()
-        QtCore.QCoreApplication.quit()
-        os.kill(os.getpid(), 9)
-        return super().closeEvent(event)
+        QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            "Window Close",
+            "Are you sure you want to close the application?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No,
+        )
+        if reply == QtWidgets.QMessageBox.Yes:
+            lime_tbx_w = self._get_lime_widget()
+            lime_tbx_w.propagate_close_event()
+            QtCore.QCoreApplication.quit()
+            os.kill(os.getpid(), 9)
+            return super().closeEvent(event)
+        else:
+            event.ignore()
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
