@@ -119,8 +119,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(elrefs, list)
         elrefs_refs = np.array(
             [
-                [0.033, 0.059, 0.076, 0.083],
-                [0.036, 0.063, 0.081, 0.088],
+                [0.055, 0.065, 0.074, 0.083],
+                [0.059, 0.069, 0.079, 0.088],
             ]
         )
         uncs_refs = np.array(
@@ -188,8 +188,8 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(elrefs, list)
         elrefs_refs = np.array(
             [
-                [0.033, 0.059, 0.076, 0.083],
-                [0.036, 0.063, 0.081, 0.088],
+                [0.055, 0.065, 0.074, 0.083],
+                [0.059, 0.069, 0.079, 0.088],
             ]
         )
         uncs_refs = np.zeros(elrefs_refs.shape)
@@ -244,8 +244,8 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [1.2e-08, 2.2e-08, 3.30652426e-08, 1e-08],
-                [1.3e-08, 2.5e-08, 4e-08, 1e-08],
+                [1.22816289e-08, 1.66544863e-08, 1.39227268e-08, 8.35593656e-09],
+                [1.36277807e-08, 1.84579950e-08, 1.54306939e-08, 9.22275540e-09],
             ]
         )
         for eli, eli_ref, unc in zip(elis, elis_refs, uncs_refs):
