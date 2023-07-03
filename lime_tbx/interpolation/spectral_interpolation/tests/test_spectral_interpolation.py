@@ -15,7 +15,7 @@ from ....datatypes.datatypes import KernelsPath, MoonData
 from lime_tbx.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
-from lime_tbx.lime_algorithms.rolo.tsis_irradiance import (
+from lime_tbx.lime_algorithms.lime.tsis_irradiance import (
     _get_tsis_data,
     tsis_cimel,
     tsis_fwhm,
@@ -34,7 +34,7 @@ MD1 = MoonData(
     0.9863676197729848,
     399227.54900652857,
     0.1343504656066533,
-    -4.658809009228347,
+    -4.6700417589443175,
     -3.139429310609046,
     11.317038213996295,
     -11.317038213996295,

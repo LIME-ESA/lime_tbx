@@ -286,91 +286,57 @@ class SpectralIntegration(ISpectralIntegration):
         ch_signal = np.trapz(ch_srf * ch_elis, ch_wlens) / divider
         return ch_signal
 
-    def _interpolate_and_convolve_srf(
-        self,
-        ch_wlens: np.ndarray,
-        ch_srf: np.ndarray,
-        elis_wlens: np.ndarray,
-        elis: np.ndarray,
-    ) -> Union[float, np.ndarray]:
-        ch_elis = np.interp(ch_wlens, elis_wlens, elis)
-        return self._convolve_srf(ch_wlens, ch_srf, ch_elis)
+    def _integrate_elis(self, elis, wlens, all_wlens, *ch_wlenssrf):
+        signals = []
+        if len(elis) == 0:
+            return []
+        ch_wlenss = []
+        ch_srfs = []
+        for i in range(0, len(ch_wlenssrf), 2):
+            ch_wlenss.append(ch_wlenssrf[i])
+            ch_srfs.append(ch_wlenssrf[i + 1])
+        all_interp_elis = np.interp(all_wlens, wlens, elis)
+        for ch_wlens, ch_srf in zip(ch_wlenss, ch_srfs):
+            elis_ids = np.where(np.in1d(all_wlens, ch_wlens))[0]
+            ch_elis = all_interp_elis[elis_ids]
+            signals.append(self._convolve_srf(ch_wlens, ch_srf, ch_elis))
+        return signals
 
     def integrate_elis(
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
-        signals = []
         wlens = elis_lime.wlens
         elis = elis_lime.data
-        if len(elis) == 0:
-            return []
-        wasnt_lists = False
-        if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
-            wasnt_lists = True
-            elis = np.array([elis])
+        # ch_wlenss = []
+        # ch_srfs = []
+        ch_wlensrfs = []
+        all_wlens = np.sort(np.unique(srf.get_wavelengths()))
         for ch in srf.channels:
-            ch_wlens = np.array(
-                [
-                    w
-                    for w in ch.spectral_response.keys()
-                    if min(wlens) <= w <= max(wlens)
-                ]
-            )
-            ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
-            elis_ids = np.where(np.in1d(wlens, ch_wlens))[0]
-            ch_signals = []
-            for subelis in elis:
-                ch_elis = subelis[elis_ids]
-                ch_signals.append(
-                    self._interpolate_and_convolve_srf(ch_wlens, ch_srf, wlens, subelis)
-                )
-                # ch_signals.append(self._convolve_srf(ch_wlens, ch_srf, ch_elis))
-            signals.append(ch_signals)
-        if wasnt_lists:
-            signals = [s[0] for s in signals]
-        return signals
+            ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.keys())))
+            ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.values())))
+            # ch_wlenss.append(np.array(list(ch.spectral_response_inrange.keys())))
+            # ch_srfs.append(np.array(list(ch.spectral_response_inrange.values())))
+        return self._integrate_elis(elis, wlens, all_wlens, *ch_wlensrfs)
 
     def u_integrate_elis(
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
     ) -> Union[List[float], List[List[float]]]:
         u_signals = []
-        wlens = elis_lime.wlens
-        elis = elis_lime.data
-        u_elis = elis_lime.uncertainties
-        corr_elis = elis_lime.ds.err_corr_irradiance.values
-        if len(elis) == 0:
-            return []
-        wasnt_lists = False
-        if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):
-            wasnt_lists = True
-            elis = np.array([elis])
-            u_elis = np.array([u_elis])
+        wlens = np.array(elis_lime.wlens)
+        elis = np.array(elis_lime.data)
+        u_elis = np.array(elis_lime.uncertainties)
+        corr_elis = np.array(elis_lime.err_corr)
+        ch_wlensrfs = []
+        all_wlens = np.sort(np.unique(srf.get_wavelengths()))
         for ch in srf.channels:
-            ch_wlens = np.array(
-                [
-                    w
-                    for w in ch.spectral_response.keys()
-                    if min(wlens) <= w <= max(wlens)
-                ]
-            )
-            ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
-            elis_ids = np.where(np.in1d(wlens, ch_wlens))[0]
-            u_ch_signals = []
-            for i, subelis in enumerate(elis):
-                ch_elis = subelis[elis_ids]
-                u_ch_elis = u_elis[i][elis_ids]
-                u_ch_signal = np.array([])
-                if len(ch_wlens) > 0:
-                    u_ch_signal = self.prop.propagate_random(
-                        self._interpolate_and_convolve_srf,
-                        [ch_wlens, ch_srf, wlens, subelis],
-                        [None, None, None, u_elis[i]],
-                        corr_x=[None, None, None, corr_elis],
-                    )
-                u_ch_signals.append(u_ch_signal)
-            u_signals.append(u_ch_signals)
-        if wasnt_lists:
-            u_signals = [s[0] for s in u_signals]
+            ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.keys())))
+            ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.values())))
+        u_signals = self.prop.propagate_random(
+            self._integrate_elis,
+            [elis, wlens, all_wlens, *ch_wlensrfs],
+            [u_elis, None, None, *[None for _ in ch_wlensrfs]],
+            corr_x=[corr_elis, None, None, *[None for _ in ch_wlensrfs]],
+        )
         return u_signals
 
 

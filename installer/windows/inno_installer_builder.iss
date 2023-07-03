@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LimeTBX"
-#define MyAppVersion "0.1.2"
+#define MyAppVersion "0.1.5"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX.exe"
-#define MyAppDevPath "Y:\"
+#define MyAppDevPath "X:\"
 ;"C:\Users\Javier\Repositorios\lime_tbx"
 
 [Setup]

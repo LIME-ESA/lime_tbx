@@ -28,6 +28,8 @@ from ..datatypes.datatypes import (
     SelenographicDataWrite,
     SpectralData,
     SurfacePoint,
+    SatellitePoint,
+    CustomPoint,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -180,7 +182,7 @@ class _NormalSimulationData:
     quant_dates: int
     coefficients_version: str
     ch_names: List[str]
-    sat_pos_ref: str
+    sat_pos_refs: List[str]
     sat_names: List[str]
     sat_pos: List[SatellitePosition]
     dates: List[datetime]
@@ -223,7 +225,7 @@ def _write_normal_simulations(
     # DIMENSIONS
     max_len_strlen = len(max(sim_data.ch_names, key=len))
     chan_st_type = "S{}".format(max_len_strlen)
-    max_len_sat_pos_ref = len(max(sim_data.sat_pos_ref, key=len))
+    max_len_sat_pos_ref = len(max(sim_data.sat_pos_refs, key=len))
     sat_pos_ref_st_type = "S{}".format(max_len_sat_pos_ref)
     max_len_sat_name = len(max(sim_data.sat_names, key=len))
     sat_name_st_type = "S{}".format(max_len_sat_name)
@@ -272,10 +274,15 @@ def _write_normal_simulations(
             for sat_pos in sim_data.sat_pos
         ]
     )  # divided by 1000 because they were in meters
-    sat_pos_ref = ds.createVariable("sat_pos_ref", "S1", ("sat_ref_strlen",))
+    sat_pos_ref = ds.createVariable(
+        "sat_pos_ref", "S1", ("number_obs", "sat_ref_strlen")
+    )
     sat_pos_ref.long_name = "reference frame of satellite position"
-    sat_pos_ref[:] = nc.stringtochar(
-        np.array([sim_data.sat_pos_ref], sat_pos_ref_st_type)
+    sat_pos_ref[:] = np.array(
+        [
+            nc.stringtochar(np.array([spr], sat_pos_ref_st_type))
+            for spr in sim_data.sat_pos_refs
+        ]
     )
     sat_name = ds.createVariable("sat_name", "S1", ("sat_name_strlen",))
     sat_name.long_name = "Name of the satellite (or empty if it wasn't a satellite)"
@@ -303,7 +310,7 @@ def write_obs(
             quant_dates,
             coefficients_version,
             obs[0].ch_names,
-            obs[0].sat_pos_ref,
+            [o.sat_pos_ref for o in obs],
             [o.sat_name for o in obs],
             [o.sat_pos for o in obs],
             [o.dt for o in obs],
@@ -311,6 +318,7 @@ def write_obs(
         ds = _write_normal_simulations(
             lglod, path, dt, sim_data, inside_mpa_range, mpas
         )
+        ds.polarisation_spectrum_name = lglod.dolp_spectrum_name
         ds.is_comparison = 0
         # dims
         wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
@@ -339,14 +347,14 @@ def write_obs(
             # mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
         irr_obs = ds.createVariable("irr_obs", "f8", ("number_obs", "chan"))
         irr_obs.units = "W m-2 nm-1"
-        irr_obs.long_name = "observed lunar irradiance for each channel"
+        irr_obs.long_name = "simulated lunar irradiance for each channel"
         irr_obs.valid_min = 0.0
         irr_obs.valid_max = 1000000.0
         irr_obs[:] = lglod.signals.data.T
         irr_obs_unc = ds.createVariable("irr_obs_unc", "f8", ("number_obs", "chan"))
         irr_obs_unc.units = "W m-2 nm-1"
         irr_obs_unc.long_name = (
-            "uncertainties of the observed lunar irradiance for each channel"
+            "uncertainties of the simulated lunar irradiance for each channel"
         )
         irr_obs_unc.valid_min = 0.0
         irr_obs_unc.valid_max = 1000000.0
@@ -452,33 +460,29 @@ def write_obs(
         )
         cimel_wlens = ds.createVariable("cimel_wlens", "f8", ("wlens_cimel",))
         cimel_wlens.units = "nm"
-        cimel_wlens.long_name = "Cimel wavelengths"
+        cimel_wlens.long_name = "CIMEL wavelengths"
         cimel_wlens[:] = lglod.elis_cimel[0].wlens
         irr_cimel = ds.createVariable("irr_cimel", "f8", ("number_obs", "wlens_cimel"))
         irr_cimel.units = "W m-2 nm-1"
-        irr_cimel.long_name = "Simulated irradiance for the cimel wavelengths."
+        irr_cimel.long_name = "Simulated lunar irradiance for the CIMEL wavelengths."
         irr_cimel[:] = np.array([cimel.data for cimel in lglod.elis_cimel])
         irr_cimel_unc = ds.createVariable(
             "irr_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         irr_cimel_unc.units = "W m-2 nm-1"
-        irr_cimel_unc.long_name = (
-            "Uncertainties for the simulated irradiance for the cimel wavelengths."
-        )
+        irr_cimel_unc.long_name = "Uncertainties for the simulated lunar irradiance for the CIMEL wavelengths."
         irr_cimel_unc[:] = np.array([cimel.uncertainties for cimel in lglod.elis_cimel])
         refl_cimel = ds.createVariable(
             "refl_cimel", "f8", ("number_obs", "wlens_cimel")
         )
         refl_cimel.units = "Fractions of unity"
-        refl_cimel.long_name = "Simulated reflectance for the cimel wavelengths."
+        refl_cimel.long_name = "Simulated lunar reflectance for the CIMEL wavelengths."
         refl_cimel[:] = np.array([cimel.data for cimel in lglod.elrefs_cimel])
         refl_cimel_unc = ds.createVariable(
             "refl_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         refl_cimel_unc.units = "Fractions of unity"
-        refl_cimel_unc.long_name = (
-            "Uncertainties for the simulated reflectance for the cimel wavelengths."
-        )
+        refl_cimel_unc.long_name = "Uncertainties for the simulated lunar reflectance for the CIMEL wavelengths."
         refl_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.elrefs_cimel]
         )
@@ -486,15 +490,15 @@ def write_obs(
             "polar_cimel", "f8", ("number_obs", "wlens_cimel")
         )
         polar_cimel.units = "Fractions of unity"
-        polar_cimel.long_name = "Simulated polarization for the cimel wavelengths."
+        polar_cimel.long_name = (
+            "Simulated lunar degree of polarization for the CIMEL wavelengths."
+        )
         polar_cimel[:] = np.array([cimel.data for cimel in lglod.polars_cimel])
         polar_cimel_unc = ds.createVariable(
             "polar_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         polar_cimel_unc.units = "Fractions of unity"
-        polar_cimel_unc.long_name = (
-            "Uncertainties for the simulated polarization for the cimel wavelengths."
-        )
+        polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths."
         polar_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.polars_cimel]
         )
@@ -523,20 +527,15 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         *list(map(lambda a: a / d_to_m, xyz))
     )
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
-    sat_pos_ref_0 = (
-        ds.variables["sat_pos_ref"][:]
-        .data.tobytes()
-        .decode("utf-8")
-        .replace("\x00", "")
-    )
+    lambda_to_str = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+    sat_pos_ref_0 = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))[0]
     signals_data = np.array(ds.variables["irr_obs"][:].data)
     signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data)
     signals = SpectralData(
         np.array(channel_names_0), signals_data, np.array(signals_uncs), None
     )
     wlens = list(map(float, ds.variables["wlens"][:].data))
-    lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
-    sat_name_0 = lambda_to_satname(ds.variables["sat_name"][:].data)
+    sat_name_0 = lambda_to_str(ds.variables["sat_name"][:].data)
     irr_spectrum = [
         list(map(float, data)) for data in ds.variables["irr_spectrum"][:].data
     ]
@@ -576,6 +575,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         selen_sun_lon_rad = ds.variables["selen_sun_lon_rad"][:].data
     obss = []
     sp_name = ds.spectrum_name
+    dolp_sp_name = ds.polarisation_spectrum_name
     data_source = ds.data_source
     skipped_uncs = bool(ds.skipped_uncertainties)
     vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
@@ -648,6 +648,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         sp_name,
         skipped_uncs,
         vers,
+        dolp_sp_name,
     )
 
 
@@ -698,35 +699,49 @@ def write_comparison(
         quant_dates = len(dates)
         ch_names = [lglod.ch_names[i] for i in index_useful_channel]
         sat_names = [lglod.sat_name for _ in range(quant_dates)]
-        if not isinstance(points_n_inrange[0][0], SurfacePoint):
-            raise Exception("Can't write comparison points with selenographic point.")
-        sat_pos_ref = constants.EARTH_FRAME
         inside_mpa_range = []
         sat_pos = []
+        sat_pos_refs = []
         mpas = []
         for sp, in_range, mpa in points_n_inrange:
-            sat_pos_pt = SatellitePosition(
-                *SPICEAdapter.to_rectangular(
-                    sp.latitude,
-                    sp.longitude,
-                    sp.altitude,
-                    "EARTH",
-                    kernels_path.main_kernels_path,
+            if isinstance(sp, CustomPoint):
+                sat_pos_pt = SatellitePosition(
+                    *SPICEAdapter.to_rectangular(
+                        sp.selen_obs_lat,
+                        sp.selen_obs_lon,
+                        sp.distance_observer_moon * 1000,
+                        "MOON",
+                        kernels_path.main_kernels_path,
+                    )
                 )
-            )
+                sat_pos_ref = constants.MOON_FRAME
+            elif isinstance(sp, SurfacePoint):
+                sat_pos_pt = SatellitePosition(
+                    *SPICEAdapter.to_rectangular(
+                        sp.latitude,
+                        sp.longitude,
+                        sp.altitude,
+                        "EARTH",
+                        kernels_path.main_kernels_path,
+                    )
+                )
+                sat_pos_ref = constants.EARTH_FRAME
+            else:
+                raise Exception("Can't write comparison points with satellital point.")
             sat_pos.append(sat_pos_pt)
+            sat_pos_refs.append(sat_pos_ref)
             inside_mpa_range.append(in_range)
             mpas.append(mpa)
         sim_data = _NormalSimulationData(
             quant_dates,
             coefficients_version,
             ch_names,
-            sat_pos_ref,
+            sat_pos_refs,
             sat_names,
             sat_pos,
             dates,
         )
-        fill_value = -999
+        fill_value = -1999999
         ds = _write_normal_simulations(
             lglod, path, dt, sim_data, inside_mpa_range, mpas
         )
@@ -762,7 +777,7 @@ def write_comparison(
             "irr_obs", "f8", ("number_obs", "chan"), fill_value=fill_value
         )
         irr_obs.units = "W m-2 nm-1"
-        irr_obs.long_name = "observed lunar irradiance for each channel"
+        irr_obs.long_name = "simulated lunar irradiance for each channel"
         irr_obs.valid_min = 0.0
         irr_obs.valid_max = 1000000.0
         irr_obs[:] = irr_obs_data.T
@@ -771,7 +786,7 @@ def write_comparison(
         )
         irr_obs_unc.units = "W m-2 nm-1"
         irr_obs_unc.long_name = (
-            "uncertainties of the observed lunar irradiance for each channel"
+            "uncertainties of the simulated lunar irradiance for each channel"
         )
         irr_obs_unc.valid_min = 0.0
         irr_obs_unc.valid_max = 1000000.0
@@ -799,7 +814,7 @@ def write_comparison(
         )
         irr_diff.units = "W m-2 nm-1"
         irr_diff.long_name = "lunar irradiance comparison difference for each channel"
-        irr_diff.valid_min = 0.0
+        irr_diff.valid_min = -1000000.0
         irr_diff.valid_max = 1000000.0
         irr_diff[:] = irr_diff_data.T
         irr_diff_unc = ds.createVariable(
@@ -807,18 +822,25 @@ def write_comparison(
         )
         irr_diff_unc.units = "W m-2 nm-1"
         irr_diff_unc.long_name = "uncertainties of the lunar irradiance comparison difference for each channel"
-        irr_diff_unc.valid_min = 0.0
+        irr_diff_unc.valid_min = -1000000.0
         irr_diff_unc.valid_max = 1000000.0
         irr_diff_unc[:] = irr_diff_data_unc.T
 
         mrd = ds.createVariable("mrd", "f8", ("chan",), fill_value=fill_value)
+        mrd.long_name = "Mean relative difference."
+        mrd.valid_max = 1.0
         mrd[:] = mrd_data
+        std_mrd = ds.createVariable("std_mrd", "f8", ("chan",), fill_value=fill_value)
+        std_mrd.long_name = "Standard deviation of the mean relative difference."
+        std_mrd.valid_min = 0.0
+        std_mrd[:] = std_mrd_data
+
         number_samples = ds.createVariable(
             "number_samples", "f8", ("chan",), fill_value=fill_value
         )
+        number_samples.long_name = "Number of comparisons for each channel"
+        number_samples.valid_min = 0.0
         number_samples[:] = number_samples_data
-        std_mrd = ds.createVariable("std_mrd", "f8", ("chan",), fill_value=fill_value)
-        std_mrd[:] = std_mrd_data
         ds.close()
     except Exception as e:
         logger.get_logger().exception(e)
@@ -843,7 +865,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     lambda_to_satpos = lambda xyz: SatellitePosition(
         *list(map(lambda a: a / d_to_m, xyz))
     )
-    fill_value = -999
+    fill_value = -1999999
     # sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
     sat_poss = list(map(lambda a: a / d_to_m, ds.variables["sat_pos"][:].data))
     irr_obs_data = np.array(ds.variables["irr_obs"][:].data).T
@@ -855,8 +877,9 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mrd = np.array(ds.variables["mrd"][:].data)
     std_mrd = np.array(ds.variables["std_mrd"][:].data)
     number_samples = np.array(ds.variables["number_samples"][:].data)
-    lambda_to_satname = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
-    sat_name = lambda_to_satname(ds.variables["sat_name"][:].data)
+    lambda_to_str = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+    sat_name = lambda_to_str(ds.variables["sat_name"][:].data)
+    sat_pos_refs = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))
     mpas = np.array(ds.variables["mpa"][:].data)
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
@@ -867,12 +890,37 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
     number_samples = number_samples[number_samples != fill_value]
-
-    sat_poss = SPICEAdapter.to_planetographic_multiple(
-        sat_poss, "EARTH", kernels_path.main_kernels_path
-    )
-    for i, sp in enumerate(sat_poss):
-        sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
+    kp = kernels_path.main_kernels_path
+    for i, (satpos, satposref) in enumerate(zip(sat_poss, sat_pos_refs)):
+        if satposref in ("MOON", "MOON_ME", "IAU_MOON"):
+            sp = SPICEAdapter.to_planetographic(
+                satpos[0],
+                satpos[1],
+                satpos[2],
+                "MOON",
+                kp,
+            )
+            mdam = SPICEAdapter.get_moon_data_from_moon(
+                sp[0], sp[1], sp[2], datetimes[i], kernels_path
+            )
+            sp = CustomPoint(
+                mdam.distance_sun_moon,
+                mdam.distance_observer_moon,
+                sp[0],
+                sp[1],
+                mdam.long_sun_radians,
+                mdam.absolute_mpa_degrees,
+                mdam.mpa_degrees,
+            )
+        else:
+            sp = SPICEAdapter.to_planetographic(
+                satpos[0],
+                satpos[1],
+                satpos[2],
+                "EARTH",
+                kp,
+            )
+            sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
         points.append(sp)
     points = np.array(points)
     for i in range(len(ch_names)):

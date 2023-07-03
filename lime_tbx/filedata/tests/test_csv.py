@@ -63,6 +63,8 @@ DTS = [
     datetime(2022, 1, 14, 11, 22, 4, tzinfo=timezone.utc),
 ]
 
+CIMEL_DATA = SpectralData([314, 420], [0.01, 0.01], [0.0000001, 0], None)
+
 
 def get_srf() -> SpectralResponseFunction:
     spectral_response = {WLENS[i]: DATA[i] for i in range(len(DATA))}
@@ -80,21 +82,48 @@ class TestCSV(unittest.TestCase):
     def test_export_csv_1(self):
         path = "./test_files/csv/export_1.test.csv"
         export_csv_simulation(
-            SD1, "Wavelength", "Irradiance", SPOINT, path, "test", True, "ASD", False
+            SD1,
+            "Wavelength",
+            "Irradiance",
+            SPOINT,
+            path,
+            "test",
+            True,
+            "ASD",
+            False,
+            CIMEL_DATA,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
     def test_export_csv_2(self):
         path = "./test_files/csv/export_2.test.csv"
         export_csv_simulation(
-            SD1, "Wavelength", "Irradiance", CPOINT, path, "test", True, "ASD", False
+            SD1,
+            "Wavelength",
+            "Irradiance",
+            CPOINT,
+            path,
+            "test",
+            True,
+            "ASD",
+            False,
+            CIMEL_DATA,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
     def test_export_csv_3(self):
         path = "./test_files/csv/export_3.test.csv"
         export_csv_simulation(
-            SD1, "Wavelength", "Irradiance", SATPOINT, path, "test", False, "ASD", False
+            SD1,
+            "Wavelength",
+            "Irradiance",
+            SATPOINT,
+            path,
+            "test",
+            False,
+            "ASD",
+            False,
+            CIMEL_DATA,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
@@ -111,6 +140,7 @@ class TestCSV(unittest.TestCase):
             [True, False],
             "ASD",
             False,
+            CIMEL_DATA,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_4.csv"))
 
@@ -127,6 +157,7 @@ class TestCSV(unittest.TestCase):
             [True, True],
             "ASD",
             False,
+            CIMEL_DATA,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 

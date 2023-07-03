@@ -10,7 +10,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from ..spectral_integration import ISpectralIntegration, SpectralIntegration
 from ...datatypes.datatypes import SRFChannel, SpectralData, SpectralResponseFunction
-from lime_tbx.lime_algorithms.rolo.tsis_irradiance import _get_tsis_data
+from lime_tbx.lime_algorithms.lime.tsis_irradiance import _get_tsis_data
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -62,7 +62,7 @@ class TestSpectralIntegration(unittest.TestCase):
     def test_u_integrate_elis_ok(self):
         si = get_spectral_integrator()
         uncertainties = si.u_integrate_elis(get_srf(), ELIS_LIME)
-        self.assertIsInstance(uncertainties, list)
+        self.assertIsInstance(uncertainties, np.ndarray)
         self.assertAlmostEqual(uncertainties[0], 0.00118, 3)
 
     def test_integrate_cimel_ok(self):

@@ -8,7 +8,6 @@ It exports the following functions:
     * get_available_spectra_names() - Obtain the spectra names that the user can use.
     * get_interpolation_spectrum_name() - Obtains the currently chosen interpolation spectrum name.
     * set_interpolation_spectrum_name() - Sets the spectrum name as the currently selected one.
-    * can_perform_polarization() - Checks if the currently selected spectrum supports polarization.
 """
 
 """___Built-In Modules___"""
@@ -62,8 +61,11 @@ def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:  # pragma: n
     return spectral_data
 
 
-def get_best_polar_asd_data(moon_phase_angle: float) -> SpectralData:
+def get_best_polar_asd_data(
+    moon_phase_angle: float,
+) -> SpectralData:  # pragma: no cover
     """Retrieve the best ASD polarization spectrum for the given moon phase angle.
+    This is not used in the end, the ASD polarization spectrum wasn't good enough.
 
     Parameters
     ----------
@@ -81,12 +83,36 @@ def get_best_polar_asd_data(moon_phase_angle: float) -> SpectralData:
 
     wavs = ds_asd.wavelength.values
     phase_angles = ds_asd.phase_angle.values
-    best_id = np.argmin(np.abs(np.abs(phase_angles) - moon_phase_angle))
+    best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
 
     pol = ds_asd.polarization.values[:, best_id]
     unc = ds_asd.u_polarization.values[:, best_id] * pol / 100
 
     spectral_data = SpectralData(wavs, pol, unc, ds_asd)
+
+    return spectral_data
+
+
+def get_linear_polar_data() -> SpectralData:
+    """Retrieve the linear polarization spectrum.
+
+    Returns
+    -------
+    spectral_data: SpectralData
+        Linear polarization spectrum.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD.nc"))
+
+    wavs = ds_asd.wavelength.values
+    pol = np.ones(wavs.shape)
+    unc = np.ones(wavs.shape) * 0.1 * pol / 100
+    corr = np.zeros((len(wavs), len(wavs)))
+    np.fill_diagonal(corr, 1)
+
+    ds = SpectralData.make_polarization_ds(wavs, pol, unc, corr)
+    spectral_data = SpectralData(wavs, pol, unc, ds)
 
     return spectral_data
 
@@ -113,7 +139,7 @@ def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
 
     wavs = ds_asd.wavelength.values
     phase_angles = ds_asd.phase_angle.values
-    best_id = np.argmin(np.abs(np.abs(phase_angles) - moon_phase_angle))
+    best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
 
     refl = ds_asd.reflectance.values[:, best_id]
     unc = ds_asd.u_reflectance.values[:, best_id] * refl / 100
@@ -206,6 +232,8 @@ SPECTRUM_NAME_APOLLO16 = "Apollo 16"
 SPECTRUM_NAME_BRECCIA = "Breccia"
 SPECTRUM_NAME_COMPOSITE = "Apollo 16 + Breccia"
 
+SPECTRUM_NAME_LINEAR = "Linear"
+
 SRF_NAME_ASD = "ASD"
 SRF_NAME_GAUSSIAN_1NM_3NM = "Gaussian SRF with 1nm spectral sampling and 3nm resolution"
 SRF_NAME_TRIANGULAR_1NM_1NM = (
@@ -223,6 +251,10 @@ _VALID_INTERP_SPECTRA = [
     #    SPECTRUM_NAME_APOLLO16,
     #    SPECTRUM_NAME_BRECCIA,
     SPECTRUM_NAME_COMPOSITE,
+]
+
+_VALID_DOLP_INTERP_SPECTRA = [
+    SPECTRUM_NAME_LINEAR,
 ]
 
 _VALID_INTERP_SRFS = [
@@ -296,6 +328,34 @@ def get_interpolation_spectrum_name() -> str:
         f"Unknown interpolation spectrum found: {setts.interpolation_spectrum}"
     )
     return _VALID_INTERP_SPECTRA[0]
+
+
+def get_available_dolp_spectra_names() -> List[str]:
+    """Obtain the dolp spectra names that the user can use.
+
+    Returns
+    -------
+    names: list of str
+        Valid interpolation spectra names.
+    """
+    return _VALID_DOLP_INTERP_SPECTRA.copy()
+
+
+def get_dolp_interpolation_spectrum_name() -> str:
+    """Obtains the currently chosen dolp (polarization) interpolation spectrum name.
+
+    Returns
+    -------
+    name: str
+        Currently chosen dolp interpolation spectrum name.
+    """
+    setts = _load_interp_settings()
+    if setts.interpolation_spectrum_polarization in _VALID_DOLP_INTERP_SPECTRA:
+        return setts.interpolation_spectrum_polarization
+    logger.get_logger().error(
+        f"Unknown interpolation spectrum found: {setts.interpolation_spectrum_polarization}"
+    )
+    return _VALID_DOLP_INTERP_SPECTRA[0]
 
 
 def get_available_interp_SRFs() -> List[str]:
@@ -373,6 +433,25 @@ def set_interpolation_spectrum_name(spectrum: str):
         raise LimeException(msg)
 
 
+def set_dolp_interpolation_spectrum_name(spectrum: str):
+    """Sets the dolp spectrum name as the currently selected one.
+
+    Parameters
+    ----------
+    spectrum: str
+        Spectrum name to set as chosen.
+    """
+    setts = _load_interp_settings()
+    if spectrum in _VALID_DOLP_INTERP_SPECTRA:
+        path = _get_interp_path()
+        setts.interpolation_spectrum_polarization = spectrum
+        setts._save_disk(path)
+    else:
+        msg = f"Tried setting unknown polarisation interpolation spectrum: {spectrum}"
+        logger.get_logger().error(msg)
+        raise LimeException(msg)
+
+
 def set_interpolation_SRF(intp_srf: str):
     """Sets the SRF as the currently selected one.
 
@@ -386,14 +465,6 @@ def set_interpolation_SRF(intp_srf: str):
         path = _get_interp_path()
         setts.interpolation_SRF = intp_srf
         setts._save_disk(path)
-        _ = """
-        lime_tbx_dir=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
-        source_dir_fwhm=os.path.join(lime_tbx_dir,"lime_tbx","spectral_integration","assets")
-        source_dir_tsis=os.path.join(lime_tbx_dir,"lime_tbx","lime_algorithms","rolo","assets")
-        target_dir=os.path.join(lime_tbx_dir,"coeff_data")
-        shutil.copyfile(os.path.join(source_dir_fwhm,SRF_DICT_FWHM_FILES[intp_srf]), os.path.join(target_dir,"interpolated_model_fwhm.csv"))
-        shutil.copyfile(os.path.join(source_dir_tsis,SRF_DICT_SOLAR_FILES[intp_srf]), os.path.join(target_dir,"tsis_intp.csv"))
-        """
     else:
         msg = f"Tried setting unknown interpolation spectrum: {intp_srf}"
         logger.get_logger().error(msg)
@@ -426,14 +497,3 @@ def set_skip_uncertainties(skip: bool):
     setts.skip_uncertainties = skip
     path = _get_interp_path()
     setts._save_disk(path)
-
-
-def can_perform_polarization() -> bool:
-    """Checks if the currently selected spectrum supports polarization.
-
-    Returns
-    -------
-    supports_polarization: bool
-        Indicator of support of polarization of the current spectrum.
-    """
-    return get_interpolation_spectrum_name() == SPECTRUM_NAME_ASD

@@ -20,6 +20,7 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
 )
+from lime_tbx.datatypes import constants
 from lime_tbx.gui.util import (
     CallbackWorker,
     start_thread as _start_thread,
@@ -35,12 +36,23 @@ __status__ = "Development"
 
 MAX_PATH_LEN = 35
 
+_A_LOT_DATETIMES_MSG = f"Usually, calculated reflectance values are used to obtain irradiances. \
+However, due to the large size of the error correlation matrices, these matrices are not \
+stored in memory for more than {constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED} datetimes. \
+This requires recalculating reflectances whenever irradiances are computed. Therefore, \
+if you want both values in this case, it is advisable to choose to calculate irradiances first."
+
 
 def _callback_read_obs_files(paths: List[str]) -> List[LunarObservation]:
     obss = []
     for path in paths:
         obss.append(moon.read_moon_obs(path))
     return [obss]
+
+
+def _callback_read_srf(path: str) -> Tuple[SpectralResponseFunction, str]:
+    read_srf = srf.read_srf(path)
+    return (read_srf, path)
 
 
 class CustomInputWidget(QtWidgets.QWidget):
@@ -88,9 +100,10 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.selen_obs_lon_spinbox.setMinimum(-180)
         self.selen_obs_lon_spinbox.setMaximum(180)
         self.selen_obs_lon_spinbox.setDecimals(4)
-        self.selen_sun_lon_spinbox.setMinimum(-180)
-        self.selen_sun_lon_spinbox.setMaximum(180)
-        self.selen_sun_lon_spinbox.setDecimals(4)
+        self.selen_sun_lon_spinbox.setMinimum(-3.141592653589793)
+        self.selen_sun_lon_spinbox.setMaximum(3.141592653589793)
+        self.selen_sun_lon_spinbox.setDecimals(6)
+        self.selen_sun_lon_spinbox.setSingleStep(0.1)
         self.moon_phase_angle_spinbox.setMinimum(-180)
         self.moon_phase_angle_spinbox.setMaximum(180)
         self.moon_phase_angle_spinbox.setDecimals(5)
@@ -194,10 +207,11 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     the simulation of lunar values for a geographic position at a concrete time.
     """
 
-    def __init__(self, callback_check_calculable: Callable):
+    def __init__(self, callback_check_calculable: Callable, skip_uncs: bool):
         super().__init__()
         self._build_layout()
         self.callback_check_calculable = callback_check_calculable
+        self._skip_uncs = skip_uncs
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QFormLayout(self)
@@ -254,14 +268,24 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
+        self.info_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxInformation
+        )
+        self.info_pixmap = self.info_icon.pixmap(32)
+        self.info_hidden_datetimes_a_lot = QtWidgets.QLabel(" ")
+        self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
+        self.info_hidden_datetimes_a_lot.setWordWrap(True)
+        self.info_hidden_datetimes_a_lot.hide()
         self.switch_layout = QtWidgets.QHBoxLayout()
         self.switch_layout.addWidget(self.show_datetimes_button)
+        self.switch_layout.addWidget(self.info_hidden_datetimes_a_lot)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
         self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_single_datetime)
         self.show_datetimes_button.clicked.connect(self.show_datetimes)
+        self._check_if_a_lot_dts_and_update_msg()
 
     def _clear_form_rows(self):
         self.main_layout.removeRow(4)
@@ -297,6 +321,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
                 self.loaded_datetimes_label.setText(shown_path)
                 self.callback_check_calculable()
+        self._check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -347,6 +372,18 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
+        self._check_if_a_lot_dts_and_update_msg()
+
+    def _check_if_a_lot_dts_and_update_msg(self):
+        if self.single_datetime:
+            return
+        max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+        if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
+            self.info_hidden_datetimes_a_lot.show()
+            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
+        else:
+            self.info_hidden_datetimes_a_lot.hide()
+            self.info_hidden_datetimes_a_lot.setToolTip("")
 
     def is_calculable(self) -> bool:
         if self.single_datetime:
@@ -354,16 +391,26 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         else:
             return len(self.loaded_datetimes) > 0
 
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self._skip_uncs = skip_uncs
+        self._check_if_a_lot_dts_and_update_msg()
+
 
 class SatelliteInputWidget(QtWidgets.QWidget):
     def __init__(
-        self, satellites: List[Satellite], callback_check_calculable: Callable
+        self,
+        satellites: List[Satellite],
+        callback_check_calculable: Callable,
+        skip_uncs: bool,
     ) -> None:
         super().__init__()
         self.satellites = satellites
         self.sat_names = [s.name for s in self.satellites]
         self._build_layout()
         self.callback_check_calculable = callback_check_calculable
+        self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_max_date = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self._skip_uncs = skip_uncs
         self.update_from_combobox(0)
 
     def _build_layout(self):
@@ -408,6 +455,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         )
         self.load_datetimes_button.clicked.connect(self.load_datetimes)
         self.loaded_datetimes_label = QtWidgets.QLabel("")
+        self.loaded_datetimes_label.setWordWrap(True)
         self.datetimes_layout.addWidget(self.load_datetimes_button)
         self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
         self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
@@ -416,14 +464,35 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
+        # info
+        self.info_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxInformation
+        )
+        self.info_pixmap = self.info_icon.pixmap(32)
+        self.info_hidden_datetimes_a_lot = QtWidgets.QLabel(" ")
+        self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
+        self.info_hidden_datetimes_a_lot.setWordWrap(True)
+        self.info_hidden_datetimes_a_lot.hide()
+        # warning
+        self.warning_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxWarning
+        )  # QtGui.QIcon.fromTheme('dialog-warning')
+        self.warning_pixmap = self.warning_icon.pixmap(32)
+        self.warn_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
+        self.warn_hidden_datetimes_invalid.setPixmap(self.warning_pixmap)
+        self.warn_hidden_datetimes_invalid.setWordWrap(True)
+        self.warn_hidden_datetimes_invalid.hide()
         self.switch_layout = QtWidgets.QHBoxLayout()
         self.switch_layout.addWidget(self.show_datetimes_button)
+        self.switch_layout.addWidget(self.info_hidden_datetimes_a_lot)
+        self.switch_layout.addWidget(self.warn_hidden_datetimes_invalid)
         self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
         self.switch_layout.addWidget(self.datetime_switch)
         self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
         self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_single_datetime)
         self.show_datetimes_button.clicked.connect(self.show_datetimes)
+        self._check_if_a_lot_dts_and_update_msg()
 
     def _clear_form_rows(self):
         self.main_layout.removeRow(2)
@@ -451,6 +520,8 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         if path != "":
             try:
                 self.loaded_datetimes = csv.read_datetimes(path)
+                self.all_loaded_datetimes = self.loaded_datetimes
+                self.update_dates_with_limits()
             except Exception as e:
                 self.show_error(e)
             else:
@@ -459,11 +530,15 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                     shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
                 self.loaded_datetimes_label.setText(path)
                 self.callback_check_calculable()
+        self._check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def show_datetimes(self):
+        self.datetimes_window = QtWidgets.QMainWindow(self)
         self.datetimes_widget = ShowDatetimeWidget(self.loaded_datetimes)
-        self.datetimes_widget.show()
+        self.datetimes_window.setCentralWidget(self.datetimes_widget)
+        self.datetimes_window.show()
+        self.datetimes_window.resize(660, 230)
 
     def get_satellite(self) -> str:
         return self.sat_names[self.combo_sats.currentIndex()]
@@ -483,8 +558,10 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         if isinstance(dt, list):
             if self.single_datetime:
                 self.change_multiple_datetime()
+            self.all_loaded_datetimes = dt
             self.loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
+            self.update_dates_with_limits()
             self.callback_check_calculable()
         else:
             if not self.single_datetime:
@@ -494,30 +571,78 @@ class SatelliteInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
+        self._check_if_a_lot_dts_and_update_msg()
+
+    def update_dates_with_limits(self):
+        self.loaded_datetimes = [
+            dt
+            for dt in self.all_loaded_datetimes
+            if self.current_min_date < dt < self.current_max_date
+        ]
+        if len(self.loaded_datetimes) != len(self.all_loaded_datetimes):
+            missing_dts = [
+                dt
+                for dt in self.all_loaded_datetimes
+                if dt not in self.loaded_datetimes
+            ]
+            missing_dts_msg = ",".join(
+                [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in missing_dts]
+            )
+            self.warn_hidden_datetimes_invalid.show()
+            self.warn_hidden_datetimes_invalid.setToolTip(
+                f"The following datetimes are not available for the selected satellite: {missing_dts_msg}"
+            )
+        else:
+            self.warn_hidden_datetimes_invalid.hide()
+            self.warn_hidden_datetimes_invalid.setToolTip("")
+        self._check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
         sat = self.satellites[i]
+        d0, df = sat.get_datetime_range()
+        if d0 == None:
+            d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_min_date = d0
+        if df == None:
+            df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_max_date = df
         if self.single_datetime:
-            d0, df = sat.get_datetime_range()
-            if d0 == None:
-                d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
             dt0 = QtCore.QDateTime(
                 d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
             )
             self.datetime_edit.setMinimumDateTime(dt0)
-            if df == None:
-                df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
             dtf = QtCore.QDateTime(
                 df.year, df.month, df.day, df.hour, df.minute, df.second
             )
             self.datetime_edit.setMaximumDateTime(dtf)
+        else:
+            self.update_dates_with_limits()
+            self.callback_check_calculable()
+
+    def _check_if_a_lot_dts_and_update_msg(self):
+        if self.single_datetime:
+            return
+        max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+        if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
+            self.info_hidden_datetimes_a_lot.show()
+            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
+        else:
+            self.info_hidden_datetimes_a_lot.hide()
+            self.info_hidden_datetimes_a_lot.setToolTip("")
+
+    def get_current_min_max_dates(self) -> Tuple[datetime, datetime]:
+        return self.current_min_date, self.current_max_date
 
     def is_calculable(self) -> bool:
         if self.single_datetime:
             return True
         else:
             return len(self.loaded_datetimes) > 0
+
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self._skip_uncs = skip_uncs
+        self._check_if_a_lot_dts_and_update_msg()
 
 
 class InputWidget(QtWidgets.QWidget):
@@ -526,24 +651,28 @@ class InputWidget(QtWidgets.QWidget):
         satellites: List[Satellite],
         change_callback: Callable,
         callback_check_calculable: Callable,
+        skip_uncs: bool,
     ):
         super().__init__()
         self.satellites = satellites
         self.change_callback = change_callback
         self.last_point: Point = None
         self.callback_check_calculable = callback_check_calculable
+        self.skip_uncs = skip_uncs
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.tabs = QtWidgets.QTabWidget()
         self.tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
-        self.surface = SurfaceInputWidget(self.callback_check_calculable)
+        self.surface = SurfaceInputWidget(
+            self.callback_check_calculable, self.skip_uncs
+        )
         self.tabs.addTab(self.surface, "Geographic")
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Selenographic")
         self.satellite = SatelliteInputWidget(
-            self.satellites, self.callback_check_calculable
+            self.satellites, self.callback_check_calculable, self.skip_uncs
         )
         self.tabs.addTab(self.satellite, "Satellite")
         self.tabs.currentChanged.connect(self.callback_check_calculable)
@@ -625,6 +754,11 @@ class InputWidget(QtWidgets.QWidget):
         self._check_last_point(point)
         return point
 
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self.skip_uncs = skip_uncs
+        self.surface.set_is_skipping_uncs(skip_uncs)
+        self.satellite.set_is_skipping_uncs(skip_uncs)
+
 
 class ComparisonInput(QtWidgets.QWidget):
     def __init__(self, callback_change: Callable):
@@ -672,20 +806,31 @@ class ComparisonInput(QtWidgets.QWidget):
         self.main_layout.addLayout(self.moon_obs_layout)
         self.main_layout.addLayout(self.srf_layout)
 
+    def _load_srf_file_finished(self, data):
+        self.loaded_srf = data[0]
+        path = data[1]
+        shown_path = path
+        if len(shown_path) > MAX_PATH_LEN:
+            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+        self.srf_feedback.setText(shown_path)
+        self.callback_change()
+        self._set_enabled_gui_input(True)
+
+    def _load_srf_file_error(self, e):
+        self.show_error(e)
+        self.clear_srf()
+
     @QtCore.Slot()
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         if path != "":
-            try:
-                self.loaded_srf = srf.read_srf(path)
-            except Exception as e:
-                self.show_error(e)
-            else:
-                shown_path = path
-                if len(shown_path) > MAX_PATH_LEN:
-                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-                self.srf_feedback.setText(shown_path)
-                self.callback_change()
+            self._set_enabled_gui_input(False)
+            self.srf_feedback.setText("Loading...")
+            self.worker = CallbackWorker(
+                _callback_read_srf,
+                [path],
+            )
+            self._start_thread(self._load_srf_file_finished, self._load_srf_file_error)
 
     def show_error(self, error: Exception):
         self._set_enabled_gui_input(True)
@@ -741,6 +886,11 @@ class ComparisonInput(QtWidgets.QWidget):
         self.moon_obs_feedback.setText("No files loaded")
         self.callback_change()
 
+    def clear_srf(self):
+        self.loaded_srf = None
+        self.srf_feedback.setText("No file loaded")
+        self.callback_change()
+
     def get_srf(self) -> Union[SpectralResponseFunction, None]:
         return self.loaded_srf
 
@@ -748,6 +898,5 @@ class ComparisonInput(QtWidgets.QWidget):
         return self.loaded_moons
 
     def clear_input(self) -> None:
-        self.loaded_srf = None
-        self.srf_feedback.setText("No file loaded")
+        self.clear_srf()
         self.clear_obs_files()

@@ -22,6 +22,7 @@ from lime_tbx.gui import (
 )
 from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.gui.spinner import SpinnerPage
+from lime_tbx.gui import constants
 from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
 from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import moon, srf as srf_loader
@@ -70,6 +71,7 @@ def eli_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
 ) -> Tuple[
     List[float],
     List[float],
@@ -115,7 +117,8 @@ def eli_callback(
         Indicates if the different point locations/s are inside the valid mpa range.
     """
     def_srf = get_default_srf()
-    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    callback_obs = lambda: signal_info.emit("another_refl_irr_simulated")
+    lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef, callback_obs)
     return (
         point,
         srf,
@@ -132,6 +135,7 @@ def elref_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
 ) -> Tuple[
     List[float],
     List[float],
@@ -166,7 +170,8 @@ def elref_callback(
         Indicates if the different point locations/s are inside the valid mpa range.
     """
     def_srf = get_default_srf()
-    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
+    callback_obs = lambda: signal_info.emit("another_refl_simulated")
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef, callback_obs)
     return (
         point,
         lime_simulation.get_elrefs(),
@@ -181,6 +186,7 @@ def polar_callback(
     point: Point,
     coeffs: PolarizationCoefficients,
     lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
 ) -> Tuple[
     Point,
     Union[SpectralData, List[SpectralData]],
@@ -189,7 +195,8 @@ def polar_callback(
     Union[bool, List[bool]],
 ]:
     def_srf = get_default_srf()
-    lime_simulation.update_polarization(def_srf, point, coeffs)
+    callback_obs = lambda: signal_info.emit("another_pol_simulated")
+    lime_simulation.update_polarization(def_srf, point, coeffs, callback_obs)
     return (
         point,
         lime_simulation.get_polars(),
@@ -241,8 +248,8 @@ def calculate_all_callback(
     lime_simulation: ILimeSimulation,
 ):
     def_srf = get_default_srf()
-    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
+    lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     lime_simulation.update_polarization(def_srf, point, p_coeffs)
     return (point, srf)
 
@@ -268,6 +275,13 @@ def show_comparisons_callback(
         settings_manager,
     )
     return (to_remove, to_remove_comps)
+
+
+def _callback_read_srf(
+    path: str, lglod: Union[LGLODData, LGLODComparisonData]
+) -> Tuple[SpectralResponseFunction, Union[LGLODData, LGLODComparisonData]]:
+    srf = srf_loader.read_srf(path)
+    return (srf, lglod)
 
 
 def _show_comps_output(
@@ -488,8 +502,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def compare_info(self, data: str):
-        self.quant_mos_simulated += 1
-        self.spinner.set_text("{}/{}".format(self.quant_mos_simulated, self.quant_mos))
+        if self.quant_mos_simulated < self.quant_mos:
+            self.spinner.set_text(f"{self.quant_mos_simulated}/{self.quant_mos}")
+            self.quant_mos_simulated += 1
+        else:
+            self.spinner.set_text(f"Finishing comparisons...")
 
     def set_show_comparison_input(self, show: bool):
         self.input.setVisible(show)
@@ -693,6 +710,7 @@ class MainSimulationsWidget(
             self.satellites,
             self._callback_regular_input_changed,
             self.update_calculability,
+            self.settings_manager.is_skip_uncertainties(),
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
@@ -722,12 +740,20 @@ class MainSimulationsWidget(
             parent=self,
         )
         self.graph.update_legend(
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]]
+            [
+                [constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ]
         )
-        self.graph.set_xlim(logic_constants.CERTAIN_MIN_WLEN)
+        self.graph.set_xlim(
+            logic_constants.CERTAIN_MIN_WLEN, logic_constants.CERTAIN_MAX_WLEN
+        )
         # srf widget
         self.srf_widget = srf.SRFEditWidget(
-            self.settings_manager, self._callback_regular_input_changed
+            self.settings_manager,
+            self._callback_regular_input_changed,
+            self._callback_set_enabled,
         )
         # signal widget
         self.signal_widget = output.SignalWidget(self.settings_manager)
@@ -756,12 +782,19 @@ class MainSimulationsWidget(
         self.main_layout.addWidget(self.export_lglod_button)
         self.update_calculability()
 
+    def _callback_set_enabled(self, enabled: bool):
+        if enabled:
+            self._unblock_gui()
+        else:
+            self._block_gui_loading()
+
     def _set_spinner(self, enabled: bool):
         self.loading_spinner.setVisible(enabled)
         if enabled:
             self.loading_spinner.movie_start()
             self.lower_stack.setCurrentIndex(0)
         else:
+            self.loading_spinner.set_text("")
             self.loading_spinner.movie_stop()
             self.lower_stack.setCurrentIndex(1)
 
@@ -790,21 +823,21 @@ class MainSimulationsWidget(
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
         polar_calculable = self.settings_manager.get_polar_coef().is_calculable()
-        self.polar_button.setEnabled(
-            calculable
-            and self.settings_manager.can_perform_polarization()
-            and polar_calculable
-        )
+        self.polar_button.setEnabled(calculable and polar_calculable)
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
     def _start_thread(
-        self, worker: CallbackWorker, finished: Callable, error: Callable
+        self,
+        worker: CallbackWorker,
+        finished: Callable,
+        error: Callable,
+        info: Callable = None,
     ):
         worker_th = QtCore.QThread()
         self.worker_ths.append(worker_th)
         self.workers.append(worker)
-        _start_thread(worker, worker_th, finished, error)
+        _start_thread(worker, worker_th, finished, error, info)
 
     def set_export_button_disabled(self, disabled: bool):
         if not self._finished_building:
@@ -840,11 +873,37 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
+        self.quant_elis = 1
+        self.quant_elis_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_elis = len(point.dt)
+        self.will_calc_reflectance_prev = (
+            self.lime_simulation.will_irradiance_calculate_reflectance_previously(point)
+        )
+        if self.will_calc_reflectance_prev:
+            self.quant_elrefs = self.quant_elis
+            self.quant_elrefs_sim = self.quant_elis_sim
         worker = CallbackWorker(
             eli_callback,
             [srf, point, cimel_coef, self.lime_simulation],
+            True,
         )
-        self._start_thread(worker, self.eli_finished, self.eli_error)
+        self._start_thread(worker, self.eli_finished, self.eli_error, self.eli_info)
+
+    def eli_info(self, data: str):
+        if (
+            self.will_calc_reflectance_prev
+            and self.quant_elrefs_sim < self.quant_elrefs
+        ):
+            self.loading_spinner.set_text(
+                f"{self.quant_elrefs_sim}/{self.quant_elrefs} (reflectances)"
+            )
+            self.quant_elrefs_sim += 1
+        elif self.quant_elis_sim < self.quant_elis:
+            self.loading_spinner.set_text(f"{self.quant_elis_sim}/{self.quant_elis}")
+            self.quant_elis_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
 
     def _set_graph_dts(self, pt: Point):
         self.graph.set_dts([])
@@ -907,14 +966,31 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
+        self.quant_elrefs = 1
+        self.quant_elrefs_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_elrefs = len(point.dt)
         worker = CallbackWorker(
-            elref_callback, [srf, point, cimel_coef, self.lime_simulation]
+            elref_callback,
+            [srf, point, cimel_coef, self.lime_simulation],
+            True,
         )
-        self._start_thread(worker, self.elref_finished, self.elref_error)
+        self._start_thread(
+            worker, self.elref_finished, self.elref_error, self.elref_info
+        )
 
     def clear_signals(self):
         self.signal_widget.clear_signals()
         self.lower_tabs.setTabEnabled(2, False)
+
+    def elref_info(self, data: str):
+        if self.quant_elrefs_sim < self.quant_elrefs:
+            self.loading_spinner.set_text(
+                f"{self.quant_elrefs_sim}/{self.quant_elrefs}"
+            )
+            self.quant_elrefs_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
 
     def elref_finished(
         self,
@@ -963,10 +1039,27 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coef()
+        self.quant_polars = 1
+        self.quant_polars_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_polars = len(point.dt)
         worker = CallbackWorker(
-            polar_callback, [srf, point, coeffs, self.lime_simulation]
+            polar_callback,
+            [srf, point, coeffs, self.lime_simulation],
+            True,
         )
-        self._start_thread(worker, self.polar_finished, self.polar_error)
+        self._start_thread(
+            worker, self.polar_finished, self.polar_error, self.polar_info
+        )
+
+    def polar_info(self, data: str):
+        if self.quant_polars_sim < self.quant_polars:
+            self.loading_spinner.set_text(
+                f"{self.quant_polars_sim}/{self.quant_polars}"
+            )
+            self.quant_polars_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
 
     def polar_finished(
         self,
@@ -980,7 +1073,7 @@ class MainSimulationsWidget(
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
-        sp_name = interp_data.get_interpolation_spectrum_name()
+        sp_name = interp_data.get_dolp_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
@@ -1033,9 +1126,16 @@ class MainSimulationsWidget(
         point: Point = data[0]
         srf: SpectralResponseFunction = data[1]
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        polar_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_coef_version_name()
         lglod = create_lglod_data(
-            point, srf, self.lime_simulation, self.kernels_path, sp_name, version
+            point,
+            srf,
+            self.lime_simulation,
+            self.kernels_path,
+            sp_name,
+            polar_sp_name,
+            version,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
@@ -1381,6 +1481,29 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         else:
             lime_tbx_w.main_page.export_glod()
 
+    def load_simulation_read_srf_finished(self, data):
+        srf = data[0]
+        lglod = data[1]
+        worker = CallbackWorker(return_args_callback, [lglod, srf])
+        self._start_thread(
+            worker, self._load_observations_finished, self.load_simulation_error
+        )
+
+    def load_comparisons_read_srf_finished(self, data):
+        srf = data[0]
+        lglod = data[1]
+        worker = CallbackWorker(return_args_callback, [lglod, srf])
+        self._start_thread(
+            worker,
+            self._load_comparisons_finished,
+            self.load_simulation_error,
+        )
+
+    def load_simulation_read_srf_error(self, e):
+        self.show_error(e)
+        lime_tbx_w = self._get_lime_widget()
+        lime_tbx_w.get_current_page()._unblock_gui()
+
     def load_simulation_finished(self, data):
         lglod = data[0]
         lime_tbx_w = self._get_lime_widget()
@@ -1389,44 +1512,43 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         if isinstance(lglod, LGLODData):
             self.simulations()
             lime_tbx_w.get_current_page()._block_gui_loading()
-            srf = None
-            cancel = False
             if lglod.not_default_srf:
                 srf_path = QtWidgets.QFileDialog().getOpenFileName(
                     self, "Select SpectralResponseFunction file"
                 )[0]
                 if srf_path == "":
-                    cancel = True
+                    lime_tbx_w.get_current_page()._unblock_gui()
                 else:
-                    try:
-                        srf = srf_loader.read_srf(srf_path)
-                    except Exception as e:
-                        cancel = True
-                        self.show_error(e)
-            if not cancel:
-                worker = CallbackWorker(return_args_callback, [lglod, srf])
-                self._start_thread(
-                    worker, self._load_observations_finished, self.load_simulation_error
-                )
+                    worker = CallbackWorker(
+                        _callback_read_srf,
+                        [srf_path, lglod],
+                    )
+                    self._start_thread(
+                        worker,
+                        self.load_simulation_read_srf_finished,
+                        self.load_simulation_read_srf_error,
+                    )
+            else:
+                lime_tbx_w = self._get_lime_widget()
+                lime_tbx_w.load_observations_finished(lglod, None)
         else:
             self.comparison()
             lime_tbx_w.get_current_page()._block_gui_loading()
-            srf = None
             srf_path = QtWidgets.QFileDialog().getOpenFileName(
                 self, "Select SpectralResponseFunction file"
             )[0]
             if srf_path != "":
-                try:
-                    srf = srf_loader.read_srf(srf_path)
-                except Exception as e:
-                    self.show_error(e)
-                else:
-                    worker = CallbackWorker(return_args_callback, [lglod, srf])
-                    self._start_thread(
-                        worker,
-                        self._load_comparisons_finished,
-                        self.load_simulation_error,
-                    )
+                worker = CallbackWorker(
+                    _callback_read_srf,
+                    [srf_path, lglod],
+                )
+                self._start_thread(
+                    worker,
+                    self.load_comparisons_read_srf_finished,
+                    self.load_simulation_read_srf_error,
+                )
+            else:
+                lime_tbx_w.get_current_page()._unblock_gui()
 
     def _load_observations_finished(self, data):
         lglod = data[0]
@@ -1518,6 +1640,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         interpol_opt_dialog = interpoptions.InterpOptionsDialog(
             lime_tbx_w.settings_manager,
             lime_tbx_w.lime_simulation,
+            self._get_lime_widget().main_page.input_widget,
             self,
         )
         interpol_opt_dialog.exec_()

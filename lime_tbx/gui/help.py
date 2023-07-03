@@ -43,6 +43,14 @@ sensing instrument (pre-stored in GLOD format files) to the LIME model output.
 )
 
 
+_CONTACT: str = """
+To communicate any problem or error please contact:
+<a style=\"color: #00ae9d\" href=\"mailto:lime_tbx@goa.uva.es\">lime_tbx@goa.uva.es</a>
+""".replace(
+    "\n", " "
+).strip()
+
+
 def _launch_cmd(cmd: str) -> Tuple[str, str]:
     cmd_exec = subprocess.Popen(
         cmd,
@@ -166,6 +174,12 @@ class AboutDialog(QtWidgets.QDialog):
             _DESCRIPTION, alignment=QtCore.Qt.AlignLeft
         )
         self.description_label.setWordWrap(True)
+        # Contact
+        self.contact_label = QtWidgets.QLabel(_CONTACT, alignment=QtCore.Qt.AlignLeft)
+        self.contact_label.setWordWrap(True)
+        self.contact_label.setTextFormat(QtCore.Qt.RichText)
+        self.contact_label.setTextInteractionFlags(QtCore.Qt.TextBrowserInteraction)
+        self.contact_label.setOpenExternalLinks(True)
         # ESA Logo
         esa_logo_path = os.path.join(_current_dir, constants.ESA_LOGO_PATH)
         esa_pixmap = QtGui.QPixmap(esa_logo_path).scaledToHeight(250)
@@ -223,6 +237,7 @@ class AboutDialog(QtWidgets.QDialog):
         self.scroll_layout.addWidget(self.version_label)
         self.scroll_layout.addWidget(self.lime_logo)
         self.scroll_layout.addWidget(self.description_label)
+        self.scroll_layout.addWidget(self.contact_label)
         self.scroll_layout.addWidget(self.esa_logo)
         self.scroll_layout.addLayout(self.collaborators_layout)
         self.scroll_layout.addStretch()

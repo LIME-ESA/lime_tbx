@@ -25,8 +25,8 @@ class TestInterpData(unittest.TestCase):
         self.assertIsNotNone(asd_data)
 
     def test_get_asd_data_not_mpa_absolute(self):
-        asd_data_neg = ipd.get_best_asd_data(-80)
-        asd_data_pos = ipd.get_best_asd_data(80)
+        asd_data_neg = ipd.get_best_asd_data(-20)
+        asd_data_pos = ipd.get_best_asd_data(20)
         self.assertTrue(np.not_equal(asd_data_neg.data, asd_data_pos.data).any())
 
     def test_get_asd_data_consistent(self):
@@ -85,18 +85,6 @@ class TestInterpData(unittest.TestCase):
         self.assertRaises(
             LimeException, ipd.set_interpolation_spectrum_name, "FakeSPectrum"
         )
-
-    def test_can_perform_polarization_only_asd(self):
-        """
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_APOLLO16)
-        self.assertFalse(ipd.can_perform_polarization())
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_BRECCIA)
-        self.assertFalse(ipd.can_perform_polarization())
-        """
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_COMPOSITE)
-        self.assertFalse(ipd.can_perform_polarization())
-        ipd.set_interpolation_spectrum_name(ipd.SPECTRUM_NAME_ASD)
-        self.assertTrue(ipd.can_perform_polarization())
 
 
 if __name__ == "__main__":

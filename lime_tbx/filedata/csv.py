@@ -36,9 +36,8 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 _EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
-_READ_FILE_ERROR_STR = (
-    "There was a problem while loading the file. See log for details."
-)
+_READ_FILE_DTS_ERROR_STR = "There was a problem while loading datetimes csv file.\n\
+Check that every row has the correct format and see log for details."
 _WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
 
@@ -125,6 +124,7 @@ def export_csv_simulation(
     inside_mpa_range: Union[bool, List[bool]],
     interp_spectrum_name: str,
     skip_uncs: bool,
+    cimel_data: Union[SpectralData, List[SpectralData]],
 ):
     """
     Export the given data to a csv file
@@ -181,6 +181,20 @@ def export_csv_simulation(
                 ylabels.append(f"{ylabel}{warn_out_mpa_range}")
                 if not skip_uncs:
                     ylabels.append(f"uncertainties{warn_out_mpa_range}")
+            if cimel_data:
+                writer.writerow([f"CIMEL {xlabel}", *ylabels])
+                if not isinstance(cimel_data, list) and not isinstance(
+                    cimel_data, np.ndarray
+                ):
+                    cimel_data = [cimel_data]
+                x_data = cimel_data[0].wlens
+                for i, cimel_w in enumerate(x_data):
+                    y_data = []
+                    for cdata in cimel_data:
+                        y_data.append(cdata.data[i])
+                        if not skip_uncs:
+                            y_data.append(cdata.uncertainties[i])
+                    writer.writerow([cimel_w, *y_data])
             writer.writerow([xlabel, *ylabels])
             if not isinstance(data, list) and not isinstance(data, np.ndarray):
                 data = [data]
@@ -396,10 +410,12 @@ def read_datetimes(path: str) -> List[datetime]:
             reader = csv.reader(file)
             datetimes = []
             for row in reader:
+                if not row:
+                    continue
                 irow = map(int, row)
                 dt = datetime(*irow, tzinfo=timezone.utc)
                 datetimes.append(dt)
             return datetimes
     except Exception as e:
         logger.get_logger().exception(e)
-        raise Exception(_READ_FILE_ERROR_STR)
+        raise Exception(_READ_FILE_DTS_ERROR_STR)

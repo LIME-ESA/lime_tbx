@@ -6,6 +6,7 @@ from datetime import datetime
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import matplotlib.backends.backend_pdf  # important import for exporting as pdf
 from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
@@ -31,6 +32,7 @@ from lime_tbx.gui.canvas import (
     font_prop,
     redraw_canvas,
 )
+from lime_tbx.gui import constants
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -64,6 +66,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.data_compare = None
         self.vertical_lines = []
         self.dts = []
+        self.cursor_names = []
         self.mpl_cursor = None
         self.xlim_left = None
         self.xlim_right = None
@@ -142,6 +145,9 @@ class GraphWidget(QtWidgets.QWidget):
         self.xlim_left = left
         self.xlim_right = right
 
+    def _update_toolbar(self):
+        self.toolbar.update()
+
     def update_plot(
         self,
         data: Union[SpectralData, List[SpectralData]] = None,
@@ -162,6 +168,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.disable_buttons(True)
         if redraw:
             self._redraw()
+            self._update_toolbar()
 
     def update_labels(
         self,
@@ -178,6 +185,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.subtitle = subtitle
         if redraw:
             self._redraw()
+        self._update_toolbar()
 
     def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
@@ -194,12 +202,18 @@ class GraphWidget(QtWidgets.QWidget):
         self.legend = legend
         if redraw:
             self._redraw()
+        self._update_toolbar()
 
     def update_size(self):
         self._redraw()
 
+    def set_cursor_names(self, labels: List[str]):
+        self.dts = None
+        self.cursor_names = labels.copy()
+
     def set_dts(self, dts: List[datetime]):
         self.dts = dts
+        self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
 
     def _redraw(self):
         self.canvas.axes.cla()  # Clear the canvas.
@@ -221,7 +235,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.canvas.fig.tight_layout()
         except:
             pass
-        if self.dts:
+        if self.cursor_names:
             cursor_lines = [
                 l
                 for l in lines
@@ -229,16 +243,25 @@ class GraphWidget(QtWidgets.QWidget):
                 or l.get_label() == self.legend[0][0]
             ]
             self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
+            func_num_from_label = lambda label: int(int(label[6:]))
+            if self.dts:
+                func_num_from_label = lambda label: int(int(label[6:]) / 2)
+
+            for l in cursor_lines:
+                lab = l.get_label()
+                if lab.startswith("_child"):
+                    num = func_num_from_label(lab)
+                    l.set_label(self.cursor_names[num])
 
             @self.mpl_cursor.connect("add")
             def _(sel):
                 sel.annotation.get_bbox_patch().set(fc="white")
                 label = sel.artist.get_label()
-                num = 0
                 if label.startswith("_child"):
-                    num = int(int(label[6:]) / 2)
-                dt: datetime = self.dts[num]
-                label = dt.strftime("%Y/%m/%d %H:%M:%S")
+                    num = func_num_from_label(label)
+                    label = self.cursor_names[num]
+                elif label == constants.INTERPOLATED_DATA_LABEL:
+                    label = self.cursor_names[0]
                 sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
@@ -253,15 +276,11 @@ class GraphWidget(QtWidgets.QWidget):
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
         )[0]
-        self.parentWidget().setDisabled(True)
-        self.disable_buttons(True)
         if name is not None and name != "":
             try:
                 self.canvas.print_figure(name)
             except Exception as e:
                 self.show_error(e)
-        self.disable_buttons(False)
-        self.parentWidget().setDisabled(False)
 
     def set_inside_mpa_range(self, inside_mpa_range):
         self.inside_mpa_range = inside_mpa_range
@@ -280,8 +299,6 @@ class GraphWidget(QtWidgets.QWidget):
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export CSV", "{}.csv".format(self.title)
         )[0]
-        self.parentWidget().setDisabled(True)
-        self.disable_buttons(True)
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
@@ -308,6 +325,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.inside_mpa_range,
                         self.interp_spectrum_name,
                         self.skip_uncs,
+                        self.cimel_data,
                     )
                 else:
                     csv.export_csv_srf(
@@ -319,8 +337,6 @@ class GraphWidget(QtWidgets.QWidget):
                     )
             except Exception as e:
                 self.show_error(e)
-        self.disable_buttons(False)
-        self.parentWidget().setDisabled(False)
 
 
 class SignalWidget(QtWidgets.QWidget):

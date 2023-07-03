@@ -26,7 +26,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
 )
 from lime_tbx.datatypes import constants, logger
-from lime_tbx.gui import settings
+from lime_tbx.gui import settings, constants as gui_constants
 from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.filedata import moon, srf as srflib, csv
@@ -62,6 +62,11 @@ LONG_OPTIONS = [
 ]
 _WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
+
+_ERROR_RINDEX_BOTH_DOT = "When creating output as CSV or GRAPH files for both DT and MPA, \
+the full CSV/GRAPH filepaths must be explictly written, including the extension \
+(.csv, .png, ...).\nAnother solution is to select the CSVD/GRAPHD option where one \
+only has to specify the output directory path.\nProblematic filepath: "
 
 
 def eprint(*args, **kwargs):
@@ -270,6 +275,7 @@ class CLI:
         version = self.settings_manager.get_lime_coef().version
         are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         csv.export_csv_simulation(
             self.lime_simulation.get_elrefs(),
@@ -281,6 +287,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             sp_name,
             skip_uncs,
+            self.lime_simulation.get_elrefs_cimel(),
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
@@ -292,6 +299,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             sp_name,
             skip_uncs,
+            self.lime_simulation.get_elis_cimel(),
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
@@ -301,8 +309,9 @@ class CLI:
             ed.o_file_polar,
             version,
             are_mpas_oinside_mpa_range,
-            sp_name,
+            dolp_sp_name,
             skip_uncs,
+            self.lime_simulation.get_polars_cimel(),
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -317,9 +326,16 @@ class CLI:
 
     def _export_lglod(self, point: Point, output_file: str):
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_lime_coef().version
         lglod = create_lglod_data(
-            point, self.srf, self.lime_simulation, self.kernels_path, sp_name, version
+            point,
+            self.srf,
+            self.lime_simulation,
+            self.kernels_path,
+            sp_name,
+            dolp_sp_name,
+            version,
         )
         now = datetime.now(timezone.utc)
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
@@ -353,10 +369,15 @@ class CLI:
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
         canv.axes.cla()  # Clear the canvas.
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elrefs(),
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]],
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ],
             self.lime_simulation.get_elrefs_cimel(),
             self.lime_simulation.get_elrefs_asd(),
             None,
@@ -379,7 +400,11 @@ class CLI:
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elis(),
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]],
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ],
             self.lime_simulation.get_elis_cimel(),
             self.lime_simulation.get_elis_asd(),
             None,
@@ -399,10 +424,18 @@ class CLI:
             )
             sys.exit(1)
         canv.axes.cla()  # Clear the canvas.
+        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}"
+        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
+        canv.axes.cla()  # Clear the canvas.
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_polars(),
-            [["interpolated data points"], ["CIMEL data points"], ["errorbars (k=2)"]],
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                ["CIMEL data points"],
+                ["errorbars (k=2)"],
+            ],
             self.lime_simulation.get_polars_cimel(),
             self.lime_simulation.get_polars_asd(),
             None,
@@ -410,7 +443,7 @@ class CLI:
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
             None,
-            sp_name,
+            dolp_sp_name,
         )
         try:
             canv.print_figure(ed.o_file_polar)
@@ -629,6 +662,8 @@ class CLI:
                                 os.path.join(ed.output_dir, ch), ed.extension
                             )
                         if is_both:
+                            if "." not in output:
+                                raise LimeException(_ERROR_RINDEX_BOTH_DOT + output)
                             idx = output.rindex(".")
                             output = output[:idx] + ".dt" + output[idx:]
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
@@ -673,6 +708,8 @@ class CLI:
                                 os.path.join(ed.output_dir, ch), ed.extension
                             )
                         if is_both:
+                            if "." not in output:
+                                raise LimeException(_ERROR_RINDEX_BOTH_DOT + output)
                             idx = output.rindex(".")
                             output = output[:idx] + ".mpa" + output[idx:]
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
@@ -733,9 +770,7 @@ class CLI:
             return 1
         if "interp_spectrum" in interp_settings:
             interp_spectrum = interp_settings["interp_spectrum"]
-            names = [
-                name for name in self.settings_manager.get_available_spectra_names()
-            ]
+            names = self.settings_manager.get_available_spectra_names()
             if interp_spectrum not in names:
                 eprint(
                     f"Interpolation spectrum not recognized. Selected: {interp_spectrum}. Available: {names}."
@@ -772,6 +807,27 @@ class CLI:
                 return 1
             skip_uncertainties = skip_uncertainties == "True"
             self.settings_manager.set_skip_uncertainties(skip_uncertainties)
+        return 0
+
+    def check_sys_args(self, sysargs: List[str]) -> int:
+        # Check if the user has forgotten one dash, or has set one dash but all together
+        if any(
+            item.startswith("-") and not item.startswith("--") and len(item) > 2
+            for item in sysargs
+        ):
+            problem_flags = [
+                item
+                for item in sysargs
+                if item.startswith("-")
+                and not item[0].startswith("--")
+                and len(item) > 2
+            ]
+            eprint(
+                f"The flags must be separated from their argument/s by at least one blank space, \
+and the flags set with only one dash '-' only have one letter. Problematic flags: {problem_flags}.\n\
+Run 'lime -h' for help."
+            )
+            return 1
         return 0
 
     def handle_input(self, opts: List[Tuple[str, str]]) -> int:

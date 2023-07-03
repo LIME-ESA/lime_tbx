@@ -9,6 +9,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 """___LIME_TBX Modules___"""
 from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.gui import constants
+from lime_tbx.gui.input import InputWidget
 from lime_tbx.simulation.lime_simulation import ILimeSimulation
 
 """___Authorship___"""
@@ -24,12 +25,14 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self,
         settings_manager: ISettingsManager,
         lime_simulation: ILimeSimulation,
+        input_w: InputWidget,
         parent=None,
     ):
         super().__init__(parent)
         self.settings_manager = settings_manager
         self.lime_simulation = lime_simulation
         self.combobox_listen = True
+        self.input_w = input_w
         self._build_layout()
 
     def _build_layout(self):
@@ -40,14 +43,13 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.main_layout.addWidget(self.title_label)
         self.combo_versions = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_versions)
-        self.form_layout = QtWidgets.QFormLayout()
         # select output SRF
         self.title_label_SRF = QtWidgets.QLabel("Select the output SRF")
         self.main_layout.addWidget(self.title_label_SRF)
         self.combo_SRF = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_SRF)
-        self.form_layout = QtWidgets.QFormLayout()
         # show interp
+        self.form_layout = QtWidgets.QFormLayout()
         self.label_show_interp = QtWidgets.QLabel("Show interpolation spectrum:")
         self.checkbox_show_interp = QtWidgets.QCheckBox()
         self.checkbox_show_interp.setChecked(
@@ -114,6 +116,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
                 self.checkbox_skip_uncerts.isChecked()
             )
             self.lime_simulation.set_simulation_changed()
+            self.input_w.set_is_skipping_uncs(self.checkbox_skip_uncerts.isChecked())
 
     @QtCore.Slot()
     def save_clicked(self):

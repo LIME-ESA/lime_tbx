@@ -33,14 +33,38 @@ __status__ = "Development"
 class IAccessData(ABC):
     @abstractmethod
     def get_all_coefficients(self) -> List[LimeCoefficients]:
+        """
+        Obtain all available LimeCoefficients
+
+        Returns
+        -------
+        coeffs: list of LimeCoefficients
+            All available LimeCoefficients
+        """
         pass
 
     @abstractmethod
     def get_previously_selected_version(self) -> str:
+        """
+        Get the version name of the previously selected version.
+
+        Returns
+        -------
+        version_name: str
+            Name of the previously selected version
+        """
         pass
 
     @abstractmethod
     def set_previusly_selected_version(self, name: str):
+        """
+        Set the name of the previously/current selected version.
+
+        Parameters
+        ----------
+        version_name: str
+            Name of the previously selected version
+        """
         pass
 
 

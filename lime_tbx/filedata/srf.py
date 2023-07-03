@@ -75,9 +75,14 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
         if hasattr(ds["wavelength"], "units"):
             wlen_units: str = ds["wavelength"].units
         f_to_nm = _calc_factor_to_nm(wlen_units)
-        for wvlen_arr in ds["wavelength"]:
-            for i in range(len(wvlen_arr)):
-                _append_if_not_masked(wvlens[i], wvlen_arr[i], f_to_nm)
+        if ds["wavelength"].ndim == 1:
+            same_arr = ds["wavelength"][:].data * f_to_nm
+            for i in range(n_channels):
+                wvlens[i] = same_arr
+        else:
+            for wvlen_arr in ds["wavelength"]:
+                for i in range(len(wvlen_arr)):
+                    _append_if_not_masked(wvlens[i], wvlen_arr[i], f_to_nm)
         for factor_arr in ds["srf"]:
             for i in range(len(factor_arr)):
                 _append_if_not_masked(factors[i], factor_arr[i])

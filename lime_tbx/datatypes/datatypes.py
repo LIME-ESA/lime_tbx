@@ -42,6 +42,7 @@ from typing import Dict, List, Union, Tuple
 from datetime import datetime
 from enum import Enum
 from abc import ABC
+import sys
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -138,6 +139,9 @@ class SRFChannel:
         self.center = center
         self.id = id
         self.spectral_response = spectral_response
+        self.spectral_response_inrange = {
+            k: v for k, v in spectral_response.items() if min_wlen <= k <= max_wlen
+        }
         spec = list(self.spectral_response.keys())
         if spec[-1] < min_wlen or spec[0] > max_wlen:
             self.valid_spectre = SpectralValidity.OUT
@@ -625,7 +629,7 @@ class LimeCoefficients:
     Attributes
     ----------
     reflectance: ReflectanceCoefficients
-        Reflectance coefficients for the ROLO/LIME model.
+        Reflectance coefficients for the LIME model.
     polarization: PolatizationCoefficients
         Polarization coefficients for the DoLP/LIME model.
     version: str
@@ -637,7 +641,6 @@ class LimeCoefficients:
     version: str
 
 
-@dataclass
 class SpectralData:
     """
     Data for a spectrum of wavelengths, with an associated uncertainty each.
@@ -645,19 +648,48 @@ class SpectralData:
     Attributes
     ----------
     wlens: np.ndarray
-        Spectrum of wavelengths
+        Spectrum of wavelengths.
     data: np.ndarray
-        Data associated to the wavelengths (irradiance, reflectance, etc)
+        Data associated to the wavelengths (irradiance, reflectance, etc).
     uncertainties: np.ndarray
-        Uncertainties associated to the data
-    ds: xarray.Dataset
-        Dataset used in data generation
+        Uncertainties associated to the data.
+    err_corr: None | np.ndarray
+        Error correlation matrix, if included.
     """
 
-    wlens: np.ndarray
-    data: np.ndarray
-    uncertainties: np.ndarray
-    ds: xarray.Dataset
+    def __init__(
+        self,
+        wlens: np.ndarray,
+        data: np.ndarray,
+        uncertainties: np.ndarray,
+        ds: xarray.Dataset,
+    ):
+        """
+        Parameters
+        ----------
+        wlens: np.ndarray
+            Spectrum of wavelengths
+        data: np.ndarray
+            Data associated to the wavelengths (irradiance, reflectance, etc)
+        uncertainties: np.ndarray
+            Uncertainties associated to the data
+        ds: xarray.Dataset
+            Dataset used in data generation
+        """
+        self.wlens = wlens
+        self.data = data
+        self.uncertainties = uncertainties
+        self.err_corr = None
+        if hasattr(ds, "err_corr_reflectance"):
+            self.err_corr = ds.err_corr_reflectance.values.astype(np.float32)
+        elif hasattr(ds, "err_corr_polarization"):
+            self.err_corr = ds.err_corr_polarization.values.astype(np.float32)
+        elif hasattr(ds, "err_corr_irradiance"):
+            self.err_corr = ds.err_corr_irradiance.values.astype(np.float32)
+
+    def clear_err_corr(self):
+        """Dereference the error correlation matrix from the object."""
+        self.err_corr = None
 
     @staticmethod
     def make_reflectance_ds(
@@ -688,7 +720,7 @@ class SpectralData:
     @staticmethod
     def make_irradiance_ds(
         wavs: np.ndarray,
-        refl: np.ndarray,
+        irr: np.ndarray,
         unc: np.ndarray = None,
         corr: np.ndarray = None,
     ) -> xarray.Dataset:
@@ -698,7 +730,7 @@ class SpectralData:
 
         ds_irr = ds_irr.assign_coords(wavelength=wavs)
 
-        ds_irr.irradiance.values = refl
+        ds_irr.irradiance.values = irr
 
         if unc is not None:
             ds_irr.u_irradiance.values = unc
@@ -919,6 +951,8 @@ class LGLODData:
         Name of the spectrum used for interpolation.
     skipped_uncs: bool
         Flag that indicates if the uncertainties calculation was skipped or not.
+    dolp_spectrum_name: str
+        Name of the spectrum used for polarisation interpolation.
     """
 
     observations: List[LunarObservationWrite]
@@ -930,6 +964,7 @@ class LGLODData:
     spectrum_name: str
     skipped_uncs: bool
     version: str
+    dolp_spectrum_name: str
 
 
 @dataclass
@@ -977,9 +1012,18 @@ class InterpolationSettings:
     ----------
     interpolation_spectrum: str
         Name (and id) of the spectrum used for interpolation.
+    interpolation_spectrum_polarization: str
+        Name (and id) of the spectrum used for interpolation for polarization.
+    interpolation_SRF: str
+        Name (and id) of the spectrum used for SRF interpolation.
+    show_interp_spectrum: bool
+        Flag that indicates if the interpolation spectrum used is going to be shown in graphs.
+    skip_uncertainties: bool
+        Flag that indicates if the uncertainties calculation should be skipped.
     """
 
     interpolation_spectrum: str
+    interpolation_spectrum_polarization: str
     interpolation_SRF: str
     show_interp_spectrum: bool
     skip_uncertainties: bool

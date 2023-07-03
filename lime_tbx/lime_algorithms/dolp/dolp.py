@@ -169,17 +169,14 @@ class DOLP(IDOLP):
         polarizations = []
         wavelengths = coefficients.get_wavelengths()
         polarizations = self._get_direct_polarized(mpa_degrees, coefficients)
-        # ds_pol = SpectralData.make_polarization_ds(wavelengths, polarizations, None, None)
         if not skip_uncs:
             uncs, corr = self._calculate_polar_unc(mpa_degrees, coefficients)
-            # uncs = ds_pol.u_polarization.values
+            ds_pol = SpectralData.make_polarization_ds(
+                wavelengths, polarizations, uncs, corr
+            )
         else:
             uncs = np.zeros(polarizations.shape)
-            corr = np.zeros((len(uncs), len(uncs)))
-            np.fill_diagonal(corr, 1)
-        ds_pol = SpectralData.make_polarization_ds(
-            wavelengths, polarizations, uncs, corr
-        )
+            ds_pol = None
         return SpectralData(
             np.array(wavelengths),
             polarizations,
