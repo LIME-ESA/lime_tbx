@@ -170,7 +170,7 @@ def _write_start_dataset(
         ds.time_coverage_end = max_dt.strftime(_DT_FORMAT)
     else:
         ds.time_coverage_end = ""
-    ds.reference_model = "LIME2 coefficients version: {}".format(coefficients_version)
+    ds.reference_model = "LIME coefficients version: {}".format(coefficients_version)
     ds.not_default_srf = int(not_default_srf)
     ds.spectrum_name = spectrum_name
     ds.skipped_uncertainties = int(skipped_uncs)
@@ -578,7 +578,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     dolp_sp_name = ds.polarisation_spectrum_name
     data_source = ds.data_source
     skipped_uncs = bool(ds.skipped_uncertainties)
-    vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
+    vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
     ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
@@ -883,7 +883,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mpas = np.array(ds.variables["mpa"][:].data)
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
-    vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
+    vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
     ds.close()
     comps = []
     points = []

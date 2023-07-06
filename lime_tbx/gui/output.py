@@ -84,7 +84,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.canvas.set_title(self.title, fontproperties=title_font_prop)
         self.canvas.axes.tick_params(labelsize=8)
         version = self.settings_manager.get_coef_version_name()
-        subtitle = "LIME2 coefficients version: {}".format(version)
+        subtitle = "LIME coefficients version: {}".format(version)
         self.subtitle = subtitle
         self.canvas.set_subtitle(subtitle, fontproperties=font_prop)
         self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)

@@ -151,7 +151,7 @@ def export_csv_simulation(
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             some_out_mpa_range = (
                 not inside_mpa_range
@@ -256,7 +256,7 @@ def export_csv_comparation(
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
@@ -337,7 +337,7 @@ def export_csv_integrated_irradiance(
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME2 coefficients version", coeff_version])
+            writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             some_out_mpa_range = (
                 not inside_mpa_range
