@@ -1,4 +1,4 @@
-LIME2 coefficients version,test
+LIME coefficients version,test
 Interpolation spectrum,ASD
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
 UTC datetime,latitude,longitude,altitude(m),Observed Signal,Simulated Signal,Observation uncertainties,Simulation uncertainties
