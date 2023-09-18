@@ -118,7 +118,6 @@ class DOLP(IDOLP):
             a_coeffs = np.array(coefficients.neg_coeffs)
             unc_coeffs = np.array(coefficients.neg_unc)
             corr_coeffs = np.array(coefficients.p_neg_err_corr_data)
-        print(unc_coeffs)
         unc, corr = prop.propagate_random(
             _measurement_func_polarization,
             [

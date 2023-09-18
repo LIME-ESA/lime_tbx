@@ -536,6 +536,7 @@ class LimeSimulation(ILimeSimulation):
         signals_srf: SpectralResponseFunction,
         skip_uncs: bool,
         callback_observation: Callable,
+        use_wehrli: bool = False,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
         SpectralData,
@@ -555,6 +556,7 @@ class LimeSimulation(ILimeSimulation):
             elref_cimel,
             ret_asd,
             skip_uncs,
+            use_wehrli,
         )
         elref, elis, signals = LimeSimulation._interpolate_refl_calc_irr_signal(
             elref_asd,
@@ -610,9 +612,11 @@ class LimeSimulation(ILimeSimulation):
         elref_cimel,
         elref_asd,
         skip_uncs: bool,
+        use_wehrli: bool = False,
     ) -> Tuple[Union[SpectralData, List[SpectralData]], SpectralData,]:
+        _cimel_srf = "cimel" if not use_wehrli else "cimel_wehrli"
         elis_cimel = LimeSimulation._calculate_eli_from_elref(
-            mds, elref_cimel, "cimel", skip_uncs
+            mds, elref_cimel, _cimel_srf, skip_uncs
         )
         elis_asd = None
         if interp_data.is_show_interpolation_spectrum():
@@ -686,6 +690,7 @@ class LimeSimulation(ILimeSimulation):
             signals_srf,
             skip_uncs,
             callback_observation,
+            self.settings_manager.get_use_wehrli_for_cimel_esi(),
         )
         if self.verbose:
             print("Irradiance, reflectance and signal update done")
@@ -727,6 +732,7 @@ class LimeSimulation(ILimeSimulation):
                     self.elref_cimel,
                     self.elref_asd,
                     skip_uncs,
+                    self.settings_manager.get_use_wehrli_for_cimel_esi(),
                 )
                 self.irr_uptodate = True
                 if self.verbose:
@@ -1021,7 +1027,7 @@ class LimeSimulation(ILimeSimulation):
         elrefs: SpectralData | list of SpectralData
             elrefs previously calculated
         srf_type: str
-            SRF type that is going to be used. Can be 'cimel', 'asd' or 'interpolated'.
+            SRF type that is going to be used. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'
         skip_uncs: bool
 
         Returns

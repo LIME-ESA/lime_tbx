@@ -198,6 +198,19 @@ class ISettingsManager(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_use_wehrli_for_cimel_esi(self) -> bool:
+        """
+        Checks if the user/dev settings are set to use the wehrli spectrum as source for the CIMEL ESI
+        or if the TSIS will be used instead.
+
+        Returns
+        -------
+        use_wehrli: bool
+            Boolean indicating if the Wehrli spectrum will be used or not.
+        """
+        pass
+
 
 DEF_SRF_STEP = 2
 
@@ -303,3 +316,6 @@ class SettingsManager(ISettingsManager):
 
     def set_coef_version_name(self, coef_version_name: str):
         self.coef_version_name = coef_version_name
+
+    def get_use_wehrli_for_cimel_esi(self) -> bool:
+        return interp_data.get_use_wehrli_for_cimel_esi()

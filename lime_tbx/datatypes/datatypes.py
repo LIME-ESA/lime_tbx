@@ -1011,7 +1011,9 @@ class InterpolationSettings:
     show_interp_spectrum: bool
         Flag that indicates if the interpolation spectrum used is going to be shown in graphs.
     skip_uncertainties: bool
-        Flag that indicates if the uncertainties calculation should be skipped.
+        Flag that indicates if the uncertainties calculation should be skipped.l:
+    use_wehrli_cimel: bool
+        Boolean indicating if the Wehrli spectrum will be used for calculating CIMEL's ESI or not.
     """
 
     interpolation_spectrum: str
@@ -1019,6 +1021,7 @@ class InterpolationSettings:
     interpolation_SRF: str
     show_interp_spectrum: bool
     skip_uncertainties: bool
+    use_wehrli_cimel: bool
 
     def _save_disk(self, path: str):
         with open(path, "w") as file:
