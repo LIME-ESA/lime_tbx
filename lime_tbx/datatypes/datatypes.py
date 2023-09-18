@@ -534,11 +534,11 @@ class PolarizationCoefficients:
     def __init__(
         self,
         wavelengths: List[float],
-        pos_coeffs: List[Tuple[float, float, float, float]],
-        pos_unc: List[Tuple[float, float, float, float]],
+        pos_coeffs: List[List[float]],
+        pos_unc: List[List[float]],
         p_pos_err_corr_data: List[List[float]],
-        neg_coeffs: List[Tuple[float, float, float, float]],
-        neg_unc: List[Tuple[float, float, float, float]],
+        neg_coeffs: List[List[float]],
+        neg_unc: List[List[float]],
         p_neg_err_corr_data: List[List[float]],
     ):
         """
@@ -546,9 +546,9 @@ class PolarizationCoefficients:
         ----------
         wavelengths: list of float
             Wavelengths present in the model, in nanometers
-        pos_coeffs: list of tuples of 4 floats
+        pos_coeffs: list of tuples of N floats
             Positive phase angles related to the given wavelengths
-        neg_coeffs: list of tuples of 4 floats
+        neg_coeffs: list of tuples of N floats
             Negative phase angles related to the given wavelengths
         """
         self.wlens = wavelengths
@@ -569,9 +569,7 @@ class PolarizationCoefficients:
         """
         return self.wlens
 
-    def get_coefficients_positive(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_coefficients_positive(self, wavelength_nm: float) -> List[float]:
         """Gets all positive phase angle coefficients for a concrete wavelength
 
         Parameters
@@ -587,15 +585,11 @@ class PolarizationCoefficients:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.pos_coeffs[index]
 
-    def get_uncertainties_positive(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_uncertainties_positive(self, wavelength_nm: float) -> List[float]:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.pos_unc[index]
 
-    def get_coefficients_negative(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_coefficients_negative(self, wavelength_nm: float) -> List[float]:
         """Gets all negative phase angle coefficients for a concrete wavelength
 
         Parameters
@@ -611,9 +605,7 @@ class PolarizationCoefficients:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.neg_coeffs[index]
 
-    def get_uncertainties_negative(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_uncertainties_negative(self, wavelength_nm: float) -> List[float]:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.neg_unc[index]
 

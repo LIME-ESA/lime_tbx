@@ -22,6 +22,7 @@ import punpy
 
 """___LIME TBX Modules___"""
 from lime_tbx.datatypes.datatypes import PolarizationCoefficients, SpectralData
+from lime_tbx.datatypes import constants
 
 
 """___Authorship___"""
@@ -69,12 +70,10 @@ class IDOLP(ABC):
 
 
 def _measurement_func_polarization(mpa: float, a_coeffs: np.ndarray) -> np.ndarray:
-    result = (
-        a_coeffs[:, 0] * mpa
-        + a_coeffs[:, 1] * mpa**2
-        + a_coeffs[:, 2] * mpa**3
-        + a_coeffs[:, 3] * mpa**4
-    )
+    quant_coeffs = len(a_coeffs[0])
+    if quant_coeffs not in (4, 5):
+        quant_coeffs = quant_coeffs / constants.NUM_CIMEL_WLENS
+    result = sum(a_coeffs[:, i] * mpa ** (i + 1) for i in range(quant_coeffs))
     return result
 
 
@@ -100,12 +99,8 @@ class DOLP(IDOLP):
             a_coeffs = coefficients.get_coefficients_positive(wlen)
         else:
             a_coeffs = coefficients.get_coefficients_negative(wlen)
-        result = (
-            a_coeffs[0] * mpa
-            + a_coeffs[1] * mpa**2
-            + a_coeffs[2] * mpa**3
-            + a_coeffs[3] * mpa**4
-        )
+        quant_coeffs = len(a_coeffs[0])
+        result = sum(a_coeffs[:, i] * mpa ** (i + 1) for i in range(quant_coeffs))
         return result
 
     def _calculate_polar_unc(
@@ -123,6 +118,7 @@ class DOLP(IDOLP):
             a_coeffs = np.array(coefficients.neg_coeffs)
             unc_coeffs = np.array(coefficients.neg_unc)
             corr_coeffs = np.array(coefficients.p_neg_err_corr_data)
+        print(unc_coeffs)
         unc, corr = prop.propagate_random(
             _measurement_func_polarization,
             [
