@@ -135,7 +135,7 @@ def get_esi(srf_type: str) -> np.ndarray:
             usecols=1,
             dtype=np.float32,
         )
-    elif srf_type == "cimel_werhli":
+    elif srf_type == "cimel_wehrli":
         return np.genfromtxt(
             os.path.join(dir_path, _WEHRLI_CIMEL_FILE),
             delimiter=",",
@@ -194,7 +194,7 @@ def get_u_esi(srf_type: str) -> np.ndarray:
             usecols=2,
             dtype=np.float32,
         )
-    elif srf_type == "cimel_werhli":
+    elif srf_type == "cimel_wehrli":
         return np.zeros(constants.NUM_CIMEL_WLENS)
     else:
         raise ValueError(
