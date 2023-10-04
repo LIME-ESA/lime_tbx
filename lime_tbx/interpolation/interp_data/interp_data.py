@@ -414,9 +414,9 @@ def is_skip_uncertainties() -> bool:
     return setts.skip_uncertainties
 
 
-def get_use_wehrli_for_cimel_esi() -> bool:
+def get_use_wehrli_for_esi() -> bool:
     """Checks if the user/dev settings are set to use the wehrli spectrum as
-    source for the CIMEL ESI or if the TSIS will be used instead.
+    source for the ESI or if the TSIS will be used instead.
 
     Returns
     -------
@@ -424,7 +424,7 @@ def get_use_wehrli_for_cimel_esi() -> bool:
         Boolean indicating if the Wehrli spectrum will be used or not.
     """
     setts = _load_interp_settings()
-    return setts.use_wehrli_cimel
+    return setts.use_wehrli
 
 
 def set_interpolation_spectrum_name(spectrum: str):

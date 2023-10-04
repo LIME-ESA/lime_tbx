@@ -336,8 +336,9 @@ class SPICEAdapter(ISPICEAdapter):
         pos_iau = list(
             map(
                 lambda n: n * 1000,
-                spice.pgrrec(
-                    body,
+                spice.georec(
+                    # spice.pgrrec(
+                    #    body,
                     spice.rpd() * lon,
                     spice.rpd() * lat,
                     alt_km,
@@ -359,7 +360,10 @@ class SPICEAdapter(ISPICEAdapter):
         pol_rad = radios[2]  # Polar radius
         flattening = (eq_rad - pol_rad) / eq_rad
         pos_iau = np.array(list(map(lambda n: n / 1000, [x, y, z])))
-        lon, lat, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
+        lon, lat, alt_km = spice.recgeo(
+            pos_iau, eq_rad, flattening
+        )  # Changing this because it's the funtion that Stefan uses.
+        # lon, lat, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
         SPICEAdapter._clear_kernels()
         lat = lat * spice.dpr()
         lon = lon * spice.dpr()
@@ -382,7 +386,8 @@ class SPICEAdapter(ISPICEAdapter):
         llh_list = []  # alt km
         for xyz in xyz_list:
             pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
-            llh = spice.recpgr(body, pos_iau, eq_rad, flattening)
+            llh = spice.recgeo(pos_iau, eq_rad, flattening)
+            # llh = spice.recpgr(body, pos_iau, eq_rad, flattening)
             llh_list.append(llh)
         SPICEAdapter._clear_kernels()
         for i, llh in enumerate(llh_list):

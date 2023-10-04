@@ -2,7 +2,7 @@
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Union
 import os
 
 """___Third-Party Modules___"""
@@ -199,15 +199,29 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_use_wehrli_for_cimel_esi(self) -> bool:
+    def get_use_wehrli_for_esi(self) -> bool:
         """
-        Checks if the user/dev settings are set to use the wehrli spectrum as source for the CIMEL ESI
+        Checks if the user/dev settings are set to use the wehrli spectrum as source for the ESI
         or if the TSIS will be used instead.
 
         Returns
         -------
         use_wehrli: bool
             Boolean indicating if the Wehrli spectrum will be used or not.
+        """
+        pass
+
+    @abstractmethod
+    def get_intermediate_results_path(self) -> Union[str, None]:
+        """
+        Checks if the user is debugging the intermediate results and checks for the path they
+        want the data to be stored at.
+
+        Returns
+        -------
+        str or None
+            Path selected by the user, or None in case that the user is not debugging the
+            intermediate results.
         """
         pass
 
@@ -317,5 +331,10 @@ class SettingsManager(ISettingsManager):
     def set_coef_version_name(self, coef_version_name: str):
         self.coef_version_name = coef_version_name
 
-    def get_use_wehrli_for_cimel_esi(self) -> bool:
-        return interp_data.get_use_wehrli_for_cimel_esi()
+    def get_use_wehrli_for_esi(self) -> bool:
+        return interp_data.get_use_wehrli_for_esi()
+
+    def get_intermediate_results_path(self) -> Union[str, None]:
+        if "LIMETBX_INTERMEDIATE_PATH" in os.environ:
+            return os.environ["LIMETBX_INTERMEDIATE_PATH"]
+        return None
