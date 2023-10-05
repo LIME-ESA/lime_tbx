@@ -232,6 +232,8 @@ class SPICEAdapter(ISPICEAdapter):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str,
+        target_frame: str,
         callback: Callable,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         if isinstance(dt, list):
@@ -241,7 +243,12 @@ class SPICEAdapter(ISPICEAdapter):
                 altitude,
                 dt,
                 kernels_path.main_kernels_path,
+                True,
+                target_frame,
                 custom_kernel_path=kernels_path.custom_kernel_path,
+                ignore_bodvrd=False,
+                source_frame=source_frame,
+                target_framestr=target_frame,
             )
             mds2 = []
             for md in mds:
@@ -262,7 +269,12 @@ class SPICEAdapter(ISPICEAdapter):
             altitude,
             [dt],
             kernels_path.main_kernels_path,
+            True,
+            target_frame,
             custom_kernel_path=kernels_path.custom_kernel_path,
+            ignore_bodvrd=False,
+            source_frame=source_frame,
+            target_framestr=target_frame,
         )[0]
         return datatypes.MoonData(
             md.dist_sun_moon_au,
@@ -283,7 +295,14 @@ class SPICEAdapter(ISPICEAdapter):
         kernels_path: datatypes.KernelsPath,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         return SPICEAdapter._get_moon_data_from_callback(
-            latitude, longitude, altitude, dt, kernels_path, spicedmoon.get_moon_datas
+            latitude,
+            longitude,
+            altitude,
+            dt,
+            kernels_path,
+            spicedmoon.get_moon_datas,
+            "IAU_EARTH",
+            "J2000",
         )
 
     @staticmethod
@@ -300,6 +319,8 @@ class SPICEAdapter(ISPICEAdapter):
             altitude,
             dt,
             kernels_path,
+            "MOON_ME",
+            "MOON_ME",
             spicedmoon.get_moon_datas_from_moon,
         )
 
