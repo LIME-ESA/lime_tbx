@@ -236,38 +236,15 @@ class SPICEAdapter(ISPICEAdapter):
         target_frame: str,
         callback: Callable,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        if isinstance(dt, list):
-            mds = callback(
-                latitude,
-                longitude,
-                altitude,
-                dt,
-                kernels_path.main_kernels_path,
-                True,
-                target_frame,
-                custom_kernel_path=kernels_path.custom_kernel_path,
-                ignore_bodvrd=False,
-                source_frame=source_frame,
-                target_framestr=target_frame,
-            )
-            mds2 = []
-            for md in mds:
-                md2 = datatypes.MoonData(
-                    md.dist_sun_moon_au,
-                    md.dist_obs_moon,
-                    md.lon_sun_rad,
-                    md.lat_obs,
-                    md.lon_obs,
-                    abs(md.mpa_deg),
-                    md.mpa_deg,
-                )
-                mds2.append(md2)
-            return mds2
-        md = callback(
+        was_list = True
+        if not isinstance(dt, list):
+            was_list = False
+            dt = [dt]
+        mds = callback(
             latitude,
             longitude,
             altitude,
-            [dt],
+            dt,
             kernels_path.main_kernels_path,
             True,
             target_frame,
@@ -275,16 +252,22 @@ class SPICEAdapter(ISPICEAdapter):
             ignore_bodvrd=False,
             source_frame=source_frame,
             target_framestr=target_frame,
-        )[0]
-        return datatypes.MoonData(
-            md.dist_sun_moon_au,
-            md.dist_obs_moon,
-            md.lon_sun_rad,
-            md.lat_obs,
-            md.lon_obs,
-            abs(md.mpa_deg),
-            md.mpa_deg,
         )
+        mds2 = []
+        for md in mds:
+            md2 = datatypes.MoonData(
+                md.dist_sun_moon_au,
+                md.dist_obs_moon,
+                md.lon_sun_rad,
+                md.lat_obs,
+                md.lon_obs,
+                abs(md.mpa_deg),
+                md.mpa_deg,
+            )
+            mds2.append(md2)
+        if not was_list:
+            mds2 = mds2[0]
+        return mds2
 
     @staticmethod
     def get_moon_data_from_earth(
@@ -300,9 +283,9 @@ class SPICEAdapter(ISPICEAdapter):
             altitude,
             dt,
             kernels_path,
-            spicedmoon.get_moon_datas,
-            "IAU_EARTH",
             "J2000",
+            "MOON_ME",
+            spicedmoon.get_moon_datas,
         )
 
     @staticmethod
