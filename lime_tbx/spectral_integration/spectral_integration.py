@@ -26,7 +26,6 @@ from lime_tbx.datatypes.datatypes import (
     SRFChannel,
 )
 from lime_tbx.datatypes import constants, logger
-from lime_tbx.gui.settings import SettingsManager
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -297,8 +296,11 @@ class SpectralIntegration(ISpectralIntegration):
             ch_wlenss.append(ch_wlenssrf[i])
             ch_srfs.append(ch_wlenssrf[i + 1])
         all_interp_elis = np.interp(all_wlens, wlens, elis)
-
-        interm_res_path = SettingsManager.get_intermediate_results_path()
+        interm_res_path = (
+            None
+            if constants.DEBUG_INTERMEDIATE_RESULTS_PATH not in os.environ
+            else os.environ[constants.DEBUG_INTERMEDIATE_RESULTS_PATH]
+        )
         if interm_res_path:
             np.savetxt(
                 f"{interm_res_path}/tests_stefan/irrs_srf_interp_from_irrs_spectrum.csv",

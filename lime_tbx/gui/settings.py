@@ -16,6 +16,7 @@ from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     ReflectanceCoefficients,
 )
+from lime_tbx.datatypes import constants
 from lime_tbx.coefficients.access_data import access_data
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
@@ -337,6 +338,6 @@ class SettingsManager(ISettingsManager):
 
     @staticmethod
     def get_intermediate_results_path() -> Union[str, None]:
-        if "LIMETBX_INTERMEDIATE_PATH" in os.environ:
-            return os.environ["LIMETBX_INTERMEDIATE_PATH"]
+        if constants.DEBUG_INTERMEDIATE_RESULTS_PATH in os.environ:
+            return os.environ[constants.DEBUG_INTERMEDIATE_RESULTS_PATH]
         return None
