@@ -251,7 +251,7 @@ class SPICEAdapter(ISPICEAdapter):
             custom_kernel_path=kernels_path.custom_kernel_path,
             ignore_bodvrd=False,
             source_frame=source_frame,
-            target_framestr=target_frame,
+            target_frame=target_frame,
         )
         mds2 = []
         for md in mds:

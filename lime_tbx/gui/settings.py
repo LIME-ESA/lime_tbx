@@ -211,8 +211,9 @@ class ISettingsManager(ABC):
         """
         pass
 
+    @staticmethod
     @abstractmethod
-    def get_intermediate_results_path(self) -> Union[str, None]:
+    def get_intermediate_results_path() -> Union[str, None]:
         """
         Checks if the user is debugging the intermediate results and checks for the path they
         want the data to be stored at.
@@ -334,7 +335,8 @@ class SettingsManager(ISettingsManager):
     def get_use_wehrli_for_esi(self) -> bool:
         return interp_data.get_use_wehrli_for_esi()
 
-    def get_intermediate_results_path(self) -> Union[str, None]:
+    @staticmethod
+    def get_intermediate_results_path() -> Union[str, None]:
         if "LIMETBX_INTERMEDIATE_PATH" in os.environ:
             return os.environ["LIMETBX_INTERMEDIATE_PATH"]
         return None
