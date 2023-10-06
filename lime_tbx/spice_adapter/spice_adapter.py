@@ -232,47 +232,42 @@ class SPICEAdapter(ISPICEAdapter):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str,
+        target_frame: str,
         callback: Callable,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        if isinstance(dt, list):
-            mds = callback(
-                latitude,
-                longitude,
-                altitude,
-                dt,
-                kernels_path.main_kernels_path,
-                custom_kernel_path=kernels_path.custom_kernel_path,
-            )
-            mds2 = []
-            for md in mds:
-                md2 = datatypes.MoonData(
-                    md.dist_sun_moon_au,
-                    md.dist_obs_moon,
-                    md.lon_sun_rad,
-                    md.lat_obs,
-                    md.lon_obs,
-                    abs(md.mpa_deg),
-                    md.mpa_deg,
-                )
-                mds2.append(md2)
-            return mds2
-        md = callback(
+        was_list = True
+        if not isinstance(dt, list):
+            was_list = False
+            dt = [dt]
+        mds = callback(
             latitude,
             longitude,
             altitude,
-            [dt],
+            dt,
             kernels_path.main_kernels_path,
+            True,
+            target_frame,
             custom_kernel_path=kernels_path.custom_kernel_path,
-        )[0]
-        return datatypes.MoonData(
-            md.dist_sun_moon_au,
-            md.dist_obs_moon,
-            md.lon_sun_rad,
-            md.lat_obs,
-            md.lon_obs,
-            abs(md.mpa_deg),
-            md.mpa_deg,
+            ignore_bodvrd=False,
+            source_frame=source_frame,
+            target_frame=target_frame,
         )
+        mds2 = []
+        for md in mds:
+            md2 = datatypes.MoonData(
+                md.dist_sun_moon_au,
+                md.dist_obs_moon,
+                md.lon_sun_rad,
+                md.lat_obs,
+                md.lon_obs,
+                abs(md.mpa_deg),
+                md.mpa_deg,
+            )
+            mds2.append(md2)
+        if not was_list:
+            mds2 = mds2[0]
+        return mds2
 
     @staticmethod
     def get_moon_data_from_earth(
@@ -283,7 +278,14 @@ class SPICEAdapter(ISPICEAdapter):
         kernels_path: datatypes.KernelsPath,
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         return SPICEAdapter._get_moon_data_from_callback(
-            latitude, longitude, altitude, dt, kernels_path, spicedmoon.get_moon_datas
+            latitude,
+            longitude,
+            altitude,
+            dt,
+            kernels_path,
+            "J2000",
+            "MOON_ME",
+            spicedmoon.get_moon_datas,
         )
 
     @staticmethod
@@ -300,6 +302,8 @@ class SPICEAdapter(ISPICEAdapter):
             altitude,
             dt,
             kernels_path,
+            "MOON_ME",
+            "MOON_ME",
             spicedmoon.get_moon_datas_from_moon,
         )
 
@@ -336,8 +340,9 @@ class SPICEAdapter(ISPICEAdapter):
         pos_iau = list(
             map(
                 lambda n: n * 1000,
-                spice.pgrrec(
-                    body,
+                spice.georec(
+                    # spice.pgrrec(
+                    #    body,
                     spice.rpd() * lon,
                     spice.rpd() * lat,
                     alt_km,
@@ -359,7 +364,10 @@ class SPICEAdapter(ISPICEAdapter):
         pol_rad = radios[2]  # Polar radius
         flattening = (eq_rad - pol_rad) / eq_rad
         pos_iau = np.array(list(map(lambda n: n / 1000, [x, y, z])))
-        lon, lat, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
+        lon, lat, alt_km = spice.recgeo(
+            pos_iau, eq_rad, flattening
+        )  # Changing this because it's the funtion that Stefan uses.
+        # lon, lat, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
         SPICEAdapter._clear_kernels()
         lat = lat * spice.dpr()
         lon = lon * spice.dpr()
@@ -382,7 +390,8 @@ class SPICEAdapter(ISPICEAdapter):
         llh_list = []  # alt km
         for xyz in xyz_list:
             pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
-            llh = spice.recpgr(body, pos_iau, eq_rad, flattening)
+            llh = spice.recgeo(pos_iau, eq_rad, flattening)
+            # llh = spice.recpgr(body, pos_iau, eq_rad, flattening)
             llh_list.append(llh)
         SPICEAdapter._clear_kernels()
         for i, llh in enumerate(llh_list):

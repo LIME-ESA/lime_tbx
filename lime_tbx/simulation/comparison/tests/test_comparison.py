@@ -150,7 +150,7 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(comp.dts[0], OBS1.dt)
         self.assertEqual(comp.number_samples, 1)
         self.assertEqual(comp.observed_signal.data[0], OBS1.ch_irrs["Default"])
-        self.assertAlmostEqual(comp.simulated_signal.data[0], 2.54180198915401e-06)
+        self.assertAlmostEqual(comp.simulated_signal.data[0], 2.59881401749616e-06)
         self.assertAlmostEqual(
             comp.simulated_signal.uncertainties[0], 1.5069602623384797e-08
         )

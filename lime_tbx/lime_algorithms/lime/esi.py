@@ -33,6 +33,7 @@ __status__ = "Development"
 
 _WEHRLI_FILE = "assets/wehrli_asc.csv"
 _WEHRLI_CIMEL_FILE = "assets/wehrli_cimel.csv"
+_WEHRLI_ASD_FILE = "assets/wehrli_asd.csv"
 _TSIS_CIMEL_FILE = "assets/tsis_cimel.csv"
 _TSIS_ASD_FILE = "assets/tsis_asd.csv"
 _TSIS_GAUSS_1_3_FILE = "assets/tsis_fwhm_3_1_gaussian.csv"
@@ -99,7 +100,8 @@ def get_esi(srf_type: str) -> np.ndarray:
     ----------
     srf_type : str
         Name of the srf. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'.
-        It can also be 'cimel_wehrli', although that option won't be available in the toolbox GUI.
+        It can also be 'cimel_wehrli' and 'asd_wehrli', although that option won't be available
+        in the toolbox GUI.
 
     Returns
     -------
@@ -142,6 +144,13 @@ def get_esi(srf_type: str) -> np.ndarray:
             usecols=1,
             dtype=np.float32,
         )
+    elif srf_type == "asd_wehrli":
+        return np.genfromtxt(
+            os.path.join(dir_path, _WEHRLI_ASD_FILE),
+            delimiter=",",
+            usecols=1,
+            dtype=np.float32,
+        )
     else:
         raise ValueError(
             f"srf_type was {srf_type} and must be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'"
@@ -158,7 +167,8 @@ def get_u_esi(srf_type: str) -> np.ndarray:
     ----------
     srf_type : str
         Name of the srf. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'.
-        It can also be 'cimel_wehrli', although that option won't be available in the toolbox GUI.
+        It can also be 'cimel_wehrli' and 'asd_wehrli', although that option won't be available
+        in the toolbox GUI.
 
     Returns
     -------
@@ -195,6 +205,8 @@ def get_u_esi(srf_type: str) -> np.ndarray:
             dtype=np.float32,
         )
     elif srf_type == "cimel_wehrli":
+        return np.zeros(constants.NUM_CIMEL_WLENS)
+    elif srf_type == "asd_wehrli":
         return np.zeros(constants.NUM_CIMEL_WLENS)
     else:
         raise ValueError(
