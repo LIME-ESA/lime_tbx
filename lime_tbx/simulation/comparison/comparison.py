@@ -191,6 +191,8 @@ class Comparison(IComparison):
         mpa_calcs = []
         sp_calcs = []
         #
+        if len(observations) == 0:
+            return []
         dts = [o.dt for o in observations]
         xyzs = [
             (
