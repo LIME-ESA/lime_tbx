@@ -57,7 +57,7 @@ setup(
         "shiboken2==5.15.2.1",
         "six==1.16.0",
         "sklearn==0.0",
-        "spicedmoon==1.0.10",
+        "spicedmoon==1.0.12",
         "spiceypy==5.1.2",
         "threadpoolctl==3.1.0",
         "wrapt==1.14.1",

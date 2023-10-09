@@ -188,47 +188,65 @@ class Comparison(IComparison):
         sps = [[] for _ in ch_names]
         mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
-        for obs in observations:
-            if callback_observation:
-                callback_observation()
-            sat_pos = obs.sat_pos
-            dt = obs.dt
-            if obs.sat_pos_ref in ("IAU_MOON", "MOON_ME", "MOON"):
-                solat, solon, dom_m = SPICEAdapter.to_planetographic(
-                    sat_pos.x,
-                    sat_pos.y,
-                    sat_pos.z,
-                    "MOON",
-                    self.kernels_path.main_kernels_path,
+        mpa_calcs = []
+        sp_calcs = []
+        #
+        dts = [o.dt for o in observations]
+        xyzs = [
+            (
+                o.sat_pos.x,
+                o.sat_pos.y,
+                o.sat_pos.z,
+            )
+            for o in observations
+        ]
+        if observations[0].sat_pos_ref in ("IAU_MOON", "MOON_ME", "MOON"):
+            llhs = SPICEAdapter.to_planetographic_multiple(
+                xyzs,
+                "MOON",
+                self.kernels_path.main_kernels_path,
+            )  # llhs = [] of solats, solons and dom_ms
+            mdas = [
+                SPICEAdapter.get_moon_data_from_moon(
+                    llh[0], llh[1], llh[2], dt, self.kernels_path
                 )
-                mdam = SPICEAdapter.get_moon_data_from_moon(
-                    solat, solon, dom_m, dt, self.kernels_path
-                )
-                mpa = mdam.mpa_degrees
-                sp = CustomPoint(
+                for llh, dt in zip(llhs, dts)
+            ]
+            sp_calcs = [
+                CustomPoint(
                     mdam.distance_sun_moon,
                     mdam.distance_observer_moon,
-                    solat,
-                    solon,
+                    llh[0],
+                    llh[1],
                     mdam.long_sun_radians,
                     mdam.absolute_mpa_degrees,
                     mdam.mpa_degrees,
                 )
-            else:
-                lat, lon, h = SPICEAdapter.to_planetographic(
-                    sat_pos.x,
-                    sat_pos.y,
-                    sat_pos.z,
-                    "EARTH",
-                    self.kernels_path.main_kernels_path,
-                )
-                sp = SurfacePoint(lat, lon, h, dt)
-                mpa = SPICEAdapter.get_moon_data_from_earth(
-                    lat, lon, h, dt, self.kernels_path
-                ).mpa_degrees
+                for mdam, llh in zip(mdas, llhs)
+            ]
+            mpa_calcs = [cp.moon_phase_angle for cp in sp_calcs]
+        else:
+            llhs = SPICEAdapter.to_planetographic_multiple(
+                xyzs,
+                "EARTH",
+                self.kernels_path.main_kernels_path,
+            )
+            sp_calcs = [
+                SurfacePoint(llh[0], llh[1], llh[2], dt) for llh, dt in zip(llhs, dts)
+            ]
+            mdas = SPICEAdapter.get_moon_datas_from_earth_rectangular_multiple(
+                xyzs, dts, self.kernels_path
+            )
+            mpa_calcs = [md.mpa_degrees for md in mdas]
+        #
+        for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):
+            if callback_observation:
+                callback_observation()
             lime_simulation.set_simulation_changed()
             def_srf = get_default_srf()
-            lime_simulation.update_irradiance(def_srf, srf, sp, coefficients)
+            lime_simulation.update_irradiance(
+                def_srf, srf, sp, coefficients, mda_precalculated=mda
+            )
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):

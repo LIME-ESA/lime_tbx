@@ -118,6 +118,7 @@ class ILimeSimulation(ABC):
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
         callback_observation: Callable = None,
+        mda_precalculated: MoonData = None,
     ):
         """
         Updates the irradiance values if the stored value are not valid, using the given parameters.
@@ -456,7 +457,12 @@ class LimeSimulation(ILimeSimulation):
         self._interp_srf_name = None
         self.settings_manager.set_coef_version_name(None)
 
-    def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
+    def _save_parameters(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        mda_precalculated: MoonData = None,
+    ):
         if not self.mds_uptodate:
             if isinstance(point, SatellitePoint):
                 (
@@ -466,9 +472,12 @@ class LimeSimulation(ILimeSimulation):
                     point, self.eocfi_path, self.kernels_path
                 )
             else:
-                self.mds = MoonDataFactory.get_md(
-                    point, self.eocfi_path, self.kernels_path
-                )
+                if mda_precalculated:
+                    self.mds = mda_precalculated
+                else:
+                    self.mds = MoonDataFactory.get_md(
+                        point, self.eocfi_path, self.kernels_path
+                    )
             self.point = point
             self.mds_uptodate = True
         if not self.srf_updtodate:
@@ -720,8 +729,9 @@ class LimeSimulation(ILimeSimulation):
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
         callback_observation: Callable = None,
+        mda_precalculated: MoonData = None,
     ):
-        self._save_parameters(srf, point)
+        self._save_parameters(srf, point, mda_precalculated)
         if self.will_irradiance_calculate_reflectance_simultaneously():
             if not self.irr_uptodate or not self.signals_uptodate:
                 self._update_irradiance_and_reflectance(

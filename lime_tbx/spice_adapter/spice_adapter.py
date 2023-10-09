@@ -77,6 +77,23 @@ class ISPICEAdapter(ABC):
         pass
 
     @staticmethod
+    def get_moon_datas_from_earth_rectangular_multiple(
+        xyzs: List[Tuple[float, float, float]],
+        dts: List[datetime],
+        kernels_path: datatypes.KernelsPath,
+    ) -> List[datatypes.MoonData]:
+        """
+        Calculate lunar data for the given rectangular coordinates.
+        Faster execution for some cases
+
+        Returns:
+        --------
+        list of MoonData
+            Lunar data for the given parameters.
+        """
+        pass
+
+    @staticmethod
     @abstractmethod
     def get_moon_data_from_moon(
         latitude: float,
@@ -287,6 +304,30 @@ class SPICEAdapter(ISPICEAdapter):
             "MOON_ME",
             spicedmoon.get_moon_datas,
         )
+
+    @staticmethod
+    def get_moon_datas_from_earth_rectangular_multiple(
+        xyzs: List[Tuple[float, float, float]],
+        dts: List[datetime],
+        kernels_path: datatypes.KernelsPath,
+    ) -> List[datatypes.MoonData]:
+        xyzs = [(x / 1000, y / 1000, z / 1000) for x, y, z in xyzs]
+        times = list(map(lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S"), dts))
+        mds = spicedmoon.spicedmoon.get_moon_datas_xyzs_no_zenith_azimuth(
+            xyzs, times, kernels_path.main_kernels_path
+        )
+        return [
+            datatypes.MoonData(
+                md.dist_sun_moon_au,
+                md.dist_obs_moon,
+                md.lon_sun_rad,
+                md.lat_obs,
+                md.lon_obs,
+                abs(md.mpa_deg),
+                md.mpa_deg,
+            )
+            for md in mds
+        ]
 
     @staticmethod
     def get_moon_data_from_moon(
