@@ -572,6 +572,7 @@ class TestLimeSimulation(unittest.TestCase):
                 srp.altitude,
                 sp.dt[i],
                 KERNELS_PATH,
+                "ITRF93",
             )
             mds_ref.append(md_ref)
         for md, mdr in zip(mds, mds_ref):

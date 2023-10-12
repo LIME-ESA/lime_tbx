@@ -34,8 +34,8 @@ class ISPICEAdapter(ABC):
     It exports the following functions:
         * get_moon_data_from_earth() - Calculate lunar data for a position on earth
             surface at a concrete datetime.
-        * get_moon_data_from_moon() - Calculate lunar data for a position on Moon's
-            surface at a concrete datetime.
+        * get_moon_datas_from_rectangular_multiple() - Calculate lunar data for some
+            rectangular coordinates from Earth or Moon.
         * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
         * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
         * to_planetographic_multiple() - Transforms multiple rectangular coordinates
@@ -50,6 +50,7 @@ class ISPICEAdapter(ABC):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         """
         Calculate lunar data for a position on earth surface at a concrete datetime.
@@ -67,6 +68,9 @@ class ISPICEAdapter(ABC):
         kernels_path: str
             Path where the needed SPICE kernels are located.
             The user must have write access to that directory.
+        source_frame: str
+            Source frame from which to transform the xyz coordinates.
+            By default J2000, but it can be others like ITRF93.
 
         Returns
         -------
@@ -294,6 +298,7 @@ class SPICEAdapter(ISPICEAdapter):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         xyz = SPICEAdapter.to_rectangular(
             latitude, longitude, altitude, "EARTH", kernels_path.main_kernels_path
@@ -304,7 +309,10 @@ class SPICEAdapter(ISPICEAdapter):
             waslist = False
         xyzs = [xyz for _ in dt]
         mda = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-            xyzs, dt, kernels_path
+            xyzs,
+            dt,
+            kernels_path,
+            source_frame,
         )
         if not waslist:
             mda = mda[0]
