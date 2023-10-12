@@ -209,13 +209,13 @@ class Comparison(IComparison):
                 xyzs,
                 "MOON",
                 self.kernels_path.main_kernels_path,
-            )  # llhs = [] of solats, solons and dom_ms
-            mdas = [
-                SPICEAdapter.get_moon_data_from_moon(
-                    llh[0], llh[1], llh[2], dt, self.kernels_path
-                )
-                for llh, dt in zip(llhs, dts)
-            ]
+            )
+            mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+                xyzs,
+                dts,
+                self.kernels_path,
+                "MOON_ME",
+            )
             sp_calcs = [
                 CustomPoint(
                     mdam.distance_sun_moon,
@@ -228,7 +228,6 @@ class Comparison(IComparison):
                 )
                 for mdam, llh in zip(mdas, llhs)
             ]
-            mpa_calcs = [cp.moon_phase_angle for cp in sp_calcs]
         else:
             llhs = SPICEAdapter.to_planetographic_multiple(
                 xyzs,
@@ -238,10 +237,10 @@ class Comparison(IComparison):
             sp_calcs = [
                 SurfacePoint(llh[0], llh[1], llh[2], dt) for llh, dt in zip(llhs, dts)
             ]
-            mdas = SPICEAdapter.get_moon_datas_from_earth_rectangular_multiple(
+            mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
                 xyzs, dts, self.kernels_path
             )
-            mpa_calcs = [md.mpa_degrees for md in mdas]
+        mpa_calcs = [md.mpa_degrees for md in mdas]
         #
         for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):
             if callback_observation:

@@ -188,10 +188,9 @@ class MoonDataFactory:
         for i, llh in enumerate(llhs):
             srp = SurfacePoint(llh[0], llh[1], llh[2], dts[i])
             srps.append(srp)
-            # mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
             print(srp)
-        mds = SPICEAdapter.get_moon_datas_from_earth_rectangular_multiple(
-            xyzs, dts, kernels_path
+        mds = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+            xyzs, dts, kernels_path, "ITRF93"  # EOCFI uses ITRF
         )
 
         if not isinstance(sp.dt, list):

@@ -77,53 +77,32 @@ class ISPICEAdapter(ABC):
         pass
 
     @staticmethod
-    def get_moon_datas_from_earth_rectangular_multiple(
+    def get_moon_datas_from_rectangular_multiple(
         xyzs: List[Tuple[float, float, float]],
         dts: List[datetime],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> List[datatypes.MoonData]:
         """
         Calculate lunar data for the given rectangular coordinates.
         Faster execution for some cases
 
+        Parameters
+        ----------
+        xyzs: list of tuple of three floats
+            Rectangular coordinates in meters
+        dts: List of datetime
+            Datetimes of each position of those xyzs
+        kernels_path: KernelsPath
+            Information about the SPICE kernels location
+        source_frame: str
+            Source frame from which to transform the xyz coordinates.
+            By default J2000, but it can be something like 'MOON_ME' if the coordinates are lunar.
+
         Returns:
         --------
         list of MoonData
             Lunar data for the given parameters.
-        """
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_moon_data_from_moon(
-        latitude: float,
-        longitude: float,
-        altitude: float,
-        dt: Union[datetime, List[datetime]],
-        kernels_path: datatypes.KernelsPath,
-    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        """
-        Calculate lunar data for a position on moon surface at a concrete datetime.
-
-        Parameters
-        ----------
-        latitude: float
-            Selenographic latitude in decimal degrees.
-        longitude: float
-            Selenographic longitude in decimal degrees.
-        altitude: float
-            Altitude in meters.
-        dt: datetime | list of datetimes
-            Time or time series at which the lunar data will be calculated.
-        kernels_path: str
-            Path where the needed SPICE kernels are located.
-            The user must have write access to that directory.
-
-        Returns
-        -------
-        md: MoonData | list of MoonData
-            Lunar data for the given parameters. If the parameter dt was a list,
-            this will be a list. Otherwise not.
         """
         pass
 
@@ -319,23 +298,33 @@ class SPICEAdapter(ISPICEAdapter):
         xyz = SPICEAdapter.to_rectangular(
             latitude, longitude, altitude, "EARTH", kernels_path.main_kernels_path
         )
+        waslist = True
         if not isinstance(dt, list) and not isinstance(dt, np.ndarray):
             dt = [dt]
+            waslist = False
         xyzs = [xyz for _ in dt]
-        return SPICEAdapter.get_moon_datas_from_earth_rectangular_multiple(
+        mda = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
             xyzs, dt, kernels_path
         )
+        if not waslist:
+            mda = mda[0]
+        return mda
 
     @staticmethod
-    def get_moon_datas_from_earth_rectangular_multiple(
+    def get_moon_datas_from_rectangular_multiple(
         xyzs: List[Tuple[float, float, float]],
         dts: List[datetime],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> List[datatypes.MoonData]:
+        # if source_frame = 'MOON_ME' or contains 'MOON' its from MOON
         xyzs = [(x / 1000, y / 1000, z / 1000) for x, y, z in xyzs]
         times = list(map(lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S"), dts))
         mds = spicedmoon.spicedmoon.get_moon_datas_xyzs_no_zenith_azimuth(
-            xyzs, times, kernels_path.main_kernels_path
+            xyzs,
+            times,
+            kernels_path.main_kernels_path,
+            source_frame,
         )
         return [
             datatypes.MoonData(
@@ -349,25 +338,6 @@ class SPICEAdapter(ISPICEAdapter):
             )
             for md in mds
         ]
-
-    @staticmethod
-    def get_moon_data_from_moon(
-        latitude: float,
-        longitude: float,
-        altitude: float,
-        dt: Union[datetime, List[datetime]],
-        kernels_path: datatypes.KernelsPath,
-    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        return SPICEAdapter._get_moon_data_from_callback(
-            latitude,
-            longitude,
-            altitude,
-            dt,
-            kernels_path,
-            "MOON_ME",
-            "MOON_ME",
-            spicedmoon.get_moon_datas_from_moon,
-        )
 
     @staticmethod
     def _load_kernels(kernels_path: str):

@@ -891,18 +891,13 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     std_mrd = std_mrd[std_mrd != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     kp = kernels_path.main_kernels_path
-    for i, (satpos, satposref) in enumerate(zip(sat_poss, sat_pos_refs)):
-        if satposref in ("MOON", "MOON_ME", "IAU_MOON"):
-            sp = SPICEAdapter.to_planetographic(
-                satpos[0],
-                satpos[1],
-                satpos[2],
-                "MOON",
-                kp,
-            )
-            mdam = SPICEAdapter.get_moon_data_from_moon(
-                sp[0], sp[1], sp[2], datetimes[i], kernels_path
-            )
+    xyzs = [(satpos[0], satpos[1], satpos[2]) for satpos in sat_poss]
+    if sat_pos_refs and sat_pos_refs[0] in ("MOON", "MOON_ME", "IAU_MOON"):
+        mdams = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+            xyzs, datetimes, kernels_path, sat_pos_refs[0]
+        )
+        sps = SPICEAdapter.to_planetographic_multiple(xyzs, "MOON", kp)
+        for sp, mdam in zip(sps, mdams):
             sp = CustomPoint(
                 mdam.distance_sun_moon,
                 mdam.distance_observer_moon,
@@ -912,16 +907,12 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
                 mdam.absolute_mpa_degrees,
                 mdam.mpa_degrees,
             )
-        else:
-            sp = SPICEAdapter.to_planetographic(
-                satpos[0],
-                satpos[1],
-                satpos[2],
-                "EARTH",
-                kp,
-            )
-            sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
-        points.append(sp)
+            points.append(sp)
+    else:
+        sps = SPICEAdapter.to_planetographic_multiple(xyzs, "EARTH", kp)
+        for sp, dt in zip(sps, datetimes):
+            sp = SurfacePoint(sp[0], sp[1], sp[2], dt)
+            points.append(sp)
     points = np.array(points)
     for i in range(len(ch_names)):
         indexes = irr_comp_data[i] != fill_value
