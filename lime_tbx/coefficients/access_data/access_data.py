@@ -167,7 +167,8 @@ def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     wlens = _POLARIZATION_WLENS
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
-    uncs = _DEFAULT_UNCS
+    uncs = np.array(_DEFAULT_UNCS)
+    uncs.fill(0.0000001)  # It fails later on if uncs are all 0
     err_corr_size = len(uncs) * len(uncs[0])
     err_corr = np.zeros((err_corr_size, err_corr_size))
     np.fill_diagonal(err_corr, 1)
