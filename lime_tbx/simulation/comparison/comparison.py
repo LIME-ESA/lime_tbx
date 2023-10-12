@@ -281,14 +281,14 @@ class Comparison(IComparison):
                 for j in range(num_samples):
                     sim = specs[1].data[j]
                     ref = specs[0].data[j]
-                    rel_dif = (sim - ref) / ref
+                    rel_dif = 100 * (sim - ref) / ref
                     tot_rel_diff += rel_dif
                     rel_diffs.append(rel_dif)
                     unc_r = 0
                     if not lime_simulation.is_skipping_uncs():
                         unc_sim = specs[1].uncertainties[j]
                         unc_ref = specs[0].uncertainties[j]
-                        unc_r = (unc_sim + unc_ref) + unc_ref
+                        unc_r = 100 * (unc_sim + unc_ref) + unc_ref
                     uncs_r.append(unc_r)
                     # i dont know if this is the correct way of propagating the uncertainty
                 mean_rel_diff = tot_rel_diff / num_samples

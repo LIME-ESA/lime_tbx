@@ -207,7 +207,7 @@ def redraw_canvas(
             )
             lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
             ax2.set_ylabel(
-                "Relative difference (Fraction of unity)",
+                "Relative difference (%)",
                 fontproperties=label_font_prop,
             )
             plt.setp(
