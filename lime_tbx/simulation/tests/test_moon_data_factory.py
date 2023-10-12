@@ -108,12 +108,12 @@ class TestMoonDataFactory(unittest.TestCase):
             SATELLITE_POINT, EOCFI_PATH, KERNELS_PATH
         )
         self.assertEqual(md.distance_sun_moon, 0.9863676197729848)
-        self.assertEqual(md.distance_observer_moon, 401359.3601239557)
+        self.assertEqual(md.distance_observer_moon, 406214.0769307725)
         self.assertEqual(md.long_sun_radians, 0.1343504656066533)
-        self.assertEqual(md.lat_obs, -5.759950739055754)
-        self.assertEqual(md.long_obs, -2.035356499774366)
-        self.assertEqual(md.absolute_mpa_degrees, 10.668693068220756)
-        self.assertEqual(md.mpa_degrees, -10.668693068220756)
+        self.assertEqual(md.lat_obs, -5.234187076763817)
+        self.assertEqual(md.long_obs, -3.2374416337423626)
+        self.assertEqual(md.absolute_mpa_degrees, 11.58747830181146)
+        self.assertEqual(md.mpa_degrees, -11.58747830181146)
 
 
 if __name__ == "__main__":

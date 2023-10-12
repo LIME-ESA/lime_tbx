@@ -184,11 +184,9 @@ class MoonDataFactory:
         llhs = SPICEAdapter.to_planetographic_multiple(
             xyzs, "EARTH", kernels_path.main_kernels_path
         )
-        print(llhs)
         for i, llh in enumerate(llhs):
             srp = SurfacePoint(llh[0], llh[1], llh[2], dts[i])
             srps.append(srp)
-            print(srp)
         mds = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
             xyzs, dts, kernels_path, "ITRF93"  # EOCFI uses ITRF
         )
