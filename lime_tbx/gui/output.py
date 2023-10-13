@@ -540,6 +540,10 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.graph_reldif.setVisible(True)
         self.graph_percdif.setVisible(False)
 
+    def tight_layout(self):
+        self.graph_percdif.canvas.fig.tight_layout()
+        self.graph_reldif.canvas.fig.tight_layout()
+
     def show_percentage(self):
         self.graph_reldif.setVisible(False)
         self.graph_percdif.setVisible(True)
@@ -759,4 +763,6 @@ for wavelengths between 350 and 2500 nm"
         return self.channel_tabs.currentIndex()
 
     def set_current_channel_index(self, index: int):
-        return self.channel_tabs.setCurrentIndex(index)
+        cui = self.channel_tabs.setCurrentIndex(index)
+        self.channels[index].tight_layout()
+        return cui
