@@ -544,11 +544,13 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.graph_reldif.setVisible(False)
         self.graph_percdif.setVisible(True)
         self.stack_layout.setCurrentIndex(1)
+        self.graph_percdif.canvas.fig.tight_layout()
 
     def show_relative(self):
         self.graph_reldif.setVisible(True)
         self.graph_percdif.setVisible(False)
         self.stack_layout.setCurrentIndex(0)
+        self.graph_reldif.canvas.fig.tight_layout()
 
     def clear(self):
         self.graph_reldif.setParent(None)

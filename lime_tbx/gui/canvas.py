@@ -220,12 +220,13 @@ def redraw_canvas(
                     alpha=0.3,
                 )
             ylim = max(list(map(abs, ax2.get_ylim())))
-            ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
             if compare_percentages:
+                ax2.set_ylim((0.0, ylim + 0.5))
                 data_compare_info = "MPD: {:.4f}%".format(
                     sdata_compare.mean_perc_difference
                 )
             else:
+                ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
                 data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
                     sdata_compare.mean_relative_difference,
                     sdata_compare.standard_deviation_mrd,
