@@ -162,7 +162,7 @@ class TestCSV(unittest.TestCase):
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
-    def test_export_csv_comparation_1(self):
+    def test_export_csv_comparison_1(self):
         data = [
             SpectralData([350, 350], [0.02, 0.03], [0, 0.005], None),
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),

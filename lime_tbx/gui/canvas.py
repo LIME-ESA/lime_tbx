@@ -110,23 +110,30 @@ def redraw_canvas(
                 if len(slegend[0]) > 1:
                     color = []
             marker = ""
-            if len(data.data) == 1:
+            markersize = None
+            ls = None
+            if len(data.data) == 1 or sdata_compare:
                 marker = "o"
-            lines += scanvas.axes.plot(
+                markersize = 4
+                ls = "none"
+            newlines = scanvas.axes.plot(
                 data.wlens,
                 data.data,
                 *color,
                 marker=marker,
                 label=label,
+                markersize=markersize,
+                ls=ls,
             )
             if data.uncertainties is not None and data.uncertainties.size > 0:
                 scanvas.axes.fill_between(
                     data.wlens,
                     data.data - 2 * data.uncertainties,
                     data.data + 2 * data.uncertainties,
-                    color="green",
+                    color=newlines[-1].get_color(),
                     alpha=0.3,
                 )
+            lines += newlines
 
         if scimel_data:
             iter_data = scimel_data
@@ -195,14 +202,14 @@ def redraw_canvas(
             label = ""
             if len(slegend) > 3 and len(slegend[3]) > 0:
                 label = slegend[3][0]
-            marker = "--"
-            if len(data_comp.data) == 1:
-                marker = "o"
             lines += ax2.plot(
                 data_comp.wlens,
                 data_comp.data,
-                "k{}".format(marker),
+                marker="o",
+                color="black",
                 label=label,
+                markersize=4,
+                ls="none",
             )
             if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
                 ax2.fill_between(

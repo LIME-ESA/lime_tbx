@@ -3,5 +3,5 @@
   interpolation_spectrum_polarization: Linear
   interpolation_SRF: Gaussian SRF with 1nm spectral sampling and 3nm resolution
   show_interp_spectrum: false
-  skip_uncertainties: true
+  skip_uncertainties: false
   use_wehrli: false
