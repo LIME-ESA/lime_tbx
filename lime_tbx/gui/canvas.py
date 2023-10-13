@@ -7,6 +7,7 @@ import os
 """___Third-Party Modules___"""
 from matplotlib.axes import Axes
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
+import matplotlib.ticker
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas,
 )
@@ -84,6 +85,7 @@ def redraw_canvas(
     svertical_lines: List[float],
     sp_name: str,
     subtitle: str = None,
+    compare_percentages: bool = False,
 ):
     lines = []
     if sdata is not None:
@@ -177,7 +179,10 @@ def redraw_canvas(
 
         data_compare_info = ""
         if sdata_compare:
-            data_comp = sdata_compare.diffs_signal
+            if compare_percentages:
+                data_comp = sdata_compare.perc_diffs
+            else:
+                data_comp = sdata_compare.diffs_signal
             ax2 = scanvas.axes.twinx()
             label = ""
             if len(slegend) > 3 and len(slegend[3]) > 0:
@@ -201,13 +206,25 @@ def redraw_canvas(
                 )
             ylim = max(list(map(abs, ax2.get_ylim())))
             ax2.set_ylim((-ylim - 0.05, ylim + 0.05))
-            data_compare_info = "MRD: {:.4f}\nσ: {:.4f}\n".format(
-                sdata_compare.mean_relative_difference,
-                sdata_compare.standard_deviation_mrd,
-            )
-            lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
+            if compare_percentages:
+                data_compare_info = "MPD: {:.4f}%".format(
+                    sdata_compare.mean_perc_difference
+                )
+            else:
+                data_compare_info = "MRD: {:.4f}%\nσ: {:.4f}%\nMARD: {:.4f}%".format(
+                    sdata_compare.mean_relative_difference,
+                    sdata_compare.standard_deviation_mrd,
+                    sdata_compare.mean_absolute_relative_difference,
+                )
+            # lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
+            if subtitle is None:
+                subtitle = ""
+            subtitle += "\n" + data_compare_info.replace("\n", " | ")
+            ylabeltit = "Relative difference (%)"
+            if compare_percentages:
+                ylabeltit = "Percentage difference (%)"
             ax2.set_ylabel(
-                "Relative difference (%)",
+                ylabeltit,
                 fontproperties=label_font_prop,
             )
             plt.setp(
@@ -215,6 +232,12 @@ def redraw_canvas(
                 rotation=30,
                 horizontalalignment="right",
             )
+            nticks = 9
+            scanvas.axes.yaxis.set_major_locator(
+                matplotlib.ticker.LinearLocator(nticks)
+            )
+            ax2.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(nticks))
+
         if len(slegend) > 0:
             legend_lines = [l for l in lines if not l.get_label().startswith("_child")]
             labels = [l.get_label() for l in legend_lines]
@@ -240,5 +263,7 @@ def redraw_canvas(
             sel.annotation.get_bbox_patch().set(fc="white")
             label = sel.artist.get_label()
             sel.annotation.set_text(label)
+
+    scanvas.axes.grid()
 
     return lines
