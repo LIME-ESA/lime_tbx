@@ -188,68 +188,47 @@ class Comparison(IComparison):
         sps = [[] for _ in ch_names]
         mpas = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
-        mpa_calcs = []
-        sp_calcs = []
-        #
-        dts = [o.dt for o in observations]
-        xyzs = [
-            (
-                o.sat_pos.x,
-                o.sat_pos.y,
-                o.sat_pos.z,
-            )
-            for o in observations
-        ]
-        if observations and observations[0].sat_pos_ref in (
-            "IAU_MOON",
-            "MOON_ME",
-            "MOON",
-        ):
-            llhs = SPICEAdapter.to_planetographic_multiple(
-                xyzs,
-                "MOON",
-                self.kernels_path.main_kernels_path,
-            )
-            mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-                xyzs,
-                dts,
-                self.kernels_path,
-                "MOON_ME",
-            )
-            sp_calcs = [
-                CustomPoint(
+        for obs in observations:
+            if callback_observation:
+                callback_observation()
+            sat_pos = obs.sat_pos
+            dt = obs.dt
+            if obs.sat_pos_ref in ("IAU_MOON", "MOON_ME", "MOON"):
+                solat, solon, dom_m = SPICEAdapter.to_planetographic(
+                    sat_pos.x,
+                    sat_pos.y,
+                    sat_pos.z,
+                    "MOON",
+                    self.kernels_path.main_kernels_path,
+                )
+                mdam = SPICEAdapter.get_moon_data_from_moon(
+                    solat, solon, dom_m, dt, self.kernels_path
+                )
+                mpa = mdam.mpa_degrees
+                sp = CustomPoint(
                     mdam.distance_sun_moon,
                     mdam.distance_observer_moon,
-                    llh[0],
-                    llh[1],
+                    solat,
+                    solon,
                     mdam.long_sun_radians,
                     mdam.absolute_mpa_degrees,
                     mdam.mpa_degrees,
                 )
-                for mdam, llh in zip(mdas, llhs)
-            ]
-        else:
-            llhs = SPICEAdapter.to_planetographic_multiple(
-                xyzs,
-                "EARTH",
-                self.kernels_path.main_kernels_path,
-            )
-            sp_calcs = [
-                SurfacePoint(llh[0], llh[1], llh[2], dt) for llh, dt in zip(llhs, dts)
-            ]
-            mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-                xyzs, dts, self.kernels_path
-            )
-        mpa_calcs = [md.mpa_degrees for md in mdas]
-        #
-        for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):
-            if callback_observation:
-                callback_observation()
+            else:
+                lat, lon, h = SPICEAdapter.to_planetographic(
+                    sat_pos.x,
+                    sat_pos.y,
+                    sat_pos.z,
+                    "EARTH",
+                    self.kernels_path.main_kernels_path,
+                )
+                sp = SurfacePoint(lat, lon, h, dt)
+                mpa = SPICEAdapter.get_moon_data_from_earth(
+                    lat, lon, h, dt, self.kernels_path
+                ).mpa_degrees
             lime_simulation.set_simulation_changed()
             def_srf = get_default_srf()
-            lime_simulation.update_irradiance(
-                def_srf, srf, sp, coefficients, mda_precalculated=mda
-            )
+            lime_simulation.update_irradiance(def_srf, srf, sp, coefficients)
             signals = lime_simulation.get_signals()
             for j, ch in enumerate(ch_names):
                 if obs.has_ch_value(ch):
@@ -275,56 +254,25 @@ class Comparison(IComparison):
                 # Relative Differences
                 rel_diffs = []
                 uncs_r = []
-                tot_rel_diff = tot_abs_rel_diff = tot_perc_diff = 0
+                tot_rel_diff = 0
                 num_samples = len(specs[0].wlens)
-                perc_diffs = []
-                uncs_p = []
                 for j in range(num_samples):
                     sim = specs[1].data[j]
                     ref = specs[0].data[j]
-                    rel_dif = 100 * (sim - ref) / ref
+                    rel_dif = (sim - ref) / ref
                     tot_rel_diff += rel_dif
-                    tot_abs_rel_diff += abs(rel_dif)
                     rel_diffs.append(rel_dif)
-                    perc_diff = 100 * abs(sim - ref) / ((sim + ref) / 2)
-                    tot_perc_diff += perc_diff
-                    perc_diffs.append(perc_diff)
-                    unc_r = unc_p = 0
+                    unc_r = 0
                     if not lime_simulation.is_skipping_uncs():
                         unc_sim = specs[1].uncertainties[j]
                         unc_ref = specs[0].uncertainties[j]
-                        if sim > ref:
-                            rel_dif1 = (
-                                100 * (sim + unc_sim - ref - unc_ref) / (ref - unc_ref)
-                            )
-                            perc_dif1 = (
-                                100
-                                * abs(sim + unc_sim - ref - unc_ref)
-                                / ((sim + unc_sim + ref - unc_ref) / 2)
-                            )
-                        else:
-                            rel_dif1 = (
-                                100 * (sim - unc_sim - ref + unc_ref) / (ref + unc_ref)
-                            )
-                            perc_dif1 = (
-                                100
-                                * abs(sim - unc_sim - ref + unc_ref)
-                                / ((sim - unc_sim + ref + unc_ref) / 2)
-                            )
-                        unc_r = abs(rel_dif - rel_dif1)
-                        unc_p = abs(perc_diff - perc_dif1)
+                        unc_r = (unc_sim + unc_ref) + unc_ref
                     uncs_r.append(unc_r)
-                    uncs_p.append(unc_p)
                     # i dont know if this is the correct way of propagating the uncertainty
                 mean_rel_diff = tot_rel_diff / num_samples
-                mean_abs_rel_diff = tot_abs_rel_diff / num_samples
-                mean_perc_diff = tot_perc_diff / num_samples
                 std = np.std(rel_diffs)
                 ratio_spec = SpectralData(
                     specs[0].wlens, np.array(rel_diffs), np.array(uncs_r), None
-                )
-                perc_spec = SpectralData(
-                    specs[0].wlens, np.array(perc_diffs), np.array(uncs_p), None
                 )
                 ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas[i]]
                 cp = ComparisonData(
@@ -332,34 +280,17 @@ class Comparison(IComparison):
                     specs[1],
                     ratio_spec,
                     mean_rel_diff,
-                    mean_abs_rel_diff,
                     std,
                     num_samples,
                     ch_dates[i],
                     sps[i],
                     mpas[i],
                     ampa_valid_range,
-                    perc_spec,
-                    mean_perc_diff,
                 )
                 comparisons.append(cp)
             else:
                 comparisons.append(
-                    ComparisonData(
-                        None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        [],
-                        [],
-                        [],
-                        [],
-                        None,
-                        None,
-                    )
+                    ComparisonData(None, None, None, None, None, None, [], [], [], [])
                 )
         return comparisons
 
@@ -369,12 +300,7 @@ class Comparison(IComparison):
             if c.observed_signal == None:
                 new_comparisons.append(c)
                 continue
-            spectrals = [
-                c.observed_signal,
-                c.simulated_signal,
-                c.diffs_signal,
-                c.perc_diffs,
-            ]
+            spectrals = [c.observed_signal, c.simulated_signal, c.diffs_signal]
             sp_vals = []
             for spectr in spectrals:
                 sp_vals.append(spectr.wlens)
@@ -393,8 +319,6 @@ class Comparison(IComparison):
                 uncertainties = np.array([v[index + 2] for v in vals])
                 new_spectrals.append(SpectralData(wlens, data, uncertainties, None))
             mrd = c.mean_relative_difference
-            mard = c.mean_absolute_relative_difference
-            mpd = c.mean_perc_difference
             std = c.standard_deviation_mrd
             nsamp = c.number_samples
             dts = [v[-3] for v in vals]
@@ -404,15 +328,12 @@ class Comparison(IComparison):
                 new_spectrals[1],
                 new_spectrals[2],
                 mrd,
-                mard,
                 std,
                 nsamp,
                 dts,
                 points,
                 mpas,
                 ampa_valid_range,
-                new_spectrals[3],
-                mpd,
             )
             new_comparisons.append(nc)
         return new_comparisons

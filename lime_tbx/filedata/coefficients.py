@@ -127,16 +127,10 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
 
     p_pos_data = np.array(ds.dolp_coeff_pos.T).astype(float)
     p_pos_u_data = np.array(ds.u_dolp_coeff_pos.T).astype(float)
-    p_pos_err_corr_data = np.nan_to_num(
-        np.array(ds.err_corr_dolp_coeff_pos).astype(float)
-    )
-    np.fill_diagonal(p_pos_err_corr_data, 1)
+    p_pos_err_corr_data = np.array(ds.err_corr_dolp_coeff_pos).astype(float)
     p_neg_data = np.array(ds.dolp_coeff_neg.T).astype(float)
     p_neg_u_data = np.array(ds.u_dolp_coeff_neg.T).astype(float)
-    p_neg_err_corr_data = np.nan_to_num(
-        np.array(ds.err_corr_dolp_coeff_neg).astype(float)
-    )
-    np.fill_diagonal(p_neg_err_corr_data, 1)
+    p_neg_err_corr_data = np.array(ds.err_corr_dolp_coeff_neg).astype(float)
     pol = PolarizationCoefficients(
         wlens,
         p_pos_data,

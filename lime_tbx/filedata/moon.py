@@ -170,7 +170,7 @@ def _write_start_dataset(
         ds.time_coverage_end = max_dt.strftime(_DT_FORMAT)
     else:
         ds.time_coverage_end = ""
-    ds.reference_model = "LIME coefficients version: {}".format(coefficients_version)
+    ds.reference_model = "LIME2 coefficients version: {}".format(coefficients_version)
     ds.not_default_srf = int(not_default_srf)
     ds.spectrum_name = spectrum_name
     ds.skipped_uncertainties = int(skipped_uncs)
@@ -578,7 +578,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     dolp_sp_name = ds.polarisation_spectrum_name
     data_source = ds.data_source
     skipped_uncs = bool(ds.skipped_uncertainties)
-    vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
+    vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
     ds.close()
     for i in range(len(sat_poss)):
         irrs = SpectralData(
@@ -673,14 +673,8 @@ def write_comparison(
         irr_comp_data_unc = [c.observed_signal.uncertainties for c in filtered_comps]
         irr_diff_data = [c.diffs_signal.data for c in filtered_comps]
         irr_diff_data_unc = [c.diffs_signal.uncertainties for c in filtered_comps]
-        irr_perc_diff_data = [c.perc_diffs.data for c in filtered_comps]
-        irr_perc_diff_data_unc = [c.perc_diffs.uncertainties for c in filtered_comps]
         mrd_data = np.array(
             [c.mean_relative_difference for c in filtered_comps],
-            dtype=object,
-        )
-        mard_data = np.array(
-            [c.mean_absolute_relative_difference for c in filtered_comps],
             dtype=object,
         )
         number_samples_data = np.array(
@@ -689,10 +683,6 @@ def write_comparison(
         )
         std_mrd_data = np.array(
             [c.standard_deviation_mrd for c in filtered_comps],
-            dtype=object,
-        )
-        mpd_data = np.array(
-            [c.mean_perc_difference for c in filtered_comps],
             dtype=object,
         )
         for c in filtered_comps:
@@ -775,20 +765,12 @@ def write_comparison(
                     irr_diff_data_unc[j] = np.insert(
                         irr_diff_data_unc[j], i, fill_value, axis=0
                     )
-                    irr_perc_diff_data[j] = np.insert(
-                        irr_perc_diff_data[j], i, fill_value, axis=0
-                    )
-                    irr_perc_diff_data_unc[j] = np.insert(
-                        irr_perc_diff_data_unc[j], i, fill_value, axis=0
-                    )
         irr_obs_data = np.array(irr_obs_data)
         irr_obs_data_unc = np.array(irr_obs_data_unc)
         irr_comp_data = np.array(irr_comp_data)
         irr_comp_data_unc = np.array(irr_comp_data_unc)
         irr_diff_data = np.array(irr_diff_data)
         irr_diff_data_unc = np.array(irr_diff_data_unc)
-        irr_perc_diff_data = np.array(irr_perc_diff_data)
-        irr_perc_diff_data_unc = np.array(irr_perc_diff_data_unc)
         # DIMENSIONS
         # vals
         irr_obs = ds.createVariable(
@@ -830,57 +812,28 @@ def write_comparison(
         irr_diff = ds.createVariable(
             "irr_diff", "f8", ("number_obs", "chan"), fill_value=fill_value
         )
-        irr_diff.units = "%"
-        irr_diff.long_name = (
-            "lunar irradiance comparison relative difference for each channel"
-        )
+        irr_diff.units = "W m-2 nm-1"
+        irr_diff.long_name = "lunar irradiance comparison difference for each channel"
         irr_diff.valid_min = -1000000.0
         irr_diff.valid_max = 1000000.0
         irr_diff[:] = irr_diff_data.T
         irr_diff_unc = ds.createVariable(
             "irr_diff_unc", "f8", ("number_obs", "chan"), fill_value=fill_value
         )
-        irr_diff_unc.units = "%"
-        irr_diff_unc.long_name = "uncertainties of the lunar irradiance comparison relative difference for each channel"
+        irr_diff_unc.units = "W m-2 nm-1"
+        irr_diff_unc.long_name = "uncertainties of the lunar irradiance comparison difference for each channel"
         irr_diff_unc.valid_min = -1000000.0
         irr_diff_unc.valid_max = 1000000.0
         irr_diff_unc[:] = irr_diff_data_unc.T
 
-        perc_diff = ds.createVariable(
-            "perc_diff", "f8", ("number_obs", "chan"), fill_value=fill_value
-        )
-        perc_diff.units = "%"
-        perc_diff.long_name = (
-            "lunar irradiance comparison percentage difference for each channel"
-        )
-        perc_diff.valid_min = -1000000.0
-        perc_diff.valid_max = 1000000.0
-        perc_diff[:] = irr_perc_diff_data.T
-        perc_diff_unc = ds.createVariable(
-            "perc_diff_unc", "f8", ("number_obs", "chan"), fill_value=fill_value
-        )
-        perc_diff_unc.units = "%"
-        perc_diff_unc.long_name = "uncertainties of the lunar irradiance comparison percentage difference for each channel"
-        perc_diff_unc.valid_min = -1000000.0
-        perc_diff_unc.valid_max = 1000000.0
-        perc_diff_unc[:] = irr_perc_diff_data_unc.T
-
         mrd = ds.createVariable("mrd", "f8", ("chan",), fill_value=fill_value)
         mrd.long_name = "Mean relative difference."
-        mrd.valid_max = 100.0
+        mrd.valid_max = 1.0
         mrd[:] = mrd_data
-        mard = ds.createVariable("mard", "f8", ("chan",), fill_value=fill_value)
-        mard.long_name = "Mean of the absolutes of relative difference."
-        mard.valid_max = 100.0
-        mard[:] = mard_data
         std_mrd = ds.createVariable("std_mrd", "f8", ("chan",), fill_value=fill_value)
         std_mrd.long_name = "Standard deviation of the mean relative difference."
         std_mrd.valid_min = 0.0
         std_mrd[:] = std_mrd_data
-        mpd = ds.createVariable("mpd", "f8", ("chan",), fill_value=fill_value)
-        mpd.long_name = "Mean of the percentage difference."
-        mpd.valid_max = 100.0
-        mpd[:] = mpd_data
 
         number_samples = ds.createVariable(
             "number_samples", "f8", ("chan",), fill_value=fill_value
@@ -921,12 +874,8 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     irr_comp_uncs = np.array(ds.variables["irr_comp_unc"][:].data).T
     irr_diff_data = np.array(ds.variables["irr_diff"][:].data).T
     irr_diff_uncs = np.array(ds.variables["irr_diff_unc"][:].data).T
-    perc_diff_data = np.array(ds.variables["perc_diff"][:].data).T
-    perc_diff_uncs = np.array(ds.variables["perc_diff_unc"][:].data).T
     mrd = np.array(ds.variables["mrd"][:].data)
     std_mrd = np.array(ds.variables["std_mrd"][:].data)
-    mard = np.array(ds.variables["mard"][:].data)
-    mpd = np.array(ds.variables["mpd"][:].data)
     number_samples = np.array(ds.variables["number_samples"][:].data)
     lambda_to_str = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
     sat_name = lambda_to_str(ds.variables["sat_name"][:].data)
@@ -934,23 +883,26 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     mpas = np.array(ds.variables["mpa"][:].data)
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
-    vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
+    vers = str(ds.reference_model)[len("LIME2 coefficients version: ") :]
     ds.close()
     comps = []
     points = []
     mrd = mrd[mrd != fill_value]
     std_mrd = std_mrd[std_mrd != fill_value]
-    mard = mard[mard != fill_value]
-    mpd = mpd[mpd != fill_value]
     number_samples = number_samples[number_samples != fill_value]
     kp = kernels_path.main_kernels_path
-    xyzs = [(satpos[0], satpos[1], satpos[2]) for satpos in sat_poss]
-    if sat_pos_refs and sat_pos_refs[0] in ("MOON", "MOON_ME", "IAU_MOON"):
-        mdams = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-            xyzs, datetimes, kernels_path, sat_pos_refs[0]
-        )
-        sps = SPICEAdapter.to_planetographic_multiple(xyzs, "MOON", kp)
-        for sp, mdam in zip(sps, mdams):
+    for i, (satpos, satposref) in enumerate(zip(sat_poss, sat_pos_refs)):
+        if satposref in ("MOON", "MOON_ME", "IAU_MOON"):
+            sp = SPICEAdapter.to_planetographic(
+                satpos[0],
+                satpos[1],
+                satpos[2],
+                "MOON",
+                kp,
+            )
+            mdam = SPICEAdapter.get_moon_data_from_moon(
+                sp[0], sp[1], sp[2], datetimes[i], kernels_path
+            )
             sp = CustomPoint(
                 mdam.distance_sun_moon,
                 mdam.distance_observer_moon,
@@ -960,12 +912,16 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
                 mdam.absolute_mpa_degrees,
                 mdam.mpa_degrees,
             )
-            points.append(sp)
-    else:
-        sps = SPICEAdapter.to_planetographic_multiple(xyzs, "EARTH", kp)
-        for sp, dt in zip(sps, datetimes):
-            sp = SurfacePoint(sp[0], sp[1], sp[2], dt)
-            points.append(sp)
+        else:
+            sp = SPICEAdapter.to_planetographic(
+                satpos[0],
+                satpos[1],
+                satpos[2],
+                "EARTH",
+                kp,
+            )
+            sp = SurfacePoint(sp[0], sp[1], sp[2], datetimes[i])
+        points.append(sp)
     points = np.array(points)
     for i in range(len(ch_names)):
         indexes = irr_comp_data[i] != fill_value
@@ -975,31 +931,23 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
         irr_obs_uncs_i = irr_obs_uncs[i][irr_obs_uncs[i] != fill_value]
         irr_diff_data_i = irr_diff_data[i][irr_diff_data[i] != fill_value]
         irr_diff_uncs_i = irr_diff_uncs[i][irr_diff_uncs[i] != fill_value]
-        perc_diff_data_i = perc_diff_data[i][perc_diff_data[i] != fill_value]
-        perc_diff_uncs_i = perc_diff_uncs[i][perc_diff_uncs[i] != fill_value]
         dts = datetimes[indexes]
         obs_signal = SpectralData(np.array(dts), irr_comp_data_i, irr_comp_uncs_i, None)
         sim_signal = SpectralData(np.array(dts), irr_obs_data_i, irr_obs_uncs_i, None)
         diffs_signal = SpectralData(
             np.array(dts), irr_diff_data_i, irr_diff_uncs_i, None
         )
-        perc_diffs = SpectralData(
-            np.array(dts), perc_diff_data_i, perc_diff_uncs_i, None
-        )
         comp = ComparisonData(
             obs_signal,
             sim_signal,
             diffs_signal,
             mrd[i],
-            mard[i],
             std_mrd[i],
             number_samples[i],
             dts,
             points[indexes],
             mpas[indexes],
             [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
-            perc_diffs,
-            mpd[i],
         )
         comps.append(comp)
     return LGLODComparisonData(comps, ch_names, sat_name, sp_name, skipped_uncs, vers)

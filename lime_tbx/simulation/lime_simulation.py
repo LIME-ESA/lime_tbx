@@ -118,7 +118,6 @@ class ILimeSimulation(ABC):
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
         callback_observation: Callable = None,
-        mda_precalculated: MoonData = None,
     ):
         """
         Updates the irradiance values if the stored value are not valid, using the given parameters.
@@ -457,12 +456,7 @@ class LimeSimulation(ILimeSimulation):
         self._interp_srf_name = None
         self.settings_manager.set_coef_version_name(None)
 
-    def _save_parameters(
-        self,
-        srf: SpectralResponseFunction,
-        point: Point,
-        mda_precalculated: MoonData = None,
-    ):
+    def _save_parameters(self, srf: SpectralResponseFunction, point: Point):
         if not self.mds_uptodate:
             if isinstance(point, SatellitePoint):
                 (
@@ -472,12 +466,9 @@ class LimeSimulation(ILimeSimulation):
                     point, self.eocfi_path, self.kernels_path
                 )
             else:
-                if mda_precalculated:
-                    self.mds = mda_precalculated
-                else:
-                    self.mds = MoonDataFactory.get_md(
-                        point, self.eocfi_path, self.kernels_path
-                    )
+                self.mds = MoonDataFactory.get_md(
+                    point, self.eocfi_path, self.kernels_path
+                )
             self.point = point
             self.mds_uptodate = True
         if not self.srf_updtodate:
@@ -530,19 +521,6 @@ class LimeSimulation(ILimeSimulation):
                 callback_observation,
                 keep_err_corr_mats,
             )
-            interm_res_path = self.settings_manager.get_intermediate_results_path()
-            if interm_res_path:
-                np.savetxt(
-                    f"{interm_res_path}/refl_cimel.csv",
-                    self.elref_cimel.data,
-                    delimiter=",",
-                )
-                np.savetxt(
-                    f"{interm_res_path}/refl_interp_spectrum.csv",
-                    np.array([self.elref.wlens, self.elref.data]).T,
-                    fmt=["%.2f", "%e"],
-                    delimiter=",",
-                )
             self.refl_uptodate = True
             if self.verbose:
                 print("reflectance update done")
@@ -558,7 +536,6 @@ class LimeSimulation(ILimeSimulation):
         signals_srf: SpectralResponseFunction,
         skip_uncs: bool,
         callback_observation: Callable,
-        use_wehrli: bool = False,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
         SpectralData,
@@ -578,10 +555,7 @@ class LimeSimulation(ILimeSimulation):
             elref_cimel,
             ret_asd,
             skip_uncs,
-            use_wehrli,
         )
-        if use_wehrli:
-            interp_srf_name = "asd_wehrli"
         elref, elis, signals = LimeSimulation._interpolate_refl_calc_irr_signal(
             elref_asd,
             elref_cimel,
@@ -636,11 +610,9 @@ class LimeSimulation(ILimeSimulation):
         elref_cimel,
         elref_asd,
         skip_uncs: bool,
-        use_wehrli: bool = False,
     ) -> Tuple[Union[SpectralData, List[SpectralData]], SpectralData,]:
-        _cimel_srf = "cimel" if not use_wehrli else "cimel_wehrli"
         elis_cimel = LimeSimulation._calculate_eli_from_elref(
-            mds, elref_cimel, _cimel_srf, skip_uncs
+            mds, elref_cimel, "cimel", skip_uncs
         )
         elis_asd = None
         if interp_data.is_show_interpolation_spectrum():
@@ -714,7 +686,6 @@ class LimeSimulation(ILimeSimulation):
             signals_srf,
             skip_uncs,
             callback_observation,
-            self.settings_manager.get_use_wehrli_for_esi(),
         )
         if self.verbose:
             print("Irradiance, reflectance and signal update done")
@@ -729,9 +700,8 @@ class LimeSimulation(ILimeSimulation):
         point: Point,
         cimel_coeff: ReflectanceCoefficients,
         callback_observation: Callable = None,
-        mda_precalculated: MoonData = None,
     ):
-        self._save_parameters(srf, point, mda_precalculated)
+        self._save_parameters(srf, point)
         if self.will_irradiance_calculate_reflectance_simultaneously():
             if not self.irr_uptodate or not self.signals_uptodate:
                 self._update_irradiance_and_reflectance(
@@ -749,7 +719,6 @@ class LimeSimulation(ILimeSimulation):
             if not self.irr_uptodate or not self.signals_uptodate:
                 if self.verbose:
                     print("starting irradiance update")
-                use_wehrli = self.settings_manager.get_use_wehrli_for_esi()
                 (
                     self.elis_cimel,
                     self.elis_asd,
@@ -758,10 +727,7 @@ class LimeSimulation(ILimeSimulation):
                     self.elref_cimel,
                     self.elref_asd,
                     skip_uncs,
-                    use_wehrli,
                 )
-                if use_wehrli:
-                    interp_srf_name = "asd_wehrli"
                 self.irr_uptodate = True
                 if self.verbose:
                     print("auxiliar irradiance update done")
@@ -776,24 +742,6 @@ class LimeSimulation(ILimeSimulation):
                     skip_uncs,
                     callback_observation,
                 )
-                interm_res_path = self.settings_manager.get_intermediate_results_path()
-                if interm_res_path:
-                    np.savetxt(
-                        f"{interm_res_path}/irr_from_refl_cimel.csv",
-                        self.elis_cimel.data,
-                        delimiter=",",
-                    )
-                    np.savetxt(
-                        f"{interm_res_path}/irr_from_interp_spectrum.csv",
-                        np.array([self.elis.wlens, self.elis.data]).T,
-                        fmt=["%.2f", "%e"],
-                        delimiter=",",
-                    )
-                    np.savetxt(
-                        f"{interm_res_path}/signals_from_irr_interp_srf_integrated.csv",
-                        self.signals.data,
-                        delimiter=",",
-                    )
                 # Free up space
                 elrefclearer = self.elref
                 if not isinstance(elrefclearer, list):
@@ -1073,7 +1021,7 @@ class LimeSimulation(ILimeSimulation):
         elrefs: SpectralData | list of SpectralData
             elrefs previously calculated
         srf_type: str
-            SRF type that is going to be used. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'
+            SRF type that is going to be used. Can be 'cimel', 'asd' or 'interpolated'.
         skip_uncs: bool
 
         Returns
@@ -1199,7 +1147,7 @@ class LimeSimulation(ILimeSimulation):
                     "EARTH",
                     self.kernels_path.main_kernels_path,
                 ),
-                dts,
+                dts
             )
         else:
             point = SatellitePoint(obss[0].sat_name, dts)
@@ -1214,7 +1162,7 @@ class LimeSimulation(ILimeSimulation):
                         "EARTH",
                         self.kernels_path.main_kernels_path,
                     ),
-                    dt,
+                    dt
                 )
                 md = MoonDataFactory.get_md(sp, self.eocfi_path, self.kernels_path)
                 surfaces_of_sat.append(sp)

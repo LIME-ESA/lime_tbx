@@ -180,16 +180,11 @@ class MoonDataFactory:
 
         mds: List[MoonData] = []
         srps: List[SurfacePoint] = []
-        xyzs = eocfi.get_satellite_position_rectangular(sp.name, dts)
-        llhs = SPICEAdapter.to_planetographic_multiple(
-            xyzs, "EARTH", kernels_path.main_kernels_path
-        )
+        llhs = eocfi.get_satellite_position(sp.name, dts)
         for i, llh in enumerate(llhs):
             srp = SurfacePoint(llh[0], llh[1], llh[2], dts[i])
             srps.append(srp)
-        mds = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-            xyzs, dts, kernels_path, "ITRF93"  # EOCFI uses ITRF
-        )
+            mds.append(MoonDataFactory.get_md_from_surface(srp, kernels_path))
 
         if not isinstance(sp.dt, list):
             return mds[0], srps[0]

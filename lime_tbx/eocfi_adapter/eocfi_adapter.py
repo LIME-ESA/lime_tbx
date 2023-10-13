@@ -137,27 +137,6 @@ class IEOCFIConverter(ABC):
         """
         pass
 
-    @abstractmethod
-    def get_satellite_position_rectangular(
-        self, sat: str, dts: List[datetime]
-    ) -> List[Tuple[float, float, float]]:
-        """
-        Get the geographic satellite position for a concrete datetime.
-
-        Parameters
-        ----------
-        sat: str
-            Satellite name. Should be present in get_sat_names
-        dts: List of datetime
-            Datetimes for which the position will be calculated
-
-        Returns
-        -------
-        positions: list of tuples of floats
-            List of tuples of 3 floats, representing xyz in meters
-        """
-        pass
-
 
 class EOCFIConverter(IEOCFIConverter):
     """Class that implements the methods of this module.
@@ -262,36 +241,6 @@ class EOCFIConverter(IEOCFIConverter):
                 Geocentric longitude of the satellite
             height: float
                 Height of the satellite over sea level in meters.
-        """
-        xyzs = self.get_satellite_position_rectangular(sat, dts)
-        positions = []
-        for xyz in xyzs:
-            lat, lon, hhh = SPICEAdapter.to_planetographic(
-                xyz[0], xyz[1], xyz[2], "EARTH", self.kernels_path.main_kernels_path
-            )
-            logger.get_logger().debug(
-                f"EOCFI output (lat, lon, height): {lat}, {lon}, {hhh}"
-            )
-            positions.append((lat, lon, hhh))
-        return positions
-
-    def get_satellite_position_rectangular(
-        self, sat: str, dts: List[datetime]
-    ) -> List[Tuple[float, float, float]]:
-        """
-        Get the geographic satellite position for a concrete datetime.
-
-        Parameters
-        ----------
-        sat: str
-            Satellite name. Should be present in get_sat_names
-        dts: List of datetime
-            Datetimes for which the position will be calculated
-
-        Returns
-        -------
-        positions: list of tuples of floats
-            List of tuples of 3 floats, representing xyz in meters
         """
         if sat not in self.get_sat_names():
             raise Exception("Satellite is not registered in LIME's satellite list.")
@@ -415,5 +364,14 @@ class EOCFIConverter(IEOCFIConverter):
                     )
                 )
 
-        positions = [(satpos[0], satpos[1], satpos[2]) for satpos in sat_positions]
+        positions = []
+        for i in range(n_dates):
+            x, y, z = (sat_positions[i][0], sat_positions[i][1], sat_positions[i][2])
+            lat, lon, hhh = SPICEAdapter.to_planetographic(
+                x, y, z, "EARTH", self.kernels_path.main_kernels_path
+            )
+            logger.get_logger().debug(
+                f"EOCFI output (lat, lon, height): {lat}, {lon}, {hhh}"
+            )
+            positions.append((lat, lon, hhh))
         return positions
