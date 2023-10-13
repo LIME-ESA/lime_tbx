@@ -310,13 +310,13 @@ class GraphWidget(QtWidgets.QWidget):
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
-                    csv.export_csv_comparation(
+                    csv.export_csv_comparison(
                         self.data,
                         self.ylabel,
                         self.point,
                         name,
                         version,
-                        self.data_compare.ampa_valid_range,
+                        self.data_compare,
                         self.interp_spectrum_name,
                         self.skip_uncs,
                         self.comparison_x_datetime,

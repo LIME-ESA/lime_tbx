@@ -18,10 +18,11 @@ from ...datatypes.datatypes import (
     SpectralData,
     SpectralResponseFunction,
     SurfacePoint,
+    ComparisonData,
 )
 from ..csv import (
     export_csv_simulation,
-    export_csv_comparation,
+    export_csv_comparison,
     export_csv_integrated_irradiance,
     export_csv_srf,
     read_datetimes,
@@ -167,13 +168,27 @@ class TestCSV(unittest.TestCase):
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
-        export_csv_comparation(
+        export_csv_comparison(
             data,
             "Signal",
             [SPOINT, SPOINT3],
             path,
             "test",
-            [True, False],
+            ComparisonData(
+                data[0],
+                data[1],
+                data[1],
+                0.0,
+                0.1,
+                0.2,
+                2,
+                [None, None],
+                [SPOINT, SPOINT3],
+                [14, 2],
+                [True, False],
+                data[1],
+                0.1,
+            ),
             "ASD",
             False,
         )
