@@ -273,6 +273,8 @@ class GraphWidget(QtWidgets.QWidget):
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
         self.canvas.draw()
+        self.update()
+        self.canvas.update()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -541,20 +543,31 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.graph_percdif.setVisible(False)
 
     def tight_layout(self):
-        self.graph_percdif.canvas.fig.tight_layout()
+        if self.graph_reldif.isVisible():
+            self._tight_layout_reldif()
+        else:
+            self._tight_layout_percdif()
+        self.update()
+
+    def _tight_layout_reldif(self):
         self.graph_reldif.canvas.fig.tight_layout()
+        self.graph_reldif.update()
+        self.graph_reldif.canvas.update()
+
+    def _tight_layout_percdif(self):
+        self.graph_percdif.canvas.fig.tight_layout()
+        self.graph_percdif.update()
+        self.graph_percdif.canvas.update()
 
     def show_percentage(self):
         self.graph_reldif.setVisible(False)
         self.graph_percdif.setVisible(True)
         self.stack_layout.setCurrentIndex(1)
-        self.graph_percdif.canvas.fig.tight_layout()
 
     def show_relative(self):
         self.graph_reldif.setVisible(True)
         self.graph_percdif.setVisible(False)
         self.stack_layout.setCurrentIndex(0)
-        self.graph_reldif.canvas.fig.tight_layout()
 
     def clear(self):
         self.graph_reldif.setParent(None)
@@ -629,10 +642,15 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.channel_tabs = QtWidgets.QTabWidget()
         self.channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.channel_tabs.currentChanged.connect(self._channel_tab_changed)
         self.main_layout.addWidget(self.channel_tabs)
         self.range_warning = QtWidgets.QLabel("")
         self.range_warning.setWordWrap(True)
         self.main_layout.addWidget(self.range_warning)
+
+    @QtCore.Slot()
+    def _channel_tab_changed(self, i: int):
+        self.channels[i].tight_layout()
 
     def set_channels(self, channels: List[str]):
         while self.channel_tabs.count() > 0:
@@ -696,10 +714,14 @@ for wavelengths between 350 and 2500 nm"
     def show_relative(self):
         for ch in self.channels:
             ch.show_relative()
+        id = self.get_current_channel_index()
+        self.channels[id].tight_layout()
 
     def show_percentage(self):
         for ch in self.channels:
             ch.show_percentage()
+        id = self.get_current_channel_index()
+        self.channels[id].tight_layout()
 
     def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
         """Update the <index> plot with the given data
