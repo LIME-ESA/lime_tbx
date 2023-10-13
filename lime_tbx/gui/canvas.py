@@ -48,6 +48,7 @@ class MplCanvas(FigureCanvas):
         self.axes: Axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
         self.axes_y_2 = None
+        self.axes_x2 = None
 
     def set_title(self, title: str, fontproperties: fm.FontProperties = None):
         self.axes.set_title(title, fontproperties=fontproperties)
@@ -58,6 +59,7 @@ class MplCanvas(FigureCanvas):
     def set_subtitle(self, subtitle: str, fontproperties: fm.FontProperties = None):
         if self.axes_y_2 == None:
             self.axes_y_2 = self.axes.twiny()
+        self.axes_y_2.set_title("Subtitle", {"alpha": 1, "size": 0})
         self.axes_y_2.set_xlabel(subtitle, fontproperties=fontproperties)
         self.axes_y_2.tick_params(
             axis="x",
@@ -67,9 +69,14 @@ class MplCanvas(FigureCanvas):
         )
 
     def get_subtitle(self) -> str:
-        if self.axes_y_2 == None:
+        if self.axes_y_2 is None:
             return ""
         return self.axes_y_2.get_xlabel()
+
+    def get_twinx(self) -> Axes:
+        if self.axes_x2 is None:
+            self.axes_x2 = self.axes.twinx()
+        return self.axes_x2
 
 
 def redraw_canvas(
@@ -183,7 +190,8 @@ def redraw_canvas(
                 data_comp = sdata_compare.perc_diffs
             else:
                 data_comp = sdata_compare.diffs_signal
-            ax2 = scanvas.axes.twinx()
+            ax2 = scanvas.get_twinx()
+            ax2.clear()
             label = ""
             if len(slegend) > 3 and len(slegend[3]) > 0:
                 label = slegend[3][0]
@@ -205,21 +213,22 @@ def redraw_canvas(
                     alpha=0.3,
                 )
             ylim = max(list(map(abs, ax2.get_ylim())))
-            ax2.set_ylim((-ylim - 0.05, ylim + 0.05))
+            ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
             if compare_percentages:
                 data_compare_info = "MPD: {:.4f}%".format(
                     sdata_compare.mean_perc_difference
                 )
             else:
-                data_compare_info = "MRD: {:.4f}%\nσ: {:.4f}%\nMARD: {:.4f}%".format(
+                data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
                     sdata_compare.mean_relative_difference,
                     sdata_compare.standard_deviation_mrd,
                     sdata_compare.mean_absolute_relative_difference,
                 )
             # lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
             if subtitle is None:
-                subtitle = ""
-            subtitle += "\n" + data_compare_info.replace("\n", " | ")
+                subtitle = data_compare_info
+            else:
+                subtitle += f" | {data_compare_info}"
             ylabeltit = "Relative difference (%)"
             if compare_percentages:
                 ylabeltit = "Percentage difference (%)"

@@ -286,7 +286,7 @@ class Comparison(IComparison):
                     tot_rel_diff += rel_dif
                     tot_abs_rel_diff += abs(rel_dif)
                     rel_diffs.append(rel_dif)
-                    perc_diff = 100 * (sim - ref) / ((sim + ref) / 2)
+                    perc_diff = 100 * abs(sim - ref) / ((sim + ref) / 2)
                     tot_perc_diff += perc_diff
                     perc_diffs.append(perc_diff)
                     unc_r = unc_p = 0
@@ -299,7 +299,7 @@ class Comparison(IComparison):
                             )
                             perc_dif1 = (
                                 100
-                                * (sim + unc_sim - ref - unc_ref)
+                                * abs(sim + unc_sim - ref - unc_ref)
                                 / ((sim + unc_sim + ref - unc_ref) / 2)
                             )
                         else:
@@ -308,7 +308,7 @@ class Comparison(IComparison):
                             )
                             perc_dif1 = (
                                 100
-                                * (sim - unc_sim - ref + unc_ref)
+                                * abs(sim - unc_sim - ref + unc_ref)
                                 / ((sim - unc_sim + ref + unc_ref) / 2)
                             )
                         unc_r = abs(rel_dif - rel_dif1)
