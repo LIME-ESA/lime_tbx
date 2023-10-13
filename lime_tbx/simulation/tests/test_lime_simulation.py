@@ -388,8 +388,8 @@ class TestLimeSimulation(unittest.TestCase):
         )
         cimel_unc_refs = np.array(
             [
-                [2.08e-17, 2.78e-17, 7.63e-17, 6.25e-17, 3.47e-17, 9.02e-17],
-                [4.86e-17, 6.25e-17, 2.78e-17, 1.39e-17, 4.16e-17, 4.16e-17],
+                [0.001062, 0.000867, 0.000977, 0.00101, 0.00092, 0.001042],
+                [0.000384, 0.000478, 0.000414, 0.00038, 0.00036, 0.000425],
             ]
         )
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
