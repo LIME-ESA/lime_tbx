@@ -4,6 +4,9 @@
 from typing import Union, List
 from datetime import datetime
 
+import PySide2.QtCore
+import PySide2.QtWidgets
+
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
@@ -74,6 +77,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
         self.skip_uncs = None
+        self.compare_percentages = None
         self.ch_names = []
         self._build_layout()
 
@@ -156,12 +160,14 @@ class GraphWidget(QtWidgets.QWidget):
         point: Union[Point, List[Point]] = None,
         data_compare: ComparisonData = None,
         redraw: bool = True,
+        compare_percentages: bool = False,
     ):
         self.point = point
         self.data = data
         self.cimel_data = data_cimel
         self.asd_data = data_asd
         self.data_compare = data_compare
+        self.compare_percentages = compare_percentages
         if data is not None:
             self.disable_buttons(False)
         else:
@@ -230,6 +236,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.vertical_lines,
             self.interp_spectrum_name,
             self.subtitle,
+            self.compare_percentages,
         )
         try:
             self.canvas.fig.tight_layout()
@@ -266,6 +273,8 @@ class GraphWidget(QtWidgets.QWidget):
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
         self.canvas.draw()
+        self.update()
+        self.canvas.update()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -303,13 +312,13 @@ class GraphWidget(QtWidgets.QWidget):
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list):
-                    csv.export_csv_comparation(
+                    csv.export_csv_comparison(
                         self.data,
                         self.ylabel,
                         self.point,
                         name,
                         version,
-                        self.data_compare.ampa_valid_range,
+                        self.data_compare,
                         self.interp_spectrum_name,
                         self.skip_uncs,
                         self.comparison_x_datetime,
@@ -520,11 +529,111 @@ for absolute moon phase angles between 2° and 90°"
         self.parentWidget().setDisabled(False)
 
 
+class ComparisonDualGraphWidget(QtWidgets.QWidget):
+    def __init__(self, graph_reldif: GraphWidget, graph_percdif: GraphWidget):
+        super().__init__()
+        self.graph_reldif = graph_reldif
+        self.graph_percdif = graph_percdif
+        self.stack_layout = QtWidgets.QStackedLayout(self)
+        self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.stack_layout.addWidget(self.graph_reldif)
+        self.stack_layout.addWidget(self.graph_percdif)
+        self.stack_layout.setCurrentIndex(0)
+        self.graph_reldif.setVisible(True)
+        self.graph_percdif.setVisible(False)
+
+    def tight_layout(self):
+        if self.graph_reldif.isVisible():
+            self._tight_layout_reldif()
+        else:
+            self._tight_layout_percdif()
+        self.update()
+
+    def _tight_layout_reldif(self):
+        self.graph_reldif.canvas.fig.tight_layout()
+        self.graph_reldif.update()
+        self.graph_reldif.canvas.update()
+
+    def _tight_layout_percdif(self):
+        self.graph_percdif.canvas.fig.tight_layout()
+        self.graph_percdif.update()
+        self.graph_percdif.canvas.update()
+
+    def show_percentage(self):
+        self.graph_reldif.setVisible(False)
+        self.graph_percdif.setVisible(True)
+        self.stack_layout.setCurrentIndex(1)
+
+    def show_relative(self):
+        self.graph_reldif.setVisible(True)
+        self.graph_percdif.setVisible(False)
+        self.stack_layout.setCurrentIndex(0)
+
+    def clear(self):
+        self.graph_reldif.setParent(None)
+        self.graph_percdif.setParent(None)
+        self.graph_reldif = None
+        self.graph_percdif = None
+
+    def update_plot(self, comparison: ComparisonData, redraw: bool = True):
+        data = [comparison.observed_signal, comparison.simulated_signal]
+        self.graph_reldif.update_plot(
+            data, point=comparison.points, data_compare=comparison, redraw=redraw
+        )
+        self.graph_percdif.update_plot(
+            data,
+            point=comparison.points,
+            data_compare=comparison,
+            redraw=redraw,
+            compare_percentages=True,
+        )
+
+    def update_labels(
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        redraw: bool = True,
+        subtitle: str = None,
+    ):
+        self.graph_reldif.update_labels(
+            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
+        )
+        self.graph_percdif.update_labels(
+            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
+        )
+
+    def set_interp_spectrum_name(self, sp_name: str):
+        self.graph_reldif.set_interp_spectrum_name(sp_name)
+        self.graph_percdif.set_interp_spectrum_name(sp_name)
+
+    def set_skipped_uncertainties(self, skip: bool):
+        self.graph_reldif.set_skipped_uncertainties(skip)
+        self.graph_percdif.set_skipped_uncertainties(skip)
+
+    def update_legends(self, legends: List[List[str]], redraw: bool = True):
+        """
+        Parameters
+        ----------
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: data
+            1: cimel_data
+            2: cimel_data errorbars
+            3: comparison
+        redraw: bool
+            Boolean that defines if the plot will be redrawn automatically or not. Default True.
+        """
+        self.graph_reldif.update_legend(legends, redraw=redraw)
+        self.graph_percdif.update_legend(legends, redraw=redraw)
+
+
 class ComparisonOutput(QtWidgets.QWidget):
     def __init__(self, settings_manager: ISettingsManager, x_datetime: bool):
         super().__init__()
         self.settings_manager = settings_manager
-        self.channels: List[GraphWidget] = []
+        self.channels: List[ComparisonDualGraphWidget] = []
         self.ch_names = []
         self.x_datetime = x_datetime
         self._build_layout()
@@ -533,22 +642,32 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.channel_tabs = QtWidgets.QTabWidget()
         self.channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.channel_tabs.currentChanged.connect(self._channel_tab_changed)
         self.main_layout.addWidget(self.channel_tabs)
         self.range_warning = QtWidgets.QLabel("")
         self.range_warning.setWordWrap(True)
         self.main_layout.addWidget(self.range_warning)
 
+    @QtCore.Slot()
+    def _channel_tab_changed(self, i: int):
+        self.channels[i].tight_layout()
+
     def set_channels(self, channels: List[str]):
         while self.channel_tabs.count() > 0:
             self.channel_tabs.removeTab(0)
         for ch in self.channels:
+            ch.clear()
             ch.setParent(None)
         self.channels.clear()
         self.ch_names = []
         for ch in channels:
-            channel = GraphWidget(
+            grel = GraphWidget(
                 self.settings_manager, ch, comparison_x_datetime=self.x_datetime
             )
+            gperc = GraphWidget(
+                self.settings_manager, ch, comparison_x_datetime=self.x_datetime
+            )
+            channel = ComparisonDualGraphWidget(grel, gperc)
             self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
@@ -586,10 +705,23 @@ for wavelengths between 350 and 2500 nm"
             if ch_name in self.ch_names:
                 index = self.ch_names.index(ch_name)
                 self.channel_tabs.removeTab(index)
+                self.channels[index].clear()
                 self.channels[index].setParent(None)
                 self.channels.pop(index)
                 self.ch_names.pop(index)
         self._check_range_warning_needed()
+
+    def show_relative(self):
+        for ch in self.channels:
+            ch.show_relative()
+        id = self.get_current_channel_index()
+        self.channels[id].tight_layout()
+
+    def show_percentage(self):
+        for ch in self.channels:
+            ch.show_percentage()
+        id = self.get_current_channel_index()
+        self.channels[id].tight_layout()
 
     def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
         """Update the <index> plot with the given data
@@ -602,10 +734,7 @@ for wavelengths between 350 and 2500 nm"
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        data = [comparison.observed_signal, comparison.simulated_signal]
-        self.channels[index].update_plot(
-            data, point=comparison.points, data_compare=comparison, redraw=redraw
-        )
+        self.channels[index].update_plot(comparison, redraw)
 
     def update_labels(
         self,
@@ -650,10 +779,12 @@ for wavelengths between 350 and 2500 nm"
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.channels[index].update_legend(legends, redraw=redraw)
+        self.channels[index].update_legends(legends, redraw=redraw)
 
     def get_current_channel_index(self) -> int:
         return self.channel_tabs.currentIndex()
 
     def set_current_channel_index(self, index: int):
-        return self.channel_tabs.setCurrentIndex(index)
+        cui = self.channel_tabs.setCurrentIndex(index)
+        self.channels[index].tight_layout()
+        return cui

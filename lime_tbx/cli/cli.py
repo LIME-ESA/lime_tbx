@@ -669,13 +669,13 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
-                            csv.export_csv_comparation(
+                            csv.export_csv_comparison(
                                 data,
                                 ylabel,
                                 points,
                                 output,
                                 version,
-                                comps[i].ampa_valid_range,
+                                comps[i],
                                 sp_name,
                                 skip_uncs,
                             )
@@ -715,13 +715,13 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
-                            csv.export_csv_comparation(
+                            csv.export_csv_comparison(
                                 data,
                                 ylabel,
                                 points,
                                 output,
                                 version,
-                                mpa_comps[i].ampa_valid_range,
+                                mpa_comps[i],
                                 sp_name,
                                 skip_uncs,
                                 False,

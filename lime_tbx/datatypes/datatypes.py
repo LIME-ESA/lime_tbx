@@ -800,9 +800,11 @@ class ComparisonData:
     simulated_signal: SpectralData
         Simulated data obtained from the model for the same conditions.
     diffs_signal: SpectralData
-        Relative differences between the simulated and real data. (sim - real) / real.
+        Relative differences between the simulated and real data. 100*(sim - real) / real.
     mean_relative_difference: float
         The mean of the relative differences (diffs_signals mean).
+    mean_absolute_relative_difference: float
+        The mean of the absolutes of the relative differences (abs(diffs_signals) mean).
     standard_deviation_mrd: float
         Standard deviation of relative differences.
     number_samples: int
@@ -816,18 +818,25 @@ class ComparisonData:
         Moon phase angle in degrees for every datetime.
     ampa_valid_range: list of bool
         Flag that indicates if the moon phase angle is in the valid LIME range.
+    perc_diffs: SpectralData
+        Percentage differences between the simulated and real data.
+    mean_perc_difference: float
+        The mean of the percentage differences (perc_diffs mean).
     """
 
     observed_signal: SpectralData
     simulated_signal: SpectralData
     diffs_signal: SpectralData
     mean_relative_difference: float
+    mean_absolute_relative_difference: float
     standard_deviation_mrd: float
     number_samples: int
     dts: List[datetime]
     points: List[SurfacePoint]
     mpas: List[float]
     ampa_valid_range: List[bool]
+    perc_diffs: SpectralData
+    mean_perc_difference: float
 
 
 @dataclass

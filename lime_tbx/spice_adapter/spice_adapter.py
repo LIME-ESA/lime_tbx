@@ -34,8 +34,8 @@ class ISPICEAdapter(ABC):
     It exports the following functions:
         * get_moon_data_from_earth() - Calculate lunar data for a position on earth
             surface at a concrete datetime.
-        * get_moon_data_from_moon() - Calculate lunar data for a position on Moon's
-            surface at a concrete datetime.
+        * get_moon_datas_from_rectangular_multiple() - Calculate lunar data for some
+            rectangular coordinates from Earth or Moon.
         * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
         * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
         * to_planetographic_multiple() - Transforms multiple rectangular coordinates
@@ -50,6 +50,7 @@ class ISPICEAdapter(ABC):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
         """
         Calculate lunar data for a position on earth surface at a concrete datetime.
@@ -67,6 +68,9 @@ class ISPICEAdapter(ABC):
         kernels_path: str
             Path where the needed SPICE kernels are located.
             The user must have write access to that directory.
+        source_frame: str
+            Source frame from which to transform the xyz coordinates.
+            By default J2000, but it can be others like ITRF93.
 
         Returns
         -------
@@ -77,53 +81,32 @@ class ISPICEAdapter(ABC):
         pass
 
     @staticmethod
-    def get_moon_datas_from_earth_rectangular_multiple(
+    def get_moon_datas_from_rectangular_multiple(
         xyzs: List[Tuple[float, float, float]],
         dts: List[datetime],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> List[datatypes.MoonData]:
         """
         Calculate lunar data for the given rectangular coordinates.
         Faster execution for some cases
 
+        Parameters
+        ----------
+        xyzs: list of tuple of three floats
+            Rectangular coordinates in meters
+        dts: List of datetime
+            Datetimes of each position of those xyzs
+        kernels_path: KernelsPath
+            Information about the SPICE kernels location
+        source_frame: str
+            Source frame from which to transform the xyz coordinates.
+            By default J2000, but it can be something like 'MOON_ME' if the coordinates are lunar.
+
         Returns:
         --------
         list of MoonData
             Lunar data for the given parameters.
-        """
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_moon_data_from_moon(
-        latitude: float,
-        longitude: float,
-        altitude: float,
-        dt: Union[datetime, List[datetime]],
-        kernels_path: datatypes.KernelsPath,
-    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        """
-        Calculate lunar data for a position on moon surface at a concrete datetime.
-
-        Parameters
-        ----------
-        latitude: float
-            Selenographic latitude in decimal degrees.
-        longitude: float
-            Selenographic longitude in decimal degrees.
-        altitude: float
-            Altitude in meters.
-        dt: datetime | list of datetimes
-            Time or time series at which the lunar data will be calculated.
-        kernels_path: str
-            Path where the needed SPICE kernels are located.
-            The user must have write access to that directory.
-
-        Returns
-        -------
-        md: MoonData | list of MoonData
-            Lunar data for the given parameters. If the parameter dt was a list,
-            this will be a list. Otherwise not.
         """
         pass
 
@@ -150,6 +133,28 @@ class ISPICEAdapter(ABC):
         Returns
         -------
         xyz: tuple of 3 floats
+            Rectangular coordinates in meters
+        """
+        pass
+
+    @staticmethod
+    def to_rectangular_multiple(
+        latlonheights: List[Tuple[float, float, float]], body: str, kernels_path: str
+    ) -> List[Tuple[float, float, float]]:
+        """Transforms planetographic coordinates to rectangular coordinates.
+
+        Parameters
+        ----------
+        latlonheights: list of tuple of floats
+            Latitude and longitude in degrees, height in meters.
+        body: str
+            Name of the body. For example 'MOON' or 'EARTH'.
+        kernels_path: str
+            Path to the directory of the main kernels.
+
+        Returns
+        -------
+        xyzs: list of tuples of 3 floats
             Rectangular coordinates in meters
         """
         pass
@@ -293,28 +298,41 @@ class SPICEAdapter(ISPICEAdapter):
         altitude: float,
         dt: Union[datetime, List[datetime]],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        return SPICEAdapter._get_moon_data_from_callback(
-            latitude,
-            longitude,
-            altitude,
+        xyz = SPICEAdapter.to_rectangular(
+            latitude, longitude, altitude, "EARTH", kernels_path.main_kernels_path
+        )
+        waslist = True
+        if not isinstance(dt, list) and not isinstance(dt, np.ndarray):
+            dt = [dt]
+            waslist = False
+        xyzs = [xyz for _ in dt]
+        mda = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+            xyzs,
             dt,
             kernels_path,
-            "J2000",
-            "MOON_ME",
-            spicedmoon.get_moon_datas,
+            source_frame,
         )
+        if not waslist:
+            mda = mda[0]
+        return mda
 
     @staticmethod
-    def get_moon_datas_from_earth_rectangular_multiple(
+    def get_moon_datas_from_rectangular_multiple(
         xyzs: List[Tuple[float, float, float]],
         dts: List[datetime],
         kernels_path: datatypes.KernelsPath,
+        source_frame: str = "J2000",
     ) -> List[datatypes.MoonData]:
+        # if source_frame = 'MOON_ME' or contains 'MOON' its from MOON
         xyzs = [(x / 1000, y / 1000, z / 1000) for x, y, z in xyzs]
         times = list(map(lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S"), dts))
         mds = spicedmoon.spicedmoon.get_moon_datas_xyzs_no_zenith_azimuth(
-            xyzs, times, kernels_path.main_kernels_path
+            xyzs,
+            times,
+            kernels_path.main_kernels_path,
+            source_frame,
         )
         return [
             datatypes.MoonData(
@@ -328,25 +346,6 @@ class SPICEAdapter(ISPICEAdapter):
             )
             for md in mds
         ]
-
-    @staticmethod
-    def get_moon_data_from_moon(
-        latitude: float,
-        longitude: float,
-        altitude: float,
-        dt: Union[datetime, List[datetime]],
-        kernels_path: datatypes.KernelsPath,
-    ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        return SPICEAdapter._get_moon_data_from_callback(
-            latitude,
-            longitude,
-            altitude,
-            dt,
-            kernels_path,
-            "MOON_ME",
-            "MOON_ME",
-            spicedmoon.get_moon_datas_from_moon,
-        )
 
     @staticmethod
     def _load_kernels(kernels_path: str):
@@ -394,6 +393,33 @@ class SPICEAdapter(ISPICEAdapter):
         )
         SPICEAdapter._clear_kernels()
         return pos_iau[0], pos_iau[1], pos_iau[2]  # in meters
+
+    @staticmethod
+    def to_rectangular_multiple(
+        latlonheights: List[Tuple[float, float, float]], body: str, kernels_path: str
+    ):  # h in meters
+        SPICEAdapter._load_kernels(kernels_path)
+        _, radios = spice.bodvrd(body, "RADII", 3)
+        eq_rad = radios[0]  # Equatorial Radius
+        pol_rad = radios[2]  # Polar radius
+        flattening = (eq_rad - pol_rad) / eq_rad
+        poss_iaus = []
+        for llh in latlonheights:
+            pos_iau = (
+                spice.georec(
+                    # spice.pgrrec(
+                    #    body,
+                    spice.rpd() * llh[1],
+                    spice.rpd() * llh[0],
+                    llh[2] / 1000,
+                    eq_rad,
+                    flattening,
+                ),
+            )
+            poss_iaus.append(pos_iau)
+        SPICEAdapter._clear_kernels()
+        poss_iaus = list(map(lambda n: n * 1000, poss_iaus))
+        return poss_iaus  # in meters
 
     @staticmethod
     def to_planetographic(

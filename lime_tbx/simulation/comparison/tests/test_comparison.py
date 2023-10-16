@@ -244,11 +244,14 @@ class TestComparison(unittest.TestCase):
                 sds[1],
                 0,
                 0,
+                0,
                 3,
                 sds[0].wlens,
                 [None, None, None],
                 mpas[i],
                 [True, True, True],
+                sds[1],
+                0,
             )
             comps.append(comp)
         new_comps = co.sort_by_mpa(comps)
@@ -287,11 +290,14 @@ class TestComparison(unittest.TestCase):
                 sds[1],
                 0,
                 0,
+                0,
                 3,
                 sds[0].wlens,
                 [None, None, None],
                 mpas[i],
                 [True, True, True],
+                sds[1],
+                0,
             )
             comps.append(comp)
         new_comps = co.sort_by_mpa(comps)
@@ -336,11 +342,14 @@ class TestComparison(unittest.TestCase):
                 sds[1],
                 0,
                 0,
+                0,
                 3,
                 sds[0].wlens,
                 [None, None, None],
                 mpas[i],
                 [True, True, True],
+                sds[1],
+                0,
             )
             comps.append(comp)
         new_comps = co.sort_by_mpa(comps)
