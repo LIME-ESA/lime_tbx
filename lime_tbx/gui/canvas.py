@@ -126,13 +126,24 @@ def redraw_canvas(
                 ls=ls,
             )
             if data.uncertainties is not None and data.uncertainties.size > 0:
-                scanvas.axes.fill_between(
-                    data.wlens,
-                    data.data - 2 * data.uncertainties,
-                    data.data + 2 * data.uncertainties,
-                    color=newlines[-1].get_color(),
-                    alpha=0.3,
-                )
+                if not sdata_compare:
+                    scanvas.axes.fill_between(
+                        data.wlens,
+                        data.data - 2 * data.uncertainties,
+                        data.data + 2 * data.uncertainties,
+                        color=newlines[-1].get_color(),
+                        alpha=0.3,
+                    )
+                else:
+                    scanvas.axes.errorbar(
+                        data.wlens,
+                        data.data,
+                        yerr=data.uncertainties * 2,
+                        color=newlines[-1].get_color(),
+                        capsize=2,
+                        ls="none",
+                        alpha=0.3,
+                    )
             lines += newlines
 
         if scimel_data:
@@ -212,11 +223,13 @@ def redraw_canvas(
                 ls="none",
             )
             if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
-                ax2.fill_between(
+                ax2.errorbar(
                     data_comp.wlens,
-                    data_comp.data - 2 * data_comp.uncertainties,
-                    data_comp.data + 2 * data_comp.uncertainties,
+                    data_comp.data,
+                    yerr=data_comp.uncertainties * 2,
                     color="pink",
+                    capsize=2,
+                    ls="none",
                     alpha=0.3,
                 )
             ylim = max(list(map(abs, ax2.get_ylim())))
