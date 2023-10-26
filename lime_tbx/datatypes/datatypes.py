@@ -534,11 +534,11 @@ class PolarizationCoefficients:
     def __init__(
         self,
         wavelengths: List[float],
-        pos_coeffs: List[Tuple[float, float, float, float]],
-        pos_unc: List[Tuple[float, float, float, float]],
+        pos_coeffs: List[List[float]],
+        pos_unc: List[List[float]],
         p_pos_err_corr_data: List[List[float]],
-        neg_coeffs: List[Tuple[float, float, float, float]],
-        neg_unc: List[Tuple[float, float, float, float]],
+        neg_coeffs: List[List[float]],
+        neg_unc: List[List[float]],
         p_neg_err_corr_data: List[List[float]],
     ):
         """
@@ -546,9 +546,9 @@ class PolarizationCoefficients:
         ----------
         wavelengths: list of float
             Wavelengths present in the model, in nanometers
-        pos_coeffs: list of tuples of 4 floats
+        pos_coeffs: list of tuples of N floats
             Positive phase angles related to the given wavelengths
-        neg_coeffs: list of tuples of 4 floats
+        neg_coeffs: list of tuples of N floats
             Negative phase angles related to the given wavelengths
         """
         self.wlens = wavelengths
@@ -569,9 +569,7 @@ class PolarizationCoefficients:
         """
         return self.wlens
 
-    def get_coefficients_positive(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_coefficients_positive(self, wavelength_nm: float) -> List[float]:
         """Gets all positive phase angle coefficients for a concrete wavelength
 
         Parameters
@@ -587,15 +585,11 @@ class PolarizationCoefficients:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.pos_coeffs[index]
 
-    def get_uncertainties_positive(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_uncertainties_positive(self, wavelength_nm: float) -> List[float]:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.pos_unc[index]
 
-    def get_coefficients_negative(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_coefficients_negative(self, wavelength_nm: float) -> List[float]:
         """Gets all negative phase angle coefficients for a concrete wavelength
 
         Parameters
@@ -611,9 +605,7 @@ class PolarizationCoefficients:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.neg_coeffs[index]
 
-    def get_uncertainties_negative(
-        self, wavelength_nm: float
-    ) -> Tuple[float, float, float, float]:
+    def get_uncertainties_negative(self, wavelength_nm: float) -> List[float]:
         index = self.get_wavelengths().index(wavelength_nm)
         return self.neg_unc[index]
 
@@ -808,9 +800,11 @@ class ComparisonData:
     simulated_signal: SpectralData
         Simulated data obtained from the model for the same conditions.
     diffs_signal: SpectralData
-        Relative differences between the simulated and real data. (sim - real) / real.
+        Relative differences between the simulated and real data. 100*(sim - real) / real.
     mean_relative_difference: float
         The mean of the relative differences (diffs_signals mean).
+    mean_absolute_relative_difference: float
+        The mean of the absolutes of the relative differences (abs(diffs_signals) mean).
     standard_deviation_mrd: float
         Standard deviation of relative differences.
     number_samples: int
@@ -824,18 +818,25 @@ class ComparisonData:
         Moon phase angle in degrees for every datetime.
     ampa_valid_range: list of bool
         Flag that indicates if the moon phase angle is in the valid LIME range.
+    perc_diffs: SpectralData
+        Percentage differences between the simulated and real data.
+    mean_perc_difference: float
+        The mean of the percentage differences (perc_diffs mean).
     """
 
     observed_signal: SpectralData
     simulated_signal: SpectralData
     diffs_signal: SpectralData
     mean_relative_difference: float
+    mean_absolute_relative_difference: float
     standard_deviation_mrd: float
     number_samples: int
     dts: List[datetime]
     points: List[SurfacePoint]
     mpas: List[float]
     ampa_valid_range: List[bool]
+    perc_diffs: SpectralData
+    mean_perc_difference: float
 
 
 @dataclass
@@ -1019,7 +1020,9 @@ class InterpolationSettings:
     show_interp_spectrum: bool
         Flag that indicates if the interpolation spectrum used is going to be shown in graphs.
     skip_uncertainties: bool
-        Flag that indicates if the uncertainties calculation should be skipped.
+        Flag that indicates if the uncertainties calculation should be skipped.l:
+    use_wehrli: bool
+        Boolean indicating if the Wehrli spectrum will be used for calculating ESI or not.
     """
 
     interpolation_spectrum: str
@@ -1027,6 +1030,7 @@ class InterpolationSettings:
     interpolation_SRF: str
     show_interp_spectrum: bool
     skip_uncertainties: bool
+    use_wehrli: bool
 
     def _save_disk(self, path: str):
         with open(path, "w") as file:

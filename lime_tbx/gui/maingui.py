@@ -308,7 +308,7 @@ def _show_comps_output(
             spectrum_info = f" | Interp. spectrum: {sp_name}"
             output.set_interp_spectrum_name(i, sp_name)
             output.set_skipped_uncertainties(i, skip)
-            subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+            subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
             _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
             subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
                 subtitle,
@@ -354,6 +354,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
         self.comparing_dts = True
+        self.showing_rel_diff = True
         self.workers = []
         self.worker_ths = []
         self._build_layout()
@@ -371,12 +372,27 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
         self.clear_comparison_button.setVisible(False)
+        # Comparison visualization options box
+        self.comp_options_box = QtWidgets.QHBoxLayout()
         self.change_mpa_dts_button = QtWidgets.QPushButton("Compare by MPA")
         self.change_mpa_dts_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
         self.change_mpa_dts_button.clicked.connect(self.switch_show_compare_mpa_dts)
         self.change_mpa_dts_button.setVisible(False)
+        self.change_rel_perc_diffs_button = QtWidgets.QPushButton(
+            "Show percentage difference"
+        )
+        self.change_rel_perc_diffs_button.setCursor(
+            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        )
+        self.change_rel_perc_diffs_button.clicked.connect(
+            self.switch_show_rel_perc_diff
+        )
+        self.change_rel_perc_diffs_button.setVisible(False)
+        self.comp_options_box.addWidget(self.change_mpa_dts_button)
+        self.comp_options_box.addWidget(self.change_rel_perc_diffs_button)
+
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
         self.output = output.ComparisonOutput(self.settings_manager, True)
@@ -395,7 +411,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.input)
         self.main_layout.addWidget(self.compare_button)
         self.main_layout.addWidget(self.clear_comparison_button)
-        self.main_layout.addWidget(self.change_mpa_dts_button)
+        self.main_layout.addLayout(self.comp_options_box)
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
 
@@ -541,6 +557,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.switch_show_compare_mpa_dts()
         self.export_lglod_button.setEnabled(False)
         self.change_mpa_dts_button.setVisible(False)
+        self.change_rel_perc_diffs_button.setVisible(False)
 
     @QtCore.Slot()
     def clear_comparison_rejected(self):
@@ -594,6 +611,16 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.change_mpa_dts_button.setText("Compare by MPA")
             self.show_compare_dts()
 
+    def switch_show_rel_perc_diff(self):
+        if self.showing_rel_diff:
+            self.showing_rel_diff = False
+            self.change_rel_perc_diffs_button.setText("Show relative difference")
+            self.show_perc_diff()
+        else:
+            self.showing_rel_diff = True
+            self.change_rel_perc_diffs_button.setText("Show percentage difference")
+            self.show_rel_diff()
+
     def show_compare_dts(self):
         self._block_gui_loading()
         ch_index = self.output_mpa.get_current_channel_index()
@@ -610,6 +637,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.output.setVisible(False)
         self.output_mpa.setVisible(True)
         self.stack_layout.setCurrentIndex(2)
+        self._unblock_gui()
+
+    def show_perc_diff(self):
+        self._block_gui_loading()
+        self.output_mpa.show_percentage()
+        self.output.show_percentage()
+        self._unblock_gui()
+
+    def show_rel_diff(self):
+        self._block_gui_loading()
+        self.output_mpa.show_relative()
+        self.output.show_relative()
         self._unblock_gui()
 
     def load_lglod_comparisons(
@@ -657,6 +696,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.change_mpa_dts_button.setVisible(True)
+        self.change_rel_perc_diffs_button.setVisible(True)
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):
@@ -942,7 +982,7 @@ class MainSimulationsWidget(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances  (Wm⁻²nm⁻¹)",
-            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[6])
         self.signal_widget.set_interp_spectrum_name(
@@ -1020,7 +1060,7 @@ class MainSimulationsWidget(
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
@@ -1089,7 +1129,7 @@ class MainSimulationsWidget(
             "Lunar polarization",
             "Wavelengths (nm)",
             "Polarizations (Fraction of unity)",
-            subtitle=f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
@@ -1376,6 +1416,14 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self.main_page.update_calculability()
 
 
+def _set_all_messagebox_buttons_pointing_hands():
+    """Function that sets qmessage buttons with pointing hands"""
+    for w in QtWidgets.QApplication.topLevelWidgets():
+        if isinstance(w, QtWidgets.QMessageBox):
+            for button in w.buttons():
+                button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+
+
 class LimeTBXWindow(QtWidgets.QMainWindow):
     def __init__(self, kernels_path: KernelsPath):
         super().__init__()
@@ -1445,11 +1493,22 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.menu_bar.addMenu(settings_menu)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
-        lime_tbx_w = self._get_lime_widget()
-        lime_tbx_w.propagate_close_event()
-        QtCore.QCoreApplication.quit()
-        os.kill(os.getpid(), 9)
-        return super().closeEvent(event)
+        QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            "Window Close",
+            "Are you sure you want to close the application?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No,
+        )
+        if reply == QtWidgets.QMessageBox.Yes:
+            lime_tbx_w = self._get_lime_widget()
+            lime_tbx_w.propagate_close_event()
+            QtCore.QCoreApplication.quit()
+            os.kill(os.getpid(), 9)
+            return super().closeEvent(event)
+        else:
+            event.ignore()
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
