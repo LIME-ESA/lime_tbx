@@ -36,12 +36,12 @@ SURFACE_POINT = SurfacePoint(LAT, LON, ALT, DT1)
 SURFACE_POINT_DTS = SurfacePoint(LAT, LON, ALT, [DT1, DT2])
 CUSTOM_POINT = CustomPoint(
     0.9863676197729848,
-    401782.2206941528,
-    -4.713616769942523,
-    -1.5456745748151752,
+    399227.54900652857,
+    -4.6700417589443175,
+    -3.139429310609046,
     0.1343504656066533,
-    9.824985380107215,
-    -9.824985380107215,
+    11.317038213996295,
+    -11.317038213996295,
 )
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 
@@ -108,12 +108,12 @@ class TestMoonDataFactory(unittest.TestCase):
             SATELLITE_POINT, EOCFI_PATH, KERNELS_PATH
         )
         self.assertEqual(md.distance_sun_moon, 0.9863676197729848)
-        self.assertEqual(md.distance_observer_moon, 406214.0769307725)
+        self.assertEqual(md.distance_observer_moon, 406214.0769307727)
         self.assertEqual(md.long_sun_radians, 0.1343504656066533)
-        self.assertEqual(md.lat_obs, -5.234187076763817)
-        self.assertEqual(md.long_obs, -3.2374416337423626)
-        self.assertEqual(md.absolute_mpa_degrees, 11.58747830181146)
-        self.assertEqual(md.mpa_degrees, -11.58747830181146)
+        self.assertEqual(md.lat_obs, -5.246792419465547)
+        self.assertEqual(md.long_obs, -3.237441633742378)
+        self.assertEqual(md.absolute_mpa_degrees, 11.587478301811478)
+        self.assertEqual(md.mpa_degrees, -11.587478301811478)
 
 
 if __name__ == "__main__":

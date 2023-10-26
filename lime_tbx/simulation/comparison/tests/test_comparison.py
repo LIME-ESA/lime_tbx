@@ -150,7 +150,7 @@ class TestComparison(unittest.TestCase):
         self.assertEqual(comp.dts[0], OBS1.dt)
         self.assertEqual(comp.number_samples, 1)
         self.assertEqual(comp.observed_signal.data[0], OBS1.ch_irrs["Default"])
-        self.assertAlmostEqual(comp.simulated_signal.data[0], 2.59881401749616e-06)
+        self.assertAlmostEqual(comp.simulated_signal.data[0], 2.54180198915401e-06)
         self.assertAlmostEqual(
             comp.simulated_signal.uncertainties[0], 1.5069602623384797e-08
         )
@@ -244,14 +244,11 @@ class TestComparison(unittest.TestCase):
                 sds[1],
                 0,
                 0,
-                0,
                 3,
                 sds[0].wlens,
                 [None, None, None],
                 mpas[i],
                 [True, True, True],
-                sds[1],
-                0,
             )
             comps.append(comp)
         new_comps = co.sort_by_mpa(comps)
@@ -290,14 +287,11 @@ class TestComparison(unittest.TestCase):
                 sds[1],
                 0,
                 0,
-                0,
                 3,
                 sds[0].wlens,
                 [None, None, None],
                 mpas[i],
                 [True, True, True],
-                sds[1],
-                0,
             )
             comps.append(comp)
         new_comps = co.sort_by_mpa(comps)
@@ -342,14 +336,11 @@ class TestComparison(unittest.TestCase):
                 sds[1],
                 0,
                 0,
-                0,
                 3,
                 sds[0].wlens,
                 [None, None, None],
                 mpas[i],
                 [True, True, True],
-                sds[1],
-                0,
             )
             comps.append(comp)
         new_comps = co.sort_by_mpa(comps)

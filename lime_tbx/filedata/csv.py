@@ -25,7 +25,6 @@ from lime_tbx.datatypes.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
-    ComparisonData,
 )
 from lime_tbx.datatypes import logger
 
@@ -152,7 +151,7 @@ def export_csv_simulation(
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME coefficients version", coeff_version])
+            writer.writerow(["LIME2 coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             some_out_mpa_range = (
                 not inside_mpa_range
@@ -215,13 +214,13 @@ def export_csv_simulation(
         raise Exception(_EXPORT_ERROR_STR)
 
 
-def export_csv_comparison(
+def export_csv_comparation(
     data: List[SpectralData],
     ylabel: str,
     points: List[SurfacePoint],
     name: str,
     coeff_version: str,
-    comparison_data: ComparisonData,
+    ampa_valid_range: List[bool],
     interp_spectrum_name: str,
     skip_uncs: bool,
     x_datetime: bool = True,
@@ -244,46 +243,21 @@ def export_csv_comparison(
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
-    comparison_data: ComparisonData
-        ComparisonData related to the comparison.
+    ampa_valid_range: list of bool
+        Indicates if the given points are inside of the valid LIME moon phase angle range.
     interp_spectrum_name: str
         Name of the spectrum used for interpolation.
     x_datetime: bool
         True if it used datetimes as the x_axis, False if it used mpa
     """
-    ampa_valid_range = comparison_data.ampa_valid_range
     x_label = "UTC datetime"
     if not x_datetime:
         x_label = "Moon phase angle (degrees)"
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME coefficients version", coeff_version])
+            writer.writerow(["LIME2 coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-            writer.writerow(
-                [
-                    "MRA (Mean Relative Difference %)",
-                    comparison_data.mean_relative_difference,
-                ]
-            )
-            writer.writerow(
-                [
-                    "STD-RD (Standard deviation of Relative Difference %)",
-                    comparison_data.mean_relative_difference,
-                ]
-            )
-            writer.writerow(
-                [
-                    "MARD (Mean of the Absolutes of the Relative Differences %)",
-                    comparison_data.mean_absolute_relative_difference,
-                ]
-            )
-            writer.writerow(
-                [
-                    "MPD (Mean Percentage Difference %)",
-                    comparison_data.mean_perc_difference,
-                ]
-            )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             header = [
@@ -293,13 +267,11 @@ def export_csv_comparison(
                 "altitude(m)",
                 "Observed {}".format(ylabel),
                 "Simulated {}".format(ylabel),
-                "Relative differences (%)",
             ]
             if not skip_uncs:
                 header += [
                     "Observation uncertainties",
                     "Simulation uncertainties",
-                    "Relative differences uncertainties",
                 ]
             writer.writerow(header)
             x_data = data[0].wlens
@@ -320,13 +292,11 @@ def export_csv_comparison(
                     pt.altitude,
                     data[0].data[i],
                     data[1].data[i],
-                    comparison_data.diffs_signal.data[i],
                 ]
                 if not skip_uncs:
                     datarow += [
                         data[0].uncertainties[i],
                         data[1].uncertainties[i],
-                        comparison_data.diffs_signal.uncertainties[i],
                     ]
                 writer.writerow(datarow)
     except Exception as e:
@@ -367,7 +337,7 @@ def export_csv_integrated_irradiance(
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME coefficients version", coeff_version])
+            writer.writerow(["LIME2 coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             some_out_mpa_range = (
                 not inside_mpa_range

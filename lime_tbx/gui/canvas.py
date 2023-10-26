@@ -7,7 +7,6 @@ import os
 """___Third-Party Modules___"""
 from matplotlib.axes import Axes
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
-import matplotlib.ticker
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas,
 )
@@ -48,7 +47,6 @@ class MplCanvas(FigureCanvas):
         self.axes: Axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
         self.axes_y_2 = None
-        self.axes_x2 = None
 
     def set_title(self, title: str, fontproperties: fm.FontProperties = None):
         self.axes.set_title(title, fontproperties=fontproperties)
@@ -59,7 +57,6 @@ class MplCanvas(FigureCanvas):
     def set_subtitle(self, subtitle: str, fontproperties: fm.FontProperties = None):
         if self.axes_y_2 == None:
             self.axes_y_2 = self.axes.twiny()
-        self.axes_y_2.set_title("Subtitle", {"alpha": 1, "size": 0})
         self.axes_y_2.set_xlabel(subtitle, fontproperties=fontproperties)
         self.axes_y_2.tick_params(
             axis="x",
@@ -69,14 +66,9 @@ class MplCanvas(FigureCanvas):
         )
 
     def get_subtitle(self) -> str:
-        if self.axes_y_2 is None:
+        if self.axes_y_2 == None:
             return ""
         return self.axes_y_2.get_xlabel()
-
-    def get_twinx(self) -> Axes:
-        if self.axes_x2 is None:
-            self.axes_x2 = self.axes.twinx()
-        return self.axes_x2
 
 
 def redraw_canvas(
@@ -92,7 +84,6 @@ def redraw_canvas(
     svertical_lines: List[float],
     sp_name: str,
     subtitle: str = None,
-    compare_percentages: bool = False,
 ):
     lines = []
     if sdata is not None:
@@ -110,20 +101,14 @@ def redraw_canvas(
                 if len(slegend[0]) > 1:
                     color = []
             marker = ""
-            markersize = None
-            ls = None
-            if len(data.data) == 1 or sdata_compare:
+            if len(data.data) == 1:
                 marker = "o"
-                markersize = 4
-                ls = "none"
-            newlines = scanvas.axes.plot(
+            lines += scanvas.axes.plot(
                 data.wlens,
                 data.data,
                 *color,
                 marker=marker,
                 label=label,
-                markersize=markersize,
-                ls=ls,
             )
             if data.uncertainties is not None and data.uncertainties.size > 0:
                 if not sdata_compare:
@@ -204,23 +189,19 @@ def redraw_canvas(
 
         data_compare_info = ""
         if sdata_compare:
-            if compare_percentages:
-                data_comp = sdata_compare.perc_diffs
-            else:
-                data_comp = sdata_compare.diffs_signal
-            ax2 = scanvas.get_twinx()
-            ax2.clear()
+            data_comp = sdata_compare.diffs_signal
+            ax2 = scanvas.axes.twinx()
             label = ""
             if len(slegend) > 3 and len(slegend[3]) > 0:
                 label = slegend[3][0]
+            marker = "--"
+            if len(data_comp.data) == 1:
+                marker = "o"
             lines += ax2.plot(
                 data_comp.wlens,
                 data_comp.data,
-                marker="o",
-                color="black",
+                "k{}".format(marker),
                 label=label,
-                markersize=4,
-                ls="none",
             )
             if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
                 ax2.errorbar(
@@ -233,28 +214,14 @@ def redraw_canvas(
                     alpha=0.3,
                 )
             ylim = max(list(map(abs, ax2.get_ylim())))
-            if compare_percentages:
-                ax2.set_ylim((0.0, ylim + 0.5))
-                data_compare_info = "MPD: {:.4f}%".format(
-                    sdata_compare.mean_perc_difference
-                )
-            else:
-                ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
-                data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
-                    sdata_compare.mean_relative_difference,
-                    sdata_compare.standard_deviation_mrd,
-                    sdata_compare.mean_absolute_relative_difference,
-                )
-            # lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
-            if subtitle is None:
-                subtitle = data_compare_info
-            else:
-                subtitle += f" | {data_compare_info}"
-            ylabeltit = "Relative difference (%)"
-            if compare_percentages:
-                ylabeltit = "Percentage difference (%)"
+            ax2.set_ylim((-ylim - 0.05, ylim + 0.05))
+            data_compare_info = "MRD: {:.4f}\nσ: {:.4f}\n".format(
+                sdata_compare.mean_relative_difference,
+                sdata_compare.standard_deviation_mrd,
+            )
+            lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
             ax2.set_ylabel(
-                ylabeltit,
+                "Relative difference (Fraction of unity)",
                 fontproperties=label_font_prop,
             )
             plt.setp(
@@ -262,12 +229,6 @@ def redraw_canvas(
                 rotation=30,
                 horizontalalignment="right",
             )
-            nticks = 9
-            scanvas.axes.yaxis.set_major_locator(
-                matplotlib.ticker.LinearLocator(nticks)
-            )
-            ax2.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(nticks))
-
         if len(slegend) > 0:
             legend_lines = [l for l in lines if not l.get_label().startswith("_child")]
             labels = [l.get_label() for l in legend_lines]
@@ -293,7 +254,5 @@ def redraw_canvas(
             sel.annotation.get_bbox_patch().set(fc="white")
             label = sel.artist.get_label()
             sel.annotation.set_text(label)
-
-    scanvas.axes.grid()
 
     return lines

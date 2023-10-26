@@ -111,7 +111,7 @@ def calculate_eli_from_elref(
     elrefs : np.ndarray of float
         Reflectances previously calculated
     srf_type: str
-        SRF type that wants to be used. Can be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'
+        SRF type that wants to be used.
 
     Returns
     -------
