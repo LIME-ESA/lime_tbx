@@ -363,7 +363,7 @@ class CLI:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         sp_name = self.settings_manager.get_selected_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
-        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
@@ -425,7 +425,7 @@ class CLI:
             sys.exit(1)
         canv.axes.cla()  # Clear the canvas.
         spectrum_info = f" | Interp. spectrum: {dolp_sp_name}"
-        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.cla()  # Clear the canvas.
         canvas.redraw_canvas(
@@ -480,7 +480,7 @@ class CLI:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         sp_name = self.settings_manager.get_selected_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}"
-        subtitle = f"LIME2 coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
         subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
             subtitle,
@@ -669,13 +669,13 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
-                            csv.export_csv_comparation(
+                            csv.export_csv_comparison(
                                 data,
                                 ylabel,
                                 points,
                                 output,
                                 version,
-                                comps[i].ampa_valid_range,
+                                comps[i],
                                 sp_name,
                                 skip_uncs,
                             )
@@ -715,13 +715,13 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
-                            csv.export_csv_comparation(
+                            csv.export_csv_comparison(
                                 data,
                                 ylabel,
                                 points,
                                 output,
                                 version,
-                                mpa_comps[i].ampa_valid_range,
+                                mpa_comps[i],
                                 sp_name,
                                 skip_uncs,
                                 False,
