@@ -311,7 +311,7 @@ class GraphWidget(QtWidgets.QWidget):
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
-                if isinstance(self.point, list):
+                if isinstance(self.point, list) or isinstance(self.point, np.ndarray):
                     csv.export_csv_comparison(
                         self.data,
                         self.ylabel,
