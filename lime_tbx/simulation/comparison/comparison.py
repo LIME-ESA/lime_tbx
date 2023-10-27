@@ -200,6 +200,8 @@ class Comparison(IComparison):
             )
             for o in observations
         ]
+        sp_calcs = []
+        mdas = []
         if observations and observations[0].sat_pos_ref in (
             "IAU_MOON",
             "MOON_ME",
@@ -231,7 +233,7 @@ class Comparison(IComparison):
                 )
                 for mdam, llh in zip(mdas, llhs)
             ]
-        else:
+        elif observations:
             llhs = SPICEAdapter.to_planetographic_multiple(
                 xyzs,
                 "EARTH",

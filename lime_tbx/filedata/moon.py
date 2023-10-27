@@ -730,12 +730,13 @@ def write_comparison(
                 )
                 sat_pos_ref = constants.MOON_FRAME
             elif isinstance(sp, SurfacePoint):
+                spdt = sp.dt if isinstance(sp.dt, list) else [sp.dt]
                 sat_pos_pt = SatellitePosition(
                     *SPICEAdapter.to_rectangular_multiple(
                         [(sp.latitude, sp.longitude, sp.altitude)],
                         "EARTH",
                         kernels_path.main_kernels_path,
-                        sp.dt,
+                        spdt,
                     )[0]
                 )
                 sat_pos_ref = constants.EARTH_FRAME
@@ -953,7 +954,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             xyzs, datetimes, kernels_path, sat_pos_refs[0]
         )
         sps = SPICEAdapter.to_planetographic_multiple(
-            xyzs, "MOON", kp, dts, sat_pos_refs[0], "IAU_MOON"
+            xyzs, "MOON", kp, datetimes, sat_pos_refs[0], "IAU_MOON"
         )
         for sp, mdam in zip(sps, mdams):
             sp = CustomPoint(
@@ -968,7 +969,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             points.append(sp)
     else:
         sps = SPICEAdapter.to_planetographic_multiple(
-            xyzs, "EARTH", kp, dts, sat_pos_refs[0]
+            xyzs, "EARTH", kp, datetimes, sat_pos_refs[0]
         )
         for sp, dt in zip(sps, datetimes):
             sp = SurfacePoint(sp[0], sp[1], sp[2], dt)

@@ -328,7 +328,8 @@ class SpectralIntegration(ISpectralIntegration):
             ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.values())))
             # ch_wlenss.append(np.array(list(ch.spectral_response_inrange.keys())))
             # ch_srfs.append(np.array(list(ch.spectral_response_inrange.values())))
-        return self._integrate_elis(elis, wlens, all_wlens, *ch_wlensrfs)
+        signals = self._integrate_elis(elis, wlens, all_wlens, *ch_wlensrfs)
+        return signals
 
     def u_integrate_elis(
         self, srf: SpectralResponseFunction, elis_lime: SpectralData
@@ -343,12 +344,21 @@ class SpectralIntegration(ISpectralIntegration):
         for ch in srf.channels:
             ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.keys())))
             ch_wlensrfs.append(np.array(list(ch.spectral_response_inrange.values())))
-        u_signals = self.prop.propagate_random(
+        # check for empty arrays as they crash the unc. propagation, but they have to be readded at the end
+        # (only adding one of each two arrays)
+        empties = [len(ch_wlensrfs[i]) == 0 for i in range(0, len(ch_wlensrfs), 2)]
+        empties_index = [i for i, x in enumerate(empties) if x]
+        ch_wlensrfs = [chwls for chwls in ch_wlensrfs if len(chwls) > 0]
+        #
+        u_signals: np.ndarray = self.prop.propagate_random(
             self._integrate_elis,
             [elis, wlens, all_wlens, *ch_wlensrfs],
             [u_elis, None, None, *[None for _ in ch_wlensrfs]],
             corr_x=[corr_elis, None, None, *[None for _ in ch_wlensrfs]],
         )
+        # fill with 0s the removed positions
+        for emp_index in empties_index:
+            u_signals = np.insert(u_signals, emp_index, 0)
         return u_signals
 
 

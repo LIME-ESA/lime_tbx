@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from abc import ABC
+import traceback
 from typing import List, Union, Tuple
 import os
 from enum import Enum
@@ -1070,6 +1071,8 @@ Run 'lime -h' for help."
             eprint("Error: {}".format(str(e)))
             return 1
         except Exception as e:
+            trace = traceback.format_exc()
             eprint("Error when performing operations: {}".format(str(e)))
+            logger.get_logger().critical(f"Error trace: {trace}")
             return 1
         return 0

@@ -1195,7 +1195,7 @@ class LimeSimulation(ILimeSimulation):
                     obss[0].sat_pos_ref,
                 )[0],
                 [dts[0]],
-            )[0]
+            )
         else:
             point = SatellitePoint(obss[0].sat_name, dts)
             surfaces_of_sat = []

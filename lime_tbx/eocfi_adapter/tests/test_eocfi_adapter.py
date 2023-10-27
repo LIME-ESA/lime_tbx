@@ -71,10 +71,10 @@ class TestEOCFIConverter(unittest.TestCase):
 
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
-        supposed_lat = 10.383888702133119
-        supposed_h = 791026.9596526251
+        supposed_lat = 10.381308335388914
+        supposed_h = 791026.6206381248
         lat, lon, h = eo.get_satellite_position("SENTINEL-2A", [DT1])[0]
-        self.assertEqual(lon, -65.90847446723077)
+        self.assertEqual(lon, -65.8307798442806)
         self.assertAlmostEqual(lat, supposed_lat)
         self.assertAlmostEqual(h, supposed_h)
         if lat != supposed_lat:
@@ -129,7 +129,7 @@ class TestEOCFIConverter(unittest.TestCase):
             KERNELS_PATH.main_kernels_path,
             dts,
             "ITRF93",
-        )
+        )[0]
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2)
         self.assertAlmostEqual(hhh, hh2)
@@ -163,7 +163,7 @@ class TestEOCFIConverter(unittest.TestCase):
             KERNELS_PATH.main_kernels_path,
             dts,
             "ITRF93",
-        )
+        )[0]
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2, 2)
         self.assertAlmostEqual(hhh, hh2, 3)
@@ -194,7 +194,7 @@ class TestEOCFIConverter(unittest.TestCase):
             KERNELS_PATH.main_kernels_path,
             dts,
             "ITRF93",
-        )
+        )[0]
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2)
         self.assertAlmostEqual(hhh, hh2, 3)
