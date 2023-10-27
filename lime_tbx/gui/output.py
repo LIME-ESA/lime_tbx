@@ -628,6 +628,10 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.graph_reldif.update_legend(legends, redraw=redraw)
         self.graph_percdif.update_legend(legends, redraw=redraw)
 
+    def set_chnames(self, ch_names: List[str]):
+        self.graph_reldif.set_srf_channel_names(ch_names)
+        self.graph_percdif.set_srf_channel_names(ch_names)
+
 
 class ComparisonOutput(QtWidgets.QWidget):
     def __init__(self, settings_manager: ISettingsManager, x_datetime: bool):
@@ -671,6 +675,8 @@ class ComparisonOutput(QtWidgets.QWidget):
             self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
+        for cha in self.channels:
+            cha.set_chnames(self.ch_names)
         # Remove range warning content
         if self.range_warning:
             self.range_warning.setText("")
@@ -710,6 +716,8 @@ for wavelengths between 350 and 2500 nm"
                 self.channels.pop(index)
                 self.ch_names.pop(index)
         self._check_range_warning_needed()
+        for cha in self.channels:
+            cha.set_chnames(self.ch_names)
 
     def show_relative(self):
         for ch in self.channels:
