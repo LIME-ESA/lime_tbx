@@ -460,7 +460,6 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
 
 
 class TestCLI(unittest.TestCase):
-
     # Cant compare output as interpolation gives different results each time, and its too slow to perform always
 
     def setUp(self):

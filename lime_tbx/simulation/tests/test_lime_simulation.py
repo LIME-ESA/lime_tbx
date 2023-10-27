@@ -82,7 +82,6 @@ def get_lime_simulation() -> ILimeSimulation:
 
 
 class TestLimeSimulation(unittest.TestCase):
-
     # Function set_simulation_changed
     def test_set_simulation_changed_ok(self):
         ls = get_lime_simulation()

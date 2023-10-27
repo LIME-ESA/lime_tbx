@@ -24,9 +24,9 @@ __status__ = "Development"
 COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20221201_V01.nc"
 
 
-def _get_23012023_coeff_data() -> Tuple[
-    List[float], List[float], List[float], List[float]
-]:
+def _get_23012023_coeff_data() -> (
+    Tuple[List[float], List[float], List[float], List[float]]
+):
     data = np.array(
         [
             [

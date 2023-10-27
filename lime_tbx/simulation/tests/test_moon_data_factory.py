@@ -47,7 +47,6 @@ SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 
 
 class TestMoonDataFactory(unittest.TestCase):
-
     # Function get_md
     def test_get_md_spoint(self):
         md = MoonDataFactory.get_md(SURFACE_POINT, EOCFI_PATH, KERNELS_PATH)

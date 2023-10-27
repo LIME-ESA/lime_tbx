@@ -868,7 +868,6 @@ class LimeSimulation(ILimeSimulation):
         skip_uncs: bool,
         callback_observation: Callable,
     ) -> Union[SpectralData, List[SpectralData]]:
-
         wlens = np.array(wlens)
         is_list = isinstance(cimel_data, list)
         if not is_list:
@@ -943,7 +942,6 @@ class LimeSimulation(ILimeSimulation):
         callback_observation: Callable,
         keep_err_corr_mats: bool,
     ) -> Union[SpectralData, List[SpectralData]]:
-
         wlens = np.array(wlens)
         is_list = isinstance(cimel_data, list)
         if not is_list:
@@ -999,7 +997,6 @@ class LimeSimulation(ILimeSimulation):
         skip_uncs: bool,
         callback_observation: Callable,
     ) -> Union[SpectralData, List[SpectralData]]:
-
         is_list = isinstance(cimel_data, list)
         if not is_list:
             cimel_data = [cimel_data]

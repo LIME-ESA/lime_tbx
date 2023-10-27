@@ -57,7 +57,6 @@ def get_spice_adapter() -> ISPICEAdapter:
 
 
 class TestSPICEAdapter(unittest.TestCase):
-
     #### Function: get_moon_data_from_earth
 
     # One dt
