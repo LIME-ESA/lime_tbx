@@ -107,12 +107,12 @@ class TestSPICEAdapter(unittest.TestCase):
         self.assertEqual(len(mds), 0)
 
     def test_to_rectangular(self):
-        x, y, z = SPICEAdapter.to_rectangular(
-            LAT, LON, ALT, "EARTH", KERNELS_PATH.main_kernels_path
-        )
-        x2, y2, z2 = SPICEAdapter.to_rectangular(
-            LAT2, LON2, ALT, "EARTH", KERNELS_PATH.main_kernels_path
-        )
+        x, y, z = SPICEAdapter.to_rectangular_same_frame(
+            [(LAT, LON, ALT)], "EARTH", KERNELS_PATH.main_kernels_path
+        )[0]
+        x2, y2, z2 = SPICEAdapter.to_rectangular_same_frame(
+            [(LAT2, LON2, ALT)], "EARTH", KERNELS_PATH.main_kernels_path
+        )[0]
         # Compared data obtained using library pyproj
         """
         import pyproj
@@ -133,13 +133,12 @@ class TestSPICEAdapter(unittest.TestCase):
         self.assertAlmostEqual(z2, z2p, 0)
 
     def test_to_planetographic(self):
-        x, y, z = (5563491.229045285, 2135624.1920654676, 2272255.1022886634)
-        x2, y2, z2 = (3694174.4986328664, -3099780.459307351, 4163997.7423554775)
-        lat, lon, hhh = SPICEAdapter.to_planetographic(
-            x, y, z, "EARTH", KERNELS_PATH.main_kernels_path
-        )
-        lat2, lon2, hhh2 = SPICEAdapter.to_planetographic(
-            x2, y2, z2, "EARTH", KERNELS_PATH.main_kernels_path
+        xyz = [
+            (5563491.229045285, 2135624.1920654676, 2272255.1022886634),
+            (3694174.4986328664, -3099780.459307351, 4163997.7423554775),
+        ]
+        llhs = SPICEAdapter.to_planetographic_same_frame(
+            xyz, "EARTH", KERNELS_PATH.main_kernels_path
         )
         # Compared data obtained using library pyproj
         """
@@ -151,21 +150,6 @@ class TestSPICEAdapter(unittest.TestCase):
         lonp, latp, hhhp = transformer.transform(x, y, z, radians=False)
         print("PYPROJ DATA: ", lonp, latp, hhhp)
         """
-        self.assertAlmostEqual(lat, LAT, 6)
-        self.assertAlmostEqual(lon, LON)
-        self.assertAlmostEqual(hhh, ALT, 0)
-        self.assertAlmostEqual(lat2, LAT2, 6)
-        self.assertAlmostEqual(lon2, LON2)
-        self.assertAlmostEqual(hhh2, ALT, 0)
-
-    def test_to_planetographic_multiple(self):
-        xyz = [
-            (5563491.229045285, 2135624.1920654676, 2272255.1022886634),
-            (3694174.4986328664, -3099780.459307351, 4163997.7423554775),
-        ]
-        llhs = SPICEAdapter.to_planetographic_multiple(
-            xyz, "EARTH", KERNELS_PATH.main_kernels_path
-        )
         llhps = [(LAT, LON, ALT), (LAT2, LON2, ALT)]
         for llh, llhp in zip(llhs, llhps):
             self.assertAlmostEqual(llh[0], llhp[0], 6)
@@ -176,38 +160,42 @@ class TestSPICEAdapter(unittest.TestCase):
         xyzs = [
             tuple(random.randint(-1000000, 1000000) for _ in range(3)) for _ in range(5)
         ]
+        dts = [datetime(2020, 1, 1, 0, 0, i) for i in range(5)]
         llhs = SPICEAdapter.to_planetographic_multiple(
+            xyzs,
+            "EARTH",
+            KERNELS_PATH.main_kernels_path,
+            dts,
+            "J2000",
+            "J2000",
+        )
+        llhssame = SPICEAdapter.to_planetographic_same_frame(
             xyzs, "EARTH", KERNELS_PATH.main_kernels_path
         )
-        llhsmanual = [
-            SPICEAdapter.to_planetographic(
-                xyz[0], xyz[1], xyz[2], "EARTH", KERNELS_PATH.main_kernels_path
-            )
-            for xyz in xyzs
-        ]
-        for llh, llhm in zip(llhs, llhsmanual):
+        for llh, llhs in zip(llhs, llhssame):
             self.assertEqual(
                 llh,
-                llhm,
-                f"Seed used for generation: {random.seed}. Lists: {llh} and {llhm}.",
+                llhs,
+                f"Seed used for generation: {random.seed}. Lists: {llh} and {llhs}.",
             )
 
     def test_to_planetographic_to_rectangular_same(self):
         xyzs = [
             tuple(random.randint(-1000000, 1000000) for _ in range(3)) for _ in range(5)
         ]
-        llhs = [
-            SPICEAdapter.to_planetographic(
-                xyz[0], xyz[1], xyz[2], "EARTH", KERNELS_PATH.main_kernels_path
-            )
-            for xyz in xyzs
-        ]
-        xyzs_back = [
-            SPICEAdapter.to_rectangular(
-                llh[0], llh[1], llh[2], "EARTH", KERNELS_PATH.main_kernels_path
-            )
-            for llh in llhs
-        ]
+        dts = [datetime(2020, 1, 1, 0, 0, i) for i in range(5)]
+        llhs = SPICEAdapter.to_planetographic_multiple(
+            xyzs,
+            "EARTH",
+            KERNELS_PATH.main_kernels_path,
+            dts,
+        )
+        xyzs_back = SPICEAdapter.to_rectangular_multiple(
+            llhs,
+            "EARTH",
+            KERNELS_PATH.main_kernels_path,
+            dts,
+        )
         for xyz, xyzb in zip(xyzs, xyzs_back):
             err_msg = (
                 f"Seed used for generation: {random.seed}. Lists: {xyz} and {xyzb}."

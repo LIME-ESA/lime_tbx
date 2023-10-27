@@ -680,7 +680,6 @@ class LimeSimulation(ILimeSimulation):
             True,
             callback_observation,
         )
-        # TODO confirm that we should skip polar uncertainties in interpolation if we do always linear
         return polar_cimel, ret_polar_asd, polar
 
     def _update_irradiance_and_reflectance(
@@ -1174,13 +1173,12 @@ class LimeSimulation(ILimeSimulation):
         )
         if not dts:
             sel = obss[0].selenographic_data
-            lat, lon, alt = SPICEAdapter.to_planetographic(
-                obss[0].sat_pos.x,
-                obss[0].sat_pos.y,
-                obss[0].sat_pos.z,
+            lat, lon, alt = SPICEAdapter.to_planetographic_same_frame(
+                [(obss[0].sat_pos.x, obss[0].sat_pos.y, obss[0].sat_pos.z)],
                 "MOON",
                 self.kernels_path.main_kernels_path,
-            )
+                "IAU_MOON",
+            )[0]
             point = CustomPoint(
                 sel.distance_sun_moon,
                 alt / 1000,
@@ -1192,28 +1190,29 @@ class LimeSimulation(ILimeSimulation):
             )
         elif not obss[0].sat_name or obss[0].sat_name == "":
             point = SurfacePoint(
-                *SPICEAdapter.to_planetographic(
-                    obss[0].sat_pos.x,
-                    obss[0].sat_pos.y,
-                    obss[0].sat_pos.z,
+                *SPICEAdapter.to_planetographic_multiple(
+                    [(obss[0].sat_pos.x, obss[0].sat_pos.y, obss[0].sat_pos.z)],
                     "EARTH",
                     self.kernels_path.main_kernels_path,
-                ),
-                dts,
-            )
+                    [dts[0]],
+                    obss[0].sat_pos_ref,
+                )[0],
+                [dts[0]],
+            )[0]
         else:
             point = SatellitePoint(obss[0].sat_name, dts)
             surfaces_of_sat = []
             mds = []
+            planetographics = SPICEAdapter.to_planetographic_multiple(
+                [(obs.sat_pos.x, obs.sat_pos.y, obs.sat_pos.z) for obs in obss],
+                "EARTH",
+                self.kernels_path.main_kernels_path,
+                dts,
+                obss[0].sat_pos_ref,
+            )
             for i, dt in enumerate(dts):
                 sp = SurfacePoint(
-                    *SPICEAdapter.to_planetographic(
-                        obss[i].sat_pos.x,
-                        obss[i].sat_pos.y,
-                        obss[i].sat_pos.z,
-                        "EARTH",
-                        self.kernels_path.main_kernels_path,
-                    ),
+                    *planetographics[i],
                     dt,
                 )
                 md = MoonDataFactory.get_md(sp, self.eocfi_path, self.kernels_path)

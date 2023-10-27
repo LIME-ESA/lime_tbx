@@ -115,15 +115,20 @@ class TestEOCFIConverter(unittest.TestCase):
     def test_get_satellite_position_true_data(self):
         # data obtained with OSV data calc (https://eop-cfi.esa.int/index.php/applications/tools/command-line-tools-osvdata-calc)
         eo = get_eocfi_converter()
-        lat, lon, hhh = eo.get_satellite_position(
-            "SENTINEL-5P", [datetime(2022, 1, 2, 0, 0, 0, tzinfo=timezone.utc)]
-        )[0]
-        lat2, lon2, hh2 = SPICEAdapter.to_planetographic(
-            -3496004.37772468,
-            -404044.1700419,
-            6279426.45463165,
+        dts = [datetime(2022, 1, 2, 0, 0, 0, tzinfo=timezone.utc)]
+        lat, lon, hhh = eo.get_satellite_position("SENTINEL-5P", dts)[0]
+        lat2, lon2, hh2 = SPICEAdapter.to_planetographic_multiple(
+            [
+                (
+                    -3496004.37772468,
+                    -404044.1700419,
+                    6279426.45463165,
+                )
+            ],
             "EARTH",
             KERNELS_PATH.main_kernels_path,
+            dts,
+            "ITRF93",
         )
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2)
@@ -147,15 +152,17 @@ class TestEOCFIConverter(unittest.TestCase):
         </OSV>
         """
         eo = get_eocfi_converter()
+        dts = [datetime(2006, 7, 20, 2, 38, 29, 989786, tzinfo=timezone.utc)]
         lat, lon, hhh = eo.get_satellite_position(
-            "ENVISAT", [datetime(2006, 7, 20, 2, 38, 29, 989786, tzinfo=timezone.utc)]
+            "ENVISAT",
+            dts,
         )[0]
-        lat2, lon2, hh2 = SPICEAdapter.to_planetographic(
-            2500149.266,
-            -6714929.064,
-            -0,
+        lat2, lon2, hh2 = SPICEAdapter.to_planetographic_multiple(
+            [(2500149.266, -6714929.064, -0)],
             "EARTH",
             KERNELS_PATH.main_kernels_path,
+            dts,
+            "ITRF93",
         )
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2, 2)
@@ -179,15 +186,14 @@ class TestEOCFIConverter(unittest.TestCase):
         </OSV>
         """
         eo = get_eocfi_converter()
-        lat, lon, hhh = eo.get_satellite_position(
-            "PROBA-V", [datetime(2018, 5, 3, 8, 47, 35, 370522, tzinfo=timezone.utc)]
-        )[0]
-        lat2, lon2, hh2 = SPICEAdapter.to_planetographic(
-            -6616761.405,
-            -2836593.220,
-            0,
+        dts = [datetime(2018, 5, 3, 8, 47, 35, 370522, tzinfo=timezone.utc)]
+        lat, lon, hhh = eo.get_satellite_position("PROBA-V", dts)[0]
+        lat2, lon2, hh2 = SPICEAdapter.to_planetographic_multiple(
+            [(-6616761.405, -2836593.220, 0)],
             "EARTH",
             KERNELS_PATH.main_kernels_path,
+            dts,
+            "ITRF93",
         )
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2)

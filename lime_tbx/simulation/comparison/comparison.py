@@ -209,6 +209,9 @@ class Comparison(IComparison):
                 xyzs,
                 "MOON",
                 self.kernels_path.main_kernels_path,
+                dts,
+                observations[0].sat_pos_ref,
+                "MOON_ME",
             )
             mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
                 xyzs,
@@ -233,6 +236,8 @@ class Comparison(IComparison):
                 xyzs,
                 "EARTH",
                 self.kernels_path.main_kernels_path,
+                dts,
+                observations[0].sat_pos_ref,
             )
             sp_calcs = [
                 SurfacePoint(llh[0], llh[1], llh[2], dt) for llh, dt in zip(llhs, dts)
