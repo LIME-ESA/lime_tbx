@@ -36,8 +36,7 @@ class ISPICEAdapter(ABC):
             surface at a concrete datetime.
         * get_moon_datas_from_rectangular_multiple() - Calculate lunar data for some
             rectangular coordinates from Earth or Moon.
-        * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
-        * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
+        * to_rectangular_multiple() - Transforms planetographic coordinates to rectangular coordinates.
         * to_planetographic_multiple() - Transforms multiple rectangular coordinates
             to planetographic coordinates.
     """
@@ -70,7 +69,7 @@ class ISPICEAdapter(ABC):
             The user must have write access to that directory.
         source_frame: str
             Source frame from which to transform the xyz coordinates.
-            By default J2000, but it can be others like ITRF93.
+            By default J2000, but it can be others like MOON_ME or ITRF93.
 
         Returns
         -------
@@ -112,36 +111,12 @@ class ISPICEAdapter(ABC):
 
     @staticmethod
     @abstractmethod
-    def to_rectangular(
-        lat: float, lon: float, alt_meters: float, body: str, kernels_path: str
-    ) -> Tuple[float, float, float]:
-        """Transforms planetographic coordinates to rectangular coordinates.
-
-        Parameters
-        ----------
-        lat: float
-            Latitude in degrees.
-        lon: float
-            Longitude in degrees.
-        alt_meters: float
-            Altitude in meters.
-        body: str
-            Name of the body. For example 'MOON' or 'EARTH'.
-        kernels_path: str
-            Path to the directory of the main kernels.
-
-        Returns
-        -------
-        xyz: tuple of 3 floats
-            Rectangular coordinates in meters
-        """
-        pass
-
-    @staticmethod
-    def to_rectangular_multiple(
-        latlonheights: List[Tuple[float, float, float]], body: str, kernels_path: str
+    def to_rectangular_same_frame(
+        latlonheights: List[Tuple[float, float, float]],
+        body: str,
+        kernels_path: str,
     ) -> List[Tuple[float, float, float]]:
-        """Transforms planetographic coordinates to rectangular coordinates.
+        """Transforms planetographic coordinates to rectangular coordinates in the same frame.
 
         Parameters
         ----------
@@ -160,20 +135,51 @@ class ISPICEAdapter(ABC):
         pass
 
     @staticmethod
-    @abstractmethod
-    def to_planetographic(
-        x: float, y: float, z: float, body: str, kernels_path: str
-    ) -> Tuple[float, float, float]:
-        """Transforms rectangular coordinates to planetographic coordinates.
+    def to_rectangular_multiple(
+        latlonheights: List[Tuple[float, float, float]],
+        body: str,
+        kernels_path: str,
+        datetimes: List[datetime],
+        source_frame: str = "IAU_EARTH",
+        target_frame: str = "J2000",
+    ) -> List[Tuple[float, float, float]]:
+        """Transforms planetographic coordinates to rectangular coordinates.
 
         Parameters
         ----------
-        x: float
-            x coordinate in meters.
-        y: float
-            y coordinate in meters.
-        z: float
-            z coordinate in meters.
+        latlonheights: list of tuple of floats
+            Latitude and longitude in degrees, height in meters.
+        body: str
+            Name of the body. For example 'MOON' or 'EARTH'.
+        kernels_path: str
+            Path to the directory of the main kernels.
+        datetimes: list of datetime
+            Datetimes of the positions
+        source_frame: str
+            Reference frame of the planetographic coordinates
+        target_frame: str
+            Reference frame of the rectangular coordinates
+
+        Returns
+        -------
+        xyzs: list of tuples of 3 floats
+            Rectangular coordinates in meters
+        """
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def to_planetographic_same_frame(
+        xyz_list: List[Tuple[float]],
+        body: str,
+        kernels_path: str,
+    ) -> List[Tuple[float, float, float]]:
+        """Transforms multiple rectangular coordinates to planetographic coordinates in the same ref frame.
+
+        Parameters
+        ----------
+        xyz_list: list of tuples of 3 floats
+            List of xyz coordinates in meters.
         body: str
             Name of the body. For example 'MOON' or 'EARTH'.
         kernels_path: str
@@ -181,18 +187,20 @@ class ISPICEAdapter(ABC):
 
         Returns
         -------
-        lat: float
-            Latitude in degrees.
-        lon: float
-            Longitude in degrees.
-        alt: float
-            Altitude in meters.
+        llhs: list of tuples of 3 floats
+            List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.
         """
+        pass
 
     @staticmethod
     @abstractmethod
     def to_planetographic_multiple(
-        xyz_list: List[Tuple[float]], body: str, kernels_path: str
+        xyz_list: List[Tuple[float]],
+        body: str,
+        kernels_path: str,
+        datetimes: List[datetime],
+        source_frame: str = "J2000",
+        target_frame: str = "IAU_EARTH",
     ) -> List[Tuple[float, float, float]]:
         """Transforms multiple rectangular coordinates to planetographic coordinates.
 
@@ -204,6 +212,12 @@ class ISPICEAdapter(ABC):
             Name of the body. For example 'MOON' or 'EARTH'.
         kernels_path: str
             Path to the directory of the main kernels.
+        datetimes: list of datetime
+            Datetimes of the positions
+        source_frame: str
+            Reference frame of the rectangular coordinates
+        target_frame: str
+            Reference frame of the planetographic coordinates
 
         Returns
         -------
@@ -241,8 +255,7 @@ class SPICEAdapter(ISPICEAdapter):
             surface at a concrete datetime.
         * get_moon_data_from_moon() - Calculate lunar data for a position on moon's
             surface at a concrete datetime.
-        * to_rectangular() - Transforms planetographic coordinates to rectangular coordinates.
-        * to_planetographic() - Transforms rectangular coordinates to planetographic coordinates.
+        * to_rectangular_multiple() - Transforms planetographic coordinates to rectangular coordinates.
         * to_planetographic_multiple() - Transforms multiple rectangular coordinates
             to planetographic coordinates.
     """
@@ -300,14 +313,18 @@ class SPICEAdapter(ISPICEAdapter):
         kernels_path: datatypes.KernelsPath,
         source_frame: str = "J2000",
     ) -> Union[datatypes.MoonData, List[datatypes.MoonData]]:
-        xyz = SPICEAdapter.to_rectangular(
-            latitude, longitude, altitude, "EARTH", kernels_path.main_kernels_path
-        )
         waslist = True
+        xyzs = []
         if not isinstance(dt, list) and not isinstance(dt, np.ndarray):
             dt = [dt]
             waslist = False
-        xyzs = [xyz for _ in dt]
+        llhs = [(latitude, longitude, altitude) for _ in dt]
+        xyzs = SPICEAdapter.to_rectangular_multiple(
+            llhs,
+            "EARTH",
+            kernels_path.main_kernels_path,
+            dt,
+        )
         mda = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
             xyzs,
             dt,
@@ -368,35 +385,10 @@ class SPICEAdapter(ISPICEAdapter):
         spice.kclear()
 
     @staticmethod
-    def to_rectangular(
-        lat: float, lon: float, alt_meters: float, body: str, kernels_path: str
-    ):
-        SPICEAdapter._load_kernels(kernels_path)
-        _, radios = spice.bodvrd(body, "RADII", 3)
-        eq_rad = radios[0]  # Equatorial Radius
-        pol_rad = radios[2]  # Polar radius
-        flattening = (eq_rad - pol_rad) / eq_rad
-        alt_km = alt_meters / 1000
-        pos_iau = list(
-            map(
-                lambda n: n * 1000,
-                spice.georec(
-                    # spice.pgrrec(
-                    #    body,
-                    spice.rpd() * lon,
-                    spice.rpd() * lat,
-                    alt_km,
-                    eq_rad,
-                    flattening,
-                ),
-            )
-        )
-        SPICEAdapter._clear_kernels()
-        return pos_iau[0], pos_iau[1], pos_iau[2]  # in meters
-
-    @staticmethod
-    def to_rectangular_multiple(
-        latlonheights: List[Tuple[float, float, float]], body: str, kernels_path: str
+    def to_rectangular_same_frame(
+        latlonheights: List[Tuple[float, float, float]],
+        body: str,
+        kernels_path: str,
     ):  # h in meters
         SPICEAdapter._load_kernels(kernels_path)
         _, radios = spice.bodvrd(body, "RADII", 3)
@@ -405,16 +397,12 @@ class SPICEAdapter(ISPICEAdapter):
         flattening = (eq_rad - pol_rad) / eq_rad
         poss_iaus = []
         for llh in latlonheights:
-            pos_iau = (
-                spice.georec(
-                    # spice.pgrrec(
-                    #    body,
-                    spice.rpd() * llh[1],
-                    spice.rpd() * llh[0],
-                    llh[2] / 1000,
-                    eq_rad,
-                    flattening,
-                ),
+            pos_iau = spice.georec(
+                spice.rpd() * llh[1],
+                spice.rpd() * llh[0],
+                llh[2] / 1000,
+                eq_rad,
+                flattening,
             )
             poss_iaus.append(pos_iau)
         SPICEAdapter._clear_kernels()
@@ -422,43 +410,85 @@ class SPICEAdapter(ISPICEAdapter):
         return poss_iaus  # in meters
 
     @staticmethod
-    def to_planetographic(
-        x: float, y: float, z: float, body: str, kernels_path: str
-    ):  # in meters
+    def to_rectangular_multiple(
+        latlonheights: List[Tuple[float, float, float]],
+        body: str,
+        kernels_path: str,
+        datetimes: List[datetime],
+        source_frame: str = "IAU_EARTH",
+        target_frame: str = "J2000",
+    ):  # h in meters
         SPICEAdapter._load_kernels(kernels_path)
         _, radios = spice.bodvrd(body, "RADII", 3)
         eq_rad = radios[0]  # Equatorial Radius
         pol_rad = radios[2]  # Polar radius
         flattening = (eq_rad - pol_rad) / eq_rad
-        pos_iau = np.array(list(map(lambda n: n / 1000, [x, y, z])))
-        lon, lat, alt_km = spice.recgeo(
-            pos_iau, eq_rad, flattening
-        )  # Changing this because it's the funtion that Stefan uses.
-        # lon, lat, alt_km = spice.recpgr(body, pos_iau, eq_rad, flattening)
+        poss_iaus = []
+        ets = spice.datetime2et(datetimes)
+        for llh, et in zip(latlonheights, ets):
+            pos_iau = spice.georec(
+                spice.rpd() * llh[1],
+                spice.rpd() * llh[0],
+                llh[2] / 1000,
+                eq_rad,
+                flattening,
+            )
+            trans_matrix = spice.pxform(source_frame, target_frame, et)
+            pos_iau = spice.mxv(trans_matrix, pos_iau)
+            poss_iaus.append(pos_iau)
         SPICEAdapter._clear_kernels()
-        lat = lat * spice.dpr()
-        lon = lon * spice.dpr()
-        alt = alt_km * 1000
-        while lon < -180:
-            lon += 360
-        while lon > 180:
-            lon -= 360
-        return lat, lon, alt
+        poss_iaus = list(map(lambda n: n * 1000, poss_iaus))
+        return poss_iaus  # in meters
 
     @staticmethod
-    def to_planetographic_multiple(
-        xyz_list: List[Tuple[float]], body: str, kernels_path: str
-    ):  # in meters
+    def to_planetographic_same_frame(
+        xyz_list: List[Tuple[float]],
+        body: str,
+        kernels_path: str,
+    ):
         SPICEAdapter._load_kernels(kernels_path)
-        _, radios = spice.bodvrd(body, "RADII", 3)
-        eq_rad = radios[0]  # Equatorial Radius
-        pol_rad = radios[2]  # Polar radius
+        _, radii = spice.bodvrd(body, "RADII", 3)
+        eq_rad = radii[0]  # Equatorial Radius
+        pol_rad = radii[2]  # Polar radius
         flattening = (eq_rad - pol_rad) / eq_rad
         llh_list = []  # alt km
         for xyz in xyz_list:
             pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
             llh = spice.recgeo(pos_iau, eq_rad, flattening)
-            # llh = spice.recpgr(body, pos_iau, eq_rad, flattening)
+            llh_list.append(llh)
+        SPICEAdapter._clear_kernels()
+        for i, llh in enumerate(llh_list):
+            lat = llh[1] * spice.dpr()
+            lon = llh[0] * spice.dpr()
+            alt = llh[2] * 1000
+            while lon < -180:
+                lon += 360
+            while lon > 180:
+                lon -= 360
+            llh_list[i] = (lat, lon, alt)
+        return llh_list
+
+    @staticmethod
+    def to_planetographic_multiple(
+        xyz_list: List[Tuple[float]],
+        body: str,
+        kernels_path: str,
+        datetimes: List[datetime],
+        source_frame: str = "J2000",
+        target_frame: str = "IAU_EARTH",
+    ):  # in meters
+        SPICEAdapter._load_kernels(kernels_path)
+        _, radii = spice.bodvrd(body, "RADII", 3)
+        eq_rad = radii[0]  # Equatorial Radius
+        pol_rad = radii[2]  # Polar radius
+        flattening = (eq_rad - pol_rad) / eq_rad
+        llh_list = []  # alt km
+        ets = spice.datetime2et(datetimes)
+        for xyz, et in zip(xyz_list, ets):
+            pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
+            trans_matrix = spice.pxform(source_frame, target_frame, et)
+            pos_iau_proc = spice.mxv(trans_matrix, pos_iau)
+            llh = spice.recgeo(pos_iau_proc, eq_rad, flattening)
             llh_list.append(llh)
         SPICEAdapter._clear_kernels()
         for i, llh in enumerate(llh_list):

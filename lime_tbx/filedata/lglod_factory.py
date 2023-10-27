@@ -104,35 +104,28 @@ def create_lglod_data(
         if not isinstance(dts, list):
             dts = [dts]
         if isinstance(point, SurfacePoint):
-            sat_pos = [
-                SatellitePosition(
-                    *SPICEAdapter.to_rectangular(
-                        point.latitude,
-                        point.longitude,
-                        point.altitude,
-                        "EARTH",
-                        kernels_path.main_kernels_path,
-                    )
-                )
-                for _ in dts
-            ]
+            llhs = [(point.latitude, point.longitude, point.altitude) for _ in dts]
+            rects = SPICEAdapter.to_rectangular_multiple(
+                llhs,
+                "EARTH",
+                kernels_path.main_kernels_path,
+                dts,
+            )
+            sat_pos = [SatellitePosition(*rect) for rect in rects]
             sat_name = ""
         else:
             sur_points = lime_simulation.get_surfacepoints()
             if isinstance(sur_points, SurfacePoint):
                 sur_points = [sur_points]
-            sat_pos = [
-                SatellitePosition(
-                    *SPICEAdapter.to_rectangular(
-                        sp.latitude,
-                        sp.longitude,
-                        sp.altitude,
-                        "EARTH",
-                        kernels_path.main_kernels_path,
-                    )
-                )
-                for sp in sur_points
-            ]
+            llhs = [(sp.latitude, sp.longitude, sp.altitude) for sp in sur_points]
+            spdts = [sp.dt for sp in sur_points]
+            rects = SPICEAdapter.to_rectangular_multiple(
+                llhs,
+                "EARTH",
+                kernels_path.main_kernels_path,
+                spdts,
+            )
+            sat_pos = [SatellitePosition(*rect) for rect in rects]
             sat_name = point.name
         for i, dt in enumerate(dts):
             ob = LunarObservationWrite(
@@ -150,13 +143,17 @@ def create_lglod_data(
             obs.append(ob)
     elif isinstance(point, CustomPoint):
         sat_pos = SatellitePosition(
-            *SPICEAdapter.to_rectangular(
-                point.selen_obs_lat,
-                point.selen_obs_lon,
-                point.distance_observer_moon * 1000,
+            *SPICEAdapter.to_rectangular_same_frame(
+                [
+                    (
+                        point.selen_obs_lat,
+                        point.selen_obs_lon,
+                        point.distance_observer_moon * 1000,
+                    )
+                ],
                 "MOON",
                 kernels_path.main_kernels_path,
-            )
+            )[0]
         )
         sat_name = ""
         sat_pos_ref = constants.MOON_FRAME
