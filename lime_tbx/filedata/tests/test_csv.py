@@ -191,6 +191,7 @@ class TestCSV(unittest.TestCase):
             ),
             "ASD",
             False,
+            True,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 

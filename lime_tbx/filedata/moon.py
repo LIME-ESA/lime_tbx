@@ -514,7 +514,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     datetimes = list(
         map(
             lambda x: datetime.fromtimestamp(x, tz=timezone.utc),
-            map(int, ds.variables["date"][:]),
+            map(float, ds.variables["date"][:]),
         )
     )
     channel_names_0 = [
@@ -903,7 +903,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
         list(
             map(
                 lambda x: datetime.fromtimestamp(x, tz=timezone.utc),
-                map(int, ds.variables["date"][:]),
+                map(float, ds.variables["date"][:]),
             )
         )
     )

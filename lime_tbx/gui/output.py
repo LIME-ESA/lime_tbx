@@ -321,6 +321,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.data_compare,
                         self.interp_spectrum_name,
                         self.skip_uncs,
+                        not self.compare_percentages,
                         self.comparison_x_datetime,
                     )
                 elif self.inside_mpa_range is not None:
