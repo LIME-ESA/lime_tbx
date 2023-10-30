@@ -3,7 +3,7 @@ This module contains the functionality that lets read and write LIME data from/t
 
 It exports the following functions:
     * export_csv - Export a graph to a csv file.
-    * export_csv_comparation - Export a channel comparison to a CSV file.
+    * export_csv_comparison - Export a channel comparison to a CSV file.
     * export_csv_integrated_irradiance - Export a integrated irradiance table to a CSV file.
     * read_datetimes - Read a time-series CSV file.
 """
@@ -224,6 +224,7 @@ def export_csv_comparison(
     comparison_data: ComparisonData,
     interp_spectrum_name: str,
     skip_uncs: bool,
+    relative_difference: bool,
     x_datetime: bool = True,
 ):
     """
@@ -248,6 +249,9 @@ def export_csv_comparison(
         ComparisonData related to the comparison.
     interp_spectrum_name: str
         Name of the spectrum used for interpolation.
+    relative_difference: bool
+        Flag indicating if the output should include the relative_difference, or if it should include the
+        percentage difference otherwise.
     x_datetime: bool
         True if it used datetimes as the x_axis, False if it used mpa
     """
@@ -286,6 +290,7 @@ def export_csv_comparison(
             )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
+            relperc = "Relative" if relative_difference else "Percentage"
             header = [
                 x_label,
                 "latitude",
@@ -293,16 +298,21 @@ def export_csv_comparison(
                 "altitude(m)",
                 "Observed {}".format(ylabel),
                 "Simulated {}".format(ylabel),
-                "Relative differences (%)",
+                f"{relperc} differences (%)",
             ]
             if not skip_uncs:
                 header += [
                     "Observation uncertainties",
                     "Simulation uncertainties",
-                    "Relative differences uncertainties",
+                    f"{relperc} differences uncertainties",
                 ]
             writer.writerow(header)
             x_data = data[0].wlens
+            difsig = (
+                comparison_data.diffs_signal
+                if relative_difference
+                else comparison_data.perc_diffs
+            )
             for i in range(len(x_data)):
                 pt = points[i]
                 if x_datetime:
@@ -320,13 +330,13 @@ def export_csv_comparison(
                     pt.altitude,
                     data[0].data[i],
                     data[1].data[i],
-                    comparison_data.diffs_signal.data[i],
+                    difsig.data[i],
                 ]
                 if not skip_uncs:
                     datarow += [
                         data[0].uncertainties[i],
                         data[1].uncertainties[i],
-                        comparison_data.diffs_signal.uncertainties[i],
+                        difsig.uncertainties[i],
                     ]
                 writer.writerow(datarow)
     except Exception as e:

@@ -110,18 +110,21 @@ class ExportComparison(ABC):
 class ExportComparisonCSV(ExportComparison):
     comparison_key: ComparisonKey
     output_files: List[str]
+    rel_diff_graph: bool
 
 
 @dataclass
 class ExportComparisonCSVDir(ExportComparison):
     comparison_key: ComparisonKey
     output_dir: str
+    rel_diff_graph: bool
 
 
 @dataclass
 class ExportComparisonGraph(ExportComparison):
     comparison_key: ComparisonKey
     output_files: List[str]
+    rel_diff_graph: bool
 
 
 @dataclass
@@ -129,6 +132,7 @@ class ExportComparisonGraphDir(ExportComparison):
     extension: str
     comparison_key: ComparisonKey
     output_dir: str
+    rel_diff_graph: bool
 
 
 @dataclass
@@ -137,11 +141,13 @@ class ExportNetCDF(ExportData, ExportComparison):
 
 
 IMAGE_EXTENSIONS = ["pdf", "jpg", "png", "svg"]
+COMP_DIFF_KEYS = ["rel", "perc"]
 
 
 def print_help():
     compsel = "(" + "|".join(COMP_KEYS) + ")"
     imsel = "(" + "|".join(IMAGE_EXTENSIONS) + ")"
+    compdiffsel = "(" + "|".join(COMP_DIFF_KEYS) + ")"
     print(
         "The lime toolbox performs simulations of lunar irradiance, reflectance and \
 polarization for a given point and datetime. It also performs comparisons for some given \
@@ -154,40 +160,34 @@ observations files in GLOD format.\n"
     print("  -v, --version\t\t Displays the version name.")
     print("  -u, --update\t\t Updates the coefficients.")
     print("  -e, --earth\t\t Performs simulations from a geographic point.")
-    print("\t\t\t -e lat_deg,lon_deg,height_m,{}".format(_DT_FORMAT))
+    print(f"\t\t\t -e lat_deg,lon_deg,height_m,{_DT_FORMAT}")
     print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
     print(
         "\t\t\t -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,\
 selen_sun_lon,moon_phase_angle"
     )
     print("  -s, --satellite\t Performs simulations from a satellite point.")
-    print("\t\t\t -s sat_name,{}".format(_DT_FORMAT))
+    print(f"\t\t\t -s sat_name,{_DT_FORMAT}")
     print(
         "  -c, --comparison\t Performs comparisons from observations files in GLOD format."
     )
     print('\t\t\t -c "input_glod1.nc input_glod2.nc ..."')
     print("  -o, --output\t\t Select the output path and format.")
     print("\t\t\t If it's a simulation:")
-    print("\t\t\t   GRAPH: -o graph,{},refl,irr,polar".format(imsel))
+    print(f"\t\t\t   GRAPH: -o graph,{imsel},refl,irr,polar")
     print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv")
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print("\t\t\t If it's a comparison:")
     print(
-        "\t\t\t   GRAPH: -o graph,{},{},comparison_channel1,comparison_channel2,...".format(
-            imsel, compsel
-        )
+        f"\t\t\t   GRAPH: -o graph,{imsel},{compsel},{compdiffsel},comparison_channel1,comparison_channel2,..."
     )
     print(
-        "\t\t\t   CSV: -o csv,{},comparison_channel1.csv,comparison_channel2.csv,...".format(
-            compsel
-        )
+        f"\t\t\t   CSV: -o csv,{compsel},{compdiffsel},comparison_channel1.csv,comparison_channel2.csv,..."
     )
     print(
-        "\t\t\t   GRAPH directory: -o graphd,{},{},comparison_folder".format(
-            imsel, compsel
-        )
+        f"\t\t\t   GRAPH directory: -o graphd,{imsel},{compsel},{compdiffsel},comparison_folder"
     )
-    print("\t\t\t   CSV directory: -o csvd,{},comparison_folder".format(compsel))
+    print(f"\t\t\t   CSV directory: -o csvd,{compsel},{compdiffsel},comparison_folder")
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print(
         "  -f, --srf\t\t Select the file that contains the Spectral Response Function \
@@ -466,6 +466,7 @@ class CLI:
         version: str,
         comparison: ComparisonData,
         ch: str,
+        relative_difference: bool,
     ):
         from lime_tbx.gui import canvas
 
@@ -511,6 +512,7 @@ class CLI:
             None,
             self.settings_manager.get_selected_spectrum_name(),
             subtitle,
+            not relative_difference,
         )
         try:
             canv.print_figure(output_file)
@@ -679,11 +681,19 @@ class CLI:
                                 comps[i],
                                 sp_name,
                                 skip_uncs,
+                                ed.rel_diff_graph,
                             )
                         else:
                             xlabel = "UTC datetime"
                             self._export_comparison_graph(
-                                data, xlabel, ylabel, output, version, comps[i], ch
+                                data,
+                                xlabel,
+                                ylabel,
+                                output,
+                                version,
+                                comps[i],
+                                ch,
+                                ed.rel_diff_graph,
                             )
                         file_index += 1
             file_index = 0
@@ -725,12 +735,20 @@ class CLI:
                                 mpa_comps[i],
                                 sp_name,
                                 skip_uncs,
+                                ed.rel_diff_graph,
                                 False,
                             )
                         else:
                             xlabel = "Moon phase angle (degrees)"
                             self._export_comparison_graph(
-                                data, xlabel, ylabel, output, version, mpa_comps[i], ch
+                                data,
+                                xlabel,
+                                ylabel,
+                                output,
+                                version,
+                                mpa_comps[i],
+                                ch,
+                                ed.rel_diff_graph,
                             )
                         file_index += 1
 
@@ -860,14 +878,19 @@ Run 'lime -h' for help."
                             splitted[1], splitted[2], splitted[3], splitted[4]
                         )
                     else:
-                        if len(splitted) < 3:
+                        if len(splitted) < 4:
                             eprint("Error: Wrong number of arguments for -o csv,...")
                             return 1
                         if splitted[1] not in COMP_KEYS:
                             eprint("Error in csv DT|MPA|BOTH parameter.")
                             return 1
+                        if splitted[2] not in COMP_DIFF_KEYS:
+                            eprint("Error in csv rel|perc parameter.")
+                            return 1
                         comp_key = ComparisonKey[splitted[1]]
-                        export_data = ExportComparisonCSV(comp_key, splitted[2:])
+                        export_data = ExportComparisonCSV(
+                            comp_key, splitted[3:], splitted[2] == COMP_DIFF_KEYS[0]
+                        )
                 elif o_type == "graph":
                     if not is_comparison:
                         if len(splitted) != 5:
@@ -885,7 +908,7 @@ Run 'lime -h' for help."
                         )
                         export_data = ExportGraph(*filepaths)
                     else:
-                        if len(splitted) < 4:
+                        if len(splitted) < 5:
                             eprint("Error: Wrong number of arguments for -o graph,...")
                             return 1
                         if splitted[1] not in IMAGE_EXTENSIONS:
@@ -896,13 +919,18 @@ Run 'lime -h' for help."
                             )
                             return 1
                         if splitted[2] not in COMP_KEYS:
-                            eprint("Error in csv DT|MPA|BOTH parameter.")
+                            eprint("Error in graph DT|MPA|BOTH parameter.")
+                            return 1
+                        if splitted[3] not in COMP_DIFF_KEYS:
+                            eprint("Error in graph rel|perc parameter.")
                             return 1
                         filepaths = list(
-                            map(lambda s: s + ".{}".format(splitted[1]), splitted[3:])
+                            map(lambda s: s + ".{}".format(splitted[1]), splitted[4:])
                         )
                         comp_key = ComparisonKey[splitted[2]]
-                        export_data = ExportComparisonGraph(comp_key, filepaths)
+                        export_data = ExportComparisonGraph(
+                            comp_key, filepaths, splitted[3] == COMP_DIFF_KEYS[0]
+                        )
                 elif o_type == "nc":
                     if len(splitted) != 2:
                         eprint("Error: Wrong number of arguments for -o nc,...")
@@ -912,21 +940,26 @@ Run 'lime -h' for help."
                     if not is_comparison:
                         eprint("Error: csvd output is only available for comparisons.")
                         return 1
-                    if len(splitted) != 3:
+                    if len(splitted) != 4:
                         eprint("Error: Wrong number of arguments for -o csvd,...")
                         return 1
                     if splitted[1] not in COMP_KEYS:
                         eprint("Error in csvd DT|MPA|BOTH parameter.")
                         return 1
+                    if splitted[2] not in COMP_DIFF_KEYS:
+                        eprint("Error in csvd rel|perc parameter.")
+                        return 1
                     comp_key = ComparisonKey[splitted[1]]
-                    export_data = ExportComparisonCSVDir(comp_key, splitted[2])
+                    export_data = ExportComparisonCSVDir(
+                        comp_key, splitted[3], splitted[2] == COMP_DIFF_KEYS[0]
+                    )
                 elif o_type == "graphd":
                     if not is_comparison:
                         eprint(
                             "Error: graphd output is only available for comparisons."
                         )
                         return 1
-                    if len(splitted) != 4:
+                    if len(splitted) != 5:
                         eprint("Error: Wrong number of arguments for -o graphd,...")
                         return 1
                     if splitted[1] not in IMAGE_EXTENSIONS:
@@ -937,11 +970,17 @@ Run 'lime -h' for help."
                         )
                         return 1
                     if splitted[2] not in COMP_KEYS:
-                        eprint("Error in csvd DT|MPA|BOTH parameter.")
+                        eprint("Error in graphd DT|MPA|BOTH parameter.")
+                        return 1
+                    if splitted[3] not in COMP_DIFF_KEYS:
+                        eprint("Error in graphd rel|perc parameter.")
                         return 1
                     comp_key = ComparisonKey[splitted[2]]
                     export_data = ExportComparisonGraphDir(
-                        splitted[1], comp_key, splitted[3]
+                        splitted[1],
+                        comp_key,
+                        splitted[4],
+                        splitted[3] == COMP_DIFF_KEYS[0],
                     )
             elif opt in ("-f", "--srf"):
                 srf_file = arg

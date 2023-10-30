@@ -227,7 +227,7 @@ def redraw_canvas(
                     data_comp.wlens,
                     data_comp.data,
                     yerr=data_comp.uncertainties * 2,
-                    color="pink",
+                    color="black",
                     capsize=2,
                     ls="none",
                     alpha=0.3,

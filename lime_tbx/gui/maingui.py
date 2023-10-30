@@ -457,6 +457,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._set_spinner(True)
         self.parentWidget().setDisabled(True)
 
+    def block_gui_drawing_message(self):
+        self._block_gui_loading()
+        self.spinner.set_text("Drawing graphs...")
+
     def can_save_simulation(self) -> bool:
         return self.export_lglod_button.isEnabled()
 
@@ -518,11 +522,14 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def compare_info(self, data: str):
-        if self.quant_mos_simulated < self.quant_mos:
+        if (
+            self.quant_mos_simulated < self.quant_mos - 1
+        ):  # -1 So it gives time to the last message to be shown
             self.spinner.set_text(f"{self.quant_mos_simulated}/{self.quant_mos}")
             self.quant_mos_simulated += 1
         else:
-            self.spinner.set_text(f"Finishing comparisons...")
+            self.spinner.set_text(f"Finishing comparisons\nand drawing graphs...")
+            self.quant_mos_simulated += 1
 
     def set_show_comparison_input(self, show: bool):
         self.input.setVisible(show)
@@ -680,6 +687,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.settings_manager,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
+        # This section blocks the spinning loading widget.
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         self.output_mpa.set_channels(ch_names)
@@ -851,12 +859,16 @@ class MainSimulationsWidget(
         self._export_lglod_button_was_disabled = True
 
     def _disable_lglod_export(self, disable: bool):
-        self.export_lglod_button.setDisabled(False)
+        self.export_lglod_button.setDisabled(disable)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(disable)
 
     def _callback_regular_input_changed(self):
         self.lime_simulation.set_simulation_changed()
+
+    def block_gui_drawing_message(self):
+        self._block_gui_loading()
+        self.loading_spinner.set_text("Drawing graphs...")
 
     def update_calculability(self):
         calculable = self.input_widget.is_calculable()
@@ -1570,7 +1582,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         page._unblock_gui()
         if isinstance(lglod, LGLODData):
             self.simulations()
-            lime_tbx_w.get_current_page()._block_gui_loading()
+            lime_tbx_w.get_current_page().block_gui_drawing_message()
             if lglod.not_default_srf:
                 srf_path = QtWidgets.QFileDialog().getOpenFileName(
                     self, "Select SpectralResponseFunction file"
@@ -1592,7 +1604,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
                 lime_tbx_w.load_observations_finished(lglod, None)
         else:
             self.comparison()
-            lime_tbx_w.get_current_page()._block_gui_loading()
+            lime_tbx_w.get_current_page().block_gui_drawing_message()
             srf_path = QtWidgets.QFileDialog().getOpenFileName(
                 self, "Select SpectralResponseFunction file"
             )[0]
