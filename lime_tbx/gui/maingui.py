@@ -859,7 +859,7 @@ class MainSimulationsWidget(
         self._export_lglod_button_was_disabled = True
 
     def _disable_lglod_export(self, disable: bool):
-        self.export_lglod_button.setDisabled(False)
+        self.export_lglod_button.setDisabled(disable)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(disable)
 
