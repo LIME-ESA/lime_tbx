@@ -51,7 +51,9 @@ def _write_point(writer, point: Union[Point, None]):
             writer.writerow(["altitude(m)", point.altitude])
             dt: Union[datetime, List[datetime]] = point.dt
             if isinstance(dt, list):
-                str_dt = map(str, dt)
+                str_dt = map(
+                    lambda dti: dti.isoformat(sep=" ", timespec="milliseconds"), dt
+                )
                 writer.writerow(["datetimes", *str_dt])
             else:
                 writer.writerow(["datetime", str(dt)])
@@ -172,9 +174,13 @@ def export_csv_simulation(
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    ylabels.append(f"{str(dt)} {ylabel}{warn_out_mpa_range}")
+                    ylabels.append(
+                        f"{dt.isoformat(sep=' ', timespec='milliseconds')} {ylabel}{warn_out_mpa_range}"
+                    )
                     if not skip_uncs:
-                        ylabels.append(f"{str(dt)} uncertainties{warn_out_mpa_range}")
+                        ylabels.append(
+                            f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties{warn_out_mpa_range}"
+                        )
             else:
                 warn_out_mpa_range = ""
                 if some_out_mpa_range:
@@ -316,7 +322,7 @@ def export_csv_comparison(
             for i in range(len(x_data)):
                 pt = points[i]
                 if x_datetime:
-                    x_val = pt.dt.strftime("%Y-%m-%d %H:%M:%S")
+                    x_val = pt.dt.isoformat(sep=" ", timespec="milliseconds")
                 else:
                     x_val = x_data[i]
                 warn_out_mpa_range = ""
@@ -400,12 +406,13 @@ def export_csv_integrated_irradiance(
                         warn_out_mpa_range = " **"
                     irr_titles.append(
                         "{} irradiances (Wm⁻²nm⁻¹){}".format(
-                            str(dt), warn_out_mpa_range
+                            dt.isoformat(sep=" ", timespec="milliseconds"),
+                            warn_out_mpa_range,
                         )
                     )
                     if not skip_uncs:
                         irr_titles.append(
-                            "{} uncertainties{}".format(str(dt), warn_out_mpa_range)
+                            f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties{warn_out_mpa_range}"
                         )
             else:
                 irr_titles.append("irradiances (Wm⁻²nm⁻¹)")

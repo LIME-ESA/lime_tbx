@@ -240,7 +240,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.loaded_datetimes = []
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
-        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
         self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -434,7 +434,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         # datetime
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
-        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
         self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
