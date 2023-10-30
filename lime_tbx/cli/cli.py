@@ -182,12 +182,12 @@ selen_sun_lon,moon_phase_angle"
         f"\t\t\t   GRAPH: -o graph,{imsel},{compsel},{compdiffsel},comparison_channel1,comparison_channel2,..."
     )
     print(
-        f"\t\t\t   CSV: -o csv,{compsel},{compdiffsel}comparison_channel1.csv,comparison_channel2.csv,..."
+        f"\t\t\t   CSV: -o csv,{compsel},{compdiffsel},comparison_channel1.csv,comparison_channel2.csv,..."
     )
     print(
-        f"\t\t\t   GRAPH directory: -o graphd,{imsel},{compsel},{compdiffsel}comparison_folder"
+        f"\t\t\t   GRAPH directory: -o graphd,{imsel},{compsel},{compdiffsel},comparison_folder"
     )
-    print(f"\t\t\t   CSV directory: -o csvd,{compsel},{compdiffsel}comparison_folder")
+    print(f"\t\t\t   CSV directory: -o csvd,{compsel},{compdiffsel},comparison_folder")
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print(
         "  -f, --srf\t\t Select the file that contains the Spectral Response Function \

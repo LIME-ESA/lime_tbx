@@ -268,7 +268,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BATH,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BATH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 1)
@@ -450,7 +450,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,LUCK,test_files/cli/chan1.test'
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,LUCK,rel,test_files/cli/chan1.test'
             )
         )
         self.assertEqual(errcode, 1)
