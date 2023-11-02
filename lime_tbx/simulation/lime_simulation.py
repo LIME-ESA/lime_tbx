@@ -1174,7 +1174,6 @@ class LimeSimulation(ILimeSimulation):
                 [(obss[0].sat_pos.x, obss[0].sat_pos.y, obss[0].sat_pos.z)],
                 "MOON",
                 self.kernels_path.main_kernels_path,
-                "IAU_MOON",
             )[0]
             point = CustomPoint(
                 sel.distance_sun_moon,
@@ -1194,7 +1193,7 @@ class LimeSimulation(ILimeSimulation):
                     [dts[0]],
                     obss[0].sat_pos_ref,
                 )[0],
-                [dts[0]],
+                dts,
             )
         else:
             point = SatellitePoint(obss[0].sat_name, dts)
