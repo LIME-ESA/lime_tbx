@@ -3,9 +3,9 @@ Interpolation spectrum,ASD
 latitude,42
 longitude,45
 altitude(m),4500
-datetimes,2018-02-27 02:00:00+00:00,2019-02-23 02:00:00+00:00
+datetimes,2018-02-27 02:00:00.000+00:00,2019-02-23 02:00:00.000+00:00
 srf name,default
-id,center (nm),inside LIME range,2018-02-27 02:00:00+00:00 irradiances (Wm⁻²nm⁻¹),2018-02-27 02:00:00+00:00 uncertainties,2019-02-23 02:00:00+00:00 irradiances (Wm⁻²nm⁻¹),2019-02-23 02:00:00+00:00 uncertainties
+id,center (nm),inside LIME range,2018-02-27 02:00:00.000+00:00 irradiances (Wm⁻²nm⁻¹),2018-02-27 02:00:00.000+00:00 uncertainties,2019-02-23 02:00:00.000+00:00 irradiances (Wm⁻²nm⁻¹),2019-02-23 02:00:00.000+00:00 uncertainties
 Default,400.0,In,0.0001,0.0,0.0002,0.0
 Secpnd,410.0,In,0.0002,0.0,0.0004,0.0
 Drai,420.0,In,0.00030000000000000003,0.0,0.0006000000000000001,0.0

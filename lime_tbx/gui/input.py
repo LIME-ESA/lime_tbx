@@ -2,13 +2,12 @@
 
 """___Built-In Modules___"""
 from datetime import datetime, timezone
-from typing import Union, Tuple
-
-from lime_tbx.filedata import moon
+from typing import Union, Tuple, Iterable
 
 """___Third-Party Modules___"""
 from typing import Callable, List
 from PySide2 import QtWidgets, QtCore, QtGui
+import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -26,6 +25,7 @@ from lime_tbx.gui.util import (
     start_thread as _start_thread,
 )
 from lime_tbx.filedata import csv, srf
+from lime_tbx.filedata import moon
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -240,7 +240,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.loaded_datetimes = []
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
-        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
         self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -359,7 +359,11 @@ class SurfaceInputWidget(QtWidgets.QWidget):
     def set_datetimes(self, dt: Union[List[datetime], datetime]):
         if isinstance(dt, list) and len(dt) == 1:
             dt = dt[0]
-        if isinstance(dt, list):
+        if (
+            isinstance(dt, list)
+            or isinstance(dt, np.ndarray)
+            or isinstance(dt, Iterable)
+        ):
             if self.single_datetime:
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
@@ -434,7 +438,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         # datetime
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
-        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
         self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))

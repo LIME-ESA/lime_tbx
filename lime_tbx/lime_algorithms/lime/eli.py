@@ -66,7 +66,6 @@ def J_eli(
     distance_earth_moon_km: float,
     dom: float,
 ):
-
     Jac_x1 = np.diag(
         ((omega * esk) / math.pi)
         * ((1 / dsm) ** 2)

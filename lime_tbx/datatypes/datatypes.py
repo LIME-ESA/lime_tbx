@@ -402,7 +402,7 @@ class Satellite:
 class SatellitePosition:
     """
     Dataclass containing the information of the position of a SatellitePoint,
-    for a specific reference system (usually ITRF93)
+    for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
 
     Attributes
     ----------
@@ -429,7 +429,7 @@ class LunarObservation:
     ch_names: list of str
         Names of the channels present
     sat_pos_ref: str
-        Name of the reference system (usually ITRF93)
+        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
     ch_irrs: dict of str and float
         Irradiances relative to each channel. The key is the channel name, and the irradiance
         is given in Wm⁻²nm⁻¹.
@@ -884,7 +884,7 @@ class LunarObservationWrite:
     ch_names: list of str
         Names of the channels present
     sat_pos_ref: str
-        Name of the reference system (usually ITRF93)
+        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
     dt: datetime
         Datetime of the observation.
     sat_pos: SatellitePosition

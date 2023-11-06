@@ -1,1 +1,1 @@
-Error in csv DT|MPA|BOTH parameter.
+Error in graph DT|MPA|BOTH parameter.

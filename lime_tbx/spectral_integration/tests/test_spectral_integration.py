@@ -44,7 +44,6 @@ def get_srf() -> SpectralResponseFunction:
 
 
 class TestSpectralIntegration(unittest.TestCase):
-
     # Function _convolve_srf
     def test_convolve_srf_ok(self):
         si: SpectralIntegration = get_spectral_integrator()

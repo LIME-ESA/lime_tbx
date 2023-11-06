@@ -156,7 +156,14 @@ htmlhelp_basename = "lime_tbxdoc"
 # -- Options for LaTeX output ------------------------------------------
 
 latex_elements = {
-    "extrapackages": r"\usepackage{unicode-math}"
+    "extrapackages": r"""
+\usepackage{textcomp}
+\usepackage{newunicodechar}
+\newunicodechar{⁻}{\textsuperscript{-}\fi}
+\newunicodechar{¹}{\ifmmode{}^1\else\textonesuperior\fi}
+\newunicodechar{²}{\ifmmode{}^2\else\texttwosuperior\fi}
+\newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
+""",
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',

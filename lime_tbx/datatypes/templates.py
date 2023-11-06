@@ -106,9 +106,9 @@ TEMPLATE_POL = {
         ],
     },
     "err_corr_polarization": {
-            "dim": ["wavelength", "wavelength"],
-            "dtype": np.float32,
-        },
+        "dim": ["wavelength", "wavelength"],
+        "dtype": np.float32,
+    },
 }
 
 TEMPLATE_SIGNALS = {
@@ -128,21 +128,20 @@ TEMPLATE_SIGNALS = {
                 "params": ["err_corr_signals_channels"],
                 "units": [],
             },
-{
+            {
                 "dim": "dts",
                 "form": "err_corr_matrix",
                 "params": ["err_corr_signals_dts"],
                 "units": [],
-            }
+            },
         ],
     },
     "err_corr_signals_channels": {
-            "dim": ["channels", "channels"],
-            "dtype": np.float32,
-        },
+        "dim": ["channels", "channels"],
+        "dtype": np.float32,
+    },
     "err_corr_signals_dts": {
-            "dim": ["dts", "dts"],
-            "dtype": np.float32,
-        },
+        "dim": ["dts", "dts"],
+        "dtype": np.float32,
+    },
 }
-

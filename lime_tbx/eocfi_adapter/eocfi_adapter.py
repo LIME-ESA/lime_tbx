@@ -264,15 +264,13 @@ class EOCFIConverter(IEOCFIConverter):
                 Height of the satellite over sea level in meters.
         """
         xyzs = self.get_satellite_position_rectangular(sat, dts)
-        positions = []
-        for xyz in xyzs:
-            lat, lon, hhh = SPICEAdapter.to_planetographic(
-                xyz[0], xyz[1], xyz[2], "EARTH", self.kernels_path.main_kernels_path
-            )
+        positions = SPICEAdapter.to_planetographic_multiple(
+            xyzs, "EARTH", self.kernels_path.main_kernels_path, dts, "ITRF93"
+        )  # EOCFI uses ITRF93
+        for llh in positions:
             logger.get_logger().debug(
-                f"EOCFI output (lat, lon, height): {lat}, {lon}, {hhh}"
+                f"EOCFI output (lat, lon, height): {llh[0]}, {llh[1]}, {llh[2]}"
             )
-            positions.append((lat, lon, hhh))
         return positions
 
     def get_satellite_position_rectangular(
@@ -291,7 +289,7 @@ class EOCFIConverter(IEOCFIConverter):
         Returns
         -------
         positions: list of tuples of floats
-            List of tuples of 3 floats, representing xyz in meters
+            List of tuples of 3 floats, representing xyz in meters, in the ITRF93 frame.
         """
         if sat not in self.get_sat_names():
             raise Exception("Satellite is not registered in LIME's satellite list.")
