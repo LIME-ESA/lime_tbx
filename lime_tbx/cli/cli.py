@@ -305,7 +305,7 @@ class CLI:
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
-            "Polarizations (Fraction of unity)",
+            "Polarizations (%)",
             point,
             ed.o_file_polar,
             version,
@@ -442,7 +442,7 @@ class CLI:
             None,
             "Extraterrestrial Lunar Polarization",
             "Wavelengths (nm)",
-            "Polarizations (Fraction of unity)",
+            "Polarizations (%)",
             None,
             dolp_sp_name,
         )

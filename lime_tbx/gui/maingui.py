@@ -1130,6 +1130,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        self.graph.set_max_ylims(-120, 120)
         version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
@@ -1140,7 +1141,7 @@ class MainSimulationsWidget(
         self.graph.update_labels(
             "Lunar polarization",
             "Wavelengths (nm)",
-            "Polarizations (Fraction of unity)",
+            "Polarizations (%)",
             subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])

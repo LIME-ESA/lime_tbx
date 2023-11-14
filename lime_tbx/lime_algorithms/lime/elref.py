@@ -207,4 +207,7 @@ def calculate_elref_unc(
         allow_some_nans=False,
     )
 
+    corr = np.where(np.isnan(corr), 0, corr)
+    np.fill_diagonal(corr, 1)
+
     return unc, corr

@@ -73,6 +73,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.mpl_cursor = None
         self.xlim_left = None
         self.xlim_right = None
+        self.max_ylim_bottom = None
+        self.max_ylim_top = None
         self.comparison_x_datetime = comparison_x_datetime
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
@@ -148,6 +150,10 @@ class GraphWidget(QtWidgets.QWidget):
     def set_xlim(self, left: float = None, right: float = None):
         self.xlim_left = left
         self.xlim_right = right
+
+    def set_max_ylims(self, bottom: float = None, top: float = None):
+        self.max_ylim_bottom = bottom
+        self.max_ylim_top = top
 
     def _update_toolbar(self):
         self.toolbar.update()
@@ -272,6 +278,13 @@ class GraphWidget(QtWidgets.QWidget):
                 sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
+        bottom = top = None
+        current_bottom, current_top = self.canvas.axes.get_ylim()
+        if self.max_ylim_bottom and self.max_ylim_bottom > current_bottom:
+            bottom = self.max_ylim_bottom
+        if self.max_ylim_top and self.max_ylim_top < current_top:
+            top = self.max_ylim_top
+        self.canvas.axes.set_ylim(bottom, top)
         self.canvas.draw()
         self.update()
         self.canvas.update()
