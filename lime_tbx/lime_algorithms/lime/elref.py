@@ -207,6 +207,8 @@ def calculate_elref_unc(
         allow_some_nans=False,
     )
 
+    if not isinstance(corr, np.ndarray) or not isinstance(corr, list):
+        corr = np.array([[corr]])
     corr = np.where(np.isnan(corr), 0, corr)
     np.fill_diagonal(corr, 1)
 
