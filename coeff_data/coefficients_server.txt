@@ -1,2 +1,2 @@
-http://ec2-35-165-69-95.us-west-2.compute.amazonaws.com/
+http://ec2-54-246-211-67.eu-west-1.compute.amazonaws.com/
 #http://localhost:8000/listv.txt
