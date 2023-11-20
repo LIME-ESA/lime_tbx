@@ -5,7 +5,7 @@
 #define MyAppVersion "0.2.3"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX.exe"
-#define MyAppDevPath "X:\"
+#define MyAppDevPath "W:\"
 ;"C:\Users\Javier\Repositorios\lime_tbx"
 
 [Setup]
