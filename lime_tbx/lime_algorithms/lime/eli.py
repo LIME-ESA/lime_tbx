@@ -177,5 +177,6 @@ def calculate_eli_from_elref_unc(
         Jx=Jx,
     )
     del prop
+    unc = np.where(np.isnan(unc), 0, unc)
 
     return unc, corr

@@ -305,7 +305,7 @@ class CLI:
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
-            "Polarizations (Fraction of unity)",
+            "Polarizations (%)",
             point,
             ed.o_file_polar,
             version,
@@ -442,7 +442,7 @@ class CLI:
             None,
             "Extraterrestrial Lunar Polarization",
             "Wavelengths (nm)",
-            "Polarizations (Fraction of unity)",
+            "Polarizations (%)",
             None,
             dolp_sp_name,
         )
@@ -987,10 +987,12 @@ Run 'lime -h' for help."
             elif opt in ("-t", "--timeseries"):
                 timeseries_file = arg
             elif opt in ("-C", "--coefficients"):
-                names = [
-                    coef.version
-                    for coef in self.settings_manager.get_available_coeffs()
-                ]
+                names = sorted(
+                    [
+                        coef.version
+                        for coef in self.settings_manager.get_available_coeffs()
+                    ]
+                )
                 if arg not in names:
                     eprint(
                         f"Coefficients version not recognized. Selected: {arg}. Available: {names}."

@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LimeTBX"
-#define MyAppVersion "0.2.2"
+#define MyAppVersion "0.2.3"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX.exe"
-#define MyAppDevPath "X:\"
+#define MyAppDevPath "W:\"
 ;"C:\Users\Javier\Repositorios\lime_tbx"
 
 [Setup]
@@ -40,6 +40,9 @@ Name: "{app}\coeff_data"; Permissions: everyone-full
 [Files]
 ;Source: "{#MyAppDevPath}\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppDevPath}\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\dist\LimeTBX\_internal\scipy\.libs\*"; DestDir: "{app}\LimeTBX\_internal\scipy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\dist\LimeTBX\_internal\numpy\.libs\*"; DestDir: "{app}\LimeTBX\_internal\numpy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\dist\LimeTBX\_internal\sklearn\.libs\*"; DestDir: "{app}\LimeTBX\_internal\sklearn\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "{#MyAppDevPath}\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
