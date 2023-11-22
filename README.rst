@@ -66,7 +66,7 @@ Deployment
 
 Requirements:
 
-- python 3.8 (Windows and Linux) or python 3.9 (Mac).
+- python 3.8 (Linux) or python 3.9 (Mac and Windows).
 - pyinstaller (installed outside of the virtual environment).
 
 It is strongly recommended to create the app-bundle using a virtual environment (venv) in order to minimize
