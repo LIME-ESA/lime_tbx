@@ -90,7 +90,7 @@ def _get_mimeapps_lines() -> List[str]:
     return lines
 
 
-def _get_default_browser_desktopfile() -> Union[str, None]:
+def _get_default_mimeapps_browser_desktopfile() -> Union[str, None]:
     valid_starts = (
         "text/html",
         "x-scheme-handler/http",
@@ -108,8 +108,20 @@ def _get_default_browser_desktopfile() -> Union[str, None]:
         return None
 
 
+def _get_default_xdg_settings_browser_desktopfile() -> Union[str, None]:
+    if which("xdg-settings") is not None:
+        so, _ = _launch_cmd("xdg-settings get default-web-browser")
+        if so is not None:
+            so = so.strip()
+            if so.endswith(".desktop"):
+                return so
+    return None
+
+
 def _get_default_browser_desktoppath() -> Union[str, None]:
-    appname = _get_default_browser_desktopfile()
+    appname = _get_default_xdg_settings_browser_desktopfile()
+    if appname == None:
+        appname = _get_default_mimeapps_browser_desktopfile()
     if appname == None:
         return None
     user_home = os.environ.get("HOME")
@@ -135,7 +147,7 @@ def _go_to_link(link: str) -> bool:
         appname = _get_default_browser_desktoppath()
         if appname != None:
             try:
-                cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
+                cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
                 so, serr = _launch_cmd(cmd)
                 logger.get_logger().debug(f"Linux executing {cmd}: {so}")
                 if serr is not None and len(serr) > 0:
