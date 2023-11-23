@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 from typing import Union, List
 import os
+from datetime import datetime
 
 """___Third-Party Modules___"""
 from matplotlib.axes import Axes
@@ -68,6 +69,17 @@ class MplCanvas(FigureCanvas):
             labeltop=False,
         )
 
+        def make_format_old(twin, old):
+            def format_coord(x, y):
+                display_coord = twin.transData.transform((x, y))
+                inv = old.transData.inverted()
+                ax_coord = inv.transform(display_coord)
+                return f"x={ax_coord[0]:#5g}  y={ax_coord[1]:#5g}"
+
+            return format_coord
+
+        self.axes_y_2.format_coord = make_format_old(self.axes_y_2, self.axes)
+
     def get_subtitle(self) -> str:
         if self.axes_y_2 is None:
             return ""
@@ -76,6 +88,18 @@ class MplCanvas(FigureCanvas):
     def get_twinx(self) -> Axes:
         if self.axes_x2 is None:
             self.axes_x2 = self.axes.twinx()
+
+        def combine_formats(twin, old):
+            def format_coord(x, y):
+                display_coord = twin.transData.transform((x, y))
+                inv = old.transData.inverted()
+                ax_coord = inv.transform(display_coord)
+                x = twin.format_xdata(x)
+                return f"x={x}  y1={ax_coord[1]:#5g}  y2={y:#5g}"
+
+            return format_coord
+
+        self.axes_x2.format_coord = combine_formats(self.axes_x2, self.axes)
         return self.axes_x2
 
 
