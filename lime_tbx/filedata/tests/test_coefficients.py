@@ -403,7 +403,7 @@ def _get_23012023_coeff_data() -> (
 class TestCoefficients(unittest.TestCase):
     def test_read_coefficients(self):
         cf = coefficients.read_coeff_nc(COEFF_PATH)
-        version = "23012023"
+        version = "23012023_v1"
         data, u_data, pos, neg = _get_23012023_coeff_data()
         self.assertEqual(cf.version, version)
         rf = cf.reflectance
