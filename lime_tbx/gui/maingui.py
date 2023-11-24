@@ -1130,7 +1130,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
-        self.graph.set_max_ylims(-120, 120)
+        # self.graph.set_max_ylims(-120, 120) # TODO decide if we do this or not
         version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
@@ -1695,6 +1695,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         select_coefficients_dialog = coefficients.SelectCoefficientsDialog(
             lime_tbx_w.settings_manager,
             lime_tbx_w.lime_simulation,
+            self.update_calculability,
             self,
         )
         select_coefficients_dialog.exec_()

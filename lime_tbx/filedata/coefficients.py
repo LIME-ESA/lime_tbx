@@ -112,7 +112,7 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
         "i_coeff.wavelength": len(ds.wavelength) * len(ds.i_coeff),
     }
     wlens = [440, 500, 675, 870, 1020, 1640]
-    version_name = release_date
+    version_name = f"{release_date}_v{file_version}"
     data = np.array(ds.coeff.values)
     u_data = np.array(ds.u_coeff.values)
     err_corr_coeff = np.array(ds.err_corr_coeff.values)
