@@ -78,7 +78,7 @@ class AccessData(IAccessData):
         for vf in version_files:
             cf = coefficients.read_coeff_nc(os.path.join(folder, vf))
             coeffs.append(cf)
-        return coeffs
+        return sorted(coeffs, key=lambda x: x.version)
 
     def get_previously_selected_version(self) -> str:
         file = os.path.join(
