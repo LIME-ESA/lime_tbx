@@ -21,7 +21,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20221201_V01.nc"
+COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20230123_V01.nc"
 
 
 def _get_23012023_coeff_data() -> (
