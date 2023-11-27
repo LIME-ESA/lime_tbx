@@ -119,7 +119,7 @@ class TestTrueUpdate(unittest.TestCase):
         cls.httpd.shutdown()
         cls.httpd.server_close()
         cls.t.join()
-        os.remove("coeff_data/versions/LIME_MODEL_COEFS_20221201_V02.nc")
+        os.remove("coeff_data/versions/LIME_MODEL_COEFS_20230123_V02.nc")
 
     def test_download_working(self):
         check_val = object()
