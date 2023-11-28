@@ -557,11 +557,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def clear_comparison_accepted(self):
+        if not self.comparing_dts:
+            self.switch_show_compare_mpa_dts()
         self.input.clear_input()
         self.set_show_comparison_input(True)
         self.clear_comp_dialog.close()
-        if not self.comparing_dts:
-            self.switch_show_compare_mpa_dts()
         self.export_lglod_button.setEnabled(False)
         self.change_mpa_dts_button.setVisible(False)
         self.change_rel_perc_diffs_button.setVisible(False)
