@@ -1479,6 +1479,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.about_action = QtWidgets.QAction(self)
         self.about_action.setText("&About")
         self.about_action.triggered.connect(self.about)
+        self.help_action = QtWidgets.QAction(self)
+        self.help_action.setText("&Help")
+        self.help_action.triggered.connect(self.help)
         # Settings actions
         self.interpolation_action = QtWidgets.QAction(self)
         self.interpolation_action.setText("&Interpolation options")
@@ -1498,6 +1501,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         coeffs_menu.addAction(self.select_coefficients_action)
         help_menu = QtWidgets.QMenu("&Help", self)
         help_menu.addAction(self.about_action)
+        help_menu.addAction(self.help_action)
         settings_menu = QtWidgets.QMenu("&Settings", self)
         settings_menu.addAction(self.interpolation_action)
         self.menu_bar.addMenu(file_menu)
@@ -1703,6 +1707,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def about(self):
         about_dialog = help.AboutDialog(self)
         about_dialog.exec_()
+
+    def help(self):
+        help_dialog = help.HelpDialog(self)
+        help_dialog.exec_()
 
     def update_calculability(self):
         lime_tbx_w = self._get_lime_widget()

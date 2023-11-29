@@ -275,3 +275,58 @@ class AboutDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def _open_web_vito(self, event):
         _go_to_link("https://vito.be/en")
+
+
+_HELP_TEXT = """
+<p>
+    Welcome to the LIME ToolBox! To check the user guide please visit:
+    <a style=\"color: #00ae9d\" href=\"https://calvalportal.ceos.org/lime\">calvalportal.ceos.org/lime</a>
+</p>
+<h2>How does it work?</h2>
+<p>
+    The LIME model computes lunar reflectance for CIMEL wavelengths with
+    the specified coefficients. Subsequently, these values undergo interpolation
+    across the entire spectrum using the 'ASD' spectrum or 'Apollo 16 + Breccia'.
+    Following this, irradiance is determined based on the calculated reflectance,
+    and ultimately, the irradiance is integrated for each band in the selected
+    Spectral Response Function (SRF).
+</p>
+<h2>Simulation</h2>
+<p>
+    Explore the various input types by switching between the top tabs.
+</p>
+<p>
+    Select the 'Irradiance,' 'Reflectance,' or 'Polarization' buttons to
+    display the simulation output corresponding to the provided input.
+</p>
+<h2>Comparison</h2>
+<p>
+    To transition from Simulation to Comparison, go to File > Perform Comparisons.
+    Here, you can load observation files in GLOD format along with their corresponding
+    SRF file and proceed to conduct the desired comparisons.
+</p>
+<h2>Too slow?</h2>
+<p>
+    Calculating uncertainties for large datasets can be time-consuming,
+    and users may not always require this information.
+    If this process is causing issues, it can be disabled.
+</p>
+<p>
+    To do so, navigate to Settings > Interpolation Settings > Skip Uncertainties Calculation,
+    and toggle the switch to activate.
+</p>
+"""
+
+
+class HelpDialog(QtWidgets.QDialog):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = ...) -> None:
+        super().__init__(parent)
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle(constants.APPLICATION_NAME)
+        self.content = QtWidgets.QLabel(_HELP_TEXT)
+        self.content.setWordWrap(True)
+        self.content.setOpenExternalLinks(True)
+        self.main_layout.addWidget(self.content)
