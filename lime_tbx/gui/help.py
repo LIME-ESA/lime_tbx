@@ -298,6 +298,8 @@ _HELP_TEXT = """
 <p>
     Select the 'Irradiance,' 'Reflectance,' or 'Polarization' buttons to
     display the simulation output corresponding to the provided input.
+    The spectrum will be displayed in the Result tab, and if irradiance is selected,
+    the integrated irradiances will be presented in the Signal tab.
 </p>
 <h2>Comparison</h2>
 <p>
