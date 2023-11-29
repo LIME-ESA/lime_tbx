@@ -377,7 +377,7 @@ class CLI:
             [
                 [gui_constants.INTERPOLATED_DATA_LABEL],
                 ["CIMEL data points"],
-                ["errorbars (k=2)"],
+                [gui_constants.ERRORBARS_LABEL],
             ],
             self.lime_simulation.get_elrefs_cimel(),
             self.lime_simulation.get_elrefs_asd(),
@@ -404,7 +404,7 @@ class CLI:
             [
                 [gui_constants.INTERPOLATED_DATA_LABEL],
                 ["CIMEL data points"],
-                ["errorbars (k=2)"],
+                [gui_constants.ERRORBARS_LABEL],
             ],
             self.lime_simulation.get_elis_cimel(),
             self.lime_simulation.get_elis_asd(),
@@ -435,7 +435,7 @@ class CLI:
             [
                 [gui_constants.INTERPOLATED_DATA_LABEL],
                 ["CIMEL data points"],
-                ["errorbars (k=2)"],
+                [gui_constants.ERRORBARS_LABEL],
             ],
             self.lime_simulation.get_polars_cimel(),
             self.lime_simulation.get_polars_asd(),

@@ -243,6 +243,7 @@ class GraphWidget(QtWidgets.QWidget):
             self.interp_spectrum_name,
             self.subtitle,
             self.compare_percentages,
+            self.settings_manager.is_show_cimel_points(),
         )
         try:
             self.canvas.fig.tight_layout()

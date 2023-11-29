@@ -48,18 +48,31 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.main_layout.addWidget(self.title_label_SRF)
         self.combo_SRF = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_SRF)
-        # show interp
+        # Checkboxes
         self.form_layout = QtWidgets.QFormLayout()
+        # show cimel points
+        self.label_show_cimel = QtWidgets.QLabel("Show CIMEL anchor points:")
+        self.checkbox_show_cimel = QtWidgets.QCheckBox()
+        self.checkbox_show_cimel.setChecked(
+            self.settings_manager.is_show_cimel_points()
+        )
+        self.form_layout.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.label_show_cimel
+        )
+        self.form_layout.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.checkbox_show_cimel
+        )
+        # show interp
         self.label_show_interp = QtWidgets.QLabel("Show interpolation spectrum:")
         self.checkbox_show_interp = QtWidgets.QCheckBox()
         self.checkbox_show_interp.setChecked(
             self.settings_manager.is_show_interp_spectrum()
         )
         self.form_layout.setWidget(
-            0, QtWidgets.QFormLayout.LabelRole, self.label_show_interp
+            1, QtWidgets.QFormLayout.LabelRole, self.label_show_interp
         )
         self.form_layout.setWidget(
-            0, QtWidgets.QFormLayout.FieldRole, self.checkbox_show_interp
+            1, QtWidgets.QFormLayout.FieldRole, self.checkbox_show_interp
         )
         # skip uncertainties
         self.label_skip_uncerts = QtWidgets.QLabel("Skip uncertainty calculations:")
@@ -68,10 +81,10 @@ class InterpOptionsDialog(QtWidgets.QDialog):
             self.settings_manager.is_skip_uncertainties()
         )
         self.form_layout.setWidget(
-            1, QtWidgets.QFormLayout.LabelRole, self.label_skip_uncerts
+            2, QtWidgets.QFormLayout.LabelRole, self.label_skip_uncerts
         )
         self.form_layout.setWidget(
-            1, QtWidgets.QFormLayout.FieldRole, self.checkbox_skip_uncerts
+            2, QtWidgets.QFormLayout.FieldRole, self.checkbox_skip_uncerts
         )
         self.main_layout.addLayout(self.form_layout)
         self.update_combos()
@@ -109,6 +122,9 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         if self.combobox_listen:
             self.settings_manager.select_interp_spectrum(name)
             self.settings_manager.select_interp_SRF(name_SRF)
+            self.settings_manager.set_show_cimel_points(
+                self.checkbox_show_cimel.isChecked()
+            )
             self.settings_manager.set_show_interp_spectrum(
                 self.checkbox_show_interp.isChecked()
             )

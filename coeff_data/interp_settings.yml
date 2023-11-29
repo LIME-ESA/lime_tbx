@@ -2,6 +2,7 @@
   interpolation_spectrum: ASD
   interpolation_spectrum_polarization: Linear
   interpolation_SRF: Gaussian SRF with 1nm spectral sampling and 3nm resolution
+  show_cimel_points: true
   show_interp_spectrum: false
   skip_uncertainties: false
   use_wehrli: false

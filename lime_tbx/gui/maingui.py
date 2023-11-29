@@ -791,7 +791,7 @@ class MainSimulationsWidget(
             [
                 [constants.INTERPOLATED_DATA_LABEL],
                 ["CIMEL data points"],
-                ["errorbars (k=2)"],
+                [constants.ERRORBARS_LABEL],
             ]
         )
         self.graph.set_xlim(

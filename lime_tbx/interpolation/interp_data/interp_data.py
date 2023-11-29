@@ -403,6 +403,18 @@ def is_show_interpolation_spectrum() -> bool:
     return setts.show_interp_spectrum
 
 
+def is_show_cimel_points() -> bool:
+    """Checks if the UI should show the CIMEL points used for interpolation.
+
+    Returns
+    -------
+    should_show: bool
+        True if the CIMEL points should be shown.
+    """
+    setts = _load_interp_settings()
+    return setts.show_cimel_points
+
+
 def is_skip_uncertainties() -> bool:
     """Checks if the user settings are set to skip the uncertainties calculation.
 
@@ -482,6 +494,20 @@ def set_interpolation_SRF(intp_srf: str):
         msg = f"Tried setting unknown interpolation spectrum: {intp_srf}"
         logger.get_logger().error(msg)
         raise LimeException(msg)
+
+
+def set_show_cimel_points(show: bool):
+    """Sets the CIMEL points visibility as <show>.
+
+    Parameters
+    ----------
+    show: bool
+        Visibility of the CIMEL points.
+    """
+    setts = _load_interp_settings()
+    setts.show_cimel_points = show
+    path = _get_interp_path()
+    setts._save_disk(path)
 
 
 def set_show_interpolation_spectrum(show: bool):

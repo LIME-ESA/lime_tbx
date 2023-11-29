@@ -157,6 +157,28 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
+    def is_show_cimel_points(self) -> bool:
+        """Checks if the UI should show the CIMEL points used for interpolation.
+
+        Returns
+        -------
+        should_show: bool
+            True if the CIMEL points should be shown.
+        """
+        pass
+
+    @abstractmethod
+    def set_show_cimel_points(self, show: bool):
+        """Sets the CIMEL points visibility as <show>.
+
+        Parameters
+        ----------
+        show: bool
+            Visibility of the CIMEL points.
+        """
+        pass
+
+    @abstractmethod
     def is_skip_uncertainties(self) -> bool:
         """Checks if the user settings are set to skip the uncertainties calculation.
 
@@ -318,6 +340,12 @@ class SettingsManager(ISettingsManager):
 
     def set_show_interp_spectrum(self, show: bool):
         interp_data.set_show_interpolation_spectrum(show)
+
+    def is_show_cimel_points(self) -> bool:
+        return interp_data.is_show_cimel_points()
+
+    def set_show_cimel_points(self, show: bool):
+        interp_data.set_show_cimel_points(show)
 
     def is_skip_uncertainties(self) -> bool:
         return interp_data.is_skip_uncertainties()

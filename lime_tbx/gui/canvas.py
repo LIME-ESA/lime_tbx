@@ -117,6 +117,7 @@ def redraw_canvas(
     sp_name: str,
     subtitle: str = None,
     compare_percentages: bool = False,
+    show_cimel_data: bool = True,
 ):
     lines = []
     if sdata is not None:
@@ -174,34 +175,36 @@ def redraw_canvas(
             iter_data = scimel_data
             if not isinstance(iter_data, list):
                 iter_data = [iter_data]
-            for i, cimel_data in enumerate(iter_data):
-                label0 = ""
-                label1 = ""
-                if i == 0 and len(slegend) >= 3:
-                    label0 = slegend[1][0]
-                    label1 = slegend[2][0]
-                extra_lines = []
-                extra_lines += scanvas.axes.plot(
-                    cimel_data.wlens,
-                    cimel_data.data,
-                    color="orange",
-                    ls="none",
-                    marker="o",
-                    label=label0,
-                )
-                extra_lines += [
-                    scanvas.axes.errorbar(
+            cimel_data = iter_data[0]  # needed later in asd
+            if show_cimel_data:
+                for i, cimel_data in enumerate(iter_data):
+                    label0 = ""
+                    label1 = ""
+                    if i == 0 and len(slegend) >= 3:
+                        label0 = slegend[1][0]
+                        label1 = slegend[2][0]
+                    extra_lines = []
+                    extra_lines += scanvas.axes.plot(
                         cimel_data.wlens,
                         cimel_data.data,
-                        yerr=cimel_data.uncertainties * 2,
-                        color="grey",
-                        capsize=3,
+                        color="orange",
                         ls="none",
-                        label=label1,
+                        marker="o",
+                        label=label0,
                     )
-                ]
-                if i == 0:
-                    lines += extra_lines
+                    extra_lines += [
+                        scanvas.axes.errorbar(
+                            cimel_data.wlens,
+                            cimel_data.data,
+                            yerr=cimel_data.uncertainties * 2,
+                            color="black",
+                            capsize=3,
+                            ls="none",
+                            label=label1,
+                        )
+                    ]
+                    if i == 0:
+                        lines += extra_lines
 
         if sasd_data:
             if isinstance(sasd_data, list):
