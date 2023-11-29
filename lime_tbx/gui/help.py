@@ -331,4 +331,7 @@ class HelpDialog(QtWidgets.QDialog):
         self.content = QtWidgets.QLabel(_HELP_TEXT)
         self.content.setWordWrap(True)
         self.content.setOpenExternalLinks(True)
-        self.main_layout.addWidget(self.content)
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.content)
+        self.main_layout.addWidget(self.scroll_area)
