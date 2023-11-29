@@ -62,7 +62,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
             0, QtWidgets.QFormLayout.FieldRole, self.checkbox_show_interp
         )
         # skip uncertainties
-        self.label_skip_uncerts = QtWidgets.QLabel("Skip uncertainty calculation:")
+        self.label_skip_uncerts = QtWidgets.QLabel("Skip uncertainty calculations:")
         self.checkbox_skip_uncerts = QtWidgets.QCheckBox()
         self.checkbox_skip_uncerts.setChecked(
             self.settings_manager.is_skip_uncertainties()

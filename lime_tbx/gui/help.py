@@ -314,7 +314,7 @@ _HELP_TEXT = """
     If this process is causing issues, it can be disabled.
 </p>
 <p>
-    To do so, navigate to Settings > Interpolation Options > Skip Uncertainty Calculation,
+    To do so, navigate to Settings > Interpolation Options > Skip Uncertainty Calculations,
     and toggle the switch to activate.
 </p>
 """
