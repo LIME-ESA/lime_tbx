@@ -35,6 +35,11 @@ def main():
     logger.get_logger().info("ToolBox started")
     warnings.filterwarnings("ignore", ".*Gtk-WARNING.*")
     warnings.filterwarnings("ignore", ".*Fontconfig warning.*")
+    warnings.filterwarnings(
+        "ignore",
+        ".*One of the provided covariance matrix is not positive.*",
+        UserWarning,
+    )
     programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
     logger.get_logger().info(

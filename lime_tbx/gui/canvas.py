@@ -212,21 +212,21 @@ def redraw_canvas(
             else:
                 asd_data = sasd_data
 
-            if np.any(cimel_data.data[cimel_data.wlens == 500] == 0):
+            if np.any(cimel_data.data[cimel_data.wlens == 1020] == 0):
                 asd_data_final = asd_data.data * 0
             else:
-                scaled_wlen = 500
+                scaled_wlen = 1020
                 if len(np.where(asd_data.wlens == scaled_wlen)[0]) == 0:
-                    scaled_wlen = 503.017  # Breccia
+                    scaled_wlen = 1009.59  # Breccia
                 scaling_factor = (
                     asd_data.data[np.where(asd_data.wlens == scaled_wlen)]
-                    / cimel_data.data[np.where(cimel_data.wlens == 500)]
+                    / cimel_data.data[np.where(cimel_data.wlens == 1020)]
                 )
                 asd_data_final = asd_data.data / scaling_factor
             lines += scanvas.axes.plot(
                 asd_data.wlens,
                 asd_data_final,
-                label=f"{sp_name} data, scaled to LIME at 500nm",
+                label=f"{sp_name} data, scaled to LIME at 1020nm",
             )
 
         data_compare_info = ""
