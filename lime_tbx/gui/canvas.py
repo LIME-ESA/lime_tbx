@@ -45,7 +45,7 @@ font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"])
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig = Figure(figsize=(width, height), dpi=dpi, tight_layout=True)
         self.axes: Axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
         self.axes_y_2 = None
