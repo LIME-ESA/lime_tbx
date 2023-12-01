@@ -3,6 +3,7 @@
 """___Built-In Modules___"""
 from typing import Union, List
 import os
+from datetime import datetime
 
 """___Third-Party Modules___"""
 from matplotlib.axes import Axes
@@ -44,7 +45,7 @@ font_prop = fm.FontProperties(family=["NotesESA", "sans-serif"])
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig = Figure(figsize=(width, height), dpi=dpi, tight_layout=True)
         self.axes: Axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
         self.axes_y_2 = None
@@ -68,6 +69,17 @@ class MplCanvas(FigureCanvas):
             labeltop=False,
         )
 
+        def make_format_old(twin, old):
+            def format_coord(x, y):
+                display_coord = twin.transData.transform((x, y))
+                inv = old.transData.inverted()
+                ax_coord = inv.transform(display_coord)
+                return f"x={ax_coord[0]:#5g}  y={ax_coord[1]:#5g}"
+
+            return format_coord
+
+        self.axes_y_2.format_coord = make_format_old(self.axes_y_2, self.axes)
+
     def get_subtitle(self) -> str:
         if self.axes_y_2 is None:
             return ""
@@ -76,6 +88,18 @@ class MplCanvas(FigureCanvas):
     def get_twinx(self) -> Axes:
         if self.axes_x2 is None:
             self.axes_x2 = self.axes.twinx()
+
+        def combine_formats(twin, old):
+            def format_coord(x, y):
+                display_coord = twin.transData.transform((x, y))
+                inv = old.transData.inverted()
+                ax_coord = inv.transform(display_coord)
+                x = twin.format_xdata(x)
+                return f"x={x}  y1={ax_coord[1]:#5g}  y2={y:#5g}"
+
+            return format_coord
+
+        self.axes_x2.format_coord = combine_formats(self.axes_x2, self.axes)
         return self.axes_x2
 
 
@@ -93,6 +117,7 @@ def redraw_canvas(
     sp_name: str,
     subtitle: str = None,
     compare_percentages: bool = False,
+    show_cimel_data: bool = True,
 ):
     lines = []
     if sdata is not None:
@@ -150,34 +175,36 @@ def redraw_canvas(
             iter_data = scimel_data
             if not isinstance(iter_data, list):
                 iter_data = [iter_data]
-            for i, cimel_data in enumerate(iter_data):
-                label0 = ""
-                label1 = ""
-                if i == 0 and len(slegend) >= 3:
-                    label0 = slegend[1][0]
-                    label1 = slegend[2][0]
-                extra_lines = []
-                extra_lines += scanvas.axes.plot(
-                    cimel_data.wlens,
-                    cimel_data.data,
-                    color="orange",
-                    ls="none",
-                    marker="o",
-                    label=label0,
-                )
-                extra_lines += [
-                    scanvas.axes.errorbar(
+            cimel_data = iter_data[0]  # needed later in asd
+            if show_cimel_data:
+                for i, cimel_data in enumerate(iter_data):
+                    label0 = ""
+                    label1 = ""
+                    if i == 0 and len(slegend) >= 3:
+                        label0 = slegend[1][0]
+                        label1 = slegend[2][0]
+                    extra_lines = []
+                    extra_lines += scanvas.axes.plot(
                         cimel_data.wlens,
                         cimel_data.data,
-                        yerr=cimel_data.uncertainties * 2,
-                        color="black",
-                        capsize=3,
+                        color="orange",
                         ls="none",
-                        label=label1,
+                        marker="o",
+                        label=label0,
                     )
-                ]
-                if i == 0:
-                    lines += extra_lines
+                    extra_lines += [
+                        scanvas.axes.errorbar(
+                            cimel_data.wlens,
+                            cimel_data.data,
+                            yerr=cimel_data.uncertainties * 2,
+                            color="black",
+                            capsize=3,
+                            ls="none",
+                            label=label1,
+                        )
+                    ]
+                    if i == 0:
+                        lines += extra_lines
 
         if sasd_data:
             if isinstance(sasd_data, list):
@@ -185,21 +212,21 @@ def redraw_canvas(
             else:
                 asd_data = sasd_data
 
-            if np.any(cimel_data.data[cimel_data.wlens == 500] == 0):
+            if np.any(cimel_data.data[cimel_data.wlens == 1020] == 0):
                 asd_data_final = asd_data.data * 0
             else:
-                scaled_wlen = 500
+                scaled_wlen = 1020
                 if len(np.where(asd_data.wlens == scaled_wlen)[0]) == 0:
-                    scaled_wlen = 503.017  # Breccia
+                    scaled_wlen = 1009.59  # Breccia
                 scaling_factor = (
                     asd_data.data[np.where(asd_data.wlens == scaled_wlen)]
-                    / cimel_data.data[np.where(cimel_data.wlens == 500)]
+                    / cimel_data.data[np.where(cimel_data.wlens == 1020)]
                 )
                 asd_data_final = asd_data.data / scaling_factor
             lines += scanvas.axes.plot(
                 asd_data.wlens,
                 asd_data_final,
-                label=f"{sp_name} data, scaled to LIME at 500nm",
+                label=f"{sp_name} data, scaled to LIME at 1020nm",
             )
 
         data_compare_info = ""
@@ -217,7 +244,7 @@ def redraw_canvas(
                 data_comp.wlens,
                 data_comp.data,
                 marker="o",
-                color="black",
+                color="grey",
                 label=label,
                 markersize=4,
                 ls="none",
@@ -227,7 +254,7 @@ def redraw_canvas(
                     data_comp.wlens,
                     data_comp.data,
                     yerr=data_comp.uncertainties * 2,
-                    color="black",
+                    color="grey",
                     capsize=2,
                     ls="none",
                     alpha=0.3,

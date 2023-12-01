@@ -33,12 +33,14 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
         self,
         settings_manager: ISettingsManager,
         lime_simulation: ILimeSimulation,
+        update_calculability_dolp: Callable,
         parent=None,
     ):
         super().__init__(parent)
         self.settings_manager = settings_manager
         self.lime_simulation = lime_simulation
         self.combobox_listen = True
+        self._update_calculability_dolp = update_calculability_dolp
         self._build_layout()
 
     def _build_layout(self):
@@ -80,6 +82,7 @@ class SelectCoefficientsDialog(QtWidgets.QDialog):
     def save_clicked(self):
         index = self.combo_versions.currentIndex()
         self.update_from_combobox(index)
+        self._update_calculability_dolp()
         self.close()
 
     @QtCore.Slot()

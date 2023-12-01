@@ -243,9 +243,11 @@ class GraphWidget(QtWidgets.QWidget):
             self.interp_spectrum_name,
             self.subtitle,
             self.compare_percentages,
+            self.settings_manager.is_show_cimel_points(),
         )
         try:
             self.canvas.fig.tight_layout()
+            self.canvas.draw()
         except:
             pass
         if self.cursor_names:
@@ -555,6 +557,11 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.stack_layout.setCurrentIndex(0)
         self.graph_reldif.setVisible(True)
         self.graph_percdif.setVisible(False)
+        self.graph_percdif.canvas.mpl_connect("resize_event", self._on_resize)
+        self.graph_reldif.canvas.mpl_connect("resize_event", self._on_resize)
+
+    def _on_resize(self, event):
+        self.tight_layout()
 
     def tight_layout(self):
         if self.graph_reldif.isVisible():
@@ -565,13 +572,11 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
 
     def _tight_layout_reldif(self):
         self.graph_reldif.canvas.fig.tight_layout()
-        self.graph_reldif.update()
-        self.graph_reldif.canvas.update()
+        self.graph_reldif.canvas.draw()
 
     def _tight_layout_percdif(self):
         self.graph_percdif.canvas.fig.tight_layout()
-        self.graph_percdif.update()
-        self.graph_percdif.canvas.update()
+        self.graph_percdif.canvas.draw()
 
     def show_percentage(self):
         self.graph_reldif.setVisible(False)
@@ -579,8 +584,8 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.stack_layout.setCurrentIndex(1)
 
     def show_relative(self):
-        self.graph_reldif.setVisible(True)
         self.graph_percdif.setVisible(False)
+        self.graph_reldif.setVisible(True)
         self.stack_layout.setCurrentIndex(0)
 
     def clear(self):
@@ -635,12 +640,14 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
             0: data
             1: cimel_data
             2: cimel_data errorbars
-            3: comparison
+            3: comparison (2 values, graph_reldif and graph_percdif)
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.graph_reldif.update_legend(legends, redraw=redraw)
-        self.graph_percdif.update_legend(legends, redraw=redraw)
+        self.graph_reldif.update_legend(legends[0:3] + [[legends[3][0]]], redraw=redraw)
+        self.graph_percdif.update_legend(
+            legends[0:3] + [[legends[3][1]]], redraw=redraw
+        )
 
     def set_chnames(self, ch_names: List[str]):
         self.graph_reldif.set_srf_channel_names(ch_names)
@@ -660,15 +667,10 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.channel_tabs = QtWidgets.QTabWidget()
         self.channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
-        self.channel_tabs.currentChanged.connect(self._channel_tab_changed)
         self.main_layout.addWidget(self.channel_tabs)
         self.range_warning = QtWidgets.QLabel("")
         self.range_warning.setWordWrap(True)
         self.main_layout.addWidget(self.range_warning)
-
-    @QtCore.Slot()
-    def _channel_tab_changed(self, i: int):
-        self.channels[i].tight_layout()
 
     def set_channels(self, channels: List[str]):
         while self.channel_tabs.count() > 0:
@@ -736,14 +738,10 @@ for wavelengths between 350 and 2500 nm"
     def show_relative(self):
         for ch in self.channels:
             ch.show_relative()
-        id = self.get_current_channel_index()
-        self.channels[id].tight_layout()
 
     def show_percentage(self):
         for ch in self.channels:
             ch.show_percentage()
-        id = self.get_current_channel_index()
-        self.channels[id].tight_layout()
 
     def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
         """Update the <index> plot with the given data
@@ -797,7 +795,7 @@ for wavelengths between 350 and 2500 nm"
             0: data
             1: cimel_data
             2: cimel_data errorbars
-            3: comparison
+            3: comparison (2 values, graph_reldif and graph_percdif)
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
@@ -808,5 +806,4 @@ for wavelengths between 350 and 2500 nm"
 
     def set_current_channel_index(self, index: int):
         cui = self.channel_tabs.setCurrentIndex(index)
-        self.channels[index].tight_layout()
         return cui

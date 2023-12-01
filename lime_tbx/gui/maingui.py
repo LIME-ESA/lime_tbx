@@ -329,7 +329,7 @@ def _show_comps_output(
                     ["Observed Irradiance", "Simulated Irradiance"],
                     [],
                     [],
-                    ["Relative Differences"],
+                    ["Relative Differences", "Percentage Differences"],
                 ],
             )
         else:
@@ -557,11 +557,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def clear_comparison_accepted(self):
+        if not self.comparing_dts:
+            self.switch_show_compare_mpa_dts()
         self.input.clear_input()
         self.set_show_comparison_input(True)
         self.clear_comp_dialog.close()
-        if not self.comparing_dts:
-            self.switch_show_compare_mpa_dts()
         self.export_lglod_button.setEnabled(False)
         self.change_mpa_dts_button.setVisible(False)
         self.change_rel_perc_diffs_button.setVisible(False)
@@ -631,18 +631,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def show_compare_dts(self):
         self._block_gui_loading()
         ch_index = self.output_mpa.get_current_channel_index()
-        self.output.set_current_channel_index(ch_index)
         self.output.setVisible(True)
         self.output_mpa.setVisible(False)
+        self.output.set_current_channel_index(ch_index)
         self.stack_layout.setCurrentIndex(1)
         self._unblock_gui()
 
     def show_compare_mpa(self):
         self._block_gui_loading()
         ch_index = self.output.get_current_channel_index()
-        self.output_mpa.set_current_channel_index(ch_index)
         self.output.setVisible(False)
         self.output_mpa.setVisible(True)
+        self.output_mpa.set_current_channel_index(ch_index)
         self.stack_layout.setCurrentIndex(2)
         self._unblock_gui()
 
@@ -791,7 +791,7 @@ class MainSimulationsWidget(
             [
                 [constants.INTERPOLATED_DATA_LABEL],
                 ["CIMEL data points"],
-                ["errorbars (k=2)"],
+                [constants.ERRORBARS_LABEL],
             ]
         )
         self.graph.set_xlim(
@@ -1130,7 +1130,7 @@ class MainSimulationsWidget(
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
-        self.graph.set_max_ylims(-120, 120)
+        # self.graph.set_max_ylims(-120, 120) # TODO decide if we do this or not
         version = self.settings_manager.get_coef_version_name()
         is_out_mpa_range = (
             not data[4] if not isinstance(data[4], list) else False in data[4]
@@ -1479,6 +1479,9 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.about_action = QtWidgets.QAction(self)
         self.about_action.setText("&About")
         self.about_action.triggered.connect(self.about)
+        self.help_action = QtWidgets.QAction(self)
+        self.help_action.setText("&Help")
+        self.help_action.triggered.connect(self.help)
         # Settings actions
         self.interpolation_action = QtWidgets.QAction(self)
         self.interpolation_action.setText("&Interpolation options")
@@ -1498,6 +1501,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         coeffs_menu.addAction(self.select_coefficients_action)
         help_menu = QtWidgets.QMenu("&Help", self)
         help_menu.addAction(self.about_action)
+        help_menu.addAction(self.help_action)
         settings_menu = QtWidgets.QMenu("&Settings", self)
         settings_menu.addAction(self.interpolation_action)
         self.menu_bar.addMenu(file_menu)
@@ -1695,6 +1699,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         select_coefficients_dialog = coefficients.SelectCoefficientsDialog(
             lime_tbx_w.settings_manager,
             lime_tbx_w.lime_simulation,
+            self.update_calculability,
             self,
         )
         select_coefficients_dialog.exec_()
@@ -1702,6 +1707,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def about(self):
         about_dialog = help.AboutDialog(self)
         about_dialog.exec_()
+
+    def help(self):
+        help_dialog = help.HelpDialog(self)
+        help_dialog.exec_()
 
     def update_calculability(self):
         lime_tbx_w = self._get_lime_widget()

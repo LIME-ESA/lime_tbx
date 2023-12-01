@@ -60,7 +60,7 @@ class IUpdate(ABC):
         Returns
         -------
         quant_news: int
-            Amount of new coefficients succesfully downloaded.
+            Amount of new coefficients downloaded.
         quant_fails: int
             Amount of coefficients that couldn't be downloaded or updated correctly.
         """

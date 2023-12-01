@@ -4,6 +4,8 @@
 from datetime import datetime, timezone
 from typing import Union, Tuple, Iterable
 
+import PySide2.QtWidgets
+
 """___Third-Party Modules___"""
 from typing import Callable, List
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -55,6 +57,14 @@ def _callback_read_srf(path: str) -> Tuple[SpectralResponseFunction, str]:
     return (read_srf, path)
 
 
+class _LimeDoubleInput(QtWidgets.QDoubleSpinBox):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def textFromValue(self, val: float) -> str:
+        return f"{val}"
+
+
 class CustomInputWidget(QtWidgets.QWidget):
     """
     Input widget that contains the GUI elements for the input of the needed parameters for
@@ -79,34 +89,34 @@ class CustomInputWidget(QtWidgets.QWidget):
             "Selenographic longitude of the Sun (RAD):"
         )
         self.moon_phase_angle_label = QtWidgets.QLabel("Moon phase angle (°):")
-        self.dist_sun_moon_spinbox = QtWidgets.QDoubleSpinBox()
-        self.dist_obs_moon_spinbox = QtWidgets.QDoubleSpinBox()
-        self.selen_obs_lat_spinbox = QtWidgets.QDoubleSpinBox()
-        self.selen_obs_lon_spinbox = QtWidgets.QDoubleSpinBox()
-        self.selen_sun_lon_spinbox = QtWidgets.QDoubleSpinBox()
-        self.moon_phase_angle_spinbox = QtWidgets.QDoubleSpinBox()
+        self.dist_sun_moon_spinbox = _LimeDoubleInput()
+        self.dist_obs_moon_spinbox = _LimeDoubleInput()
+        self.selen_obs_lat_spinbox = _LimeDoubleInput()
+        self.selen_obs_lon_spinbox = _LimeDoubleInput()
+        self.selen_sun_lon_spinbox = _LimeDoubleInput()
+        self.moon_phase_angle_spinbox = _LimeDoubleInput()
         self.dist_sun_moon_spinbox.setMinimum(0.00001)
         self.dist_sun_moon_spinbox.setMaximum(1.5)
-        self.dist_sun_moon_spinbox.setDecimals(15)
+        self.dist_sun_moon_spinbox.setDecimals(20)
         self.dist_sun_moon_spinbox.setSingleStep(0.001)
         self.dist_sun_moon_spinbox.setValue(1)
         self.dist_obs_moon_spinbox.setMinimum(1)
         self.dist_obs_moon_spinbox.setMaximum(1000000)
-        self.dist_obs_moon_spinbox.setDecimals(10)
+        self.dist_obs_moon_spinbox.setDecimals(20)
         self.dist_obs_moon_spinbox.setValue(400000)
         self.selen_obs_lat_spinbox.setMinimum(-90)
         self.selen_obs_lat_spinbox.setMaximum(90)
-        self.selen_obs_lat_spinbox.setDecimals(10)
+        self.selen_obs_lat_spinbox.setDecimals(20)
         self.selen_obs_lon_spinbox.setMinimum(-180)
         self.selen_obs_lon_spinbox.setMaximum(180)
-        self.selen_obs_lon_spinbox.setDecimals(10)
+        self.selen_obs_lon_spinbox.setDecimals(20)
         self.selen_sun_lon_spinbox.setMinimum(-3.141592653589793)
         self.selen_sun_lon_spinbox.setMaximum(3.141592653589793)
-        self.selen_sun_lon_spinbox.setDecimals(15)
+        self.selen_sun_lon_spinbox.setDecimals(20)
         self.selen_sun_lon_spinbox.setSingleStep(0.1)
         self.moon_phase_angle_spinbox.setMinimum(-180)
         self.moon_phase_angle_spinbox.setMaximum(180)
-        self.moon_phase_angle_spinbox.setDecimals(10)
+        self.moon_phase_angle_spinbox.setDecimals(20)
         self.moon_phase_angle_spinbox.setValue(30)
         self.main_layout.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
         self.main_layout.addRow(self.dist_obs_moon_label, self.dist_obs_moon_spinbox)
@@ -218,18 +228,18 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.latitude_label = QtWidgets.QLabel("Latitude (°):")
         self.longitude_label = QtWidgets.QLabel("Longitude (°):")
         self.altitude_label = QtWidgets.QLabel("Altitude (m):")
-        self.latitude_spinbox = QtWidgets.QDoubleSpinBox()
-        self.longitude_spinbox = QtWidgets.QDoubleSpinBox()
-        self.altitude_spinbox = QtWidgets.QDoubleSpinBox()
+        self.latitude_spinbox = _LimeDoubleInput()
+        self.longitude_spinbox = _LimeDoubleInput()
+        self.altitude_spinbox = _LimeDoubleInput()
         self.latitude_spinbox.setMinimum(-90)
         self.latitude_spinbox.setMaximum(90)
-        self.latitude_spinbox.setDecimals(10)
+        self.latitude_spinbox.setDecimals(20)
         self.longitude_spinbox.setMinimum(-180)
         self.longitude_spinbox.setMaximum(180)
-        self.longitude_spinbox.setDecimals(10)
+        self.longitude_spinbox.setDecimals(20)
         self.altitude_spinbox.setMinimum(0)
         self.altitude_spinbox.setMaximum(10000000)
-        self.altitude_spinbox.setDecimals(5)
+        self.altitude_spinbox.setDecimals(20)
         self.main_layout.addRow(self.latitude_label, self.latitude_spinbox)
         self.main_layout.addRow(self.longitude_label, self.longitude_spinbox)
         self.main_layout.addRow(self.altitude_label, self.altitude_spinbox)

@@ -21,7 +21,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20221201_V01.nc"
+COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20230123_V01.nc"
 
 
 def _get_23012023_coeff_data() -> (
@@ -403,7 +403,7 @@ def _get_23012023_coeff_data() -> (
 class TestCoefficients(unittest.TestCase):
     def test_read_coefficients(self):
         cf = coefficients.read_coeff_nc(COEFF_PATH)
-        version = "23012023"
+        version = "20230123_v1"
         data, u_data, pos, neg = _get_23012023_coeff_data()
         self.assertEqual(cf.version, version)
         rf = cf.reflectance

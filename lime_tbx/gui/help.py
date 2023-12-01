@@ -90,7 +90,7 @@ def _get_mimeapps_lines() -> List[str]:
     return lines
 
 
-def _get_default_browser_desktopfile() -> Union[str, None]:
+def _get_default_mimeapps_browser_desktopfile() -> Union[str, None]:
     valid_starts = (
         "text/html",
         "x-scheme-handler/http",
@@ -108,8 +108,20 @@ def _get_default_browser_desktopfile() -> Union[str, None]:
         return None
 
 
+def _get_default_xdg_settings_browser_desktopfile() -> Union[str, None]:
+    if which("xdg-settings") is not None:
+        so, _ = _launch_cmd("xdg-settings get default-web-browser")
+        if so is not None:
+            so = so.strip()
+            if so.endswith(".desktop"):
+                return so
+    return None
+
+
 def _get_default_browser_desktoppath() -> Union[str, None]:
-    appname = _get_default_browser_desktopfile()
+    appname = _get_default_xdg_settings_browser_desktopfile()
+    if appname == None:
+        appname = _get_default_mimeapps_browser_desktopfile()
     if appname == None:
         return None
     user_home = os.environ.get("HOME")
@@ -135,7 +147,7 @@ def _go_to_link(link: str) -> bool:
         appname = _get_default_browser_desktoppath()
         if appname != None:
             try:
-                cmd = f"$(grep '^Exec' {appname} | tail -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} &"
+                cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
                 so, serr = _launch_cmd(cmd)
                 logger.get_logger().debug(f"Linux executing {cmd}: {so}")
                 if serr is not None and len(serr) > 0:
@@ -263,3 +275,68 @@ class AboutDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def _open_web_vito(self, event):
         _go_to_link("https://vito.be/en")
+
+
+_HELP_TEXT = """
+<p>
+    Welcome to the LIME ToolBox! To check the user guide please visit:
+    <a style=\"color: #00ae9d\" href=\"https://calvalportal.ceos.org/lime\">calvalportal.ceos.org/lime</a>
+</p>
+<h2>How does it work?</h2>
+<p>
+    The LIME model computes lunar reflectance for CIMEL wavelengths with
+    the specified coefficients. Subsequently, these values undergo interpolation
+    across the entire spectrum using the 'ASD' spectrum or 'Apollo 16 + Breccia'.
+    Following this, irradiance is determined based on the calculated reflectance,
+    and ultimately, the irradiance is integrated for each band in the selected
+    Spectral Response Function (SRF).
+</p>
+<h2>Simulation</h2>
+<p>
+    Explore the various input types by switching between the top tabs.
+</p>
+<p>
+    Select the 'Irradiance,' 'Reflectance,' or 'Polarization' buttons to
+    display the simulation output corresponding to the provided input.
+    The spectrum will be displayed in the Result tab, and if irradiance is selected,
+    the integrated irradiances will be presented in the Signal tab.
+</p>
+<h2>Comparison</h2>
+<p>
+    To transition from Simulation to Comparison, go to File > Perform Comparisons.
+    Here, you can load observation files in GLOD format along with their corresponding
+    SRF file and proceed to conduct the desired comparisons.
+</p>
+<p>
+    The comparison can be presented either with respect to datetime or moon phase angle.
+    The difference can be expressed as either a percentage difference or a relative
+    difference, calculated using the formula '100 * (Observation - Simulation) / Simulation'.
+</p>
+<h2>Too slow?</h2>
+<p>
+    Calculating uncertainties for large datasets can be time-consuming,
+    and users may not always require this information.
+    If this process is causing issues, it can be disabled.
+</p>
+<p>
+    To do so, navigate to Settings > Interpolation Options > Skip Uncertainty Calculations,
+    and toggle the switch to activate.
+</p>
+"""
+
+
+class HelpDialog(QtWidgets.QDialog):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = ...) -> None:
+        super().__init__(parent)
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle(constants.APPLICATION_NAME)
+        self.content = QtWidgets.QLabel(_HELP_TEXT)
+        self.content.setWordWrap(True)
+        self.content.setOpenExternalLinks(True)
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.content)
+        self.main_layout.addWidget(self.scroll_area)

@@ -109,7 +109,7 @@ class DOLP(IDOLP):
         coefficients: PolarizationCoefficients,
     ) -> Tuple[np.ndarray, np.ndarray]:
         # it fails if unc_coeffs == zeros
-        prop = punpy.MCPropagation(100, MCdimlast=True)
+        prop = punpy.MCPropagation(100, 1, MCdimlast=True)
         if mpa_degrees > 0:  # is this sign ok?
             a_coeffs = np.array(coefficients.pos_coeffs)
             unc_coeffs = np.array(coefficients.pos_unc)

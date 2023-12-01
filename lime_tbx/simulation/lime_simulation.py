@@ -558,6 +558,7 @@ class LimeSimulation(ILimeSimulation):
         signals_srf: SpectralResponseFunction,
         skip_uncs: bool,
         callback_observation: Callable,
+        show_interp_spectrum: bool,
         use_wehrli: bool = False,
     ) -> Tuple[
         Union[SpectralData, List[SpectralData]],
@@ -578,6 +579,7 @@ class LimeSimulation(ILimeSimulation):
             elref_cimel,
             ret_asd,
             skip_uncs,
+            show_interp_spectrum,
             use_wehrli,
         )
         if use_wehrli:
@@ -636,6 +638,7 @@ class LimeSimulation(ILimeSimulation):
         elref_cimel,
         elref_asd,
         skip_uncs: bool,
+        show_interp_spectrum: bool,
         use_wehrli: bool = False,
     ) -> Tuple[Union[SpectralData, List[SpectralData]], SpectralData,]:
         _cimel_srf = "cimel" if not use_wehrli else "cimel_wehrli"
@@ -643,7 +646,7 @@ class LimeSimulation(ILimeSimulation):
             mds, elref_cimel, _cimel_srf, skip_uncs
         )
         elis_asd = None
-        if interp_data.is_show_interpolation_spectrum():
+        if show_interp_spectrum:
             md = mds
             if isinstance(md, list):
                 md = md[0]
@@ -713,6 +716,7 @@ class LimeSimulation(ILimeSimulation):
             signals_srf,
             skip_uncs,
             callback_observation,
+            self.settings_manager.is_show_interp_spectrum(),
             self.settings_manager.get_use_wehrli_for_esi(),
         )
         if self.verbose:
@@ -757,6 +761,7 @@ class LimeSimulation(ILimeSimulation):
                     self.elref_cimel,
                     self.elref_asd,
                     skip_uncs,
+                    self.settings_manager.is_show_interp_spectrum(),
                     use_wehrli,
                 )
                 if use_wehrli:
@@ -1242,12 +1247,12 @@ class LimeSimulation(ILimeSimulation):
         return self.elis_cimel
 
     def get_elrefs_asd(self) -> Union[SpectralData, List[SpectralData]]:
-        if not interp_data.is_show_interpolation_spectrum():
+        if not self.settings_manager.is_show_interp_spectrum():
             return None
         return self.elref_asd
 
     def get_elis_asd(self) -> Union[SpectralData, List[SpectralData]]:
-        if not interp_data.is_show_interpolation_spectrum():
+        if not self.settings_manager.is_show_interp_spectrum():
             return None
         return self.elis_asd
 
@@ -1258,7 +1263,7 @@ class LimeSimulation(ILimeSimulation):
         return self.polars_cimel
 
     def get_polars_asd(self) -> Union[SpectralData, List[SpectralData]]:
-        if not interp_data.is_show_interpolation_spectrum():
+        if not self.settings_manager.is_show_interp_spectrum():
             return None
         return self.polars_asd
 

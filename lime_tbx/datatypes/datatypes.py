@@ -1028,6 +1028,7 @@ class InterpolationSettings:
     interpolation_spectrum: str
     interpolation_spectrum_polarization: str
     interpolation_SRF: str
+    show_cimel_points: bool
     show_interp_spectrum: bool
     skip_uncertainties: bool
     use_wehrli: bool

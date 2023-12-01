@@ -38,7 +38,7 @@ class TestAccessData(unittest.TestCase):
         cfs = ad.get_all_coefficients()
         self.assertGreater(len(cfs), 0)
         folder = os.path.join(".", "coeff_data", "versions")
-        version_files = os.listdir(folder)
+        version_files = sorted(os.listdir(folder))
         cfs_check = []
         for vf in version_files:
             cf = coefficients.read_coeff_nc(os.path.join(folder, vf))
