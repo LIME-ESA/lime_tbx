@@ -46,9 +46,9 @@ for absolute moon phase angles between 2° and 90°"
 def _write_point(writer, point: Union[Point, None]):
     if point is not None:
         if isinstance(point, SurfacePoint):
-            writer.writerow(["latitude", point.latitude])
-            writer.writerow(["longitude", point.longitude])
-            writer.writerow(["altitude(m)", point.altitude])
+            writer.writerow(["latitude (deg)", point.latitude])
+            writer.writerow(["longitude (deg)", point.longitude])
+            writer.writerow(["altitude (m)", point.altitude])
             dt: Union[datetime, List[datetime]] = point.dt
             if isinstance(dt, list):
                 str_dt = map(
@@ -58,14 +58,20 @@ def _write_point(writer, point: Union[Point, None]):
             else:
                 writer.writerow(["datetime", str(dt)])
         elif isinstance(point, CustomPoint):
-            writer.writerow(["absolute moon phase angle", point.abs_moon_phase_angle])
-            writer.writerow(["distance observer moon", point.distance_observer_moon])
-            writer.writerow(["distance sun moon", point.distance_sun_moon])
-            writer.writerow(["selenographic latitude of observer", point.selen_obs_lat])
+            writer.writerow(["moon phase angle (deg)", point.moon_phase_angle])
             writer.writerow(
-                ["selenographic longitude of observer", point.selen_obs_lon]
+                ["distance observer moon (km)", point.distance_observer_moon]
             )
-            writer.writerow(["selenographic longitude of sun", point.selen_sun_lon])
+            writer.writerow(["distance sun moon (AU)", point.distance_sun_moon])
+            writer.writerow(
+                ["selenographic latitude of observer (deg)", point.selen_obs_lat]
+            )
+            writer.writerow(
+                ["selenographic longitude of observer (deg)", point.selen_obs_lon]
+            )
+            writer.writerow(
+                ["selenographic longitude of sun (rad)", point.selen_sun_lon]
+            )
         else:
             writer.writerow(["satellite", point.name])
             dt: Union[datetime, List[datetime]] = point.dt

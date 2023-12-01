@@ -1,8 +1,8 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
-latitude,43
-longitude,45
-altitude(m),4500
+latitude (deg),43
+longitude (deg),45
+altitude (m),4500
 datetime,2018-02-27 02:00:00+00:00
 CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties
 314,0.01,1e-07
