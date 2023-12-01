@@ -329,7 +329,7 @@ def _show_comps_output(
                     ["Observed Irradiance", "Simulated Irradiance"],
                     [],
                     [],
-                    ["Relative Differences"],
+                    ["Relative Differences", "Percentage Differences"],
                 ],
             )
         else:

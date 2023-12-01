@@ -636,12 +636,14 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
             0: data
             1: cimel_data
             2: cimel_data errorbars
-            3: comparison
+            3: comparison (2 values, graph_reldif and graph_percdif)
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.graph_reldif.update_legend(legends, redraw=redraw)
-        self.graph_percdif.update_legend(legends, redraw=redraw)
+        self.graph_reldif.update_legend(legends[0:3] + [[legends[3][0]]], redraw=redraw)
+        self.graph_percdif.update_legend(
+            legends[0:3] + [[legends[3][1]]], redraw=redraw
+        )
 
     def set_chnames(self, ch_names: List[str]):
         self.graph_reldif.set_srf_channel_names(ch_names)
@@ -798,7 +800,7 @@ for wavelengths between 350 and 2500 nm"
             0: data
             1: cimel_data
             2: cimel_data errorbars
-            3: comparison
+            3: comparison (2 values, graph_reldif and graph_percdif)
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """

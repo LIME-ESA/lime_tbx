@@ -501,7 +501,7 @@ class CLI:
                 ["Observed Irradiance", "Simulated Irradiance"],
                 [],
                 [],
-                ["Relative Differences"],
+                ["Relative Differences", "Percentage Differences"],
             ],
             None,
             None,
