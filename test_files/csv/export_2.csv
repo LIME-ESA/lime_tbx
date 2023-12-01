@@ -1,11 +1,11 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
-absolute moon phase angle,11.2
-distance observer moon,450000
-distance sun moon,0.9
-selenographic latitude of observer,30
-selenographic longitude of observer,30
-selenographic longitude of sun,1
+moon phase angle (deg),-11.2
+distance observer moon (km),450000
+distance sun moon (AU),0.9
+selenographic latitude of observer (deg),30
+selenographic longitude of observer (deg),30
+selenographic longitude of sun (rad),1
 CIMEL Wavelength,Irradiance,uncertainties
 314,0.01,1e-07
 420,0.01,0

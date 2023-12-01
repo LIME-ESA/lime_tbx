@@ -329,7 +329,7 @@ def _show_comps_output(
                     ["Observed Irradiance", "Simulated Irradiance"],
                     [],
                     [],
-                    ["Relative Differences"],
+                    ["Relative Differences", "Percentage Differences"],
                 ],
             )
         else:
@@ -631,18 +631,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def show_compare_dts(self):
         self._block_gui_loading()
         ch_index = self.output_mpa.get_current_channel_index()
-        self.output.set_current_channel_index(ch_index)
         self.output.setVisible(True)
         self.output_mpa.setVisible(False)
+        self.output.set_current_channel_index(ch_index)
         self.stack_layout.setCurrentIndex(1)
         self._unblock_gui()
 
     def show_compare_mpa(self):
         self._block_gui_loading()
         ch_index = self.output.get_current_channel_index()
-        self.output_mpa.set_current_channel_index(ch_index)
         self.output.setVisible(False)
         self.output_mpa.setVisible(True)
+        self.output_mpa.set_current_channel_index(ch_index)
         self.stack_layout.setCurrentIndex(2)
         self._unblock_gui()
 

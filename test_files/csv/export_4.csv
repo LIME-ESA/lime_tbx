@@ -1,9 +1,9 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
-latitude,42
-longitude,45
-altitude(m),4500
+latitude (deg),42
+longitude (deg),45
+altitude (m),4500
 datetimes,2018-02-27 02:00:00.000+00:00,2019-02-23 02:00:00.000+00:00
 CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties,2019-02-23 02:00:00.000+00:00 Irradiance **,2019-02-23 02:00:00.000+00:00 uncertainties **
 314,0.01,1e-07

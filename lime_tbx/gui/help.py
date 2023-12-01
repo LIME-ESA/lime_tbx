@@ -307,6 +307,11 @@ _HELP_TEXT = """
     Here, you can load observation files in GLOD format along with their corresponding
     SRF file and proceed to conduct the desired comparisons.
 </p>
+<p>
+    The comparison can be presented either with respect to datetime or moon phase angle.
+    The difference can be expressed as either a percentage difference or a relative
+    difference, calculated using the formula '100 * (Observation - Simulation) / Simulation'.
+</p>
 <h2>Too slow?</h2>
 <p>
     Calculating uncertainties for large datasets can be time-consuming,

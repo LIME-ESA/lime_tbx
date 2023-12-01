@@ -49,6 +49,9 @@ def _get_tsis_data() -> Dict[float, Tuple[float, float]]:
     return data
 
 
+_PARALLEL_CORES = 1
+
+
 def tsis_cimel(
     solar_y: NDArray[np.float_],
     solar_x: NDArray[np.float_],
@@ -59,7 +62,7 @@ def tsis_cimel(
     Calculate TSIS solar irradiances and uncertainties, band integrated to the CIMEL bands
     """
     si = SpectralIntegration()
-    prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
+    prop = punpy.MCPropagation(MCsteps, parallel_cores=_PARALLEL_CORES)
     cimel_wavs = np.array([440, 500, 675, 870, 1020, 1640])
     cimel_esi = si.integrate_cimel(solar_y, solar_x)
     u_cimel_esi = prop.propagate_random(
@@ -79,7 +82,7 @@ def tsis_asd(
     Calculate TSIS solar irradiances and uncertainties, band integrated to the ASD bands
     """
     si = SpectralIntegration()
-    prop = punpy.MCPropagation(MCsteps, parallel_cores=1)
+    prop = punpy.MCPropagation(MCsteps, parallel_cores=_PARALLEL_CORES)
     asd_wavs = np.array(si.asd_srf.get_wavelengths())
     asd_esi = si.integrate_solar_asd(solar_y, solar_x)
     u_asd_esi = prop.propagate_random(
