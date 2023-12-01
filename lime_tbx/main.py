@@ -40,6 +40,12 @@ def main():
         ".*One of the provided covariance matrix is not positive.*",
         UserWarning,
     )
+    warnings.filterwarnings(
+        "ignore",
+        ".*elementwise comparison failed; returning scalar instead.*",
+        FutureWarning,
+        "punpy",
+    )
     programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
     logger.get_logger().info(
