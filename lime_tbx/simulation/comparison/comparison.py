@@ -289,7 +289,7 @@ class Comparison(IComparison):
                 for j in range(num_samples):
                     sim = specs[1].data[j]
                     ref = specs[0].data[j]
-                    rel_dif = 100 * (sim - ref) / ref
+                    rel_dif = 100 * (ref - sim) / sim
                     tot_rel_diff += rel_dif
                     tot_abs_rel_diff += abs(rel_dif)
                     rel_diffs.append(rel_dif)
