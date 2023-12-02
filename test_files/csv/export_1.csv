@@ -4,7 +4,7 @@ latitude (deg),43
 longitude (deg),45
 altitude (m),4500
 datetime,2018-02-27 02:00:00+00:00
-CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties
+CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties (k=2)
 314,0.01,1e-07
 420,0.01,0
 Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties
