@@ -171,6 +171,7 @@ def export_csv_simulation(
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             _write_point(writer, point)
             ylabels = []
+            cimel_ylabels = []
             if not isinstance(point, CustomPoint) and point != None:
                 dts = point.dt
                 if not isinstance(dts, list):
@@ -180,22 +181,25 @@ def export_csv_simulation(
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    ylabels.append(
-                        f"{dt.isoformat(sep=' ', timespec='milliseconds')} {ylabel}{warn_out_mpa_range}"
-                    )
+                    ylab = f"{dt.isoformat(sep=' ', timespec='milliseconds')} {ylabel}{warn_out_mpa_range}"
+                    ylabels.append(ylab)
+                    cimel_ylabels.append(ylab)
                     if not skip_uncs:
-                        ylabels.append(
-                            f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties{warn_out_mpa_range}"
-                        )
+                        halfy2 = f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties"
+                        ylabels.append(f"{halfy2}{warn_out_mpa_range}")
+                        cimel_ylabels.append(f"{halfy2} (k=2){warn_out_mpa_range}")
             else:
                 warn_out_mpa_range = ""
                 if some_out_mpa_range:
                     warn_out_mpa_range = " **"
-                ylabels.append(f"{ylabel}{warn_out_mpa_range}")
+                ylab = f"{ylabel}{warn_out_mpa_range}"
+                ylabels.append(ylab)
+                cimel_ylabels.append(ylab)
                 if not skip_uncs:
                     ylabels.append(f"uncertainties{warn_out_mpa_range}")
+                    cimel_ylabels.append(f"uncertainties (k=2){warn_out_mpa_range}")
             if cimel_data:
-                writer.writerow([f"CIMEL {xlabel}", *ylabels])
+                writer.writerow([f"CIMEL {xlabel}", *cimel_ylabels])
                 if not isinstance(cimel_data, list) and not isinstance(
                     cimel_data, np.ndarray
                 ):

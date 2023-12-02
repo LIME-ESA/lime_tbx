@@ -192,17 +192,20 @@ def redraw_canvas(
                         marker="o",
                         label=label0,
                     )
-                    extra_lines += [
-                        scanvas.axes.errorbar(
-                            cimel_data.wlens,
-                            cimel_data.data,
-                            yerr=cimel_data.uncertainties * 2,
-                            color="black",
-                            capsize=3,
-                            ls="none",
-                            label=label1,
-                        )
-                    ]
+                    if np.any(
+                        cimel_data.uncertainties
+                    ):  # Not show errorbars if they are all 0 (skipping uncerts)
+                        extra_lines += [
+                            scanvas.axes.errorbar(
+                                cimel_data.wlens,
+                                cimel_data.data,
+                                yerr=cimel_data.uncertainties * 2,
+                                color="black",
+                                capsize=3,
+                                ls="none",
+                                label=label1,
+                            )
+                        ]
                     if i == 0:
                         lines += extra_lines
 
