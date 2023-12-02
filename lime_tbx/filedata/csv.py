@@ -320,7 +320,7 @@ def export_csv_comparison(
                 header += [
                     "Observation uncertainties",
                     "Simulation uncertainties",
-                    f"{relperc} differences uncertainties",
+                    f"{relperc} difference uncertainties",
                 ]
             writer.writerow(header)
             x_data = data[0].wlens
