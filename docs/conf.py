@@ -159,7 +159,7 @@ latex_elements = {
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
-\newunicodechar{⁻}{\textsuperscript{-}\fi}
+\newunicodechar{⁻}{\textsuperscript{-}}
 \newunicodechar{¹}{\ifmmode{}^1\else\textonesuperior\fi}
 \newunicodechar{²}{\ifmmode{}^2\else\texttwosuperior\fi}
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
