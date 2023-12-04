@@ -776,9 +776,12 @@ class InputWidget(QtWidgets.QWidget):
 
 
 class ComparisonInput(QtWidgets.QWidget):
-    def __init__(self, callback_change: Callable):
+    def __init__(
+        self, callback_change: Callable, callback_compare_but_enable: Callable
+    ):
         super().__init__()
         self.callback_change = callback_change
+        self.callback_compare_but_enable = callback_compare_but_enable
         self.loaded_srf: SpectralResponseFunction = None
         self.loaded_moons: List[LunarObservation] = []
         self._build_layout()
@@ -839,6 +842,7 @@ class ComparisonInput(QtWidgets.QWidget):
     def load_srf_file(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
         if path != "":
+            self.callback_compare_but_enable(False)
             self._set_enabled_gui_input(False)
             self.srf_feedback.setText("Loading...")
             self.worker = CallbackWorker(
@@ -864,6 +868,7 @@ class ComparisonInput(QtWidgets.QWidget):
         paths = QtWidgets.QFileDialog().getOpenFileNames(self)[0]
         if len(paths) == 0:
             return
+        self.callback_compare_but_enable(False)
         self._set_enabled_gui_input(False)
         self.moon_obs_feedback.setText("Loading...")
         self.worker = CallbackWorker(
@@ -881,8 +886,8 @@ class ComparisonInput(QtWidgets.QWidget):
         if len(self.loaded_moons) > 0:
             shown_path = "Loaded {} files".format(len(self.loaded_moons))
             self.moon_obs_feedback.setText(shown_path)
-            self.callback_change()
         self._set_enabled_gui_input(True)
+        self.callback_change()
 
     def loading_obs_files_error(self, e):
         self.show_error(e)

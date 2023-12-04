@@ -361,7 +361,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.input = input.ComparisonInput(self._callback_compare_input_changed)
+        self.input = input.ComparisonInput(
+            self._callback_compare_input_changed, self._callback_compare_button_enable
+        )
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
@@ -414,6 +416,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.comp_options_box)
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
+
+    def _callback_compare_button_enable(self, enable: bool):
+        self.compare_button.setEnabled(enable)
 
     def _callback_compare_input_changed(self):
         self.lime_simulation.set_simulation_changed()
