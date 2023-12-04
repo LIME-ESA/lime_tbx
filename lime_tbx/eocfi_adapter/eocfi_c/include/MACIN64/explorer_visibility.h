@@ -175,6 +175,10 @@
  *             +----------------------------------------------------------------------------------+
  *             |   4.24  | 29/11/22 | DEIMOS Space S.L.U    | Maintenance release                 |
  *             +----------------------------------------------------------------------------------+
+ *             |   4.25  | 10/05/23 | DEIMOS Space S.L.U    | Maintenance release                 |
+ *             |         |          |                       | New features:                       |
+ *             |         |          |                       |  + Support for ANX drift in OSF     |
+ *             +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 #ifndef EXPLORER_VISIBILITY_H
@@ -2561,6 +2565,8 @@ typedef enum
   XV_CFI_GENSCF_WRONG_FILENAME_ERR,
   XV_CFI_GENSCF_WRITE_ERR,
   XV_CFI_GENSCF_MEM_ERR,
+  XV_CFI_GENSCF_WRONG_DRAW_ERR,
+  XV_CFI_GENSCF_WRONG_FILL_ERR,
   XV_CFI_GENSCF_NO_DIR_WARN
 
 } XV_CFI_gen_scf_err_enum;
