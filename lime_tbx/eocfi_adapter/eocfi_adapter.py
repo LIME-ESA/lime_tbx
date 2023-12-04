@@ -370,7 +370,7 @@ class EOCFIConverter(IEOCFIConverter):
                 norad,
                 tle_file,
                 orbit_path,
-                sat.name,
+                f'"{sat.name}"',
                 intdes,
             )
         for dt in dts:
