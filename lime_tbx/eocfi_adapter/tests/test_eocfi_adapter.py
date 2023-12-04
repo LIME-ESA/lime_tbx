@@ -2,9 +2,12 @@
 
 """___Built-In Modules___"""
 from datetime import datetime, timezone
+import os
 
 """___Third-Party Modules___"""
 import unittest
+import numpy as np
+import spiceypy as spice
 
 """___LIME_TBX Modules___"""
 from ..eocfi_adapter import EOCFIConverter, IEOCFIConverter, _get_file_datetimes
@@ -29,6 +32,18 @@ MANDATORY_SATS = [
     "SENTINEL-3A",
     "SENTINEL-3B",
     "FLEX",
+]
+_BASIC_KERNELS = [
+    "pck00010.tpc",
+    "naif0011.tls",
+    "earth_assoc_itrf93.tf",
+    "de421.bsp",
+    "earth_latest_high_prec.bpc",
+    "earth_070425_370426_predict.bpc",
+]
+_MOON_KERNELS = [
+    "moon_pa_de421_1900-2050.bpc",
+    "moon_080317.tf",
 ]
 
 
@@ -198,6 +213,134 @@ class TestEOCFIConverter(unittest.TestCase):
         self.assertAlmostEqual(lat, lat2)
         self.assertAlmostEqual(lon, lon2)
         self.assertAlmostEqual(hhh, hh2, 3)
+
+    def test_get_against_sentinel3a(self):
+        # The coordinates are taken from SW2 GLOD datafiles
+        coords0 = np.array(
+            [
+                [-1367.947271, -6186.552006, -3393.027741],
+                [724.439474, 6548.852351, 2852.697976],
+                [-5980.021454, 3961.94646, -396.730665],
+                [-5459.598289, -3033.917013, -3556.042138],
+                [-270.294847, -5953.919906, -4017.467633],
+            ]
+        )
+        sat_pos_ref = "J2000"
+        dates = [
+            datetime(2020, 7, 4, 18, 13, 5, 413824, tzinfo=timezone.utc),
+            datetime(2022, 1, 18, 9, 6, 39, 651946, tzinfo=timezone.utc),
+            datetime(2022, 3, 18, 16, 54, 3, 527799, tzinfo=timezone.utc),
+            datetime(2022, 5, 16, 17, 16, 38, 629877, tzinfo=timezone.utc),
+            datetime(2022, 7, 14, 1, 36, 35, 327542, tzinfo=timezone.utc),
+        ]
+        eo = get_eocfi_converter()
+        coords1 = (
+            np.array(eo.get_satellite_position_rectangular("SENTINEL-3A", dates)) / 1000
+        )
+        SPICEAdapter._load_kernels(KERNELS_PATH.main_kernels_path)
+        coords1 = np.array(
+            [
+                SPICEAdapter._change_frames(
+                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
+                )
+                for coord, date in zip(coords1, dates)
+            ]
+        )
+        SPICEAdapter._clear_kernels()
+        np.testing.assert_allclose(coords0, coords1, 5)
+
+    def test_get_against_sentinel3b(self):
+        # The coordinates are taken from SW2 GLOD datafiles
+        coords0 = np.array(
+            [
+                [956.428977, -6474.181784, -2969.738931],
+                [-2917.455755, 6359.521681, 1621.118477],
+                [-6811.023693, 235.044077, -2279.050897],
+                [-3009.816054, -5029.841617, -4159.906603],
+            ]
+        )
+        sat_pos_ref = "J2000"
+        dates = [
+            datetime(2018, 7, 27, 7, 22, 43, 462684, tzinfo=timezone.utc),
+            datetime(2022, 2, 17, 0, 21, 44, 30567, tzinfo=timezone.utc),
+            datetime(2022, 4, 17, 7, 26, 50, 352449, tzinfo=timezone.utc),
+            datetime(2022, 6, 15, 0, 8, 20, 171066, tzinfo=timezone.utc),
+        ]
+        eo = get_eocfi_converter()
+        coords1 = (
+            np.array(eo.get_satellite_position_rectangular("SENTINEL-3B", dates)) / 1000
+        )
+        SPICEAdapter._load_kernels(KERNELS_PATH.main_kernels_path)
+        coords1 = np.array(
+            [
+                SPICEAdapter._change_frames(
+                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
+                )
+                for coord, date in zip(coords1, dates)
+            ]
+        )
+        SPICEAdapter._clear_kernels()
+        np.testing.assert_allclose(coords0, coords1, 5)
+
+    def test_get_against_probav(self):
+        # The coordinates are taken from SW2 GLOD datafiles
+        coords0 = np.array(
+            [
+                [-673.04352, 1786.783284, -6945.481248],
+                [-799.559962, 678.006872, 7109.660942],
+                [-4554.017121, -5322.674454, 1627.142592],
+            ]
+        )
+        sat_pos_ref = "J2000"
+        dates = [
+            datetime(2017, 9, 6, 22, 0, 31, 939209, tzinfo=timezone.utc),
+            datetime(2023, 8, 5, 19, 20, 53, 203194, tzinfo=timezone.utc),
+            datetime(2023, 7, 31, 2, 18, 18, 489596, tzinfo=timezone.utc),
+        ]
+        eo = get_eocfi_converter()
+        coords1 = (
+            np.array(eo.get_satellite_position_rectangular("PROBA-V", dates)) / 1000
+        )
+        SPICEAdapter._load_kernels(KERNELS_PATH.main_kernels_path)
+        coords1 = np.array(
+            [
+                SPICEAdapter._change_frames(
+                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
+                )
+                for coord, date in zip(coords1, dates)
+            ]
+        )
+        SPICEAdapter._clear_kernels()
+        np.testing.assert_allclose(coords0, coords1, 1, 5000)
+
+    def test_get_against_pleiades1b(self):
+        # The coordinates are taken from SW2 GLOD datafiles
+        coords0 = np.array(
+            [
+                [376047.094026, -17931.27136, 19077.743743],
+                [403764.134505, 25331.937873, -1241.291837],
+            ]
+        )
+        sat_pos_ref = "IAU_MOON"
+        dates = [
+            datetime(2013, 3, 1, 7, 9, 54, 999991, tzinfo=timezone.utc),
+            datetime(2016, 4, 18, 14, 30, 24, 4, tzinfo=timezone.utc),
+        ]
+        eo = get_eocfi_converter()
+        coords1 = (
+            np.array(eo.get_satellite_position_rectangular("PLEIADES 1B", dates)) / 1000
+        )
+        SPICEAdapter._load_kernels(KERNELS_PATH.main_kernels_path)
+        coords1 = np.array(
+            [
+                SPICEAdapter._change_frames(
+                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
+                )
+                for coord, date in zip(coords1, dates)
+            ]
+        )
+        SPICEAdapter._clear_kernels()
+        np.testing.assert_allclose(coords0, coords1, 1, 5000)
 
 
 if __name__ == "__main__":
