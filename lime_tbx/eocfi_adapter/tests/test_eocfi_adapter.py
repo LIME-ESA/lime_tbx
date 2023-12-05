@@ -202,9 +202,12 @@ class TestEOCFIConverter(unittest.TestCase):
         """
         eo = get_eocfi_converter()
         dts = [datetime(2018, 5, 3, 8, 47, 35, 370522, tzinfo=timezone.utc)]
+        xyz_esa = np.array((-6616761.405, -2836593.220, 0))
+        xyz = np.array(eo.get_satellite_position_rectangular("PROBA-V", dts)[0])
+        np.testing.assert_array_almost_equal(xyz, xyz_esa, 3)
         lat, lon, hhh = eo.get_satellite_position("PROBA-V", dts)[0]
         lat2, lon2, hh2 = SPICEAdapter.to_planetographic_multiple(
-            [(-6616761.405, -2836593.220, 0)],
+            [xyz_esa],
             "EARTH",
             KERNELS_PATH.main_kernels_path,
             dts,
@@ -247,7 +250,12 @@ class TestEOCFIConverter(unittest.TestCase):
             ]
         )
         SPICEAdapter._clear_kernels()
-        np.testing.assert_allclose(coords0, coords1, 5)
+        distances = np.linalg.norm(coords0 - coords1, axis=1)
+        max_dist = 14000
+        for c0, c1, dist in zip(coords0, coords1, distances):
+            msg = f"Distance too big. {dist} > {max_dist}. Coordinates: {c0} and {c1}"
+            self.assertLessEqual(dist, max_dist, msg)
+        np.testing.assert_allclose(coords0, coords1, 2, 3000)
 
     def test_get_against_sentinel3b(self):
         # The coordinates are taken from SW2 GLOD datafiles
@@ -274,13 +282,19 @@ class TestEOCFIConverter(unittest.TestCase):
         coords1 = np.array(
             [
                 SPICEAdapter._change_frames(
-                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
+                    coord, "J2000", sat_pos_ref, spice.datetime2et(date)
                 )
                 for coord, date in zip(coords1, dates)
             ]
         )
         SPICEAdapter._clear_kernels()
-        np.testing.assert_allclose(coords0, coords1, 5)
+        distances = np.linalg.norm(coords0 - coords1, axis=1)
+        print(np.mean(distances))
+        max_dist = 12000
+        for c0, c1, dist in zip(coords0, coords1, distances):
+            msg = f"Distance too big. {dist} > {max_dist}. Coordinates: {c0} and {c1}"
+            self.assertLessEqual(dist, max_dist, msg)
+        np.testing.assert_allclose(coords0, coords1, 2, 3000)
 
     def test_get_against_probav(self):
         # The coordinates are taken from SW2 GLOD datafiles
@@ -305,12 +319,17 @@ class TestEOCFIConverter(unittest.TestCase):
         coords1 = np.array(
             [
                 SPICEAdapter._change_frames(
-                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
+                    coord, "J2000", sat_pos_ref, spice.datetime2et(date)
                 )
                 for coord, date in zip(coords1, dates)
             ]
         )
         SPICEAdapter._clear_kernels()
+        distances = np.linalg.norm(coords0 - coords1, axis=1)
+        max_dist = 2000
+        for c0, c1, dist in zip(coords0, coords1, distances):
+            msg = f"Distance too big. {dist} > {max_dist}. Coordinates: {c0} and {c1}"
+            self.assertLessEqual(dist, max_dist, msg)
         np.testing.assert_allclose(coords0, coords1, 1, 5000)
 
     def test_get_against_pleiades1b(self):
@@ -340,6 +359,11 @@ class TestEOCFIConverter(unittest.TestCase):
             ]
         )
         SPICEAdapter._clear_kernels()
+        distances = np.linalg.norm(coords0 - coords1, axis=1)
+        max_dist = 11000
+        for c0, c1, dist in zip(coords0, coords1, distances):
+            msg = f"Distance too big. {dist} > {max_dist}. Coordinates: {c0} and {c1}"
+            self.assertLessEqual(dist, max_dist, msg)
         np.testing.assert_allclose(coords0, coords1, 1, 5000)
 
 

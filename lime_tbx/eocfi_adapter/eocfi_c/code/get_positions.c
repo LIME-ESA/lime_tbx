@@ -248,6 +248,62 @@ double * get_moon_position(
 
 }
 
+
+
+#ifdef _WIN32
+__declspec(dllexport) int position_to_j2000(
+#else
+    int  position_to_j2000(
+#endif
+        double* position,
+        double* vel,
+        double* acc,
+        xl_time_id* time_id,
+        long* time_ref,
+        double* time
+    ){
+    long status, func_id, n;
+    long xl_ierr[XL_ERR_VECTOR_MAX_LENGTH];
+    char msg[XL_MAX_COD][XL_MAX_STR];
+    xl_model_id model_id = {NULL};
+    long model_mode,
+    models[XL_NUM_MODEL_TYPES_ENUM];
+    long cs_in, cs_out;
+    long calc_mode = XL_CALC_POS_VEL_ACC;
+    double pos_out[3] = {0.0, 0.0, 0.0};
+    double vel_out[3] = {0.0, 0.0, 0.0};
+    double acc_out[3] = {0.0, 0.0, 0.0};
+
+    model_mode = XL_MODEL_DEFAULT;
+    status = xl_model_init(&model_mode, models, &model_id, xl_ierr);
+    if (status != XL_OK)
+    {
+        func_id = XL_MODEL_INIT_ID;
+        xl_get_msg(&func_id, xl_ierr, &n, msg);
+        xl_print_msg(&n, msg);
+        if (status <= XL_ERR) return(XL_ERR);
+    }
+
+
+    cs_in = XL_EF; /* Initial coordinate system = True of Date */
+    cs_out = XL_BM2000; /* Final coordinate system = Earth fixed */
+    status = xl_change_cart_cs(&model_id, time_id, &calc_mode, &cs_in, &cs_out,
+                                time_ref, time, position, vel, acc, pos_out, vel_out, acc_out);
+    if (status != XL_OK)
+    {
+        func_id = XL_CHANGE_CART_CS_ID;
+        xl_get_msg(&func_id, &status, &n, msg);
+        xl_print_msg(&n, msg);
+        if (status <= XL_ERR) return(XL_ERR);
+    }
+    position[0] = pos_out[0];
+    position[1] = pos_out[1];
+    position[2] = pos_out[2];
+
+    return XO_OK;
+}
+
+
 #ifdef _WIN32
 __declspec(dllexport) int  get_satellite_position_osf(
 #else
@@ -388,6 +444,18 @@ __declspec(dllexport) int  get_satellite_position_osf(
             func_id = XO_OSV_COMPUTE_EXTRA_ID;
             xo_get_msg(&func_id, errors, &n, msg);
             xo_print_msg(&n, msg);
+        }
+
+        status = position_to_j2000(pos, vel, acc, &time_id, &time_ref_utc, &time);
+#ifdef DEBUG
+        printf( "\n\t-  time = %lf (%s)", time,  to_timestamp(&time_id, time));
+        printf( "\n\t-  pos[0] = %lf", pos[0] );
+        printf( "\n\t-  pos[1] = %lf", pos[1] );
+        printf( "\n\t-  pos[2] = %lf", pos[2] );
+#endif
+        if (status != XO_OK)
+        {
+            return status;
         }
 
         position_returns[i][0] = pos[0];
@@ -594,6 +662,8 @@ __declspec(dllexport) int  get_satellite_position_tle(
             xo_print_msg(&n, msg);
         }
 
+        position_to_j2000(pos, vel, acc, &time_id, &time_ref_utc, &time);
+
         position_returns[i][0] = pos[0];
         position_returns[i][1] = pos[1];
         position_returns[i][2] = pos[2];
@@ -615,6 +685,8 @@ __declspec(dllexport) int  get_satellite_position_tle(
     xl_time_close(&time_id, errors);
     return XL_OK;
 }
+
+
 
 #define STR_SIZE_INPUT 1000
 
