@@ -238,6 +238,7 @@ class CLI:
             eocfi_path, kernels_path, self.settings_manager
         )
         self.srf = self.settings_manager.get_default_srf()
+        self.updater = Update()
 
     def load_srf(self, srf_file: str):
         if srf_file == "":
@@ -753,7 +754,7 @@ class CLI:
                         file_index += 1
 
     def update_coefficients(self) -> int:
-        updater: IUpdate = Update()
+        updater: IUpdate = self.updater
         stopper_checker_true = lambda *_: True
         updates = False
         try:

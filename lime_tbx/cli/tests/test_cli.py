@@ -8,13 +8,16 @@ import io
 import shlex
 import locale
 import warnings
+import threading
 
 """___Third-Party Modules___"""
 import unittest
+import requests
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import KernelsPath
 from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.coefficients.update.tests.test_update import HTTPServer, get_updater
 from ..cli import (
     CLI,
     OPTIONS,
@@ -673,3 +676,144 @@ class TestCLI(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 0)
+
+
+class TestCLIUpdateNoServer(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+
+    def setUp(self):
+        warnings.filterwarnings("ignore")
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
+
+    def test_connection_error(self):
+        cli = get_cli()
+        cli.updater = get_updater()
+        cli.updater.url = "http://localhost:6969/listv.txt"  # Which is not the same
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_update_connection.txt")
+        self.assertEqual(self.capturedOutput.getvalue(), f.read())
+        f.close()
+
+
+class TestCLIUpdate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+        dirname = os.path.join(os.path.dirname(__file__), "../../../coeff_data")
+        cls.httpd = HTTPServer(dirname, ("localhost", 8000))
+        cls.t = threading.Thread(
+            name="test server proc", target=cls.httpd.serve_forever
+        )
+        cls.t.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.t.join()
+
+    def setUp(self):
+        warnings.filterwarnings("ignore")
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
+
+    def test_download(self):
+        cli = get_cli()
+        cli.updater = get_updater()
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 0)
+        msg = "Download finished.\nThere were no updates.\n"
+        self.assertEqual(self.capturedOutput.getvalue(), msg)
+
+
+class TestCLITrueUpdate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+        dirname = os.path.join(
+            os.path.dirname(__file__), "../../../test_files/update/coeff_data"
+        )
+        cls.httpd = HTTPServer(dirname, ("localhost", 8000))
+        cls.t = threading.Thread(
+            name="test server proc", target=cls.httpd.serve_forever
+        )
+        cls.t.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.t.join()
+        os.remove("coeff_data/versions/LIME_MODEL_COEFS_20230123_V02.nc")
+
+    def setUp(self):
+        warnings.filterwarnings("ignore")
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
+
+    def test_download_working(self):
+        cli = get_cli()
+        cli.updater = get_updater()
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 0)
+        msg = (
+            f"Download finished with errors.\nThere were 2 updates, 1 of them failed.\n"
+        )
+        self.assertEqual(self.capturedOutput.getvalue(), msg)
