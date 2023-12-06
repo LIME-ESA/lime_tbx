@@ -221,6 +221,10 @@ used for interpolation. The valid values are 'True' and 'False'."
         "\t\t\t   skip_uncertainties: Sets if the ToolBox should skip the \
 uncertainties calculations. The valid values are 'True' and 'False'."
     )
+    print(
+        "\t\t\t   show_cimel_points: Sets if the graphs should show the CIMEL \
+anchor points used for interpolation. The valid values are 'True' and 'False'."
+    )
 
 
 def print_version():
@@ -827,6 +831,15 @@ class CLI:
                 return 1
             skip_uncertainties = skip_uncertainties == "True"
             self.settings_manager.set_skip_uncertainties(skip_uncertainties)
+        if "show_cimel_points" in interp_settings:
+            show_cimel_points = interp_settings["show_cimel_points"]
+            if show_cimel_points not in ("True", "False"):
+                eprint(
+                    f'Interpolation settings show_cimel_points value {show_cimel_points} not valid. Must be "True" or "False"'
+                )
+                return 1
+            show_cimel_points = show_cimel_points == "True"
+            self.settings_manager.set_show_cimel_points(show_cimel_points)
         return 0
 
     def check_sys_args(self, sysargs: List[str]) -> int:

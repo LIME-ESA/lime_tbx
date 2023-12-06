@@ -500,6 +500,22 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(errcode, 0)
 
+    def test_earth_glod_ok_select_mult_inter_setts(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \
+\'{"interp_spectrum": "ASD", "interp_srf": "asd", "show_inter_spectrum": "False", "skip_uncertainties": \
+"True", "show_cimel_points": "True"}\''
+            )
+        )
+        interp_data.set_interpolation_spectrum_name("ASD")
+        interp_data.set_interpolation_SRF(
+            "Gaussian SRF with 1nm spectral sampling and 3nm resolution"
+        )
+        interp_data.set_skip_uncertainties(False)
+        self.assertEqual(errcode, 0)
+
     def test_earth_glod_ok_select_spectrum_apollo(self):
         cli = get_cli()
         errcode = cli.handle_input(
