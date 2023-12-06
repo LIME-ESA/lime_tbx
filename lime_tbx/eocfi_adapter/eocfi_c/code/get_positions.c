@@ -285,8 +285,8 @@ __declspec(dllexport) int position_to_j2000(
     }
 
 
-    cs_in = XL_EF; /* Initial coordinate system = True of Date */
-    cs_out = XL_BM2000; /* Final coordinate system = Earth fixed */
+    cs_in = XL_EF; /* Initial coordinate system = Earth fixed ITRF */
+    cs_out = XL_GM2000; /* Final coordinate system =  J2000 */
     status = xl_change_cart_cs(&model_id, time_id, &calc_mode, &cs_in, &cs_out,
                                 time_ref, time, position, vel, acc, pos_out, vel_out, acc_out);
     if (status != XL_OK)
@@ -444,18 +444,6 @@ __declspec(dllexport) int  get_satellite_position_osf(
             func_id = XO_OSV_COMPUTE_EXTRA_ID;
             xo_get_msg(&func_id, errors, &n, msg);
             xo_print_msg(&n, msg);
-        }
-
-        status = position_to_j2000(pos, vel, acc, &time_id, &time_ref_utc, &time);
-#ifdef DEBUG
-        printf( "\n\t-  time = %lf (%s)", time,  to_timestamp(&time_id, time));
-        printf( "\n\t-  pos[0] = %lf", pos[0] );
-        printf( "\n\t-  pos[1] = %lf", pos[1] );
-        printf( "\n\t-  pos[2] = %lf", pos[2] );
-#endif
-        if (status != XO_OK)
-        {
-            return status;
         }
 
         position_returns[i][0] = pos[0];
@@ -661,8 +649,6 @@ __declspec(dllexport) int  get_satellite_position_tle(
             xo_get_msg(&func_id, errors, &n, msg);
             xo_print_msg(&n, msg);
         }
-
-        position_to_j2000(pos, vel, acc, &time_id, &time_ref_utc, &time);
 
         position_returns[i][0] = pos[0];
         position_returns[i][1] = pos[1];

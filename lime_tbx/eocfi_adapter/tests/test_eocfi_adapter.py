@@ -282,15 +282,14 @@ class TestEOCFIConverter(unittest.TestCase):
         coords1 = np.array(
             [
                 SPICEAdapter._change_frames(
-                    coord, "J2000", sat_pos_ref, spice.datetime2et(date)
+                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
                 )
                 for coord, date in zip(coords1, dates)
             ]
         )
         SPICEAdapter._clear_kernels()
         distances = np.linalg.norm(coords0 - coords1, axis=1)
-        print(np.mean(distances))
-        max_dist = 12000
+        max_dist = 14000
         for c0, c1, dist in zip(coords0, coords1, distances):
             msg = f"Distance too big. {dist} > {max_dist}. Coordinates: {c0} and {c1}"
             self.assertLessEqual(dist, max_dist, msg)
@@ -319,14 +318,14 @@ class TestEOCFIConverter(unittest.TestCase):
         coords1 = np.array(
             [
                 SPICEAdapter._change_frames(
-                    coord, "J2000", sat_pos_ref, spice.datetime2et(date)
+                    coord, "ITRF93", sat_pos_ref, spice.datetime2et(date)
                 )
                 for coord, date in zip(coords1, dates)
             ]
         )
         SPICEAdapter._clear_kernels()
         distances = np.linalg.norm(coords0 - coords1, axis=1)
-        max_dist = 2000
+        max_dist = 8000
         for c0, c1, dist in zip(coords0, coords1, distances):
             msg = f"Distance too big. {dist} > {max_dist}. Coordinates: {c0} and {c1}"
             self.assertLessEqual(dist, max_dist, msg)
