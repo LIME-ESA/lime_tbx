@@ -33,3 +33,4 @@ Options:
 			   interp_srf: Sets the output SRF. The valid values are 'asd', 'interpolated_gaussian' and 'interpolated_triangle'.
 			   show_interp_spectrum: Sets if the graphs should show the spectrum used for interpolation. The valid values are 'True' and 'False'.
 			   skip_uncertainties: Sets if the ToolBox should skip the uncertainties calculations. The valid values are 'True' and 'False'.
+			   show_cimel_points: Sets if the graphs should show the CIMEL anchor points used for interpolation. The valid values are 'True' and 'False'.
