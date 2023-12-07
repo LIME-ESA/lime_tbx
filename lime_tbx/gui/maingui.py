@@ -795,7 +795,7 @@ class MainSimulationsWidget(
         self.graph.update_legend(
             [
                 [constants.INTERPOLATED_DATA_LABEL],
-                ["CIMEL data points"],
+                [constants.CIMEL_POINT_LABEL],
                 [constants.ERRORBARS_LABEL],
             ]
         )
