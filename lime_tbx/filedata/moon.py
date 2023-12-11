@@ -871,19 +871,22 @@ def write_comparison(
 
         mrd = ds.createVariable("mrd", "f8", ("chan",), fill_value=fill_value)
         mrd.long_name = "Mean relative difference."
-        mrd.valid_max = 100.0
+        mrd.units = "%"
         mrd[:] = mrd_data
         mard = ds.createVariable("mard", "f8", ("chan",), fill_value=fill_value)
         mard.long_name = "Mean of the absolutes of relative difference."
-        mard.valid_max = 100.0
+        mard.valid_min = 0.0
+        mard.units = "%"
         mard[:] = mard_data
         std_mrd = ds.createVariable("std_mrd", "f8", ("chan",), fill_value=fill_value)
         std_mrd.long_name = "Standard deviation of the mean relative difference."
         std_mrd.valid_min = 0.0
+        std_mrd.units = "%"
         std_mrd[:] = std_mrd_data
         mpd = ds.createVariable("mpd", "f8", ("chan",), fill_value=fill_value)
         mpd.long_name = "Mean of the percentage difference."
-        mpd.valid_max = 100.0
+        mpd.valid_min = 0.0
+        mpd.units = "%"
         mpd[:] = mpd_data
 
         number_samples = ds.createVariable(
