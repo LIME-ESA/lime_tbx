@@ -8,13 +8,16 @@ import io
 import shlex
 import locale
 import warnings
+import threading
 
 """___Third-Party Modules___"""
 import unittest
+import requests
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import KernelsPath
 from lime_tbx.interpolation.interp_data import interp_data
+from lime_tbx.coefficients.update.tests.test_update import HTTPServer, get_updater
 from ..cli import (
     CLI,
     OPTIONS,
@@ -97,7 +100,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                "-s PROBA-V,2023-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
+                "-s PROBA-V,2250-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
             )
         )
         self.assertEqual(errcode, 1)
@@ -482,7 +485,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             get_opts(
-                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C 20230123_v1"
+                "-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C 20231120_v1"
             )
         )
         self.assertEqual(errcode, 0)
@@ -495,6 +498,22 @@ class TestCLI(unittest.TestCase):
                 '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "ASD"}\''
             )
         )
+        self.assertEqual(errcode, 0)
+
+    def test_earth_glod_ok_select_mult_inter_setts(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            get_opts(
+                '-e 80,80,2000,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \
+\'{"interp_spectrum": "ASD", "interp_srf": "asd", "show_inter_spectrum": "False", "skip_uncertainties": \
+"True", "show_cimel_points": "True"}\''
+            )
+        )
+        interp_data.set_interpolation_spectrum_name("ASD")
+        interp_data.set_interpolation_SRF(
+            "Gaussian SRF with 1nm spectral sampling and 3nm resolution"
+        )
+        interp_data.set_skip_uncertainties(False)
         self.assertEqual(errcode, 0)
 
     def test_earth_glod_ok_select_spectrum_apollo(self):
@@ -673,3 +692,144 @@ class TestCLI(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 0)
+
+
+class TestCLIUpdateNoServer(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+
+    def setUp(self):
+        warnings.filterwarnings("ignore")
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
+
+    def test_connection_error(self):
+        cli = get_cli()
+        cli.updater = get_updater()
+        cli.updater.url = "http://localhost:6969/listv.txt"  # Which is not the same
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_update_connection.txt")
+        self.assertEqual(self.capturedOutput.getvalue(), f.read())
+        f.close()
+
+
+class TestCLIUpdate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+        dirname = os.path.join(os.path.dirname(__file__), "../../../coeff_data")
+        cls.httpd = HTTPServer(dirname, ("localhost", 8000))
+        cls.t = threading.Thread(
+            name="test server proc", target=cls.httpd.serve_forever
+        )
+        cls.t.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.t.join()
+
+    def setUp(self):
+        warnings.filterwarnings("ignore")
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
+
+    def test_download(self):
+        cli = get_cli()
+        cli.updater = get_updater()
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 0)
+        msg = "Download finished.\nThere were no updates.\n"
+        self.assertEqual(self.capturedOutput.getvalue(), msg)
+
+
+class TestCLITrueUpdate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists("ignore_folder"):
+            os.mkdir("ignore_folder")
+        cls._prev_lang = ""
+        if "LC_ALL" in os.environ:
+            cls._prev_lang = os.environ["LC_ALL"]
+        locale.setlocale(locale.LC_ALL, "C")
+
+        dirname = os.path.join(
+            os.path.dirname(__file__), "../../../test_files/update/coeff_data"
+        )
+        cls.httpd = HTTPServer(dirname, ("localhost", 8000))
+        cls.t = threading.Thread(
+            name="test server proc", target=cls.httpd.serve_forever
+        )
+        cls.t.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.t.join()
+        os.remove("coeff_data/versions/LIME_MODEL_COEFS_20230123_V02.nc")
+
+    def setUp(self):
+        warnings.filterwarnings("ignore")
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        sys.stdout = self.capturedOutput
+        sys.stderr = self.capturedErr
+        self._prev_skip = interp_data.is_skip_uncertainties()
+        interp_data.set_skip_uncertainties(True)
+
+    def tearDown(self):
+        warnings.resetwarnings()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        interp_data.set_skip_uncertainties(self._prev_skip)
+
+    def test_download_working(self):
+        cli = get_cli()
+        cli.updater = get_updater()
+        errcode = cli.handle_input(get_opts("-u"))
+        self.assertEqual(errcode, 0)
+        msg = (
+            f"Download finished with errors.\nThere were 2 updates, 1 of them failed.\n"
+        )
+        self.assertEqual(self.capturedOutput.getvalue(), msg)

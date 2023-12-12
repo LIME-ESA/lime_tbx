@@ -800,7 +800,7 @@ class ComparisonData:
     simulated_signal: SpectralData
         Simulated data obtained from the model for the same conditions.
     diffs_signal: SpectralData
-        Relative differences between the simulated and real data. 100*(sim - real) / real.
+        Relative differences between the simulated and real data. 100*(experimental - simulated) / simulated.
     mean_relative_difference: float
         The mean of the relative differences (diffs_signals mean).
     mean_absolute_relative_difference: float

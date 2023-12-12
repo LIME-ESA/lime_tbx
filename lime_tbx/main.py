@@ -42,6 +42,11 @@ def main():
     )
     warnings.filterwarnings(
         "ignore",
+        ".*One of the correlation matrices is not positive.*",
+        UserWarning,
+    )
+    warnings.filterwarnings(
+        "ignore",
         ".*elementwise comparison failed; returning scalar instead.*",
         FutureWarning,
         "punpy",

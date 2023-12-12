@@ -166,6 +166,10 @@
  *              +-----------------------------------------------------------------------------+
  *              |   4.24  | 29/11/22 | DEIMOS Space S.L.U| Maintenance release                |
  *              +-----------------------------------------------------------------------------+
+ *              |   4.25  | 10/05/23 | DEIMOS Space S.L.U| Maintenance release                |
+ *              |         |          |                   | New features:                      |
+ *              |         |          |                   |  + Support for ANX drift in OSF    |
+ *              +-----------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
@@ -1797,6 +1801,12 @@ extern "C"
 
   typedef struct
   {
+    double offset; /*deg*/
+    double linear_term; /*deg/day*/
+  } xd_anx_longitude_drift;
+
+  typedef struct
+  {
     long linear_approx_validity;
     double quadratic_term; /*sec/day^2*/
     long nof_harmonics;
@@ -1824,6 +1834,8 @@ extern "C"
     long phase; /* These first variables contain the information of an OSF record. */
 
     long time_ref_of; /* Reference time to be considered as original */
+
+    xd_anx_longitude_drift anx_longitude_drift;
 
     xd_mlst_nonlinear_drift mlst_nonlinear_drift;
 

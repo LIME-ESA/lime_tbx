@@ -206,6 +206,10 @@
  *               |         |        |                   | + Allow the use of multiple AEM files   |
  *               |         |        |                   |   to initialize Attitude                |
  *               +--------------------------------------------------------------------------------+
+ *               |   4.25  |10/05/23| DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |        |                   | New features:                           |
+ *               |         |        |                   |  + Support for ANX drift in OSF         |
+ *               +--------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 #ifndef EXPLORER_POINTING_H

@@ -6,7 +6,7 @@ distance sun moon (AU),0.9
 selenographic latitude of observer (deg),30
 selenographic longitude of observer (deg),30
 selenographic longitude of sun (rad),1
-CIMEL Wavelength,Irradiance,uncertainties
+CIMEL Wavelength,Irradiance,uncertainties (k=2)
 314,0.01,1e-07
 420,0.01,0
 Wavelength,Irradiance,uncertainties

@@ -1,8 +1,10 @@
 /*!
     @file   explorer_file_handling.h
     @brief  Public header file for the explorer_file_handling library.
-    @version  4.24
-    @date   29/11/2022
+*/
+/*
+    @version  4.25
+    @date   10/05/2022
 
     <b>Copyright DEIMOS SPACE S.L.U</b>
 
@@ -11,21 +13,12 @@
     This product includes software developed by the GNOME Project
     http://xmlsoft.org/
 
-
 */
 
 /*!
     @mainpage
-
-    <center><b>Software User Manual
-
-    EE-MA-DMS-GS-008 Issue 4.24
-
-    29/11/2022</b></center>
-
-
+    
     @htmlinclude usage_guide.html
-
 */
 
 #ifndef EXPLORER_FILE_HANDLING_H
@@ -172,7 +165,7 @@ extern "C"
                                                         char *element,
                                                         long *value,
                                                         long *error );
-    @brief    Reads an integer number value
+    @brief    Reads an integer number value.
 
     @param    fd (IN):
                 File descriptor
@@ -868,7 +861,7 @@ extern "C"
 
     @param    fd (IN):
                 File descriptor
-    @param    path (IN):
+    @param    node_name (IN):
                 Path/node name to the element. It can be the whole path name of the 
                 node or just the following node with the given name. If an empty string
                 is provided, then the namespace is searched in the root element
@@ -907,7 +900,7 @@ extern "C"
 
     @param    fd (IN):
                 File descriptor
-    @param    error(OUT):
+    @param    error (OUT):
                 Error code
 
     Sets the parser pointer to the root element of the document being parsed,
@@ -935,7 +928,7 @@ extern "C"
                 File descriptor
     @param    path (IN):
                 Path to the element.
-    @param    error(OUT):
+    @param    error (OUT):
                 Error code
 
     Sets the current tree pointer of the file referred by \a fd
@@ -973,7 +966,7 @@ extern "C"
     @param    element (IN):
                 Element name. If it is NULL, means it is on the current
                 element name
-    @param    error(OUT):
+    @param    error (OUT):
                 Error code
 
     Sets the current tree pointer of the file referred by \a fd
@@ -1001,7 +994,7 @@ extern "C"
 
     @param    fd (IN):
                 File descriptor
-    @param    error(OUT):
+    @param    error (OUT):
                 Error code
 
     Sets the current tree pointer of the file referred by \a fd
@@ -1030,7 +1023,7 @@ extern "C"
                 File descriptor
     @param    path (OUT):
                 Path of the current element node.
-    @param    error(OUT):
+    @param    error (OUT):
                 Error code
 
     Gets the Xpath of the current tree pointer of the file referred by
@@ -1446,13 +1439,13 @@ extern "C"
     Write an XML document previously opened or created to a file on disk.
 
     The empty tags in a XML file can be written in two ways:
-      - short format: <tag/>
-      - long format:  <tag></tag>
+      - short format: "<tag/>"
+      - long format:  "<tag></tag>"
     The used format depends on the libxml's global variable "xmlSaveNoEmptyTags"
     (defined in libxml/globals.h). This variable is set to 0 by default (so that 
     the short format is written). To use the long format, the variable has to be 
     set to 1.
-
+ 
     - Assumptions : N/A
     - Errors   :
        - XF_CFI_WRONG_FILE_DESCRIPTOR
@@ -1486,7 +1479,7 @@ extern "C"
                - XF_CHANGE_SCHEMA:             Change schema
                - XF_DELETE_ALL:                Delete schema and version attributes
                - XF_DELETE_SCHEMA:             Delete schema attribute
-    @par    error(OUT):
+    @par    error (OUT):
               Error code.
   
     This function sets the schema in the root element of the filename
@@ -2104,7 +2097,7 @@ extern "C"
              Source filename
     @param source_node (IN):
              Node to copy
-    @param errr (OUT):
+    @param error (OUT):
              Error code
 
     This function copies a node from the src_file into the

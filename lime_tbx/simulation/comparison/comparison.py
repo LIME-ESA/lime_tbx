@@ -110,6 +110,10 @@ def _to_xyz(latitude, longitude, altitude):
     return x, y, z
 
 
+def _calc_rel_dif(experimental, theoretical):
+    return 100 * (experimental - theoretical) / theoretical
+
+
 class IComparison(ABC):
     """Interface that contains the methods of this module.
 
@@ -289,7 +293,7 @@ class Comparison(IComparison):
                 for j in range(num_samples):
                     sim = specs[1].data[j]
                     ref = specs[0].data[j]
-                    rel_dif = 100 * (ref - sim) / sim
+                    rel_dif = _calc_rel_dif(ref, sim)
                     tot_rel_diff += rel_dif
                     tot_abs_rel_diff += abs(rel_dif)
                     rel_diffs.append(rel_dif)
@@ -300,25 +304,21 @@ class Comparison(IComparison):
                     if not lime_simulation.is_skipping_uncs():
                         unc_sim = specs[1].uncertainties[j]
                         unc_ref = specs[0].uncertainties[j]
+                        rd_0 = _calc_rel_dif(ref - unc_ref, sim + unc_sim)
+                        rd_1 = _calc_rel_dif(ref + unc_ref, sim - unc_sim)
                         if sim > ref:
-                            rel_dif1 = (
-                                100 * (sim + unc_sim - ref - unc_ref) / (ref - unc_ref)
-                            )
                             perc_dif1 = (
                                 100
                                 * abs(sim + unc_sim - ref - unc_ref)
                                 / ((sim + unc_sim + ref - unc_ref) / 2)
                             )
                         else:
-                            rel_dif1 = (
-                                100 * (sim - unc_sim - ref + unc_ref) / (ref + unc_ref)
-                            )
                             perc_dif1 = (
                                 100
                                 * abs(sim - unc_sim - ref + unc_ref)
                                 / ((sim - unc_sim + ref + unc_ref) / 2)
                             )
-                        unc_r = abs(rel_dif - rel_dif1)
+                        unc_r = max(abs(rel_dif - rd_0), abs(rel_dif - rd_1))
                         unc_p = abs(perc_diff - perc_dif1)
                     uncs_r.append(unc_r)
                     uncs_p.append(unc_p)

@@ -221,6 +221,10 @@ used for interpolation. The valid values are 'True' and 'False'."
         "\t\t\t   skip_uncertainties: Sets if the ToolBox should skip the \
 uncertainties calculations. The valid values are 'True' and 'False'."
     )
+    print(
+        "\t\t\t   show_cimel_points: Sets if the graphs should show the CIMEL \
+anchor points used for interpolation. The valid values are 'True' and 'False'."
+    )
 
 
 def print_version():
@@ -238,6 +242,7 @@ class CLI:
             eocfi_path, kernels_path, self.settings_manager
         )
         self.srf = self.settings_manager.get_default_srf()
+        self.updater = Update()
 
     def load_srf(self, srf_file: str):
         if srf_file == "":
@@ -376,7 +381,7 @@ class CLI:
             self.lime_simulation.get_elrefs(),
             [
                 [gui_constants.INTERPOLATED_DATA_LABEL],
-                ["CIMEL data points"],
+                [gui_constants.CIMEL_POINT_LABEL],
                 [gui_constants.ERRORBARS_LABEL],
             ],
             self.lime_simulation.get_elrefs_cimel(),
@@ -403,7 +408,7 @@ class CLI:
             self.lime_simulation.get_elis(),
             [
                 [gui_constants.INTERPOLATED_DATA_LABEL],
-                ["CIMEL data points"],
+                [gui_constants.CIMEL_POINT_LABEL],
                 [gui_constants.ERRORBARS_LABEL],
             ],
             self.lime_simulation.get_elis_cimel(),
@@ -434,7 +439,7 @@ class CLI:
             self.lime_simulation.get_polars(),
             [
                 [gui_constants.INTERPOLATED_DATA_LABEL],
-                ["CIMEL data points"],
+                [gui_constants.CIMEL_POINT_LABEL],
                 [gui_constants.ERRORBARS_LABEL],
             ],
             self.lime_simulation.get_polars_cimel(),
@@ -753,7 +758,7 @@ class CLI:
                         file_index += 1
 
     def update_coefficients(self) -> int:
-        updater: IUpdate = Update()
+        updater: IUpdate = self.updater
         stopper_checker_true = lambda *_: True
         updates = False
         try:
@@ -826,6 +831,15 @@ class CLI:
                 return 1
             skip_uncertainties = skip_uncertainties == "True"
             self.settings_manager.set_skip_uncertainties(skip_uncertainties)
+        if "show_cimel_points" in interp_settings:
+            show_cimel_points = interp_settings["show_cimel_points"]
+            if show_cimel_points not in ("True", "False"):
+                eprint(
+                    f'Interpolation settings show_cimel_points value {show_cimel_points} not valid. Must be "True" or "False"'
+                )
+                return 1
+            show_cimel_points = show_cimel_points == "True"
+            self.settings_manager.set_show_cimel_points(show_cimel_points)
         return 0
 
     def check_sys_args(self, sysargs: List[str]) -> int:

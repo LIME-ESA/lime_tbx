@@ -197,6 +197,10 @@
  *               +----------------------------------------------------------------------------------+
  *               |   4.24  | 29/11/22 | DEIMOS Space S.L.U| Maintenance release                     |
  *               +----------------------------------------------------------------------------------+
+ *               |   4.25  | 10/05/23 | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |  + Support for ANX drift in OSF         |
+ *               +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
@@ -1436,6 +1440,8 @@ extern "C"
     long phase_num;
   } xo_mission_info;
 
+  typedef xd_anx_longitude_drift xo_anx_longitude_drift;
+
   typedef xd_mlst_nonlinear_drift xo_mlst_nonlinear_drift;
 
   typedef struct
@@ -1447,6 +1453,7 @@ extern "C"
     double ANX_long;
     double mlst; /* hours */
     double mlst_drift; /* s/day */
+    xo_anx_longitude_drift anx_longitude_drift;
     xo_mlst_nonlinear_drift mlst_nonlinear_drift;
   } xo_ref_orbit_info;
 

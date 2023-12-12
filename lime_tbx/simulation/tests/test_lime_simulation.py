@@ -222,17 +222,9 @@ class TestLimeSimulation(unittest.TestCase):
             np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_equal(cimel.uncertainties, unc)
 
-    # Function update_irradiance
-    def test_update_irradiance(self):
-        ls = get_lime_simulation()
-        ls._skip_uncs = False
-        ls.update_irradiance(
-            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
-        )
-        elis = ls.get_elis()
+    def _check_irr_output(self, elis, signals, cimels):
         self.assertIsNotNone(elis)
         self.assertIsInstance(elis, list)
-        signals = ls.get_signals()
         self.assertIsNotNone(signals)
         self.assertIsInstance(signals, SpectralData)
         elis_refs = np.array(
@@ -256,7 +248,6 @@ class TestLimeSimulation(unittest.TestCase):
             signals.data, np.array([[3.16668016e-06, 3.75979585e-06]])
         )
         np.testing.assert_array_almost_equal(signals.uncertainties, np.array([[0, 0]]))
-        cimels = ls.get_elis_cimel()
         cimel_refs = np.array(
             [
                 [
@@ -286,6 +277,29 @@ class TestLimeSimulation(unittest.TestCase):
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
             np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 8)
+
+    def test_update_irradiance_and_reflectance(self):
+        ls: LimeSimulation = get_lime_simulation()
+        ls._skip_uncs = False
+        ls._update_irradiance_and_reflectance(
+            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
+        )
+        elis = ls.get_elis()
+        signals = ls.get_signals()
+        cimels = ls.get_elis_cimel()
+        self._check_irr_output(elis, signals, cimels)
+
+    # Function update_irradiance
+    def test_update_irradiance(self):
+        ls = get_lime_simulation()
+        ls._skip_uncs = False
+        ls.update_irradiance(
+            get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
+        )
+        elis = ls.get_elis()
+        signals = ls.get_signals()
+        cimels = ls.get_elis_cimel()
+        self._check_irr_output(elis, signals, cimels)
 
     def test_update_irradiance_skip_uncs(self):
         ls = get_lime_simulation()

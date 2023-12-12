@@ -159,7 +159,8 @@ def redraw_canvas(
                         color=newlines[-1].get_color(),
                         alpha=0.3,
                     )
-                else:
+                elif np.any(data.uncertainties):
+                    # Not show errorbars if they are all 0 (skipping uncerts):
                     scanvas.axes.errorbar(
                         data.wlens,
                         data.data,
@@ -192,17 +193,19 @@ def redraw_canvas(
                         marker="o",
                         label=label0,
                     )
-                    extra_lines += [
-                        scanvas.axes.errorbar(
-                            cimel_data.wlens,
-                            cimel_data.data,
-                            yerr=cimel_data.uncertainties * 2,
-                            color="black",
-                            capsize=3,
-                            ls="none",
-                            label=label1,
-                        )
-                    ]
+                    if np.any(cimel_data.uncertainties):
+                        # Not show errorbars if they are all 0 (skipping uncerts)
+                        extra_lines += [
+                            scanvas.axes.errorbar(
+                                cimel_data.wlens,
+                                cimel_data.data,
+                                yerr=cimel_data.uncertainties * 2,
+                                color="black",
+                                capsize=3,
+                                ls="none",
+                                label=label1,
+                            )
+                        ]
                     if i == 0:
                         lines += extra_lines
 
@@ -244,7 +247,7 @@ def redraw_canvas(
                 data_comp.wlens,
                 data_comp.data,
                 marker="o",
-                color="grey",
+                color="#545454",
                 label=label,
                 markersize=4,
                 ls="none",
@@ -254,7 +257,7 @@ def redraw_canvas(
                     data_comp.wlens,
                     data_comp.data,
                     yerr=data_comp.uncertainties * 2,
-                    color="grey",
+                    color="#545454",
                     capsize=2,
                     ls="none",
                     alpha=0.3,

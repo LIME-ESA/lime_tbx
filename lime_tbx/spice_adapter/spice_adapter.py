@@ -385,6 +385,22 @@ class SPICEAdapter(ISPICEAdapter):
         spice.kclear()
 
     @staticmethod
+    def _change_frames(
+        coords: np.ndarray, source_frame: str, target_frame: str, et: float
+    ) -> np.ndarray:
+        if "MOON" not in target_frame:
+            trans_matrix = spice.pxform(source_frame, target_frame, et)
+            return spice.mxv(trans_matrix, coords)
+        moon_pos_satref, _ = spice.spkpos("MOON", et, source_frame, "NONE", "EARTH")
+        rotation = spice.pxform(source_frame, target_frame, et)
+        # set moon center as zero point
+        sat_pos_translate = np.zeros(3)
+        sat_pos_translate[0] = coords[0] - moon_pos_satref[0]
+        sat_pos_translate[1] = coords[1] - moon_pos_satref[1]
+        sat_pos_translate[2] = coords[2] - moon_pos_satref[2]
+        return spice.mxv(rotation, sat_pos_translate)
+
+    @staticmethod
     def to_rectangular_same_frame(
         latlonheights: List[Tuple[float, float, float]],
         body: str,
@@ -433,9 +449,9 @@ class SPICEAdapter(ISPICEAdapter):
                 eq_rad,
                 flattening,
             )
-            trans_matrix = spice.pxform(source_frame, target_frame, et)
-            pos_iau = spice.mxv(trans_matrix, pos_iau)
-            poss_iaus.append(pos_iau)
+            poss_iaus.append(
+                SPICEAdapter._change_frames(pos_iau, source_frame, target_frame, et)
+            )
         SPICEAdapter._clear_kernels()
         poss_iaus = list(map(lambda n: n * 1000, poss_iaus))
         return poss_iaus  # in meters
@@ -486,8 +502,9 @@ class SPICEAdapter(ISPICEAdapter):
         ets = spice.datetime2et(datetimes)
         for xyz, et in zip(xyz_list, ets):
             pos_iau = np.array(list(map(lambda n: n / 1000, xyz)))
-            trans_matrix = spice.pxform(source_frame, target_frame, et)
-            pos_iau_proc = spice.mxv(trans_matrix, pos_iau)
+            pos_iau_proc = SPICEAdapter._change_frames(
+                pos_iau, source_frame, target_frame, et
+            )
             llh = spice.recgeo(pos_iau_proc, eq_rad, flattening)
             llh_list.append(llh)
         SPICEAdapter._clear_kernels()

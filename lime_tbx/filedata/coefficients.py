@@ -1,6 +1,7 @@
 import numpy as np
 import xarray as xr
 import obsarray
+from packaging import version
 
 from lime_tbx.datatypes.datatypes import (
     LimeCoefficients,
@@ -8,6 +9,7 @@ from lime_tbx.datatypes.datatypes import (
     PolarizationCoefficients,
 )
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
+from lime_tbx.datatypes import constants
 
 TEMPLATE_COEFFS = {
     "coeff": {
@@ -99,6 +101,16 @@ TEMPLATE_COEFFS = {
 
 def read_coeff_nc(path: str) -> LimeCoefficients:
     ds = xr.open_dataset(path)
+    if "tbx_version_required" in ds.attrs:
+        tbx_minv = ds.tbx_version_required
+        tbx_v = constants.VERSION_NAME
+        if version.parse(tbx_v) < version.parse(tbx_minv):
+            # Coefficients won't work for a version prior to tbx_minv
+            ds.close()
+            raise Exception(
+                f"Coefficient file {path} has a minimum LIME TBX version specified. "
+                f"Required version: >={tbx_minv}. Current TBX version: {tbx_v}."
+            )
     file_version = ds.file_version
     creation_date = ds.creation_date
     release_date = ds.release_date
@@ -146,4 +158,5 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
         p_neg_u_data,
         p_neg_err_corr_data,
     )
+    ds.close()
     return LimeCoefficients(rf, pol, version_name)
