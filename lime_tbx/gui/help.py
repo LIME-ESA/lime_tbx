@@ -296,7 +296,7 @@ _HELP_TEXT = """
     Explore the various input types by switching between the top tabs.
 </p>
 <p>
-    Select the 'Irradiance,' 'Reflectance,' or 'Polarization' buttons to
+    Select the 'Irradiance,' 'Reflectance,' or 'Polarisation' buttons to
     display the simulation output corresponding to the provided input.
     The spectrum will be displayed in the Result tab, and if irradiance is selected,
     the integrated irradiances will be presented in the Signal tab.

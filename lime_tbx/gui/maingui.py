@@ -39,7 +39,7 @@ from lime_tbx.datatypes.datatypes import (
     LimeException,
     LunarObservation,
     Point,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
     SpectralValidity,
@@ -184,7 +184,7 @@ def elref_callback(
 def polar_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: PolarizationCoefficients,
+    coeffs: PolarisationCoefficients,
     lime_simulation: ILimeSimulation,
     signal_info: QtCore.Signal,
 ) -> Tuple[
@@ -196,7 +196,7 @@ def polar_callback(
 ]:
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_pol_simulated")
-    lime_simulation.update_polarization(def_srf, point, coeffs, callback_obs)
+    lime_simulation.update_polarisation(def_srf, point, coeffs, callback_obs)
     return (
         point,
         lime_simulation.get_polars(),
@@ -244,13 +244,13 @@ def calculate_all_callback(
     srf: SpectralResponseFunction,
     point: Point,
     cimel_coef: ReflectanceCoefficients,
-    p_coeffs: PolarizationCoefficients,
+    p_coeffs: PolarisationCoefficients,
     lime_simulation: ILimeSimulation,
 ):
     def_srf = get_default_srf()
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     lime_simulation.update_reflectance(def_srf, point, cimel_coef)
-    lime_simulation.update_polarization(def_srf, point, p_coeffs)
+    lime_simulation.update_polarisation(def_srf, point, p_coeffs)
     return (point, srf)
 
 
@@ -775,7 +775,7 @@ class MainSimulationsWidget(
         self.elref_button = QtWidgets.QPushButton("Reflectance")
         self.elref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.elref_button.clicked.connect(self.show_elref)
-        self.polar_button = QtWidgets.QPushButton("Polarization")
+        self.polar_button = QtWidgets.QPushButton("Polarisation")
         self.polar_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.polar_button.clicked.connect(self.show_polar)
         self.buttons_layout.addWidget(self.eli_button)
@@ -1090,7 +1090,7 @@ class MainSimulationsWidget(
     @QtCore.Slot()
     def show_polar(self):
         """
-        Calculate and show extraterrestrial lunar polarization for the given input.
+        Calculate and show extraterrestrial lunar polarisation for the given input.
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
@@ -1144,9 +1144,9 @@ class MainSimulationsWidget(
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
-            "Lunar polarization",
+            "Lunar polarisation",
             "Wavelengths (nm)",
-            "Polarizations (%)",
+            "Degree of Linear Polarisation (%)",
             subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])

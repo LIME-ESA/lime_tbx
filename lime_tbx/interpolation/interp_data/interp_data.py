@@ -64,18 +64,18 @@ def _get_default_asd_data(moon_phase_angle: float) -> SpectralData:  # pragma: n
 def get_best_polar_asd_data(
     moon_phase_angle: float,
 ) -> SpectralData:  # pragma: no cover
-    """Retrieve the best ASD polarization spectrum for the given moon phase angle.
-    This is not used in the end, the ASD polarization spectrum wasn't good enough.
+    """Retrieve the best ASD polarisation spectrum for the given moon phase angle.
+    This is not used in the end, the ASD polarisation spectrum wasn't good enough.
 
     Parameters
     ----------
     moon_phase_angle: float
-        Moon phase angle in degrees of which the best ASD polarization will be retrieved.
+        Moon phase angle in degrees of which the best ASD polarisation will be retrieved.
 
     Returns
     -------
     spectral_data: SpectralData
-        ASD polarization spectrum.
+        ASD polarisation spectrum.
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -85,8 +85,8 @@ def get_best_polar_asd_data(
     phase_angles = ds_asd.phase_angle.values
     best_id = np.argmin(np.abs(phase_angles - moon_phase_angle))
 
-    pol = ds_asd.polarization.values[:, best_id]
-    unc = ds_asd.u_polarization.values[:, best_id] * pol / 100
+    pol = ds_asd.polarisation.values[:, best_id]
+    unc = ds_asd.u_polarisation.values[:, best_id] * pol / 100
 
     spectral_data = SpectralData(wavs, pol, unc, ds_asd)
 
@@ -94,12 +94,12 @@ def get_best_polar_asd_data(
 
 
 def get_linear_polar_data() -> SpectralData:
-    """Retrieve the linear polarization spectrum.
+    """Retrieve the linear polarisation spectrum.
 
     Returns
     -------
     spectral_data: SpectralData
-        Linear polarization spectrum.
+        Linear polarisation spectrum.
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -111,7 +111,7 @@ def get_linear_polar_data() -> SpectralData:
     corr = np.zeros((len(wavs), len(wavs)))
     np.fill_diagonal(corr, 1)
 
-    ds = SpectralData.make_polarization_ds(wavs, pol, unc, corr)
+    ds = SpectralData.make_polarisation_ds(wavs, pol, unc, corr)
     spectral_data = SpectralData(wavs, pol, unc, ds)
 
     return spectral_data
@@ -342,7 +342,7 @@ def get_available_dolp_spectra_names() -> List[str]:
 
 
 def get_dolp_interpolation_spectrum_name() -> str:
-    """Obtains the currently chosen dolp (polarization) interpolation spectrum name.
+    """Obtains the currently chosen dolp (polarisation) interpolation spectrum name.
 
     Returns
     -------
@@ -350,10 +350,10 @@ def get_dolp_interpolation_spectrum_name() -> str:
         Currently chosen dolp interpolation spectrum name.
     """
     setts = _load_interp_settings()
-    if setts.interpolation_spectrum_polarization in _VALID_DOLP_INTERP_SPECTRA:
-        return setts.interpolation_spectrum_polarization
+    if setts.interpolation_spectrum_polarisation in _VALID_DOLP_INTERP_SPECTRA:
+        return setts.interpolation_spectrum_polarisation
     logger.get_logger().error(
-        f"Unknown interpolation spectrum found: {setts.interpolation_spectrum_polarization}"
+        f"Unknown interpolation spectrum found: {setts.interpolation_spectrum_polarisation}"
     )
     return _VALID_DOLP_INTERP_SPECTRA[0]
 
@@ -469,7 +469,7 @@ def set_dolp_interpolation_spectrum_name(spectrum: str):
     setts = _load_interp_settings()
     if spectrum in _VALID_DOLP_INTERP_SPECTRA:
         path = _get_interp_path()
-        setts.interpolation_spectrum_polarization = spectrum
+        setts.interpolation_spectrum_polarisation = spectrum
         setts._save_disk(path)
     else:
         msg = f"Tried setting unknown polarisation interpolation spectrum: {spectrum}"

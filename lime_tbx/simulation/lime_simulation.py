@@ -14,7 +14,7 @@ from lime_tbx.datatypes.datatypes import (
     LGLODData,
     MoonData,
     Point,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
     SpectralData,
@@ -137,24 +137,24 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
-    def update_polarization(
+    def update_polarisation(
         self,
         srf: SpectralResponseFunction,
         point: Point,
-        polar_coeff: PolarizationCoefficients,
+        polar_coeff: PolarisationCoefficients,
         callback_observation: Callable = None,
     ):
         """
-        Updates the polarization values if the stored values are not valid, using the given parameters.
+        Updates the polarisation values if the stored values are not valid, using the given parameters.
 
         Parameters
         ----------
         srf: SpectralResponseFunction
-            SRF for which the polarization will be calculated.
+            SRF for which the polarisation will be calculated.
         point: Point
-            Point (location) for which the polarization will be calculated.
-        polar_coeff: PolarizationCoefficients
-            Coefficients used for the calculation of polarization.
+            Point (location) for which the polarisation will be calculated.
+        polar_coeff: PolarisationCoefficients
+            Coefficients used for the calculation of polarisation.
         """
         pass
 
@@ -245,36 +245,36 @@ class ILimeSimulation(ABC):
     @abstractmethod
     def get_polars(self) -> Union[SpectralData, List[SpectralData]]:
         """
-        Returns the stored value for lunar polarization degree
+        Returns the stored value for lunar polarisation degree
 
         Returns
         -------
         polars: SpectralData | list of SpectralData
-            Previously calculated polarization/s
+            Previously calculated polarisation/s
         """
         pass
 
     @abstractmethod
     def get_polars_cimel(self) -> Union[SpectralData, List[SpectralData]]:
         """
-        Returns the stored value for lunar polarization degree for the cimel wavelengths
+        Returns the stored value for lunar polarisation degree for the cimel wavelengths
 
         Returns
         -------
         polars_cimel: SpectralData | list of SpectralData
-            Previously calculated polarization/s
+            Previously calculated polarisation/s
         """
         pass
 
     @abstractmethod
     def get_polars_asd(self) -> Union[SpectralData, List[SpectralData]]:
         """
-        Returns the stored value for lunar polarization degree for the asd spectrum.
+        Returns the stored value for lunar polarisation degree for the asd spectrum.
 
         Returns
         -------
         polars_asd: SpectralData | list of SpectralData
-            Previously calculated polarization/s
+            Previously calculated polarisation/s
         """
         pass
 
@@ -380,14 +380,14 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
-    def is_polarization_updated(self) -> bool:
-        """Returns if the polarization has been updated. If not, or nothing has been executed,
-        or the spectrum doesn't contain polarization values.
+    def is_polarisation_updated(self) -> bool:
+        """Returns if the polarisation has been updated. If not, or nothing has been executed,
+        or the spectrum doesn't contain polarisation values.
 
         Returns
         -------
         pol_uptodate: bool
-            True if the polarization is updated
+            True if the polarisation is updated
         """
         pass
 
@@ -656,9 +656,9 @@ class LimeSimulation(ILimeSimulation):
         return elis_cimel, elis_asd
 
     @staticmethod
-    def _calculate_polarization_values(
+    def _calculate_polarisation_values(
         mds: Union[MoonData, List[MoonData]],
-        polar_coeff: PolarizationCoefficients,
+        polar_coeff: PolarisationCoefficients,
         intp: SpectralInterpolation,
         wlens: List[float],
         skip_uncs: bool,
@@ -828,14 +828,14 @@ class LimeSimulation(ILimeSimulation):
                 return True
         return False
 
-    def is_polarization_updated(self) -> bool:
+    def is_polarisation_updated(self) -> bool:
         return self.pol_uptodate
 
-    def update_polarization(
+    def update_polarisation(
         self,
         srf: SpectralResponseFunction,
         point: Point,
-        polar_coeff: PolarizationCoefficients,
+        polar_coeff: PolarisationCoefficients,
         callback_observation: Callable = None,
     ):
         skip_uncs = self.is_skipping_uncs()
@@ -848,7 +848,7 @@ class LimeSimulation(ILimeSimulation):
                 self.polars_cimel,
                 self.polars_asd,
                 self.polars,
-            ) = LimeSimulation._calculate_polarization_values(
+            ) = LimeSimulation._calculate_polarisation_values(
                 self.mds,
                 polar_coeff,
                 self.intp,
@@ -1093,7 +1093,7 @@ class LimeSimulation(ILimeSimulation):
     @staticmethod
     def _calculate_polar(
         mds: Union[MoonData, List[MoonData]],
-        polar_coeff: PolarizationCoefficients,
+        polar_coeff: PolarisationCoefficients,
         skip_uncs: bool,
     ) -> Union[SpectralData, List[SpectralData]]:
         dl = dolp.DOLP()

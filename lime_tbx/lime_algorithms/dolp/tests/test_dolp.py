@@ -9,7 +9,7 @@ import numpy as np
 
 """___NPL Modules___"""
 from ..dolp import DOLP, IDOLP
-from lime_tbx.datatypes.datatypes import PolarizationCoefficients
+from lime_tbx.datatypes.datatypes import PolarisationCoefficients
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -47,7 +47,7 @@ _nounc_size = len(_NO_UNCS) * len(_NO_UNCS[0])
 _NO_ERR_CORR = np.zeros((_nounc_size, _nounc_size))
 np.fill_diagonal(_NO_ERR_CORR, 1)
 
-POL_COEFFS = PolarizationCoefficients(
+POL_COEFFS = PolarisationCoefficients(
     _WLENS,
     _POS_COEFFS,
     _NO_UNCS,

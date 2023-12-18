@@ -430,7 +430,7 @@ def write_obs(
         )
         polar_spectrum.units = "Fractions of unity"
         polar_spectrum.long_name = (
-            "simulated lunar degree of polarization per wavelength"
+            "simulated lunar degree of polarisation per wavelength"
         )
         polar_spectrum.valid_min = -1.0
         polar_spectrum.valid_max = 1.0
@@ -446,7 +446,7 @@ def write_obs(
         )
         polar_spectrum_unc.units = "Fractions of unity"
         polar_spectrum_unc.long_name = (
-            "uncertainties of the simulated lunar degree of polarization per wavelength"
+            "uncertainties of the simulated lunar degree of polarisation per wavelength"
         )
         polar_spectrum_unc.valid_min = -1.0
         polar_spectrum_unc.valid_max = 1.0
@@ -491,14 +491,14 @@ def write_obs(
         )
         polar_cimel.units = "Fractions of unity"
         polar_cimel.long_name = (
-            "Simulated lunar degree of polarization for the CIMEL wavelengths."
+            "Simulated lunar degree of polarisation for the CIMEL wavelengths."
         )
         polar_cimel[:] = np.array([cimel.data for cimel in lglod.polars_cimel])
         polar_cimel_unc = ds.createVariable(
             "polar_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         polar_cimel_unc.units = "Fractions of unity"
-        polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths."
+        polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarisation for the CIMEL wavelengths."
         polar_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.polars_cimel]
         )

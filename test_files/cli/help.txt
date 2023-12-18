@@ -1,4 +1,4 @@
-The lime toolbox performs simulations of lunar irradiance, reflectance and polarization for a given point and datetime. It also performs comparisons for some given observations files in GLOD format.
+The lime toolbox performs simulations of lunar irradiance, reflectance and polarisation for a given point and datetime. It also performs comparisons for some given observations files in GLOD format.
 
 It won't work unless given only one of the options (-h|-e|-l|-s|-c).
 

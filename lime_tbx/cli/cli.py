@@ -150,7 +150,7 @@ def print_help():
     compdiffsel = "(" + "|".join(COMP_DIFF_KEYS) + ")"
     print(
         "The lime toolbox performs simulations of lunar irradiance, reflectance and \
-polarization for a given point and datetime. It also performs comparisons for some given \
+polarisation for a given point and datetime. It also performs comparisons for some given \
 observations files in GLOD format.\n"
     )
     print("It won't work unless given only one of the options (-h|-e|-l|-s|-c).")
@@ -262,16 +262,16 @@ class CLI:
             def_srf, point, self.settings_manager.get_cimel_coef()
         )
 
-    def _calculate_polarization(self, point: Point):
+    def _calculate_polarisation(self, point: Point):
         def_srf = get_default_srf()
-        self.lime_simulation.update_polarization(
+        self.lime_simulation.update_polarisation(
             def_srf, point, self.settings_manager.get_polar_coef()
         )
 
     def _calculate_all(self, point: Point):
         self._calculate_reflectance(point)
         self._calculate_irradiance(point)
-        self._calculate_polarization(point)
+        self._calculate_polarisation(point)
 
     def _export_csvs(
         self,
@@ -310,7 +310,7 @@ class CLI:
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
-            "Polarizations (%)",
+            "Degree of Linear Polarisation (%)",
             point,
             ed.o_file_polar,
             version,
@@ -445,9 +445,9 @@ class CLI:
             self.lime_simulation.get_polars_cimel(),
             self.lime_simulation.get_polars_asd(),
             None,
-            "Extraterrestrial Lunar Polarization",
+            "Extraterrestrial Lunar Polarisation",
             "Wavelengths (nm)",
-            "Polarizations (%)",
+            "Degree of Linear Polarisation (%)",
             None,
             dolp_sp_name,
         )
@@ -455,7 +455,7 @@ class CLI:
             canv.print_figure(ed.o_file_polar)
         except Exception as e:
             eprint(
-                "Something went wrong while exporting polarization graph. {}".format(
+                "Something went wrong while exporting polarisation graph. {}".format(
                     str(e)
                 )
             )
