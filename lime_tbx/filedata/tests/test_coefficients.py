@@ -350,7 +350,7 @@ class TestCoefficients(unittest.TestCase):
         for i, arr in enumerate(rf._ds.u_coeff.values):
             for j, val in enumerate(arr):
                 self.assertAlmostEqual(val, u_data[i][j])
-        pl = cf.polarization
+        pl = cf.polarisation
         for i, arr in enumerate(pl.pos_coeffs):
             np.testing.assert_array_almost_equal(arr, pos.T[i])
         for i, arr in enumerate(pl.neg_coeffs):

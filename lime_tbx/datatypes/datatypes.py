@@ -15,10 +15,10 @@ It exports the following classes:
     * Satellite - ESA Satellite
     * SatellitePosition - A satellite's position
     * LunarObservation - GLOD lunar observation
-    * PolarizationCoefficients - Coefficients used in the DoLP algorithm.
+    * PolarisationCoefficients - Coefficients used in the DoLP algorithm.
     * ReflectanceCoefficients - Dataclass containing the cimel coefficients that will be used in the
         reflectance simulation algorithm.
-    * LimeCoefficients - Dataclass containing a PolarizationCoefficients and a ReflectanceCoefficients.
+    * LimeCoefficients - Dataclass containing a PolarisationCoefficients and a ReflectanceCoefficients.
     * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
     * ComparisonData - Dataclass containing the data outputed from a comparison.
     * KernelsPath - Dataclass containing the needed information in order to find all SPICE kernels.
@@ -524,7 +524,7 @@ class ReflectanceCoefficients:
         self.err_corr_coeff = _ds.err_corr_coeff.values
 
 
-class PolarizationCoefficients:
+class PolarisationCoefficients:
     """
     Coefficients used in the DoLP algorithm.
 
@@ -622,14 +622,14 @@ class LimeCoefficients:
     ----------
     reflectance: ReflectanceCoefficients
         Reflectance coefficients for the LIME model.
-    polarization: PolatizationCoefficients
-        Polarization coefficients for the DoLP/LIME model.
+    polarisation: PolatizationCoefficients
+        Polarisation coefficients for the DoLP/LIME model.
     version: str
         Name of the version that will be shown to the user.
     """
 
     reflectance: ReflectanceCoefficients
-    polarization: PolarizationCoefficients
+    polarisation: PolarisationCoefficients
     version: str
 
 
@@ -674,8 +674,8 @@ class SpectralData:
         self.err_corr = None
         if hasattr(ds, "err_corr_reflectance"):
             self.err_corr = ds.err_corr_reflectance.values.astype(np.float32)
-        elif hasattr(ds, "err_corr_polarization"):
-            self.err_corr = ds.err_corr_polarization.values.astype(np.float32)
+        elif hasattr(ds, "err_corr_polarisation"):
+            self.err_corr = ds.err_corr_polarisation.values.astype(np.float32)
         elif hasattr(ds, "err_corr_irradiance"):
             self.err_corr = ds.err_corr_irradiance.values.astype(np.float32)
 
@@ -732,9 +732,9 @@ class SpectralData:
         return ds_irr
 
     @staticmethod
-    def make_polarization_ds(
+    def make_polarisation_ds(
         wavs: np.ndarray,
-        polarization: np.ndarray,
+        polarisation: np.ndarray,
         unc: np.ndarray = None,
         corr: np.ndarray = None,
     ) -> xarray.Dataset:
@@ -744,18 +744,18 @@ class SpectralData:
 
         ds_pol = ds_pol.assign_coords(wavelength=wavs)
 
-        ds_pol.polarization.values = polarization
+        ds_pol.polarisation.values = polarisation
 
         if unc is not None:
-            ds_pol.u_polarization.values = unc
+            ds_pol.u_polarisation.values = unc
         else:
-            ds_pol.u_polarization.values = np.abs(polarization) * 0.05
+            ds_pol.u_polarisation.values = np.abs(polarisation) * 0.05
 
         if corr is not None:
-            ds_pol.err_corr_polarization.values = corr
+            ds_pol.err_corr_polarisation.values = corr
         else:
-            ds_pol.err_corr_polarization.values = np.ones(
-                (len(polarization), len(polarization))
+            ds_pol.err_corr_polarisation.values = np.ones(
+                (len(polarisation), len(polarisation))
             )
 
         return ds_pol
@@ -894,7 +894,7 @@ class LunarObservationWrite:
     refls: SpectralData
         Reflectance data
     polars: SpectralData
-        Polarization data
+        Polarisation data
     sat_name: str | None
         Name of the satellite. If None or empty, then it's a SurfacePoint
     selenographic_data: SelenographicDataWrite | None
@@ -937,7 +937,7 @@ class LGLODData:
     Attributes
     ----------
     observations: list of LunarObservationWrite
-        Spectral irradiance, reflectance and polarization for all the datetimes.
+        Spectral irradiance, reflectance and polarisation for all the datetimes.
     signals: SpectralData
         SRF-Integrated irradiance data.
     not_default_srf: bool
@@ -947,7 +947,7 @@ class LGLODData:
     elrefs_cimel: list of SpectralData
         Reflectance for the cimel.
     polars_cimel: list of SpectralData
-        Polarization for the cimel.
+        Polarisation for the cimel.
     spectrum_name: str
         Name of the spectrum used for interpolation.
     skipped_uncs: bool
@@ -1013,8 +1013,8 @@ class InterpolationSettings:
     ----------
     interpolation_spectrum: str
         Name (and id) of the spectrum used for interpolation.
-    interpolation_spectrum_polarization: str
-        Name (and id) of the spectrum used for interpolation for polarization.
+    interpolation_spectrum_polarisation: str
+        Name (and id) of the spectrum used for interpolation for polarisation.
     interpolation_SRF: str
         Name (and id) of the spectrum used for SRF interpolation.
     show_interp_spectrum: bool
@@ -1026,7 +1026,7 @@ class InterpolationSettings:
     """
 
     interpolation_spectrum: str
-    interpolation_spectrum_polarization: str
+    interpolation_spectrum_polarisation: str
     interpolation_SRF: str
     show_cimel_points: bool
     show_interp_spectrum: bool

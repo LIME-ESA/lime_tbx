@@ -12,7 +12,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from ..lime_simulation import ILimeSimulation, LimeSimulation, is_ampa_valid_range
 from ...datatypes.datatypes import (
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     ReflectanceCoefficients,
     SpectralData,
     SpectralResponseFunction,
@@ -23,7 +23,7 @@ from ...datatypes.datatypes import (
     LGLODData,
 )
 from ...coefficients.access_data.access_data import (
-    _get_default_polarization_coefficients,
+    _get_default_polarisation_coefficients,
     _get_demo_cimel_coeffs,
 )
 from ...filedata import moon, srf as srflib
@@ -72,8 +72,8 @@ def get_cimel_coeffs() -> ReflectanceCoefficients:
     return _get_demo_cimel_coeffs()
 
 
-def get_polar_coeffs() -> PolarizationCoefficients:
-    return _get_default_polarization_coefficients()
+def get_polar_coeffs() -> PolarisationCoefficients:
+    return _get_default_polarisation_coefficients()
 
 
 def get_lime_simulation() -> ILimeSimulation:
@@ -353,11 +353,11 @@ class TestLimeSimulation(unittest.TestCase):
             np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_equal(cimel.uncertainties, unc)
 
-    # Function update_polarization
-    def test_update_polarization(self):
+    # Function update_polarisation
+    def test_update_polarisation(self):
         ls = get_lime_simulation()
         ls._skip_uncs = False
-        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
+        ls.update_polarisation(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         polars = ls.get_polars()
         self.assertIsNotNone(polars)
         self.assertIsInstance(polars, list)
@@ -416,10 +416,10 @@ class TestLimeSimulation(unittest.TestCase):
             np.testing.assert_array_equal(cimel.data, data)
             np.testing.assert_allclose(cimel.uncertainties, unc, rtol=0.4)
 
-    def test_update_polarization_skip_uncs(self):
+    def test_update_polarisation_skip_uncs(self):
         ls = get_lime_simulation()
         ls._skip_uncs = True
-        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
+        ls.update_polarisation(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         polars = ls.get_polars()
         self.assertIsNotNone(polars)
         self.assertIsInstance(polars, list)
@@ -469,7 +469,7 @@ class TestLimeSimulation(unittest.TestCase):
         ls.update_irradiance(
             get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
         )
-        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
+        ls.update_polarisation(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
         elis = ls.get_elis()
         self.assertIsNotNone(elis)
         self.assertIsInstance(elis, list)
@@ -620,20 +620,20 @@ class TestLimeSimulation(unittest.TestCase):
         for md, valid in zip(mds, valids):
             self.assertEqual(valid, is_ampa_valid_range(md.absolute_mpa_degrees))
 
-    # is_polarization_updated
-    def test_is_polarization_updated(self):
+    # is_polarisation_updated
+    def test_is_polarisation_updated(self):
         ls = get_lime_simulation()
-        self.assertFalse(ls.is_polarization_updated())
+        self.assertFalse(ls.is_polarisation_updated())
         ls.update_reflectance(get_default_srf(), SURFACE_POINT, get_cimel_coeffs())
-        self.assertFalse(ls.is_polarization_updated())
+        self.assertFalse(ls.is_polarisation_updated())
         ls.update_irradiance(
             get_default_srf(), get_srf(), SURFACE_POINT, get_cimel_coeffs()
         )
-        self.assertFalse(ls.is_polarization_updated())
-        ls.update_polarization(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
-        self.assertTrue(ls.is_polarization_updated())
+        self.assertFalse(ls.is_polarisation_updated())
+        ls.update_polarisation(get_default_srf(), SURFACE_POINT, get_polar_coeffs())
+        self.assertTrue(ls.is_polarisation_updated())
         ls.set_simulation_changed()
-        self.assertFalse(ls.is_polarization_updated())
+        self.assertFalse(ls.is_polarisation_updated())
 
     # set_observations
     def test_load_lglod(self):

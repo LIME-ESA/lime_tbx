@@ -178,7 +178,7 @@ def main():
     ds = nc.Dataset(DS_PATH, "r+")
     wlens = ds["wavelength"][:].data
     refl = ds["reflectance"][:].data
-    dolp = ds["polarization"][:].data
+    dolp = ds["polarisation"][:].data
     refl = replace_too_corrupted_mpas(wlens, refl)
     ds["reflectance"][:] = refl
     return
@@ -194,7 +194,7 @@ def main():
             extrapolate(ini, stop, wlens, refl)
             extrapolate_constant(ini, stop, wlens, dolp)
     ds["reflectance"][:] = refl
-    ds["polarization"][:] = dolp
+    ds["polarisation"][:] = dolp
     ds.close()
 
 

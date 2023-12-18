@@ -15,7 +15,7 @@ import obsarray
 from ..datatypes import (
     LunarObservation,
     OrbitFile,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     ReflectanceCoefficients,
     SRFChannel,
     Satellite,
@@ -242,9 +242,9 @@ _nounc_size = len(UNCERTAINTIES) * len(UNCERTAINTIES[0])
 ERR_CORR = np.random.random_sample((_nounc_size, _nounc_size))
 
 
-class TestPolarizationCoefficients(unittest.TestCase):
+class TestPolarisationCoefficients(unittest.TestCase):
     def test_polcoeffs_ok(self):
-        coeffs = PolarizationCoefficients(
+        coeffs = PolarisationCoefficients(
             COEF_WLENS,
             POS_COEFFS,
             UNCERTAINTIES,
@@ -267,7 +267,7 @@ class TestPolarizationCoefficients(unittest.TestCase):
     def test_polcoeffs_not_calculable(self):
         pos_coeffs = POS_COEFFS.copy()
         pos_coeffs[2] = tuple(np.nan for _ in range(4))
-        coeffs = PolarizationCoefficients(
+        coeffs = PolarisationCoefficients(
             COEF_WLENS,
             pos_coeffs,
             UNCERTAINTIES,
@@ -277,7 +277,7 @@ class TestPolarizationCoefficients(unittest.TestCase):
             ERR_CORR * -1,
         )
         self.assertFalse(coeffs.is_calculable())
-        coeffs = PolarizationCoefficients(
+        coeffs = PolarisationCoefficients(
             COEF_WLENS,
             POS_COEFFS,
             UNCERTAINTIES,
@@ -370,12 +370,12 @@ class TestSpectralData(unittest.TestCase):
         self.assertIsNotNone(ds.u_irradiance.values)
         self.assertIsNotNone(ds.err_corr_irradiance.values)
 
-    def test_make_polarization_ds_ok(self):
-        ds = SpectralData.make_polarization_ds(SPD_WAVS, SPD_VALS)
-        for i, val in enumerate(ds.polarization.values):
+    def test_make_polarisation_ds_ok(self):
+        ds = SpectralData.make_polarisation_ds(SPD_WAVS, SPD_VALS)
+        for i, val in enumerate(ds.polarisation.values):
             self.assertEqual(val, SPD_VALS[i])
-        self.assertIsNotNone(ds.u_polarization.values)
-        self.assertIsNotNone(ds.err_corr_polarization.values)
+        self.assertIsNotNone(ds.u_polarisation.values)
+        self.assertIsNotNone(ds.err_corr_polarisation.values)
 
     def test_make_signals_ds_ok(self):
         ds = SpectralData.make_signals_ds(CH_IDS, SIGNALS_DATA)

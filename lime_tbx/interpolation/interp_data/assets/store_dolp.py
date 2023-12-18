@@ -44,7 +44,7 @@ def store_dolp_original(df):
     print(mpas_ids)
     dolps = np.array([df[df.columns[mpa]] for mpa in mpas_ids])
     print(dolps.shape)
-    ds["polarization"][:] = dolps.T
+    ds["polarisation"][:] = dolps.T
     ds.close()
 
 
@@ -100,7 +100,7 @@ def store_dolp(df):
     #    np.array([df[df.columns[mpa]] for mpa in mpas_ids])
     dolps = np.array(dolps)
     print(dolps.shape)
-    ds["polarization"][:] = dolps.T
+    ds["polarisation"][:] = dolps.T
     ds.close()
 
 

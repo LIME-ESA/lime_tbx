@@ -1,5 +1,5 @@
 """
-This module calculates the extra-terrestrial lunar disk degree of polarization.
+This module calculates the extra-terrestrial lunar disk degree of polarisation.
 
 It exports the following classes:
     * IDOLP - Interface that contains the methods of this module.
@@ -21,7 +21,7 @@ import numpy as np
 import punpy
 
 """___LIME TBX Modules___"""
-from lime_tbx.datatypes.datatypes import PolarizationCoefficients, SpectralData
+from lime_tbx.datatypes.datatypes import PolarisationCoefficients, SpectralData
 from lime_tbx.datatypes import constants
 
 
@@ -38,7 +38,7 @@ class IDOLP(ABC):
     Interface that contains the methods of this module.
 
     It exports the following functions:
-        * get_polarized: Calculates the extra-terrestrial lunar polarization in fractions of unity for some
+        * get_polarized: Calculates the extra-terrestrial lunar polarisation in fractions of unity for some
             given parameters.
     """
 
@@ -46,30 +46,30 @@ class IDOLP(ABC):
     def get_polarized(
         self,
         mpa_degrees: float,
-        coefficients: PolarizationCoefficients,
+        coefficients: PolarisationCoefficients,
         skip_uncs: bool = False,
     ) -> SpectralData:
         """
-        Calculation of the degree of linear polarization.
+        Calculation of the degree of linear polarisation.
 
         Parameters
         ----------
         mpa_degrees: float
             Moon phase angle in degrees.
-        coefficients: PolarizationCoefficients
+        coefficients: PolarisationCoefficients
             Coefficients needed in the dolp algorithm
         skip_uncs: bool
             Flag for skipping the calculation of uncertainties.
 
         Returns
         -------
-        polarizations: SpectralData
-            SpectralData with the degrees of polarization for each given wavelength.
+        polarisations: SpectralData
+            SpectralData with the degrees of polarisation for each given wavelength.
         """
         pass
 
 
-def _measurement_func_polarization(mpa: float, a_coeffs: np.ndarray) -> np.ndarray:
+def _measurement_func_polarisation(mpa: float, a_coeffs: np.ndarray) -> np.ndarray:
     quant_coeffs = len(a_coeffs[0])
     if quant_coeffs not in (4, 5):
         quant_coeffs = quant_coeffs / constants.NUM_CIMEL_WLENS
@@ -81,19 +81,19 @@ class DOLP(IDOLP):
     def _get_direct_polarized(
         self,
         mpa: float,
-        coefficients: PolarizationCoefficients,
+        coefficients: PolarisationCoefficients,
     ) -> float:
         if mpa > 0:  # is this sign ok?
             a_coeffs = np.array(coefficients.pos_coeffs)
         else:
             a_coeffs = np.array(coefficients.neg_coeffs)
-        return _measurement_func_polarization(mpa, a_coeffs)
+        return _measurement_func_polarisation(mpa, a_coeffs)
 
     def _get_direct_polarized_individual(
         self,
         wlen: float,
         mpa: float,
-        coefficients: PolarizationCoefficients,
+        coefficients: PolarisationCoefficients,
     ) -> float:
         if mpa > 0:  # is this sign ok?
             a_coeffs = coefficients.get_coefficients_positive(wlen)
@@ -106,7 +106,7 @@ class DOLP(IDOLP):
     def _calculate_polar_unc(
         self,
         mpa_degrees: float,
-        coefficients: PolarizationCoefficients,
+        coefficients: PolarisationCoefficients,
     ) -> Tuple[np.ndarray, np.ndarray]:
         # it fails if unc_coeffs == zeros
         prop = punpy.MCPropagation(100, 1, MCdimlast=True)
@@ -119,7 +119,7 @@ class DOLP(IDOLP):
             unc_coeffs = np.array(coefficients.neg_unc)
             corr_coeffs = np.array(coefficients.p_neg_err_corr_data)
         unc, corr = prop.propagate_random(
-            _measurement_func_polarization,
+            _measurement_func_polarisation,
             [
                 mpa_degrees,
                 a_coeffs,
@@ -141,40 +141,40 @@ class DOLP(IDOLP):
     def get_polarized(
         self,
         mpa_degrees: float,
-        coefficients: PolarizationCoefficients,
+        coefficients: PolarisationCoefficients,
         skip_uncs: bool = False,
     ) -> SpectralData:
         """
-        Calculation of the degree of linear polarization.
+        Calculation of the degree of linear polarisation.
 
         Parameters
         ----------
         mpa_degrees: float
             Moon phase angle in degrees.
-        coefficients: PolarizationCoefficients
+        coefficients: PolarisationCoefficients
             Coefficients needed in the dolp algorithm
         skip_uncs: bool
             Flag for skipping the calculation of uncertainties.
 
         Returns
         -------
-        polarizations: SpectralData
-            List with the degrees of polarization for each given wavelength.
+        polarisations: SpectralData
+            List with the degrees of polarisation for each given wavelength.
         """
-        polarizations = []
+        polarisations = []
         wavelengths = coefficients.get_wavelengths()
-        polarizations = self._get_direct_polarized(mpa_degrees, coefficients)
+        polarisations = self._get_direct_polarized(mpa_degrees, coefficients)
         if not skip_uncs:
             uncs, corr = self._calculate_polar_unc(mpa_degrees, coefficients)
-            ds_pol = SpectralData.make_polarization_ds(
-                wavelengths, polarizations, uncs, corr
+            ds_pol = SpectralData.make_polarisation_ds(
+                wavelengths, polarisations, uncs, corr
             )
         else:
-            uncs = np.zeros(polarizations.shape)
+            uncs = np.zeros(polarisations.shape)
             ds_pol = None
         return SpectralData(
             np.array(wavelengths),
-            polarizations,
+            polarisations,
             uncs,
             ds_pol,
         )

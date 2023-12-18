@@ -37,7 +37,7 @@ class TestLGLODFactory(unittest.TestCase):
             40, 40, 400, datetime(2000, 1, 1, 1, 1, 1, tzinfo=timezone.utc)
         )
         ls.update_irradiance(srf, srf, pt, get_coeffs())
-        ls.update_polarization(srf, pt, POL_COEFFS)
+        ls.update_polarisation(srf, pt, POL_COEFFS)
         lglod = lglod_factory.create_lglod_data(
             pt,
             srf,
@@ -60,7 +60,7 @@ class TestLGLODFactory(unittest.TestCase):
             "ENVISAT", datetime(2005, 10, 10, 10, 10, 10, tzinfo=timezone.utc)
         )
         ls.update_irradiance(srf, srf, pt, get_coeffs())
-        ls.update_polarization(srf, pt, POL_COEFFS)
+        ls.update_polarisation(srf, pt, POL_COEFFS)
         lglod = lglod_factory.create_lglod_data(
             pt,
             srf,
@@ -81,7 +81,7 @@ class TestLGLODFactory(unittest.TestCase):
         srf = get_default_srf()
         pt = CustomPoint(1, 400000, 30, 30, 1, 40, -40)
         ls.update_irradiance(srf, srf, pt, get_coeffs())
-        ls.update_polarization(srf, pt, POL_COEFFS)
+        ls.update_polarisation(srf, pt, POL_COEFFS)
         lglod = lglod_factory.create_lglod_data(
             pt, srf, ls, KERNELS_PATH, "test", "testp", "test"
         )

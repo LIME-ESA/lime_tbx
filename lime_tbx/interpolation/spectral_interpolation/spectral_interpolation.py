@@ -41,7 +41,7 @@ class ISpectralInterpolation(ABC):
     It exports the following functions:
         * get_best_interp_reference() - Get the best reflectance interpolation reference
             for the given data for the currently selected interpolation spectrum.
-        * get_best_polar_interp_reference() - Get the best polarization interpolation
+        * get_best_polar_interp_reference() - Get the best polarisation interpolation
             reference for the given data for the currently selected interpolation spectrum.
         * get_interpolated_refl() - Interpolates the cimel values to final_wav using the
             given spectrum data as reference.
@@ -71,7 +71,7 @@ class ISpectralInterpolation(ABC):
     @abstractmethod
     def get_best_polar_interp_reference(self, moon_data: MoonData) -> SpectralData:
         """
-        Get the best polarization interpolation reference for the given data for the currently
+        Get the best polarisation interpolation reference for the given data for the currently
         selected interpolation spectrum.
 
         Parameters
