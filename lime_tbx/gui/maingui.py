@@ -2,7 +2,7 @@
 
 """___Built-In Modules___"""
 from enum import Enum
-from typing import List, Callable, Union, Tuple
+from typing import List, Callable, Union, Tuple, Iterable
 from datetime import datetime, timezone
 import os
 
@@ -46,6 +46,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     ReflectanceCoefficients,
     SpectralData,
+    MoonData,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
@@ -80,6 +81,7 @@ def eli_callback(
     List[float],
     SpectralResponseFunction,
     Union[SpectralData, List[SpectralData], Union[bool, List[bool]]],
+    Union[float, None],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -115,10 +117,16 @@ def eli_callback(
         Calculated uncertainty data.
     inside_mpa_range: bool or list of bool
         Indicates if the different point locations/s are inside the valid mpa range.
+    mpa: float or None
+        Moon phase angle in degrees in case that it's only one moon phase angle value.
     """
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_refl_irr_simulated")
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    mpa = None
+    if isinstance(mdas, MoonData):
+        mpa = mdas.mpa_degrees
     return (
         point,
         srf,
@@ -127,6 +135,7 @@ def eli_callback(
         lime_simulation.get_elis_asd(),
         lime_simulation.get_signals(),
         lime_simulation.are_mpas_inside_mpa_range(),
+        mpa,
     )
 
 
@@ -142,6 +151,7 @@ def elref_callback(
     Point,
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
+    Union[float, None],
 ]:
     """Callback that performs the Reflectance operations.
 
@@ -168,16 +178,23 @@ def elref_callback(
         Calculated uncertainty data.
     inside_mpa_range: bool or list of bool
         Indicates if the different point locations/s are inside the valid mpa range.
+    mpa: float or None
+        Moon phase angle in degrees in case that it's only one moon phase angle value.
     """
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_refl_simulated")
     lime_simulation.update_reflectance(def_srf, point, cimel_coef, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    mpa = None
+    if isinstance(mdas, MoonData):
+        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_elrefs(),
         lime_simulation.get_elrefs_cimel(),
         lime_simulation.get_elrefs_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
+        mpa,
     )
 
 
@@ -193,16 +210,22 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
+    Union[float, None],
 ]:
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_pol_simulated")
     lime_simulation.update_polarisation(def_srf, point, coeffs, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    mpa = None
+    if isinstance(mdas, MoonData):
+        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_polars(),
         lime_simulation.get_polars_cimel(),
         lime_simulation.get_polars_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
+        mpa,
     )
 
 
@@ -978,12 +1001,16 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             SpectralData,
             Union[bool, List[bool]],
+            Union[float, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        mpa_text = ""
+        if data[7] is not None:
+            mpa_text = f" | MPA: {data[7]:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
@@ -1057,12 +1084,16 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
+            Union[float, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        mpa_text = ""
+        if data[5] is not None:
+            mpa_text = f" | MPA: {data[5]:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
@@ -1126,12 +1157,16 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
+            Union[float, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        mpa_text = ""
+        if data[5] is not None:
+            mpa_text = f" | MPA: {data[5]:.3f}°"
         sp_name = interp_data.get_dolp_interpolation_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)

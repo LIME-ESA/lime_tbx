@@ -25,6 +25,7 @@ from lime_tbx.datatypes.datatypes import (
     SatellitePoint,
     SpectralData,
     SurfacePoint,
+    MoonData,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.gui import settings, constants as gui_constants
@@ -368,7 +369,14 @@ class CLI:
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         sp_name = self.settings_manager.get_selected_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        mdas = self.lime_simulation.get_moon_datas()
+        mpa = None
+        if isinstance(mdas, MoonData):
+            mpa = mdas.mpa_degrees
+        mpa_text = ""
+        if mpa is not None:
+            mpa_text = f" | MPA: {mpa:.3f}°"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
@@ -430,7 +438,7 @@ class CLI:
             )
             sys.exit(1)
         canv.axes.cla()  # Clear the canvas.
-        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}"
+        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}{mpa_text}"
         subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.cla()  # Clear the canvas.
