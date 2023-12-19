@@ -1,5 +1,6 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
+moon phase angle (deg),-30.4
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
 satellite,BIOMASS
 datetime,2018-02-27 02:00:00+00:00

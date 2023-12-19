@@ -282,6 +282,10 @@ class CLI:
         version = self.settings_manager.get_lime_coef().version
         are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        mdas = self.lime_simulation.get_moon_datas()
+        mpa = None
+        if isinstance(mdas, MoonData):
+            mpa = mdas.mpa_degrees
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         csv.export_csv_simulation(
@@ -295,6 +299,7 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elrefs_cimel(),
+            mpa,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
@@ -307,6 +312,7 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elis_cimel(),
+            mpa,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
@@ -319,6 +325,7 @@ class CLI:
             dolp_sp_name,
             skip_uncs,
             self.lime_simulation.get_polars_cimel(),
+            mpa,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -329,6 +336,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             sp_name,
             skip_uncs,
+            mpa,
         )
 
     def _export_lglod(self, point: Point, output_file: str):

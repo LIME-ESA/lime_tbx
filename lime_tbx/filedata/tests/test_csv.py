@@ -93,6 +93,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
+            30.123,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
@@ -109,6 +110,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
+            CPOINT.moon_phase_angle,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
@@ -125,6 +127,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
+            -30.4,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
@@ -142,6 +145,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
+            None,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_4.csv"))
 
@@ -159,6 +163,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
+            None,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
@@ -214,6 +219,7 @@ class TestCSV(unittest.TestCase):
             [True, True],
             "ASD",
             False,
+            30,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
 

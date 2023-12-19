@@ -1012,6 +1012,7 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mpa(data[7])
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
@@ -1032,6 +1033,7 @@ class MainSimulationsWidget(
         self.signal_widget.set_interp_spectrum_name(
             self.settings_manager.get_selected_spectrum_name()
         )
+        self.signal_widget.set_mpa(data[7])
         self.signal_widget.set_skipped_uncertainties(is_skip_uncs)
         self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
@@ -1095,6 +1097,7 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mpa(data[5])
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_coef_version_name()
@@ -1168,6 +1171,7 @@ class MainSimulationsWidget(
         sp_name = interp_data.get_dolp_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mpa(data[5])
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         # self.graph.set_max_ylims(-120, 120) # TODO decide if we do this or not
