@@ -71,9 +71,10 @@ class IDOLP(ABC):
 
 def _measurement_func_polarisation(mpa: float, a_coeffs: np.ndarray) -> np.ndarray:
     quant_coeffs = len(a_coeffs[0])
-    if quant_coeffs not in (4, 5):
-        quant_coeffs = quant_coeffs / constants.NUM_CIMEL_WLENS
-    result = sum(a_coeffs[:, i] * mpa ** (i + 1) for i in range(quant_coeffs))
+    if quant_coeffs == 4:
+        result = sum(a_coeffs[:, i] * mpa ** (i + 1) for i in range(quant_coeffs))
+    else:  # elif quant_coeffs == 5:
+        result = sum(a_coeffs[:, i] * mpa**i for i in range(quant_coeffs))
     return result
 
 
