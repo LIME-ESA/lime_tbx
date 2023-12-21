@@ -612,7 +612,9 @@ class CLI:
     ):
         self.loaded_moons: List[LunarObservation] = []
         for path in input_files:
-            self._add_observation(moon.read_moon_obs(path))
+            self._add_observation(
+                moon.read_moon_obs(path, self.kernels_path, self.eocfi_path)
+            )
         if len(self.loaded_moons) == 0:
             raise LimeException("No observations given. Aborting.")
         mos = self.loaded_moons

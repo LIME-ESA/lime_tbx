@@ -292,7 +292,9 @@ class EOCFIConverter(IEOCFIConverter):
             List of tuples of 3 floats, representing xyz in meters, in the ITRF93 frame.
         """
         if sat not in self.get_sat_names():
-            raise Exception("Satellite is not registered in LIME's satellite list.")
+            raise LimeException(
+                f"Satellite '{sat}' is not registered in LIME's satellite list."
+            )
         sat: Satellite = [s for s in self.get_sat_list() if s.name == sat][0]
         dt_orb_f = {}
         for dt in dts:

@@ -196,61 +196,77 @@ class Comparison(IComparison):
         sp_calcs = []
         #
         dts = [o.dt for o in observations]
-        xyzs = [
-            (
-                o.sat_pos.x,
-                o.sat_pos.y,
-                o.sat_pos.z,
-            )
-            for o in observations
-        ]
         sp_calcs = []
         mdas = []
-        if observations and observations[0].sat_pos_ref in (
-            "IAU_MOON",
-            "MOON_ME",
-            "MOON",
-        ):
-            llhs = SPICEAdapter.to_planetographic_multiple(
-                xyzs,
+        if observations[0].sat_pos is not None:
+            xyzs = [
+                (
+                    o.sat_pos.x,
+                    o.sat_pos.y,
+                    o.sat_pos.z,
+                )
+                for o in observations
+            ]
+            if observations and observations[0].sat_pos_ref in (
+                "IAU_MOON",
+                "MOON_ME",
                 "MOON",
-                self.kernels_path.main_kernels_path,
-                dts,
-                observations[0].sat_pos_ref,
-                "MOON_ME",
-            )
-            mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-                xyzs,
-                dts,
-                self.kernels_path,
-                "MOON_ME",
-            )
+            ):
+                llhs = SPICEAdapter.to_planetographic_multiple(
+                    xyzs,
+                    "MOON",
+                    self.kernels_path.main_kernels_path,
+                    dts,
+                    observations[0].sat_pos_ref,
+                    "MOON_ME",
+                )
+                mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+                    xyzs,
+                    dts,
+                    self.kernels_path,
+                    "MOON_ME",
+                )
+                sp_calcs = [
+                    CustomPoint(
+                        mdam.distance_sun_moon,
+                        mdam.distance_observer_moon,
+                        llh[0],
+                        llh[1],
+                        mdam.long_sun_radians,
+                        mdam.absolute_mpa_degrees,
+                        mdam.mpa_degrees,
+                    )
+                    for mdam, llh in zip(mdas, llhs)
+                ]
+            elif observations:
+                llhs = SPICEAdapter.to_planetographic_multiple(
+                    xyzs,
+                    "EARTH",
+                    self.kernels_path.main_kernels_path,
+                    dts,
+                    observations[0].sat_pos_ref,
+                )
+                sp_calcs = [
+                    SurfacePoint(llh[0], llh[1], llh[2], dt)
+                    for llh, dt in zip(llhs, dts)
+                ]
+                mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+                    xyzs, dts, self.kernels_path
+                )
+        else:
+            mdas = [o.md for o in observations]
             sp_calcs = [
                 CustomPoint(
-                    mdam.distance_sun_moon,
-                    mdam.distance_observer_moon,
-                    llh[0],
-                    llh[1],
-                    mdam.long_sun_radians,
-                    mdam.absolute_mpa_degrees,
-                    mdam.mpa_degrees,
+                    mda.distance_sun_moon,
+                    mda.distance_observer_moon,
+                    mda.lat_obs,
+                    mda.long_obs,
+                    mda.long_sun_radians,
+                    mda.absolute_mpa_degrees,
+                    mda.mpa_degrees,
                 )
-                for mdam, llh in zip(mdas, llhs)
+                for mda in mdas
             ]
-        elif observations:
-            llhs = SPICEAdapter.to_planetographic_multiple(
-                xyzs,
-                "EARTH",
-                self.kernels_path.main_kernels_path,
-                dts,
-                observations[0].sat_pos_ref,
-            )
-            sp_calcs = [
-                SurfacePoint(llh[0], llh[1], llh[2], dt) for llh, dt in zip(llhs, dts)
-            ]
-            mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-                xyzs, dts, self.kernels_path
-            )
         mpa_calcs = [md.mpa_degrees for md in mdas]
         #
         for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):

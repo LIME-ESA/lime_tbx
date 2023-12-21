@@ -438,14 +438,16 @@ class LunarObservation:
         Satellite position at that moment.
     data_source: str
         Data source of the lunar observation.
+    md: MoonData or None
     """
 
     ch_names: List[str]
     sat_pos_ref: str
     ch_irrs: Dict[str, float]
     dt: datetime
-    sat_pos: SatellitePosition
+    sat_pos: Union[SatellitePosition, None]
     data_source: str
+    md: Union[MoonData, None]
 
     def get_ch_irradiance(self, name: str) -> float:
         if name not in self.ch_irrs:

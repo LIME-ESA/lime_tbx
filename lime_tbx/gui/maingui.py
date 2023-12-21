@@ -371,11 +371,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         lime_simulation: ILimeSimulation,
         settings_manager: settings.ISettingsManager,
         kernels_path: KernelsPath,
+        eocfi_path: str,
     ):
         super().__init__()
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self.comparing_dts = True
         self.showing_rel_diff = True
         self.workers = []
@@ -385,7 +387,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.input = input.ComparisonInput(
-            self._callback_compare_input_changed, self._callback_compare_button_enable
+            self._callback_compare_input_changed,
+            self._callback_compare_button_enable,
+            self.kernels_path,
+            self.eocfi_path,
         )
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -1347,7 +1352,10 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.comparison_page = ComparisonPageWidget(
-            self.lime_simulation, self.settings_manager, self.kernels_path
+            self.lime_simulation,
+            self.settings_manager,
+            self.kernels_path,
+            self.eocfi_path,
         )
         self.comparison_page.hide()
         self.main_page = MainSimulationsWidget(

@@ -30,10 +30,12 @@ from ..datatypes.datatypes import (
     SurfacePoint,
     SatellitePoint,
     CustomPoint,
+    MoonData,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
+from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -69,7 +71,9 @@ def _calc_divisor_to_nm(units: str) -> float:
     return d_to_nm
 
 
-def read_moon_obs(path: str) -> LunarObservation:
+def read_moon_obs(
+    path: str, kernels_path: KernelsPath, eocfi_path: str
+) -> LunarObservation:
     """
     Read a glod-formatted netcdf moon observations file and create a data object
     from it.
@@ -100,9 +104,44 @@ def read_moon_obs(path: str) -> LunarObservation:
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
-        sat_pos = SatellitePosition(
-            *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
-        )
+        if not (ds["sat_pos"][:].mask).any():
+            sat_pos = SatellitePosition(
+                *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
+            )
+            md = None
+        else:
+            sat_pos = None
+            mpa = ds["phase_angle"][:].data[0]
+            if "distance_sun_moon" in ds.variables:
+                dsm = ds["distance_sun_moon"][:].data[0]
+            else:
+                smd = SPICEAdapter.get_solar_moon_datas(
+                    [dt], kernels_path.main_kernels_path
+                )[0]
+                dsm = smd.dist_sun_moon_au
+            if "distance_sat_moon" in ds.variables:
+                dom = ds["distance_sat_moon"][:].data[0]
+            else:
+                eo = EOCFIConverter(eocfi_path, kernels_path.main_kernels_path)
+                sat_name = ds["sat_name"][:][0]
+                xyzs = eo.get_satellite_position_rectangular(sat_name, [dt])
+                mdeo = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+                    xyzs, [dt], kernels_path, "ITRF93"
+                )[0]
+                dom = mdeo.distance_observer_moon
+            sat_sel_lon = ds["sat_sel_lon"][:].data[0]
+            sat_sel_lat = ds["sat_sel_lat"][:].data[0]
+            sun_sel_lon = ds["sun_sel_lon"][:].data[0]
+            # sun_sel_lat = ds['sun_sel_lat'][:].data[0]
+            md = MoonData(
+                dsm,
+                dom,
+                np.radians(sun_sel_lon),
+                sat_sel_lat,
+                sat_sel_lon,
+                abs(mpa),
+                mpa,
+            )
         irr_obs = ds["irr_obs"][:]
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
@@ -112,7 +151,7 @@ def read_moon_obs(path: str) -> LunarObservation:
         data_source = ds.data_source
         ds.close()
         return LunarObservation(
-            ch_names, sat_pos_ref, ch_irrs, dt, sat_pos, data_source
+            ch_names, sat_pos_ref, ch_irrs, dt, sat_pos, data_source, md
         )
     except Exception as e:
         logger.get_logger().exception(e)
