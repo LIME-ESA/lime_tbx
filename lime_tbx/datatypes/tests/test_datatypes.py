@@ -148,7 +148,7 @@ class TestLunarObservation(unittest.TestCase):
         stp = SatellitePosition(10000, 10000, 10000)
         ch_names = ["default"]
         ch_irrs = {ch_names[0]: 0.003}
-        lo = LunarObservation(ch_names, "ITRF93", ch_irrs, DT2, stp, "Test")
+        lo = LunarObservation(ch_names, "ITRF93", ch_irrs, DT2, stp, "Test", None)
         self.assertEqual(lo.get_ch_irradiance(ch_names[0]), ch_irrs[ch_names[0]])
         self.assertTrue(lo.has_ch_value(ch_names[0]))
         self.assertFalse(lo.has_ch_value(""))
@@ -162,7 +162,7 @@ class TestLunarObservation(unittest.TestCase):
         stp = SatellitePosition(10000, 10000, 10000)
         ch_names = ["default"]
         ch_irrs = {ch_names[0]: 0.003}
-        lo = LunarObservation(ch_names, "ITRF93", ch_irrs, DT2, stp, "Test")
+        lo = LunarObservation(ch_names, "ITRF93", ch_irrs, DT2, stp, "Test", None)
         self.assertRaises(ValueError, lo.get_ch_irradiance, "")
 
 
