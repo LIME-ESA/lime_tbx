@@ -104,35 +104,61 @@ def read_moon_obs(
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
-        if not (ds["sat_pos"][:].mask).any():
+        if "sat_pos" in ds.variables and not (ds["sat_pos"][:].mask).all():
             sat_pos = SatellitePosition(
                 *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
             )
             md = None
         else:
             sat_pos = None
-            mpa = ds["phase_angle"][:].data[0]
-            if "distance_sun_moon" in ds.variables:
-                dsm = ds["distance_sun_moon"][:].data[0]
-            else:
-                smd = SPICEAdapter.get_solar_moon_datas(
-                    [dt], kernels_path.main_kernels_path
-                )[0]
-                dsm = smd.dist_sun_moon_au
-            if "distance_sat_moon" in ds.variables:
-                dom = ds["distance_sat_moon"][:].data[0]
-            else:
-                eo = EOCFIConverter(eocfi_path, kernels_path.main_kernels_path)
-                sat_name = ds["sat_name"][:][0]
-                xyzs = eo.get_satellite_position_rectangular(sat_name, [dt])
-                mdeo = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
-                    xyzs, [dt], kernels_path, "ITRF93"
-                )[0]
-                dom = mdeo.distance_observer_moon
-            sat_sel_lon = ds["sat_sel_lon"][:].data[0]
-            sat_sel_lat = ds["sat_sel_lat"][:].data[0]
-            sun_sel_lon = ds["sun_sel_lon"][:].data[0]
-            # sun_sel_lat = ds['sun_sel_lat'][:].data[0]
+            # sun vars
+            sun_vars = {"distance_sun_moon": None, "sun_sel_lon": None}  # 'sun_sel_lat'
+            sun_var_smd_eq = {
+                "distance_sun_moon": "dist_sun_moon_au",
+                "sun_sel_lon": "lon_sun_rad",
+            }
+            smd = None
+            for suva in sun_vars:
+                if suva in ds.variables:
+                    sun_vars[suva] = ds[suva][:].data[0]
+                else:
+                    if smd is None:
+                        smd = SPICEAdapter.get_solar_moon_datas(
+                            [dt], kernels_path.main_kernels_path
+                        )[0]
+                    sun_vars[suva] = getattr(smd, sun_var_smd_eq[suva])
+            sun_sel_lon = sat_vars["sun_sel_lon"]
+            dsm = sun_vars["distance_sun_moon"]
+            # sat vars
+            sat_vars = {
+                "distance_sat_moon": None,
+                "sat_sel_lon": None,
+                "sat_sel_lat": None,
+                "phase_angle": None,
+            }
+            sat_var_md_eq = {
+                "distance_sat_moon": "distance_observer_moon",
+                "sat_sel_lon": "long_obs",
+                "sat_sel_lat": "lat_obs",
+                "phase_angle": "mpa_degrees",
+            }
+            mdeo = None
+            for sava in sat_vars:
+                if sava in ds.variables:
+                    sat_vars[sava] = ds[sava][:].data[0]
+                else:
+                    if mdeo is None:
+                        eo = EOCFIConverter(eocfi_path, kernels_path.main_kernels_path)
+                        sat_name = ds["sat_name"][:][0]
+                        xyzs = eo.get_satellite_position_rectangular(sat_name, [dt])
+                        mdeo = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+                            xyzs, [dt], kernels_path, "ITRF93"
+                        )[0]
+                    sat_vars[sava] = getattr(mdeo, sat_var_md_eq[sava])
+            dom = sat_vars["distance_sat_moon"]
+            sat_sel_lon = sat_vars["sat_sel_lon"]
+            sat_sel_lat = sat_vars["sat_sel_lat"]
+            mpa = sat_vars["phase_angle"]
             md = MoonData(
                 dsm,
                 dom,
