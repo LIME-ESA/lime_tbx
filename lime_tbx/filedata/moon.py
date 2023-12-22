@@ -35,6 +35,7 @@ from ..datatypes.datatypes import (
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
+from lime_tbx.lime_algorithms.lime.eli import DIST_EARTH_MOON_KM
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 
 """___Authorship___"""
@@ -127,7 +128,7 @@ def read_moon_obs(
                             [dt], kernels_path.main_kernels_path
                         )[0]
                     sun_vars[suva] = getattr(smd, sun_var_smd_eq[suva])
-            sun_sel_lon = sat_vars["sun_sel_lon"]
+            sun_sel_lon = sun_vars["sun_sel_lon"]
             dsm = sun_vars["distance_sun_moon"]
             # sat vars
             sat_vars = {
@@ -168,11 +169,23 @@ def read_moon_obs(
                 abs(mpa),
                 mpa,
             )
+        to_correct_distance = False
+        if (
+            "to_correct_distance" in ds.ncattrs()
+            and getattr(ds, "to_correct_distance") == 1
+        ):
+            to_correct_distance = True
         irr_obs = ds["irr_obs"][:]
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
         for i, ch_irr in enumerate(irr_obs):
             if not isinstance(ch_irr, np.ma.core.MaskedConstant):
+                if to_correct_distance:
+                    ch_irr = (
+                        ch_irr
+                        * ((1 / md.distance_sun_moon) ** 2)
+                        * (DIST_EARTH_MOON_KM / md.distance_observer_moon) ** 2
+                    )
                 ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
         data_source = ds.data_source
         ds.close()
