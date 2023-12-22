@@ -198,7 +198,7 @@ class Comparison(IComparison):
         dts = [o.dt for o in observations]
         sp_calcs = []
         mdas = []
-        if observations[0].sat_pos is not None:
+        if observations and observations[0].sat_pos is not None:
             xyzs = [
                 (
                     o.sat_pos.x,
@@ -253,7 +253,7 @@ class Comparison(IComparison):
                 mdas = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
                     xyzs, dts, self.kernels_path
                 )
-        else:
+        elif observations:
             mdas = [o.md for o in observations]
             sp_calcs = [
                 CustomPoint(
