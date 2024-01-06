@@ -429,6 +429,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self.current_max_date = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self._skip_uncs = skip_uncs
+        self.all_loaded_datetimes = []
         self.update_from_combobox(0)
 
     def _build_layout(self):
