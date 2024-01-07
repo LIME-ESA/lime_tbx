@@ -134,6 +134,7 @@ def export_csv_simulation(
     interp_spectrum_name: str,
     skip_uncs: bool,
     cimel_data: Union[SpectralData, List[SpectralData]],
+    mpa: Union[float, None],
 ):
     """
     Export the given data to a csv file
@@ -162,6 +163,8 @@ def export_csv_simulation(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+            if mpa is not None and not isinstance(point, CustomPoint):
+                writer.writerow(["moon phase angle (deg)", mpa])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)
@@ -369,6 +372,7 @@ def export_csv_integrated_irradiance(
     inside_mpa_range: Union[bool, List[bool]],
     interp_spectrum_name: str,
     skip_uncs: bool,
+    mpa: Union[float, None],
 ):
     """
     Export the given integrated signal data to a csv file
@@ -395,6 +399,8 @@ def export_csv_integrated_irradiance(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+            if mpa is not None and not isinstance(point, CustomPoint):
+                writer.writerow(["moon phase angle (deg)", mpa])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)

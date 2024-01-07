@@ -20,6 +20,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
     SatellitePoint,
+    KernelsPath,
 )
 from lime_tbx.datatypes import constants
 from lime_tbx.gui.util import (
@@ -45,10 +46,12 @@ This requires recalculating reflectances whenever irradiances are computed. Ther
 if you want both values in this case, it is advisable to choose to calculate irradiances first."
 
 
-def _callback_read_obs_files(paths: List[str]) -> List[LunarObservation]:
+def _callback_read_obs_files(
+    paths: List[str], kernels_path: KernelsPath, eocfi_path: str
+) -> List[LunarObservation]:
     obss = []
     for path in paths:
-        obss.append(moon.read_moon_obs(path))
+        obss.append(moon.read_moon_obs(path, kernels_path, eocfi_path))
     return [obss]
 
 
@@ -426,6 +429,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self.current_max_date = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self._skip_uncs = skip_uncs
+        self.all_loaded_datetimes = []
         self.update_from_combobox(0)
 
     def _build_layout(self):
@@ -777,11 +781,17 @@ class InputWidget(QtWidgets.QWidget):
 
 class ComparisonInput(QtWidgets.QWidget):
     def __init__(
-        self, callback_change: Callable, callback_compare_but_enable: Callable
+        self,
+        callback_change: Callable,
+        callback_compare_but_enable: Callable,
+        kernels_path: KernelsPath,
+        eocfi_path: str,
     ):
         super().__init__()
         self.callback_change = callback_change
         self.callback_compare_but_enable = callback_compare_but_enable
+        self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self.loaded_srf: SpectralResponseFunction = None
         self.loaded_moons: List[LunarObservation] = []
         self._build_layout()
@@ -873,7 +883,7 @@ class ComparisonInput(QtWidgets.QWidget):
         self.moon_obs_feedback.setText("Loading...")
         self.worker = CallbackWorker(
             _callback_read_obs_files,
-            [paths],
+            [paths, self.kernels_path, self.eocfi_path],
         )
         self._start_thread(
             self.loading_obs_files_finished, self.loading_obs_files_error

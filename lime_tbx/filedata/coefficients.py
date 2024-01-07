@@ -6,7 +6,7 @@ from packaging import version
 from lime_tbx.datatypes.datatypes import (
     LimeCoefficients,
     ReflectanceCoefficients,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
 )
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 from lime_tbx.datatypes import constants
@@ -149,7 +149,7 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
         np.array(ds.err_corr_dolp_coeff_neg).astype(float)
     )
     np.fill_diagonal(p_neg_err_corr_data, 1)
-    pol = PolarizationCoefficients(
+    pol = PolarisationCoefficients(
         wlens,
         p_pos_data,
         p_pos_u_data,

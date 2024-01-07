@@ -78,7 +78,7 @@ def create_lglod_data(
         elis = [elis]
     if not isinstance(elrefs, list):
         elrefs = [elrefs]
-    if lime_simulation.is_polarization_updated():
+    if lime_simulation.is_polarisation_updated():
         polars = lime_simulation.get_polars()
         polars_cimel = lime_simulation.get_polars_cimel()
         if not isinstance(polars_cimel, list):

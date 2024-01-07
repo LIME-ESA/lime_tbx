@@ -11,7 +11,7 @@ import numpy as np
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
     LimeCoefficients,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     SRFChannel,
     SpectralResponseFunction,
     ReflectanceCoefficients,
@@ -45,8 +45,8 @@ class ISettingsManager(ABC):
         pass
 
     @abstractmethod
-    def get_polar_coef(self) -> PolarizationCoefficients:
-        """Obtain the current PolarizationCoefficients chosen by the user."""
+    def get_polar_coef(self) -> PolarisationCoefficients:
+        """Obtain the current PolarisationCoefficients chosen by the user."""
         pass
 
     @abstractmethod
@@ -106,7 +106,7 @@ class ISettingsManager(ABC):
 
     @abstractmethod
     def get_selected_polar_spectrum_name(self) -> str:
-        """Obtain the currently selected polarization interpolation spectrum name"""
+        """Obtain the currently selected polarisation interpolation spectrum name"""
         pass
 
     @abstractmethod
@@ -266,7 +266,7 @@ class SettingsManager(ISettingsManager):
                 index = versions.index(previous_coeff_name)
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
-        self.polar_coeff = self.coeffs[index].polarization
+        self.polar_coeff = self.coeffs[index].polarisation
         self.coef_version_name = None
 
     def get_default_srf(self) -> SpectralResponseFunction:
@@ -275,7 +275,7 @@ class SettingsManager(ISettingsManager):
     def get_srf(self) -> SpectralResponseFunction:
         return self.srf
 
-    def get_polar_coef(self) -> PolarizationCoefficients:
+    def get_polar_coef(self) -> PolarisationCoefficients:
         return self.polar_coeff
 
     def load_srf(self, srf: SpectralResponseFunction):
@@ -299,14 +299,14 @@ class SettingsManager(ISettingsManager):
     def select_lime_coeff(self, index: int) -> None:
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
-        self.polar_coeff = self.coeffs[index].polarization
+        self.polar_coeff = self.coeffs[index].polarisation
         access_data.AccessData().set_previusly_selected_version(self.coeff.version)
 
     def reload_coeffs(self) -> None:
         self.coeffs = access_data.AccessData().get_all_coefficients()
         self.coeff = self.coeffs[-1]
         self.cimel_coeff = self.coeffs[-1].reflectance
-        self.polar_coeff = self.coeffs[-1].polarization
+        self.polar_coeff = self.coeffs[-1].polarisation
 
     def get_available_interp_SRFs(self) -> List[str]:
         return interp_data.get_available_interp_SRFs()

@@ -27,11 +27,12 @@ __status__ = "Development"
 PATH = "./test_files/moon/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc"
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
+EOCFI_PATH = "eocfi_data"
 
 
 class TestMoon(unittest.TestCase):
     def test_read_moon_obs_ok(self):
-        lo = moon.read_moon_obs(PATH)
+        lo = moon.read_moon_obs(PATH, KERNELS_PATH, EOCFI_PATH)
         ch_names = ["VIS006", "VIS008", "NIR016", "HRVIS"]
         ch_irrs = {
             "VIS006": 1.9233498386870263e-06,
@@ -51,7 +52,7 @@ class TestMoon(unittest.TestCase):
         self.assertEqual(lo.sat_pos_ref, "ITRF93")
 
     def test_read_moon_obs_check_srf(self):
-        lo = moon.read_moon_obs(PATH)
+        lo = moon.read_moon_obs(PATH, KERNELS_PATH, EOCFI_PATH)
         srf = read_srf(
             "./test_files/srf/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc"
         )

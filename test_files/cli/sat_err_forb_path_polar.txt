@@ -1,1 +1,1 @@
-Something went wrong while exporting polarization graph. [Errno 13] Permission denied: '/root.png'
+Something went wrong while exporting polarisation graph. [Errno 13] Permission denied: '/root.png'

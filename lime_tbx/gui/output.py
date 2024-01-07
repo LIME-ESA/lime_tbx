@@ -78,6 +78,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.comparison_x_datetime = comparison_x_datetime
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
+        self.mpa = None
         self.skip_uncs = None
         self.compare_percentages = None
         self.ch_names = []
@@ -312,6 +313,9 @@ class GraphWidget(QtWidgets.QWidget):
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
 
+    def set_mpa(self, mpa: Union[float, None]):
+        self.mpa = mpa
+
     def set_skipped_uncertainties(self, skip: bool):
         self.skip_uncs = skip
 
@@ -351,6 +355,7 @@ class GraphWidget(QtWidgets.QWidget):
                         self.interp_spectrum_name,
                         self.skip_uncs,
                         self.cimel_data,
+                        self.mpa,
                     )
                 else:
                     csv.export_csv_srf(
@@ -369,6 +374,8 @@ class SignalWidget(QtWidgets.QWidget):
         super().__init__(parent)
         self.settings_manager = settings_manager
         self.skip_uncs = None
+        self.mpa = None
+        self.interp_spectrum_name = None
         self._build_layout()
 
     def _build_layout(self):
@@ -519,6 +526,9 @@ for absolute moon phase angles between 2° and 90°"
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
 
+    def set_mpa(self, mpa: Union[float, None]):
+        self.mpa = mpa
+
     @QtCore.Slot()
     def export_csv(self):
         name = QtWidgets.QFileDialog().getSaveFileName(
@@ -538,6 +548,7 @@ for absolute moon phase angles between 2° and 90°"
                     self.inside_mpa_range,
                     self.interp_spectrum_name,
                     self.skip_uncs,
+                    self.mpa,
                 )
             except Exception as e:
                 self.show_error(e)

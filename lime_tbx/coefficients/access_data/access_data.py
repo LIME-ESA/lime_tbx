@@ -15,7 +15,7 @@ import numpy as np
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
     LimeCoefficients,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
@@ -135,7 +135,7 @@ _DEFAULT_APOLLO_COEFFS = [
     0.8945,
     0.9689,
 ]
-_POLARIZATION_WLENS = [440, 500, 675, 870, 1020, 1640]
+_POLARISATION_WLENS = [440, 500, 675, 870, 1020, 1640]
 # POLAR COEFFS MIGHT BE WRONG
 _DEFAULT_POS_POLAR_COEFFS = [
     (0.003008799098, 0.000177889155, 0.000002581092, 0.000000012553),
@@ -163,8 +163,8 @@ _DEFAULT_UNCS = [
 ]
 
 
-def _get_default_polarization_coefficients() -> PolarizationCoefficients:
-    wlens = _POLARIZATION_WLENS
+def _get_default_polarisation_coefficients() -> PolarisationCoefficients:
+    wlens = _POLARISATION_WLENS
     pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
     neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
     uncs = np.array(_DEFAULT_UNCS)
@@ -172,7 +172,7 @@ def _get_default_polarization_coefficients() -> PolarizationCoefficients:
     err_corr_size = len(uncs) * len(uncs[0])
     err_corr = np.zeros((err_corr_size, err_corr_size))
     np.fill_diagonal(err_corr, 1)
-    coeffs = PolarizationCoefficients(
+    coeffs = PolarisationCoefficients(
         wlens, pos_coeffs, uncs, err_corr, neg_coeffs, uncs, err_corr
     )
     return coeffs

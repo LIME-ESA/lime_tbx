@@ -25,6 +25,7 @@ from lime_tbx.datatypes.datatypes import (
     SatellitePoint,
     SpectralData,
     SurfacePoint,
+    MoonData,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.gui import settings, constants as gui_constants
@@ -150,7 +151,7 @@ def print_help():
     compdiffsel = "(" + "|".join(COMP_DIFF_KEYS) + ")"
     print(
         "The lime toolbox performs simulations of lunar irradiance, reflectance and \
-polarization for a given point and datetime. It also performs comparisons for some given \
+polarisation for a given point and datetime. It also performs comparisons for some given \
 observations files in GLOD format.\n"
     )
     print("It won't work unless given only one of the options (-h|-e|-l|-s|-c).")
@@ -262,16 +263,16 @@ class CLI:
             def_srf, point, self.settings_manager.get_cimel_coef()
         )
 
-    def _calculate_polarization(self, point: Point):
+    def _calculate_polarisation(self, point: Point):
         def_srf = get_default_srf()
-        self.lime_simulation.update_polarization(
+        self.lime_simulation.update_polarisation(
             def_srf, point, self.settings_manager.get_polar_coef()
         )
 
     def _calculate_all(self, point: Point):
         self._calculate_reflectance(point)
         self._calculate_irradiance(point)
-        self._calculate_polarization(point)
+        self._calculate_polarisation(point)
 
     def _export_csvs(
         self,
@@ -281,6 +282,10 @@ class CLI:
         version = self.settings_manager.get_lime_coef().version
         are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         sp_name = self.settings_manager.get_selected_spectrum_name()
+        mdas = self.lime_simulation.get_moon_datas()
+        mpa = None
+        if isinstance(mdas, MoonData):
+            mpa = mdas.mpa_degrees
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         csv.export_csv_simulation(
@@ -294,6 +299,7 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elrefs_cimel(),
+            mpa,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
@@ -306,11 +312,12 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elis_cimel(),
+            mpa,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
-            "Polarizations (%)",
+            "Degree of Linear Polarisation (%)",
             point,
             ed.o_file_polar,
             version,
@@ -318,6 +325,7 @@ class CLI:
             dolp_sp_name,
             skip_uncs,
             self.lime_simulation.get_polars_cimel(),
+            mpa,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -328,6 +336,7 @@ class CLI:
             are_mpas_oinside_mpa_range,
             sp_name,
             skip_uncs,
+            mpa,
         )
 
     def _export_lglod(self, point: Point, output_file: str):
@@ -368,7 +377,14 @@ class CLI:
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         sp_name = self.settings_manager.get_selected_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        mdas = self.lime_simulation.get_moon_datas()
+        mpa = None
+        if isinstance(mdas, MoonData):
+            mpa = mdas.mpa_degrees
+        mpa_text = ""
+        if mpa is not None:
+            mpa_text = f" | MPA: {mpa:.3f}°"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
@@ -430,7 +446,7 @@ class CLI:
             )
             sys.exit(1)
         canv.axes.cla()  # Clear the canvas.
-        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}"
+        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}{mpa_text}"
         subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.cla()  # Clear the canvas.
@@ -445,9 +461,9 @@ class CLI:
             self.lime_simulation.get_polars_cimel(),
             self.lime_simulation.get_polars_asd(),
             None,
-            "Extraterrestrial Lunar Polarization",
+            "Extraterrestrial Lunar Polarisation",
             "Wavelengths (nm)",
-            "Polarizations (%)",
+            "Degree of Linear Polarisation (%)",
             None,
             dolp_sp_name,
         )
@@ -455,7 +471,7 @@ class CLI:
             canv.print_figure(ed.o_file_polar)
         except Exception as e:
             eprint(
-                "Something went wrong while exporting polarization graph. {}".format(
+                "Something went wrong while exporting polarisation graph. {}".format(
                     str(e)
                 )
             )
@@ -596,7 +612,9 @@ class CLI:
     ):
         self.loaded_moons: List[LunarObservation] = []
         for path in input_files:
-            self._add_observation(moon.read_moon_obs(path))
+            self._add_observation(
+                moon.read_moon_obs(path, self.kernels_path, self.eocfi_path)
+            )
         if len(self.loaded_moons) == 0:
             raise LimeException("No observations given. Aborting.")
         mos = self.loaded_moons

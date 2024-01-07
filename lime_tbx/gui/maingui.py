@@ -2,7 +2,7 @@
 
 """___Built-In Modules___"""
 from enum import Enum
-from typing import List, Callable, Union, Tuple
+from typing import List, Callable, Union, Tuple, Iterable
 from datetime import datetime, timezone
 import os
 
@@ -39,13 +39,14 @@ from lime_tbx.datatypes.datatypes import (
     LimeException,
     LunarObservation,
     Point,
-    PolarizationCoefficients,
+    PolarisationCoefficients,
     SatellitePoint,
     SpectralResponseFunction,
     SpectralValidity,
     SurfacePoint,
     ReflectanceCoefficients,
     SpectralData,
+    MoonData,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
@@ -80,6 +81,7 @@ def eli_callback(
     List[float],
     SpectralResponseFunction,
     Union[SpectralData, List[SpectralData], Union[bool, List[bool]]],
+    Union[float, None],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -115,10 +117,16 @@ def eli_callback(
         Calculated uncertainty data.
     inside_mpa_range: bool or list of bool
         Indicates if the different point locations/s are inside the valid mpa range.
+    mpa: float or None
+        Moon phase angle in degrees in case that it's only one moon phase angle value.
     """
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_refl_irr_simulated")
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    mpa = None
+    if isinstance(mdas, MoonData):
+        mpa = mdas.mpa_degrees
     return (
         point,
         srf,
@@ -127,6 +135,7 @@ def eli_callback(
         lime_simulation.get_elis_asd(),
         lime_simulation.get_signals(),
         lime_simulation.are_mpas_inside_mpa_range(),
+        mpa,
     )
 
 
@@ -142,6 +151,7 @@ def elref_callback(
     Point,
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
+    Union[float, None],
 ]:
     """Callback that performs the Reflectance operations.
 
@@ -168,23 +178,30 @@ def elref_callback(
         Calculated uncertainty data.
     inside_mpa_range: bool or list of bool
         Indicates if the different point locations/s are inside the valid mpa range.
+    mpa: float or None
+        Moon phase angle in degrees in case that it's only one moon phase angle value.
     """
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_refl_simulated")
     lime_simulation.update_reflectance(def_srf, point, cimel_coef, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    mpa = None
+    if isinstance(mdas, MoonData):
+        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_elrefs(),
         lime_simulation.get_elrefs_cimel(),
         lime_simulation.get_elrefs_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
+        mpa,
     )
 
 
 def polar_callback(
     srf: SpectralResponseFunction,
     point: Point,
-    coeffs: PolarizationCoefficients,
+    coeffs: PolarisationCoefficients,
     lime_simulation: ILimeSimulation,
     signal_info: QtCore.Signal,
 ) -> Tuple[
@@ -193,16 +210,22 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
+    Union[float, None],
 ]:
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_pol_simulated")
-    lime_simulation.update_polarization(def_srf, point, coeffs, callback_obs)
+    lime_simulation.update_polarisation(def_srf, point, coeffs, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    mpa = None
+    if isinstance(mdas, MoonData):
+        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_polars(),
         lime_simulation.get_polars_cimel(),
         lime_simulation.get_polars_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
+        mpa,
     )
 
 
@@ -244,13 +267,13 @@ def calculate_all_callback(
     srf: SpectralResponseFunction,
     point: Point,
     cimel_coef: ReflectanceCoefficients,
-    p_coeffs: PolarizationCoefficients,
+    p_coeffs: PolarisationCoefficients,
     lime_simulation: ILimeSimulation,
 ):
     def_srf = get_default_srf()
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     lime_simulation.update_reflectance(def_srf, point, cimel_coef)
-    lime_simulation.update_polarization(def_srf, point, p_coeffs)
+    lime_simulation.update_polarisation(def_srf, point, p_coeffs)
     return (point, srf)
 
 
@@ -348,11 +371,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         lime_simulation: ILimeSimulation,
         settings_manager: settings.ISettingsManager,
         kernels_path: KernelsPath,
+        eocfi_path: str,
     ):
         super().__init__()
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self.comparing_dts = True
         self.showing_rel_diff = True
         self.workers = []
@@ -362,7 +387,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.input = input.ComparisonInput(
-            self._callback_compare_input_changed, self._callback_compare_button_enable
+            self._callback_compare_input_changed,
+            self._callback_compare_button_enable,
+            self.kernels_path,
+            self.eocfi_path,
         )
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -775,7 +803,7 @@ class MainSimulationsWidget(
         self.elref_button = QtWidgets.QPushButton("Reflectance")
         self.elref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.elref_button.clicked.connect(self.show_elref)
-        self.polar_button = QtWidgets.QPushButton("Polarization")
+        self.polar_button = QtWidgets.QPushButton("Polarisation")
         self.polar_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.polar_button.clicked.connect(self.show_polar)
         self.buttons_layout.addWidget(self.eli_button)
@@ -978,13 +1006,18 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             SpectralData,
             Union[bool, List[bool]],
+            Union[float, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        mpa_text = ""
+        if data[7] is not None:
+            mpa_text = f" | MPA: {data[7]:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mpa(data[7])
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
@@ -1005,6 +1038,7 @@ class MainSimulationsWidget(
         self.signal_widget.set_interp_spectrum_name(
             self.settings_manager.get_selected_spectrum_name()
         )
+        self.signal_widget.set_mpa(data[7])
         self.signal_widget.set_skipped_uncertainties(is_skip_uncs)
         self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
@@ -1057,13 +1091,18 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
+            Union[float, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        mpa_text = ""
+        if data[5] is not None:
+            mpa_text = f" | MPA: {data[5]:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mpa(data[5])
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_coef_version_name()
@@ -1090,7 +1129,7 @@ class MainSimulationsWidget(
     @QtCore.Slot()
     def show_polar(self):
         """
-        Calculate and show extraterrestrial lunar polarization for the given input.
+        Calculate and show extraterrestrial lunar polarisation for the given input.
         """
         self._block_gui_loading()
         point = self.input_widget.get_point()
@@ -1126,13 +1165,18 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
+            Union[float, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
+        mpa_text = ""
+        if data[5] is not None:
+            mpa_text = f" | MPA: {data[5]:.3f}°"
         sp_name = interp_data.get_dolp_interpolation_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mpa(data[5])
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         # self.graph.set_max_ylims(-120, 120) # TODO decide if we do this or not
@@ -1144,9 +1188,9 @@ class MainSimulationsWidget(
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
         self.graph.update_labels(
-            "Lunar polarization",
+            "Lunar polarisation",
             "Wavelengths (nm)",
-            "Polarizations (%)",
+            "Degree of Linear Polarisation (%)",
             subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[4])
@@ -1308,7 +1352,10 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.comparison_page = ComparisonPageWidget(
-            self.lime_simulation, self.settings_manager, self.kernels_path
+            self.lime_simulation,
+            self.settings_manager,
+            self.kernels_path,
+            self.eocfi_path,
         )
         self.comparison_page.hide()
         self.main_page = MainSimulationsWidget(

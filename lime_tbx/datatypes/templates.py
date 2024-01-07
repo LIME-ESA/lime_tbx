@@ -87,12 +87,12 @@ TEMPLATE_IRR = {
 }
 
 TEMPLATE_POL = {
-    "polarization": {
+    "polarisation": {
         "dtype": np.float32,
         "dim": ["wavelength"],
-        "attrs": {"units": [], "u_components": ["u_polarization"]},
+        "attrs": {"units": [], "u_components": ["u_polarisation"]},
     },
-    "u_polarization": {
+    "u_polarisation": {
         "dtype": np.float32,
         "dim": ["wavelength"],
         "attrs": {"units": "%"},
@@ -100,12 +100,12 @@ TEMPLATE_POL = {
             {
                 "dim": "wavelength",
                 "form": "err_corr_matrix",
-                "params": ["err_corr_polarization"],
+                "params": ["err_corr_polarisation"],
                 "units": [],
             }
         ],
     },
-    "err_corr_polarization": {
+    "err_corr_polarisation": {
         "dim": ["wavelength", "wavelength"],
         "dtype": np.float32,
     },

@@ -30,10 +30,13 @@ from ..datatypes.datatypes import (
     SurfacePoint,
     SatellitePoint,
     CustomPoint,
+    MoonData,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
+from lime_tbx.lime_algorithms.lime.eli import DIST_EARTH_MOON_KM
+from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -69,7 +72,9 @@ def _calc_divisor_to_nm(units: str) -> float:
     return d_to_nm
 
 
-def read_moon_obs(path: str) -> LunarObservation:
+def read_moon_obs(
+    path: str, kernels_path: KernelsPath, eocfi_path: str
+) -> LunarObservation:
     """
     Read a glod-formatted netcdf moon observations file and create a data object
     from it.
@@ -100,19 +105,92 @@ def read_moon_obs(path: str) -> LunarObservation:
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
-        sat_pos = SatellitePosition(
-            *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
-        )
+        if "sat_pos" in ds.variables and not (ds["sat_pos"][:].mask).all():
+            sat_pos = SatellitePosition(
+                *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
+            )
+            md = None
+        else:
+            sat_pos = None
+            # sun vars
+            sun_vars = {"distance_sun_moon": None, "sun_sel_lon": None}  # 'sun_sel_lat'
+            sun_var_smd_eq = {
+                "distance_sun_moon": "dist_sun_moon_au",
+                "sun_sel_lon": "lon_sun_rad",
+            }
+            smd = None
+            for suva in sun_vars:
+                if suva in ds.variables:
+                    sun_vars[suva] = ds[suva][:].data[0]
+                else:
+                    if smd is None:
+                        smd = SPICEAdapter.get_solar_moon_datas(
+                            [dt], kernels_path.main_kernels_path
+                        )[0]
+                    sun_vars[suva] = getattr(smd, sun_var_smd_eq[suva])
+            sun_sel_lon = sun_vars["sun_sel_lon"]
+            dsm = sun_vars["distance_sun_moon"]
+            # sat vars
+            sat_vars = {
+                "distance_sat_moon": None,
+                "sat_sel_lon": None,
+                "sat_sel_lat": None,
+                "phase_angle": None,
+            }
+            sat_var_md_eq = {
+                "distance_sat_moon": "distance_observer_moon",
+                "sat_sel_lon": "long_obs",
+                "sat_sel_lat": "lat_obs",
+                "phase_angle": "mpa_degrees",
+            }
+            mdeo = None
+            for sava in sat_vars:
+                if sava in ds.variables:
+                    sat_vars[sava] = ds[sava][:].data[0]
+                else:
+                    if mdeo is None:
+                        eo = EOCFIConverter(eocfi_path, kernels_path.main_kernels_path)
+                        sat_name = ds["sat_name"][:][0]
+                        xyzs = eo.get_satellite_position_rectangular(sat_name, [dt])
+                        mdeo = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
+                            xyzs, [dt], kernels_path, "ITRF93"
+                        )[0]
+                    sat_vars[sava] = getattr(mdeo, sat_var_md_eq[sava])
+            dom = sat_vars["distance_sat_moon"]
+            sat_sel_lon = sat_vars["sat_sel_lon"]
+            sat_sel_lat = sat_vars["sat_sel_lat"]
+            mpa = sat_vars["phase_angle"]
+            md = MoonData(
+                dsm,
+                dom,
+                np.radians(sun_sel_lon),
+                sat_sel_lat,
+                sat_sel_lon,
+                abs(mpa),
+                mpa,
+            )
+        to_correct_distance = False
+        if (
+            "to_correct_distance" in ds.ncattrs()
+            and getattr(ds, "to_correct_distance") == 1
+        ):
+            to_correct_distance = True
         irr_obs = ds["irr_obs"][:]
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
         for i, ch_irr in enumerate(irr_obs):
             if not isinstance(ch_irr, np.ma.core.MaskedConstant):
+                if to_correct_distance:
+                    ch_irr = (
+                        ch_irr
+                        * ((1 / md.distance_sun_moon) ** 2)
+                        * (DIST_EARTH_MOON_KM / md.distance_observer_moon) ** 2
+                    )
                 ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
         data_source = ds.data_source
         ds.close()
         return LunarObservation(
-            ch_names, sat_pos_ref, ch_irrs, dt, sat_pos, data_source
+            ch_names, sat_pos_ref, ch_irrs, dt, sat_pos, data_source, md
         )
     except Exception as e:
         logger.get_logger().exception(e)
@@ -430,7 +508,7 @@ def write_obs(
         )
         polar_spectrum.units = "Fractions of unity"
         polar_spectrum.long_name = (
-            "simulated lunar degree of polarization per wavelength"
+            "simulated lunar degree of polarisation per wavelength"
         )
         polar_spectrum.valid_min = -1.0
         polar_spectrum.valid_max = 1.0
@@ -446,7 +524,7 @@ def write_obs(
         )
         polar_spectrum_unc.units = "Fractions of unity"
         polar_spectrum_unc.long_name = (
-            "uncertainties of the simulated lunar degree of polarization per wavelength"
+            "uncertainties of the simulated lunar degree of polarisation per wavelength"
         )
         polar_spectrum_unc.valid_min = -1.0
         polar_spectrum_unc.valid_max = 1.0
@@ -491,14 +569,14 @@ def write_obs(
         )
         polar_cimel.units = "Fractions of unity"
         polar_cimel.long_name = (
-            "Simulated lunar degree of polarization for the CIMEL wavelengths."
+            "Simulated lunar degree of polarisation for the CIMEL wavelengths."
         )
         polar_cimel[:] = np.array([cimel.data for cimel in lglod.polars_cimel])
         polar_cimel_unc = ds.createVariable(
             "polar_cimel_unc", "f8", ("number_obs", "wlens_cimel")
         )
         polar_cimel_unc.units = "Fractions of unity"
-        polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths."
+        polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarisation for the CIMEL wavelengths."
         polar_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.polars_cimel]
         )

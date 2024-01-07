@@ -7,6 +7,8 @@ import sys
 from shutil import which
 import webbrowser
 import subprocess
+import re
+import functools
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -147,7 +149,17 @@ def _go_to_link(link: str) -> bool:
         appname = _get_default_browser_desktoppath()
         if appname != None:
             try:
-                cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
+                # cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
+                line = ""
+                with open(appname) as fp:
+                    for line in fp.readlines():
+                        if line.startswith("Exec"):
+                            break
+                line = line.strip()
+                browsercmd = functools.reduce(
+                    lambda a, b: re.sub(b, "", a), [line, "^Exec=", "%.", '^"', '" *$']
+                )
+                cmd = f"nohup {browsercmd} {link} >/dev/null 2>&1 &"
                 so, serr = _launch_cmd(cmd)
                 logger.get_logger().debug(f"Linux executing {cmd}: {so}")
                 if serr is not None and len(serr) > 0:
@@ -296,7 +308,7 @@ _HELP_TEXT = """
     Explore the various input types by switching between the top tabs.
 </p>
 <p>
-    Select the 'Irradiance,' 'Reflectance,' or 'Polarization' buttons to
+    Select the 'Irradiance,' 'Reflectance,' or 'Polarisation' buttons to
     display the simulation output corresponding to the provided input.
     The spectrum will be displayed in the Result tab, and if irradiance is selected,
     the integrated irradiances will be presented in the Signal tab.
