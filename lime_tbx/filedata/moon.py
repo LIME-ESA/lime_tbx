@@ -105,7 +105,11 @@ def read_moon_obs(
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
-        if "sat_pos" in ds.variables and not (ds["sat_pos"][:].mask).all():
+        if "sat_pos" in ds.variables and (
+            not (ds["sat_pos"][:].mask).all()
+            or not hasattr(ds["sat_pos"], "_FillValue")
+            or not (ds["sat_pos"][:].data == ds["sat_pos"]._FillValue).all()
+        ):
             sat_pos = SatellitePosition(
                 *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
             )
@@ -150,7 +154,11 @@ def read_moon_obs(
                 else:
                     if mdeo is None:
                         eo = EOCFIConverter(eocfi_path, kernels_path.main_kernels_path)
-                        sat_name = ds["sat_name"][:][0]
+                        _sname = ds["sat_name"][:]
+                        if str(_sname.dtype.str).startswith("|S"):
+                            sat_name = str(_sname, "utf-8")
+                        else:
+                            sat_name = _sname[0]
                         xyzs = eo.get_satellite_position_rectangular(sat_name, [dt])
                         mdeo = SPICEAdapter.get_moon_datas_from_rectangular_multiple(
                             xyzs, [dt], kernels_path, "ITRF93"

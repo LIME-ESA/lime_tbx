@@ -145,31 +145,33 @@ def _get_default_browser_desktoppath() -> Union[str, None]:
 def _go_to_link(link: str) -> bool:
     if sys.platform != "linux":
         return webbrowser.open_new_tab(link)
-    else:
-        appname = _get_default_browser_desktoppath()
-        if appname != None:
-            try:
-                # cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
-                line = ""
-                with open(appname) as fp:
-                    for line in fp.readlines():
-                        if line.startswith("Exec"):
-                            break
-                line = line.strip()
-                browsercmd = functools.reduce(
-                    lambda a, b: re.sub(b, "", a), [line, "^Exec=", "%.", '^"', '" *$']
+    sensible_worked = _try_go_to_link_sensible_browser(link)
+    if sensible_worked:
+        return True
+    appname = _get_default_browser_desktoppath()
+    if appname != None:
+        try:
+            # cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
+            line = ""
+            with open(appname) as fp:
+                for line in fp.readlines():
+                    if line.startswith("Exec"):
+                        break
+            line = line.strip()
+            browsercmd = functools.reduce(
+                lambda a, b: re.sub(b, "", a), [line, "^Exec=", "%.", '^"', '" *$']
+            )
+            cmd = f"nohup {browsercmd} {link} >/dev/null 2>&1 &"
+            so, serr = _launch_cmd(cmd)
+            logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+            if serr is not None and len(serr) > 0:
+                logger.get_logger().warning(
+                    f"Returned error messages: Linux {cmd}: {serr}"
                 )
-                cmd = f"nohup {browsercmd} {link} >/dev/null 2>&1 &"
-                so, serr = _launch_cmd(cmd)
-                logger.get_logger().debug(f"Linux executing {cmd}: {so}")
-                if serr is not None and len(serr) > 0:
-                    logger.get_logger().warning(
-                        f"Returned error messages: Linux {cmd}: {serr}"
-                    )
-                return True
-            except Exception as e:
-                logger.get_logger().exception(e)
-        return _try_go_to_link_sensible_browser(link)
+            return True
+        except Exception as e:
+            logger.get_logger().exception(e)
+    return False
 
 
 class AboutDialog(QtWidgets.QDialog):
