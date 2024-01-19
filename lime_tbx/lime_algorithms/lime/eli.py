@@ -46,15 +46,18 @@ def _measurement_func_eli(
     dsm: float,
     distance_earth_moon_km: float,
     dom: float,
+    geom_factor: Union[float, None],
 ) -> Union[float, np.ndarray]:
     """
-    Final computation of the Eq 3 in Roman et al., 2020
+    Final computation of the Eq 3 in Roman et al., 2020, but also letting the user specify the geom_factor
     """
-    lunar_irr = (
-        ((a_l * omega * esk) / math.pi)
-        * ((1 / dsm) ** 2)
-        * (distance_earth_moon_km / dom) ** 2
-    )
+    unnormalized_irr = (a_l * omega * esk) / math.pi
+    if geom_factor:
+        lunar_irr = unnormalized_irr / geom_factor
+    else:
+        lunar_irr = (
+            unnormalized_irr * ((1 / dsm) ** 2) * (distance_earth_moon_km / dom) ** 2
+        )
     return lunar_irr
 
 
@@ -122,7 +125,13 @@ def calculate_eli_from_elref(
     dom = moon_data.distance_observer_moon
 
     lunar_irr = _measurement_func_eli(
-        elrefs, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom
+        elrefs,
+        SOLID_ANGLE_MOON,
+        esk,
+        dsm,
+        DIST_EARTH_MOON_KM,
+        dom,
+        moon_data.geom_factor,
     )
     return lunar_irr
 
@@ -163,7 +172,15 @@ def calculate_eli_from_elref_unc(
 
     unc, corr = prop.propagate_standard(
         _measurement_func_eli,
-        [elref_spectrum.data, SOLID_ANGLE_MOON, esk, dsm, DIST_EARTH_MOON_KM, dom],
+        [
+            elref_spectrum.data,
+            SOLID_ANGLE_MOON,
+            esk,
+            dsm,
+            DIST_EARTH_MOON_KM,
+            dom,
+            moon_data.geom_factor,
+        ],
         [elref_spectrum.uncertainties, None, u_esk, None, None, None],
         corr_x=[
             elref_spectrum.err_corr,

@@ -105,6 +105,7 @@ def read_moon_obs(
         sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
+        to_correct_distance = False
         if "sat_pos" in ds.variables and (
             not (ds["sat_pos"][:].mask).all()
             or not hasattr(ds["sat_pos"], "_FillValue")
@@ -168,6 +169,17 @@ def read_moon_obs(
             sat_sel_lon = sat_vars["sat_sel_lon"]
             sat_sel_lat = sat_vars["sat_sel_lat"]
             mpa = sat_vars["phase_angle"]
+            geom_factor = None
+            if (
+                "to_correct_distance" in ds.ncattrs()
+                and getattr(ds, "to_correct_distance") == 1
+            ):
+                to_correct_distance = True
+            geom_factor_names = ["geom_factor", "geom_const"]
+            for gfn in geom_factor_names:
+                if gfn in ds.variables:
+                    geom_factor = ds[gfn][:].data[0]
+                    break
             md = MoonData(
                 dsm,
                 dom,
@@ -176,13 +188,8 @@ def read_moon_obs(
                 sat_sel_lon,
                 abs(mpa),
                 mpa,
+                geom_factor,
             )
-        to_correct_distance = False
-        if (
-            "to_correct_distance" in ds.ncattrs()
-            and getattr(ds, "to_correct_distance") == 1
-        ):
-            to_correct_distance = True
         irr_obs = ds["irr_obs"][:]
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)

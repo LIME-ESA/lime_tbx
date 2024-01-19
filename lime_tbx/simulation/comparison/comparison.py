@@ -267,6 +267,8 @@ class Comparison(IComparison):
                 )
                 for mda in mdas
             ]
+        for mda, o in zip(mdas, observations):
+            mda.geom_factor = o.md.geom_factor
         mpa_calcs = [md.mpa_degrees for md in mdas]
         #
         for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):

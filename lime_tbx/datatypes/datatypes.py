@@ -62,7 +62,6 @@ from lime_tbx.datatypes.templates import (
 )
 
 
-@dataclass
 class MoonData:
     """
     Moon data needed to calculate Moon's irradiance, probably obtained from NASA's SPICE Toolbox
@@ -83,15 +82,30 @@ class MoonData:
         Absolute Moon phase angle (in degrees)
     mpa_degrees : float
         Moon phase angle (in degrees)
+    geom_factor : float
+        Geometric factor by which the TBX calculated irradiance will be divided.
+        Used in comparisons when the normalization parameters (distances) are not available with precision.
     """
 
-    distance_sun_moon: float
-    distance_observer_moon: float
-    long_sun_radians: float
-    lat_obs: float
-    long_obs: float
-    absolute_mpa_degrees: float
-    mpa_degrees: float
+    def __init__(
+        self,
+        distance_sun_moon: float,
+        distance_observer_moon: float,
+        long_sun_radians: float,
+        lat_obs: float,
+        long_obs: float,
+        absolute_mpa_degrees: float,
+        mpa_degrees: float,
+        geom_factor: Union[float, None] = None,
+    ):
+        self.distance_sun_moon = distance_sun_moon
+        self.distance_observer_moon = distance_observer_moon
+        self.long_sun_radians = long_sun_radians
+        self.lat_obs = lat_obs
+        self.long_obs = long_obs
+        self.absolute_mpa_degrees = absolute_mpa_degrees
+        self.mpa_degrees = mpa_degrees
+        self.geom_factor = geom_factor
 
 
 class SpectralValidity(Enum):
