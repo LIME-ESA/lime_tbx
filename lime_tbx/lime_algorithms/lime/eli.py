@@ -87,6 +87,7 @@ def J_eli(
             np.zeros((1, len(Jac_x1))),
             np.zeros((1, len(Jac_x1))),
             np.zeros((1, len(Jac_x1))),
+            np.zeros((1, len(Jac_x1))),
         )
     ).T
     return Jac
@@ -181,11 +182,12 @@ def calculate_eli_from_elref_unc(
             dom,
             moon_data.geom_factor,
         ],
-        [elref_spectrum.uncertainties, None, u_esk, None, None, None],
+        [elref_spectrum.uncertainties, None, u_esk, None, None, None, None],
         corr_x=[
             elref_spectrum.err_corr,
             None,
             "syst",
+            None,
             None,
             None,
             None,
