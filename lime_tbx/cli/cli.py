@@ -46,7 +46,7 @@ __status__ = "Development"
 
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
-OPTIONS = "hvude:l:s:c:o:f:t:C:i:"
+OPTIONS = "hvude:l:s:co:f:t:C:i:"
 LONG_OPTIONS = [
     "help",
     "version",
@@ -55,7 +55,7 @@ LONG_OPTIONS = [
     "earth=",
     "lunar=",
     "satellite=",
-    "comparison=",
+    "comparison",
     "output=",
     "srf=",
     "timeseries=",
@@ -881,7 +881,7 @@ Run 'lime -h' for help."
             return 1
         return 0
 
-    def handle_input(self, opts: List[Tuple[str, str]]) -> int:
+    def handle_input(self, opts: List[Tuple[str, str]], args: List[str]) -> int:
         srf_file = ""
         export_data: ExportData = None
         timeseries_file: str = None
@@ -1134,7 +1134,9 @@ Run 'lime -h' for help."
                     self.calculate_selenographic(*params, export_data)
                     break
                 elif opt in ("-c", "--comparison"):  # Comparison
-                    params = arg.split(" ")
+                    params = args
+                    if len(params) == 1:
+                        params = params[0].split(" ")
                     input_files = []
                     for param in params:
                         input_files += glob.glob(param)
