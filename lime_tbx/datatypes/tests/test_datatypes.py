@@ -354,7 +354,7 @@ class TestSpectralData(unittest.TestCase):
         for i, val in enumerate(ds.reflectance.values):
             self.assertEqual(val, SPD_VALS[i])
         self.assertIsNotNone(ds.u_reflectance.values)
-        self.assertIsNotNone(ds.err_corr_reflectance.values)
+        self.assertIsNotNone(ds.err_corr_reflectance_wavelength.values)
 
     def test_make_reflectance_ds_Spectral_Data(self):
         ds = SpectralData.make_reflectance_ds(
