@@ -673,8 +673,8 @@ class SpectralData:
         self.data = data
         self.uncertainties = uncertainties
         self.err_corr = None
-        if hasattr(ds, "err_corr_reflectance"):
-            self.err_corr = ds.err_corr_reflectance.values.astype(np.float32)
+        if hasattr(ds, "err_corr_reflectance_wavelength"):
+            self.err_corr = ds.err_corr_reflectance_wavelength.values.astype(np.float32)
         elif hasattr(ds, "err_corr_polarisation"):
             self.err_corr = ds.err_corr_polarisation.values.astype(np.float32)
         elif hasattr(ds, "err_corr_irradiance"):
@@ -706,7 +706,7 @@ class SpectralData:
         if unc is not None:
             ds_refl.u_reflectance.values = unc
         if corr is not None:
-            ds_refl.err_corr_reflectance.values = corr
+            ds_refl.err_corr_reflectance_wavelength.values = corr
 
         return ds_refl
 

@@ -50,12 +50,12 @@ TEMPLATE_REFL = {
             {
                 "dim": "wavelength",
                 "form": "err_corr_matrix",
-                "params": ["err_corr_reflectance"],
+                "params": ["err_corr_reflectance_wavelength"],
                 "units": [],
             }
         ],
     },
-    "err_corr_reflectance": {
+    "err_corr_reflectance_wavelength": {
         "dim": ["wavelength", "wavelength"],
         "dtype": np.float32,
     },
