@@ -571,7 +571,9 @@ class TestLimeSimulation(unittest.TestCase):
             KERNELS_PATH,
         )
         for md, mdr in zip(mds, mds_ref):
-            self.assertEqual(md, mdr)
+            md = np.array(list(md.__dict__.values()))
+            mdr = np.array(list(mdr.__dict__.values()))
+            np.testing.assert_equal(md, mdr)
 
     def test_get_moon_datas_ok_sat(self):
         ls = get_lime_simulation()
@@ -595,8 +597,8 @@ class TestLimeSimulation(unittest.TestCase):
             )
             mds_ref.append(md_ref)
         for md, mdr in zip(mds, mds_ref):
-            md = np.array(list(md.__dict__.values()))
-            mdr = np.array(list(mdr.__dict__.values()))
+            md = np.array(list(md.__dict__.values())).astype(float)
+            mdr = np.array(list(mdr.__dict__.values())).astype(float)
             np.testing.assert_almost_equal(md, mdr, 8)
 
     # is_ampa_valid_range

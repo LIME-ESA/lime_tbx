@@ -83,6 +83,7 @@ class TestELRef(unittest.TestCase):
             MD.distance_sun_moon,
             DIST_EARTH_MOON_KM,
             MD.distance_observer_moon,
+            MD.geom_factor,
         )
         np.testing.assert_array_equal(elis, ELIS_CHECK_DATA_WEHRLI)
 
@@ -94,6 +95,7 @@ class TestELRef(unittest.TestCase):
             MD.distance_sun_moon,
             DIST_EARTH_MOON_KM,
             MD.distance_observer_moon,
+            MD.geom_factor,
         )
         self.assertEqual(eli_val, ELIS_CHECK_DATA_WEHRLI[0])
 
@@ -105,6 +107,7 @@ class TestELRef(unittest.TestCase):
             MD.distance_sun_moon,
             DIST_EARTH_MOON_KM,
             MD.distance_observer_moon,
+            MD.geom_factor,
         )
         eli_ones = np.array(
             [
@@ -115,6 +118,7 @@ class TestELRef(unittest.TestCase):
                     MD.distance_sun_moon,
                     DIST_EARTH_MOON_KM,
                     MD.distance_observer_moon,
+                    MD.geom_factor,
                 )
                 for i in range(len(ELREF_DATA))
             ]
