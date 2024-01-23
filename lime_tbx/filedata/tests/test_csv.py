@@ -187,7 +187,7 @@ class TestCSV(unittest.TestCase):
                 0.1,
                 0.2,
                 2,
-                [None, None],
+                [DT1, DT2],
                 [SPOINT, SPOINT3],
                 [14, 2],
                 [True, False],
