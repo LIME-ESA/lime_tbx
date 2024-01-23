@@ -15,7 +15,7 @@ def read(filename):
 
 
 setup(
-    version="1.0.2",
+    version="1.0.3",
     cmdclass=versioneer.get_cmdclass(),
     name="lime_tbx",
     url="https://gitlab.npl.co.uk/eco/eo/lime_tbx",

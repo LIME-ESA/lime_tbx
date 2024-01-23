@@ -5,8 +5,8 @@ lime_tbx
 The LIME TBX is a python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model
 to simulate lunar observations and compare to remote sensing observations of the moon.
 
-.. image:: https://img.shields.io/badge/version-1.0.2-informational
-  :alt: Version 1.0.2
+.. image:: https://img.shields.io/badge/version-1.0.3-informational
+  :alt: Version 1.0.3
 
 
 Documentation
@@ -99,8 +99,9 @@ Licence
 Authors
 -------
 
+`Javier Gatón Herguedas <gaton@goa.uva.es>`_.
 `Pieter De Vis <pieter.de.vis@npl.co.uk>`_.
 `Jacob Fahy <jacob.fahy@npl.co.uk>`_.
-`Javier Gatón Herguedas <gaton@goa.uva.es>`_.
+`Stefan Adriaensen <stefan.adriaensen@vito.be>`_.
 `Ramiro González Catón <ramiro@goa.uva.es>`_.
 `Carlos Toledano <toledano@goa.uva.es>`_.
