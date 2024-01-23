@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 import requests
 from typing import Callable, Tuple
+import re
 
 """___Third-Party Modules___"""
 # import here
@@ -82,7 +83,9 @@ class Update(IUpdate):
 
     def check_for_updates(self, timeout=60) -> bool:
         urlpath = self.url
-        version_files = requests.get(urlpath, timeout=timeout).text.split()
+        text = requests.get(urlpath, timeout=timeout).text
+        text = re.sub("<\!\-\-(.|\n)*\-\-\>", "", text)  # remove comments
+        version_files = text.split()
         version_files = [
             tuple(line.split(","))
             for line in version_files

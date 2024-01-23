@@ -237,7 +237,7 @@ def export_csv_simulation(
 def export_csv_comparison(
     data: List[SpectralData],
     ylabel: str,
-    points: List[SurfacePoint],
+    points: Union[List[SurfacePoint], List[CustomPoint]],
     name: str,
     coeff_version: str,
     comparison_data: ComparisonData,
@@ -258,7 +258,7 @@ def export_csv_comparison(
         In the comparation it is the observed irradiance and the simulated one, in that exact order.
     ylabel: str
         Label of the y_data
-    points: list of SurfacePoint
+    points: list of SurfacePoint or list of CustomPoint
         Points from which the data is generated. In case it's None, no metadata will be printed.
     name: str
         CSV file path
@@ -310,15 +310,27 @@ def export_csv_comparison(
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             relperc = "Relative" if relative_difference else "Percentage"
-            header = [
-                x_label,
-                "latitude",
-                "longitude",
-                "altitude(m)",
-                "Observed {}".format(ylabel),
-                "Simulated {}".format(ylabel),
-                f"{relperc} differences (%)",
-            ]
+            is_surface = isinstance(points[0], SurfacePoint)
+            if is_surface:
+                header_coords = ["latitude", "longitude", "altitude(m)"]
+            else:  # CustomPoint
+                header_coords = [
+                    "moon phase angle (deg)",
+                    "selenographic latitude (deg)",
+                    "selenographic longitude (deg)",
+                    "solar selenographic longitude (rad)",
+                    "distance sun moon (AU)",
+                    "distance observer moon (km)",
+                ]
+            header = (
+                [x_label]
+                + header_coords
+                + [
+                    "Observed {}".format(ylabel),
+                    "Simulated {}".format(ylabel),
+                    f"{relperc} differences (%)",
+                ]
+            )
             if not skip_uncs:
                 header += [
                     "Observation uncertainties",
@@ -335,22 +347,37 @@ def export_csv_comparison(
             for i in range(len(x_data)):
                 pt = points[i]
                 if x_datetime:
-                    x_val = pt.dt.isoformat(sep=" ", timespec="milliseconds")
+                    dt = comparison_data.dts[i]
+                    x_val = dt.isoformat(sep=" ", timespec="milliseconds")
                 else:
                     x_val = x_data[i]
                 warn_out_mpa_range = ""
                 if not ampa_valid_range[i]:
                     warn_out_mpa_range = " **"
                 x_val = f"{x_val}{warn_out_mpa_range}"
-                datarow = [
-                    x_val,
-                    pt.latitude,
-                    pt.longitude,
-                    pt.altitude,
-                    data[0].data[i],
-                    data[1].data[i],
-                    difsig.data[i],
-                ]
+                if is_surface:
+                    datarow = [
+                        x_val,
+                        pt.latitude,
+                        pt.longitude,
+                        pt.altitude,
+                        data[0].data[i],
+                        data[1].data[i],
+                        difsig.data[i],
+                    ]
+                else:
+                    datarow = [
+                        x_val,
+                        pt.moon_phase_angle,
+                        pt.selen_obs_lat,
+                        pt.selen_obs_lon,
+                        pt.selen_sun_lon,
+                        pt.distance_sun_moon,
+                        pt.distance_observer_moon,
+                        data[0].data[i],
+                        data[1].data[i],
+                        difsig.data[i],
+                    ]
                 if not skip_uncs:
                     datarow += [
                         data[0].uncertainties[i],
