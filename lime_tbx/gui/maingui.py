@@ -319,7 +319,7 @@ def _show_comps_output(
     to_remove = []
     for i, ch in enumerate(ch_names):
         if len(comps[i].dts) > 0:
-            output.update_plot(i, comps[i])
+            output.update_plot(i, comps[i], False)
             n_comp_points = len(comps[i].diffs_signal.wlens)
             data_start = min(comps[i].dts)
             data_end = max(comps[i].dts)
@@ -345,6 +345,7 @@ def _show_comps_output(
                 y_label,
                 "Irradiance (Wm⁻²nm⁻¹)",
                 subtitle=subtitle,
+                redraw=False,
             )
             output.update_legends(
                 i,
@@ -354,6 +355,7 @@ def _show_comps_output(
                     [],
                     ["Relative Differences", "Percentage Differences"],
                 ],
+                redraw=True,
             )
         else:
             to_remove.append(ch)
