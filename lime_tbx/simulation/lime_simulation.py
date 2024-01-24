@@ -75,6 +75,13 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
+    def clear_srf(self):
+        """
+        Dereference the SRF object from the LimeSimulation, allowing the garbage collector to remove it.
+        """
+        pass
+
+    @abstractmethod
     def is_skipping_uncs(self) -> bool:
         """
         Checks if the current simulation instance is skipping the uncertainties calculation.
@@ -456,6 +463,10 @@ class LimeSimulation(ILimeSimulation):
         self._skip_uncs = None
         self._interp_srf_name = None
         self.settings_manager.set_coef_version_name(None)
+
+    def clear_srf(self):
+        self.srf = None
+        self.set_simulation_changed()
 
     def _save_parameters(
         self,

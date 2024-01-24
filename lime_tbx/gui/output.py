@@ -54,6 +54,7 @@ class GraphWidget(QtWidgets.QWidget):
         ylabel="",
         comparison_x_datetime=True,
         parent=None,
+        build_layout_ini=True,
     ):
         super().__init__(parent)
         self._init_parent = parent
@@ -82,9 +83,19 @@ class GraphWidget(QtWidgets.QWidget):
         self.skip_uncs = None
         self.compare_percentages = None
         self.ch_names = []
-        self._build_layout()
+        self.is_built = False
+        self._to_update_plot = False
+        self._to_update_labels = False
+        if build_layout_ini:
+            self._build_layout()
+
+    def showEvent(self, event):
+        if not self.is_built:
+            self._build_layout()
+        super().showEvent(event)
 
     def _build_layout(self):
+        self.is_built = True
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # canvas
         self.canvas = MplCanvas(self)
@@ -113,6 +124,10 @@ class GraphWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.canvas, 1)
         self.main_layout.addLayout(self.buttons_layout)
+        if self._to_update_plot:
+            self._update_plot()
+        if self._to_update_labels:
+            self._update_labels()
 
     def _prepare_toolbar(self):
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -175,7 +190,13 @@ class GraphWidget(QtWidgets.QWidget):
         self.asd_data = data_asd
         self.data_compare = data_compare
         self.compare_percentages = compare_percentages
-        if data is not None:
+        if self.is_built:
+            self._update_plot(redraw)
+        else:
+            self._to_update_plot = True
+
+    def _update_plot(self, redraw=True):
+        if self.data is not None:
             self.disable_buttons(False)
         else:
             self.disable_buttons(True)
@@ -196,6 +217,12 @@ class GraphWidget(QtWidgets.QWidget):
         self.ylabel = ylabel
         if subtitle != None:
             self.subtitle = subtitle
+        if self.is_built:
+            self._update_labels(redraw)
+        else:
+            self._to_update_labels = True
+
+    def _update_labels(self, redraw=True):
         if redraw:
             self._redraw()
         self._update_toolbar()
@@ -213,9 +240,12 @@ class GraphWidget(QtWidgets.QWidget):
             3: comparison
         """
         self.legend = legend
-        if redraw:
-            self._redraw()
-        self._update_toolbar()
+        if self.is_built:
+            if redraw:
+                self._redraw()
+            self._update_toolbar()
+        else:
+            self._to_update_labels = True
 
     def update_size(self):
         self._redraw()
@@ -229,6 +259,8 @@ class GraphWidget(QtWidgets.QWidget):
         self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
 
     def _redraw(self):
+        if not self.is_built:
+            return
         self.canvas.axes.cla()  # Clear the canvas.
         lines = redraw_canvas(
             self.canvas,
@@ -566,10 +598,18 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.stack_layout.addWidget(self.graph_reldif)
         self.stack_layout.addWidget(self.graph_percdif)
         self.stack_layout.setCurrentIndex(0)
-        self.graph_reldif.setVisible(True)
-        self.graph_percdif.setVisible(False)
+        self.visible_reldif = True
+
+    def showEvent(self, event):
+        self.set_visible_graphs()
         self.graph_percdif.canvas.mpl_connect("resize_event", self._on_resize)
         self.graph_reldif.canvas.mpl_connect("resize_event", self._on_resize)
+        super().showEvent(event)
+
+    def set_visible_graphs(self):
+        if self.isVisible():
+            self.graph_reldif.setVisible(self.visible_reldif)
+            self.graph_percdif.setVisible(not self.visible_reldif)
 
     def _on_resize(self, event):
         self.tight_layout()
@@ -590,13 +630,13 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.graph_percdif.canvas.draw()
 
     def show_percentage(self):
-        self.graph_reldif.setVisible(False)
-        self.graph_percdif.setVisible(True)
+        self.visible_reldif = False
+        self.set_visible_graphs()
         self.stack_layout.setCurrentIndex(1)
 
     def show_relative(self):
-        self.graph_percdif.setVisible(False)
-        self.graph_reldif.setVisible(True)
+        self.visible_reldif = True
+        self.set_visible_graphs()
         self.stack_layout.setCurrentIndex(0)
 
     def clear(self):
@@ -684,19 +724,33 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout.addWidget(self.range_warning)
 
     def set_channels(self, channels: List[str]):
-        while self.channel_tabs.count() > 0:
-            self.channel_tabs.removeTab(0)
-        for ch in self.channels:
-            ch.clear()
-            ch.setParent(None)
+        new_channel_tabs = QtWidgets.QTabWidget()
+        new_channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.main_layout.replaceWidget(self.channel_tabs, new_channel_tabs)
+        self.channel_tabs.setParent(None)
+        self.channel_tabs.deleteLater()
+        self.channel_tabs = new_channel_tabs
+        # Former deletion was too slow:
+        # while self.channel_tabs.count() > 0:
+        #    self.channel_tabs.removeTab(0)
+        # for ch in self.channels:
+        #    ch.clear()
+        #    ch.setParent(None)
         self.channels.clear()
         self.ch_names = []
+        build_layout_ini = len(channels) < 15
         for ch in channels:
             grel = GraphWidget(
-                self.settings_manager, ch, comparison_x_datetime=self.x_datetime
+                self.settings_manager,
+                ch,
+                comparison_x_datetime=self.x_datetime,
+                build_layout_ini=build_layout_ini,
             )
             gperc = GraphWidget(
-                self.settings_manager, ch, comparison_x_datetime=self.x_datetime
+                self.settings_manager,
+                ch,
+                comparison_x_datetime=self.x_datetime,
+                build_layout_ini=build_layout_ini,
             )
             channel = ComparisonDualGraphWidget(grel, gperc)
             self.channels.append(channel)
@@ -707,9 +761,6 @@ class ComparisonOutput(QtWidgets.QWidget):
         # Remove range warning content
         if self.range_warning:
             self.range_warning.setText("")
-        # if self.range_warning:
-        #    self.range_warning.setParent(None)
-        #    self.range_warning = None
 
     def set_as_partly(self, ch_name: str):
         if ch_name in self.ch_names:
@@ -724,14 +775,19 @@ for wavelengths between 350 and 2500 nm"
             else:
                 self.range_warning.setText(msg)
 
+    def check_if_range_visible(self):
+        if self.range_warning.text() != "":
+            self.range_warning.setVisible(True)
+        else:
+            self.range_warning.setVisible(False)
+
     def _check_range_warning_needed(self):
         for i in range(len(self.ch_names)):
             if "*" in self.channel_tabs.tabText(i):
                 return
-        # Not needed
         if self.range_warning:
-            self.range_warning.setParent(None)
-            self.range_warning = None
+            self.range_warning.setText("")
+            self.range_warning.setVisible(False)
 
     def remove_channels(self, channels: List[str]):
         for ch_name in channels:

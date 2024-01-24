@@ -319,7 +319,7 @@ def _show_comps_output(
     to_remove = []
     for i, ch in enumerate(ch_names):
         if len(comps[i].dts) > 0:
-            output.update_plot(i, comps[i])
+            output.update_plot(i, comps[i], False)
             n_comp_points = len(comps[i].diffs_signal.wlens)
             data_start = min(comps[i].dts)
             data_end = max(comps[i].dts)
@@ -345,6 +345,7 @@ def _show_comps_output(
                 y_label,
                 "Irradiance (Wm⁻²nm⁻¹)",
                 subtitle=subtitle,
+                redraw=False,
             )
             output.update_legends(
                 i,
@@ -354,6 +355,7 @@ def _show_comps_output(
                     [],
                     ["Relative Differences", "Percentage Differences"],
                 ],
+                redraw=True,
             )
         else:
             to_remove.append(ch)
@@ -590,10 +592,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def clear_comparison_accepted(self):
+        # Try to delete the SRF
+        for i in range(len(self.srf.channels) - 1, -1, -1):
+            self.srf.channels[i].spectral_response = None
+            self.srf.channels[i].spectral_response_inrange = None
+            self.srf.channels[i].valid_spectre = None
+            del self.srf.channels[i]
+        self.srf = None
+        self.set_show_comparison_input(True)
         if not self.comparing_dts:
             self.switch_show_compare_mpa_dts()
         self.input.clear_input()
-        self.set_show_comparison_input(True)
+        self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
         self.export_lglod_button.setEnabled(False)
         self.change_mpa_dts_button.setVisible(False)
@@ -703,7 +713,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.set_show_comparison_input(False)
         self.input.clear_input()
         self.compare_button.setDisabled(True)
-        srf = srf
         self.comps = comps
         self.data_source = data_source
         self.skipped_uncs = skipped_uncs
@@ -731,7 +740,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _load_lglod_comparisons_finished(self, data):
         self.output.remove_channels(data[0])
+        self.output.check_if_range_visible()
         self.output_mpa.remove_channels(data[1])
+        self.output_mpa.check_if_range_visible()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
