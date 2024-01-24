@@ -592,10 +592,17 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def clear_comparison_accepted(self):
+        # Try to delete the SRF
+        for i in range(len(self.srf.channels) - 1, -1, -1):
+            self.srf.channels[i].spectral_response = None
+            self.srf.channels[i].spectral_response_inrange = None
+            self.srf.channels[i].valid_spectre = None
+            del self.srf.channels[i]
+        self.srf = None
+        self.set_show_comparison_input(True)
         if not self.comparing_dts:
             self.switch_show_compare_mpa_dts()
         self.input.clear_input()
-        self.set_show_comparison_input(True)
         self.clear_comp_dialog.close()
         self.export_lglod_button.setEnabled(False)
         self.change_mpa_dts_button.setVisible(False)
@@ -705,7 +712,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.set_show_comparison_input(False)
         self.input.clear_input()
         self.compare_button.setDisabled(True)
-        srf = srf
         self.comps = comps
         self.data_source = data_source
         self.skipped_uncs = skipped_uncs

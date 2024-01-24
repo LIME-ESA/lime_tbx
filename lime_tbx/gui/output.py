@@ -724,11 +724,18 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout.addWidget(self.range_warning)
 
     def set_channels(self, channels: List[str]):
-        while self.channel_tabs.count() > 0:
-            self.channel_tabs.removeTab(0)
-        for ch in self.channels:
-            ch.clear()
-            ch.setParent(None)
+        new_channel_tabs = QtWidgets.QTabWidget()
+        new_channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.main_layout.replaceWidget(self.channel_tabs, new_channel_tabs)
+        self.channel_tabs.setParent(None)
+        self.channel_tabs.deleteLater()
+        self.channel_tabs = new_channel_tabs
+        # Former deletion was too slow:
+        # while self.channel_tabs.count() > 0:
+        #    self.channel_tabs.removeTab(0)
+        # for ch in self.channels:
+        #    ch.clear()
+        #    ch.setParent(None)
         self.channels.clear()
         self.ch_names = []
         build_layout_ini = len(channels) < 15
