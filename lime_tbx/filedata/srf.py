@@ -98,7 +98,10 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
             channel = SRFChannel(center, c_id, channel_spec_resp)
             channels.append(channel)
         name = os.path.basename(filepath)
-        return SpectralResponseFunction(name, channels)
+        srf = SpectralResponseFunction(name, channels)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_ERROR_STR)
+    finally:
+        ds.close()
+    return srf

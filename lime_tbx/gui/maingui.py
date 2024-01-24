@@ -603,6 +603,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         if not self.comparing_dts:
             self.switch_show_compare_mpa_dts()
         self.input.clear_input()
+        self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
         self.export_lglod_button.setEnabled(False)
         self.change_mpa_dts_button.setVisible(False)
@@ -739,7 +740,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _load_lglod_comparisons_finished(self, data):
         self.output.remove_channels(data[0])
+        self.output.check_if_range_visible()
         self.output_mpa.remove_channels(data[1])
+        self.output_mpa.check_if_range_visible()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()

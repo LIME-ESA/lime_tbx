@@ -761,9 +761,6 @@ class ComparisonOutput(QtWidgets.QWidget):
         # Remove range warning content
         if self.range_warning:
             self.range_warning.setText("")
-        # if self.range_warning:
-        #    self.range_warning.setParent(None)
-        #    self.range_warning = None
 
     def set_as_partly(self, ch_name: str):
         if ch_name in self.ch_names:
@@ -778,14 +775,19 @@ for wavelengths between 350 and 2500 nm"
             else:
                 self.range_warning.setText(msg)
 
+    def check_if_range_visible(self):
+        if self.range_warning.text() != "":
+            self.range_warning.setVisible(True)
+        else:
+            self.range_warning.setVisible(False)
+
     def _check_range_warning_needed(self):
         for i in range(len(self.ch_names)):
             if "*" in self.channel_tabs.tabText(i):
                 return
-        # Not needed
         if self.range_warning:
-            self.range_warning.setParent(None)
-            self.range_warning = None
+            self.range_warning.setText("")
+            self.range_warning.setVisible(False)
 
     def remove_channels(self, channels: List[str]):
         for ch_name in channels:
