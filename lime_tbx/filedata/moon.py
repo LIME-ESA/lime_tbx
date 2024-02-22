@@ -154,7 +154,7 @@ def read_moon_obs(
                     sat_vars[sava] = ds[sava][:].data[0]
                 else:
                     if mdeo is None:
-                        eo = EOCFIConverter(eocfi_path, kernels_path.main_kernels_path)
+                        eo = EOCFIConverter(eocfi_path, kernels_path)
                         _sname = ds["sat_name"][:]
                         if str(_sname.dtype.str).startswith("|S"):
                             sat_name = str(_sname, "utf-8")
