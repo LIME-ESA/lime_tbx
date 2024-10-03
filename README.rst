@@ -9,6 +9,11 @@ to simulate lunar observations and compare to remote sensing observations of the
   :alt: Version 1.0.3
 
 
+.. image:: https://img.shields.io/badge/License-LGPL_v3-blue.svg
+  :target: https://www.gnu.org/licenses/lgpl-3.0
+  :alt: License: LGPL v3
+
+
 Documentation
 =============
 

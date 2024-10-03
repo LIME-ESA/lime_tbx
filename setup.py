@@ -68,5 +68,6 @@ setup(
         "Development Status :: 4 - Beta",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
+        "OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     ],
 )
