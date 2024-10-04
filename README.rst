@@ -1,9 +1,6 @@
 ========
-lime_tbx
+LIME Toolbox
 ========
-
-The LIME TBX is a python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model
-to simulate lunar observations and compare to remote sensing observations of the moon.
 
 .. image:: https://img.shields.io/badge/version-1.0.3-informational
   :alt: Version 1.0.3
@@ -12,6 +9,13 @@ to simulate lunar observations and compare to remote sensing observations of the
 .. image:: https://img.shields.io/badge/License-LGPL_v3-blue.svg
   :target: https://www.gnu.org/licenses/lgpl-3.0
   :alt: License: LGPL v3
+
+
+The *lime_tbx* is a Python package that provides a comprehensive toolbox for utilizing the Lunar
+Irradiance Model of ESA (LIME) to simulate lunar observations and compare them with remote sensing
+data of the Moon.
+
+More information about the LIME can be found on `lime.uva.es <https://lime.uva.es>`_.
 
 
 Documentation
@@ -57,7 +61,7 @@ The project composite structure is explained in quality_documentation/uml/compos
 Testing
 -------
 
-To perform the unit tests one must type::
+To perform the unit tests one must run::
 
     python3 -m unittest
 
@@ -98,15 +102,17 @@ Compatibility
 - Linux with GLIBC >= 2.23 and x86_64 arch.
 - Mac with x86_64 arch. or with ARM64 arch. and Rosetta interpreter.
 
-Licence
+License
 -------
+
+`LGPL v3 <./LICENSE>`_
 
 Authors
 -------
 
-`Javier Gatón Herguedas <gaton@goa.uva.es>`_.
-`Pieter De Vis <pieter.de.vis@npl.co.uk>`_.
-`Jacob Fahy <jacob.fahy@npl.co.uk>`_.
-`Stefan Adriaensen <stefan.adriaensen@vito.be>`_.
-`Ramiro González Catón <ramiro@goa.uva.es>`_.
-`Carlos Toledano <toledano@goa.uva.es>`_.
+* `Javier Gatón Herguedas <gaton@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`_
+* `Pieter De Vis <pieter.de.vis@npl.co.uk>`_ - `NPL <https://npl.co.uk>`_
+* `Jacob Fahy <jacob.fahy@npl.co.uk>`_ - `NPL <https://npl.co.uk>`_
+* `Stefan Adriaensen <stefan.adriaensen@vito.be>`_ - `VITO <https://vito.be>`_
+* `Ramiro González Catón <ramiro@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`_
+* `Carlos Toledano <toledano@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`_
