@@ -1,19 +1,17 @@
 # LIME Toolbox
 
-![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational)](../../tags) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 The *lime_tbx* is a Python package that provides a comprehensive toolbox
 for utilizing the Lunar Irradiance Model of ESA (LIME) to simulate lunar
 observations and compare them with remote sensing data of the Moon.
 
 <div align="center">
-<img src="./docs/images/lime_logo.png" alt="LIME logo" width="250px"/>
+<img src="./docs/images/lime_logo.png" alt="LIME logo" width="300px"/>
 </div>
 
 This project is managed, financed and supported by the European Space
 Agency (ESA).
-
-<img src="./docs/images/esa.png" alt="ESA logo" width="250px" align="center"/>
   
 More information about the LIME can be found on [lime.uva.es](https://lime.uva.es>).
 
@@ -53,15 +51,15 @@ The project dependencies can be installed with::
 
     pip install -r requirements.txt
 
-The project composite structure is explained in quality
-documentation/uml/composite_structure.png:
+The project composite structure is explained in
+quality_documentation/uml/composite_structure.png:
 
-<p align="center">
+<div align="center">
 <a href="./quality_documentation/uml/composite_structure.png">
   <img src="./quality_documentation/uml/composite_structure.png"
 alt="UML diagram of the composite structure of lime_tbx" width="1000px"/>
 </a>
-</p>
+</div>
 
 
 Testing
@@ -127,4 +125,6 @@ Authors
 * [Carlos Toledano](toledano@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
 
 
-| <img src="./docs/images/uva_sello.png" alt="Logo of UVa" style="width:30%"> | <img src="./docs/images/npl.png" alt="Logo of NPL" style="width:30%"> | <img src="./docs/images/vito.png" alt="Logo of VITO" style="width:30%"> |
+<div align="center">
+<img src="./docs/images/esa.png" alt="ESA logo" width="20%"/> <img src="./docs/images/uva_sello.png" alt="Logo of UVa" width="20%"> <img src="./docs/images/npl.png" alt="Logo of NPL" width="20%"> <img src="./docs/images/vito.png" alt="Logo of VITO" width="20%">
+</div>
