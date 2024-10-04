@@ -1,39 +1,21 @@
 # LIME Toolbox
 
-![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 The *lime_tbx* is a Python package that provides a comprehensive toolbox
 for utilizing the Lunar Irradiance Model of ESA (LIME) to simulate lunar
 observations and compare them with remote sensing data of the Moon.
 
-
-<style>
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-.column {
-  float: left;
-  width: 30%;
-  padding: 5px;
-}
-.row::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-</style>
-
-<img src="../images/lime_logo.png" alt="LIME logo" style="width:250px;" class="center"/>
+<p align="center">
+<img src="./docs/images/lime_logo.png" alt="LIME logo" style="width:250px;"/>
+</p>
 
 This project is managed, financed and supported by the European Space
 Agency (ESA).
 
-
-<img src="../images/esa.png" alt="ESA logo" style="width:250px;" class="center"/>
+<p align="center">
+<img src="./docs/images/esa.png" alt="ESA logo" style="width:250px;" class="center"/>
+</p>
 
 More information about the LIME can be found on [lime.uva.es](https://lime.uva.es>).
 
@@ -76,10 +58,12 @@ The project dependencies can be installed with::
 The project composite structure is explained in quality
 documentation/uml/composite_structure.png:
 
-<a href="../../quality_documentation/uml/composite_structure.png">
-  <img src="../../quality_documentation/uml/composite_structure.png"
-alt="UML diagram of the composite structure of lime_tbx" style="width:1000px;" class="center"/>
+<p align="center">
+<a href="./quality_documentation/uml/composite_structure.png">
+  <img src="./quality_documentation/uml/composite_structure.png"
+alt="UML diagram of the composite structure of lime_tbx" style="width:1000px;"/>
 </a>
+</p>
 
 
 Testing
@@ -144,14 +128,5 @@ Authors
 * [Ramiro González Catón](ramiro@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
 * [Carlos Toledano](toledano@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
 
-<div class="row">
-  <div class="column">
-    <img src="../images/uva_sello.png" alt="Logo of UVa" style="width:100%">
-  </div>
-  <div class="column">
-    <img src="../images/npl.png" alt="Logo of NPL" style="width:100%">
-  </div>
-  <div class="column">
-    <img src="../images/vito.png" alt="Logo of VITO" style="width:100%">
-  </div>
-</div>
+
+| <img src="./docs/images/uva_sello.png" alt="Logo of UVa" style="width:30%"> | <img src="./docs/images/npl.png" alt="Logo of NPL" style="width:30%"> | <img src="./docs/images/vito.png" alt="Logo of VITO" style="width:30%"> |
