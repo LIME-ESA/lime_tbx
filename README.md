@@ -1,13 +1,13 @@
 # LIME Toolbox
 
-[![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational)](../../tags) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational)](https://gitlab.npl.co.uk/eco/eo/lime_tbx/-/tags) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 The *lime_tbx* is a Python package that provides a comprehensive toolbox
 for utilizing the Lunar Irradiance Model of ESA (LIME) to simulate lunar
 observations and compare them with remote sensing data of the Moon.
 
 <div align="center">
-<img src="./docs/images/lime_logo.png" alt="LIME logo" width="300px"/>
+<img src="./docs/images/lime_logo.png" alt="LIME logo" width="250px"/>
 </div>
 
 This project is managed, financed and supported by the European Space
@@ -126,5 +126,5 @@ Authors
 
 
 <div align="center">
-<img src="./docs/images/esa.png" alt="ESA logo" width="20%"/> <img src="./docs/images/uva_sello.png" alt="Logo of UVa" width="20%"> <img src="./docs/images/npl.png" alt="Logo of NPL" width="20%"> <img src="./docs/images/vito.png" alt="Logo of VITO" width="20%">
+<a href="https://esa.int"><img src="./docs/images/esa.png" alt="ESA logo" width="22%"/></a> <a href="https://uva.es"><img src="./docs/images/uva_sello.png" alt="Logo of UVa" width="22%"></a> <a href="https://npl.co.uk"><img src="./docs/images/npl.png" alt="Logo of NPL" width="22%"></a> <a href="https://vito.be"><img src="./docs/images/vito.png" alt="Logo of VITO" width="22%"></a>
 </div>
