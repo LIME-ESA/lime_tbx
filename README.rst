@@ -17,14 +17,16 @@ observations and compare them with remote sensing data of the Moon.
 
 
 .. image:: ./docs/images/lime_logo.png
-  :width: 650
+  :width: 100
+  :align: center
   :alt: LIME logo.
 
 This project is managed, financed and supported by the European Space
 Agency (ESA).
 
 .. image:: ./docs/images/esa.png
-  :width: 650
+  :width: 100
+  :align: center
   :alt: ESA logo.
 
 More information about the LIME can be found on `lime.uva.es <https://lime.uva.es>`_.
@@ -137,11 +139,11 @@ Authors
 
 
 .. image:: ./docs/images/uva_sello.png
-  :width: 30 %
+  :width: 25 %
   :alt: Logo of UVa
 .. image:: ./docs/images/npl.png
-  :width: 30 %
+  :width: 25 %
   :alt: Logo of NPL
 .. image:: ./docs/images/vito.png
-  :width: 30 %
+  :width: 25 %
   :alt: Logo of VITO
