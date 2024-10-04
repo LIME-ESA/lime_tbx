@@ -1,6 +1,6 @@
-========
+==============
 LIME Toolbox
-========
+==============
 
 .. image:: https://img.shields.io/badge/version-1.0.3-informational
   :alt: Version 1.0.3
@@ -11,9 +11,21 @@ LIME Toolbox
   :alt: License: LGPL v3
 
 
-The *lime_tbx* is a Python package that provides a comprehensive toolbox for utilizing the Lunar
-Irradiance Model of ESA (LIME) to simulate lunar observations and compare them with remote sensing
-data of the Moon.
+The *lime_tbx* is a Python package that provides a comprehensive toolbox
+for utilizing the Lunar Irradiance Model of ESA (LIME) to simulate lunar
+observations and compare them with remote sensing data of the Moon.
+
+
+.. image:: ./docs/images/lime_logo.png
+  :width: 650
+  :alt: LIME logo.
+
+This project is managed, financed and supported by the European Space
+Agency (ESA).
+
+.. image:: ./docs/images/esa.png
+  :width: 650
+  :alt: ESA logo.
 
 More information about the LIME can be found on `lime.uva.es <https://lime.uva.es>`_.
 
@@ -30,7 +42,8 @@ Usage
 Installation
 ------------
 
-The LIME TBX is designed as a standalone application, but you can install the python package and its dependencies by using::
+The LIME TBX is designed as a standalone application, but you can
+install the python package and its dependencies by using::
 
     pip install -e .
 
@@ -38,7 +51,8 @@ The LIME TBX is designed as a standalone application, but you can install the py
 Development
 -----------
 
-For developing the package, you'll want to install the pre-commit hooks as well. Type::
+For developing the package, you'll want to install the pre-commit
+hooks as well. Type::
 
     pre-commit install
 
@@ -51,7 +65,8 @@ The project dependencies can be installed with::
 
     pip install -r requirements.txt
 
-The project composite structure is explained in quality_documentation/uml/composite_structure.png:
+The project composite structure is explained in quality
+documentation/uml/composite_structure.png:
 
 .. image:: ./quality_documentation/uml/composite_structure.png
   :width: 650
@@ -78,21 +93,24 @@ Requirements:
 - python 3.8 (Linux) or python 3.9 (Mac and Windows).
 - pyinstaller (installed outside of the virtual environment).
 
-It is strongly recommended to create the app-bundle using a virtual environment (venv) in order to minimize
-the application size. Inside of it, the project dependencies can be installed with::
+It is strongly recommended to create the app-bundle using a virtual
+environment (venv) in order to minimize the application size. Inside of
+it, the project dependencies can be installed with::
 
     pip install -r requirements.txt
 
 Create a desktop app-bundle for your OS by using::
-  
+
     pyinstaller lime_tbx.spec
 
-Now you can deactivate the virtual environment. You may create an installer for your OS under the installer directory.
-For Windows you must use "InnoSetup", for Mac and Linux you must execute the scripts "build_mac_installer.sh"
-and "build_linux_installer.sh" respectively, and for Debian you must execute the "build_deb.sh" script.
+Now you can deactivate the virtual environment. You may create an installer
+for your OS under the installer directory. For Windows you must use
+"InnoSetup", for Mac and Linux you must execute the scripts
+"build_mac_installer.sh" and "build_linux_installer.sh" respectively,
+and for Debian you must execute the "build_deb.sh" script.
 
-For more information about the recommended environments for the production of TBX binaries please check the
-installer directory.
+For more information about the recommended environments for the production
+of TBX binaries please check the installer directory.
 
 
 Compatibility
@@ -110,9 +128,20 @@ License
 Authors
 -------
 
-* `Javier Gatón Herguedas <gaton@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`_
-* `Pieter De Vis <pieter.de.vis@npl.co.uk>`_ - `NPL <https://npl.co.uk>`_
-* `Jacob Fahy <jacob.fahy@npl.co.uk>`_ - `NPL <https://npl.co.uk>`_
+* `Javier Gatón Herguedas <gaton@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`__
+* `Pieter De Vis <pieter.de.vis@npl.co.uk>`_ - `NPL <https://npl.co.uk>`__
 * `Stefan Adriaensen <stefan.adriaensen@vito.be>`_ - `VITO <https://vito.be>`_
-* `Ramiro González Catón <ramiro@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`_
-* `Carlos Toledano <toledano@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`_
+* `Jacob Fahy <jacob.fahy@npl.co.uk>`_ - `NPL <https://npl.co.uk>`__
+* `Ramiro González Catón <ramiro@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`__
+* `Carlos Toledano <toledano@goa.uva.es>`_ - `GOA-UVa <https://goa.uva.es>`__
+
+
+.. image:: ./docs/images/uva_sello.png
+  :width: 30 %
+  :alt: Logo of UVa
+.. image:: ./docs/images/npl.png
+  :width: 30 %
+  :alt: Logo of NPL
+.. image:: ./docs/images/vito.png
+  :width: 30 %
+  :alt: Logo of VITO

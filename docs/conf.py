@@ -91,8 +91,7 @@ master_doc = "index"
 
 # General information about the project.
 project = project_title
-copyright = "Pieter De Vis"
-author = "Pieter De Vis"
+author = "Javier Gatón, Pieter De Vis, Stefan Adriaensen, Jacob Fahy, Ramiro González Catón, Carlos Toledano"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -186,7 +185,7 @@ latex_documents = [
         master_doc,
         "user_manual.tex",
         "{} Documentation".format(project_title),
-        "Pieter De Vis",
+        author,
         "manual",
     ),
 ]
