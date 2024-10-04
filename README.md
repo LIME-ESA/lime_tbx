@@ -6,17 +6,15 @@ The *lime_tbx* is a Python package that provides a comprehensive toolbox
 for utilizing the Lunar Irradiance Model of ESA (LIME) to simulate lunar
 observations and compare them with remote sensing data of the Moon.
 
-<p align="center">
-<img src="./docs/images/lime_logo.png" alt="LIME logo" style="width:250px;"/>
-</p>
+<div align="center">
+<img src="./docs/images/lime_logo.png" alt="LIME logo" width="250px"/>
+</div>
 
 This project is managed, financed and supported by the European Space
 Agency (ESA).
 
-<p align="center">
-<img src="./docs/images/esa.png" alt="ESA logo" style="width:250px;" class="center"/>
-</p>
-
+<img src="./docs/images/esa.png" alt="ESA logo" width="250px" align="center"/>
+  
 More information about the LIME can be found on [lime.uva.es](https://lime.uva.es>).
 
 
@@ -61,7 +59,7 @@ documentation/uml/composite_structure.png:
 <p align="center">
 <a href="./quality_documentation/uml/composite_structure.png">
   <img src="./quality_documentation/uml/composite_structure.png"
-alt="UML diagram of the composite structure of lime_tbx" style="width:1000px;"/>
+alt="UML diagram of the composite structure of lime_tbx" width="1000px"/>
 </a>
 </p>
 
