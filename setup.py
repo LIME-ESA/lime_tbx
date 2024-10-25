@@ -19,7 +19,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     name="lime_tbx",
     url="https://gitlab.npl.co.uk/eco/eo/lime_tbx",
-    license="None",
+    license="LGPL-3.0-only",
     author="Javier Gatón Herguedas",
     author_email="gaton@goa.uva.es",
     description="The LIME TBX isa python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare to remote sensing observations of the moon.",
@@ -65,7 +65,7 @@ setup(
     ],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
         "OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",

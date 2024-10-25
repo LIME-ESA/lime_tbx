@@ -102,7 +102,11 @@ def read_moon_obs(
                 ch_name = ch_name[:end]
             ch_names.append(ch_name)
         dt = datetime.fromtimestamp(float(ds["date"][0].data), tz=timezone.utc)
-        sat_pos_ref = str(ds["sat_pos_ref"][:].data, "utf-8")
+        sat_pos_ref = ds["sat_pos_ref"][:]
+        if str(sat_pos_ref.dtype.str).startswith("|S"):
+            sat_pos_ref = str(sat_pos_ref, "utf-8")
+        else:
+            sat_pos_ref = sat_pos_ref[0]
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
         to_correct_distance = False
