@@ -23,7 +23,7 @@ setup(
     author="Javier Gatón Herguedas",
     author_email="gaton@goa.uva.es",
     description="The LIME TBX isa python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare to remote sensing observations of the moon.",
-    long_description=read("README.rst"),
+    long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
     install_requires=[
         "certifi==2022.6.15",
@@ -66,8 +66,16 @@ setup(
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "Natural Language :: English",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
-        "OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Scientific/Engineering :: Astronomy",
     ],
 )
