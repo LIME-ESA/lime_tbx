@@ -87,6 +87,8 @@ mypy:
     - pip install tox
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
+    - pip install setuptools~=74.1.1
+    - pip install packaging~=24.1
     - tox
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
