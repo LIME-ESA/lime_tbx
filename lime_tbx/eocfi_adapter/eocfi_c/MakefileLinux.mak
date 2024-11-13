@@ -58,10 +58,12 @@ LIBS_DIR = \
 
 LIBS = 	\
 	-lexplorer_orbit \
+	-lexplorer_visibility \
+	-lexplorer_pointing \
 	-lexplorer_lib \
 	-lexplorer_data_handling \
 	-lexplorer_file_handling \
-	-lgeotiff -ltiff -lproj -lxml2 -lm -lc -lpthread
+	-lgeotiff -ltiff -lproj -lxml2 -lm -lc -lpthread -fopenmp
 
 default : executable
 

@@ -414,6 +414,9 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self._check_if_a_lot_dts_and_update_msg()
 
 
+_DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
+
+
 class SatelliteInputWidget(QtWidgets.QWidget):
     def __init__(
         self,
@@ -427,7 +430,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self._build_layout()
         self.callback_check_calculable = callback_check_calculable
         self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        self.current_max_date = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        self.current_max_date = _DEF_MAX_DATE
         self._skip_uncs = skip_uncs
         self.all_loaded_datetimes = []
         self.update_from_combobox(0)
@@ -624,7 +627,8 @@ class SatelliteInputWidget(QtWidgets.QWidget):
             d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         self.current_min_date = d0
         if df == None:
-            df = datetime(2100, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+            df = _DEF_MAX_DATE
+        df = min(df, _DEF_MAX_DATE)
         self.current_max_date = df
         if self.single_datetime:
             dt0 = QtCore.QDateTime(
