@@ -79,19 +79,29 @@ class CustomInputWidget(QtWidgets.QWidget):
         self._build_layout()
 
     def _build_layout(self):
-        self.main_layout = QtWidgets.QFormLayout(self)
-        self.dist_sun_moon_label = QtWidgets.QLabel("Distance Sun-Moon (AU):")
-        self.dist_obs_moon_label = QtWidgets.QLabel("Distance Observer-Moon (km):")
-        self.selen_obs_lat_label = QtWidgets.QLabel(
-            "Selenographic latitude of the observer (°):"
-        )
-        self.selen_obs_lon_label = QtWidgets.QLabel(
-            "Selenographic longitude of the observer (°):"
-        )
-        self.selen_sun_lon_label = QtWidgets.QLabel(
-            "Selenographic longitude of the Sun (RAD):"
-        )
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.dist_sun_moon_label = QtWidgets.QLabel("Dist. Sun-Moon (AU):")
+        self.dist_obs_moon_label = QtWidgets.QLabel("Dist. Observer-Moon (km):")
         self.moon_phase_angle_label = QtWidgets.QLabel("Moon phase angle (°):")
+        self.selen_obs_lat_label = QtWidgets.QLabel("Observer sel. latitude (°):")
+        self.selen_obs_lon_label = QtWidgets.QLabel("Observer sel. longitude (°):")
+        self.selen_sun_lon_label = QtWidgets.QLabel("Sun sel. longitude (RAD):")
+        self.dist_sun_moon_label.setToolTip(
+            "Distance between the Sun and the Moon in Astronomical Units"
+        )
+        self.dist_obs_moon_label.setToolTip(
+            "Distance between the observer and the Moon in kilometers"
+        )
+        self.moon_phase_angle_label.setToolTip("Moon phase angles in degrees")
+        self.selen_obs_lat_label.setToolTip(
+            "Selenographic latitude of the observer in degrees"
+        )
+        self.selen_obs_lon_label.setToolTip(
+            "Selenographic longitude of the observer in degrees"
+        )
+        self.selen_sun_lon_label.setToolTip(
+            "Selenographic longitude of the Sun in radians"
+        )
         self.dist_sun_moon_spinbox = _LimeDoubleInput()
         self.dist_obs_moon_spinbox = _LimeDoubleInput()
         self.selen_obs_lat_spinbox = _LimeDoubleInput()
@@ -121,14 +131,24 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.moon_phase_angle_spinbox.setMaximum(180)
         self.moon_phase_angle_spinbox.setDecimals(20)
         self.moon_phase_angle_spinbox.setValue(30)
-        self.main_layout.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
-        self.main_layout.addRow(self.dist_obs_moon_label, self.dist_obs_moon_spinbox)
-        self.main_layout.addRow(self.selen_obs_lat_label, self.selen_obs_lat_spinbox)
-        self.main_layout.addRow(self.selen_obs_lon_label, self.selen_obs_lon_spinbox)
-        self.main_layout.addRow(self.selen_sun_lon_label, self.selen_sun_lon_spinbox)
-        self.main_layout.addRow(
+        self.dists_layout = QtWidgets.QFormLayout()
+        self.sel_coords_layout = QtWidgets.QFormLayout()
+        self.dists_layout.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
+        self.dists_layout.addRow(self.dist_obs_moon_label, self.dist_obs_moon_spinbox)
+        self.dists_layout.addRow(
             self.moon_phase_angle_label, self.moon_phase_angle_spinbox
         )
+        self.main_layout.addLayout(self.dists_layout)
+        self.sel_coords_layout.addRow(
+            self.selen_obs_lat_label, self.selen_obs_lat_spinbox
+        )
+        self.sel_coords_layout.addRow(
+            self.selen_obs_lon_label, self.selen_obs_lon_spinbox
+        )
+        self.sel_coords_layout.addRow(
+            self.selen_sun_lon_label, self.selen_sun_lon_spinbox
+        )
+        self.main_layout.addLayout(self.sel_coords_layout)
 
     def get_dist_sun_moon(self) -> float:
         return self.dist_sun_moon_spinbox.value()
@@ -214,74 +234,62 @@ class ShowDatetimeWidget(QtWidgets.QWidget):
             )
 
 
-class SurfaceInputWidget(QtWidgets.QWidget):
-    """
-    Input widget that contains the GUI elements for the input of the needed parameters for
-    the simulation of lunar values for a geographic position at a concrete time.
-    """
-
-    def __init__(self, callback_check_calculable: Callable, skip_uncs: bool):
+class FlexibleDateTimeInput(QtWidgets.QWidget):
+    def __init__(self, callback_check_calculable: Callable):
         super().__init__()
-        self._build_layout()
         self.callback_check_calculable = callback_check_calculable
-        self._skip_uncs = skip_uncs
+        self._build_layout()
 
     def _build_layout(self):
-        self.main_layout = QtWidgets.QFormLayout(self)
-        self.latitude_label = QtWidgets.QLabel("Latitude (°):")
-        self.longitude_label = QtWidgets.QLabel("Longitude (°):")
-        self.altitude_label = QtWidgets.QLabel("Altitude (m):")
-        self.latitude_spinbox = _LimeDoubleInput()
-        self.longitude_spinbox = _LimeDoubleInput()
-        self.altitude_spinbox = _LimeDoubleInput()
-        self.latitude_spinbox.setMinimum(-90)
-        self.latitude_spinbox.setMaximum(90)
-        self.latitude_spinbox.setDecimals(20)
-        self.longitude_spinbox.setMinimum(-180)
-        self.longitude_spinbox.setMaximum(180)
-        self.longitude_spinbox.setDecimals(20)
-        self.altitude_spinbox.setMinimum(0)
-        self.altitude_spinbox.setMaximum(10000000)
-        self.altitude_spinbox.setDecimals(20)
-        self.main_layout.addRow(self.latitude_label, self.latitude_spinbox)
-        self.main_layout.addRow(self.longitude_label, self.longitude_spinbox)
-        self.main_layout.addRow(self.altitude_label, self.altitude_spinbox)
-        self._build_layout_single_datetime()
-
-    def _build_layout_single_datetime(self):
-        self.single_datetime = True
-        self.loaded_datetimes = []
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        # Single DT input
+        self.single_dt_layout = QtWidgets.QHBoxLayout()
+        ## DT form
+        self.single_dt_form = QtWidgets.QFormLayout()
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
         self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
-        self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
+        self.single_dt_form.addRow(self.datetime_label, self.datetime_edit)
+        self.single_dt_layout.addLayout(self.single_dt_form, 1)
+        self.single_dt_layout.addWidget(QtWidgets.QLabel())
+        ## DT switch
+        self.datetime_switch = QtWidgets.QPushButton(" Load time-series ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.switch_layout = QtWidgets.QHBoxLayout()
-        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
-        self.switch_layout.addWidget(self.datetime_switch)
-        self.main_layout.addRow(self.datetime_label, self.datetime_edit)
-        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
         self.datetime_switch.clicked.connect(self.change_multiple_datetime)
-
-    def _build_layout_multiple_datetime(self):
-        self.single_datetime = False
-        self.datetime_label = QtWidgets.QLabel("Time-series file:")
-        self.datetimes_layout = QtWidgets.QHBoxLayout()
+        self.single_dt_layout.addWidget(self.datetime_switch)
+        ## Add Layout
+        self.single_dt_frame = QtWidgets.QFrame()
+        self.single_dt_frame.setLayout(self.single_dt_layout)
+        self.main_layout.addWidget(self.single_dt_frame)
+        self.single_dt_frame.setHidden(True)
+        # Multiple DT
+        self.multiple_dt_layout = QtWidgets.QHBoxLayout()
+        ## DTs form
+        self.multiple_dt_form = QtWidgets.QFormLayout()
+        self.datetimes_label = QtWidgets.QLabel("Time-series file:")
         self.load_datetimes_button = QtWidgets.QPushButton("Load file")
         self.load_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
         self.load_datetimes_button.clicked.connect(self.load_datetimes)
         self.loaded_datetimes_label = QtWidgets.QLabel("")
-        self.datetimes_layout.addWidget(self.load_datetimes_button)
-        self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
-        self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
-        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.show_datetimes_button = QtWidgets.QPushButton(" See datetimes ")
+        self.datetimes_input_layout = QtWidgets.QHBoxLayout()
+        self.datetimes_input_layout.addWidget(self.load_datetimes_button)
+        self.datetimes_input_layout.addWidget(self.loaded_datetimes_label, 1)
+        self.multiple_dt_form.addRow(self.datetimes_label, self.datetimes_input_layout)
+        self.multiple_dt_layout.addLayout(self.multiple_dt_form)
+        ## Aux buttons
+        self.dts_buttons = QtWidgets.QHBoxLayout()
+        ### Show DTs
+        self.show_datetimes_button = QtWidgets.QPushButton(" See DTS ")
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
+        self.show_datetimes_button.clicked.connect(self.show_datetimes)
+        self.dts_buttons.addWidget(self.show_datetimes_button)
+        self.dts_buttons.addWidget(QtWidgets.QLabel(), 1)
+        ### Info 'a lot dts'
         self.info_icon = self.style().standardIcon(
             QtWidgets.QStyle.SP_MessageBoxInformation
         )
@@ -290,36 +298,55 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
         self.info_hidden_datetimes_a_lot.setWordWrap(True)
         self.info_hidden_datetimes_a_lot.hide()
-        self.switch_layout = QtWidgets.QHBoxLayout()
-        self.switch_layout.addWidget(self.show_datetimes_button)
-        self.switch_layout.addWidget(self.info_hidden_datetimes_a_lot)
-        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
-        self.switch_layout.addWidget(self.datetime_switch)
-        self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
-        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
-        self.datetime_switch.clicked.connect(self.change_single_datetime)
-        self.show_datetimes_button.clicked.connect(self.show_datetimes)
-        self._check_if_a_lot_dts_and_update_msg()
+        self.dts_buttons.addWidget(self.info_hidden_datetimes_a_lot)
+        self.dts_buttons.addWidget(QtWidgets.QLabel(), 1)
+        ### Datetimes switch
+        self.datetimes_switch = QtWidgets.QPushButton(" Input single datetime ")
+        self.datetimes_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.datetimes_switch.clicked.connect(self.change_single_datetime)
+        self.dts_buttons.addWidget(self.datetimes_switch)
+        self.multiple_dt_layout.addLayout(self.dts_buttons)
+        ## Add Layout
+        self.multiple_dt_frame = QtWidgets.QFrame()
+        self.multiple_dt_frame.setLayout(self.multiple_dt_layout)
+        self.main_layout.addWidget(self.multiple_dt_frame)
+        self.multiple_dt_frame.setHidden(True)
+        # Build single dt
+        self._build_layout_single_datetime()
 
-    def _clear_form_rows(self):
-        self.main_layout.removeRow(4)
-        self.main_layout.removeRow(3)
+    def _build_layout_single_datetime(self):
+        self.single_datetime = True
+        self.loaded_datetimes = []
+        self.single_dt_frame.setHidden(False)
 
-    @QtCore.Slot()
+    def _build_layout_multiple_datetime(self):
+        self.single_datetime = False
+        self.multiple_dt_frame.setHidden(False)
+        self.check_if_a_lot_dts_and_update_msg()
+
+    def _clear_layout(self):
+        self.single_dt_frame.setHidden(True)
+        self.multiple_dt_frame.setHidden(True)
+
     def change_single_datetime(self):
-        self._clear_form_rows()
+        self._clear_layout()
         self._build_layout_single_datetime()
         self.callback_check_calculable()
 
-    @QtCore.Slot()
     def change_multiple_datetime(self):
-        self._clear_form_rows()
+        self._clear_layout()
         self._build_layout_multiple_datetime()
         self.callback_check_calculable()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
         error_dialog.critical(self, "ERROR", str(error))
+
+    def get_datetimes(self) -> Union[datetime, List[datetime]]:
+        if self.single_datetime:
+            return self.datetime_edit.dateTime().toPython().replace(tzinfo=timezone.utc)
+        else:
+            return self.loaded_datetimes
 
     @QtCore.Slot()
     def load_datetimes(self):
@@ -335,7 +362,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
                 self.loaded_datetimes_label.setText(shown_path)
                 self.callback_check_calculable()
-        self._check_if_a_lot_dts_and_update_msg()
+        self.check_if_a_lot_dts_and_update_msg()
 
     @QtCore.Slot()
     def show_datetimes(self):
@@ -344,30 +371,6 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.datetimes_window.setCentralWidget(self.datetimes_widget)
         self.datetimes_window.show()
         self.datetimes_window.resize(660, 230)
-
-    def get_latitude(self) -> float:
-        return self.latitude_spinbox.value()
-
-    def get_longitude(self) -> float:
-        return self.longitude_spinbox.value()
-
-    def get_altitude(self) -> float:
-        return self.altitude_spinbox.value()
-
-    def get_datetimes(self) -> Union[datetime, List[datetime]]:
-        if self.single_datetime:
-            return self.datetime_edit.dateTime().toPython().replace(tzinfo=timezone.utc)
-        else:
-            return self.loaded_datetimes
-
-    def set_latitude(self, lat: float):
-        self.latitude_spinbox.setValue(lat)
-
-    def set_longitude(self, lon: float):
-        self.longitude_spinbox.setValue(lon)
-
-    def set_altitude(self, alt: float):
-        self.altitude_spinbox.setValue(alt)
 
     def set_datetimes(self, dt: Union[List[datetime], datetime]):
         if isinstance(dt, list) and len(dt) == 1:
@@ -390,9 +393,9 @@ class SurfaceInputWidget(QtWidgets.QWidget):
                     dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
                 )
             )
-        self._check_if_a_lot_dts_and_update_msg()
+        self.check_if_a_lot_dts_and_update_msg()
 
-    def _check_if_a_lot_dts_and_update_msg(self):
+    def check_if_a_lot_dts_and_update_msg(self):
         if self.single_datetime:
             return
         max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
@@ -409,9 +412,85 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         else:
             return len(self.loaded_datetimes) > 0
 
+
+class SurfaceInputWidget(QtWidgets.QWidget):
+    """
+    Input widget that contains the GUI elements for the input of the needed parameters for
+    the simulation of lunar values for a geographic position at a concrete time.
+    """
+
+    def __init__(self, callback_check_calculable: Callable, skip_uncs: bool):
+        super().__init__()
+        self.callback_check_calculable = callback_check_calculable
+        self._skip_uncs = skip_uncs
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.latitude_label = QtWidgets.QLabel("Latitude (°):")
+        self.longitude_label = QtWidgets.QLabel("Longitude (°):")
+        self.altitude_label = QtWidgets.QLabel("Altitude (m):")
+        self.latitude_spinbox = _LimeDoubleInput()
+        self.longitude_spinbox = _LimeDoubleInput()
+        self.altitude_spinbox = _LimeDoubleInput()
+        self.latitude_spinbox.setMinimum(-90)
+        self.latitude_spinbox.setMaximum(90)
+        self.latitude_spinbox.setDecimals(20)
+        self.longitude_spinbox.setMinimum(-180)
+        self.longitude_spinbox.setMaximum(180)
+        self.longitude_spinbox.setDecimals(20)
+        self.altitude_spinbox.setMinimum(0)
+        self.altitude_spinbox.setMaximum(10000000)
+        self.altitude_spinbox.setDecimals(20)
+        self.coordinates_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.addLayout(self.coordinates_layout)
+        self.coord_forms_layouts = [QtWidgets.QFormLayout() for _ in range(3)]
+        self.coord_forms_layouts[0].addRow(self.latitude_label, self.latitude_spinbox)
+        self.coord_forms_layouts[1].addRow(self.longitude_label, self.longitude_spinbox)
+        self.coord_forms_layouts[2].addRow(self.altitude_label, self.altitude_spinbox)
+        for lay in self.coord_forms_layouts:
+            self.coordinates_layout.addLayout(lay)
+        self.flexdt_wg = FlexibleDateTimeInput(self.callback_check_calculable)
+        self.main_layout.addWidget(self.flexdt_wg)
+
+    @QtCore.Slot()
+    def change_single_datetime(self):
+        self.flexdt_wg.change_single_datetime()
+
+    @QtCore.Slot()
+    def change_multiple_datetime(self):
+        self.flexdt_wg.change_multiple_datetime()
+
+    def get_latitude(self) -> float:
+        return self.latitude_spinbox.value()
+
+    def get_longitude(self) -> float:
+        return self.longitude_spinbox.value()
+
+    def get_altitude(self) -> float:
+        return self.altitude_spinbox.value()
+
+    def get_datetimes(self) -> Union[datetime, List[datetime]]:
+        return self.flexdt_wg.get_datetimes()
+
+    def set_latitude(self, lat: float):
+        self.latitude_spinbox.setValue(lat)
+
+    def set_longitude(self, lon: float):
+        self.longitude_spinbox.setValue(lon)
+
+    def set_altitude(self, alt: float):
+        self.altitude_spinbox.setValue(alt)
+
+    def set_datetimes(self, dt: Union[List[datetime], datetime]):
+        self.flexdt_wg.set_datetimes(dt)
+
+    def is_calculable(self) -> bool:
+        return self.flexdt_wg.is_calculable()
+
     def set_is_skipping_uncs(self, skip_uncs: bool):
         self._skip_uncs = skip_uncs
-        self._check_if_a_lot_dts_and_update_msg()
+        self.flexdt_wg.check_if_a_lot_dts_and_update_msg()
 
 
 _DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
@@ -440,6 +519,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         # satellite
         self.satellite_label = QtWidgets.QLabel("Satellite:")
         self.combo_sats = QtWidgets.QComboBox()
+        self.combo_sats.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.combo_sats.addItems(self.sat_names)
         for i, sat in enumerate(self.satellites):
             if not sat.orbit_files:
