@@ -235,9 +235,19 @@ class ShowDatetimeWidget(QtWidgets.QWidget):
 
 
 class FlexibleDateTimeInput(QtWidgets.QWidget):
-    def __init__(self, callback_check_calculable: Callable):
+    def __init__(
+        self,
+        callback_check_calculable: Callable,
+        skip_uncs: bool,
+        min_date: datetime = None,
+        max_date: datetime = None,
+    ):
         super().__init__()
         self.callback_check_calculable = callback_check_calculable
+        self._skip_uncs = skip_uncs
+        self.min_date = min_date
+        self.max_date = max_date
+        self.all_loaded_datetimes = []
         self._build_layout()
 
     def _build_layout(self):
@@ -298,7 +308,16 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
         self.info_hidden_datetimes_a_lot.setWordWrap(True)
         self.info_hidden_datetimes_a_lot.hide()
+        self.warning_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxWarning
+        )
+        self.warning_pixmap = self.warning_icon.pixmap(32)
+        self.warn_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
+        self.warn_hidden_datetimes_invalid.setPixmap(self.warning_pixmap)
+        self.warn_hidden_datetimes_invalid.setWordWrap(True)
+        self.warn_hidden_datetimes_invalid.hide()
         self.dts_buttons.addWidget(self.info_hidden_datetimes_a_lot)
+        self.dts_buttons.addWidget(self.warn_hidden_datetimes_invalid)
         self.dts_buttons.addWidget(QtWidgets.QLabel(), 1)
         ### Datetimes switch
         self.datetimes_switch = QtWidgets.QPushButton(" Input single time ")
@@ -356,12 +375,14 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         if path != "":
             try:
                 self.loaded_datetimes = csv.read_datetimes(path)
+                self.all_loaded_datetimes = self.loaded_datetimes
+                self.update_dates_with_limits()
             except Exception as e:
                 self.show_error(e)
             else:
                 shown_path = path
                 if len(shown_path) > MAX_PATH_LEN:
-                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) :]
                 self.loaded_datetimes_label.setText(shown_path)
                 self.callback_check_calculable()
         self.check_if_a_lot_dts_and_update_msg()
@@ -386,6 +407,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
+            self.update_dates_with_limits()
             self.callback_check_calculable()
         else:
             if not self.single_datetime:
@@ -413,6 +435,52 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
             return True
         else:
             return len(self.loaded_datetimes) > 0
+
+    def update_dates_with_limits(self):
+        self.loaded_datetimes = self.all_loaded_datetimes
+        if self.min_date is not None:
+            self.loaded_datetimes = [
+                dt for dt in self.loaded_datetimes if self.min_date < dt
+            ]
+        if self.max_date is not None:
+            self.loaded_datetimes = [
+                dt for dt in self.loaded_datetimes if dt < self.max_date
+            ]
+        if len(self.loaded_datetimes) != len(self.all_loaded_datetimes):
+            missing_dts = [
+                dt
+                for dt in self.all_loaded_datetimes
+                if dt not in self.loaded_datetimes
+            ]
+            missing_dts_msg = ",".join(
+                [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in missing_dts]
+            )
+            self.warn_hidden_datetimes_invalid.show()
+            self.warn_hidden_datetimes_invalid.setToolTip(
+                f"The following datetimes are not available for the selected satellite: {missing_dts_msg}"
+            )
+        else:
+            self.warn_hidden_datetimes_invalid.hide()
+            self.warn_hidden_datetimes_invalid.setToolTip("")
+        self.check_if_a_lot_dts_and_update_msg()
+
+    def set_limits(self, d0: datetime, df: datetime):
+        self.min_date = d0
+        self.max_date = df
+        dt0 = QtCore.QDateTime(d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second)
+        self.datetime_edit.setMinimumDateTime(dt0)
+        dtf = QtCore.QDateTime(df.year, df.month, df.day, df.hour, df.minute, df.second)
+        self.datetime_edit.setMaximumDateTime(dtf)
+        if not self.single_datetime:
+            self.update_dates_with_limits()
+            self.callback_check_calculable()
+
+    def get_minmax_dates(self) -> Tuple[datetime, datetime]:
+        return self.min_date, self.max_date
+
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self._skip_uncs = skip_uncs
+        self.check_if_a_lot_dts_and_update_msg()
 
 
 class SurfaceInputWidget(QtWidgets.QWidget):
@@ -452,7 +520,9 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.coord_forms_layouts[2].addRow(self.altitude_label, self.altitude_spinbox)
         for lay in self.coord_forms_layouts:
             self.coordinates_layout.addLayout(lay)
-        self.flexdt_wg = FlexibleDateTimeInput(self.callback_check_calculable)
+        self.flexdt_wg = FlexibleDateTimeInput(
+            self.callback_check_calculable, self._skip_uncs
+        )
         self.main_layout.addWidget(self.flexdt_wg)
         self.main_layout.addStretch()
 
@@ -494,7 +564,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
 
     def set_is_skipping_uncs(self, skip_uncs: bool):
         self._skip_uncs = skip_uncs
-        self.flexdt_wg.check_if_a_lot_dts_and_update_msg()
+        self.flexdt_wg.set_is_skipping_uncs(skip_uncs)
 
 
 _DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
@@ -510,11 +580,9 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         super().__init__()
         self.satellites = satellites
         self.sat_names = [s.name for s in self.satellites]
-        self._build_layout()
         self.callback_check_calculable = callback_check_calculable
-        self.current_min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        self.current_max_date = _DEF_MAX_DATE
         self._skip_uncs = skip_uncs
+        self._build_layout()
         self.all_loaded_datetimes = []
         self.update_from_combobox(0)
 
@@ -531,177 +599,24 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.combo_sats.currentIndexChanged.connect(self.update_from_combobox)
         # finish layout
         self.main_layout.addRow(self.satellite_label, self.combo_sats)
-        self._build_layout_single_datetime()
-
-    def _build_layout_single_datetime(self):
-        self.single_datetime = True
-        self.loaded_datetimes = []
-        # datetime
-        self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
-        self.datetime_edit = QtWidgets.QDateTimeEdit()
-        self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
-        self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
-        self.datetime_switch = QtWidgets.QPushButton(" Load time-series file ")
-        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.switch_layout = QtWidgets.QHBoxLayout()
-        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
-        self.switch_layout.addWidget(self.datetime_switch)
-        #
-        self.main_layout.addRow(self.datetime_label, self.datetime_edit)
-        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
-        self.datetime_switch.clicked.connect(self.change_multiple_datetime)
-
-    def _build_layout_multiple_datetime(self):
-        self.single_datetime = False
-        self.datetime_label = QtWidgets.QLabel("Time-series file:")
-        self.datetimes_layout = QtWidgets.QHBoxLayout()
-        self.load_datetimes_button = QtWidgets.QPushButton("Load file")
-        self.load_datetimes_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+        max_date = _DEF_MAX_DATE
+        self.flex_dt_wg = FlexibleDateTimeInput(
+            self.callback_check_calculable, self._skip_uncs, min_date, max_date
         )
-        self.load_datetimes_button.clicked.connect(self.load_datetimes)
-        self.loaded_datetimes_label = QtWidgets.QLabel("")
-        self.loaded_datetimes_label.setWordWrap(True)
-        self.datetimes_layout.addWidget(self.load_datetimes_button)
-        self.datetimes_layout.addWidget(self.loaded_datetimes_label, 1)
-        self.datetime_switch = QtWidgets.QPushButton(" Input single datetime ")
-        self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.show_datetimes_button = QtWidgets.QPushButton(" See datetimes ")
-        self.show_datetimes_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
-        )
-        # info
-        self.info_icon = self.style().standardIcon(
-            QtWidgets.QStyle.SP_MessageBoxInformation
-        )
-        self.info_pixmap = self.info_icon.pixmap(32)
-        self.info_hidden_datetimes_a_lot = QtWidgets.QLabel(" ")
-        self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
-        self.info_hidden_datetimes_a_lot.setWordWrap(True)
-        self.info_hidden_datetimes_a_lot.hide()
-        # warning
-        self.warning_icon = self.style().standardIcon(
-            QtWidgets.QStyle.SP_MessageBoxWarning
-        )  # QtGui.QIcon.fromTheme('dialog-warning')
-        self.warning_pixmap = self.warning_icon.pixmap(32)
-        self.warn_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
-        self.warn_hidden_datetimes_invalid.setPixmap(self.warning_pixmap)
-        self.warn_hidden_datetimes_invalid.setWordWrap(True)
-        self.warn_hidden_datetimes_invalid.hide()
-        self.switch_layout = QtWidgets.QHBoxLayout()
-        self.switch_layout.addWidget(self.show_datetimes_button)
-        self.switch_layout.addWidget(self.info_hidden_datetimes_a_lot)
-        self.switch_layout.addWidget(self.warn_hidden_datetimes_invalid)
-        self.switch_layout.addWidget(QtWidgets.QLabel(), 1)
-        self.switch_layout.addWidget(self.datetime_switch)
-        self.main_layout.addRow(self.datetime_label, self.datetimes_layout)
-        self.main_layout.addRow(QtWidgets.QLabel(), self.switch_layout)
-        self.datetime_switch.clicked.connect(self.change_single_datetime)
-        self.show_datetimes_button.clicked.connect(self.show_datetimes)
-        self._check_if_a_lot_dts_and_update_msg()
-
-    def _clear_form_rows(self):
-        self.main_layout.removeRow(2)
-        self.main_layout.removeRow(1)
-
-    @QtCore.Slot()
-    def change_single_datetime(self):
-        self._clear_form_rows()
-        self._build_layout_single_datetime()
-        self.callback_check_calculable()
-
-    @QtCore.Slot()
-    def change_multiple_datetime(self):
-        self._clear_form_rows()
-        self._build_layout_multiple_datetime()
-        self.callback_check_calculable()
-
-    def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QMessageBox(self)
-        error_dialog.critical(self, "ERROR", str(error))
-
-    @QtCore.Slot()
-    def load_datetimes(self):
-        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        if path != "":
-            try:
-                self.loaded_datetimes = csv.read_datetimes(path)
-                self.all_loaded_datetimes = self.loaded_datetimes
-                self.update_dates_with_limits()
-            except Exception as e:
-                self.show_error(e)
-            else:
-                shown_path = path
-                if len(shown_path) > MAX_PATH_LEN:
-                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
-                self.loaded_datetimes_label.setText(path)
-                self.callback_check_calculable()
-        self._check_if_a_lot_dts_and_update_msg()
-
-    @QtCore.Slot()
-    def show_datetimes(self):
-        self.datetimes_window = QtWidgets.QMainWindow(self)
-        self.datetimes_widget = ShowDatetimeWidget(self.loaded_datetimes)
-        self.datetimes_window.setCentralWidget(self.datetimes_widget)
-        self.datetimes_window.show()
-        self.datetimes_window.resize(660, 230)
+        self.main_layout.addRow(self.flex_dt_wg)
 
     def get_satellite(self) -> str:
         return self.sat_names[self.combo_sats.currentIndex()]
 
     def get_datetimes(self) -> Union[datetime, List[datetime]]:
-        if self.single_datetime:
-            return self.datetime_edit.dateTime().toPython().replace(tzinfo=timezone.utc)
-        else:
-            return self.loaded_datetimes
+        return self.flex_dt_wg.get_datetimes()
 
     def set_satellite(self, name: str):
         self.combo_sats.setCurrentIndex(self.sat_names.index(name))
 
     def set_datetimes(self, dt: Union[datetime, List[datetime]]):
-        if isinstance(dt, list) and len(dt) == 1:
-            dt = dt[0]
-        if isinstance(dt, list):
-            if self.single_datetime:
-                self.change_multiple_datetime()
-            self.all_loaded_datetimes = dt
-            self.loaded_datetimes = dt
-            self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
-            self.update_dates_with_limits()
-            self.callback_check_calculable()
-        else:
-            if not self.single_datetime:
-                self.change_single_datetime()
-            self.datetime_edit.setDateTime(
-                QtCore.QDateTime(
-                    dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
-                )
-            )
-        self._check_if_a_lot_dts_and_update_msg()
-
-    def update_dates_with_limits(self):
-        self.loaded_datetimes = [
-            dt
-            for dt in self.all_loaded_datetimes
-            if self.current_min_date < dt < self.current_max_date
-        ]
-        if len(self.loaded_datetimes) != len(self.all_loaded_datetimes):
-            missing_dts = [
-                dt
-                for dt in self.all_loaded_datetimes
-                if dt not in self.loaded_datetimes
-            ]
-            missing_dts_msg = ",".join(
-                [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in missing_dts]
-            )
-            self.warn_hidden_datetimes_invalid.show()
-            self.warn_hidden_datetimes_invalid.setToolTip(
-                f"The following datetimes are not available for the selected satellite: {missing_dts_msg}"
-            )
-        else:
-            self.warn_hidden_datetimes_invalid.hide()
-            self.warn_hidden_datetimes_invalid.setToolTip("")
-        self._check_if_a_lot_dts_and_update_msg()
+        self.flex_dt_wg.set_datetimes(dt)
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
@@ -709,47 +624,20 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         d0, df = sat.get_datetime_range()
         if d0 == None:
             d0 = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-        self.current_min_date = d0
         if df == None:
             df = _DEF_MAX_DATE
         df = min(df, _DEF_MAX_DATE)
-        self.current_max_date = df
-        if self.single_datetime:
-            dt0 = QtCore.QDateTime(
-                d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
-            )
-            self.datetime_edit.setMinimumDateTime(dt0)
-            dtf = QtCore.QDateTime(
-                df.year, df.month, df.day, df.hour, df.minute, df.second
-            )
-            self.datetime_edit.setMaximumDateTime(dtf)
-        else:
-            self.update_dates_with_limits()
-            self.callback_check_calculable()
-
-    def _check_if_a_lot_dts_and_update_msg(self):
-        if self.single_datetime:
-            return
-        max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
-        if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
-            self.info_hidden_datetimes_a_lot.show()
-            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
-        else:
-            self.info_hidden_datetimes_a_lot.hide()
-            self.info_hidden_datetimes_a_lot.setToolTip("")
+        self.flex_dt_wg.set_limits(d0, df)
 
     def get_current_min_max_dates(self) -> Tuple[datetime, datetime]:
-        return self.current_min_date, self.current_max_date
+        return self.flex_dt_wg.get_minmax_dates()
 
     def is_calculable(self) -> bool:
-        if self.single_datetime:
-            return True
-        else:
-            return len(self.loaded_datetimes) > 0
+        return self.flex_dt_wg.is_calculable()
 
     def set_is_skipping_uncs(self, skip_uncs: bool):
         self._skip_uncs = skip_uncs
-        self._check_if_a_lot_dts_and_update_msg()
+        self.flex_dt_wg.set_is_skipping_uncs(skip_uncs)
 
 
 class InputWidget(QtWidgets.QWidget):
