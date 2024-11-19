@@ -242,31 +242,31 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         # Single DT input
         self.single_dt_layout = QtWidgets.QHBoxLayout()
         ## DT form
-        self.single_dt_form = QtWidgets.QFormLayout()
         self.datetime_label = QtWidgets.QLabel("UTC DateTime:")
         self.datetime_edit = QtWidgets.QDateTimeEdit()
         self.datetime_edit.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
         self.datetime_edit.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
-        self.single_dt_form.addRow(self.datetime_label, self.datetime_edit)
-        self.single_dt_layout.addLayout(self.single_dt_form, 1)
-        self.single_dt_layout.addWidget(QtWidgets.QLabel())
+        self.single_dt_layout.addWidget(self.datetime_label)
+        self.single_dt_layout.addWidget(self.datetime_edit, 1)
         ## DT switch
         self.datetime_switch = QtWidgets.QPushButton(" Load time-series ")
         self.datetime_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.datetime_switch.clicked.connect(self.change_multiple_datetime)
         self.single_dt_layout.addWidget(self.datetime_switch)
         ## Add Layout
-        self.single_dt_frame = QtWidgets.QFrame()
+        self.single_dt_frame = QtWidgets.QWidget()
+        self.single_dt_layout.setContentsMargins(0, 0, 0, 0)
         self.single_dt_frame.setLayout(self.single_dt_layout)
         self.main_layout.addWidget(self.single_dt_frame)
         self.single_dt_frame.setHidden(True)
         # Multiple DT
         self.multiple_dt_layout = QtWidgets.QHBoxLayout()
         ## DTs form
-        self.multiple_dt_form = QtWidgets.QFormLayout()
         self.datetimes_label = QtWidgets.QLabel("Time-series file:")
         self.load_datetimes_button = QtWidgets.QPushButton("Load file")
         self.load_datetimes_button.setCursor(
@@ -277,12 +277,12 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.datetimes_input_layout = QtWidgets.QHBoxLayout()
         self.datetimes_input_layout.addWidget(self.load_datetimes_button)
         self.datetimes_input_layout.addWidget(self.loaded_datetimes_label, 1)
-        self.multiple_dt_form.addRow(self.datetimes_label, self.datetimes_input_layout)
-        self.multiple_dt_layout.addLayout(self.multiple_dt_form)
+        self.multiple_dt_layout.addWidget(self.datetimes_label)
+        self.multiple_dt_layout.addLayout(self.datetimes_input_layout)
         ## Aux buttons
         self.dts_buttons = QtWidgets.QHBoxLayout()
         ### Show DTs
-        self.show_datetimes_button = QtWidgets.QPushButton(" See DTS ")
+        self.show_datetimes_button = QtWidgets.QPushButton(" See Times ")
         self.show_datetimes_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
@@ -301,13 +301,15 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.dts_buttons.addWidget(self.info_hidden_datetimes_a_lot)
         self.dts_buttons.addWidget(QtWidgets.QLabel(), 1)
         ### Datetimes switch
-        self.datetimes_switch = QtWidgets.QPushButton(" Input single datetime ")
+        self.datetimes_switch = QtWidgets.QPushButton(" Input single time ")
         self.datetimes_switch.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.datetimes_switch.clicked.connect(self.change_single_datetime)
         self.dts_buttons.addWidget(self.datetimes_switch)
+        self.dts_buttons.setContentsMargins(0, 0, 0, 0)
         self.multiple_dt_layout.addLayout(self.dts_buttons)
         ## Add Layout
-        self.multiple_dt_frame = QtWidgets.QFrame()
+        self.multiple_dt_frame = QtWidgets.QWidget()
+        self.multiple_dt_layout.setContentsMargins(0, 0, 0, 0)
         self.multiple_dt_frame.setLayout(self.multiple_dt_layout)
         self.main_layout.addWidget(self.multiple_dt_frame)
         self.multiple_dt_frame.setHidden(True)
@@ -429,7 +431,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.latitude_label = QtWidgets.QLabel("Latitude (°):")
         self.longitude_label = QtWidgets.QLabel("Longitude (°):")
-        self.altitude_label = QtWidgets.QLabel("Altitude (m):")
+        self.altitude_label = QtWidgets.QLabel("Altitude (km):")
         self.latitude_spinbox = _LimeDoubleInput()
         self.longitude_spinbox = _LimeDoubleInput()
         self.altitude_spinbox = _LimeDoubleInput()
@@ -439,8 +441,8 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.longitude_spinbox.setMinimum(-180)
         self.longitude_spinbox.setMaximum(180)
         self.longitude_spinbox.setDecimals(20)
-        self.altitude_spinbox.setMinimum(0)
-        self.altitude_spinbox.setMaximum(10000000)
+        self.altitude_spinbox.setMinimum(-1)
+        self.altitude_spinbox.setMaximum(1000000)
         self.altitude_spinbox.setDecimals(20)
         self.coordinates_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.coordinates_layout)
@@ -452,6 +454,7 @@ class SurfaceInputWidget(QtWidgets.QWidget):
             self.coordinates_layout.addLayout(lay)
         self.flexdt_wg = FlexibleDateTimeInput(self.callback_check_calculable)
         self.main_layout.addWidget(self.flexdt_wg)
+        self.main_layout.addStretch()
 
     @QtCore.Slot()
     def change_single_datetime(self):
@@ -468,7 +471,8 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         return self.longitude_spinbox.value()
 
     def get_altitude(self) -> float:
-        return self.altitude_spinbox.value()
+        # Get altitude in meters
+        return self.altitude_spinbox.value() * 1000
 
     def get_datetimes(self) -> Union[datetime, List[datetime]]:
         return self.flexdt_wg.get_datetimes()
