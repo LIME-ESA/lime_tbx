@@ -1,10 +1,10 @@
 """describe class"""
 
 """___Built-In Modules___"""
+import os
 from datetime import datetime, timezone
 from typing import Union, Tuple, Iterable
-
-import PySide2.QtWidgets
+import shutil
 
 """___Third-Party Modules___"""
 from typing import Callable, List
@@ -21,8 +21,10 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
     KernelsPath,
+    LimeException,
 )
 from lime_tbx.datatypes import constants
+from lime_tbx.eocfi_adapter import eocfi_adapter
 from lime_tbx.gui.util import (
     CallbackWorker,
     start_thread as _start_thread,
@@ -58,6 +60,42 @@ def _callback_read_obs_files(
 def _callback_read_srf(path: str) -> Tuple[SpectralResponseFunction, str]:
     read_srf = srf.read_srf(path)
     return (read_srf, path)
+
+
+def _callback_save_satellite(
+    sat: Satellite,
+    start_date: datetime,
+    end_date: datetime,
+    eocfi_path: str,
+    kernels_path: KernelsPath,
+):
+    orbf = sat.orbit_files[0]
+    sat.orbit_files = []
+    eo = eocfi_adapter.EOCFIConverter(eocfi_path, kernels_path)
+    sat.time_file = [s for s in eo.get_sat_list() if s.name == "ENVISAT"][
+        0
+    ].time_file  # TODO this seems ugly
+    result = eo._get_sat_position_orbit_path(
+        sat, [start_date, end_date], orbf
+    )  # TODO don't use a 'private' function
+    if np.all(np.array(result) == 0.0):
+        errmsg = (
+            "Satellite position calculation failed for the given start "
+            "and end dates using the selected data file. Not adding the satellite data."
+        )
+        raise LimeException(errmsg)
+    destdir = os.path.join(eocfi_path, "data", "custom_missions", sat.name)
+    os.makedirs(destdir, exist_ok=True)
+    fmt = "%Y%m%dT%H%M%S"
+    filename = f"{sat.name}_{start_date.strftime(fmt)}_{end_date.strftime(fmt)}"
+    fileid = 1
+    for f in os.listdir(destdir):
+        if f.startswith(filename) and f.endswith(orbf[-3:]):
+            fileid += 1
+    filename = f"{filename}_{fileid:04}.{orbf[-3:]}"
+    shutil.copyfile(orbf, os.path.join(destdir, filename))
+    sat.orbit_files = [f"../custom_missions/{sat.name}/{filename}"]
+    eo.add_sat(sat)
 
 
 class _LimeDoubleInput(QtWidgets.QDoubleSpinBox):
@@ -384,6 +422,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
                 if len(shown_path) > MAX_PATH_LEN:
                     shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) :]
                 self.loaded_datetimes_label.setText(shown_path)
+                self.loaded_datetimes_label.setToolTip(path)
                 self.callback_check_calculable()
         self.check_if_a_lot_dts_and_update_msg()
 
@@ -407,6 +446,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
                 self.change_multiple_datetime()
             self.loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
+            self.loaded_datetimes_label.setToolTip("")
             self.update_dates_with_limits()
             self.callback_check_calculable()
         else:
@@ -567,24 +607,243 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.flexdt_wg.set_is_skipping_uncs(skip_uncs)
 
 
+_ADDSATDESCR = (
+    "<p>You can add OSF (Orbit Scenario Files) or TLE/3LE (Three-Line Element) "
+    "files to include satellite data, whether it's for a new satellite or "
+    "updating data for an existing one. OSF files define detailed orbit "
+    "scenarios, while 3LE files provide the critical orbital parameters "
+    "needed for satellite tracking. Please note that only 3LE data is "
+    "accepted, not standard TLE (Two-Line Element) files.</p>"
+    '<p>If you need to generate 3LE data, visit <a style="color: #00ae9d" '
+    'href="https://celestrak.org/NORAD/archives/request.php?FORMAT=tle">'
+    "CelesTrak</a> for resources and tools.</p>"
+)
+
+
+class AddSatDialog(QtWidgets.QDialog):
+    def __init__(self, parent, eocfi_path: str, kernels_path: KernelsPath) -> None:
+        super().__init__(parent)
+        self.eocfi_path = eocfi_path
+        self.kernels_path = kernels_path
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle("Add Satellite Data")
+        # Title & Descr
+        title = "Add Satellite Data"
+        self.title_label = QtWidgets.QLabel(title, alignment=QtCore.Qt.AlignCenter)
+        description = _ADDSATDESCR
+        self.description_label = QtWidgets.QLabel(
+            description, alignment=QtCore.Qt.AlignLeft
+        )
+        self.description_label.setWordWrap(True)
+        self.description_label.setTextFormat(QtCore.Qt.RichText)
+        self.description_label.setTextInteractionFlags(QtCore.Qt.TextBrowserInteraction)
+        self.description_label.setOpenExternalLinks(True)
+        self.main_layout.addWidget(self.title_label)
+        self.main_layout.addWidget(self.description_label)
+        # Input file
+        self.input_data_layout = QtWidgets.QHBoxLayout()
+        self.datafile_label = QtWidgets.QLabel("Data file:")
+        self.load_file_button = QtWidgets.QPushButton("Load file")
+        self.load_file_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.load_file_button.clicked.connect(self.load_datafile)
+        self.loaded_file_label = QtWidgets.QLabel("")
+        self.file_input_layout = QtWidgets.QHBoxLayout()
+        self.file_input_layout.addWidget(self.load_file_button)
+        self.file_input_layout.addWidget(self.loaded_file_label, 1)
+        self.input_data_layout.addWidget(self.datafile_label)
+        self.input_data_layout.addLayout(self.file_input_layout)
+        self.main_layout.addLayout(self.input_data_layout)
+        # File info
+        self.fileinfo_form_frame = QtWidgets.QWidget()
+        self.fileinfo_form = QtWidgets.QFormLayout()
+        self.filetype_label = QtWidgets.QLabel("Type:")
+        self.filetype_field = QtWidgets.QLabel("")
+        self.fileinfo_form.addRow(self.filetype_label, self.filetype_field)
+        self.satname_label = QtWidgets.QLabel("Satellite Name:")
+        self.satname_field = QtWidgets.QLineEdit("")
+        self.satname_field.textChanged.connect(self._check_if_can_submit)
+        self.fileinfo_form.addRow(self.satname_label, self.satname_field)
+        self.norad_label = QtWidgets.QLabel("Norad Number:")
+        self.norad_field = QtWidgets.QLineEdit("")
+        self.norad_field.setDisabled(True)
+        self.fileinfo_form.addRow(self.norad_label, self.norad_field)
+        self.intdes_label = QtWidgets.QLabel("Int. Des.:")
+        self.intdes_label.setToolTip("International Designator")
+        self.intdes_field = QtWidgets.QLineEdit("")
+        self.intdes_field.setDisabled(True)
+        self.fileinfo_form.addRow(self.intdes_label, self.intdes_field)
+        self.tle_specifics = [
+            self.norad_label,
+            self.norad_field,
+            self.intdes_label,
+            self.intdes_field,
+        ]
+        self.hide_tle_specifics(True)
+        self.start_time_label = QtWidgets.QLabel("Start time:")
+        self.start_time_field = QtWidgets.QDateTimeEdit()
+        self.start_time_field.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
+        self.start_time_field.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
+        self.start_time_field.dateTimeChanged.connect(self._check_if_can_submit)
+        self.fileinfo_form.addRow(self.start_time_label, self.start_time_field)
+        self.end_time_label = QtWidgets.QLabel("End time:")
+        self.end_time_field = QtWidgets.QDateTimeEdit()
+        self.end_time_field.setDisplayFormat("yyyy-MM-dd hh:mm:ss.zzz")
+        self.end_time_field.setDateTime(QtCore.QDateTime.currentDateTimeUtc())
+        self.end_time_field.dateTimeChanged.connect(self._check_if_can_submit)
+        self.fileinfo_form.addRow(self.end_time_label, self.end_time_field)
+        self.button_save_data = QtWidgets.QPushButton("Save satellite data")
+        self.button_save_data.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_save_data.clicked.connect(self.save_data)
+        self.button_save_data.setDisabled(True)
+        self.fileinfo_form.addRow(self.button_save_data)
+        self.fileinfo_form_frame.setLayout(self.fileinfo_form)
+        self.fileinfo_form_frame.setVisible(False)
+        self.main_layout.addWidget(self.fileinfo_form_frame)
+
+    def hide_tle_specifics(self, hide: bool):
+        for elem in self.tle_specifics:
+            elem.setHidden(hide)
+
+    def _check_if_can_submit(self):
+        if len(self.satname_field.text()) == 0:
+            self.button_save_data.setDisabled(True)
+        elif self.start_time_field.dateTime() >= self.end_time_field.dateTime():
+            self.button_save_data.setDisabled(True)
+        else:
+            self.button_save_data.setDisabled(False)
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
+    def show_warning(self, msg: str):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.warning(self, "WARNING", msg)
+
+    def _show_path(self, path: str):
+        shown_path = path
+        if len(shown_path) > MAX_PATH_LEN:
+            shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) :]
+        self.loaded_file_label.setText(shown_path)
+        self.loaded_file_label.setToolTip(path)
+
+    def _load_osf(self, path: str):
+        self.filetype_field.setText("OSF")
+        self._show_path(path)
+        self.satname_field.setDisabled(False)
+        self.fileinfo_form_frame.setVisible(True)
+        self.hide_tle_specifics(True)
+
+    def _load_tle(self, path: str):
+        with open(path) as fp:
+            headlines = [fp.readline() for _ in range(4)]
+        if (not len(headlines[3]) and headlines[0]) or headlines[
+            0
+        ].strip() == headlines[3].strip():
+            satname = headlines[0].strip()
+            norad = headlines[2].strip().split()[1]
+            intdes = headlines[1].strip().split()[2]
+            self.filetype_field.setText("TLE")
+            self._show_path(path)
+            self.satname_field.setText(satname)
+            self.norad_field.setText(norad)
+            self.intdes_field.setText(intdes)
+            self.satname_field.setDisabled(True)
+            self.fileinfo_form_frame.setVisible(True)
+            self.hide_tle_specifics(False)
+        else:
+            self.show_error(
+                Exception(
+                    "Couldn't load TLE (3LE) file. There was an error in the format."
+                )
+            )
+
+    @QtCore.Slot()
+    def load_datafile(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        self.loaded_path = path
+        if path != "":
+            if len(path) > 3:
+                if path[-4:].upper() in (".OSF", ".EOF", ".EEF"):
+                    self._load_osf(path)
+                elif path[-4:].upper() in (".TLE", ".3LE"):
+                    self._load_tle(path)
+                else:
+                    self.show_warning(
+                        "Satellite data file extension must be either '.OSF', '.EOF', '.EEF', '.TLE' or '.3LE'."
+                    )
+            else:
+                self.show_warning("Couldn't detect file's extension.")
+        self.resize(self.sizeHint())
+
+    def _set_enabled_gui_input(self, enabled: bool):
+        self.setEnabled(enabled)
+
+    @QtCore.Slot()
+    def save_data(self):
+        satname = self.satname_field.text()
+        satid = 200
+        datafiles = [self.loaded_path]
+        norad = self.norad_field.text()
+        norad = int(norad) if norad else None
+        intdes = self.intdes_field.text()
+        intdes = intdes if intdes else None
+        time_file = None
+        sat = Satellite(satname, satid, datafiles, norad, intdes, time_file)
+        start_date = (
+            self.start_time_field.dateTime().toPython().replace(tzinfo=timezone.utc)
+        )
+        end_date = (
+            self.end_time_field.dateTime().toPython().replace(tzinfo=timezone.utc)
+        )
+        self._set_enabled_gui_input(False)
+        self.worker = CallbackWorker(
+            _callback_save_satellite,
+            [sat, start_date, end_date, self.eocfi_path, self.kernels_path],
+        )
+        self._start_thread(self._save_sat_finished, self._save_sat_error)
+
+    def _save_sat_finished(self, data):
+        self.close()
+
+    def _save_sat_error(self, e):
+        self._set_enabled_gui_input(True)
+        self.show_error(e)
+
+    def _start_thread(self, finished: Callable, error: Callable, info: Callable = None):
+        self.worker_th = QtCore.QThread()
+        _start_thread(self.worker, self.worker_th, finished, error, info)
+
+
 _DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
 
 
 class SatelliteInputWidget(QtWidgets.QWidget):
     def __init__(
         self,
-        satellites: List[Satellite],
         callback_check_calculable: Callable,
         skip_uncs: bool,
+        eocfi_path: str,
+        kernels_path: KernelsPath,
     ) -> None:
         super().__init__()
-        self.satellites = satellites
+        self.eocfi_path = eocfi_path
+        self.kernels_path = kernels_path
+        self._load_satellites()
         self.sat_names = [s.name for s in self.satellites]
         self.callback_check_calculable = callback_check_calculable
         self._skip_uncs = skip_uncs
         self._build_layout()
         self.all_loaded_datetimes = []
         self.update_from_combobox(0)
+
+    def _load_satellites(self):
+        self.satellites = eocfi_adapter.EOCFIConverter(
+            self.eocfi_path, self.kernels_path
+        ).get_sat_list()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QFormLayout(self)
@@ -597,8 +856,15 @@ class SatelliteInputWidget(QtWidgets.QWidget):
             if not sat.orbit_files:
                 self.combo_sats.model().item(i).setEnabled(False)
         self.combo_sats.currentIndexChanged.connect(self.update_from_combobox)
+        self.add_sat_button = QtWidgets.QPushButton(" ＋ ")
+        self.add_sat_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.add_sat_button.clicked.connect(self.open_add_satellite_modal)
+        self.sat_field_layout = QtWidgets.QHBoxLayout()
+        self.sat_field_layout.setContentsMargins(0, 0, 0, 0)
+        self.sat_field_layout.addWidget(self.combo_sats, 1)
+        self.sat_field_layout.addWidget(self.add_sat_button)
         # finish layout
-        self.main_layout.addRow(self.satellite_label, self.combo_sats)
+        self.main_layout.addRow(self.satellite_label, self.sat_field_layout)
         min_date = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         max_date = _DEF_MAX_DATE
         self.flex_dt_wg = FlexibleDateTimeInput(
@@ -617,6 +883,12 @@ class SatelliteInputWidget(QtWidgets.QWidget):
 
     def set_datetimes(self, dt: Union[datetime, List[datetime]]):
         self.flex_dt_wg.set_datetimes(dt)
+
+    @QtCore.Slot()
+    def open_add_satellite_modal(self):
+        add_sat_dialog = AddSatDialog(self, self.eocfi_path, self.kernels_path)
+        add_sat_dialog.exec_()
+        self._load_satellites()
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
@@ -643,13 +915,15 @@ class SatelliteInputWidget(QtWidgets.QWidget):
 class InputWidget(QtWidgets.QWidget):
     def __init__(
         self,
-        satellites: List[Satellite],
         change_callback: Callable,
         callback_check_calculable: Callable,
         skip_uncs: bool,
+        eocfi_path: str,
+        kernels_path: KernelsPath,
     ):
         super().__init__()
-        self.satellites = satellites
+        self.eocfi_path = eocfi_path
+        self.kernels_path = kernels_path
         self.change_callback = change_callback
         self.last_point: Point = None
         self.callback_check_calculable = callback_check_calculable
@@ -667,7 +941,10 @@ class InputWidget(QtWidgets.QWidget):
         self.custom = CustomInputWidget()
         self.tabs.addTab(self.custom, "Selenographic")
         self.satellite = SatelliteInputWidget(
-            self.satellites, self.callback_check_calculable, self.skip_uncs
+            self.callback_check_calculable,
+            self.skip_uncs,
+            self.eocfi_path,
+            self.kernels_path,
         )
         self.tabs.addTab(self.satellite, "Satellite")
         self.tabs.currentChanged.connect(self.callback_check_calculable)
@@ -817,6 +1094,7 @@ class ComparisonInput(QtWidgets.QWidget):
         if len(shown_path) > MAX_PATH_LEN:
             shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) : -1]
         self.srf_feedback.setText(shown_path)
+        self.srf_feedback.setToolTip(path)
         self.callback_change()
         self._set_enabled_gui_input(True)
 
@@ -831,6 +1109,7 @@ class ComparisonInput(QtWidgets.QWidget):
             self.callback_compare_but_enable(False)
             self._set_enabled_gui_input(False)
             self.srf_feedback.setText("Loading...")
+            self.srf_feedback.setToolTip("")
             self.worker = CallbackWorker(
                 _callback_read_srf,
                 [path],
@@ -895,6 +1174,7 @@ class ComparisonInput(QtWidgets.QWidget):
     def clear_srf(self):
         self.loaded_srf = None
         self.srf_feedback.setText("No file loaded")
+        self.srf_feedback.setToolTip("")
         self.callback_change()
 
     def get_srf(self) -> Union[SpectralResponseFunction, None]:
