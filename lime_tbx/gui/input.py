@@ -1,4 +1,4 @@
-"""describe class"""
+"""GUI widgets related to letting the user input data so they can perform simulations and comparisons."""
 
 """___Built-In Modules___"""
 import os
@@ -37,7 +37,7 @@ __author__ = "Javier Gatón Herguedas"
 __created__ = "03/05/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+__status__ = "Production"
 
 MAX_PATH_LEN = 35
 
@@ -72,13 +72,9 @@ def _callback_save_satellite(
     orbf = sat.orbit_files[0]
     sat.orbit_files = []
     eo = eocfi_adapter.EOCFIConverter(eocfi_path, kernels_path)
-    sat.time_file = [s for s in eo.get_sat_list() if s.name == "ENVISAT"][
-        0
-    ].time_file  # TODO this seems ugly
-    result = eo._get_sat_position_orbit_path(
-        sat, [start_date, end_date], orbf
-    )  # TODO don't use a 'private' function
-    if np.all(np.array(result) == 0.0):
+    sat.time_file = eo.get_default_timefile()
+    valid = eo.check_data_file_works(sat, [start_date, end_date], orbf)
+    if not valid:
         errmsg = (
             "Satellite position calculation failed for the given start "
             "and end dates using the selected data file. Not adding the satellite data."
