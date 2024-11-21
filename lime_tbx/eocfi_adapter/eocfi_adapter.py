@@ -537,7 +537,7 @@ class EOCFIConverter(IEOCFIConverter):
             True if the file works, False if it doesn't
         """
         positions = self._get_sat_position_orbit_path(sat, dts, orbit_path)
-        if np.all(np.array(positions) == 0.0):
+        if np.any(np.all(np.array(positions) == 0.0, axis=1)):
             return False
         return True
 

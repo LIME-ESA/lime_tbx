@@ -829,7 +829,6 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.eocfi_path = eocfi_path
         self.kernels_path = kernels_path
         self._load_satellites()
-        self.sat_names = [s.name for s in self.satellites]
         self.callback_check_calculable = callback_check_calculable
         self._skip_uncs = skip_uncs
         self._build_layout()
@@ -840,6 +839,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.satellites = eocfi_adapter.EOCFIConverter(
             self.eocfi_path, self.kernels_path
         ).get_sat_list()
+        self.sat_names = [s.name for s in self.satellites]
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QFormLayout(self)
@@ -847,10 +847,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self.satellite_label = QtWidgets.QLabel("Satellite:")
         self.combo_sats = QtWidgets.QComboBox()
         self.combo_sats.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.combo_sats.addItems(self.sat_names)
-        for i, sat in enumerate(self.satellites):
-            if not sat.orbit_files:
-                self.combo_sats.model().item(i).setEnabled(False)
+        self._refresh_satellites_combo()
         self.combo_sats.currentIndexChanged.connect(self.update_from_combobox)
         self.add_sat_button = QtWidgets.QPushButton(" ＋ ")
         self.add_sat_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -867,6 +864,13 @@ class SatelliteInputWidget(QtWidgets.QWidget):
             self.callback_check_calculable, self._skip_uncs, min_date, max_date
         )
         self.main_layout.addRow(self.flex_dt_wg)
+
+    def _refresh_satellites_combo(self):
+        self.combo_sats.clear()
+        self.combo_sats.addItems(self.sat_names)
+        for i, sat in enumerate(self.satellites):
+            if not sat.orbit_files:
+                self.combo_sats.model().item(i).setEnabled(False)
 
     def get_satellite(self) -> str:
         return self.sat_names[self.combo_sats.currentIndex()]
@@ -885,6 +889,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         add_sat_dialog = AddSatDialog(self, self.eocfi_path, self.kernels_path)
         add_sat_dialog.exec_()
         self._load_satellites()
+        self._refresh_satellites_combo()
 
     @QtCore.Slot()
     def update_from_combobox(self, i: int):
