@@ -782,6 +782,7 @@ class MainSimulationsWidget(
     ):
         super().__init__()
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self._finished_building = False
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
@@ -789,7 +790,6 @@ class MainSimulationsWidget(
             eocfi_path,
             kernels_path,
         )
-        self.satellites = self.eocfi.get_sat_list()
         self.workers = []
         self.worker_ths = []
         self._build_layout()
@@ -799,10 +799,11 @@ class MainSimulationsWidget(
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
         self.input_widget = input.InputWidget(
-            self.satellites,
             self._callback_regular_input_changed,
             self.update_calculability,
             self.settings_manager.is_skip_uncertainties(),
+            self.eocfi_path,
+            self.kernels_path,
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
