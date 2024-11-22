@@ -363,7 +363,19 @@ class GraphWidget(QtWidgets.QWidget):
         if name is not None and name != "":
             try:
                 if isinstance(self.point, list) or isinstance(self.point, np.ndarray):
+                    xdata = self.data[0].wlens
+                    xlabel = "Moon phase angle (degrees)"
+                    if self.comparison_x_datetime:
+                        xdata = list(
+                            map(
+                                self.data_compare.dts,
+                                lambda x: x.isoformat(sep=" ", timespec="milliseconds"),
+                            )
+                        )
+                        xlabel = "UTC datetime"
                     csv.export_csv_comparison(
+                        xdata,
+                        xlabel,
                         self.data,
                         self.ylabel,
                         self.point,
@@ -373,7 +385,6 @@ class GraphWidget(QtWidgets.QWidget):
                         self.interp_spectrum_name,
                         self.skip_uncs,
                         not self.compare_percentages,
-                        self.comparison_x_datetime,
                     )
                 elif self.inside_mpa_range is not None:
                     csv.export_csv_simulation(
@@ -724,6 +735,7 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout.addWidget(self.range_warning)
 
     def set_channels(self, channels: List[str]):
+        # TODO make this function faster
         new_channel_tabs = QtWidgets.QTabWidget()
         new_channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         self.main_layout.replaceWidget(self.channel_tabs, new_channel_tabs)

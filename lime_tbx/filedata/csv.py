@@ -235,6 +235,8 @@ def export_csv_simulation(
 
 
 def export_csv_comparison(
+    xdata: List[str],
+    xlabel: str,
     data: List[SpectralData],
     ylabel: str,
     points: Union[List[SurfacePoint], List[CustomPoint]],
@@ -244,7 +246,6 @@ def export_csv_comparison(
     interp_spectrum_name: str,
     skip_uncs: bool,
     relative_difference: bool,
-    x_datetime: bool = True,
 ):
     """
     Export the given data to a csv file
@@ -271,13 +272,8 @@ def export_csv_comparison(
     relative_difference: bool
         Flag indicating if the output should include the relative_difference, or if it should include the
         percentage difference otherwise.
-    x_datetime: bool
-        True if it used datetimes as the x_axis, False if it used mpa
     """
     ampa_valid_range = comparison_data.ampa_valid_range
-    x_label = "UTC datetime"
-    if not x_datetime:
-        x_label = "Moon phase angle (degrees)"
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -323,7 +319,7 @@ def export_csv_comparison(
                     "distance observer moon (km)",
                 ]
             header = (
-                [x_label]
+                [xlabel]
                 + header_coords
                 + [
                     "Observed {}".format(ylabel),
@@ -338,19 +334,13 @@ def export_csv_comparison(
                     f"{relperc} difference uncertainties",
                 ]
             writer.writerow(header)
-            x_data = data[0].wlens
             difsig = (
                 comparison_data.diffs_signal
                 if relative_difference
                 else comparison_data.perc_diffs
             )
-            for i in range(len(x_data)):
+            for i, x_val in enumerate(xdata):
                 pt = points[i]
-                if x_datetime:
-                    dt = comparison_data.dts[i]
-                    x_val = dt.isoformat(sep=" ", timespec="milliseconds")
-                else:
-                    x_val = x_data[i]
                 warn_out_mpa_range = ""
                 if not ampa_valid_range[i]:
                     warn_out_mpa_range = " **"

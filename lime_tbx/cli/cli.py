@@ -695,7 +695,18 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
+                            xdata = list(
+                                map(
+                                    comps[i].dts,
+                                    lambda x: x.isoformat(
+                                        sep=" ", timespec="milliseconds"
+                                    ),
+                                )
+                            )
+                            xlabel = "UTC datetime"
                             csv.export_csv_comparison(
+                                xdata,
+                                xlabel,
                                 data,
                                 ylabel,
                                 points,
@@ -749,7 +760,11 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
+                            xdata = data[0].wlens
+                            xlabel = "Moon Phase Angle (degrees)"
                             csv.export_csv_comparison(
+                                xdata,
+                                xlabel,
                                 data,
                                 ylabel,
                                 points,

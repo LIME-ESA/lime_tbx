@@ -173,27 +173,34 @@ class TestCSV(unittest.TestCase):
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
+        comp_data = ComparisonData(
+            data[0],
+            data[1],
+            data[1],
+            0.0,
+            0.1,
+            0.2,
+            2,
+            [DT1, DT2],
+            [SPOINT, SPOINT3],
+            [14, 2],
+            [True, False],
+            data[1],
+            0.1,
+        )
+        xdata = list(
+            map(comp_data.dts, lambda x: x.isoformat(sep=" ", timespec="milliseconds"))
+        )
+        xlabel = "UTC datetime"
         export_csv_comparison(
+            xdata,
+            xlabel,
             data,
             "Signal",
             [SPOINT, SPOINT3],
             path,
             "test",
-            ComparisonData(
-                data[0],
-                data[1],
-                data[1],
-                0.0,
-                0.1,
-                0.2,
-                2,
-                [DT1, DT2],
-                [SPOINT, SPOINT3],
-                [14, 2],
-                [True, False],
-                data[1],
-                0.1,
-            ),
+            comp_data,
             "ASD",
             False,
             True,

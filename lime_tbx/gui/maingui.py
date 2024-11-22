@@ -277,6 +277,7 @@ def calculate_all_callback(
     return (point, srf)
 
 
+"""
 def show_comparisons_callback(
     output: output.ComparisonOutput,
     output_mpa: output.ComparisonOutput,
@@ -287,7 +288,7 @@ def show_comparisons_callback(
     settings_manager: ISettingsManager,
 ) -> Tuple[List[str], List[str]]:
     to_remove = _show_comps_output(
-        output, comps, "datetimes", srf, version, settings_manager
+        output, comps, "Date", srf, version, settings_manager
     )
     to_remove_comps = _show_comps_output(
         output_mpa,
@@ -298,6 +299,21 @@ def show_comparisons_callback(
         settings_manager,
     )
     return (to_remove, to_remove_comps)
+"""
+
+
+def show_comparisons_callback(
+    output: output.ComparisonOutput,
+    comps: List[ComparisonData],
+    xlabel: str,
+    srf: SpectralResponseFunction,
+    version: str,
+    settings_manager: ISettingsManager,
+) -> Tuple[output.ComparisonOutput, List[str]]:
+    to_remove = _show_comps_output(
+        output, comps, xlabel, srf, version, settings_manager
+    )
+    return output, to_remove
 
 
 def _callback_read_srf(
@@ -367,6 +383,15 @@ def _show_comps_output(
     return to_remove
 
 
+class CompFields:
+    COMP_MPA = "Moon Phase Angle"
+    COMP_DATE = "Date"
+    COMP_WLEN = "Wavelength"
+    DIFF_NONE = "None"
+    DIFF_REL = "Relative"
+    DIFF_PERC = "Percentage"
+
+
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
@@ -380,72 +405,100 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.comparing_dts = True
-        self.showing_rel_diff = True
         self.workers = []
         self.worker_ths = []
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        # Top input pre comparison
+        self.top_precomp_layout = QtWidgets.QVBoxLayout()
         self.input = input.ComparisonInput(
             self._callback_compare_input_changed,
             self._callback_compare_button_enable,
             self.kernels_path,
             self.eocfi_path,
         )
+        self.top_precomp_layout.addWidget(self.input)
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
-        self.clear_comparison_button = QtWidgets.QPushButton("New Comparison")
+        self.top_precomp_layout.addWidget(self.compare_button)
+        self.top_precomp = QtWidgets.QWidget()
+        self.top_precomp.setLayout(self.top_precomp_layout)
+        self.top_precomp.setContentsMargins(0, 0, 0, 0)
+        # Top input post comparison
+        self.top_postcomp_layout = QtWidgets.QVBoxLayout()
+        self.comp_options_box = QtWidgets.QHBoxLayout()
+        self.clear_comparison_button = QtWidgets.QPushButton("New")
         self.clear_comparison_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
-        self.clear_comparison_button.setVisible(False)
-        # Comparison visualization options box
-        self.comp_options_box = QtWidgets.QHBoxLayout()
-        self.change_mpa_dts_button = QtWidgets.QPushButton("Compare by MPA")
-        self.change_mpa_dts_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        self.comp_options_box.addWidget(self.clear_comparison_button)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 2)
+        self.compare_by_label = QtWidgets.QLabel("Compare by:")
+        self.compare_by_field = QtWidgets.QComboBox()
+        self.compare_by_field.view().setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAsNeeded
         )
-        self.change_mpa_dts_button.clicked.connect(self.switch_show_compare_mpa_dts)
-        self.change_mpa_dts_button.setVisible(False)
-        self.change_rel_perc_diffs_button = QtWidgets.QPushButton(
-            "Show percentage difference"
+        self.compare_by_field.addItems(
+            [CompFields.COMP_DATE, CompFields.COMP_MPA, CompFields.COMP_WLEN]
         )
-        self.change_rel_perc_diffs_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        self.compare_by_field.currentTextChanged.connect(
+            self._update_from_compare_combo
         )
-        self.change_rel_perc_diffs_button.clicked.connect(
-            self.switch_show_rel_perc_diff
+        self.comp_options_box.addWidget(self.compare_by_label)
+        self.comp_options_box.addWidget(self.compare_by_field)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 1)
+        self.difference_by_label = QtWidgets.QLabel("Difference:")
+        self.difference_by_field = QtWidgets.QComboBox()
+        self.difference_by_field.view().setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAsNeeded
         )
-        self.change_rel_perc_diffs_button.setVisible(False)
-        self.comp_options_box.addWidget(self.change_mpa_dts_button)
-        self.comp_options_box.addWidget(self.change_rel_perc_diffs_button)
-
+        self.difference_by_field.addItems(
+            [CompFields.DIFF_NONE, CompFields.DIFF_REL, CompFields.DIFF_PERC]
+        )
+        self.difference_by_field.currentTextChanged.connect(
+            self._update_from_difference_combo
+        )
+        self.comp_options_box.addWidget(self.difference_by_label)
+        self.comp_options_box.addWidget(self.difference_by_field)
+        self.top_postcomp_layout.addLayout(self.comp_options_box)
+        self.top_postcomp = QtWidgets.QWidget()
+        self.top_postcomp.setLayout(self.top_postcomp_layout)
+        self.top_postcomp.setContentsMargins(0, 0, 0, 0)
+        self.top_postcomp.setVisible(False)
+        # Comparison content
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
         self.output = output.ComparisonOutput(self.settings_manager, True)
-        self.output_mpa = output.ComparisonOutput(self.settings_manager, False)
-        self.output_mpa.setVisible(False)
         self.spinner = SpinnerPage()
         self.spinner.setVisible(False)
         self.stack_layout.addWidget(self.spinner)
         self.stack_layout.addWidget(self.output)
-        self.stack_layout.addWidget(self.output_mpa)
         self.stack_layout.setCurrentIndex(1)
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_lglod_button.clicked.connect(self.export_to_lglod)
         self.export_lglod_button.setDisabled(True)
-        self.main_layout.addWidget(self.input)
-        self.main_layout.addWidget(self.compare_button)
-        self.main_layout.addWidget(self.clear_comparison_button)
-        self.main_layout.addLayout(self.comp_options_box)
+        self.main_layout.addWidget(self.top_precomp)
+        self.main_layout.addWidget(self.top_postcomp)
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
+
+    def _update_from_compare_combo(self, value: str):
+        if value == CompFields.COMP_MPA:
+            self.show_compare_mpa()
+        elif value == CompFields.COMP_DATE:
+            self.show_compare_dts()
+
+    def _update_from_difference_combo(self, value: str):
+        if value == CompFields.DIFF_PERC:
+            self.show_perc_diff()
+        elif value == CompFields.DIFF_REL:
+            self.show_rel_diff()
 
     def _callback_compare_button_enable(self, enable: bool):
         self.compare_button.setEnabled(enable)
@@ -479,10 +532,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         else:
             self.spinner.set_text("")
             self.spinner.movie_stop()
-            if self.comparing_dts:
-                self.stack_layout.setCurrentIndex(1)
-            else:
-                self.stack_layout.setCurrentIndex(2)
+            self.stack_layout.setCurrentIndex(1)
 
     def _unblock_gui(self):
         self._set_spinner(False)
@@ -567,11 +617,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.quant_mos_simulated += 1
 
     def set_show_comparison_input(self, show: bool):
-        self.input.setVisible(show)
-        self.compare_button.setVisible(show)
-        self.clear_comparison_button.setVisible(not show)
+        self.top_precomp.setVisible(show)
+        self.top_postcomp.setVisible(not show)
         if show:
-            self.output_mpa.set_channels([])
             self.output.set_channels([])
 
     @QtCore.Slot()
@@ -600,14 +648,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             del self.srf.channels[i]
         self.srf = None
         self.set_show_comparison_input(True)
-        if not self.comparing_dts:
-            self.switch_show_compare_mpa_dts()
+        if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
+            self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
         self.export_lglod_button.setEnabled(False)
-        self.change_mpa_dts_button.setVisible(False)
-        self.change_rel_perc_diffs_button.setVisible(False)
+        self.top_postcomp.setVisible(False)
 
     @QtCore.Slot()
     def clear_comparison_rejected(self):
@@ -632,72 +679,66 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
         self.mpa_comps = mpa_comps
         self.srf = srf
-        version = self.settings_manager.get_coef_version_name()
+        self.version = self.settings_manager.get_coef_version_name()
         params = [
             self.output,
-            self.output_mpa,
             self.comps,
-            self.mpa_comps,
+            CompFields.COMP_DATE,
             self.srf,
-            version,
+            self.version,
             self.settings_manager,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
-        self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
 
-    def switch_show_compare_mpa_dts(self):
-        if self.comparing_dts:
-            self.comparing_dts = False
-            self.change_mpa_dts_button.setText("Compare by datetime")
-            self.show_compare_mpa()
-        else:
-            self.comparing_dts = True
-            self.change_mpa_dts_button.setText("Compare by MPA")
-            self.show_compare_dts()
-
-    def switch_show_rel_perc_diff(self):
-        if self.showing_rel_diff:
-            self.showing_rel_diff = False
-            self.change_rel_perc_diffs_button.setText("Show relative difference")
-            self.show_perc_diff()
-        else:
-            self.showing_rel_diff = True
-            self.change_rel_perc_diffs_button.setText("Show percentage difference")
-            self.show_rel_diff()
-
     def show_compare_dts(self):
         self._block_gui_loading()
-        ch_index = self.output_mpa.get_current_channel_index()
-        self.output.setVisible(True)
-        self.output_mpa.setVisible(False)
-        self.output.set_current_channel_index(ch_index)
-        self.stack_layout.setCurrentIndex(1)
-        self._unblock_gui()
+        params = [
+            self.output,
+            self.comps,
+            CompFields.COMP_DATE,
+            self.srf,
+            self.version,
+            self.settings_manager,
+        ]
+        # Channels are set to the output here, as that needs to be done in the main qt thread.
+        ch_names = self.srf.get_channels_names()
+        self.output.set_channels(ch_names)
+        worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(
+            worker, self._load_lglod_comparisons_finished, self.compare_error
+        )
 
     def show_compare_mpa(self):
         self._block_gui_loading()
-        ch_index = self.output.get_current_channel_index()
-        self.output.setVisible(False)
-        self.output_mpa.setVisible(True)
-        self.output_mpa.set_current_channel_index(ch_index)
-        self.stack_layout.setCurrentIndex(2)
-        self._unblock_gui()
+        params = [
+            self.output,
+            self.mpa_comps,
+            CompFields.COMP_MPA,
+            self.srf,
+            self.version,
+            self.settings_manager,
+        ]
+        # Channels are set to the output here, as that needs to be done in the main qt thread.
+        ch_names = self.srf.get_channels_names()
+        self.output.set_channels(ch_names)
+        worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(
+            worker, self._load_lglod_comparisons_finished, self.compare_error
+        )
 
     def show_perc_diff(self):
         self._block_gui_loading()
-        self.output_mpa.show_percentage()
         self.output.show_percentage()
         self._unblock_gui()
 
     def show_rel_diff(self):
         self._block_gui_loading()
-        self.output_mpa.show_relative()
         self.output.show_relative()
         self._unblock_gui()
 
@@ -721,9 +762,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
         params = [
             self.output,
-            self.output_mpa,
             self.comps,
-            self.mpa_comps,
+            CompFields.COMP_DATE,
             self.srf,
             version,
             self.settings_manager,
@@ -732,23 +772,20 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         # This section blocks the spinning loading widget.
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
-        self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
 
     def _load_lglod_comparisons_finished(self, data):
-        self.output.remove_channels(data[0])
-        self.output.check_if_range_visible()
-        self.output_mpa.remove_channels(data[1])
-        self.output_mpa.check_if_range_visible()
+        outp: output.ComparisonOutput = data[0]
+        outp.remove_channels(data[1])
+        outp.check_if_range_visible()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
-        self.change_mpa_dts_button.setVisible(True)
-        self.change_rel_perc_diffs_button.setVisible(True)
+        self.top_postcomp.setVisible(True)
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):
