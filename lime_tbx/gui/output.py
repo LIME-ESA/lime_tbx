@@ -3,7 +3,7 @@
 """___Built-In Modules___"""
 from typing import Union, List
 from datetime import datetime
-from abc import ABCMeta
+from abc import ABC, abstractmethod
 
 
 """___Third-Party Modules___"""
@@ -26,13 +26,14 @@ from lime_tbx.datatypes.datatypes import (
 )
 from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import csv
-from lime_tbx.gui.ifaces import IMainSimulationsWidget
+from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.gui.canvas import (
     MplCanvas,
     title_font_prop,
     label_font_prop,
     font_prop,
     redraw_canvas,
+    redraw_canvas_compare,
 )
 from lime_tbx.gui import constants
 
@@ -44,53 +45,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
-    def __init__(
-        self,
-        settings_manager: ISettingsManager,
-        title="",
-        xlabel="",
-        ylabel="",
-        parent=None,
-        build_layout_ini=True,
-    ):
-        super().__init__(parent)
-        self._init_parent = parent
-        self.settings_manager = settings_manager
-        self.title = title
-        self.xlabel = xlabel
-        self.ylabel = ylabel
-        self.legend = []
-        self.data = None
-        self.cimel_data = None
-        self.asd_data = None
-        self.point = None
-        self.data_compare = None
-        self.vertical_lines = []
-        self.dts = []
-        self.cursor_names = []
-        self.mpl_cursor = None
-        self.xlim_left = None
-        self.xlim_right = None
-        self.max_ylim_bottom = None
-        self.max_ylim_top = None
-        self.inside_mpa_range = None
-        self.interp_spectrum_name = None
-        self.mpa = None
-        self.skip_uncs = None
-        self.compare_percentages = None
-        self.ch_names = []
-        self.is_built = False
-        self._to_update_plot = False
-        self._to_update_labels = False
-        if build_layout_ini:
-            self._build_layout()
-
-    def showEvent(self, event):
-        if not self.is_built:
-            self._build_layout()
-        super().showEvent(event)
-
+class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
     def _build_layout(self):
         self.is_built = True
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -126,6 +81,28 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
         if self._to_update_labels:
             self._update_labels()
 
+    @abstractmethod
+    def _redraw(self):
+        pass
+
+    def disable_buttons(self, disable: bool):
+        self.export_button.setDisabled(disable)
+        self.csv_button.setDisabled(disable)
+
+    def _update_plot(self, redraw=True):
+        if self.data is not None:
+            self.disable_buttons(False)
+        else:
+            self.disable_buttons(True)
+        if redraw:
+            self._redraw()
+            self._update_toolbar()
+
+    def showEvent(self, event):
+        if not self.is_built:
+            self._build_layout()
+        super().showEvent(event)
+
     def _prepare_toolbar(self):
         self.toolbar = NavigationToolbar(self.canvas, self)
         unwanted_buttons = ["Back", "Forward"]
@@ -150,13 +127,6 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
             pixmap = QtGui.QPixmap.fromImage(tmp)
             ta.setIcon(QtGui.QIcon(pixmap))
 
-    def disable_buttons(self, disable: bool):
-        self.export_button.setDisabled(disable)
-        self.csv_button.setDisabled(disable)
-        # TODO Make this extendable for not only main page widgets
-        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
-            self._init_parent.set_export_button_disabled(disable)
-
     def set_vertical_lines(self, xs: List[float]):
         self.vertical_lines = xs
         self._redraw()
@@ -171,36 +141,6 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
 
     def _update_toolbar(self):
         self.toolbar.update()
-
-    def update_plot(
-        self,
-        data: Union[SpectralData, List[SpectralData]] = None,
-        data_cimel: Union[SpectralData, List[SpectralData]] = None,
-        data_asd: Union[SpectralData, List[SpectralData]] = None,
-        point: Union[Point, List[Point]] = None,
-        data_compare: ComparisonData = None,
-        redraw: bool = True,
-        compare_percentages: bool = False,
-    ):
-        self.point = point
-        self.data = data
-        self.cimel_data = data_cimel
-        self.asd_data = data_asd
-        self.data_compare = data_compare
-        self.compare_percentages = compare_percentages
-        if self.is_built:
-            self._update_plot(redraw)
-        else:
-            self._to_update_plot = True
-
-    def _update_plot(self, redraw=True):
-        if self.data is not None:
-            self.disable_buttons(False)
-        else:
-            self.disable_buttons(True)
-        if redraw:
-            self._redraw()
-            self._update_toolbar()
 
     def update_labels(
         self,
@@ -225,6 +165,95 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
             self._redraw()
         self._update_toolbar()
 
+    def update_size(self):
+        self._redraw()
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
+    @QtCore.Slot()
+    def export_graph(self):
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
+        )[0]
+        if name is not None and name != "":
+            try:
+                self.canvas.print_figure(name)
+            except Exception as e:
+                self.show_error(e)
+
+    @abstractmethod
+    def update_legend(self, legend: List[List[str]], redraw: bool = True):
+        pass
+
+    @abstractmethod
+    def export_csv(self):
+        pass
+
+
+class SimGraphWidget(GraphWidget):
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        title="",
+        xlabel="",
+        ylabel="",
+        parent=None,
+        build_layout_ini=True,
+    ):
+        super().__init__(parent)
+        self._init_parent = parent
+        self.settings_manager = settings_manager
+        self.title = title
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.legend = []
+        self.data = None
+        self.cimel_data = None
+        self.asd_data = None
+        self.point = None
+        self.vertical_lines = []
+        self.dts = []
+        self.cursor_names = []
+        self.mpl_cursor = None
+        self.xlim_left = None
+        self.xlim_right = None
+        self.max_ylim_bottom = None
+        self.max_ylim_top = None
+        self.inside_mpa_range = None
+        self.interp_spectrum_name = None
+        self.mpa = None
+        self.skip_uncs = None
+        self.ch_names = []
+        self.is_built = False
+        self._to_update_plot = False
+        self._to_update_labels = False
+        if build_layout_ini:
+            self._build_layout()
+
+    def disable_buttons(self, disable: bool):
+        super().disable_buttons(disable)
+        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
+            self._init_parent.set_export_button_disabled(disable)
+
+    def update_plot(
+        self,
+        data: Union[SpectralData, List[SpectralData]] = None,
+        data_cimel: Union[SpectralData, List[SpectralData]] = None,
+        data_asd: Union[SpectralData, List[SpectralData]] = None,
+        point: Union[Point, List[Point]] = None,
+        redraw: bool = True,
+    ):
+        self.point = point
+        self.data = data
+        self.cimel_data = data_cimel
+        self.asd_data = data_asd
+        if self.is_built:
+            self._update_plot(redraw)
+        else:
+            self._to_update_plot = True
+
     def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
         Parameters
@@ -235,7 +264,6 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
             0: data
             1: cimel_data
             2: cimel_data errorbars
-            3: comparison
         """
         self.legend = legend
         if self.is_built:
@@ -245,14 +273,12 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
         else:
             self._to_update_labels = True
 
-    def update_size(self):
-        self._redraw()
-
     def set_cursor_names(self, labels: List[str]):
         self.dts = None
         self.cursor_names = labels.copy()
 
     def set_dts(self, dts: List[datetime]):
+        # TODO: Refactor this, change func name and combine with set_cursor_names
         self.dts = dts
         self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
 
@@ -266,14 +292,12 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
             self.legend,
             self.cimel_data,
             self.asd_data,
-            self.data_compare,
             self.title,
             self.xlabel,
             self.ylabel,
             self.vertical_lines,
             self.interp_spectrum_name,
             self.subtitle,
-            self.compare_percentages,
             self.settings_manager.is_show_cimel_points(),
         )
         try:
@@ -322,21 +346,6 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
         self.update()
         self.canvas.update()
 
-    def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QMessageBox(self)
-        error_dialog.critical(self, "ERROR", str(error))
-
-    @QtCore.Slot()
-    def export_graph(self):
-        name = QtWidgets.QFileDialog().getSaveFileName(
-            self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
-        )[0]
-        if name is not None and name != "":
-            try:
-                self.canvas.print_figure(name)
-            except Exception as e:
-                self.show_error(e)
-
     def set_inside_mpa_range(self, inside_mpa_range):
         self.inside_mpa_range = inside_mpa_range
 
@@ -360,31 +369,7 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
-                if isinstance(self.point, list) or isinstance(self.point, np.ndarray):
-                    xdata = self.data[0].wlens
-                    xlabel = "Moon phase angle (degrees)"
-                    if self.comparison_x_datetime:
-                        xdata = list(
-                            map(
-                                self.data_compare.dts,
-                                lambda x: x.isoformat(sep=" ", timespec="milliseconds"),
-                            )
-                        )
-                        xlabel = "UTC datetime"
-                    csv.export_csv_comparison(
-                        xdata,
-                        xlabel,
-                        self.data,
-                        self.ylabel,
-                        self.point,
-                        name,
-                        version,
-                        self.data_compare,
-                        self.interp_spectrum_name,
-                        self.skip_uncs,
-                        not self.compare_percentages,
-                    )
-                elif self.inside_mpa_range is not None:
+                if self.inside_mpa_range is not None:
                     csv.export_csv_simulation(
                         self.data,
                         self.xlabel,
@@ -409,13 +394,12 @@ class GraphWidget(QtWidgets.QWidget, metaclass=ABCMeta):
             except Exception as e:
                 self.show_error(e)
 
-    def recycle(self, ch_name: str, comparison_x_datetime: bool):
-        self.title = ch_name
-        self.comparison_x_datetime = comparison_x_datetime
+    def recycle(self, title: str):
+        self.title = title
         self.canvas.axes.cla()
 
 
-class OldGraphWidget(QtWidgets.QWidget):
+class CompGraphWidget(GraphWidget):
     def __init__(
         self,
         settings_manager: ISettingsManager,
@@ -433,11 +417,8 @@ class OldGraphWidget(QtWidgets.QWidget):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.legend = []
-        self.data = None
-        self.cimel_data = None
-        self.asd_data = None
         self.point = None
-        self.data_compare = None
+        self.data = None
         self.vertical_lines = []
         self.dts = []
         self.cursor_names = []
@@ -447,155 +428,29 @@ class OldGraphWidget(QtWidgets.QWidget):
         self.max_ylim_bottom = None
         self.max_ylim_top = None
         self.comparison_x_datetime = comparison_x_datetime
-        self.inside_mpa_range = None
         self.interp_spectrum_name = None
-        self.mpa = None
         self.skip_uncs = None
         self.compare_percentages = None
-        self.ch_names = []
         self.is_built = False
         self._to_update_plot = False
         self._to_update_labels = False
         if build_layout_ini:
             self._build_layout()
 
-    def showEvent(self, event):
-        if not self.is_built:
-            self._build_layout()
-        super().showEvent(event)
-
-    def _build_layout(self):
-        self.is_built = True
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-        # canvas
-        self.canvas = MplCanvas(self)
-        self.canvas.set_title(self.title, fontproperties=title_font_prop)
-        self.canvas.axes.tick_params(labelsize=8)
-        version = self.settings_manager.get_coef_version_name()
-        subtitle = "LIME coefficients version: {}".format(version)
-        self.subtitle = subtitle
-        self.canvas.set_subtitle(subtitle, fontproperties=font_prop)
-        self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
-        self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
-        self._prepare_toolbar()
-        self._redraw()
-        # save buttons
-        self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.export_button = QtWidgets.QPushButton("Export graph (.png, .jpg, .pdf...)")
-        self.export_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.export_button.clicked.connect(self.export_graph)
-        self.csv_button = QtWidgets.QPushButton("Export CSV")
-        self.csv_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.csv_button.clicked.connect(self.export_csv)
-        self.disable_buttons(True)
-        self.buttons_layout.addWidget(self.export_button)
-        self.buttons_layout.addWidget(self.csv_button)
-        # finish main
-        self.main_layout.addWidget(self.toolbar)
-        self.main_layout.addWidget(self.canvas, 1)
-        self.main_layout.addLayout(self.buttons_layout)
-        if self._to_update_plot:
-            self._update_plot()
-        if self._to_update_labels:
-            self._update_labels()
-
-    def _prepare_toolbar(self):
-        self.toolbar = NavigationToolbar(self.canvas, self)
-        unwanted_buttons = ["Back", "Forward"]
-        for ta in self.toolbar.actions():
-            ta: QtWidgets.QAction = ta
-            if ta.text() in unwanted_buttons:
-                self.toolbar.removeAction(ta)
-                continue
-            icon = ta.icon()
-            sizes = icon.availableSizes()
-            max_h = max_w = 0
-            for i in range(len(sizes)):
-                max_h = max(max_h, sizes[i].height())
-                max_w = max(max_w, sizes[i].width())
-            pixmap: QtGui.QPixmap = icon.pixmap(QtCore.QSize(max_w, max_h))
-            tmp = pixmap.toImage()
-            color = QtGui.QColor(QtGui.qRgb(232, 232, 228))
-            for h in range(tmp.height()):
-                for w in range(tmp.width()):
-                    color.setAlpha(tmp.pixelColor(w, h).alpha())
-                    tmp.setPixelColor(w, h, color)
-            pixmap = QtGui.QPixmap.fromImage(tmp)
-            ta.setIcon(QtGui.QIcon(pixmap))
-
-    def disable_buttons(self, disable: bool):
-        self.export_button.setDisabled(disable)
-        self.csv_button.setDisabled(disable)
-        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
-            self._init_parent.set_export_button_disabled(disable)
-
-    def set_vertical_lines(self, xs: List[float]):
-        self.vertical_lines = xs
-        self._redraw()
-
-    def set_xlim(self, left: float = None, right: float = None):
-        self.xlim_left = left
-        self.xlim_right = right
-
-    def set_max_ylims(self, bottom: float = None, top: float = None):
-        self.max_ylim_bottom = bottom
-        self.max_ylim_top = top
-
-    def _update_toolbar(self):
-        self.toolbar.update()
-
     def update_plot(
         self,
-        data: Union[SpectralData, List[SpectralData]] = None,
-        data_cimel: Union[SpectralData, List[SpectralData]] = None,
-        data_asd: Union[SpectralData, List[SpectralData]] = None,
         point: Union[Point, List[Point]] = None,
         data_compare: ComparisonData = None,
         redraw: bool = True,
         compare_percentages: bool = False,
     ):
         self.point = point
-        self.data = data
-        self.cimel_data = data_cimel
-        self.asd_data = data_asd
-        self.data_compare = data_compare
+        self.data = data_compare
         self.compare_percentages = compare_percentages
         if self.is_built:
             self._update_plot(redraw)
         else:
             self._to_update_plot = True
-
-    def _update_plot(self, redraw=True):
-        if self.data is not None:
-            self.disable_buttons(False)
-        else:
-            self.disable_buttons(True)
-        if redraw:
-            self._redraw()
-            self._update_toolbar()
-
-    def update_labels(
-        self,
-        title: str,
-        xlabel: str,
-        ylabel: str,
-        redraw: bool = True,
-        subtitle: str = None,
-    ):
-        self.title = title
-        self.xlabel = xlabel
-        self.ylabel = ylabel
-        if subtitle != None:
-            self.subtitle = subtitle
-        if self.is_built:
-            self._update_labels(redraw)
-        else:
-            self._to_update_labels = True
-
-    def _update_labels(self, redraw=True):
-        if redraw:
-            self._redraw()
-        self._update_toolbar()
 
     def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
@@ -604,10 +459,7 @@ class OldGraphWidget(QtWidgets.QWidget):
         legend: list of list of str
             Each list represents a group of legends
             Lengeds index:
-            0: data
-            1: cimel_data
-            2: cimel_data errorbars
-            3: comparison
+            0: comparison
         """
         self.legend = legend
         if self.is_built:
@@ -617,70 +469,25 @@ class OldGraphWidget(QtWidgets.QWidget):
         else:
             self._to_update_labels = True
 
-    def update_size(self):
-        self._redraw()
-
-    def set_cursor_names(self, labels: List[str]):
-        self.dts = None
-        self.cursor_names = labels.copy()
-
-    def set_dts(self, dts: List[datetime]):
-        self.dts = dts
-        self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
-
     def _redraw(self):
         if not self.is_built:
             return
         self.canvas.axes.cla()  # Clear the canvas.
-        lines = redraw_canvas(
+        lines = redraw_canvas_compare(
             self.canvas,
             self.data,
             self.legend,
-            self.cimel_data,
-            self.asd_data,
-            self.data_compare,
             self.title,
             self.xlabel,
             self.ylabel,
-            self.vertical_lines,
-            self.interp_spectrum_name,
             self.subtitle,
             self.compare_percentages,
-            self.settings_manager.is_show_cimel_points(),
         )
         try:
             self.canvas.fig.tight_layout()
             self.canvas.draw()
         except:
             pass
-        if self.cursor_names:
-            cursor_lines = [
-                l
-                for l in lines
-                if l.get_label().startswith("_child")
-                or l.get_label() == self.legend[0][0]
-            ]
-            self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
-            func_num_from_label = lambda label: int(int(label[6:]))
-            if self.dts:
-                func_num_from_label = lambda label: int(int(label[6:]) / 2)
-
-            for l in cursor_lines:
-                lab = l.get_label()
-                if lab.startswith("_child"):
-                    num = func_num_from_label(lab)
-                    l.set_label(self.cursor_names[num])
-
-            @self.mpl_cursor.connect("add")
-            def _(sel):
-                sel.annotation.get_bbox_patch().set(fc="white")
-                label = sel.artist.get_label()
-                if label.startswith("_child"):
-                    num = func_num_from_label(label)
-                    label = self.cursor_names[num]
-                elif label == constants.INTERPOLATED_DATA_LABEL:
-                    label = self.cursor_names[0]
-                sel.annotation.set_text(label)
 
         self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
         bottom = top = None
@@ -694,35 +501,11 @@ class OldGraphWidget(QtWidgets.QWidget):
         self.update()
         self.canvas.update()
 
-    def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QMessageBox(self)
-        error_dialog.critical(self, "ERROR", str(error))
-
-    @QtCore.Slot()
-    def export_graph(self):
-        name = QtWidgets.QFileDialog().getSaveFileName(
-            self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
-        )[0]
-        if name is not None and name != "":
-            try:
-                self.canvas.print_figure(name)
-            except Exception as e:
-                self.show_error(e)
-
-    def set_inside_mpa_range(self, inside_mpa_range):
-        self.inside_mpa_range = inside_mpa_range
-
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
 
-    def set_mpa(self, mpa: Union[float, None]):
-        self.mpa = mpa
-
     def set_skipped_uncertainties(self, skip: bool):
         self.skip_uncs = skip
-
-    def set_srf_channel_names(self, ch_names: List[str]):
-        self.ch_names = ch_names
 
     @QtCore.Slot()
     def export_csv(self):
@@ -732,57 +515,35 @@ class OldGraphWidget(QtWidgets.QWidget):
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
-                if isinstance(self.point, list) or isinstance(self.point, np.ndarray):
-                    xdata = self.data[0].wlens
-                    xlabel = "Moon phase angle (degrees)"
-                    if self.comparison_x_datetime:
-                        xdata = list(
-                            map(
-                                self.data_compare.dts,
-                                lambda x: x.isoformat(sep=" ", timespec="milliseconds"),
-                            )
+                data = [self.data.observed_signal, self.data.simulated_signal]
+                xdata = data[0].wlens
+                xlabel = "Moon phase angle (degrees)"
+                if self.comparison_x_datetime:
+                    xdata = list(
+                        map(
+                            self.data.dts,
+                            lambda x: x.isoformat(sep=" ", timespec="milliseconds"),
                         )
-                        xlabel = "UTC datetime"
-                    csv.export_csv_comparison(
-                        xdata,
-                        xlabel,
-                        self.data,
-                        self.ylabel,
-                        self.point,
-                        name,
-                        version,
-                        self.data_compare,
-                        self.interp_spectrum_name,
-                        self.skip_uncs,
-                        not self.compare_percentages,
                     )
-                elif self.inside_mpa_range is not None:
-                    csv.export_csv_simulation(
-                        self.data,
-                        self.xlabel,
-                        self.ylabel,
-                        self.point,
-                        name,
-                        version,
-                        self.inside_mpa_range,
-                        self.interp_spectrum_name,
-                        self.skip_uncs,
-                        self.cimel_data,
-                        self.mpa,
-                    )
-                else:
-                    csv.export_csv_srf(
-                        self.data,
-                        self.ch_names,
-                        self.xlabel,
-                        self.ylabel,
-                        name,
-                    )
+                    xlabel = "UTC datetime"
+                csv.export_csv_comparison(
+                    xdata,
+                    xlabel,
+                    data,
+                    self.ylabel,
+                    self.point,
+                    name,
+                    version,
+                    self.data,
+                    self.interp_spectrum_name,
+                    self.skip_uncs,
+                    not self.compare_percentages,
+                )
             except Exception as e:
                 self.show_error(e)
 
-    def recycle(self, ch_name: str, comparison_x_datetime: bool):
-        self.title = ch_name
+    def recycle(self, title: str, comparison_x_datetime: bool):
+        self.title = title
         self.comparison_x_datetime = comparison_x_datetime
         self.canvas.axes.cla()
 
@@ -975,7 +736,7 @@ for absolute moon phase angles between 2° and 90°"
 
 
 class ComparisonDualGraphWidget(QtWidgets.QWidget):
-    def __init__(self, graph_reldif: GraphWidget, graph_percdif: GraphWidget):
+    def __init__(self, graph_reldif: CompGraphWidget, graph_percdif: CompGraphWidget):
         super().__init__()
         self.graph_reldif = graph_reldif
         self.graph_percdif = graph_percdif
@@ -1032,12 +793,10 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         self.graph_percdif = None
 
     def update_plot(self, comparison: ComparisonData, redraw: bool = True):
-        data = [comparison.observed_signal, comparison.simulated_signal]
         self.graph_reldif.update_plot(
-            data, point=comparison.points, data_compare=comparison, redraw=redraw
+            point=comparison.points, data_compare=comparison, redraw=redraw
         )
         self.graph_percdif.update_plot(
-            data,
             point=comparison.points,
             data_compare=comparison,
             redraw=redraw,
@@ -1087,8 +846,8 @@ class ComparisonDualGraphWidget(QtWidgets.QWidget):
         )
 
     def set_chnames(self, ch_names: List[str]):
-        self.graph_reldif.set_srf_channel_names(ch_names)
-        self.graph_percdif.set_srf_channel_names(ch_names)
+        # TODO what is this for? if for nothing: remove
+        self.ch_names = ch_names
 
     def recycle(self, ch_name: str, comparison_x_datetime: bool):
         self.graph_reldif.recycle(ch_name, comparison_x_datetime)
@@ -1141,13 +900,13 @@ class ComparisonOutput(QtWidgets.QWidget):
                     comparison_x_datetime=self.x_datetime,
                 )
             else:
-                grel = GraphWidget(
+                grel = CompGraphWidget(
                     self.settings_manager,
                     ch,
                     comparison_x_datetime=self.x_datetime,
                     build_layout_ini=build_layout_ini,
                 )
-                gperc = GraphWidget(
+                gperc = CompGraphWidget(
                     self.settings_manager,
                     ch,
                     comparison_x_datetime=self.x_datetime,

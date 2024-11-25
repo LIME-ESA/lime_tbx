@@ -705,7 +705,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.output,
             self.comps,
             CompFields.COMP_DATE,
-            ch_names,
             self.srf,
             self.version,
             self.settings_manager,
@@ -722,7 +721,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.output,
             self.mpa_comps,
             CompFields.COMP_MPA,
-            ch_names,
             self.srf,
             self.version,
             self.settings_manager,
@@ -871,7 +869,7 @@ class MainSimulationsWidget(
         self.lower_tabs = QtWidgets.QTabWidget()
         self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         # graph
-        self.graph = output.GraphWidget(
+        self.graph = output.SimGraphWidget(
             self.settings_manager,
             "Simulation output",
             "Wavelengths (nm)",
