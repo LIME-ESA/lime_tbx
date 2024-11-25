@@ -331,11 +331,13 @@ def _show_comps_output(
     version: str,
     settings_manager: ISettingsManager,
 ) -> List[str]:
-    ch_names = srf.get_channels_names()
     to_remove = []
+    ch_names = srf.get_channels_names()
     for i, ch in enumerate(ch_names):
         if len(comps[i].dts) > 0:
-            output.update_plot(i, comps[i], False)
+            ch_id = output.get_channel_id(ch)
+            print(ch, ch_id)
+            output.update_plot(ch_id, comps[i], False)
             n_comp_points = len(comps[i].diffs_signal.wlens)
             data_start = min(comps[i].dts)
             data_end = max(comps[i].dts)
@@ -345,8 +347,8 @@ def _show_comps_output(
             sp_name = settings_manager.get_selected_spectrum_name()
             skip = settings_manager.is_skip_uncertainties()
             spectrum_info = f" | Interp. spectrum: {sp_name}"
-            output.set_interp_spectrum_name(i, sp_name)
-            output.set_skipped_uncertainties(i, skip)
+            output.set_interp_spectrum_name(ch_id, sp_name)
+            output.set_skipped_uncertainties(ch_id, skip)
             subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
             _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
             subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -356,7 +358,7 @@ def _show_comps_output(
                 n_comp_points,
             )
             output.update_labels(
-                i,
+                ch_id,
                 "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                 y_label,
                 "Irradiance (Wm⁻²nm⁻¹)",
@@ -364,7 +366,7 @@ def _show_comps_output(
                 redraw=False,
             )
             output.update_legends(
-                i,
+                ch_id,
                 [
                     ["Observed Irradiance", "Simulated Irradiance"],
                     [],
@@ -698,38 +700,36 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def show_compare_dts(self):
         self._block_gui_loading()
+        ch_names = self.output.get_channel_names()
         params = [
             self.output,
             self.comps,
             CompFields.COMP_DATE,
+            ch_names,
             self.srf,
             self.version,
             self.settings_manager,
         ]
-        # Channels are set to the output here, as that needs to be done in the main qt thread.
-        ch_names = self.srf.get_channels_names()
-        self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
-            worker, self._load_lglod_comparisons_finished, self.compare_error
+            worker, self._show_comparisons_switch_finished, self.compare_error
         )
 
     def show_compare_mpa(self):
         self._block_gui_loading()
+        ch_names = self.output.get_channel_names()
         params = [
             self.output,
             self.mpa_comps,
             CompFields.COMP_MPA,
+            ch_names,
             self.srf,
             self.version,
             self.settings_manager,
         ]
-        # Channels are set to the output here, as that needs to be done in the main qt thread.
-        ch_names = self.srf.get_channels_names()
-        self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
-            worker, self._load_lglod_comparisons_finished, self.compare_error
+            worker, self._show_comparisons_switch_finished, self.compare_error
         )
 
     def show_perc_diff(self):
@@ -780,6 +780,15 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _load_lglod_comparisons_finished(self, data):
         outp: output.ComparisonOutput = data[0]
         outp.remove_channels(data[1])
+        outp.check_if_range_visible()
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+        self.top_postcomp.setVisible(True)
+
+    def _show_comparisons_switch_finished(self, data):
+        outp: output.ComparisonOutput = data[0]
         outp.check_if_range_visible()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
