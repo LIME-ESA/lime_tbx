@@ -336,7 +336,6 @@ def _show_comps_output(
     for i, ch in enumerate(ch_names):
         if len(comps[i].dts) > 0:
             ch_id = output.get_channel_id(ch)
-            print(ch, ch_id)
             output.update_plot(ch_id, comps[i], False)
             n_comp_points = len(comps[i].diffs_signal.wlens)
             data_start = min(comps[i].dts)
@@ -369,9 +368,6 @@ def _show_comps_output(
                 ch_id,
                 [
                     ["Observed Irradiance", "Simulated Irradiance"],
-                    [],
-                    [],
-                    ["Relative Differences", "Percentage Differences"],
                 ],
                 redraw=True,
             )
@@ -383,15 +379,6 @@ def _show_comps_output(
         if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
             output.set_as_partly(chsrf.id)
     return to_remove
-
-
-class CompFields:
-    COMP_MPA = "Moon Phase Angle"
-    COMP_DATE = "Date"
-    COMP_WLEN = "Wavelength"
-    DIFF_NONE = "None"
-    DIFF_REL = "Relative"
-    DIFF_PERC = "Percentage"
 
 
 class ComparisonPageWidget(QtWidgets.QWidget):
@@ -446,7 +433,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             QtCore.Qt.ScrollBarAsNeeded
         )
         self.compare_by_field.addItems(
-            [CompFields.COMP_DATE, CompFields.COMP_MPA, CompFields.COMP_WLEN]
+            [
+                constants.CompFields.COMP_DATE,
+                constants.CompFields.COMP_MPA,
+                constants.CompFields.COMP_WLEN,
+            ]
         )
         self.compare_by_field.currentTextChanged.connect(
             self._update_from_compare_combo
@@ -460,8 +451,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             QtCore.Qt.ScrollBarAsNeeded
         )
         self.difference_by_field.addItems(
-            [CompFields.DIFF_NONE, CompFields.DIFF_REL, CompFields.DIFF_PERC]
+            [
+                constants.CompFields.DIFF_NONE,
+                constants.CompFields.DIFF_REL,
+                constants.CompFields.DIFF_PERC,
+            ]
         )
+        self.difference_by_field.setCurrentIndex(1)
         self.difference_by_field.currentTextChanged.connect(
             self._update_from_difference_combo
         )
@@ -491,16 +487,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.export_lglod_button)
 
     def _update_from_compare_combo(self, value: str):
-        if value == CompFields.COMP_MPA:
+        if value == constants.CompFields.COMP_MPA:
             self.show_compare_mpa()
-        elif value == CompFields.COMP_DATE:
+        elif value == constants.CompFields.COMP_DATE:
             self.show_compare_dts()
 
     def _update_from_difference_combo(self, value: str):
-        if value == CompFields.DIFF_PERC:
+        if value == constants.CompFields.DIFF_PERC:
             self.show_perc_diff()
-        elif value == CompFields.DIFF_REL:
+        elif value == constants.CompFields.DIFF_REL:
             self.show_rel_diff()
+        else:
+            self.show_no_diff()
 
     def _callback_compare_button_enable(self, enable: bool):
         self.compare_button.setEnabled(enable)
@@ -650,8 +648,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             del self.srf.channels[i]
         self.srf = None
         self.set_show_comparison_input(True)
-        if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
-            self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
+        if not self.compare_by_field.currentText() == constants.CompFields.COMP_DATE:
+            self.compare_by_field.setCurrentText(constants.CompFields.COMP_DATE)
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
@@ -685,7 +683,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         params = [
             self.output,
             self.comps,
-            CompFields.COMP_DATE,
+            constants.CompFields.COMP_DATE,
             self.srf,
             self.version,
             self.settings_manager,
@@ -700,11 +698,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def show_compare_dts(self):
         self._block_gui_loading()
-        ch_names = self.output.get_channel_names()
         params = [
             self.output,
             self.comps,
-            CompFields.COMP_DATE,
+            constants.CompFields.COMP_DATE,
             self.srf,
             self.version,
             self.settings_manager,
@@ -716,11 +713,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def show_compare_mpa(self):
         self._block_gui_loading()
-        ch_names = self.output.get_channel_names()
         params = [
             self.output,
             self.mpa_comps,
-            CompFields.COMP_MPA,
+            constants.CompFields.COMP_MPA,
             self.srf,
             self.version,
             self.settings_manager,
@@ -738,6 +734,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def show_rel_diff(self):
         self._block_gui_loading()
         self.output.show_relative()
+        self._unblock_gui()
+
+    def show_no_diff(self):
+        self._block_gui_loading()
+        self.output.show_no_diff()
         self._unblock_gui()
 
     def load_lglod_comparisons(
@@ -761,7 +762,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         params = [
             self.output,
             self.comps,
-            CompFields.COMP_DATE,
+            constants.CompFields.COMP_DATE,
             self.srf,
             version,
             self.settings_manager,

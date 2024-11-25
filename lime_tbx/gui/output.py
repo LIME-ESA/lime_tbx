@@ -34,6 +34,7 @@ from lime_tbx.gui.canvas import (
     font_prop,
     redraw_canvas,
     redraw_canvas_compare,
+    redraw_canvas_compare_only_diffs,
 )
 from lime_tbx.gui import constants
 
@@ -407,6 +408,7 @@ class CompGraphWidget(GraphWidget):
         xlabel="",
         ylabel="",
         comparison_x_datetime=True,
+        chosen_diffs=constants.CompFields.DIFF_REL,
         parent=None,
         build_layout_ini=True,
     ):
@@ -417,7 +419,6 @@ class CompGraphWidget(GraphWidget):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.legend = []
-        self.point = None
         self.data = None
         self.vertical_lines = []
         self.dts = []
@@ -430,23 +431,21 @@ class CompGraphWidget(GraphWidget):
         self.comparison_x_datetime = comparison_x_datetime
         self.interp_spectrum_name = None
         self.skip_uncs = None
-        self.compare_percentages = None
         self.is_built = False
         self._to_update_plot = False
         self._to_update_labels = False
+        self.chosen_diffs = chosen_diffs
         if build_layout_ini:
             self._build_layout()
 
     def update_plot(
         self,
-        point: Union[Point, List[Point]] = None,
         data_compare: ComparisonData = None,
         redraw: bool = True,
-        compare_percentages: bool = False,
+        chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
     ):
-        self.point = point
         self.data = data_compare
-        self.compare_percentages = compare_percentages
+        self.chosen_diffs = chosen_diffs
         if self.is_built:
             self._update_plot(redraw)
         else:
@@ -472,7 +471,7 @@ class CompGraphWidget(GraphWidget):
     def _redraw(self):
         if not self.is_built:
             return
-        self.canvas.axes.cla()  # Clear the canvas.
+        self.canvas.clear()  # Clear the canvas.
         lines = redraw_canvas_compare(
             self.canvas,
             self.data,
@@ -481,7 +480,7 @@ class CompGraphWidget(GraphWidget):
             self.xlabel,
             self.ylabel,
             self.subtitle,
-            self.compare_percentages,
+            self.chosen_diffs,
         )
         try:
             self.canvas.fig.tight_layout()
@@ -500,6 +499,20 @@ class CompGraphWidget(GraphWidget):
         self.canvas.draw()
         self.update()
         self.canvas.update()
+
+    def change_diff_canvas(self, chosen_diffs: constants.CompFields):
+        self.chosen_diffs = chosen_diffs
+        redraw_canvas_compare_only_diffs(
+            self.canvas,
+            self.data,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+        try:
+            self.canvas.fig.tight_layout()
+            self.canvas.draw()
+        except:
+            pass
 
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
@@ -531,7 +544,7 @@ class CompGraphWidget(GraphWidget):
                     xlabel,
                     data,
                     self.ylabel,
-                    self.point,
+                    self.data.points,
                     name,
                     version,
                     self.data,
@@ -546,6 +559,19 @@ class CompGraphWidget(GraphWidget):
         self.title = title
         self.comparison_x_datetime = comparison_x_datetime
         self.canvas.axes.cla()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.canvas.mpl_connect("resize_event", self._on_resize)
+        self.tight_layout()
+
+    def _on_resize(self, event):
+        self.tight_layout()
+
+    def tight_layout(self):
+        self.canvas.fig.tight_layout()
+        self.canvas.draw()
+        self.update()
 
 
 class SignalWidget(QtWidgets.QWidget):
@@ -735,133 +761,14 @@ for absolute moon phase angles between 2° and 90°"
         self.parentWidget().setDisabled(False)
 
 
-class ComparisonDualGraphWidget(QtWidgets.QWidget):
-    def __init__(self, graph_reldif: CompGraphWidget, graph_percdif: CompGraphWidget):
-        super().__init__()
-        self.graph_reldif = graph_reldif
-        self.graph_percdif = graph_percdif
-        self.stack_layout = QtWidgets.QStackedLayout(self)
-        self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
-        self.stack_layout.addWidget(self.graph_reldif)
-        self.stack_layout.addWidget(self.graph_percdif)
-        self.stack_layout.setCurrentIndex(0)
-        self.visible_reldif = True
-
-    def showEvent(self, event):
-        self.set_visible_graphs()
-        self.graph_percdif.canvas.mpl_connect("resize_event", self._on_resize)
-        self.graph_reldif.canvas.mpl_connect("resize_event", self._on_resize)
-        super().showEvent(event)
-
-    def set_visible_graphs(self):
-        if self.isVisible():
-            self.graph_reldif.setVisible(self.visible_reldif)
-            self.graph_percdif.setVisible(not self.visible_reldif)
-
-    def _on_resize(self, event):
-        self.tight_layout()
-
-    def tight_layout(self):
-        if self.graph_reldif.isVisible():
-            self._tight_layout_reldif()
-        else:
-            self._tight_layout_percdif()
-        self.update()
-
-    def _tight_layout_reldif(self):
-        self.graph_reldif.canvas.fig.tight_layout()
-        self.graph_reldif.canvas.draw()
-
-    def _tight_layout_percdif(self):
-        self.graph_percdif.canvas.fig.tight_layout()
-        self.graph_percdif.canvas.draw()
-
-    def show_percentage(self):
-        self.visible_reldif = False
-        self.set_visible_graphs()
-        self.stack_layout.setCurrentIndex(1)
-
-    def show_relative(self):
-        self.visible_reldif = True
-        self.set_visible_graphs()
-        self.stack_layout.setCurrentIndex(0)
-
-    def clear(self):
-        self.graph_reldif.setParent(None)
-        self.graph_percdif.setParent(None)
-        self.graph_reldif = None
-        self.graph_percdif = None
-
-    def update_plot(self, comparison: ComparisonData, redraw: bool = True):
-        self.graph_reldif.update_plot(
-            point=comparison.points, data_compare=comparison, redraw=redraw
-        )
-        self.graph_percdif.update_plot(
-            point=comparison.points,
-            data_compare=comparison,
-            redraw=redraw,
-            compare_percentages=True,
-        )
-
-    def update_labels(
-        self,
-        title: str,
-        xlabel: str,
-        ylabel: str,
-        redraw: bool = True,
-        subtitle: str = None,
-    ):
-        self.graph_reldif.update_labels(
-            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
-        )
-        self.graph_percdif.update_labels(
-            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
-        )
-
-    def set_interp_spectrum_name(self, sp_name: str):
-        self.graph_reldif.set_interp_spectrum_name(sp_name)
-        self.graph_percdif.set_interp_spectrum_name(sp_name)
-
-    def set_skipped_uncertainties(self, skip: bool):
-        self.graph_reldif.set_skipped_uncertainties(skip)
-        self.graph_percdif.set_skipped_uncertainties(skip)
-
-    def update_legends(self, legends: List[List[str]], redraw: bool = True):
-        """
-        Parameters
-        ----------
-        legend: list of list of str
-            Each list represents a group of legends
-            Lengeds index:
-            0: data
-            1: cimel_data
-            2: cimel_data errorbars
-            3: comparison (2 values, graph_reldif and graph_percdif)
-        redraw: bool
-            Boolean that defines if the plot will be redrawn automatically or not. Default True.
-        """
-        self.graph_reldif.update_legend(legends[0:3] + [[legends[3][0]]], redraw=redraw)
-        self.graph_percdif.update_legend(
-            legends[0:3] + [[legends[3][1]]], redraw=redraw
-        )
-
-    def set_chnames(self, ch_names: List[str]):
-        # TODO what is this for? if for nothing: remove
-        self.ch_names = ch_names
-
-    def recycle(self, ch_name: str, comparison_x_datetime: bool):
-        self.graph_reldif.recycle(ch_name, comparison_x_datetime)
-        self.graph_percdif.recycle(ch_name, comparison_x_datetime)
-        self.stack_layout.setCurrentIndex(0)
-
-
 class ComparisonOutput(QtWidgets.QWidget):
     def __init__(self, settings_manager: ISettingsManager, x_datetime: bool):
         super().__init__()
         self.settings_manager = settings_manager
-        self.channels: List[ComparisonDualGraphWidget] = []
+        self.channels: List[CompGraphWidget] = []
         self.ch_names = []
         self.x_datetime = x_datetime
+        self.chosen_diffs = constants.CompFields.DIFF_REL
         self._build_layout()
 
     def _build_layout(self):
@@ -900,24 +807,15 @@ class ComparisonOutput(QtWidgets.QWidget):
                     comparison_x_datetime=self.x_datetime,
                 )
             else:
-                grel = CompGraphWidget(
+                channel = CompGraphWidget(
                     self.settings_manager,
                     ch,
                     comparison_x_datetime=self.x_datetime,
                     build_layout_ini=build_layout_ini,
                 )
-                gperc = CompGraphWidget(
-                    self.settings_manager,
-                    ch,
-                    comparison_x_datetime=self.x_datetime,
-                    build_layout_ini=build_layout_ini,
-                )
-                channel = ComparisonDualGraphWidget(grel, gperc)
                 self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
-        for cha in self.channels:
-            cha.set_chnames(self.ch_names)
         # Remove range warning content
         if self.range_warning:
             self.range_warning.setText("")
@@ -954,21 +852,26 @@ for wavelengths between 350 and 2500 nm"
             if ch_name in self.ch_names:
                 index = self.ch_names.index(ch_name)
                 self.channel_tabs.removeTab(index)
-                self.channels[index].clear()
                 self.channels[index].setParent(None)
                 self.channels.pop(index)
                 self.ch_names.pop(index)
         self._check_range_warning_needed()
-        for cha in self.channels:
-            cha.set_chnames(self.ch_names)
+
+    def _redraw_new_diffs(self):
+        for ch in self.channels:
+            ch.change_diff_canvas(self.chosen_diffs)
 
     def show_relative(self):
-        for ch in self.channels:
-            ch.show_relative()
+        self.chosen_diffs = constants.CompFields.DIFF_REL
+        self._redraw_new_diffs()
 
     def show_percentage(self):
-        for ch in self.channels:
-            ch.show_percentage()
+        self.chosen_diffs = constants.CompFields.DIFF_PERC
+        self._redraw_new_diffs()
+
+    def show_no_diff(self):
+        self.chosen_diffs = constants.CompFields.DIFF_NONE
+        self._redraw_new_diffs()
 
     def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
         """Update the <index> plot with the given data
@@ -981,7 +884,7 @@ for wavelengths between 350 and 2500 nm"
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.channels[index].update_plot(comparison, redraw)
+        self.channels[index].update_plot(comparison, redraw, self.chosen_diffs)
 
     def update_labels(
         self,
@@ -1015,18 +918,15 @@ for wavelengths between 350 and 2500 nm"
         Parameters
         ----------
         index: int
-            Plot index (SRF)
+            Plot index (SRF band)
         legend: list of list of str
             Each list represents a group of legends
             Lengeds index:
-            0: data
-            1: cimel_data
-            2: cimel_data errorbars
-            3: comparison (2 values, graph_reldif and graph_percdif)
+            0: main data legend
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.channels[index].update_legends(legends, redraw=redraw)
+        self.channels[index].update_legend(legends, redraw=redraw)
 
     def get_current_channel_index(self) -> int:
         return self.channel_tabs.currentIndex()

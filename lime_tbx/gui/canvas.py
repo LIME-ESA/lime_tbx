@@ -1,12 +1,14 @@
 """Module in charge of defining the matplotlib canvas"""
 
 """___Built-In Modules___"""
-from typing import Union, List
+from typing import Union, List, Tuple
 import os
 from datetime import datetime
 
 """___Third-Party Modules___"""
+from matplotlib.lines import Line2D
 from matplotlib.axes import Axes
+import matplotlib.dates as mdates
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
 import matplotlib.ticker
 from matplotlib.backends.backend_qt5agg import (
@@ -88,6 +90,7 @@ class MplCanvas(FigureCanvas):
     def get_twinx(self) -> Axes:
         if self.axes_x2 is None:
             self.axes_x2 = self.axes.twinx()
+        self.axes_x2.set_visible(True)
 
         def combine_formats(twin, old):
             def format_coord(x, y):
@@ -102,6 +105,109 @@ class MplCanvas(FigureCanvas):
         self.axes_x2.format_coord = combine_formats(self.axes_x2, self.axes)
         return self.axes_x2
 
+    def get_lines(self) -> List[Line2D]:
+        lines2 = []
+        if self.axes_x2 is not None:
+            lines2 = self.axes_x2.get_lines()
+        return self.axes.get_lines() + lines2
+
+    def clear(self):
+        if self.axes_x2 is not None:
+            self.axes_x2.cla()
+        self.axes.cla()
+
+
+_YAXIS_NTICKS = 9
+
+
+def _redraw_canvas_compare_only_diffs(
+    scanvas: MplCanvas,
+    sdata_compare: Union[ComparisonData, None],
+    chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
+) -> Tuple[list, str]:
+    lines = []
+    data_compare_info = ""
+    if sdata_compare is not None:
+        if chosen_diffs == constants.CompFields.DIFF_PERC:
+            data_comp = sdata_compare.perc_diffs
+            ylabeltit = "Percentage difference (%)"
+        elif chosen_diffs == constants.CompFields.DIFF_REL:
+            data_comp = sdata_compare.diffs_signal
+            ylabeltit = "Relative difference (%)"
+        else:
+            data_comp = None
+            ylabeltit = None
+
+        ax2 = scanvas.get_twinx()
+        ax2.clear()
+        if data_comp:
+            label = ylabeltit
+            lines += ax2.plot(
+                data_comp.wlens,
+                data_comp.data,
+                marker="o",
+                color="#545454",
+                label=label,
+                markersize=4,
+                ls="none",
+            )
+            if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
+                ax2.errorbar(
+                    data_comp.wlens,
+                    data_comp.data,
+                    yerr=data_comp.uncertainties * 2,
+                    color="#545454",
+                    capsize=2,
+                    ls="none",
+                    alpha=0.3,
+                )
+            ylim = max(list(map(abs, ax2.get_ylim())))
+            if chosen_diffs == constants.CompFields.DIFF_PERC:
+                ax2.set_ylim((0.0, ylim + 0.5))
+                data_compare_info = "MPD: {:.4f}%".format(
+                    sdata_compare.mean_perc_difference
+                )
+            else:
+                ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
+                data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
+                    sdata_compare.mean_relative_difference,
+                    sdata_compare.standard_deviation_mrd,
+                    sdata_compare.mean_absolute_relative_difference,
+                )
+            ax2.set_ylabel(
+                ylabeltit,
+                fontproperties=label_font_prop,
+            )
+            ax2.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(_YAXIS_NTICKS))
+        else:
+            ax2.set_visible(False)
+    return lines, data_compare_info
+
+
+def redraw_canvas_compare_only_diffs(
+    scanvas: MplCanvas,
+    sdata_compare: Union[ComparisonData, None],
+    subtitle: str = None,
+    chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
+):
+    dlines, data_compare_info = _redraw_canvas_compare_only_diffs(
+        scanvas, sdata_compare, chosen_diffs
+    )
+    if isinstance(sdata_compare.diffs_signal.wlens[0], datetime):
+        scanvas.axes.xaxis.set_major_formatter(
+            mdates.AutoDateFormatter(scanvas.axes.xaxis.get_major_locator())
+        )
+    if subtitle is None:
+        subtitle = data_compare_info
+    elif data_compare_info:
+        subtitle += f" | {data_compare_info}"
+    if subtitle != None:
+        scanvas.set_subtitle(subtitle, fontproperties=font_prop)
+
+    legend_lines = [l for l in scanvas.get_lines() if not l.get_label().startswith("_")]
+    labels = [l.get_label() for l in legend_lines]
+    scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
+
 
 def redraw_canvas_compare(
     scanvas: MplCanvas,
@@ -111,7 +217,7 @@ def redraw_canvas_compare(
     sxlabel: str,
     sylabel: str,
     subtitle: str = None,
-    compare_percentages: bool = False,
+    chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
 ):
     lines = []
     if sdata_compare is not None:
@@ -154,74 +260,33 @@ def redraw_canvas_compare(
                         alpha=0.3,
                     )
             lines += newlines
-
         data_compare_info = ""
-        if compare_percentages:
-            data_comp = sdata_compare.perc_diffs
-        else:
-            data_comp = sdata_compare.diffs_signal
-        ax2 = scanvas.get_twinx()
-        ax2.clear()
-        label = ""
-        if len(slegend[0]) > 0:
-            label = slegend[0][0]
-        lines += ax2.plot(
-            data_comp.wlens,
-            data_comp.data,
-            marker="o",
-            color="#545454",
-            label=label,
-            markersize=4,
-            ls="none",
-        )
-        if data_comp.uncertainties is not None and data_comp.uncertainties.size > 0:
-            ax2.errorbar(
-                data_comp.wlens,
-                data_comp.data,
-                yerr=data_comp.uncertainties * 2,
-                color="#545454",
-                capsize=2,
-                ls="none",
-                alpha=0.3,
+        if chosen_diffs != constants.CompFields.DIFF_NONE:
+            dlines, data_compare_info = _redraw_canvas_compare_only_diffs(
+                scanvas, sdata_compare, chosen_diffs
             )
-        ylim = max(list(map(abs, ax2.get_ylim())))
-        if compare_percentages:
-            ax2.set_ylim((0.0, ylim + 0.5))
-            data_compare_info = "MPD: {:.4f}%".format(
-                sdata_compare.mean_perc_difference
-            )
-        else:
-            ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
-            data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
-                sdata_compare.mean_relative_difference,
-                sdata_compare.standard_deviation_mrd,
-                sdata_compare.mean_absolute_relative_difference,
-            )
-        # lines += scanvas.axes.plot([], [], " ", label=data_compare_info)
+            lines += dlines
         if subtitle is None:
             subtitle = data_compare_info
-        else:
+        elif data_compare_info:
             subtitle += f" | {data_compare_info}"
-        ylabeltit = "Relative difference (%)"
-        if compare_percentages:
-            ylabeltit = "Percentage difference (%)"
-        ax2.set_ylabel(
-            ylabeltit,
-            fontproperties=label_font_prop,
-        )
+
         plt.setp(
             scanvas.axes.get_xticklabels(),
             rotation=30,
             horizontalalignment="right",
         )
-        nticks = 9
-        scanvas.axes.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(nticks))
-        ax2.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(nticks))
+        scanvas.axes.yaxis.set_major_locator(
+            matplotlib.ticker.LinearLocator(_YAXIS_NTICKS)
+        )
+        if isinstance(data.wlens[0], datetime):
+            scanvas.axes.xaxis.set_major_formatter(
+                mdates.AutoDateFormatter(scanvas.axes.xaxis.get_major_locator())
+            )
 
-        if len(slegend) > 0:
-            legend_lines = [l for l in lines if not l.get_label().startswith("_child")]
-            labels = [l.get_label() for l in legend_lines]
-            scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
+        legend_lines = [l for l in lines if not l.get_label().startswith("_child")]
+        labels = [l.get_label() for l in legend_lines]
+        scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
 
     if subtitle != None:
         scanvas.set_subtitle(subtitle, fontproperties=font_prop)
