@@ -488,7 +488,16 @@ class CompGraphWidget(GraphWidget):
         except:
             pass
 
-        self.canvas.axes.set_xlim(self.xlim_left, self.xlim_right)
+        xll, xlr = self.xlim_left, self.xlim_right
+        if self.data:
+            xmin = self.data.observed_signal.wlens.min()
+            xmax = self.data.observed_signal.wlens.max()
+            xmargin = (xmax - xmin) * 0.05
+            if not xll:
+                xll = xmin - xmargin
+            if not xlr:
+                xlr = xmax + xmargin
+        self.canvas.axes.set_xlim(xll, xlr)
         bottom = top = None
         current_bottom, current_top = self.canvas.axes.get_ylim()
         if self.max_ylim_bottom and self.max_ylim_bottom > current_bottom:

@@ -295,9 +295,12 @@ class Comparison(IComparison):
                 # Observed and Simulated
                 specs = (
                     SpectralData(
-                        ch_dates[i], obs_irrs[i], np.zeros(len(ch_dates[i])), None
+                        np.array(ch_dates[i]),
+                        obs_irrs[i],
+                        np.zeros(len(ch_dates[i])),
+                        None,
                     ),
-                    SpectralData(ch_dates[i], irrs, uncs, None),
+                    SpectralData(np.array(ch_dates[i]), irrs, uncs, None),
                 )
                 # Relative Differences
                 rel_diffs = []
