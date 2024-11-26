@@ -15,12 +15,3 @@ LIME_SPECTRUM_LIMIT_LABEL = "LIME Spectrum limit"
 INTERPOLATED_DATA_LABEL = "Interpolated spectrum"
 ERRORBARS_LABEL = "Uncertainty (k=2)"
 CIMEL_POINT_LABEL = "Model output at CIMEL channels"
-
-
-class CompFields:
-    COMP_MPA = "Moon Phase Angle"
-    COMP_DATE = "Date"
-    COMP_WLEN = "Wavelength"
-    DIFF_NONE = "None"
-    DIFF_REL = "Relative"
-    DIFF_PERC = "Percentage"

@@ -49,6 +49,7 @@ from lime_tbx.datatypes.datatypes import (
     MoonData,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
+from lime_tbx.datatypes.constants import CompFields
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
@@ -277,31 +278,6 @@ def calculate_all_callback(
     return (point, srf)
 
 
-"""
-def show_comparisons_callback(
-    output: output.ComparisonOutput,
-    output_mpa: output.ComparisonOutput,
-    comps: List[ComparisonData],
-    mpa_comps: List[ComparisonData],
-    srf: SpectralResponseFunction,
-    version: str,
-    settings_manager: ISettingsManager,
-) -> Tuple[List[str], List[str]]:
-    to_remove = _show_comps_output(
-        output, comps, "Date", srf, version, settings_manager
-    )
-    to_remove_comps = _show_comps_output(
-        output_mpa,
-        mpa_comps,
-        "Moon Phase Angle (degrees)",
-        srf,
-        version,
-        settings_manager,
-    )
-    return (to_remove, to_remove_comps)
-"""
-
-
 def show_comparisons_callback(
     output: output.ComparisonOutput,
     comps: List[ComparisonData],
@@ -381,6 +357,16 @@ def _show_comps_output(
     return to_remove
 
 
+def clear_comparison_callback(srf: SpectralResponseFunction):
+    # Try to delete the SRF
+    for i in range(len(srf.channels) - 1, -1, -1):
+        srf.channels[i].spectral_response = None
+        srf.channels[i].spectral_response_inrange = None
+        srf.channels[i].valid_spectre = None
+        del srf.channels[i]
+    return []
+
+
 class ComparisonPageWidget(QtWidgets.QWidget):
     def __init__(
         self,
@@ -396,6 +382,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.eocfi_path = eocfi_path
         self.workers = []
         self.worker_ths = []
+        self._listening_changes_combobox = True
         self._build_layout()
 
     def _build_layout(self):
@@ -434,9 +421,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
         self.compare_by_field.addItems(
             [
-                constants.CompFields.COMP_DATE,
-                constants.CompFields.COMP_MPA,
-                constants.CompFields.COMP_WLEN,
+                CompFields.COMP_DATE,
+                CompFields.COMP_MPA,
+                CompFields.COMP_WLEN,
             ]
         )
         self.compare_by_field.currentTextChanged.connect(
@@ -452,9 +439,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
         self.difference_by_field.addItems(
             [
-                constants.CompFields.DIFF_NONE,
-                constants.CompFields.DIFF_REL,
-                constants.CompFields.DIFF_PERC,
+                CompFields.DIFF_NONE,
+                CompFields.DIFF_REL,
+                CompFields.DIFF_PERC,
             ]
         )
         self.difference_by_field.setCurrentIndex(1)
@@ -471,7 +458,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         # Comparison content
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
-        self.output = output.ComparisonOutput(self.settings_manager, True)
+        self.output = output.ComparisonOutput(self.settings_manager)
         self.spinner = SpinnerPage()
         self.spinner.setVisible(False)
         self.stack_layout.addWidget(self.spinner)
@@ -487,18 +474,20 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.export_lglod_button)
 
     def _update_from_compare_combo(self, value: str):
-        if value == constants.CompFields.COMP_MPA:
-            self.show_compare_mpa()
-        elif value == constants.CompFields.COMP_DATE:
-            self.show_compare_dts()
+        if self._listening_changes_combobox:
+            if value == CompFields.COMP_MPA:
+                self.show_compare_mpa()
+            elif value == CompFields.COMP_DATE:
+                self.show_compare_dts()
 
     def _update_from_difference_combo(self, value: str):
-        if value == constants.CompFields.DIFF_PERC:
-            self.show_perc_diff()
-        elif value == constants.CompFields.DIFF_REL:
-            self.show_rel_diff()
-        else:
-            self.show_no_diff()
+        if self._listening_changes_combobox:
+            if value == CompFields.DIFF_PERC:
+                self.show_perc_diff()
+            elif value == CompFields.DIFF_REL:
+                self.show_rel_diff()
+            else:
+                self.show_no_diff()
 
     def _callback_compare_button_enable(self, enable: bool):
         self.compare_button.setEnabled(enable)
@@ -640,21 +629,35 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def clear_comparison_accepted(self):
-        # Try to delete the SRF
-        for i in range(len(self.srf.channels) - 1, -1, -1):
-            self.srf.channels[i].spectral_response = None
-            self.srf.channels[i].spectral_response_inrange = None
-            self.srf.channels[i].valid_spectre = None
-            del self.srf.channels[i]
+        self._listening_changes_combobox = False
+        self._block_gui_loading()
+        params = [
+            self.srf,
+        ]
+        worker = CallbackWorker(clear_comparison_callback, params)
+        self._start_thread(
+            worker, self._clear_comparison_finished, self._clear_comparison_error
+        )
+
+    def _clear_comparison_finished(self, data):
         self.srf = None
         self.set_show_comparison_input(True)
-        if not self.compare_by_field.currentText() == constants.CompFields.COMP_DATE:
-            self.compare_by_field.setCurrentText(constants.CompFields.COMP_DATE)
+        if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
+            self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
         self.export_lglod_button.setEnabled(False)
         self.top_postcomp.setVisible(False)
+        self._listening_changes_combobox = True
+        self._unblock_gui()
+
+    def _clear_comparison_error(self, error: Exception):
+        self._unblock_gui()
+        self.handle_operation_error(error)
+        self.export_lglod_button.setEnabled(False)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(True)
 
     @QtCore.Slot()
     def clear_comparison_rejected(self):
@@ -683,7 +686,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         params = [
             self.output,
             self.comps,
-            constants.CompFields.COMP_DATE,
+            CompFields.COMP_DATE,
             self.srf,
             self.version,
             self.settings_manager,
@@ -701,7 +704,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         params = [
             self.output,
             self.comps,
-            constants.CompFields.COMP_DATE,
+            CompFields.COMP_DATE,
             self.srf,
             self.version,
             self.settings_manager,
@@ -716,7 +719,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         params = [
             self.output,
             self.mpa_comps,
-            constants.CompFields.COMP_MPA,
+            CompFields.COMP_MPA,
             self.srf,
             self.version,
             self.settings_manager,
@@ -759,10 +762,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.mpa_comps = mpa_comps
         self.srf = srf
         self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
+        self.version = version
         params = [
             self.output,
             self.comps,
-            constants.CompFields.COMP_DATE,
+            CompFields.COMP_DATE,
             self.srf,
             version,
             self.settings_manager,

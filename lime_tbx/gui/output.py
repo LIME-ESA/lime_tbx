@@ -37,6 +37,7 @@ from lime_tbx.gui.canvas import (
     redraw_canvas_compare_only_diffs,
 )
 from lime_tbx.gui import constants
+from lime_tbx.datatypes.constants import CompFields
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -397,7 +398,8 @@ class SimGraphWidget(GraphWidget):
 
     def recycle(self, title: str):
         self.title = title
-        self.canvas.axes.cla()
+        if self.is_built:
+            self.canvas.axes.cla()
 
 
 class CompGraphWidget(GraphWidget):
@@ -407,8 +409,7 @@ class CompGraphWidget(GraphWidget):
         title="",
         xlabel="",
         ylabel="",
-        comparison_x_datetime=True,
-        chosen_diffs=constants.CompFields.DIFF_REL,
+        chosen_diffs=CompFields.DIFF_REL,
         parent=None,
         build_layout_ini=True,
     ):
@@ -428,7 +429,6 @@ class CompGraphWidget(GraphWidget):
         self.xlim_right = None
         self.max_ylim_bottom = None
         self.max_ylim_top = None
-        self.comparison_x_datetime = comparison_x_datetime
         self.interp_spectrum_name = None
         self.skip_uncs = None
         self.is_built = False
@@ -442,7 +442,7 @@ class CompGraphWidget(GraphWidget):
         self,
         data_compare: ComparisonData = None,
         redraw: bool = True,
-        chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
     ):
         self.data = data_compare
         self.chosen_diffs = chosen_diffs
@@ -509,19 +509,22 @@ class CompGraphWidget(GraphWidget):
         self.update()
         self.canvas.update()
 
-    def change_diff_canvas(self, chosen_diffs: constants.CompFields):
+    def change_diff_canvas(self, chosen_diffs: CompFields):
         self.chosen_diffs = chosen_diffs
-        redraw_canvas_compare_only_diffs(
-            self.canvas,
-            self.data,
-            self.subtitle,
-            self.chosen_diffs,
-        )
-        try:
-            self.canvas.fig.tight_layout()
-            self.canvas.draw()
-        except:
-            pass
+        if self.is_built:
+            redraw_canvas_compare_only_diffs(
+                self.canvas,
+                self.data,
+                self.subtitle,
+                self.chosen_diffs,
+            )
+            try:
+                self.canvas.fig.tight_layout()
+                self.canvas.draw()
+            except:
+                pass
+        else:
+            self._to_update_plot = True
 
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
@@ -537,37 +540,23 @@ class CompGraphWidget(GraphWidget):
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
-                data = [self.data.observed_signal, self.data.simulated_signal]
-                xdata = data[0].wlens
-                xlabel = "Moon phase angle (degrees)"
-                if self.comparison_x_datetime:
-                    xdata = list(
-                        map(
-                            self.data.dts,
-                            lambda x: x.isoformat(sep=" ", timespec="milliseconds"),
-                        )
-                    )
-                    xlabel = "UTC datetime"
                 csv.export_csv_comparison(
-                    xdata,
-                    xlabel,
-                    data,
-                    self.ylabel,
-                    self.data.points,
+                    self.data,
+                    self.xlabel,
+                    self.legend[0],
                     name,
                     version,
-                    self.data,
                     self.interp_spectrum_name,
                     self.skip_uncs,
-                    not self.compare_percentages,
+                    self.chosen_diffs,
                 )
             except Exception as e:
                 self.show_error(e)
 
-    def recycle(self, title: str, comparison_x_datetime: bool):
+    def recycle(self, title: str):
         self.title = title
-        self.comparison_x_datetime = comparison_x_datetime
-        self.canvas.axes.cla()
+        if self.is_built:
+            self.canvas.axes.cla()
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -771,13 +760,12 @@ for absolute moon phase angles between 2° and 90°"
 
 
 class ComparisonOutput(QtWidgets.QWidget):
-    def __init__(self, settings_manager: ISettingsManager, x_datetime: bool):
+    def __init__(self, settings_manager: ISettingsManager):
         super().__init__()
         self.settings_manager = settings_manager
         self.channels: List[CompGraphWidget] = []
         self.ch_names = []
-        self.x_datetime = x_datetime
-        self.chosen_diffs = constants.CompFields.DIFF_REL
+        self.chosen_diffs = CompFields.DIFF_REL
         self._build_layout()
 
     def _build_layout(self):
@@ -791,21 +779,13 @@ class ComparisonOutput(QtWidgets.QWidget):
 
     def set_channels(self, channels: List[str]):
         # TODO make this function faster
-        # new_channel_tabs = QtWidgets.QTabWidget()
-        # new_channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
-        # self.main_layout.replaceWidget(self.channel_tabs, new_channel_tabs)
-        # self.channel_tabs.setParent(None)
-        # self.channel_tabs.deleteLater()
-        # self.channel_tabs = new_channel_tabs
-        # Former deletion was too slow:
-        while self.channel_tabs.count() > 0:
-            self.channel_tabs.removeTab(0)
-        # for ch in self.channels:
-        #    ch.clear()
-        #    ch.setParent(None)
+        new_channel_tabs = QtWidgets.QTabWidget()
+        new_channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
+        self.main_layout.replaceWidget(self.channel_tabs, new_channel_tabs)
+        self.channel_tabs.setParent(None)
+        self.channel_tabs.deleteLater()
+        self.channel_tabs = new_channel_tabs
 
-        ###
-        # self.channels.clear()
         self.ch_names = []
         build_layout_ini = len(channels) < 15
         for i, ch in enumerate(channels):
@@ -813,13 +793,11 @@ class ComparisonOutput(QtWidgets.QWidget):
                 channel = self.channels[i]
                 channel.recycle(
                     ch,
-                    comparison_x_datetime=self.x_datetime,
                 )
             else:
                 channel = CompGraphWidget(
                     self.settings_manager,
                     ch,
-                    comparison_x_datetime=self.x_datetime,
                     build_layout_ini=build_layout_ini,
                 )
                 self.channels.append(channel)
@@ -871,15 +849,15 @@ for wavelengths between 350 and 2500 nm"
             ch.change_diff_canvas(self.chosen_diffs)
 
     def show_relative(self):
-        self.chosen_diffs = constants.CompFields.DIFF_REL
+        self.chosen_diffs = CompFields.DIFF_REL
         self._redraw_new_diffs()
 
     def show_percentage(self):
-        self.chosen_diffs = constants.CompFields.DIFF_PERC
+        self.chosen_diffs = CompFields.DIFF_PERC
         self._redraw_new_diffs()
 
     def show_no_diff(self):
-        self.chosen_diffs = constants.CompFields.DIFF_NONE
+        self.chosen_diffs = CompFields.DIFF_NONE
         self._redraw_new_diffs()
 
     def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):

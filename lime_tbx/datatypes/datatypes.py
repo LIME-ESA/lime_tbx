@@ -847,11 +847,25 @@ class ComparisonData:
     standard_deviation_mrd: float
     number_samples: int
     dts: List[datetime]
-    points: List[SurfacePoint]
+    points: Union[List[SurfacePoint], List[CustomPoint]]
     mpas: List[float]
     ampa_valid_range: List[bool]
     perc_diffs: SpectralData
     mean_perc_difference: float
+
+    def get_diffs_and_label(
+        self, chosen_diffs: constants.CompFields
+    ) -> Union[Tuple[SpectralData, str], Tuple[None, None]]:
+        if chosen_diffs == constants.CompFields.DIFF_PERC:
+            datadiff = self.perc_diffs
+            label = "Percentage difference (%)"
+        elif chosen_diffs == constants.CompFields.DIFF_REL:
+            datadiff = self.diffs_signal
+            label = "Relative difference (%)"
+        else:
+            datadiff = None
+            label = None
+        return datadiff, label
 
 
 @dataclass

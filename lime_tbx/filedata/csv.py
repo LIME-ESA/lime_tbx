@@ -28,6 +28,7 @@ from lime_tbx.datatypes.datatypes import (
     ComparisonData,
 )
 from lime_tbx.datatypes import logger
+from lime_tbx.datatypes.constants import CompFields
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -235,45 +236,36 @@ def export_csv_simulation(
 
 
 def export_csv_comparison(
-    xdata: List[str],
+    data: ComparisonData,
     xlabel: str,
-    data: List[SpectralData],
-    ylabel: str,
-    points: Union[List[SurfacePoint], List[CustomPoint]],
+    ylabels: List[str],
     name: str,
     coeff_version: str,
-    comparison_data: ComparisonData,
     interp_spectrum_name: str,
     skip_uncs: bool,
-    relative_difference: bool,
+    chosen_diffs: CompFields,
 ):
     """
     Export the given data to a csv file
 
     Parameters
     ----------
-    x_data: list of float
-        Data from the x axis, which would correspond to the key, of the key-value pair
-    y_data: tuple of two list of float
-        Data from the y axis, which would correspond to the value, of the key-value pair.
-        In the comparation it is the observed irradiance and the simulated one, in that exact order.
-    ylabel: str
-        Label of the y_data
-    points: list of SurfacePoint or list of CustomPoint
-        Points from which the data is generated. In case it's None, no metadata will be printed.
+    data: ComparisonData
+        Comparison data.
+    xlabel: str
+        Label of the x axis data
+    ylabels: list of str
+        Labels of the y axis data
     name: str
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
-    comparison_data: ComparisonData
-        ComparisonData related to the comparison.
     interp_spectrum_name: str
         Name of the spectrum used for interpolation.
-    relative_difference: bool
-        Flag indicating if the output should include the relative_difference, or if it should include the
-        percentage difference otherwise.
+    chosen_diffs: CompFields
+        Type of difference chosen to be shown for this comparison.
     """
-    ampa_valid_range = comparison_data.ampa_valid_range
+    ampa_valid_range = data.ampa_valid_range
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -282,31 +274,30 @@ def export_csv_comparison(
             writer.writerow(
                 [
                     "MRA (Mean Relative Difference %)",
-                    comparison_data.mean_relative_difference,
+                    data.mean_relative_difference,
                 ]
             )
             writer.writerow(
                 [
                     "STD-RD (Standard deviation of Relative Difference %)",
-                    comparison_data.mean_relative_difference,
+                    data.mean_relative_difference,
                 ]
             )
             writer.writerow(
                 [
                     "MARD (Mean of the Absolutes of the Relative Differences %)",
-                    comparison_data.mean_absolute_relative_difference,
+                    data.mean_absolute_relative_difference,
                 ]
             )
             writer.writerow(
                 [
                     "MPD (Mean Percentage Difference %)",
-                    comparison_data.mean_perc_difference,
+                    data.mean_perc_difference,
                 ]
             )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            relperc = "Relative" if relative_difference else "Percentage"
-            is_surface = isinstance(points[0], SurfacePoint)
+            is_surface = isinstance(data.points[0], SurfacePoint)
             if is_surface:
                 header_coords = ["latitude", "longitude", "altitude(m)"]
             else:  # CustomPoint
@@ -318,29 +309,23 @@ def export_csv_comparison(
                     "distance sun moon (AU)",
                     "distance observer moon (km)",
                 ]
-            header = (
-                [xlabel]
-                + header_coords
-                + [
-                    "Observed {}".format(ylabel),
-                    "Simulated {}".format(ylabel),
-                    f"{relperc} differences (%)",
-                ]
-            )
+            diffdata, difflabel = data.get_diffs_and_label(chosen_diffs)
+            header = [xlabel] + header_coords + [ylabels[0], ylabels[1]]
+            if difflabel:
+                header += [difflabel]
             if not skip_uncs:
                 header += [
-                    "Observation uncertainties",
-                    "Simulation uncertainties",
-                    f"{relperc} difference uncertainties",
+                    f"{ylabels[0]} uncertainties",
+                    f"{ylabels[1]} uncertainties",
                 ]
+                if difflabel:
+                    header += [f"{difflabel} uncertainties"]
             writer.writerow(header)
-            difsig = (
-                comparison_data.diffs_signal
-                if relative_difference
-                else comparison_data.perc_diffs
-            )
+            xdata = data.observed_signal.wlens
+            if isinstance(xdata[0], datetime):
+                xdata = [x.isoformat(sep=" ", timespec="milliseconds") for x in xdata]
             for i, x_val in enumerate(xdata):
-                pt = points[i]
+                pt = data.points[i]
                 warn_out_mpa_range = ""
                 if not ampa_valid_range[i]:
                     warn_out_mpa_range = " **"
@@ -351,9 +336,8 @@ def export_csv_comparison(
                         pt.latitude,
                         pt.longitude,
                         pt.altitude,
-                        data[0].data[i],
-                        data[1].data[i],
-                        difsig.data[i],
+                        data.observed_signal.data[i],
+                        data.simulated_signal.data[i],
                     ]
                 else:
                     datarow = [
@@ -364,16 +348,18 @@ def export_csv_comparison(
                         pt.selen_sun_lon,
                         pt.distance_sun_moon,
                         pt.distance_observer_moon,
-                        data[0].data[i],
-                        data[1].data[i],
-                        difsig.data[i],
+                        data.observed_signal.data[i],
+                        data.simulated_signal.data[i],
                     ]
+                if diffdata:
+                    datarow.append(diffdata.data[i])
                 if not skip_uncs:
                     datarow += [
-                        data[0].uncertainties[i],
-                        data[1].uncertainties[i],
-                        difsig.uncertainties[i],
+                        data.observed_signal.uncertainties[i],
+                        data.simulated_signal.uncertainties[i],
                     ]
+                    if diffdata:
+                        datarow.append(diffdata.uncertainties[i])
                 writer.writerow(datarow)
     except Exception as e:
         logger.get_logger().exception(e)

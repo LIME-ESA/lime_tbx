@@ -26,6 +26,7 @@ from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     SpectralData,
 )
+from lime_tbx.datatypes.constants import CompFields
 from lime_tbx.gui import constants
 
 
@@ -123,21 +124,12 @@ _YAXIS_NTICKS = 9
 def _redraw_canvas_compare_only_diffs(
     scanvas: MplCanvas,
     sdata_compare: Union[ComparisonData, None],
-    chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
+    chosen_diffs: CompFields = CompFields.DIFF_REL,
 ) -> Tuple[list, str]:
     lines = []
     data_compare_info = ""
     if sdata_compare is not None:
-        if chosen_diffs == constants.CompFields.DIFF_PERC:
-            data_comp = sdata_compare.perc_diffs
-            ylabeltit = "Percentage difference (%)"
-        elif chosen_diffs == constants.CompFields.DIFF_REL:
-            data_comp = sdata_compare.diffs_signal
-            ylabeltit = "Relative difference (%)"
-        else:
-            data_comp = None
-            ylabeltit = None
-
+        data_comp, ylabeltit = sdata_compare.get_diffs_and_label(chosen_diffs)
         ax2 = scanvas.get_twinx()
         ax2.clear()
         if data_comp:
@@ -162,7 +154,7 @@ def _redraw_canvas_compare_only_diffs(
                     alpha=0.3,
                 )
             ylim = max(list(map(abs, ax2.get_ylim())))
-            if chosen_diffs == constants.CompFields.DIFF_PERC:
+            if chosen_diffs == CompFields.DIFF_PERC:
                 ax2.set_ylim((0.0, ylim + 0.5))
                 data_compare_info = "MPD: {:.4f}%".format(
                     sdata_compare.mean_perc_difference
@@ -188,7 +180,7 @@ def redraw_canvas_compare_only_diffs(
     scanvas: MplCanvas,
     sdata_compare: Union[ComparisonData, None],
     subtitle: str = None,
-    chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
+    chosen_diffs: CompFields = CompFields.DIFF_REL,
 ):
     dlines, data_compare_info = _redraw_canvas_compare_only_diffs(
         scanvas, sdata_compare, chosen_diffs
@@ -217,7 +209,7 @@ def redraw_canvas_compare(
     sxlabel: str,
     sylabel: str,
     subtitle: str = None,
-    chosen_diffs: constants.CompFields = constants.CompFields.DIFF_REL,
+    chosen_diffs: CompFields = CompFields.DIFF_REL,
 ):
     lines = []
     if sdata_compare is not None:
@@ -261,7 +253,7 @@ def redraw_canvas_compare(
                     )
             lines += newlines
         data_compare_info = ""
-        if chosen_diffs != constants.CompFields.DIFF_NONE:
+        if chosen_diffs != CompFields.DIFF_NONE:
             dlines, data_compare_info = _redraw_canvas_compare_only_diffs(
                 scanvas, sdata_compare, chosen_diffs
             )
