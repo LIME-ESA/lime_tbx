@@ -20,6 +20,7 @@ from ...datatypes.datatypes import (
     SurfacePoint,
     ComparisonData,
 )
+from ...datatypes.constants import CompFields
 from ..csv import (
     export_csv_simulation,
     export_csv_comparison,
@@ -193,17 +194,14 @@ class TestCSV(unittest.TestCase):
         )
         xlabel = "UTC datetime"
         export_csv_comparison(
-            xdata,
+            comp_data,
             xlabel,
-            data,
-            "Signal",
-            [SPOINT, SPOINT3],
+            ["Observed Signal", "Simulated Signal"],
             path,
             "test",
-            comp_data,
             "ASD",
             False,
-            True,
+            CompFields.DIFF_REL,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
 

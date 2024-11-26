@@ -28,6 +28,7 @@ from lime_tbx.datatypes.datatypes import (
     MoonData,
 )
 from lime_tbx.datatypes import constants, logger
+from lime_tbx.datatypes.constants import CompFields
 from lime_tbx.gui import settings, constants as gui_constants
 from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
@@ -111,21 +112,21 @@ class ExportComparison(ABC):
 class ExportComparisonCSV(ExportComparison):
     comparison_key: ComparisonKey
     output_files: List[str]
-    rel_diff_graph: bool
+    chosen_diff: CompFields
 
 
 @dataclass
 class ExportComparisonCSVDir(ExportComparison):
     comparison_key: ComparisonKey
     output_dir: str
-    rel_diff_graph: bool
+    chosen_diff: CompFields
 
 
 @dataclass
 class ExportComparisonGraph(ExportComparison):
     comparison_key: ComparisonKey
     output_files: List[str]
-    rel_diff_graph: bool
+    chosen_diff: CompFields
 
 
 @dataclass
@@ -133,7 +134,7 @@ class ExportComparisonGraphDir(ExportComparison):
     extension: str
     comparison_key: ComparisonKey
     output_dir: str
-    rel_diff_graph: bool
+    chosen_diff: CompFields
 
 
 @dataclass
@@ -142,7 +143,7 @@ class ExportNetCDF(ExportData, ExportComparison):
 
 
 IMAGE_EXTENSIONS = ["pdf", "jpg", "png", "svg"]
-COMP_DIFF_KEYS = ["rel", "perc"]
+COMP_DIFF_KEYS = ["rel", "perc", "none"]
 
 
 def print_help():
@@ -230,6 +231,15 @@ anchor points used for interpolation. The valid values are 'True' and 'False'."
 
 def print_version():
     print(constants.VERSION_NAME)
+
+
+def _get_chosen_diff_from_cli(param: str) -> CompFields:
+    chosen_diff = CompFields.DIFF_NONE
+    if param == COMP_DIFF_KEYS[0]:
+        chosen_diff = CompFields.DIFF_REL
+    elif param == COMP_DIFF_KEYS[1]:
+        chosen_diff = CompFields.DIFF_PERC
+    return chosen_diff
 
 
 class CLI:
@@ -480,14 +490,13 @@ class CLI:
 
     def _export_comparison_graph(
         self,
-        data: List[SpectralData],
+        comparison: ComparisonData,
         xlabel: str,
         ylabel: str,
         output_file: str,
         version: str,
-        comparison: ComparisonData,
         ch: str,
-        relative_difference: bool,
+        chosen_diffs: CompFields,
     ):
         from lime_tbx.gui import canvas
 
@@ -515,25 +524,18 @@ class CLI:
         canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
         canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
         canv.axes.cla()  # Clear the canvas.
-        canvas.redraw_canvas(
+        canvas.redraw_canvas_compare(
             canv,
-            data,
+            comparison,
             [
                 ["Observed Irradiance", "Simulated Irradiance"],
-                [],
-                [],
                 ["Relative Differences", "Percentage Differences"],
             ],
-            None,
-            None,
-            comparison,
             ch,
             xlabel,
             ylabel,
-            None,
-            self.settings_manager.get_selected_spectrum_name(),
             subtitle,
-            not relative_difference,
+            chosen_diffs,
         )
         try:
             canv.print_figure(output_file)
@@ -673,9 +675,8 @@ class CLI:
             if ed.comparison_key != ComparisonKey.MPA:
                 for i, ch in enumerate(ch_names):
                     if len(comps[i].dts) > 0:
-                        data = [comps[i].observed_signal, comps[i].simulated_signal]
-                        points = comps[i].points
                         ylabel = "Irradiance (Wm⁻²nm⁻¹)"
+                        ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
                         output = ""
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonGraph
@@ -695,39 +696,27 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
-                            xdata = list(
-                                map(
-                                    comps[i].dts,
-                                    lambda x: x.isoformat(
-                                        sep=" ", timespec="milliseconds"
-                                    ),
-                                )
-                            )
-                            xlabel = "UTC datetime"
+                            xlabel = "UTC Date"
                             csv.export_csv_comparison(
-                                xdata,
+                                comps[i],
                                 xlabel,
-                                data,
-                                ylabel,
-                                points,
+                                ylabels,
                                 output,
                                 version,
-                                comps[i],
                                 sp_name,
                                 skip_uncs,
-                                ed.rel_diff_graph,
+                                ed.chosen_diff,
                             )
                         else:
-                            xlabel = "UTC datetime"
+                            xlabel = "UTC Date"
                             self._export_comparison_graph(
-                                data,
+                                comps[i],
                                 xlabel,
-                                ylabel,
+                                ylabels,
                                 output,
                                 version,
-                                comps[i],
                                 ch,
-                                ed.rel_diff_graph,
+                                ed.chosen_diff,
                             )
                         file_index += 1
             file_index = 0
@@ -735,12 +724,8 @@ class CLI:
                 mpa_comps = co.sort_by_mpa(comps)
                 for i, ch in enumerate(ch_names):
                     if len(mpa_comps[i].dts) > 0:
-                        data = [
-                            mpa_comps[i].observed_signal,
-                            mpa_comps[i].simulated_signal,
-                        ]
-                        points = mpa_comps[i].points
                         ylabel = "Irradiance (Wm⁻²nm⁻¹)"
+                        ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
                         output = ""
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonGraph
@@ -760,33 +745,27 @@ class CLI:
                         if isinstance(ed, ExportComparisonCSV) or isinstance(
                             ed, ExportComparisonCSVDir
                         ):
-                            xdata = data[0].wlens
                             xlabel = "Moon Phase Angle (degrees)"
                             csv.export_csv_comparison(
-                                xdata,
+                                mpa_comps[i],
                                 xlabel,
-                                data,
-                                ylabel,
-                                points,
+                                ylabels,
                                 output,
                                 version,
-                                mpa_comps[i],
                                 sp_name,
                                 skip_uncs,
-                                ed.rel_diff_graph,
-                                False,
+                                ed.chosen_diff,
                             )
                         else:
                             xlabel = "Moon phase angle (degrees)"
                             self._export_comparison_graph(
-                                data,
+                                mpa_comps[i],
                                 xlabel,
                                 ylabel,
                                 output,
                                 version,
-                                mpa_comps[i],
                                 ch,
-                                ed.rel_diff_graph,
+                                ed.chosen_diff,
                             )
                         file_index += 1
 
@@ -935,8 +914,9 @@ Run 'lime -h' for help."
                             eprint("Error in csv rel|perc parameter.")
                             return 1
                         comp_key = ComparisonKey[splitted[1]]
+                        chosen_diff = _get_chosen_diff_from_cli(splitted[2])
                         export_data = ExportComparisonCSV(
-                            comp_key, splitted[3:], splitted[2] == COMP_DIFF_KEYS[0]
+                            comp_key, splitted[3:], chosen_diff
                         )
                 elif o_type == "graph":
                     if not is_comparison:
@@ -969,14 +949,17 @@ Run 'lime -h' for help."
                             eprint("Error in graph DT|MPA|BOTH parameter.")
                             return 1
                         if splitted[3] not in COMP_DIFF_KEYS:
-                            eprint("Error in graph rel|perc parameter.")
+                            eprint("Error in graph rel|perc|none parameter.")
                             return 1
                         filepaths = list(
                             map(lambda s: s + ".{}".format(splitted[1]), splitted[4:])
                         )
                         comp_key = ComparisonKey[splitted[2]]
+                        chosen_diff = _get_chosen_diff_from_cli(splitted[3])
                         export_data = ExportComparisonGraph(
-                            comp_key, filepaths, splitted[3] == COMP_DIFF_KEYS[0]
+                            comp_key,
+                            filepaths,
+                            chosen_diff,
                         )
                 elif o_type == "nc":
                     if len(splitted) != 2:
@@ -997,8 +980,9 @@ Run 'lime -h' for help."
                         eprint("Error in csvd rel|perc parameter.")
                         return 1
                     comp_key = ComparisonKey[splitted[1]]
+                    chosen_diff = _get_chosen_diff_from_cli(splitted[2])
                     export_data = ExportComparisonCSVDir(
-                        comp_key, splitted[3], splitted[2] == COMP_DIFF_KEYS[0]
+                        comp_key, splitted[3], chosen_diff
                     )
                 elif o_type == "graphd":
                     if not is_comparison:
@@ -1023,11 +1007,12 @@ Run 'lime -h' for help."
                         eprint("Error in graphd rel|perc parameter.")
                         return 1
                     comp_key = ComparisonKey[splitted[2]]
+                    chosen_diff = _get_chosen_diff_from_cli(splitted[3])
                     export_data = ExportComparisonGraphDir(
                         splitted[1],
                         comp_key,
                         splitted[4],
-                        splitted[3] == COMP_DIFF_KEYS[0],
+                        chosen_diff,
                     )
             elif opt in ("-f", "--srf"):
                 srf_file = arg
