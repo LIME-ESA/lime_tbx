@@ -8,6 +8,7 @@ import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.gui import (
@@ -278,6 +279,54 @@ def calculate_all_callback(
     return (point, srf)
 
 
+def show_comparisons_wlen_callback(
+    output: output.ComparisonByWlenOutput,
+    comps: List[ComparisonData],
+    srf: SpectralResponseFunction,
+    version: str,
+    settings_manager: ISettingsManager,
+) -> Tuple[output.ComparisonOutput, List[str]]:
+    comps = [c if c.observed_signal is not None else None for c in comps]
+    output.update_plot(comps, srf.get_channels_centers(), False)
+    statscomps = [c for c in comps if c is not None]
+    n_comp_points = np.mean([len(c.diffs_signal.wlens) for c in statscomps])
+    data_start = min([min(c.dts) for c in statscomps])
+    data_end = max([max(c.dts) for c in statscomps])
+    warning_out_mpa_range = ""
+    if False in [not np.all(c.ampa_valid_range) for c in statscomps]:
+        warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+    sp_name = settings_manager.get_selected_spectrum_name()
+    skip = settings_manager.is_skip_uncertainties()
+    spectrum_info = f" | Interp. spectrum: {sp_name}"
+    output.set_interp_spectrum_name(sp_name)
+    output.set_skipped_uncertainties(skip)
+    subtitle = (
+        f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+    )
+    _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
+    subtitle = "{}\nData start: {} | Data end: {}\nMean number of points: {}".format(
+        subtitle,
+        data_start.strftime(_subtitle_date_format),
+        data_end.strftime(_subtitle_date_format),
+        n_comp_points,
+    )
+    ylabel = "Wavelength (nm)"
+    output.update_labels(
+        "",
+        ylabel,
+        "Irradiance (Wm⁻²nm⁻¹)",
+        subtitle=subtitle,
+        redraw=False,
+    )
+    output.update_legends(
+        [
+            ["Observed Irradiance", "Simulated Irradiance"],
+        ],
+        redraw=True,
+    )
+    return []
+
+
 def show_comparisons_callback(
     output: output.ComparisonOutput,
     comps: List[ComparisonData],
@@ -459,10 +508,18 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
         self.output = output.ComparisonOutput(self.settings_manager)
+        self.output_wlen = output.ComparisonByWlenOutput(self.settings_manager)
+        self.output_wlen.setVisible(False)
+        self.output_stacklay = QtWidgets.QStackedLayout()
+        self.output_stacklay.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.output_stacklay.addWidget(self.output)
+        self.output_stacklay.addWidget(self.output_wlen)
+        self.output_stacklayw = QtWidgets.QWidget()
+        self.output_stacklayw.setLayout(self.output_stacklay)
         self.spinner = SpinnerPage()
         self.spinner.setVisible(False)
         self.stack_layout.addWidget(self.spinner)
-        self.stack_layout.addWidget(self.output)
+        self.stack_layout.addWidget(self.output_stacklayw)
         self.stack_layout.setCurrentIndex(1)
         self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -473,12 +530,25 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
 
+    def _focus_on_comp_wlen(self, focuswlen: bool):
+        self.output_wlen.setVisible(focuswlen)
+        self.output.setVisible(not focuswlen)
+        if focuswlen:
+            self.output_stacklay.setCurrentIndex(1)
+        else:
+            self.output_stacklay.setCurrentIndex(0)
+
+    def is_focus_on_comp_wlen(self) -> bool:
+        return self.output_stacklay.currentIndex() == 1
+
     def _update_from_compare_combo(self, value: str):
         if self._listening_changes_combobox:
             if value == CompFields.COMP_MPA:
                 self.show_compare_mpa()
             elif value == CompFields.COMP_DATE:
                 self.show_compare_dts()
+            elif value == CompFields.COMP_WLEN:
+                self.show_compare_wlen()
 
     def _update_from_difference_combo(self, value: str):
         if self._listening_changes_combobox:
@@ -610,6 +680,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.top_postcomp.setVisible(not show)
         if show:
             self.output.set_channels([])
+            self.output_wlen.clear()
+            self._focus_on_comp_wlen(False)
 
     @QtCore.Slot()
     def clear_comparison_pressed(self):
@@ -644,6 +716,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.set_show_comparison_input(True)
         if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
             self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
+        if not self.difference_by_field.currentText() == CompFields.DIFF_REL:
+            self.difference_by_field.setCurrentText(CompFields.DIFF_REL)
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
@@ -700,6 +774,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def show_compare_dts(self):
+        self._focus_on_comp_wlen(False)
         self._block_gui_loading()
         params = [
             self.output,
@@ -715,6 +790,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def show_compare_mpa(self):
+        self._focus_on_comp_wlen(False)
         self._block_gui_loading()
         params = [
             self.output,
@@ -729,19 +805,40 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             worker, self._show_comparisons_switch_finished, self.compare_error
         )
 
+    def show_compare_wlen(self):
+        self._focus_on_comp_wlen(True)
+        self._block_gui_loading()
+        params = [
+            self.output_wlen,
+            self.comps,
+            self.srf,
+            self.version,
+            self.settings_manager,
+        ]
+        worker = CallbackWorker(show_comparisons_wlen_callback, params)
+        self._start_thread(
+            worker, self._show_comparisons_wlen_finished, self.compare_error
+        )
+
     def show_perc_diff(self):
         self._block_gui_loading()
-        self.output.show_percentage()
+        focuswlen = self.is_focus_on_comp_wlen()
+        self.output.show_percentage(not focuswlen)
+        self.output_wlen.show_percentage(focuswlen)
         self._unblock_gui()
 
     def show_rel_diff(self):
         self._block_gui_loading()
-        self.output.show_relative()
+        focuswlen = self.is_focus_on_comp_wlen()
+        self.output.show_relative(not focuswlen)
+        self.output_wlen.show_relative(focuswlen)
         self._unblock_gui()
 
     def show_no_diff(self):
         self._block_gui_loading()
-        self.output.show_no_diff()
+        focuswlen = self.is_focus_on_comp_wlen()
+        self.output.show_no_diff(not focuswlen)
+        self.output_wlen.show_no_diff(focuswlen)
         self._unblock_gui()
 
     def load_lglod_comparisons(
@@ -781,6 +878,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def _load_lglod_comparisons_finished(self, data):
+        self._focus_on_comp_wlen(False)
         outp: output.ComparisonOutput = data[0]
         outp.remove_channels(data[1])
         outp.check_if_range_visible()
@@ -791,8 +889,17 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.top_postcomp.setVisible(True)
 
     def _show_comparisons_switch_finished(self, data):
+        self._focus_on_comp_wlen(False)
         outp: output.ComparisonOutput = data[0]
         outp.check_if_range_visible()
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+        self.top_postcomp.setVisible(True)
+
+    def _show_comparisons_wlen_finished(self, data):
+        self._focus_on_comp_wlen(True)
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()

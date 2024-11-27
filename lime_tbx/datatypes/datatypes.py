@@ -195,6 +195,12 @@ class SpectralResponseFunction:
     def get_channels_names(self) -> List[str]:
         return [ch.id for ch in self.channels]
 
+    def get_channels_centers(self) -> List[float]:
+        wlcs = []
+        for ch in self.channels:
+            wlcs.append(ch.center)
+        return wlcs
+
     def get_channel_from_name(self, name: str) -> SRFChannel:
         chs = [ch for ch in self.channels if ch.id == name]
         if len(chs) == 0:

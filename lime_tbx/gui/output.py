@@ -35,6 +35,8 @@ from lime_tbx.gui.canvas import (
     redraw_canvas,
     redraw_canvas_compare,
     redraw_canvas_compare_only_diffs,
+    redraw_canvas_compare_boxplot,
+    redraw_canvas_compare_boxplot_only_diffs,
 )
 from lime_tbx.gui import constants
 from lime_tbx.datatypes.constants import CompFields
@@ -169,6 +171,10 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
 
     def update_size(self):
         self._redraw()
+
+    def clear(self):
+        if self.is_built:
+            self.canvas.clear()
 
     def show_error(self, error: Exception):
         error_dialog = QtWidgets.QMessageBox(self)
@@ -468,11 +474,8 @@ class CompGraphWidget(GraphWidget):
         else:
             self._to_update_labels = True
 
-    def _redraw(self):
-        if not self.is_built:
-            return
-        self.canvas.clear()  # Clear the canvas.
-        lines = redraw_canvas_compare(
+    def _redraw_canvas_compare(self) -> list:
+        return redraw_canvas_compare(
             self.canvas,
             self.data,
             self.legend,
@@ -482,6 +485,20 @@ class CompGraphWidget(GraphWidget):
             self.subtitle,
             self.chosen_diffs,
         )
+
+    def _redraw_canvas_compare_only_diffs(self):
+        return redraw_canvas_compare_only_diffs(
+            self.canvas,
+            self.data,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+    def _redraw(self):
+        if not self.is_built:
+            return
+        self.canvas.clear()  # Clear the canvas.
+        lines = self._redraw_canvas_compare()
         try:
             self.canvas.fig.tight_layout()
             self.canvas.draw()
@@ -489,7 +506,7 @@ class CompGraphWidget(GraphWidget):
             pass
 
         xll, xlr = self.xlim_left, self.xlim_right
-        if self.data:
+        if self.data and isinstance(self.data, ComparisonData):
             xmin = self.data.observed_signal.wlens.min()
             xmax = self.data.observed_signal.wlens.max()
             xmargin = (xmax - xmin) * 0.05
@@ -512,12 +529,7 @@ class CompGraphWidget(GraphWidget):
     def change_diff_canvas(self, chosen_diffs: CompFields):
         self.chosen_diffs = chosen_diffs
         if self.is_built:
-            redraw_canvas_compare_only_diffs(
-                self.canvas,
-                self.data,
-                self.subtitle,
-                self.chosen_diffs,
-            )
+            self._redraw_canvas_compare_only_diffs()
             try:
                 self.canvas.fig.tight_layout()
                 self.canvas.draw()
@@ -555,8 +567,7 @@ class CompGraphWidget(GraphWidget):
 
     def recycle(self, title: str):
         self.title = title
-        if self.is_built:
-            self.canvas.axes.cla()
+        self.clear()
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -803,6 +814,11 @@ class ComparisonOutput(QtWidgets.QWidget):
                 self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
+        # Remove unused channels
+        for _ in range(len(channels), len(self.channels)):
+            ch = self.channels.pop(len(channels))
+            ch.setParent(None)
+            ch.deleteLater()
         # Remove range warning content
         if self.range_warning:
             self.range_warning.setText("")
@@ -848,17 +864,20 @@ for wavelengths between 350 and 2500 nm"
         for ch in self.channels:
             ch.change_diff_canvas(self.chosen_diffs)
 
-    def show_relative(self):
+    def show_relative(self, redraw=True):
         self.chosen_diffs = CompFields.DIFF_REL
-        self._redraw_new_diffs()
+        if redraw:
+            self._redraw_new_diffs()
 
-    def show_percentage(self):
+    def show_percentage(self, redraw=True):
         self.chosen_diffs = CompFields.DIFF_PERC
-        self._redraw_new_diffs()
+        if redraw:
+            self._redraw_new_diffs()
 
-    def show_no_diff(self):
+    def show_no_diff(self, redraw=True):
         self.chosen_diffs = CompFields.DIFF_NONE
-        self._redraw_new_diffs()
+        if redraw:
+            self._redraw_new_diffs()
 
     def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
         """Update the <index> plot with the given data
@@ -927,3 +946,129 @@ for wavelengths between 350 and 2500 nm"
 
     def get_channel_id(self, ch_name: str) -> int:
         return self.get_channel_names().index(ch_name)
+
+
+class CompBoxPlotGraphWidget(CompGraphWidget):
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        wlens: List[float],
+        title="",
+        xlabel="",
+        ylabel="",
+        chosen_diffs=CompFields.DIFF_REL,
+        parent=None,
+        build_layout_ini=True,
+    ):
+        self.wlens = wlens
+        super().__init__(
+            settings_manager,
+            title,
+            xlabel,
+            ylabel,
+            chosen_diffs,
+            parent,
+            build_layout_ini,
+        )
+
+    def _set_wlens(self, wlens: List[float]):
+        self.wlens = wlens
+
+    def _redraw_canvas_compare(self) -> list:
+        return redraw_canvas_compare_boxplot(
+            self.canvas,
+            self.data,
+            self.wlens,
+            self.legend,
+            self.title,
+            self.xlabel,
+            self.ylabel,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+    def _redraw_canvas_compare_only_diffs(self):
+        return redraw_canvas_compare_boxplot_only_diffs(
+            self.canvas,
+            self.data,
+            self.wlens,
+            self.legend,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+
+class ComparisonByWlenOutput(QtWidgets.QWidget):
+    def __init__(self, settings_manager: ISettingsManager):
+        super().__init__()
+        self.settings_manager = settings_manager
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.comp_w = CompBoxPlotGraphWidget(self.settings_manager, [])
+        self.main_layout.addWidget(self.comp_w)
+
+    def update_plot(
+        self, comps: List[ComparisonData], wlens: List[float], redraw: bool = True
+    ):
+        self.comp_w._set_wlens(wlens)
+        self.comp_w.update_plot(comps)
+
+    def update_labels(
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        redraw: bool = True,
+        subtitle: str = None,
+    ):
+        self.comp_w.update_labels(
+            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
+        )
+
+    def update_legends(self, legends: List[List[str]], redraw: bool = True):
+        """
+        Parameters
+        ----------
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: main data legend
+        redraw: bool
+            Boolean that defines if the plot will be redrawn automatically or not. Default True.
+        """
+        self.comp_w.update_legend(legends, redraw=redraw)
+
+    def set_interp_spectrum_name(
+        self,
+        sp_name: str,
+    ):
+        self.comp_w.set_interp_spectrum_name(sp_name)
+
+    def set_skipped_uncertainties(
+        self,
+        skip: bool,
+    ):
+        self.comp_w.set_skipped_uncertainties(skip)
+
+    def _redraw_new_diffs(self):
+        self.comp_w.change_diff_canvas(self.chosen_diffs)
+
+    def show_relative(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_REL
+        if redraw:
+            self._redraw_new_diffs()
+
+    def show_percentage(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_PERC
+        if redraw:
+            self._redraw_new_diffs()
+
+    def show_no_diff(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_NONE
+        if redraw:
+            self._redraw_new_diffs()
+
+    def clear(self):
+        self.comp_w.clear()

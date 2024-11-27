@@ -53,6 +53,8 @@ class MplCanvas(FigureCanvas):
         super(MplCanvas, self).__init__(self.fig)
         self.axes_y_2 = None
         self.axes_x2 = None
+        self.boxplot_lines_ax = []
+        self.boxplot_lines_ax2 = []
 
     def set_title(self, title: str, fontproperties: fm.FontProperties = None):
         self.axes.set_title(title, fontproperties=fontproperties)
@@ -112,13 +114,30 @@ class MplCanvas(FigureCanvas):
             lines2 = self.axes_x2.get_lines()
         return self.axes.get_lines() + lines2
 
-    def clear(self):
+    def store_ax_boxplot_lines(self, boxes: List[dict]):
+        self.boxplot_lines_ax += boxes
+
+    def store_ax2_boxplot_lines(self, boxes: List[dict]):
+        self.boxplot_lines_ax2 += boxes
+
+    def get_boxplot_lines(self) -> List[dict]:
+        return self.boxplot_lines_ax + self.boxplot_lines_ax2
+
+    def clear_twinx(self):
         if self.axes_x2 is not None:
             self.axes_x2.cla()
+            self.boxplot_lines_ax2 = []
+
+    def clear(self):
+        self.boxplot_lines_ax = []
+        self.clear_twinx()
         self.axes.cla()
 
 
 _YAXIS_NTICKS = 9
+_OBS_COLOR = "#1f77b4"
+_SIM_COLOR = "#ff7f0e"
+_DIFFS_COLOR = "#545454"
 
 
 def _redraw_canvas_compare_only_diffs(
@@ -130,15 +149,15 @@ def _redraw_canvas_compare_only_diffs(
     data_compare_info = ""
     if sdata_compare is not None:
         data_comp, ylabeltit = sdata_compare.get_diffs_and_label(chosen_diffs)
+        scanvas.clear_twinx()
         ax2 = scanvas.get_twinx()
-        ax2.clear()
         if data_comp:
             label = ylabeltit
             lines += ax2.plot(
                 data_comp.wlens,
                 data_comp.data,
                 marker="o",
-                color="#545454",
+                color=_DIFFS_COLOR,
                 label=label,
                 markersize=4,
                 ls="none",
@@ -148,7 +167,7 @@ def _redraw_canvas_compare_only_diffs(
                     data_comp.wlens,
                     data_comp.data,
                     yerr=data_comp.uncertainties * 2,
-                    color="#545454",
+                    color=_DIFFS_COLOR,
                     capsize=2,
                     ls="none",
                     alpha=0.3,
@@ -199,6 +218,194 @@ def redraw_canvas_compare_only_diffs(
     legend_lines = [l for l in scanvas.get_lines() if not l.get_label().startswith("_")]
     labels = [l.get_label() for l in legend_lines]
     scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
+
+
+def _set_boxplot_color(box: dict, color: str):
+    for item in ["boxes", "whiskers", "fliers", "medians", "caps"]:
+        plt.setp(box[item], color=color)
+    plt.setp(box["boxes"], facecolor=color)
+    plt.setp(box["fliers"], markeredgecolor=color)
+
+
+def _redraw_canvas_compare_boxplot_only_diffs(
+    scanvas: MplCanvas,
+    sdata_compare: List[ComparisonData],
+    positions: List[float],
+    width: float,
+    chosen_diffs: CompFields = CompFields.DIFF_REL,
+) -> Tuple[dict, str]:
+    lines = dict()
+    data_compare_info = ""
+    label = ""
+    if sdata_compare is not None:
+        diffs = [sd.get_diffs_and_label(chosen_diffs)[0] for sd in sdata_compare]
+
+        scanvas.clear_twinx()
+        ax2 = scanvas.get_twinx()
+        if diffs and diffs[0]:
+            label = sdata_compare[0].get_diffs_and_label(chosen_diffs)[1]
+            x = np.array([dff.data for dff in diffs], dtype=object)
+            lines = ax2.boxplot(
+                x.T,
+                notch=True,
+                patch_artist=True,
+                manage_ticks=False,
+                positions=positions,
+                widths=width,
+            )
+            lines["boxes"][0].set_label(label)
+            _set_boxplot_color(lines, _DIFFS_COLOR)
+            scanvas.store_ax2_boxplot_lines([lines])
+            ax2.set_ylabel(
+                label,
+                fontproperties=label_font_prop,
+            )
+            ax2.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(_YAXIS_NTICKS))
+
+            ylim = max(list(map(abs, ax2.get_ylim())))
+            if chosen_diffs == CompFields.DIFF_PERC:
+                ax2.set_ylim((0.0, ylim + 0.5))
+                data_compare_info = "MPD: {:.4f}%".format(
+                    np.ma.masked_invalid(
+                        [sd.mean_perc_difference for sd in sdata_compare]
+                    ).mean()
+                )
+            else:
+                ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
+                data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
+                    np.ma.masked_invalid(
+                        [sd.mean_relative_difference for sd in sdata_compare]
+                    ).mean(),
+                    np.ma.masked_invalid(
+                        [sd.standard_deviation_mrd for sd in sdata_compare]
+                    ).mean(),
+                    np.ma.masked_invalid(
+                        [sd.mean_absolute_relative_difference for sd in sdata_compare]
+                    ).mean(),
+                )
+        else:
+            ax2.set_visible(False)
+    return lines, data_compare_info
+
+
+def _calc_boxplot_width(positions: List[float]):
+    if len(positions) > 1:
+        mindiff = min([abs(p1 - p0) for p0, p1 in zip(positions[:-1], positions[1:])])
+        width = mindiff / 2
+    else:
+        width = 0.5
+    return width
+
+
+def redraw_canvas_compare_boxplot_only_diffs(
+    scanvas: MplCanvas,
+    sdata_compare: List[ComparisonData],
+    wlens: List[float],
+    slegend: List[List[str]],
+    subtitle: str = None,
+    chosen_diffs: CompFields = CompFields.DIFF_REL,
+):
+    if sdata_compare:
+        wlens = np.array([w for w, s in zip(wlens, sdata_compare) if s is not None])
+        sdata_compare = [s for s in sdata_compare if s is not None]
+    positions = np.array(wlens)
+    width = _calc_boxplot_width(positions)
+    lines, data_compare_info = _redraw_canvas_compare_boxplot_only_diffs(
+        scanvas, sdata_compare, positions, width, chosen_diffs
+    )
+    legend_lines = [l["boxes"][0] for l in scanvas.get_boxplot_lines()]
+    legend_lines = [l for l in legend_lines if not l.get_label().startswith("_")]
+    labels = [l.get_label() for l in legend_lines]
+    scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
+
+    if subtitle is None:
+        subtitle = data_compare_info
+    elif data_compare_info:
+        subtitle += f" | {data_compare_info}"
+    if subtitle != None:
+        scanvas.set_subtitle(subtitle, fontproperties=font_prop)
+
+
+def redraw_canvas_compare_boxplot(
+    scanvas: MplCanvas,
+    sdata_compare: List[ComparisonData],
+    wlens: List[float],
+    slegend: List[List[str]],
+    stitle: str,
+    sxlabel: str,
+    sylabel: str,
+    subtitle: str = None,
+    chosen_diffs: CompFields = CompFields.DIFF_REL,
+):
+    lines = []
+    if sdata_compare:
+        wlens = np.array([w for w, s in zip(wlens, sdata_compare) if s is not None])
+        sdata_compare = [s for s in sdata_compare if s is not None]
+    if sdata_compare:
+        positions = np.array(wlens)
+        width = _calc_boxplot_width(positions)
+        x = np.array([sd.observed_signal.data for sd in sdata_compare], dtype=object)
+        box = scanvas.axes.boxplot(
+            x.T,
+            notch=True,
+            patch_artist=True,
+            manage_ticks=False,
+            positions=positions - width / 20,
+            widths=width,
+        )
+        lines += [box]
+        _set_boxplot_color(box, _OBS_COLOR)
+        x = np.array([sd.simulated_signal.data for sd in sdata_compare], dtype=object)
+        box = scanvas.axes.boxplot(
+            x.T,
+            labels=wlens,
+            notch=True,
+            patch_artist=True,
+            manage_ticks=True,
+            positions=positions + width / 20,
+            widths=width,
+        )
+        lines += [box]
+        scanvas.store_ax_boxplot_lines(lines)
+        _set_boxplot_color(box, _SIM_COLOR)
+
+        if slegend and len(slegend[0]) > 1:
+            for box, legend in zip(lines, slegend[0][:2]):
+                box["boxes"][0].set_label(legend)
+
+        data_compare_info = ""
+        if chosen_diffs != CompFields.DIFF_NONE:
+            dlines, data_compare_info = _redraw_canvas_compare_boxplot_only_diffs(
+                scanvas, sdata_compare, positions, width, chosen_diffs
+            )
+            lines += [dlines]
+        if subtitle is None:
+            subtitle = data_compare_info
+        elif data_compare_info:
+            subtitle += f" | {data_compare_info}"
+        plt.setp(
+            scanvas.axes.get_xticklabels(),
+            rotation=30,
+            horizontalalignment="right",
+        )
+        scanvas.axes.yaxis.set_major_locator(
+            matplotlib.ticker.LinearLocator(_YAXIS_NTICKS)
+        )
+
+        legend_lines = [l["boxes"][0] for l in scanvas.get_boxplot_lines()]
+        legend_lines = [l for l in legend_lines if not l.get_label().startswith("_")]
+        labels = [l.get_label() for l in legend_lines]
+        scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
+        scanvas.axes.set_xlim(min(wlens) - width, max(wlens) + width)
+
+    if subtitle != None:
+        scanvas.set_subtitle(subtitle, fontproperties=font_prop)
+    if stitle:
+        scanvas.set_title(stitle, fontproperties=title_font_prop)
+    scanvas.axes.set_xlabel(sxlabel, fontproperties=label_font_prop)
+    scanvas.axes.set_ylabel(sylabel, fontproperties=label_font_prop)
+    scanvas.axes.grid()
+    return lines
 
 
 def redraw_canvas_compare(
