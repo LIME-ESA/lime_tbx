@@ -879,7 +879,13 @@ for wavelengths between 350 and 2500 nm"
         if redraw:
             self._redraw_new_diffs()
 
-    def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
+    def update_plot(
+        self,
+        index: int,
+        comparison: ComparisonData,
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
         """Update the <index> plot with the given data
 
         Parameters
@@ -890,6 +896,7 @@ for wavelengths between 350 and 2500 nm"
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
+        self.chosen_diffs = chosen_diffs
         self.channels[index].update_plot(comparison, redraw, self.chosen_diffs)
 
     def update_labels(
@@ -971,9 +978,6 @@ class CompBoxPlotGraphWidget(CompGraphWidget):
             build_layout_ini,
         )
 
-    def _set_wlens(self, wlens: List[float]):
-        self.wlens = wlens
-
     def _redraw_canvas_compare(self) -> list:
         return redraw_canvas_compare_boxplot(
             self.canvas,
@@ -1019,6 +1023,69 @@ class CompBoxPlotGraphWidget(CompGraphWidget):
             except Exception as e:
                 self.show_error(e)
 
+    def update_plot(
+        self,
+        comps: List[ComparisonData],
+        wlens: List[float],
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
+        self.wlens = wlens
+        super().update_plot(comps, redraw, chosen_diffs)
+
+
+class CompWlensGraphWidget(CompGraphWidget):
+    def update_plot(
+        self,
+        comps: List[ComparisonData],
+        wlens: List[float],
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
+        wlens = np.array([w for w, c in zip(wlens, comps) if c is not None])
+        comps = [c for c in comps if c is not None]
+        self.wlens = wlens
+        obs = SpectralData(
+            wlens,
+            np.array([np.mean(c.observed_signal.data) for c in comps]),
+            None,
+            None,
+        )
+        sim = SpectralData(
+            wlens,
+            np.array([np.mean(c.simulated_signal.data) for c in comps]),
+            None,
+            None,
+        )
+        diffs = SpectralData(
+            wlens, np.array([np.mean(c.diffs_signal.data) for c in comps]), None, None
+        )
+        mrd = np.mean(diffs.data)
+        mard = np.mean([c.mean_absolute_relative_difference for c in comps])
+        stdrd = np.mean([c.standard_deviation_mrd for c in comps])
+        ns = np.mean([c.number_samples for c in comps])
+        ampavr = np.array([np.all(c.ampa_valid_range) for c in comps])
+        perc_diffs = SpectralData(
+            wlens, np.array([np.mean(c.perc_diffs.data) for c in comps]), None, None
+        )
+        mpd = np.mean(perc_diffs.data)
+        c = ComparisonData(
+            obs,
+            sim,
+            diffs,
+            mrd,
+            mard,
+            stdrd,
+            ns,
+            None,
+            None,
+            None,
+            ampavr,
+            perc_diffs,
+            mpd,
+        )
+        super().update_plot(c, redraw, chosen_diffs)
+
 
 class ComparisonByWlenOutput(QtWidgets.QWidget):
     def __init__(self, settings_manager: ISettingsManager):
@@ -1028,14 +1095,27 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.comp_w = CompBoxPlotGraphWidget(self.settings_manager, [])
-        self.main_layout.addWidget(self.comp_w)
+        self.stackl = QtWidgets.QStackedLayout()
+        self.main_layout.addLayout(self.stackl)
+        self.comp_bp = CompBoxPlotGraphWidget(self.settings_manager, [])
+        self.comp_normal = CompWlensGraphWidget(self.settings_manager)
+        self.stackl.addWidget(self.comp_bp)
+        self.stackl.addWidget(self.comp_normal)
+        self.stackl.setCurrentIndex(0)
+
+    def _get_current_graph(self):
+        if self.stackl.currentIndex() == 0:
+            return self.comp_bp
+        return self.comp_normal
 
     def update_plot(
-        self, comps: List[ComparisonData], wlens: List[float], redraw: bool = True
+        self,
+        comps: List[ComparisonData],
+        wlens: List[float],
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
     ):
-        self.comp_w._set_wlens(wlens)
-        self.comp_w.update_plot(comps)
+        self._get_current_graph().update_plot(comps, wlens, redraw, chosen_diffs)
 
     def update_labels(
         self,
@@ -1045,7 +1125,7 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
         redraw: bool = True,
         subtitle: str = None,
     ):
-        self.comp_w.update_labels(
+        self._get_current_graph().update_labels(
             title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
         )
 
@@ -1060,22 +1140,22 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.comp_w.update_legend(legends, redraw=redraw)
+        self._get_current_graph().update_legend(legends, redraw=redraw)
 
     def set_interp_spectrum_name(
         self,
         sp_name: str,
     ):
-        self.comp_w.set_interp_spectrum_name(sp_name)
+        self._get_current_graph().set_interp_spectrum_name(sp_name)
 
     def set_skipped_uncertainties(
         self,
         skip: bool,
     ):
-        self.comp_w.set_skipped_uncertainties(skip)
+        self._get_current_graph().set_skipped_uncertainties(skip)
 
     def _redraw_new_diffs(self):
-        self.comp_w.change_diff_canvas(self.chosen_diffs)
+        self._get_current_graph().change_diff_canvas(self.chosen_diffs)
 
     def show_relative(self, redraw=True):
         self.chosen_diffs = CompFields.DIFF_REL
@@ -1093,4 +1173,11 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
             self._redraw_new_diffs()
 
     def clear(self):
-        self.comp_w.clear()
+        self.comp_bp.clear()
+        self.comp_normal.clear()
+
+    def set_kind(self, boxplot: bool):
+        if boxplot:
+            self.stackl.setCurrentIndex(0)
+        else:
+            self.stackl.setCurrentIndex(1)

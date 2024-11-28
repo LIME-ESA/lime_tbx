@@ -285,9 +285,10 @@ def show_comparisons_wlen_callback(
     srf: SpectralResponseFunction,
     version: str,
     settings_manager: ISettingsManager,
+    chosen_diffs: CompFields,
 ) -> Tuple[output.ComparisonOutput, List[str]]:
     comps = [c if c.observed_signal is not None else None for c in comps]
-    output.update_plot(comps, srf.get_channels_centers(), False)
+    output.update_plot(comps, srf.get_channels_centers(), False, chosen_diffs)
     statscomps = [c for c in comps if c is not None]
     n_comp_points = np.mean([len(c.diffs_signal.wlens) for c in statscomps])
     data_start = min([min(c.dts) for c in statscomps])
@@ -333,9 +334,16 @@ def show_comparisons_callback(
     srf: SpectralResponseFunction,
     version: str,
     settings_manager: ISettingsManager,
+    chosen_diffs: CompFields,
 ) -> Tuple[output.ComparisonOutput, List[str]]:
     to_remove = _show_comps_output(
-        output, comps, xlabel, srf, version, settings_manager
+        output,
+        comps,
+        xlabel,
+        srf,
+        version,
+        settings_manager,
+        chosen_diffs,
     )
     return output, to_remove
 
@@ -354,13 +362,14 @@ def _show_comps_output(
     srf: SpectralResponseFunction,
     version: str,
     settings_manager: ISettingsManager,
+    chosen_diffs: CompFields,
 ) -> List[str]:
     to_remove = []
     ch_names = srf.get_channels_names()
     for i, ch in enumerate(ch_names):
         if len(comps[i].dts) > 0:
             ch_id = output.get_channel_id(ch)
-            output.update_plot(ch_id, comps[i], False)
+            output.update_plot(ch_id, comps[i], False, chosen_diffs)
             n_comp_points = len(comps[i].diffs_signal.wlens)
             data_start = min(comps[i].dts)
             data_end = max(comps[i].dts)
@@ -431,6 +440,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.workers = []
         self.worker_ths = []
         self._listening_changes_combobox = True
+        self.chosen_diffs = CompFields.DIFF_REL
         self._build_layout()
 
     def _build_layout(self):
@@ -472,6 +482,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
                 CompFields.COMP_DATE,
                 CompFields.COMP_MPA,
                 CompFields.COMP_WLEN,
+                CompFields.COMP_WLEN_MEAN,
             ]
         )
         self.compare_by_field.currentTextChanged.connect(
@@ -547,9 +558,13 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             elif value == CompFields.COMP_DATE:
                 self.show_compare_dts()
             elif value == CompFields.COMP_WLEN:
-                self.show_compare_wlen()
+                self.show_compare_wlen_boxplot()
+            elif value == CompFields.COMP_WLEN_MEAN:
+                self.show_compare_wlen_mean()
 
     def _update_from_difference_combo(self, value: str):
+        if value in [CompFields.DIFF_NONE, CompFields.DIFF_PERC, CompFields.DIFF_REL]:
+            self.chosen_diffs = value
         if self._listening_changes_combobox:
             if value == CompFields.DIFF_PERC:
                 self.show_perc_diff()
@@ -763,6 +778,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.srf,
             self.version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         ch_names = srf.get_channels_names()
@@ -782,6 +798,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.srf,
             self.version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
@@ -798,26 +815,35 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.srf,
             self.version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
             worker, self._show_comparisons_switch_finished, self.compare_error
         )
 
-    def show_compare_wlen(self):
+    def _show_compare_wlen(self, boxplot: bool):
         self._focus_on_comp_wlen(True)
         self._block_gui_loading()
+        self.output_wlen.set_kind(boxplot)
         params = [
             self.output_wlen,
             self.comps,
             self.srf,
             self.version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         worker = CallbackWorker(show_comparisons_wlen_callback, params)
         self._start_thread(
             worker, self._show_comparisons_wlen_finished, self.compare_error
         )
+
+    def show_compare_wlen_boxplot(self):
+        self._show_compare_wlen(True)
+
+    def show_compare_wlen_mean(self):
+        self._show_compare_wlen(False)
 
     def show_perc_diff(self):
         self._block_gui_loading()
@@ -866,6 +892,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.srf,
             version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         # This section blocks the spinning loading widget.
