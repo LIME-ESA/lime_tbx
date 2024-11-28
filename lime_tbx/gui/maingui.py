@@ -310,10 +310,9 @@ def show_comparisons_wlen_callback(
         data_end.strftime(_subtitle_date_format),
         n_comp_points,
     )
-    ylabel = "Wavelength (nm)"
     output.update_labels(
         "All channels",
-        ylabel,
+        "Wavelength (nm)",
         "Irradiance (Wm⁻²nm⁻¹)",
         subtitle=subtitle,
         redraw=False,

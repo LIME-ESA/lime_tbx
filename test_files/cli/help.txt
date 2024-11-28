@@ -20,10 +20,16 @@ Options:
 			   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv
 			   LGLOD (netcdf): -o nc,output_lglod.nc
 			 If it's a comparison:
-			   GRAPH: -o graph,(pdf|jpg|png|svg),(DT|MPA|BOTH),(rel|perc),comparison_channel1,comparison_channel2,...
-			   CSV: -o csv,(DT|MPA|BOTH),(rel|perc),comparison_channel1.csv,comparison_channel2.csv,...
-			   GRAPH directory: -o graphd,(pdf|jpg|png|svg),(DT|MPA|BOTH),(rel|perc),comparison_folder
-			   CSV directory: -o csvd,(DT|MPA|BOTH),(rel|perc),comparison_folder
+			   GRAPH: -o graph,(pdf|jpg|png|svg),(DT|MPA|BOTH|CHANNEL),(rel|perc|none),output
+				 output:
+					 Compare not by channel: comparison_channel1,comparison_channel2,...
+					 Compare by channel: comparison
+			   CSV: -o csv,(DT|MPA|BOTH|CHANNEL),(rel|perc|none),output
+				 output:
+					 Compare not by channel: comparison_channel1.csv,comparison_channel2.csv,...
+					 Compare by channel: comparison.csv
+			   GRAPH directory: -o graphd,(pdf|jpg|png|svg),(DT|MPA|BOTH|CHANNEL),(rel|perc|none),comparison_folder
+			   CSV directory: -o csvd,(DT|MPA|BOTH|CHANNEL),(rel|perc|none),comparison_folder
 			   LGLOD (netcdf): -o nc,output_lglod.nc
   -f, --srf		 Select the file that contains the Spectral Response Function in GLOD format.
   -t, --timeseries	 Select a CSV file with multiple datetimes instead of inputing directly only one datetime. Valid only if the main option is -e or -s.

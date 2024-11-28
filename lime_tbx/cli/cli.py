@@ -11,7 +11,7 @@ import sys
 import json
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -95,13 +95,14 @@ class ExportGraph(ExportData):
     o_file_polar: str
 
 
-COMP_KEYS = ["DT", "MPA", "BOTH"]
+COMP_KEYS = ["DT", "MPA", "BOTH", "CHANNEL"]
 
 
 class ComparisonKey(Enum):
     DT = 0
     MPA = 1
     BOTH = 2
+    CHANNEL = 3
 
 
 class ExportComparison(ABC):
@@ -180,12 +181,18 @@ selen_sun_lon,moon_phase_angle"
     print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv")
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print("\t\t\t If it's a comparison:")
+    print(f"\t\t\t   GRAPH: -o graph,{imsel},{compsel},{compdiffsel},output")
+    print(f"\t\t\t\t output:")
     print(
-        f"\t\t\t   GRAPH: -o graph,{imsel},{compsel},{compdiffsel},comparison_channel1,comparison_channel2,..."
+        f"\t\t\t\t\t Compare not by channel: comparison_channel1,comparison_channel2,..."
     )
+    print(f"\t\t\t\t\t Compare by channel: comparison")
+    print(f"\t\t\t   CSV: -o csv,{compsel},{compdiffsel},output")
+    print(f"\t\t\t\t output:")
     print(
-        f"\t\t\t   CSV: -o csv,{compsel},{compdiffsel},comparison_channel1.csv,comparison_channel2.csv,..."
+        f"\t\t\t\t\t Compare not by channel: comparison_channel1.csv,comparison_channel2.csv,..."
     )
+    print(f"\t\t\t\t\t Compare by channel: comparison.csv")
     print(
         f"\t\t\t   GRAPH directory: -o graphd,{imsel},{compsel},{compdiffsel},comparison_folder"
     )
@@ -486,7 +493,7 @@ class CLI:
                 )
             )
             sys.exit(1)
-        canv.axes.cla()  # Clear the canvas.
+        canv.clear()  # Clear the canvas.
 
     def _export_comparison_graph(
         self,
@@ -547,6 +554,66 @@ class CLI:
             )
             sys.exit(1)
         canv.axes.cla()  # Clear the canvas.
+
+    def _export_comparison_bywlen_graph(
+        self,
+        data: List[ComparisonData],
+        wlcs: List[float],
+        xlabel: str,
+        ylabel: str,
+        output_file: str,
+        version: str,
+        chosen_diffs: CompFields,
+    ):
+        from lime_tbx.gui import canvas
+
+        canv = canvas.MplCanvas(width=15, height=10, dpi=200)
+        canv.set_title("", fontproperties=canvas.title_font_prop)
+        canv.axes.tick_params(labelsize=8)
+        version = self.settings_manager.get_lime_coef().version
+        comps = [c if c.observed_signal is not None else None for c in data]
+        statscomps = [c for c in comps if c is not None]
+        n_comp_points = np.mean([len(c.diffs_signal.wlens) for c in statscomps])
+        data_start = min([min(c.dts) for c in statscomps])
+        data_end = max([max(c.dts) for c in statscomps])
+        warning_out_mpa_range = ""
+        if False in [not np.all(c.ampa_valid_range) for c in statscomps]:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        sp_name = self.settings_manager.get_selected_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
+        subtitle = (
+            "{}\nData start: {} | Data end: {}\nMean number of points: {}".format(
+                subtitle,
+                data_start.strftime(_subtitle_date_format),
+                data_end.strftime(_subtitle_date_format),
+                n_comp_points,
+            )
+        )
+        canvas.redraw_canvas_compare_boxplot(
+            canv,
+            data,
+            wlcs,
+            [
+                ["Observed Irradiance", "Simulated Irradiance"],
+            ],
+            "All channels",
+            xlabel,
+            ylabel,
+            subtitle,
+            chosen_diffs,
+        )
+        try:
+            canv.print_figure(output_file)
+        except Exception as e:
+            eprint(
+                "Something went wrong while exporting comparison graph. {}".format(
+                    str(e)
+                )
+            )
+            sys.exit(1)
+        canv.clear()  # Clear the canvas.
 
     def _export(self, point: Point, ed: ExportData):
         if isinstance(ed, ExportCSV):
@@ -672,7 +739,7 @@ class CLI:
             file_index = 0
             is_both = ed.comparison_key == ComparisonKey.BOTH
             sp_name = self.settings_manager.get_selected_spectrum_name()
-            if ed.comparison_key != ComparisonKey.MPA:
+            if ed.comparison_key in (ComparisonKey.DT, ComparisonKey.BOTH):
                 for i, ch in enumerate(ch_names):
                     if len(comps[i].dts) > 0:
                         ylabel = "Irradiance (Wm⁻²nm⁻¹)"
@@ -720,7 +787,7 @@ class CLI:
                             )
                         file_index += 1
             file_index = 0
-            if ed.comparison_key != ComparisonKey.DT:
+            if ed.comparison_key in (ComparisonKey.MPA, ComparisonKey.BOTH):
                 mpa_comps = co.sort_by_mpa(comps)
                 for i, ch in enumerate(ch_names):
                     if len(mpa_comps[i].dts) > 0:
@@ -768,6 +835,46 @@ class CLI:
                                 ed.chosen_diff,
                             )
                         file_index += 1
+            if ed.comparison_key == ComparisonKey.CHANNEL:
+                wlcs = self.srf.get_channels_centers()
+                xlabel = "Wavelength (nm)"
+                ylabel = "Irradiance (Wm⁻²nm⁻¹)"
+                ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
+                output = ""
+                if isinstance(ed, ExportComparisonCSV) or isinstance(
+                    ed, ExportComparisonGraph
+                ):
+                    output = ed.output_files[0]
+                elif isinstance(ed, ExportComparisonCSVDir):
+                    output = "{}.csv".format(os.path.join(ed.output_dir, "allchannels"))
+                elif isinstance(ed, ExportComparisonGraphDir):
+                    output = "{}.{}".format(
+                        os.path.join(ed.output_dir, "allchannels"), ed.extension
+                    )
+                    if isinstance(ed, ExportComparisonCSV) or isinstance(
+                        ed, ExportComparisonCSVDir
+                    ):
+                        csv.export_csv_comparison_bywlen(
+                            comps,
+                            wlcs,
+                            xlabel,
+                            ylabels,
+                            output,
+                            version,
+                            sp_name,
+                            skip_uncs,
+                            ed.chosen_diff,
+                        )
+                    else:
+                        self._export_comparison_bywlen_graph(
+                            comps,
+                            wlcs,
+                            xlabel,
+                            ylabel,
+                            output,
+                            version,
+                            ed.chosen_diff,
+                        )
 
     def update_coefficients(self) -> int:
         updater: IUpdate = self.updater
