@@ -1,7 +1,7 @@
 """Module in charge of defining the matplotlib canvas"""
 
 """___Built-In Modules___"""
-from typing import Union, List, Tuple
+from typing import Union, List, Tuple, Dict
 import os
 from datetime import datetime
 
@@ -220,11 +220,42 @@ def redraw_canvas_compare_only_diffs(
     scanvas.axes.legend(legend_lines, labels, loc=0, prop=font_prop)
 
 
-def _set_boxplot_color(box: dict, color: str):
+def _set_boxplot_color(box: Dict[str, List[Line2D]], color: str, meancolor: str = None):
     for item in ["boxes", "whiskers", "fliers", "medians", "caps"]:
         plt.setp(box[item], color=color)
+    if meancolor:
+        plt.setp(
+            box["means"],
+            color=meancolor,
+            markerfacecolor=meancolor,
+            markeredgecolor=meancolor,
+        )
     plt.setp(box["boxes"], facecolor=color)
     plt.setp(box["fliers"], markeredgecolor=color)
+
+
+def _draw_boxplot(
+    axes: Axes,
+    x,
+    wlens,
+    positions,
+    width,
+    manage_ticks: bool,
+):
+    labels = None
+    if manage_ticks:
+        labels = wlens
+    box = axes.boxplot(
+        x,
+        notch=True,
+        labels=labels,
+        patch_artist=True,
+        manage_ticks=manage_ticks,
+        positions=positions,
+        widths=width,
+        showmeans=True,
+    )
+    return box
 
 
 def _redraw_canvas_compare_boxplot_only_diffs(
@@ -245,14 +276,7 @@ def _redraw_canvas_compare_boxplot_only_diffs(
         if diffs and diffs[0]:
             label = sdata_compare[0].get_diffs_and_label(chosen_diffs)[1]
             x = np.array([dff.data for dff in diffs], dtype=object)
-            lines = ax2.boxplot(
-                x.T,
-                notch=True,
-                patch_artist=True,
-                manage_ticks=False,
-                positions=positions,
-                widths=width,
-            )
+            lines = _draw_boxplot(ax2, x.T, None, positions, width, False)
             lines["boxes"][0].set_label(label)
             _set_boxplot_color(lines, _DIFFS_COLOR)
             scanvas.store_ax2_boxplot_lines([lines])
@@ -345,29 +369,18 @@ def redraw_canvas_compare_boxplot(
         positions = np.array(wlens)
         width = _calc_boxplot_width(positions)
         x = np.array([sd.observed_signal.data for sd in sdata_compare], dtype=object)
-        box = scanvas.axes.boxplot(
-            x.T,
-            notch=True,
-            patch_artist=True,
-            manage_ticks=False,
-            positions=positions - width / 20,
-            widths=width,
+        box = _draw_boxplot(
+            scanvas.axes, x.T, wlens, positions - width / 20, width, False
         )
         lines += [box]
-        _set_boxplot_color(box, _OBS_COLOR)
+        _set_boxplot_color(box, _OBS_COLOR, "cyan")
         x = np.array([sd.simulated_signal.data for sd in sdata_compare], dtype=object)
-        box = scanvas.axes.boxplot(
-            x.T,
-            labels=wlens,
-            notch=True,
-            patch_artist=True,
-            manage_ticks=True,
-            positions=positions + width / 20,
-            widths=width,
+        box = _draw_boxplot(
+            scanvas.axes, x.T, wlens, positions + width / 20, width, True
         )
         lines += [box]
         scanvas.store_ax_boxplot_lines(lines)
-        _set_boxplot_color(box, _SIM_COLOR)
+        _set_boxplot_color(box, _SIM_COLOR, "red")
 
         if slegend and len(slegend[0]) > 1:
             for box, legend in zip(lines, slegend[0][:2]):

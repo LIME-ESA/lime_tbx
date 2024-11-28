@@ -997,6 +997,28 @@ class CompBoxPlotGraphWidget(CompGraphWidget):
             self.chosen_diffs,
         )
 
+    @QtCore.Slot()
+    def export_csv(self):
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export CSV", "{}.csv".format(self.title)
+        )[0]
+        version = self.settings_manager.get_coef_version_name()
+        if name is not None and name != "":
+            try:
+                csv.export_csv_comparison_bywlen(
+                    self.data,
+                    self.wlens,
+                    self.xlabel,
+                    self.legend[0],
+                    name,
+                    version,
+                    self.interp_spectrum_name,
+                    self.skip_uncs,
+                    self.chosen_diffs,
+                )
+            except Exception as e:
+                self.show_error(e)
+
 
 class ComparisonByWlenOutput(QtWidgets.QWidget):
     def __init__(self, settings_manager: ISettingsManager):

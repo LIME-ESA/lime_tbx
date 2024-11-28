@@ -312,7 +312,7 @@ def show_comparisons_wlen_callback(
     )
     ylabel = "Wavelength (nm)"
     output.update_labels(
-        "",
+        "All channels",
         ylabel,
         "Irradiance (Wm⁻²nm⁻¹)",
         subtitle=subtitle,

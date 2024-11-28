@@ -16,6 +16,7 @@ import os
 
 """___Third-Party Modules___"""
 import numpy as np
+import pandas as pd
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -273,7 +274,7 @@ def export_csv_comparison(
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             writer.writerow(
                 [
-                    "MRA (Mean Relative Difference %)",
+                    "MRD (Mean Relative Difference %)",
                     data.mean_relative_difference,
                 ]
             )
@@ -364,6 +365,71 @@ def export_csv_comparison(
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
+
+
+def export_csv_comparison_bywlen(
+    data: List[ComparisonData],
+    wlens: List[float],
+    xlabel: str,
+    ylabels: List[str],
+    name: str,
+    coeff_version: str,
+    interp_spectrum_name: str,
+    skip_uncs: bool,
+    chosen_diffs: CompFields,
+):
+    wlens = [w for w, d in zip(wlens, data) if d is not None]
+    data = [d for d in data if d is not None]
+    if data:
+        try:
+            with open(name, "w", newline="", encoding="utf-8") as file:
+                writer = csv.writer(file)
+                mpd = np.ma.masked_invalid(
+                    [sd.mean_perc_difference for sd in data]
+                ).mean()
+                mrd = np.ma.masked_invalid(
+                    [sd.mean_relative_difference for sd in data]
+                ).mean()
+                stdrd = np.ma.masked_invalid(
+                    [sd.standard_deviation_mrd for sd in data]
+                ).mean()
+                mard = np.ma.masked_invalid(
+                    [sd.mean_absolute_relative_difference for sd in data]
+                ).mean()
+                writer.writerow(["LIME coefficients version", coeff_version])
+                writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+                writer.writerow(["MRD (Mean Relative Difference %)", mrd])
+                writer.writerow(
+                    ["STD-RD (Standard deviation of Relative Difference %)", stdrd]
+                )
+                writer.writerow(
+                    ["MARD (Mean of the Absolutes of the Relative Differences %)", mard]
+                )
+                writer.writerow(["MPD (Mean Percentage Difference %)", mpd])
+                if False in [not np.all(d.ampa_valid_range) for d in data]:
+                    writer.writerow(["**", _WARN_OUT_MPA_RANGE])
+            # Now with pandas the rest
+            _, diff_name = data[0].get_diffs_and_label(chosen_diffs)
+            diff_name = [diff_name] if diff_name is not None else []
+            arr_names = ylabels + diff_name
+            stat_names = ["Q1", "Median", "Q3", "Mean"]
+            stat_names = [f"{arn} {st}" for arn in arr_names for st in stat_names]
+            vals = []
+            for d, w in zip(data, wlens):
+                diff_arr, _ = d.get_diffs_and_label(chosen_diffs)
+                diff_arr = [diff_arr.data] if diff_arr is not None else []
+                arrs = [d.observed_signal.data, d.simulated_signal.data] + diff_arr
+                qs = np.quantile(arrs, [0.25, 0.5, 0.75], axis=1)
+                m = np.mean(arrs, axis=1)
+                vals.append(
+                    np.concatenate([[w], np.concatenate([qs, [m]]).T.flatten()])
+                )
+            columns = [xlabel] + stat_names
+            df = pd.DataFrame(vals, columns=columns)
+            df.set_index(xlabel).to_csv(name, mode="a")
+        except Exception as e:
+            logger.get_logger().exception(e)
+            raise Exception(_EXPORT_ERROR_STR)
 
 
 def export_csv_integrated_irradiance(
