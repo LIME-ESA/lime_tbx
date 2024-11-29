@@ -40,6 +40,7 @@ from lime_tbx.gui.canvas import (
 )
 from lime_tbx.gui import constants
 from lime_tbx.datatypes.constants import CompFields
+from lime_tbx.simulation.comparison.utils import average_comparisons
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -1045,45 +1046,7 @@ class CompWlensGraphWidget(CompGraphWidget):
         wlens = np.array([w for w, c in zip(wlens, comps) if c is not None])
         comps = [c for c in comps if c is not None]
         self.wlens = wlens
-        obs = SpectralData(
-            wlens,
-            np.array([np.mean(c.observed_signal.data) for c in comps]),
-            None,
-            None,
-        )
-        sim = SpectralData(
-            wlens,
-            np.array([np.mean(c.simulated_signal.data) for c in comps]),
-            None,
-            None,
-        )
-        diffs = SpectralData(
-            wlens, np.array([np.mean(c.diffs_signal.data) for c in comps]), None, None
-        )
-        mrd = np.mean(diffs.data)
-        mard = np.mean([c.mean_absolute_relative_difference for c in comps])
-        stdrd = np.mean([c.standard_deviation_mrd for c in comps])
-        ns = np.mean([c.number_samples for c in comps])
-        ampavr = np.array([np.all(c.ampa_valid_range) for c in comps])
-        perc_diffs = SpectralData(
-            wlens, np.array([np.mean(c.perc_diffs.data) for c in comps]), None, None
-        )
-        mpd = np.mean(perc_diffs.data)
-        c = ComparisonData(
-            obs,
-            sim,
-            diffs,
-            mrd,
-            mard,
-            stdrd,
-            ns,
-            None,
-            None,
-            None,
-            ampavr,
-            perc_diffs,
-            mpd,
-        )
+        c = average_comparisons(wlens, comps)
         super().update_plot(c, redraw, chosen_diffs)
 
 

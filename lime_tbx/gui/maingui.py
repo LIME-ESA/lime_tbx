@@ -29,6 +29,7 @@ from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import moon, srf as srf_loader
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
+from lime_tbx.simulation.comparison.utils import sort_by_mpa
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from lime_tbx.eocfi_adapter import eocfi_adapter
 from lime_tbx.interpolation.interp_data import interp_data
@@ -261,7 +262,7 @@ def compare_callback(
     comparisons = co.get_simulations(
         mos, srf, cimel_coef, lime_simulation, callback_obs
     )
-    mpa_comp = co.sort_by_mpa(comparisons)
+    mpa_comp = sort_by_mpa(comparisons)
     return comparisons, mpa_comp, mos, srf
 
 
@@ -1509,13 +1510,12 @@ def check_srf_comparison_callback(
 
 def obtain_sorted_mpa_callback(
     lglod: LGLODComparisonData,
-    kernels_path: KernelsPath,
     srf,
 ):
     comps = lglod.comparisons
     data_source = lglod.sat_name
     skipped_uncs = lglod.skipped_uncs
-    mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
+    mpa_comps = sort_by_mpa(comps)
     return comps, mpa_comps, srf, data_source, skipped_uncs, lglod.version
 
 
@@ -1639,7 +1639,6 @@ class LimeTBXWidget(QtWidgets.QWidget):
             obtain_sorted_mpa_callback,
             [
                 lglod,
-                self.kernels_path,
                 srf,
             ],
         )

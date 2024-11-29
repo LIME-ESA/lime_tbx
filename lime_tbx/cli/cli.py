@@ -23,7 +23,6 @@ from lime_tbx.datatypes.datatypes import (
     LunarObservation,
     Point,
     SatellitePoint,
-    SpectralData,
     SurfacePoint,
     MoonData,
 )
@@ -32,6 +31,7 @@ from lime_tbx.datatypes.constants import CompFields
 from lime_tbx.gui import settings, constants as gui_constants
 from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
+from lime_tbx.simulation.comparison.utils import sort_by_mpa, average_comparisons
 from lime_tbx.filedata import moon, srf as srflib, csv
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.coefficients.update.update import IUpdate, Update
@@ -95,7 +95,7 @@ class ExportGraph(ExportData):
     o_file_polar: str
 
 
-COMP_KEYS = ["DT", "MPA", "BOTH", "CHANNEL"]
+COMP_KEYS = ["DT", "MPA", "BOTH", "CHANNEL", "CHANNEL_MEAN"]
 
 
 class ComparisonKey(Enum):
@@ -103,6 +103,7 @@ class ComparisonKey(Enum):
     MPA = 1
     BOTH = 2
     CHANNEL = 3
+    CHANNEL_MEAN = 4
 
 
 class ExportComparison(ABC):
@@ -502,7 +503,7 @@ class CLI:
         ylabel: str,
         output_file: str,
         version: str,
-        ch: str,
+        title: str,
         chosen_diffs: CompFields,
     ):
         from lime_tbx.gui import canvas
@@ -538,7 +539,7 @@ class CLI:
                 ["Observed Irradiance", "Simulated Irradiance"],
                 ["Relative Differences", "Percentage Differences"],
             ],
-            ch,
+            title,
             xlabel,
             ylabel,
             subtitle,
@@ -788,7 +789,7 @@ class CLI:
                         file_index += 1
             file_index = 0
             if ed.comparison_key in (ComparisonKey.MPA, ComparisonKey.BOTH):
-                mpa_comps = co.sort_by_mpa(comps)
+                mpa_comps = sort_by_mpa(comps)
                 for i, ch in enumerate(ch_names):
                     if len(mpa_comps[i].dts) > 0:
                         ylabel = "Irradiance (Wm⁻²nm⁻¹)"
@@ -835,8 +836,11 @@ class CLI:
                                 ed.chosen_diff,
                             )
                         file_index += 1
-            if ed.comparison_key == ComparisonKey.CHANNEL:
+            if ed.comparison_key in (ComparisonKey.CHANNEL, ComparisonKey.CHANNEL_MEAN):
                 wlcs = self.srf.get_channels_centers()
+                comps = [c if c.observed_signal is not None else None for c in comps]
+                wlcs = np.array([w for w, c in zip(wlcs, comps) if c is not None])
+                comps = [c for c in comps if c is not None]
                 xlabel = "Wavelength (nm)"
                 ylabel = "Irradiance (Wm⁻²nm⁻¹)"
                 ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
@@ -851,30 +855,56 @@ class CLI:
                     output = "{}.{}".format(
                         os.path.join(ed.output_dir, "allchannels"), ed.extension
                     )
-                    if isinstance(ed, ExportComparisonCSV) or isinstance(
-                        ed, ExportComparisonCSVDir
-                    ):
-                        csv.export_csv_comparison_bywlen(
-                            comps,
-                            wlcs,
-                            xlabel,
-                            ylabels,
-                            output,
-                            version,
-                            sp_name,
-                            skip_uncs,
-                            ed.chosen_diff,
-                        )
+                    if ed.comparison_key == ComparisonKey.CHANNEL:
+                        if isinstance(ed, ExportComparisonCSV) or isinstance(
+                            ed, ExportComparisonCSVDir
+                        ):
+                            csv.export_csv_comparison_bywlen(
+                                comps,
+                                wlcs,
+                                xlabel,
+                                ylabels,
+                                output,
+                                version,
+                                sp_name,
+                                skip_uncs,
+                                ed.chosen_diff,
+                            )
+                        else:
+                            self._export_comparison_bywlen_graph(
+                                comps,
+                                wlcs,
+                                xlabel,
+                                ylabel,
+                                output,
+                                version,
+                                ed.chosen_diff,
+                            )
                     else:
-                        self._export_comparison_bywlen_graph(
-                            comps,
-                            wlcs,
-                            xlabel,
-                            ylabel,
-                            output,
-                            version,
-                            ed.chosen_diff,
-                        )
+                        comp = average_comparisons(wlcs, comps)
+                        if isinstance(ed, ExportComparisonCSV) or isinstance(
+                            ed, ExportComparisonCSVDir
+                        ):
+                            csv.export_csv_comparison(
+                                comp,
+                                xlabel,
+                                ylabels,
+                                output,
+                                version,
+                                sp_name,
+                                skip_uncs,
+                                ed.chosen_diff,
+                            )
+                        else:
+                            self._export_comparison_graph(
+                                comp,
+                                xlabel,
+                                ylabel,
+                                output,
+                                version,
+                                "All channels",
+                                ed.chosen_diff,
+                            )
 
     def update_coefficients(self) -> int:
         updater: IUpdate = self.updater

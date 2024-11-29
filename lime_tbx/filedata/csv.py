@@ -281,7 +281,7 @@ def export_csv_comparison(
             writer.writerow(
                 [
                     "STD-RD (Standard deviation of Relative Difference %)",
-                    data.mean_relative_difference,
+                    data.standard_deviation_mrd,
                 ]
             )
             writer.writerow(
@@ -298,18 +298,21 @@ def export_csv_comparison(
             )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            is_surface = isinstance(data.points[0], SurfacePoint)
-            if is_surface:
-                header_coords = ["latitude", "longitude", "altitude(m)"]
-            else:  # CustomPoint
-                header_coords = [
-                    "moon phase angle (deg)",
-                    "selenographic latitude (deg)",
-                    "selenographic longitude (deg)",
-                    "solar selenographic longitude (rad)",
-                    "distance sun moon (AU)",
-                    "distance observer moon (km)",
-                ]
+            if data.points:  # When exporting by wavelength using means, points are None
+                is_surface = isinstance(data.points[0], SurfacePoint)
+                if is_surface:
+                    header_coords = ["latitude", "longitude", "altitude(m)"]
+                else:  # CustomPoint
+                    header_coords = [
+                        "moon phase angle (deg)",
+                        "selenographic latitude (deg)",
+                        "selenographic longitude (deg)",
+                        "solar selenographic longitude (rad)",
+                        "distance sun moon (AU)",
+                        "distance observer moon (km)",
+                    ]
+            else:
+                header_coords = []
             diffdata, difflabel = data.get_diffs_and_label(chosen_diffs)
             header = [xlabel] + header_coords + [ylabels[0], ylabels[1]]
             if difflabel:
@@ -326,32 +329,33 @@ def export_csv_comparison(
             if isinstance(xdata[0], datetime):
                 xdata = [x.isoformat(sep=" ", timespec="milliseconds") for x in xdata]
             for i, x_val in enumerate(xdata):
-                pt = data.points[i]
                 warn_out_mpa_range = ""
                 if not ampa_valid_range[i]:
                     warn_out_mpa_range = " **"
                 x_val = f"{x_val}{warn_out_mpa_range}"
-                if is_surface:
-                    datarow = [
-                        x_val,
-                        pt.latitude,
-                        pt.longitude,
-                        pt.altitude,
-                        data.observed_signal.data[i],
-                        data.simulated_signal.data[i],
-                    ]
-                else:
-                    datarow = [
-                        x_val,
-                        pt.moon_phase_angle,
-                        pt.selen_obs_lat,
-                        pt.selen_obs_lon,
-                        pt.selen_sun_lon,
-                        pt.distance_sun_moon,
-                        pt.distance_observer_moon,
-                        data.observed_signal.data[i],
-                        data.simulated_signal.data[i],
-                    ]
+                pt_datarow = []
+                if data.points:
+                    pt = data.points[i]
+                    if is_surface:
+                        pt_datarow = [
+                            pt.latitude,
+                            pt.longitude,
+                            pt.altitude,
+                        ]
+                    else:
+                        pt_datarow = [
+                            pt.moon_phase_angle,
+                            pt.selen_obs_lat,
+                            pt.selen_obs_lon,
+                            pt.selen_sun_lon,
+                            pt.distance_sun_moon,
+                            pt.distance_observer_moon,
+                        ]
+                datarow = (
+                    [x_val]
+                    + pt_datarow
+                    + [data.observed_signal.data[i], data.simulated_signal.data[i]]
+                )
                 if diffdata:
                     datarow.append(diffdata.data[i])
                 if not skip_uncs:
