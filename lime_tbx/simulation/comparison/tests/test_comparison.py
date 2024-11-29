@@ -8,6 +8,7 @@ from typing import Tuple
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
+import pytest
 
 """___LIME_TBX Modules___"""
 from .. import comparison
@@ -142,6 +143,7 @@ class TestComparison(unittest.TestCase):
         self.assertAlmostEqual(z, 5138362, delta=4)
 
     # Function get_simulations
+    @pytest.mark.slow
     def test_get_simulations_ok(self):
         co = get_comparison()
         lime = get_lime_simulation()
@@ -159,6 +161,7 @@ class TestComparison(unittest.TestCase):
             comp.simulated_signal.uncertainties[0], 1.5069602623384797e-08
         )
 
+    @pytest.mark.slow
     def test_get_simulations_multiple_obs_and_channels(self):
         co = get_comparison()
         lime = get_lime_simulation()
@@ -188,6 +191,7 @@ class TestComparison(unittest.TestCase):
             np.array([2.290940e-08, 2.594562e-08]),
         )
 
+    @pytest.mark.slow
     def test_get_simulations_other_srf(self):
         # Wrong srf in comparisons output empty comparison data instances.
         co = get_comparison()
