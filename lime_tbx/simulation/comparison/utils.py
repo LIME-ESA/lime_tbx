@@ -131,9 +131,11 @@ def average_comparisons(
         np.array([np.mean(c.diffs_signal.uncertainties) for c in comps]),
         None,
     )
-    mrd = np.mean(diffs.data)
-    mard = np.mean([c.mean_absolute_relative_difference for c in comps])
-    stdrd = np.mean([c.standard_deviation_mrd for c in comps])
+    mrd = np.ma.masked_invalid(diffs.data).mean()
+    mard = np.ma.masked_invalid(
+        [c.mean_absolute_relative_difference for c in comps]
+    ).mean()
+    stdrd = np.ma.masked_invalid([c.standard_deviation_mrd for c in comps]).mean()
     ns = np.mean([c.number_samples for c in comps])
     ampavr = np.array([np.all(c.ampa_valid_range) for c in comps])
     perc_diffs = SpectralData(
@@ -142,7 +144,7 @@ def average_comparisons(
         np.array([np.mean(c.perc_diffs.uncertainties) for c in comps]),
         None,
     )
-    mpd = np.mean(perc_diffs.data)
+    mpd = np.ma.masked_invalid(perc_diffs.data).mean()
     c = ComparisonData(
         obs,
         sim,
