@@ -20,9 +20,11 @@ from ...datatypes.datatypes import (
     SurfacePoint,
     ComparisonData,
 )
+from ...datatypes.constants import CompFields
 from ..csv import (
     export_csv_simulation,
     export_csv_comparison,
+    export_csv_comparison_bywlen,
     export_csv_integrated_irradiance,
     export_csv_srf,
     read_datetimes,
@@ -173,32 +175,86 @@ class TestCSV(unittest.TestCase):
             SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
-        export_csv_comparison(
-            data,
-            "Signal",
+        comp_data = ComparisonData(
+            data[0],
+            data[1],
+            data[1],
+            0.0,
+            0.1,
+            0.2,
+            2,
+            [DT1, DT2],
             [SPOINT, SPOINT3],
+            [14, 2],
+            [True, False],
+            data[1],
+            0.1,
+        )
+        xlabel = "UTC datetime"
+        export_csv_comparison(
+            comp_data,
+            xlabel,
+            ["Observed Signal", "Simulated Signal"],
             path,
             "test",
-            ComparisonData(
-                data[0],
-                data[1],
-                data[1],
-                0.0,
-                0.1,
-                0.2,
-                2,
-                [DT1, DT2],
-                [SPOINT, SPOINT3],
-                [14, 2],
-                [True, False],
-                data[1],
-                0.1,
-            ),
             "ASD",
             False,
-            True,
+            CompFields.DIFF_REL,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_1.csv"))
+
+    def test_export_csv_comparison_wlen(self):
+        data = [
+            SpectralData([DT1, DT2], [0.02, 0.03], [0, 0.005], None),
+            SpectralData([DT1, DT2], [0.03, 0.03], [0, 0], None),
+        ]
+        path = "./test_files/csv/export_comp_wlen.test.csv"
+        comp_data = ComparisonData(
+            data[0],
+            data[1],
+            data[1],
+            0.0,
+            0.1,
+            0.2,
+            2,
+            [DT1, DT2],
+            [SPOINT, SPOINT3],
+            [14, 2],
+            [True, False],
+            data[1],
+            0.1,
+        )
+        data2 = [
+            SpectralData([DT1, DT2], [0.05, 0.03], [0, 0.005], None),
+            SpectralData([DT1, DT2], [0.08, 0.03], [0, 0], None),
+        ]
+        comp_data2 = ComparisonData(
+            data2[0],
+            data2[1],
+            data2[1],
+            0.0,
+            0.1,
+            0.2,
+            2,
+            [DT1, DT2],
+            [SPOINT, SPOINT3],
+            [14, 2],
+            [True, False],
+            data[1],
+            0.1,
+        )
+        export_csv_comparison_bywlen(
+            [comp_data, comp_data2],
+            [350, 450],
+            "Wavelength",
+            ["Observed Signal", "Simulated Signal"],
+            path,
+            "test",
+            "ASD",
+            False,
+            CompFields.DIFF_REL,
+        )
+        self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_comp_wlen.csv"))
 
     def test_export_csv_integrated_irradiance(self):
         srf = get_srf()

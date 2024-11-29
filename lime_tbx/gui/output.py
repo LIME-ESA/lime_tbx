@@ -3,9 +3,8 @@
 """___Built-In Modules___"""
 from typing import Union, List
 from datetime import datetime
+from abc import ABC, abstractmethod
 
-import PySide2.QtCore
-import PySide2.QtWidgets
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
@@ -27,15 +26,21 @@ from lime_tbx.datatypes.datatypes import (
 )
 from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import csv
-from lime_tbx.gui.ifaces import IMainSimulationsWidget
+from lime_tbx.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
 from lime_tbx.gui.canvas import (
     MplCanvas,
     title_font_prop,
     label_font_prop,
     font_prop,
     redraw_canvas,
+    redraw_canvas_compare,
+    redraw_canvas_compare_only_diffs,
+    redraw_canvas_compare_boxplot,
+    redraw_canvas_compare_boxplot_only_diffs,
 )
 from lime_tbx.gui import constants
+from lime_tbx.datatypes.constants import CompFields
+from lime_tbx.simulation.comparison.utils import average_comparisons
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -45,55 +50,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-class GraphWidget(QtWidgets.QWidget):
-    def __init__(
-        self,
-        settings_manager: ISettingsManager,
-        title="",
-        xlabel="",
-        ylabel="",
-        comparison_x_datetime=True,
-        parent=None,
-        build_layout_ini=True,
-    ):
-        super().__init__(parent)
-        self._init_parent = parent
-        self.settings_manager = settings_manager
-        self.title = title
-        self.xlabel = xlabel
-        self.ylabel = ylabel
-        self.legend = []
-        self.data = None
-        self.cimel_data = None
-        self.asd_data = None
-        self.point = None
-        self.data_compare = None
-        self.vertical_lines = []
-        self.dts = []
-        self.cursor_names = []
-        self.mpl_cursor = None
-        self.xlim_left = None
-        self.xlim_right = None
-        self.max_ylim_bottom = None
-        self.max_ylim_top = None
-        self.comparison_x_datetime = comparison_x_datetime
-        self.inside_mpa_range = None
-        self.interp_spectrum_name = None
-        self.mpa = None
-        self.skip_uncs = None
-        self.compare_percentages = None
-        self.ch_names = []
-        self.is_built = False
-        self._to_update_plot = False
-        self._to_update_labels = False
-        if build_layout_ini:
-            self._build_layout()
-
-    def showEvent(self, event):
-        if not self.is_built:
-            self._build_layout()
-        super().showEvent(event)
-
+class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
     def _build_layout(self):
         self.is_built = True
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -129,6 +86,28 @@ class GraphWidget(QtWidgets.QWidget):
         if self._to_update_labels:
             self._update_labels()
 
+    @abstractmethod
+    def _redraw(self):
+        pass
+
+    def disable_buttons(self, disable: bool):
+        self.export_button.setDisabled(disable)
+        self.csv_button.setDisabled(disable)
+
+    def _update_plot(self, redraw=True):
+        if self.data is not None:
+            self.disable_buttons(False)
+        else:
+            self.disable_buttons(True)
+        if redraw:
+            self._redraw()
+            self._update_toolbar()
+
+    def showEvent(self, event):
+        if not self.is_built:
+            self._build_layout()
+        super().showEvent(event)
+
     def _prepare_toolbar(self):
         self.toolbar = NavigationToolbar(self.canvas, self)
         unwanted_buttons = ["Back", "Forward"]
@@ -153,12 +132,6 @@ class GraphWidget(QtWidgets.QWidget):
             pixmap = QtGui.QPixmap.fromImage(tmp)
             ta.setIcon(QtGui.QIcon(pixmap))
 
-    def disable_buttons(self, disable: bool):
-        self.export_button.setDisabled(disable)
-        self.csv_button.setDisabled(disable)
-        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
-            self._init_parent.set_export_button_disabled(disable)
-
     def set_vertical_lines(self, xs: List[float]):
         self.vertical_lines = xs
         self._redraw()
@@ -173,36 +146,6 @@ class GraphWidget(QtWidgets.QWidget):
 
     def _update_toolbar(self):
         self.toolbar.update()
-
-    def update_plot(
-        self,
-        data: Union[SpectralData, List[SpectralData]] = None,
-        data_cimel: Union[SpectralData, List[SpectralData]] = None,
-        data_asd: Union[SpectralData, List[SpectralData]] = None,
-        point: Union[Point, List[Point]] = None,
-        data_compare: ComparisonData = None,
-        redraw: bool = True,
-        compare_percentages: bool = False,
-    ):
-        self.point = point
-        self.data = data
-        self.cimel_data = data_cimel
-        self.asd_data = data_asd
-        self.data_compare = data_compare
-        self.compare_percentages = compare_percentages
-        if self.is_built:
-            self._update_plot(redraw)
-        else:
-            self._to_update_plot = True
-
-    def _update_plot(self, redraw=True):
-        if self.data is not None:
-            self.disable_buttons(False)
-        else:
-            self.disable_buttons(True)
-        if redraw:
-            self._redraw()
-            self._update_toolbar()
 
     def update_labels(
         self,
@@ -227,6 +170,99 @@ class GraphWidget(QtWidgets.QWidget):
             self._redraw()
         self._update_toolbar()
 
+    def update_size(self):
+        self._redraw()
+
+    def clear(self):
+        if self.is_built:
+            self.canvas.clear()
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
+    @QtCore.Slot()
+    def export_graph(self):
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
+        )[0]
+        if name is not None and name != "":
+            try:
+                self.canvas.print_figure(name)
+            except Exception as e:
+                self.show_error(e)
+
+    @abstractmethod
+    def update_legend(self, legend: List[List[str]], redraw: bool = True):
+        pass
+
+    @abstractmethod
+    def export_csv(self):
+        pass
+
+
+class SimGraphWidget(GraphWidget):
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        title="",
+        xlabel="",
+        ylabel="",
+        parent=None,
+        build_layout_ini=True,
+    ):
+        super().__init__(parent)
+        self._init_parent = parent
+        self.settings_manager = settings_manager
+        self.title = title
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.legend = []
+        self.data = None
+        self.cimel_data = None
+        self.asd_data = None
+        self.point = None
+        self.vertical_lines = []
+        self.dts = []
+        self.cursor_names = []
+        self.mpl_cursor = None
+        self.xlim_left = None
+        self.xlim_right = None
+        self.max_ylim_bottom = None
+        self.max_ylim_top = None
+        self.inside_mpa_range = None
+        self.interp_spectrum_name = None
+        self.mpa = None
+        self.skip_uncs = None
+        self.ch_names = []
+        self.is_built = False
+        self._to_update_plot = False
+        self._to_update_labels = False
+        if build_layout_ini:
+            self._build_layout()
+
+    def disable_buttons(self, disable: bool):
+        super().disable_buttons(disable)
+        if self._init_parent and isinstance(self._init_parent, IMainSimulationsWidget):
+            self._init_parent.set_export_button_disabled(disable)
+
+    def update_plot(
+        self,
+        data: Union[SpectralData, List[SpectralData]] = None,
+        data_cimel: Union[SpectralData, List[SpectralData]] = None,
+        data_asd: Union[SpectralData, List[SpectralData]] = None,
+        point: Union[Point, List[Point]] = None,
+        redraw: bool = True,
+    ):
+        self.point = point
+        self.data = data
+        self.cimel_data = data_cimel
+        self.asd_data = data_asd
+        if self.is_built:
+            self._update_plot(redraw)
+        else:
+            self._to_update_plot = True
+
     def update_legend(self, legend: List[List[str]], redraw: bool = True):
         """
         Parameters
@@ -237,7 +273,6 @@ class GraphWidget(QtWidgets.QWidget):
             0: data
             1: cimel_data
             2: cimel_data errorbars
-            3: comparison
         """
         self.legend = legend
         if self.is_built:
@@ -247,14 +282,12 @@ class GraphWidget(QtWidgets.QWidget):
         else:
             self._to_update_labels = True
 
-    def update_size(self):
-        self._redraw()
-
     def set_cursor_names(self, labels: List[str]):
         self.dts = None
         self.cursor_names = labels.copy()
 
     def set_dts(self, dts: List[datetime]):
+        # TODO: Refactor this, change func name and combine with set_cursor_names
         self.dts = dts
         self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
 
@@ -268,14 +301,12 @@ class GraphWidget(QtWidgets.QWidget):
             self.legend,
             self.cimel_data,
             self.asd_data,
-            self.data_compare,
             self.title,
             self.xlabel,
             self.ylabel,
             self.vertical_lines,
             self.interp_spectrum_name,
             self.subtitle,
-            self.compare_percentages,
             self.settings_manager.is_show_cimel_points(),
         )
         try:
@@ -324,21 +355,6 @@ class GraphWidget(QtWidgets.QWidget):
         self.update()
         self.canvas.update()
 
-    def show_error(self, error: Exception):
-        error_dialog = QtWidgets.QMessageBox(self)
-        error_dialog.critical(self, "ERROR", str(error))
-
-    @QtCore.Slot()
-    def export_graph(self):
-        name = QtWidgets.QFileDialog().getSaveFileName(
-            self, "Export graph (.png, .jpg, .pdf...)", "{}.png".format(self.title)
-        )[0]
-        if name is not None and name != "":
-            try:
-                self.canvas.print_figure(name)
-            except Exception as e:
-                self.show_error(e)
-
     def set_inside_mpa_range(self, inside_mpa_range):
         self.inside_mpa_range = inside_mpa_range
 
@@ -362,20 +378,7 @@ class GraphWidget(QtWidgets.QWidget):
         version = self.settings_manager.get_coef_version_name()
         if name is not None and name != "":
             try:
-                if isinstance(self.point, list) or isinstance(self.point, np.ndarray):
-                    csv.export_csv_comparison(
-                        self.data,
-                        self.ylabel,
-                        self.point,
-                        name,
-                        version,
-                        self.data_compare,
-                        self.interp_spectrum_name,
-                        self.skip_uncs,
-                        not self.compare_percentages,
-                        self.comparison_x_datetime,
-                    )
-                elif self.inside_mpa_range is not None:
+                if self.inside_mpa_range is not None:
                     csv.export_csv_simulation(
                         self.data,
                         self.xlabel,
@@ -399,6 +402,186 @@ class GraphWidget(QtWidgets.QWidget):
                     )
             except Exception as e:
                 self.show_error(e)
+
+    def recycle(self, title: str):
+        self.title = title
+        if self.is_built:
+            self.canvas.axes.cla()
+
+
+class CompGraphWidget(GraphWidget):
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        title="",
+        xlabel="",
+        ylabel="",
+        chosen_diffs=CompFields.DIFF_REL,
+        parent=None,
+        build_layout_ini=True,
+    ):
+        super().__init__(parent)
+        self._init_parent = parent
+        self.settings_manager = settings_manager
+        self.title = title
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.legend = []
+        self.data = None
+        self.vertical_lines = []
+        self.dts = []
+        self.cursor_names = []
+        self.mpl_cursor = None
+        self.xlim_left = None
+        self.xlim_right = None
+        self.max_ylim_bottom = None
+        self.max_ylim_top = None
+        self.interp_spectrum_name = None
+        self.skip_uncs = None
+        self.is_built = False
+        self._to_update_plot = False
+        self._to_update_labels = False
+        self.chosen_diffs = chosen_diffs
+        if build_layout_ini:
+            self._build_layout()
+
+    def update_plot(
+        self,
+        data_compare: ComparisonData = None,
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
+        self.data = data_compare
+        self.chosen_diffs = chosen_diffs
+        if self.is_built:
+            self._update_plot(redraw)
+        else:
+            self._to_update_plot = True
+
+    def update_legend(self, legend: List[List[str]], redraw: bool = True):
+        """
+        Parameters
+        ----------
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: comparison
+        """
+        self.legend = legend
+        if self.is_built:
+            if redraw:
+                self._redraw()
+            self._update_toolbar()
+        else:
+            self._to_update_labels = True
+
+    def _redraw_canvas_compare(self) -> list:
+        return redraw_canvas_compare(
+            self.canvas,
+            self.data,
+            self.legend,
+            self.title,
+            self.xlabel,
+            self.ylabel,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+    def _redraw_canvas_compare_only_diffs(self):
+        return redraw_canvas_compare_only_diffs(
+            self.canvas,
+            self.data,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+    def _redraw(self):
+        if not self.is_built:
+            return
+        self.canvas.clear()  # Clear the canvas.
+        lines = self._redraw_canvas_compare()
+        try:
+            self.canvas.fig.tight_layout()
+            self.canvas.draw()
+        except:
+            pass
+
+        xll, xlr = self.xlim_left, self.xlim_right
+        if self.data and isinstance(self.data, ComparisonData):
+            xmin = self.data.observed_signal.wlens.min()
+            xmax = self.data.observed_signal.wlens.max()
+            xmargin = (xmax - xmin) * 0.05
+            if not xll:
+                xll = xmin - xmargin
+            if not xlr:
+                xlr = xmax + xmargin
+        self.canvas.axes.set_xlim(xll, xlr)
+        bottom = top = None
+        current_bottom, current_top = self.canvas.axes.get_ylim()
+        if self.max_ylim_bottom and self.max_ylim_bottom > current_bottom:
+            bottom = self.max_ylim_bottom
+        if self.max_ylim_top and self.max_ylim_top < current_top:
+            top = self.max_ylim_top
+        self.canvas.axes.set_ylim(bottom, top)
+        self.canvas.draw()
+        self.update()
+        self.canvas.update()
+
+    def change_diff_canvas(self, chosen_diffs: CompFields):
+        self.chosen_diffs = chosen_diffs
+        if self.is_built:
+            self._redraw_canvas_compare_only_diffs()
+            try:
+                self.canvas.fig.tight_layout()
+                self.canvas.draw()
+            except:
+                pass
+        else:
+            self._to_update_plot = True
+
+    def set_interp_spectrum_name(self, interp_spectrum_name: str):
+        self.interp_spectrum_name = interp_spectrum_name
+
+    def set_skipped_uncertainties(self, skip: bool):
+        self.skip_uncs = skip
+
+    @QtCore.Slot()
+    def export_csv(self):
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export CSV", "{}.csv".format(self.title)
+        )[0]
+        version = self.settings_manager.get_coef_version_name()
+        if name is not None and name != "":
+            try:
+                csv.export_csv_comparison(
+                    self.data,
+                    self.xlabel,
+                    self.legend[0],
+                    name,
+                    version,
+                    self.interp_spectrum_name,
+                    self.skip_uncs,
+                    self.chosen_diffs,
+                )
+            except Exception as e:
+                self.show_error(e)
+
+    def recycle(self, title: str):
+        self.title = title
+        self.clear()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.canvas.mpl_connect("resize_event", self._on_resize)
+        self.tight_layout()
+
+    def _on_resize(self, event):
+        self.tight_layout()
+
+    def tight_layout(self):
+        self.canvas.fig.tight_layout()
+        self.canvas.draw()
+        self.update()
 
 
 class SignalWidget(QtWidgets.QWidget):
@@ -588,130 +771,13 @@ for absolute moon phase angles between 2° and 90°"
         self.parentWidget().setDisabled(False)
 
 
-class ComparisonDualGraphWidget(QtWidgets.QWidget):
-    def __init__(self, graph_reldif: GraphWidget, graph_percdif: GraphWidget):
-        super().__init__()
-        self.graph_reldif = graph_reldif
-        self.graph_percdif = graph_percdif
-        self.stack_layout = QtWidgets.QStackedLayout(self)
-        self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
-        self.stack_layout.addWidget(self.graph_reldif)
-        self.stack_layout.addWidget(self.graph_percdif)
-        self.stack_layout.setCurrentIndex(0)
-        self.visible_reldif = True
-
-    def showEvent(self, event):
-        self.set_visible_graphs()
-        self.graph_percdif.canvas.mpl_connect("resize_event", self._on_resize)
-        self.graph_reldif.canvas.mpl_connect("resize_event", self._on_resize)
-        super().showEvent(event)
-
-    def set_visible_graphs(self):
-        if self.isVisible():
-            self.graph_reldif.setVisible(self.visible_reldif)
-            self.graph_percdif.setVisible(not self.visible_reldif)
-
-    def _on_resize(self, event):
-        self.tight_layout()
-
-    def tight_layout(self):
-        if self.graph_reldif.isVisible():
-            self._tight_layout_reldif()
-        else:
-            self._tight_layout_percdif()
-        self.update()
-
-    def _tight_layout_reldif(self):
-        self.graph_reldif.canvas.fig.tight_layout()
-        self.graph_reldif.canvas.draw()
-
-    def _tight_layout_percdif(self):
-        self.graph_percdif.canvas.fig.tight_layout()
-        self.graph_percdif.canvas.draw()
-
-    def show_percentage(self):
-        self.visible_reldif = False
-        self.set_visible_graphs()
-        self.stack_layout.setCurrentIndex(1)
-
-    def show_relative(self):
-        self.visible_reldif = True
-        self.set_visible_graphs()
-        self.stack_layout.setCurrentIndex(0)
-
-    def clear(self):
-        self.graph_reldif.setParent(None)
-        self.graph_percdif.setParent(None)
-        self.graph_reldif = None
-        self.graph_percdif = None
-
-    def update_plot(self, comparison: ComparisonData, redraw: bool = True):
-        data = [comparison.observed_signal, comparison.simulated_signal]
-        self.graph_reldif.update_plot(
-            data, point=comparison.points, data_compare=comparison, redraw=redraw
-        )
-        self.graph_percdif.update_plot(
-            data,
-            point=comparison.points,
-            data_compare=comparison,
-            redraw=redraw,
-            compare_percentages=True,
-        )
-
-    def update_labels(
-        self,
-        title: str,
-        xlabel: str,
-        ylabel: str,
-        redraw: bool = True,
-        subtitle: str = None,
-    ):
-        self.graph_reldif.update_labels(
-            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
-        )
-        self.graph_percdif.update_labels(
-            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
-        )
-
-    def set_interp_spectrum_name(self, sp_name: str):
-        self.graph_reldif.set_interp_spectrum_name(sp_name)
-        self.graph_percdif.set_interp_spectrum_name(sp_name)
-
-    def set_skipped_uncertainties(self, skip: bool):
-        self.graph_reldif.set_skipped_uncertainties(skip)
-        self.graph_percdif.set_skipped_uncertainties(skip)
-
-    def update_legends(self, legends: List[List[str]], redraw: bool = True):
-        """
-        Parameters
-        ----------
-        legend: list of list of str
-            Each list represents a group of legends
-            Lengeds index:
-            0: data
-            1: cimel_data
-            2: cimel_data errorbars
-            3: comparison (2 values, graph_reldif and graph_percdif)
-        redraw: bool
-            Boolean that defines if the plot will be redrawn automatically or not. Default True.
-        """
-        self.graph_reldif.update_legend(legends[0:3] + [[legends[3][0]]], redraw=redraw)
-        self.graph_percdif.update_legend(
-            legends[0:3] + [[legends[3][1]]], redraw=redraw
-        )
-
-    def set_chnames(self, ch_names: List[str]):
-        self.graph_reldif.set_srf_channel_names(ch_names)
-        self.graph_percdif.set_srf_channel_names(ch_names)
-
-
 class ComparisonOutput(QtWidgets.QWidget):
-    def __init__(self, settings_manager: ISettingsManager, x_datetime: bool):
+    def __init__(self, settings_manager: ISettingsManager):
         super().__init__()
         self.settings_manager = settings_manager
-        self.channels: List[ComparisonDualGraphWidget] = []
+        self.channels: List[CompGraphWidget] = []
         self.ch_names = []
-        self.x_datetime = x_datetime
+        self.chosen_diffs = CompFields.DIFF_REL
         self._build_layout()
 
     def _build_layout(self):
@@ -724,40 +790,36 @@ class ComparisonOutput(QtWidgets.QWidget):
         self.main_layout.addWidget(self.range_warning)
 
     def set_channels(self, channels: List[str]):
+        # TODO make this function faster
         new_channel_tabs = QtWidgets.QTabWidget()
         new_channel_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         self.main_layout.replaceWidget(self.channel_tabs, new_channel_tabs)
         self.channel_tabs.setParent(None)
         self.channel_tabs.deleteLater()
         self.channel_tabs = new_channel_tabs
-        # Former deletion was too slow:
-        # while self.channel_tabs.count() > 0:
-        #    self.channel_tabs.removeTab(0)
-        # for ch in self.channels:
-        #    ch.clear()
-        #    ch.setParent(None)
-        self.channels.clear()
+
         self.ch_names = []
         build_layout_ini = len(channels) < 15
-        for ch in channels:
-            grel = GraphWidget(
-                self.settings_manager,
-                ch,
-                comparison_x_datetime=self.x_datetime,
-                build_layout_ini=build_layout_ini,
-            )
-            gperc = GraphWidget(
-                self.settings_manager,
-                ch,
-                comparison_x_datetime=self.x_datetime,
-                build_layout_ini=build_layout_ini,
-            )
-            channel = ComparisonDualGraphWidget(grel, gperc)
-            self.channels.append(channel)
+        for i, ch in enumerate(channels):
+            if len(self.channels) > i:
+                channel = self.channels[i]
+                channel.recycle(
+                    ch,
+                )
+            else:
+                channel = CompGraphWidget(
+                    self.settings_manager,
+                    ch,
+                    build_layout_ini=build_layout_ini,
+                )
+                self.channels.append(channel)
             self.ch_names.append(ch)
             self.channel_tabs.addTab(channel, ch)
-        for cha in self.channels:
-            cha.set_chnames(self.ch_names)
+        # Remove unused channels
+        for _ in range(len(channels), len(self.channels)):
+            ch = self.channels.pop(len(channels))
+            ch.setParent(None)
+            ch.deleteLater()
         # Remove range warning content
         if self.range_warning:
             self.range_warning.setText("")
@@ -794,23 +856,37 @@ for wavelengths between 350 and 2500 nm"
             if ch_name in self.ch_names:
                 index = self.ch_names.index(ch_name)
                 self.channel_tabs.removeTab(index)
-                self.channels[index].clear()
                 self.channels[index].setParent(None)
                 self.channels.pop(index)
                 self.ch_names.pop(index)
         self._check_range_warning_needed()
-        for cha in self.channels:
-            cha.set_chnames(self.ch_names)
 
-    def show_relative(self):
+    def _redraw_new_diffs(self):
         for ch in self.channels:
-            ch.show_relative()
+            ch.change_diff_canvas(self.chosen_diffs)
 
-    def show_percentage(self):
-        for ch in self.channels:
-            ch.show_percentage()
+    def show_relative(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_REL
+        if redraw:
+            self._redraw_new_diffs()
 
-    def update_plot(self, index: int, comparison: ComparisonData, redraw: bool = True):
+    def show_percentage(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_PERC
+        if redraw:
+            self._redraw_new_diffs()
+
+    def show_no_diff(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_NONE
+        if redraw:
+            self._redraw_new_diffs()
+
+    def update_plot(
+        self,
+        index: int,
+        comparison: ComparisonData,
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
         """Update the <index> plot with the given data
 
         Parameters
@@ -821,7 +897,8 @@ for wavelengths between 350 and 2500 nm"
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.channels[index].update_plot(comparison, redraw)
+        self.chosen_diffs = chosen_diffs
+        self.channels[index].update_plot(comparison, redraw, self.chosen_diffs)
 
     def update_labels(
         self,
@@ -855,18 +932,15 @@ for wavelengths between 350 and 2500 nm"
         Parameters
         ----------
         index: int
-            Plot index (SRF)
+            Plot index (SRF band)
         legend: list of list of str
             Each list represents a group of legends
             Lengeds index:
-            0: data
-            1: cimel_data
-            2: cimel_data errorbars
-            3: comparison (2 values, graph_reldif and graph_percdif)
+            0: main data legend
         redraw: bool
             Boolean that defines if the plot will be redrawn automatically or not. Default True.
         """
-        self.channels[index].update_legends(legends, redraw=redraw)
+        self.channels[index].update_legend(legends, redraw=redraw)
 
     def get_current_channel_index(self) -> int:
         return self.channel_tabs.currentIndex()
@@ -874,3 +948,199 @@ for wavelengths between 350 and 2500 nm"
     def set_current_channel_index(self, index: int):
         cui = self.channel_tabs.setCurrentIndex(index)
         return cui
+
+    def get_channel_names(self) -> List[str]:
+        return self.ch_names
+
+    def get_channel_id(self, ch_name: str) -> int:
+        return self.get_channel_names().index(ch_name)
+
+
+class CompBoxPlotGraphWidget(CompGraphWidget):
+    def __init__(
+        self,
+        settings_manager: ISettingsManager,
+        wlens: List[float],
+        title="",
+        xlabel="",
+        ylabel="",
+        chosen_diffs=CompFields.DIFF_REL,
+        parent=None,
+        build_layout_ini=True,
+    ):
+        self.wlens = wlens
+        super().__init__(
+            settings_manager,
+            title,
+            xlabel,
+            ylabel,
+            chosen_diffs,
+            parent,
+            build_layout_ini,
+        )
+
+    def _redraw_canvas_compare(self) -> list:
+        return redraw_canvas_compare_boxplot(
+            self.canvas,
+            self.data,
+            self.wlens,
+            self.legend,
+            self.title,
+            self.xlabel,
+            self.ylabel,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+    def _redraw_canvas_compare_only_diffs(self):
+        return redraw_canvas_compare_boxplot_only_diffs(
+            self.canvas,
+            self.data,
+            self.wlens,
+            self.legend,
+            self.subtitle,
+            self.chosen_diffs,
+        )
+
+    @QtCore.Slot()
+    def export_csv(self):
+        name = QtWidgets.QFileDialog().getSaveFileName(
+            self, "Export CSV", "{}.csv".format(self.title)
+        )[0]
+        version = self.settings_manager.get_coef_version_name()
+        if name is not None and name != "":
+            try:
+                csv.export_csv_comparison_bywlen(
+                    self.data,
+                    self.wlens,
+                    self.xlabel,
+                    self.legend[0],
+                    name,
+                    version,
+                    self.interp_spectrum_name,
+                    self.skip_uncs,
+                    self.chosen_diffs,
+                )
+            except Exception as e:
+                self.show_error(e)
+
+    def update_plot(
+        self,
+        comps: List[ComparisonData],
+        wlens: List[float],
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
+        self.wlens = wlens
+        super().update_plot(comps, redraw, chosen_diffs)
+
+
+class CompWlensGraphWidget(CompGraphWidget):
+    def update_plot(
+        self,
+        comps: List[ComparisonData],
+        wlens: List[float],
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
+        wlens = np.array([w for w, c in zip(wlens, comps) if c is not None])
+        comps = [c for c in comps if c is not None]
+        self.wlens = wlens
+        c = average_comparisons(wlens, comps)
+        super().update_plot(c, redraw, chosen_diffs)
+
+
+class ComparisonByWlenOutput(QtWidgets.QWidget):
+    def __init__(self, settings_manager: ISettingsManager):
+        super().__init__()
+        self.settings_manager = settings_manager
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.stackl = QtWidgets.QStackedLayout()
+        self.main_layout.addLayout(self.stackl)
+        self.comp_bp = CompBoxPlotGraphWidget(self.settings_manager, [])
+        self.comp_normal = CompWlensGraphWidget(self.settings_manager)
+        self.stackl.addWidget(self.comp_bp)
+        self.stackl.addWidget(self.comp_normal)
+        self.stackl.setCurrentIndex(0)
+
+    def _get_current_graph(self):
+        if self.stackl.currentIndex() == 0:
+            return self.comp_bp
+        return self.comp_normal
+
+    def update_plot(
+        self,
+        comps: List[ComparisonData],
+        wlens: List[float],
+        redraw: bool = True,
+        chosen_diffs: CompFields = CompFields.DIFF_REL,
+    ):
+        self._get_current_graph().update_plot(comps, wlens, redraw, chosen_diffs)
+
+    def update_labels(
+        self,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        redraw: bool = True,
+        subtitle: str = None,
+    ):
+        self._get_current_graph().update_labels(
+            title, xlabel, ylabel, redraw=redraw, subtitle=subtitle
+        )
+
+    def update_legends(self, legends: List[List[str]], redraw: bool = True):
+        """
+        Parameters
+        ----------
+        legend: list of list of str
+            Each list represents a group of legends
+            Lengeds index:
+            0: main data legend
+        redraw: bool
+            Boolean that defines if the plot will be redrawn automatically or not. Default True.
+        """
+        self._get_current_graph().update_legend(legends, redraw=redraw)
+
+    def set_interp_spectrum_name(
+        self,
+        sp_name: str,
+    ):
+        self._get_current_graph().set_interp_spectrum_name(sp_name)
+
+    def set_skipped_uncertainties(
+        self,
+        skip: bool,
+    ):
+        self._get_current_graph().set_skipped_uncertainties(skip)
+
+    def _redraw_new_diffs(self):
+        self._get_current_graph().change_diff_canvas(self.chosen_diffs)
+
+    def show_relative(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_REL
+        if redraw:
+            self._redraw_new_diffs()
+
+    def show_percentage(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_PERC
+        if redraw:
+            self._redraw_new_diffs()
+
+    def show_no_diff(self, redraw=True):
+        self.chosen_diffs = CompFields.DIFF_NONE
+        if redraw:
+            self._redraw_new_diffs()
+
+    def clear(self):
+        self.comp_bp.clear()
+        self.comp_normal.clear()
+
+    def set_kind(self, boxplot: bool):
+        if boxplot:
+            self.stackl.setCurrentIndex(0)
+        else:
+            self.stackl.setCurrentIndex(1)

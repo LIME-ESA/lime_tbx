@@ -64,7 +64,7 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.selection_layout.addWidget(self.combo_srf, 1)
         self.selection_layout.addWidget(self.load_button)
         # Graph
-        self.graph = output.GraphWidget(
+        self.graph = output.SimGraphWidget(
             self.settings_manager,
             "SRF",
             "Wavelengths (nm)",

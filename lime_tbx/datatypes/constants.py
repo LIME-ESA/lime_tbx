@@ -14,3 +14,13 @@ LIME_TBX_DATA_SOURCE = "LIME-TBX"
 MAX_LIMIT_REFL_ERR_CORR_ARE_STORED = 25
 NUM_CIMEL_WLENS = 6
 DEBUG_INTERMEDIATE_RESULTS_PATH = "LIMETBX_INTERMEDIATE_PATH"
+
+
+class CompFields:
+    COMP_MPA = "Moon Phase Angle"
+    COMP_DATE = "Date"
+    COMP_WLEN = "Wavelength (Box Plot)"
+    COMP_WLEN_MEAN = "Wavelength (Mean)"
+    DIFF_NONE = "None"
+    DIFF_REL = "Relative"
+    DIFF_PERC = "Percentage"

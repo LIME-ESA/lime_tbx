@@ -604,11 +604,47 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(errcode, 0)
 
+    def test_comparison_glob_csvd_channel_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_csvd_channel_mean_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
     def test_comparison_glob_csvd_both_perc_ok(self):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
                 '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,perc,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_csvd_channel_perc_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,perc,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_csvd_channel_mean_perc_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,perc,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -620,6 +656,28 @@ class TestCLI(unittest.TestCase):
         errcode = cli.handle_input(
             *get_opts(
                 '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,rel,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_graph_channel_ok(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,CHANNEL,rel,test_files/cli/out_comp_allchannels.test.jpg'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_glob_graph_channel_mean_ok(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,CHANNEL_MEAN,rel,test_files/cli/out_comp_allchannels.test.jpg'
             )
         )
         self.assertEqual(errcode, 0)
@@ -657,6 +715,40 @@ class TestCLI(unittest.TestCase):
             # Dont know how to compare
             self.assertTrue(os.path.exists(os.path.join(test_path, gname)))
 
+    def test_comparison_glob_graphd_png_channel_ok(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+        graphs = [
+            "allchannels.png",
+        ]
+        test_path = "test_files/cli/comp_out.test.dir"
+        for gname in graphs:
+            self.assertTrue(os.path.exists(os.path.join(test_path, gname)))
+
+    def test_comparison_glob_graphd_png_channel_mean_ok(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+        graphs = [
+            "allchannels.png",
+        ]
+        test_path = "test_files/cli/comp_out.test.dir"
+        for gname in graphs:
+            self.assertTrue(os.path.exists(os.path.join(test_path, gname)))
+
     def test_comparison_glob_csvd_dt_ok(self):
         cli = get_cli()
         errcode = cli.handle_input(
@@ -680,6 +772,24 @@ class TestCLI(unittest.TestCase):
         errcode = cli.handle_input(
             *get_opts(
                 '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_csvd_channel_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_comparison_csvd_channel_mean_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)

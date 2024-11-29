@@ -1073,7 +1073,7 @@ class ComparisonInput(QtWidgets.QWidget):
         self.moon_obs_layout.addRow(QtWidgets.QLabel(), obs_but_layout)
         # SRF filepath
         self.srf_layout = QtWidgets.QFormLayout()
-        self.srf_label = QtWidgets.QLabel("SRF file:")
+        self.srf_label = QtWidgets.QLabel("Spectral Response Function file:")
         self.srf_feedback = QtWidgets.QLabel("No file loaded")
         self.srf_feedback.setWordWrap(True)
         self.srf_button = QtWidgets.QPushButton(" Load file ")

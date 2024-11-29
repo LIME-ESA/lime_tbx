@@ -1,10 +1,10 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
-MRA (Mean Relative Difference %),0.0
-STD-RD (Standard deviation of Relative Difference %),0.0
+MRD (Mean Relative Difference %),0.0
+STD-RD (Standard deviation of Relative Difference %),0.2
 MARD (Mean of the Absolutes of the Relative Differences %),0.1
 MPD (Mean Percentage Difference %),0.1
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
-UTC datetime,latitude,longitude,altitude(m),Observed Signal,Simulated Signal,Relative differences (%),Observation uncertainties,Simulation uncertainties,Relative difference uncertainties
-2018-02-27 02:00:00.000+00:00,43,45,4500,0.02,0.03,0.03,0,0,0
-2019-02-23 02:00:00.000+00:00 **,43,45,4500,0.03,0.03,0.03,0.005,0,0
+UTC datetime,latitude,longitude,altitude(m),Observed Signal,Simulated Signal,Relative difference (%),Observed Signal uncertainties,Simulated Signal uncertainties,Relative difference (%) uncertainties
+350,43,45,4500,0.02,0.03,0.03,0,0,0
+350 **,43,45,4500,0.03,0.03,0.03,0.005,0,0
