@@ -1,7 +1,7 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
 MRD (Mean Relative Difference %),0.0
-STD-RD (Standard deviation of Relative Difference %),0.0
+STD-RD (Standard deviation of Relative Difference %),0.2
 MARD (Mean of the Absolutes of the Relative Differences %),0.1
 MPD (Mean Percentage Difference %),0.1
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
