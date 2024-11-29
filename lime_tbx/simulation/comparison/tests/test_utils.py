@@ -214,11 +214,11 @@ class TestCompUtils(unittest.TestCase):
             comps.append(comp)
         comp = average_comparisons(wlcs, comps)
         omeans = np.array([np.mean(c.observed_signal.data) for c in comps])
-        self.assertEquals(comp.observed_signal.data, omeans)
+        np.testing.assert_array_equal(comp.observed_signal.data, omeans)
         smeans = np.array([np.mean(c.simulated_signal.data) for c in comps])
-        self.assertEquals(comp.simulated_signal.data, smeans)
+        np.testing.assert_array_equal(comp.simulated_signal.data, smeans)
         dmeans = np.array([np.mean(c.diffs_signal.data) for c in comps])
-        self.assertEquals(comp.diffs_signal.data, dmeans)
+        np.testing.assert_array_equal(comp.diffs_signal.data, dmeans)
 
 
 if __name__ == "__main__":
