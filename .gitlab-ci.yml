@@ -126,6 +126,8 @@ tox_slowtests:
       - export PYTHONPATH="$PYTHONPATH:."
       - python -c "import sys;print(sys.path)"
       - pip install tox
+      - mkdir test_report
+      - export GITLAB_CI="GITLAB_CI"
       - tox -- --runslow
     coverage: '/^TOTAL.+?(\d+\%)$/'
     needs: []
