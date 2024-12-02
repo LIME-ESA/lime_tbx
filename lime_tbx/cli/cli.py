@@ -302,7 +302,9 @@ class CLI:
         sp_name = self.settings_manager.get_selected_spectrum_name()
         mdas = self.lime_simulation.get_moon_datas()
         mpa = None
+        mda = None
         if isinstance(mdas, MoonData):
+            mda = mdas
             mpa = mdas.mpa_degrees
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
@@ -317,12 +319,12 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elrefs_cimel(),
-            mpa,
+            mda,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²nm⁻¹)",
+            "Irradiances (Wm⁻²nm⁻¹)",
             point,
             ed.o_file_irr,
             version,
@@ -330,7 +332,7 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elis_cimel(),
-            mpa,
+            mda,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
@@ -343,7 +345,7 @@ class CLI:
             dolp_sp_name,
             skip_uncs,
             self.lime_simulation.get_polars_cimel(),
-            mpa,
+            mda,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -361,6 +363,9 @@ class CLI:
         sp_name = self.settings_manager.get_selected_spectrum_name()
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_lime_coef().version
+        mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(mds, list):
+            mds = [mds]
         lglod = create_lglod_data(
             point,
             self.srf,
@@ -369,14 +374,11 @@ class CLI:
             sp_name,
             dolp_sp_name,
             version,
+            mds,
         )
         now = datetime.now(timezone.utc)
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        _mds = self.lime_simulation.get_moon_datas()
-        if not isinstance(_mds, list):
-            _mds = [_mds]
-        mpas = [m.mpa_degrees for m in _mds]
-        moon.write_obs(lglod, output_file, now, inside_mpa_range, mpas)
+        moon.write_obs(lglod, output_file, now, inside_mpa_range)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
         from lime_tbx.gui import canvas
@@ -450,7 +452,7 @@ class CLI:
             None,
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²nm⁻¹)",
+            "Irradiances (Wm⁻²nm⁻¹)",
             None,
             sp_name,
         )
@@ -692,7 +694,10 @@ class CLI:
             ch_names_obs = {
                 ch_name for mo in mos for ch_name in list(mo.ch_irrs.keys())
             }
-            if len(ch_names_obs) > len(ed.output_files):
+            if ed.comparison_key not in (
+                ComparisonKey.CHANNEL,
+                ComparisonKey.CHANNEL_MEAN,
+            ) and len(ch_names_obs) > len(ed.output_files):
                 raise LimeException(
                     "The amount of export files given is not enough. There are more channels."
                 )

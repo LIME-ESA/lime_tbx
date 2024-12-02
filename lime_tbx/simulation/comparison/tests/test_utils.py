@@ -3,7 +3,7 @@
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 import random
-from typing import Tuple
+from typing import Tuple, List
 
 """___Third-Party Modules___"""
 import unittest
@@ -13,6 +13,7 @@ import numpy as np
 from ....datatypes.datatypes import (
     ComparisonData,
     SpectralData,
+    MoonData,
 )
 from ..utils import sort_by_mpa, average_comparisons
 
@@ -40,6 +41,23 @@ def get_random_spectral_data_dts(
     return s0, s1
 
 
+def _get_random_moondatas_from_mpas(mpas: List[float]) -> List[MoonData]:
+    mdas = []
+    for mpa in mpas:
+        mdas.append(
+            MoonData(
+                random.random(),
+                300000 + random.random() * 100000,
+                -np.pi + random.random() * 2 * np.pi,
+                -90 + random.random() * 180,
+                -180 + random.random() * 180,
+                abs(mpa),
+                mpa,
+            )
+        )
+    return mdas
+
+
 class TestCompUtils(unittest.TestCase):
     # Function sort by mpa
     def test_sort_by_mpa_ok(self):
@@ -52,6 +70,7 @@ class TestCompUtils(unittest.TestCase):
             [115, 150, -5],
             [-1, -2, -80],
         ]
+
         for i in range(len(mpas)):
             sds = get_random_spectral_data_dts(n_elems)
             comp = ComparisonData(
@@ -64,10 +83,10 @@ class TestCompUtils(unittest.TestCase):
                 3,
                 sds[0].wlens,
                 [None, None, None],
-                mpas[i],
                 [True, True, True],
                 sds[1],
                 0,
+                _get_random_moondatas_from_mpas(mpas[i]),
             )
             comps.append(comp)
         new_comps = sort_by_mpa(comps)
@@ -109,10 +128,10 @@ class TestCompUtils(unittest.TestCase):
                 3,
                 sds[0].wlens,
                 [None, None, None],
-                mpas[i],
                 [True, True, True],
                 sds[1],
                 0,
+                _get_random_moondatas_from_mpas(mpas[i]),
             )
             comps.append(comp)
         new_comps = sort_by_mpa(comps)
@@ -159,10 +178,10 @@ class TestCompUtils(unittest.TestCase):
                 3,
                 sds[0].wlens,
                 [None, None, None],
-                mpas[i],
                 [True, True, True],
                 sds[1],
                 0,
+                _get_random_moondatas_from_mpas(mpas[i]),
             )
             comps.append(comp)
         new_comps = sort_by_mpa(comps)
@@ -206,10 +225,10 @@ class TestCompUtils(unittest.TestCase):
                 3,
                 sds[0].wlens,
                 [None, None, None],
-                mpas[i],
                 [True, True, True],
                 sds[1],
                 0,
+                _get_random_moondatas_from_mpas(mpas[i]),
             )
             comps.append(comp)
         comp = average_comparisons(wlcs, comps)

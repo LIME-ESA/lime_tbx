@@ -27,6 +27,7 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
     ComparisonData,
+    MoonData,
 )
 from lime_tbx.datatypes import logger
 from lime_tbx.datatypes.constants import CompFields
@@ -84,6 +85,27 @@ def _write_point(writer, point: Union[Point, None]):
                 writer.writerow(["datetime", str(dt)])
 
 
+def _write_moondata(writer, mdas: Union[List[MoonData], MoonData]):
+    if isinstance(mdas, MoonData):
+        mdas = [mdas]
+    writer.writerows(
+        [
+            ["moon phase angle (deg)", *[mda.mpa_degrees for mda in mdas]],
+            ["selenographic latitude (deg)", *[mda.lat_obs for mda in mdas]],
+            ["selenographic longitude (deg)", *[mda.long_obs for mda in mdas]],
+            [
+                "solar selenographic longitude (rad)",
+                *[mda.long_sun_radians for mda in mdas],
+            ],
+            ["distance sun moon (AU)", *[mda.distance_sun_moon for mda in mdas]],
+            [
+                "distance observer moon (km)",
+                *[mda.distance_observer_moon for mda in mdas],
+            ],
+        ]
+    )
+
+
 def export_csv_srf(
     data: Union[SpectralData, List[SpectralData]],
     ch_names: List[str],
@@ -136,7 +158,7 @@ def export_csv_simulation(
     interp_spectrum_name: str,
     skip_uncs: bool,
     cimel_data: Union[SpectralData, List[SpectralData]],
-    mpa: Union[float, None],
+    mda: Union[List[MoonData], MoonData, None],
 ):
     """
     Export the given data to a csv file
@@ -165,8 +187,6 @@ def export_csv_simulation(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-            if mpa is not None and not isinstance(point, CustomPoint):
-                writer.writerow(["moon phase angle (deg)", mpa])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)
@@ -174,7 +194,11 @@ def export_csv_simulation(
             )
             if some_out_mpa_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            _write_point(writer, point)
+            if not isinstance(point, CustomPoint):
+                # CustomPoint data already written with write_moondata
+                _write_point(writer, point)
+            if mda:
+                _write_moondata(writer, mda)
             ylabels = []
             cimel_ylabels = []
             if not isinstance(point, CustomPoint) and point != None:
@@ -186,13 +210,14 @@ def export_csv_simulation(
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    ylab = f"{dt.isoformat(sep=' ', timespec='milliseconds')} {ylabel}{warn_out_mpa_range}"
+                    dtprint = dt.isoformat(sep=" ", timespec="milliseconds")
+                    ylab = f"{dtprint} {ylabel}{warn_out_mpa_range}"
                     ylabels.append(ylab)
                     cimel_ylabels.append(ylab)
                     if not skip_uncs:
-                        halfy2 = f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties"
+                        halfy2 = f"{dtprint} {ylabel} uncertainties (k=2)"
                         ylabels.append(f"{halfy2}{warn_out_mpa_range}")
-                        cimel_ylabels.append(f"{halfy2} (k=2){warn_out_mpa_range}")
+                        cimel_ylabels.append(f"{halfy2}{warn_out_mpa_range}")
             else:
                 warn_out_mpa_range = ""
                 if some_out_mpa_range:
@@ -201,8 +226,10 @@ def export_csv_simulation(
                 ylabels.append(ylab)
                 cimel_ylabels.append(ylab)
                 if not skip_uncs:
-                    ylabels.append(f"uncertainties{warn_out_mpa_range}")
-                    cimel_ylabels.append(f"uncertainties (k=2){warn_out_mpa_range}")
+                    ylabels.append(f"{ylabel} uncertainties (k=2){warn_out_mpa_range}")
+                    cimel_ylabels.append(
+                        f"{ylabel} uncertainties (k=2){warn_out_mpa_range}"
+                    )
             if cimel_data:
                 writer.writerow([f"CIMEL {xlabel}", *cimel_ylabels])
                 if not isinstance(cimel_data, list) and not isinstance(
@@ -298,19 +325,20 @@ def export_csv_comparison(
             )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            if data.points:  # When exporting by wavelength using means, points are None
+            if (
+                data.points is not None and len(data.points) > 0
+            ):  # When exporting by wavelength using means, points are None
                 is_surface = isinstance(data.points[0], SurfacePoint)
+                header_coords = [
+                    "moon phase angle (deg)",
+                    "selenographic latitude (deg)",
+                    "selenographic longitude (deg)",
+                    "solar selenographic longitude (rad)",
+                    "distance sun moon (AU)",
+                    "distance observer moon (km)",
+                ]
                 if is_surface:
-                    header_coords = ["latitude", "longitude", "altitude(m)"]
-                else:  # CustomPoint
-                    header_coords = [
-                        "moon phase angle (deg)",
-                        "selenographic latitude (deg)",
-                        "selenographic longitude (deg)",
-                        "solar selenographic longitude (rad)",
-                        "distance sun moon (AU)",
-                        "distance observer moon (km)",
-                    ]
+                    header_coords += ["latitude", "longitude", "altitude(m)"]
             else:
                 header_coords = []
             diffdata, difflabel = data.get_diffs_and_label(chosen_diffs)
@@ -334,22 +362,24 @@ def export_csv_comparison(
                     warn_out_mpa_range = " **"
                 x_val = f"{x_val}{warn_out_mpa_range}"
                 pt_datarow = []
-                if data.points:
-                    pt = data.points[i]
+                if data.points is not None and data.mdas is not None:
+                    # Just for understanding it, but if either points or mdas is none, the other should be too.
+                    # They are None when it's not representing real measurements, like when using means.
+                    mda = data.mdas[i]
+                    pt_datarow = [
+                        mda.mpa_degrees,
+                        mda.lat_obs,
+                        mda.long_obs,
+                        mda.long_sun_radians,
+                        mda.distance_sun_moon,
+                        mda.distance_observer_moon,
+                    ]
                     if is_surface:
-                        pt_datarow = [
+                        pt = data.points[i]
+                        pt_datarow += [
                             pt.latitude,
                             pt.longitude,
                             pt.altitude,
-                        ]
-                    else:
-                        pt_datarow = [
-                            pt.moon_phase_angle,
-                            pt.selen_obs_lat,
-                            pt.selen_obs_lon,
-                            pt.selen_sun_lon,
-                            pt.distance_sun_moon,
-                            pt.distance_observer_moon,
                         ]
                 datarow = (
                     [x_val]

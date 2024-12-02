@@ -10,7 +10,7 @@ It exports the following classes:
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 import math
-from typing import List, Callable
+from typing import List, Callable, Tuple
 from deprecated import deprecated
 
 """___Third-Party Modules___"""
@@ -26,6 +26,7 @@ from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
     CustomPoint,
+    MoonData,
 )
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -170,9 +171,8 @@ class Comparison(IComparison):
         sigs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
         sps = [[] for _ in ch_names]
-        mpas = [[] for _ in ch_names]
+        mdas_comp: List[List[MoonData]] = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
-        mpa_calcs = []
         sp_calcs = []
         #
         dts = [o.dt for o in observations]
@@ -247,9 +247,8 @@ class Comparison(IComparison):
                 )
                 for mda in mdas
             ]
-        mpa_calcs = [md.mpa_degrees for md in mdas]
         #
-        for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):
+        for obs, sp, mda, dt in zip(observations, sp_calcs, mdas, dts):
             if callback_observation:
                 callback_observation()
             lime_simulation.set_simulation_changed()
@@ -264,7 +263,7 @@ class Comparison(IComparison):
                     sigs[j].append((signals.data[j][0], signals.uncertainties[j][0]))
                     # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
-                    mpas[j].append(mpa)
+                    mdas_comp[j].append(mda)
                     obs_irrs[j].append(obs.ch_irrs[ch])
         if callback_observation:
             callback_observation()
@@ -332,7 +331,9 @@ class Comparison(IComparison):
                 perc_spec = SpectralData(
                     specs[0].wlens, np.array(perc_diffs), np.array(uncs_p), None
                 )
-                ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas[i]]
+                ampa_valid_range = [
+                    is_ampa_valid_range(abs(mda.mpa_degrees)) for mda in mdas_comp[i]
+                ]
                 cp = ComparisonData(
                     specs[0],
                     specs[1],
@@ -343,10 +344,10 @@ class Comparison(IComparison):
                     num_samples,
                     ch_dates[i],
                     sps[i],
-                    mpas[i],
                     ampa_valid_range,
                     perc_spec,
                     mean_perc_diff,
+                    mdas_comp[i],
                 )
                 comparisons.append(cp)
             else:
@@ -362,9 +363,9 @@ class Comparison(IComparison):
                         [],
                         [],
                         [],
+                        None,
+                        None,
                         [],
-                        None,
-                        None,
                     )
                 )
         return comparisons

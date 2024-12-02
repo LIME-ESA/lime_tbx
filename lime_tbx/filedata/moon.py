@@ -229,7 +229,7 @@ def _write_start_dataset(
     warning_outside_mpa_range: bool,
     spectrum_name: str,
     skipped_uncs: bool,
-):
+) -> nc.Dataset:
     ds = nc.Dataset(path, "w", format="NETCDF4")
     ds.Conventions = "CF-1.6"
     ds.Metadata_Conventions = "Unidata Dataset Discovery v1.0"
@@ -285,13 +285,88 @@ class _NormalSimulationData:
     dates: List[datetime]
 
 
+def _read_selenographic_data(ds) -> List[SelenographicDataWrite]:
+    mpas = np.array(ds.variables["mpa"][:].data)
+    m = {}
+    seleno_vars = [
+        "distance_sun_moon",
+        "sun_lon",
+        "obs_lat",
+        "obs_lon",
+        "distance_obs_moon",
+    ]
+    for v in seleno_vars:
+        if v in ds.variables.keys():
+            m[v] = np.array(ds.variables[v][:].data)
+        else:
+            m[v] = np.array([np.nan for _ in mpas])
+    seldata = []
+    for mpa, dsm, slo, ola, olo, dom in zip(
+        mpas,
+        m["distance_sun_moon"],
+        m["sun_lon"],
+        m["obs_lat"],
+        m["obs_lon"],
+        m["distance_obs_moon"],
+    ):
+        sel = SelenographicDataWrite(dsm, slo, mpa, ola, olo, dom)
+        seldata.append(sel)
+    return seldata
+
+
+def _read_selenographic_data_as_moondata(ds) -> List[MoonData]:
+    seldata = _read_selenographic_data(ds)
+    mds = []
+    for sd in seldata:
+        md = MoonData(
+            sd.distance_sun_moon,
+            sd.distance_obs_moon_km,
+            sd.selen_sun_lon_rad,
+            sd.selen_obs_lat_deg,
+            sd.selen_obs_lon_deg,
+            abs(sd.mpa_degrees),
+            sd.mpa_degrees,
+        )
+        mds.append(md)
+    return mds
+
+
+def _write_selenographic_data(ds, seldata: List[SelenographicDataWrite]):
+    mpa_vals = ds.createVariable("mpa", "f8", ("number_obs",))
+    mpa_vals.long_name = "Moon Phase Angle"
+    # mpa_vals[:] = np.array(mpas)
+    mpa_vals[:] = np.array([s.mpa_degrees for s in seldata])
+    mpa_vals.units = "Decimal degrees"
+    distance_sun_moon = ds.createVariable("distance_sun_moon", "f8", ("number_obs",))
+    distance_sun_moon.long_name = "Distance between the Sun and the Moon."
+    distance_sun_moon.units = "AU"
+    distance_sun_moon[:] = np.array([s.distance_sun_moon for s in seldata])
+    selen_sun_lon_rad = ds.createVariable("sun_lon", "f8", ("number_obs",))
+    selen_sun_lon_rad.long_name = "Selenographic longitude of the Sun"
+    selen_sun_lon_rad.units = "Radians"
+    selen_sun_lon_rad[:] = np.array([s.selen_sun_lon_rad for s in seldata])
+    obs_lat = ds.createVariable("obs_lat", "f8", ("number_obs",))
+    obs_lat.long_name = "Selenographic latitude of the observer"
+    obs_lat.units = "Decimal degrees"
+    obs_lat[:] = np.array([s.selen_obs_lat_deg for s in seldata])
+    obs_lon = ds.createVariable("obs_lon", "f8", ("number_obs",))
+    obs_lon.long_name = "Selenographic longitude of the observer"
+    obs_lon.units = "Decimal degrees"
+    obs_lon[:] = np.array([s.selen_obs_lon_deg for s in seldata])
+
+    dist_obs_moon = ds.createVariable("distance_obs_moon", "f8", ("number_obs",))
+    dist_obs_moon.long_name = "Distance between the observer and the Moon."
+    dist_obs_moon.units = "km"
+    dist_obs_moon[:] = np.array([s.distance_obs_moon_km for s in seldata])
+
+
 def _write_normal_simulations(
     lglod: Union[LGLODData, LGLODComparisonData],
     path: str,
     dt: datetime,
     sim_data: _NormalSimulationData,
     inside_mpa_range: List[bool],
-    mpas: List[float],
+    seldata: List[SelenographicDataWrite],
 ):
     not_default_srf = True
     if isinstance(lglod, LGLODData):
@@ -350,10 +425,7 @@ def _write_normal_simulations(
     outside_mpa_range[:] = np.array(
         list(map(lambda x: not x, inside_mpa_range)), dtype=np.int8
     )
-    mpa_vals = ds.createVariable("mpa", "f8", ("number_obs",))
-    mpa_vals.long_name = "Moon Phase Angle"
-    mpa_vals[:] = np.array(mpas)
-    mpa_vals.units = "Decimal degrees"
+    _write_selenographic_data(ds, seldata)
     channel_name = ds.createVariable("channel_name", "S1", ("chan", "chan_strlen"))
     channel_name.standard_name = "sensor_band_identifier"
     channel_name.long_name = "channel identifier"
@@ -393,7 +465,6 @@ def write_obs(
     path: str,
     dt: datetime,
     inside_mpa_range: Union[bool, List[bool]],
-    mpas: List[float],
 ):
     coefficients_version = lglod.version
     if not isinstance(inside_mpa_range, list):
@@ -412,8 +483,9 @@ def write_obs(
             [o.sat_pos for o in obs],
             [o.dt for o in obs],
         )
+        seldata = [o.selenographic_data for o in obs]
         ds = _write_normal_simulations(
-            lglod, path, dt, sim_data, inside_mpa_range, mpas
+            lglod, path, dt, sim_data, inside_mpa_range, seldata
         )
         ds.polarisation_spectrum_name = lglod.dolp_spectrum_name
         ds.is_comparison = 0
@@ -421,27 +493,6 @@ def write_obs(
         wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
         wlens_cimel = ds.createDimension("wlens_cimel", len(lglod.elis_cimel[0].wlens))
         # vals
-        if quant_dates == 0:
-            distance_sun_moon = ds.createVariable(
-                "distance_sun_moon", "f8", ("number_obs",)
-            )
-            distance_sun_moon.long_name = "Distance between the Sun and the Moon."
-            distance_sun_moon.units = "AU"
-            distance_sun_moon[:] = np.array(
-                [o.selenographic_data.distance_sun_moon for o in obs]
-            )
-            selen_sun_lon_rad = ds.createVariable(
-                "selen_sun_lon_rad", "f8", ("number_obs",)
-            )
-            selen_sun_lon_rad.long_name = "Selenographic longitude of the Sun"
-            selen_sun_lon_rad.units = "Radians"
-            selen_sun_lon_rad[:] = np.array(
-                [o.selenographic_data.selen_sun_lon_rad for o in obs]
-            )
-            # mpa_degrees = ds.createVariable("mpa_degrees", "f8", ("number_obs",))
-            # mpa_degrees.long_name = "Moon phase angle"
-            # mpa_degrees.units = "Decimal degrees"
-            # mpa_degrees[:] = np.array([o.selenographic_data.mpa_degrees for o in obs])
         irr_obs = ds.createVariable("irr_obs", "f8", ("number_obs", "chan"))
         irr_obs.units = "W m-2 nm-1"
         irr_obs.long_name = "simulated lunar irradiance for each channel"
@@ -666,10 +717,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     polar_cimel_unc = [
         list(map(float, data)) for data in ds.variables["polar_cimel_unc"][:].data
     ]
-    mpas = np.array(ds.variables["mpa"][:].data)
-    if len(datetimes) == 0:
-        distance_sun_moon = ds.variables["distance_sun_moon"][:].data
-        selen_sun_lon_rad = ds.variables["selen_sun_lon_rad"][:].data
+    seldata = _read_selenographic_data(ds)
     obss = []
     sp_name = ds.spectrum_name
     dolp_sp_name = ds.polarisation_spectrum_name
@@ -697,13 +745,9 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
             None,
         )
         dt = None
-        selenographic_data = None
         if len(datetimes) > 0:
             dt = datetimes[i]
-        else:
-            selenographic_data = SelenographicDataWrite(
-                distance_sun_moon[i], selen_sun_lon_rad[i], mpas[i]
-            )
+        selenographic_data = seldata[i]
         obs = LunarObservationWrite(
             channel_names_0,
             sat_pos_ref_0,
@@ -795,10 +839,19 @@ def write_comparison(
         for c in filtered_comps:
             for i, cdt in enumerate(c.dts):
                 if cdt not in dates_n_points:
+                    md = c.mdas[i]
+                    seldw = SelenographicDataWrite(
+                        md.distance_sun_moon,
+                        md.long_sun_radians,
+                        md.mpa_degrees,
+                        md.lat_obs,
+                        md.long_obs,
+                        md.distance_observer_moon,
+                    )
                     dates_n_points[cdt] = (
                         c.points[i],
                         c.ampa_valid_range[i],
-                        c.mpas[i],
+                        seldw,
                     )
         dates_n_points = dict(sorted(dates_n_points.items(), key=lambda item: item[0]))
         dates = list(dates_n_points.keys())
@@ -809,8 +862,8 @@ def write_comparison(
         inside_mpa_range = []
         sat_pos = []
         sat_pos_refs = []
-        mpas = []
-        for sp, in_range, mpa in points_n_inrange:
+        seldata = []
+        for sp, in_range, seldw in points_n_inrange:
             if isinstance(sp, CustomPoint):
                 sat_pos_pt = SatellitePosition(
                     *SPICEAdapter.to_rectangular_same_frame(
@@ -842,7 +895,7 @@ def write_comparison(
             sat_pos.append(sat_pos_pt)
             sat_pos_refs.append(sat_pos_ref)
             inside_mpa_range.append(in_range)
-            mpas.append(mpa)
+            seldata.append(seldw)
         sim_data = _NormalSimulationData(
             quant_dates,
             coefficients_version,
@@ -854,7 +907,7 @@ def write_comparison(
         )
         fill_value = -1999999
         ds = _write_normal_simulations(
-            lglod, path, dt, sim_data, inside_mpa_range, mpas
+            lglod, path, dt, sim_data, inside_mpa_range, seldata
         )
         ds.is_comparison = 1
         for j, c in enumerate(filtered_comps):
@@ -1036,6 +1089,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     sat_name = lambda_to_str(ds.variables["sat_name"][:].data)
     sat_pos_refs = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))
     mpas = np.array(ds.variables["mpa"][:].data)
+    seldata = np.array(_read_selenographic_data_as_moondata(ds))
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
     vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
@@ -1104,10 +1158,10 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             number_samples[i],
             dts,
             points[indexes],
-            mpas[indexes],
             [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
             perc_diffs,
             mpd[i],
+            seldata[indexes],
         )
         comps.append(comp)
     return LGLODComparisonData(comps, ch_names, sat_name, sp_name, skipped_uncs, vers)

@@ -20,6 +20,7 @@ from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
 from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     SpectralData,
+    MoonData,
 )
 
 """___Authorship___"""
@@ -59,15 +60,16 @@ def sort_by_mpa(comparisons: List[ComparisonData]) -> List[ComparisonData]:
             sp_vals.append(spectr.wlens)
             sp_vals.append(spectr.data)
             sp_vals.append(spectr.uncertainties)
-        vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
-        vals.sort(key=lambda v: v[-1])
-        mpas = [v[-1] for v in vals]
+        vals = list(zip(*sp_vals, c.dts, c.points, c.mdas))
+        vals.sort(key=lambda v: v[-1].mpa_degrees)
+        mdas: List[MoonData] = [v[-1] for v in vals]
+        mpas = [mda.mpa_degrees for mda in mdas]
         ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas]
         new_spectrals = []
         index = 0
         for i, spectr in enumerate(spectrals):
             index = i * 3
-            wlens = np.array(mpas)  # [v[index] for v in vals]
+            wlens = np.array(mpas)  # [v[index].mpa_degrees for v in vals]
             data = np.array([v[index + 1] for v in vals])
             uncertainties = np.array([v[index + 2] for v in vals])
             new_spectrals.append(SpectralData(wlens, data, uncertainties, None))
@@ -88,10 +90,10 @@ def sort_by_mpa(comparisons: List[ComparisonData]) -> List[ComparisonData]:
             nsamp,
             dts,
             points,
-            mpas,
             ampa_valid_range,
             new_spectrals[3],
             mpd,
+            mdas,
         )
         new_comparisons.append(nc)
     return new_comparisons
@@ -155,9 +157,9 @@ def average_comparisons(
         ns,
         None,
         None,
-        None,
         ampavr,
         perc_diffs,
         mpd,
+        None,
     )
     return c

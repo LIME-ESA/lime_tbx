@@ -19,6 +19,7 @@ from ...datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
     ComparisonData,
+    MoonData,
 )
 from ...datatypes.constants import CompFields
 from ..csv import (
@@ -45,6 +46,10 @@ UNCS = [0, 0, 0, 0.0000000001, 0, 0]
 UNCS2 = [0.000002, 0, 0, 0.0000000001, 0, 0]
 DT1 = datetime(2018, 2, 27, 2, tzinfo=timezone.utc)
 DT2 = datetime(2019, 2, 23, 2, tzinfo=timezone.utc)
+MD1 = MoonData(1, 400000, 1.1, 45.10, 44.1, 15.2, -15.2)
+MD2 = MoonData(1.000001, 400100, 1.15, 45.60, 42.1, 12.2, -12.2)
+MD3 = MoonData(0.98128, 387282, 0.9912, 23.99, -55.2, 30.123, 30.123)
+MD4 = MoonData(0.9, 450000, 1, 30, 30, 11.2, -11.2)
 SPOINT = SurfacePoint(43, 45, 4500, DT1)
 SPOINT2 = SurfacePoint(42, 45, 4500, [DT1, DT2])
 SPOINT3 = SurfacePoint(43, 45, 4500, DT2)
@@ -95,7 +100,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
-            30.123,
+            MD3,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_1.csv"))
 
@@ -112,7 +117,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
-            CPOINT.moon_phase_angle,
+            MD4,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_2.csv"))
 
@@ -129,7 +134,7 @@ class TestCSV(unittest.TestCase):
             "ASD",
             False,
             CIMEL_DATA,
-            -30.4,
+            MD2,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_3.csv"))
 
@@ -171,8 +176,12 @@ class TestCSV(unittest.TestCase):
 
     def test_export_csv_comparison_1(self):
         data = [
-            SpectralData([350, 350], [0.02, 0.03], [0, 0.005], None),
-            SpectralData([350, 350], [0.03, 0.03], [0, 0], None),
+            SpectralData(
+                [MD1.mpa_degrees, MD2.mpa_degrees], [0.02, 0.03], [0, 0.005], None
+            ),
+            SpectralData(
+                [MD1.mpa_degrees, MD2.mpa_degrees], [0.03, 0.03], [0, 0], None
+            ),
         ]
         path = "./test_files/csv/export_comp_1.test.csv"
         comp_data = ComparisonData(
@@ -185,12 +194,12 @@ class TestCSV(unittest.TestCase):
             2,
             [DT1, DT2],
             [SPOINT, SPOINT3],
-            [14, 2],
             [True, False],
             data[1],
             0.1,
+            [MD1, MD2],
         )
-        xlabel = "UTC datetime"
+        xlabel = "MPA"
         export_csv_comparison(
             comp_data,
             xlabel,
@@ -219,10 +228,10 @@ class TestCSV(unittest.TestCase):
             2,
             [DT1, DT2],
             [SPOINT, SPOINT3],
-            [14, 2],
             [True, False],
             data[1],
             0.1,
+            [MD1, MD2],
         )
         data2 = [
             SpectralData([DT1, DT2], [0.05, 0.03], [0, 0.005], None),
@@ -238,10 +247,10 @@ class TestCSV(unittest.TestCase):
             2,
             [DT1, DT2],
             [SPOINT, SPOINT3],
-            [14, 2],
             [True, False],
             data[1],
             0.1,
+            [MD1, MD2],
         )
         export_csv_comparison_bywlen(
             [comp_data, comp_data2],

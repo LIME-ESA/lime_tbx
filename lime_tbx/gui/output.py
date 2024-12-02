@@ -23,6 +23,7 @@ from lime_tbx.datatypes.datatypes import (
     SpectralValidity,
     CustomPoint,
     SpectralData,
+    MoonData,
 )
 from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import csv
@@ -232,7 +233,7 @@ class SimGraphWidget(GraphWidget):
         self.max_ylim_top = None
         self.inside_mpa_range = None
         self.interp_spectrum_name = None
-        self.mpa = None
+        self.mda = None
         self.skip_uncs = None
         self.ch_names = []
         self.is_built = False
@@ -361,8 +362,8 @@ class SimGraphWidget(GraphWidget):
     def set_interp_spectrum_name(self, interp_spectrum_name: str):
         self.interp_spectrum_name = interp_spectrum_name
 
-    def set_mpa(self, mpa: Union[float, None]):
-        self.mpa = mpa
+    def set_mda(self, mda: Union[List[MoonData], MoonData, None]):
+        self.mda = mda
 
     def set_skipped_uncertainties(self, skip: bool):
         self.skip_uncs = skip
@@ -390,7 +391,7 @@ class SimGraphWidget(GraphWidget):
                         self.interp_spectrum_name,
                         self.skip_uncs,
                         self.cimel_data,
-                        self.mpa,
+                        self.mda,
                     )
                 else:
                     csv.export_csv_srf(
