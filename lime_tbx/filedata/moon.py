@@ -314,6 +314,23 @@ def _read_selenographic_data(ds) -> List[SelenographicDataWrite]:
     return seldata
 
 
+def _read_selenographic_data_as_moondata(ds) -> List[MoonData]:
+    seldata = _read_selenographic_data(ds)
+    mds = []
+    for sd in seldata:
+        md = MoonData(
+            sd.distance_sun_moon,
+            sd.distance_obs_moon_km,
+            sd.selen_sun_lon_rad,
+            sd.selen_obs_lat_deg,
+            sd.selen_obs_lon_deg,
+            abs(sd.mpa_degrees),
+            sd.mpa_degrees,
+        )
+        mds.append(md)
+    return mds
+
+
 def _write_selenographic_data(ds, seldata: List[SelenographicDataWrite]):
     mpa_vals = ds.createVariable("mpa", "f8", ("number_obs",))
     mpa_vals.long_name = "Moon Phase Angle"
@@ -1072,7 +1089,7 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
     sat_name = lambda_to_str(ds.variables["sat_name"][:].data)
     sat_pos_refs = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))
     mpas = np.array(ds.variables["mpa"][:].data)
-    seldata = np.array(_read_selenographic_data(ds))
+    seldata = np.array(_read_selenographic_data_as_moondata(ds))
     sp_name = ds.spectrum_name
     skipped_uncs = bool(ds.skipped_uncertainties)
     vers = str(ds.reference_model)[len("LIME coefficients version: ") :]

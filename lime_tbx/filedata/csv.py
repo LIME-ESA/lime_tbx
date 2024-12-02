@@ -325,7 +325,9 @@ def export_csv_comparison(
             )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            if data.points:  # When exporting by wavelength using means, points are None
+            if (
+                data.points is not None and len(data.points) > 0
+            ):  # When exporting by wavelength using means, points are None
                 is_surface = isinstance(data.points[0], SurfacePoint)
                 header_coords = [
                     "moon phase angle (deg)",
@@ -360,7 +362,7 @@ def export_csv_comparison(
                     warn_out_mpa_range = " **"
                 x_val = f"{x_val}{warn_out_mpa_range}"
                 pt_datarow = []
-                if data.points and data.mdas:
+                if data.points is not None and data.mdas is not None:
                     # Just for understanding it, but if either points or mdas is none, the other should be too.
                     # They are None when it's not representing real measurements, like when using means.
                     mda = data.mdas[i]
