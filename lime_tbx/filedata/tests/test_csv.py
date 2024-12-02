@@ -19,6 +19,7 @@ from ...datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
     ComparisonData,
+    MoonData,
 )
 from ...datatypes.constants import CompFields
 from ..csv import (
@@ -45,6 +46,8 @@ UNCS = [0, 0, 0, 0.0000000001, 0, 0]
 UNCS2 = [0.000002, 0, 0, 0.0000000001, 0, 0]
 DT1 = datetime(2018, 2, 27, 2, tzinfo=timezone.utc)
 DT2 = datetime(2019, 2, 23, 2, tzinfo=timezone.utc)
+MD1 = MoonData(1, 400000, 1.1, 45.10, 44.1, 15.2, -15.2)
+MD2 = MoonData(1.000001, 400100, 1.15, 45.60, 42.1, 12.2, -12.2)
 SPOINT = SurfacePoint(43, 45, 4500, DT1)
 SPOINT2 = SurfacePoint(42, 45, 4500, [DT1, DT2])
 SPOINT3 = SurfacePoint(43, 45, 4500, DT2)
@@ -185,10 +188,10 @@ class TestCSV(unittest.TestCase):
             2,
             [DT1, DT2],
             [SPOINT, SPOINT3],
-            [14, 2],
-            [True, False],
+            [MD1.mpa_degrees, MD2.mpa_degrees][True, False],
             data[1],
             0.1,
+            [MD1, MD2],
         )
         xlabel = "UTC datetime"
         export_csv_comparison(
@@ -219,10 +222,10 @@ class TestCSV(unittest.TestCase):
             2,
             [DT1, DT2],
             [SPOINT, SPOINT3],
-            [14, 2],
-            [True, False],
+            [MD1.mpa_degrees, MD2.mpa_degrees][True, False],
             data[1],
             0.1,
+            [MD1, MD2],
         )
         data2 = [
             SpectralData([DT1, DT2], [0.05, 0.03], [0, 0.005], None),
@@ -238,10 +241,10 @@ class TestCSV(unittest.TestCase):
             2,
             [DT1, DT2],
             [SPOINT, SPOINT3],
-            [14, 2],
-            [True, False],
+            [MD1.mpa_degrees, MD2.mpa_degrees][True, False],
             data[1],
             0.1,
+            [MD1, MD2],
         )
         export_csv_comparison_bywlen(
             [comp_data, comp_data2],

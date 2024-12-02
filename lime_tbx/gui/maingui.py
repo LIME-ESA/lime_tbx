@@ -49,6 +49,7 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
     SpectralData,
     MoonData,
+    SelenographicDataWrite,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
 from lime_tbx.datatypes.constants import CompFields
@@ -1425,6 +1426,9 @@ class MainSimulationsWidget(
         sp_name = self.settings_manager.get_selected_spectrum_name()
         polar_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_coef_version_name()
+        mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(mds, list):
+            mds = [mds]
         lglod = create_lglod_data(
             point,
             srf,
@@ -1433,15 +1437,12 @@ class MainSimulationsWidget(
             sp_name,
             polar_sp_name,
             version,
+            mds,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        _mds = self.lime_simulation.get_moon_datas()
-        if not isinstance(_mds, list):
-            _mds = [_mds]
-        mpas = [m.mpa_degrees for m in _mds]
         if name is not None and name != "":
             worker = CallbackWorker(
                 moon.write_obs,
@@ -1450,7 +1451,6 @@ class MainSimulationsWidget(
                     name,
                     datetime.now().astimezone(timezone.utc),
                     inside_mpa_range,
-                    mpas,
                 ],
             )
             self._start_thread(worker, self._unblock_gui, self.calculate_all_error)

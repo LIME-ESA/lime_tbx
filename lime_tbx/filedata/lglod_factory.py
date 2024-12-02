@@ -1,7 +1,7 @@
 """This module creates LGLOD datatypes"""
 
 """___Built-In Modules___"""
-# import here
+from typing import List
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -22,6 +22,7 @@ from ..datatypes.datatypes import (
     KernelsPath,
     LGLODData,
     SpectralData,
+    MoonData,
 )
 
 """___Authorship___"""
@@ -29,7 +30,7 @@ __author__ = "Javier Gatón Herguedas"
 __created__ = "26/09/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+__status__ = "Production"
 
 
 def create_lglod_data(
@@ -40,6 +41,7 @@ def create_lglod_data(
     spectrum_name: str,
     dolp_spectrum_name: str,
     coeff_version: str,
+    mdas: List[MoonData],
 ) -> LGLODData:
     """
     Creates a LGLOD object
@@ -127,7 +129,7 @@ def create_lglod_data(
             )
             sat_pos = [SatellitePosition(*rect) for rect in rects]
             sat_name = point.name
-        for i, dt in enumerate(dts):
+        for i, (dt, md) in enumerate(zip(dts, mdas)):
             ob = LunarObservationWrite(
                 ch_names,
                 sat_pos_ref,
@@ -137,7 +139,14 @@ def create_lglod_data(
                 elrefs[i],
                 polars[i],
                 sat_name,
-                None,
+                SelenographicDataWrite(
+                    md.distance_sun_moon,
+                    md.long_sun_radians,
+                    md.mpa_degrees,
+                    md.lat_obs,
+                    md.long_obs,
+                    md.distance_observer_moon,
+                ),
                 constants.LIME_TBX_DATA_SOURCE,
             )
             obs.append(ob)
@@ -171,6 +180,9 @@ def create_lglod_data(
                     point.distance_sun_moon,
                     point.selen_sun_lon,
                     point.moon_phase_angle,
+                    point.selen_obs_lat,
+                    point.selen_obs_lon,
+                    point.distance_observer_moon,
                 ),
                 constants.LIME_TBX_DATA_SOURCE,
             )
