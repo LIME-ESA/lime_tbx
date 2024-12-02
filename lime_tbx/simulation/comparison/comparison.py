@@ -365,7 +365,7 @@ class Comparison(IComparison):
                         [],
                         None,
                         None,
-                        None,
+                        [],
                     )
                 )
         return comparisons

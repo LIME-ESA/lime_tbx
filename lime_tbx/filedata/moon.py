@@ -287,14 +287,27 @@ class _NormalSimulationData:
 
 def _read_selenographic_data(ds) -> List[SelenographicDataWrite]:
     mpas = np.array(ds.variables["mpa"][:].data)
-    distance_sun_moons = np.array(ds.variables["distance_sun_moon"][:].data)
-    sun_lons = np.array(ds.variables["sun_lon"][:].data)
-    obs_lats = np.array(ds.variables["obs_lat"][:].data)
-    obs_lons = np.array(ds.variables["obs_lon"][:].data)
-    distance_obs_moons = np.array(ds.variables["distance_obs_moon"][:].data)
+    m = {}
+    seleno_vars = [
+        "distance_sun_moon",
+        "sun_lon",
+        "obs_lat",
+        "obs_lon",
+        "distance_obs_moon",
+    ]
+    for v in seleno_vars:
+        if v in ds.variables.keys():
+            m[v] = np.array(ds.variables[v][:].data)
+        else:
+            m[v] = np.array([np.nan for _ in mpas])
     seldata = []
     for mpa, dsm, slo, ola, olo, dom in zip(
-        mpas, distance_sun_moons, sun_lons, obs_lats, obs_lons, distance_obs_moons
+        mpas,
+        m["distance_sun_moon"],
+        m["sun_lon"],
+        m["obs_lat"],
+        m["obs_lon"],
+        m["distance_obs_moon"],
     ):
         sel = SelenographicDataWrite(dsm, slo, mpa, ola, olo, dom)
         seldata.append(sel)

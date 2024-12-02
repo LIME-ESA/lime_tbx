@@ -1,7 +1,7 @@
 """This module creates LGLOD datatypes"""
 
 """___Built-In Modules___"""
-from typing import List
+from typing import List, Union
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -41,7 +41,7 @@ def create_lglod_data(
     spectrum_name: str,
     dolp_spectrum_name: str,
     coeff_version: str,
-    mdas: List[MoonData],
+    mdas: Union[MoonData, List[MoonData]],
 ) -> LGLODData:
     """
     Creates a LGLOD object
@@ -80,6 +80,8 @@ def create_lglod_data(
         elis = [elis]
     if not isinstance(elrefs, list):
         elrefs = [elrefs]
+    if not isinstance(mdas, list):
+        mdas = [mdas]
     if lime_simulation.is_polarisation_updated():
         polars = lime_simulation.get_polars()
         polars_cimel = lime_simulation.get_polars_cimel()

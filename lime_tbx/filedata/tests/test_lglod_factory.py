@@ -38,6 +38,7 @@ class TestLGLODFactory(unittest.TestCase):
         )
         ls.update_irradiance(srf, srf, pt, get_coeffs())
         ls.update_polarisation(srf, pt, POL_COEFFS)
+        mdas = ls.get_moon_datas()
         lglod = lglod_factory.create_lglod_data(
             pt,
             srf,
@@ -46,6 +47,7 @@ class TestLGLODFactory(unittest.TestCase):
             "test",
             "testp",
             "test",
+            mdas,
         )
         self.assertEqual(lglod.spectrum_name, "test")
         self.assertEqual(lglod.dolp_spectrum_name, "testp")
@@ -61,6 +63,7 @@ class TestLGLODFactory(unittest.TestCase):
         )
         ls.update_irradiance(srf, srf, pt, get_coeffs())
         ls.update_polarisation(srf, pt, POL_COEFFS)
+        mdas = ls.get_moon_datas()
         lglod = lglod_factory.create_lglod_data(
             pt,
             srf,
@@ -69,6 +72,7 @@ class TestLGLODFactory(unittest.TestCase):
             "test",
             "testp",
             "test",
+            mdas,
         )
         self.assertEqual(lglod.spectrum_name, "test")
         self.assertEqual(lglod.dolp_spectrum_name, "testp")
@@ -82,8 +86,16 @@ class TestLGLODFactory(unittest.TestCase):
         pt = CustomPoint(1, 400000, 30, 30, 1, 40, -40)
         ls.update_irradiance(srf, srf, pt, get_coeffs())
         ls.update_polarisation(srf, pt, POL_COEFFS)
+        mdas = ls.get_moon_datas()
         lglod = lglod_factory.create_lglod_data(
-            pt, srf, ls, KERNELS_PATH, "test", "testp", "test"
+            pt,
+            srf,
+            ls,
+            KERNELS_PATH,
+            "test",
+            "testp",
+            "test",
+            mdas,
         )
         self.assertEqual(lglod.spectrum_name, "test")
         self.assertEqual(lglod.dolp_spectrum_name, "testp")
