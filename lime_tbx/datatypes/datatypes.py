@@ -835,15 +835,13 @@ class ComparisonData:
         for the SpectraDatas.
     points: list of SurfacePoint
         Point for every datetime.
-    mpas: list of float
-        Moon phase angle in degrees for every datetime.
     ampa_valid_range: list of bool
         Flag that indicates if the moon phase angle is in the valid LIME range.
     perc_diffs: SpectralData
         Percentage differences between the simulated and real data.
     mean_perc_difference: float
         The mean of the percentage differences (perc_diffs mean).
-    mdas: float
+    mdas: list of MoonData
         List of lunar geometry and angles for the comparison measurements
     """
 
@@ -856,7 +854,6 @@ class ComparisonData:
     number_samples: int
     dts: List[datetime]
     points: Union[List[SurfacePoint], List[CustomPoint]]
-    mpas: List[float]
     ampa_valid_range: List[bool]
     perc_diffs: SpectralData
     mean_perc_difference: float

@@ -821,7 +821,6 @@ def write_comparison(
                     dates_n_points[cdt] = (
                         c.points[i],
                         c.ampa_valid_range[i],
-                        c.mpas[i],
                         seldw,
                     )
         dates_n_points = dict(sorted(dates_n_points.items(), key=lambda item: item[0]))
@@ -833,9 +832,8 @@ def write_comparison(
         inside_mpa_range = []
         sat_pos = []
         sat_pos_refs = []
-        mpas = []
         seldata = []
-        for sp, in_range, mpa, seldw in points_n_inrange:
+        for sp, in_range, seldw in points_n_inrange:
             if isinstance(sp, CustomPoint):
                 sat_pos_pt = SatellitePosition(
                     *SPICEAdapter.to_rectangular_same_frame(
@@ -867,7 +865,6 @@ def write_comparison(
             sat_pos.append(sat_pos_pt)
             sat_pos_refs.append(sat_pos_ref)
             inside_mpa_range.append(in_range)
-            mpas.append(mpa)
             seldata.append(seldw)
         sim_data = _NormalSimulationData(
             quant_dates,
@@ -1131,7 +1128,6 @@ def _read_comparison(ds: nc.Dataset, kernels_path: KernelsPath) -> LGLODComparis
             number_samples[i],
             dts,
             points[indexes],
-            mpas[indexes],
             [is_ampa_valid_range(abs(mpa)) for mpa in mpas[indexes]],
             perc_diffs,
             mpd[i],

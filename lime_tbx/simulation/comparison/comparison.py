@@ -331,8 +331,9 @@ class Comparison(IComparison):
                 perc_spec = SpectralData(
                     specs[0].wlens, np.array(perc_diffs), np.array(uncs_p), None
                 )
-                mpas_c = [md.mpa_degrees for md in mdas_comp[i]]
-                ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas_c]
+                ampa_valid_range = [
+                    is_ampa_valid_range(abs(mda.mpa_degrees)) for mda in mdas_comp[i]
+                ]
                 cp = ComparisonData(
                     specs[0],
                     specs[1],
@@ -343,7 +344,6 @@ class Comparison(IComparison):
                     num_samples,
                     ch_dates[i],
                     sps[i],
-                    mpas_c,
                     ampa_valid_range,
                     perc_spec,
                     mean_perc_diff,
@@ -360,7 +360,6 @@ class Comparison(IComparison):
                         None,
                         None,
                         None,
-                        [],
                         [],
                         [],
                         [],
