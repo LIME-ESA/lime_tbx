@@ -71,6 +71,18 @@ _WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation
 for absolute moon phase angles between 2° and 90°"
 
 
+def _simplify_mdas_mda(
+    mdas: Union[List[MoonData], MoonData, None]
+) -> Union[MoonData, None]:
+    mda = None
+    if mdas:
+        if isinstance(mdas, MoonData):
+            mda = mdas
+        elif len(mdas) == 1:
+            mda = mdas[0]
+    return mda
+
+
 def eli_callback(
     srf: SpectralResponseFunction,
     point: Point,
@@ -85,7 +97,7 @@ def eli_callback(
     List[float],
     SpectralResponseFunction,
     Union[SpectralData, List[SpectralData], Union[bool, List[bool]]],
-    Union[float, None],
+    Union[List[MoonData], MoonData, None],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -128,9 +140,6 @@ def eli_callback(
     callback_obs = lambda: signal_info.emit("another_refl_irr_simulated")
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef, callback_obs)
     mdas = lime_simulation.get_moon_datas()
-    mpa = None
-    if isinstance(mdas, MoonData):
-        mpa = mdas.mpa_degrees
     return (
         point,
         srf,
@@ -139,7 +148,7 @@ def eli_callback(
         lime_simulation.get_elis_asd(),
         lime_simulation.get_signals(),
         lime_simulation.are_mpas_inside_mpa_range(),
-        mpa,
+        mdas,
     )
 
 
@@ -155,7 +164,7 @@ def elref_callback(
     Point,
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
-    Union[float, None],
+    Union[List[MoonData], MoonData, None],
 ]:
     """Callback that performs the Reflectance operations.
 
@@ -189,16 +198,13 @@ def elref_callback(
     callback_obs = lambda: signal_info.emit("another_refl_simulated")
     lime_simulation.update_reflectance(def_srf, point, cimel_coef, callback_obs)
     mdas = lime_simulation.get_moon_datas()
-    mpa = None
-    if isinstance(mdas, MoonData):
-        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_elrefs(),
         lime_simulation.get_elrefs_cimel(),
         lime_simulation.get_elrefs_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
-        mpa,
+        mdas,
     )
 
 
@@ -214,22 +220,19 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
-    Union[float, None],
+    Union[List[MoonData], MoonData, None],
 ]:
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_pol_simulated")
     lime_simulation.update_polarisation(def_srf, point, coeffs, callback_obs)
     mdas = lime_simulation.get_moon_datas()
-    mpa = None
-    if isinstance(mdas, MoonData):
-        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_polars(),
         lime_simulation.get_polars_cimel(),
         lime_simulation.get_polars_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
-        mpa,
+        mdas,
     )
 
 
@@ -533,7 +536,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.stack_layout.addWidget(self.spinner)
         self.stack_layout.addWidget(self.output_stacklayw)
         self.stack_layout.setCurrentIndex(1)
-        self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
+        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_lglod_button.clicked.connect(self.export_to_lglod)
         self.export_lglod_button.setDisabled(True)
@@ -1040,7 +1043,7 @@ class MainSimulationsWidget(
         self.lower_tabs.addTab(self.signal_widget, "Signal")
         self.lower_tabs.currentChanged.connect(self.lower_tabs_changed)
         # Export to LGLOD
-        self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
+        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
         self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.export_lglod_button.clicked.connect(self.export_glod)
         self.export_lglod_button.setDisabled(True)
@@ -1202,18 +1205,20 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             SpectralData,
             Union[bool, List[bool]],
-            Union[float, None],
+            Union[List[MoonData], MoonData, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         mpa_text = ""
-        if data[7] is not None:
-            mpa_text = f" | MPA: {data[7]:.3f}°"
+        mdas = data[7]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_mpa(data[7])
+        self.graph.set_mda(mdas)
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
@@ -1227,14 +1232,15 @@ class MainSimulationsWidget(
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²nm⁻¹)",
+            "Irradiances (Wm⁻²nm⁻¹)",
             subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[6])
         self.signal_widget.set_interp_spectrum_name(
             self.settings_manager.get_selected_spectrum_name()
         )
-        self.signal_widget.set_mpa(data[7])
+        if mda:
+            self.signal_widget.set_mpa(mda.mpa_degrees)
         self.signal_widget.set_skipped_uncertainties(is_skip_uncs)
         self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
@@ -1287,18 +1293,20 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
-            Union[float, None],
+            Union[List[MoonData], MoonData, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         mpa_text = ""
-        if data[5] is not None:
-            mpa_text = f" | MPA: {data[5]:.3f}°"
+        mdas = data[5]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_mpa(data[5])
+        self.graph.set_mda(mdas)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_coef_version_name()
@@ -1361,18 +1369,20 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
-            Union[float, None],
+            Union[List[MoonData], MoonData, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         mpa_text = ""
-        if data[5] is not None:
-            mpa_text = f" | MPA: {data[5]:.3f}°"
+        mdas = data[5]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
         sp_name = interp_data.get_dolp_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_mpa(data[5])
+        self.graph.set_mda(mdas)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         # self.graph.set_max_ylims(-120, 120) # TODO decide if we do this or not

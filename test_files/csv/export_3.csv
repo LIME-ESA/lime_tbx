@@ -1,13 +1,18 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
-moon phase angle (deg),-30.4
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
 satellite,BIOMASS
 datetime,2018-02-27 02:00:00+00:00
-CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance **,2018-02-27 02:00:00.000+00:00 uncertainties (k=2) **
+moon phase angle (deg),-12.2
+selenographic latitude (deg),45.6
+selenographic longitude (deg),42.1
+solar selenographic longitude (rad),1.15
+distance sun moon (AU),1.000001
+distance observer moon (km),400100
+CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance **,2018-02-27 02:00:00.000+00:00 Irradiance uncertainties (k=2) **
 314,0.01,1e-07
 420,0.01,0
-Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance **,2018-02-27 02:00:00.000+00:00 uncertainties **
+Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance **,2018-02-27 02:00:00.000+00:00 Irradiance uncertainties (k=2) **
 350,0.0001,0
 370,0.0002,0
 390,0.0001,0

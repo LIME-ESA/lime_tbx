@@ -302,7 +302,9 @@ class CLI:
         sp_name = self.settings_manager.get_selected_spectrum_name()
         mdas = self.lime_simulation.get_moon_datas()
         mpa = None
+        mda = None
         if isinstance(mdas, MoonData):
+            mda = mdas
             mpa = mdas.mpa_degrees
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
@@ -317,12 +319,12 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elrefs_cimel(),
-            mpa,
+            mda,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_elis(),
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²nm⁻¹)",
+            "Irradiances (Wm⁻²nm⁻¹)",
             point,
             ed.o_file_irr,
             version,
@@ -330,7 +332,7 @@ class CLI:
             sp_name,
             skip_uncs,
             self.lime_simulation.get_elis_cimel(),
-            mpa,
+            mda,
         )
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
@@ -343,7 +345,7 @@ class CLI:
             dolp_sp_name,
             skip_uncs,
             self.lime_simulation.get_polars_cimel(),
-            mpa,
+            mda,
         )
         csv.export_csv_integrated_irradiance(
             self.srf,
@@ -450,7 +452,7 @@ class CLI:
             None,
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²nm⁻¹)",
+            "Irradiances (Wm⁻²nm⁻¹)",
             None,
             sp_name,
         )
