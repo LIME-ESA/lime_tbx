@@ -694,7 +694,10 @@ class CLI:
             ch_names_obs = {
                 ch_name for mo in mos for ch_name in list(mo.ch_irrs.keys())
             }
-            if len(ch_names_obs) > len(ed.output_files):
+            if ed.comparison_key not in (
+                ComparisonKey.CHANNEL,
+                ComparisonKey.CHANNEL_MEAN,
+            ) and len(ch_names_obs) > len(ed.output_files):
                 raise LimeException(
                     "The amount of export files given is not enough. There are more channels."
                 )
