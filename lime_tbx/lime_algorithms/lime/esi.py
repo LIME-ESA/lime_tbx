@@ -113,42 +113,42 @@ def get_esi(srf_type: str) -> np.ndarray:
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_CIMEL_FILE),
             delimiter=",",
-            usecols=1,
+            usecols=[0, 1],
             dtype=np.float32,
         )
     elif srf_type == "asd":
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_ASD_FILE),
             delimiter=",",
-            usecols=1,
+            usecols=[0, 1],
             dtype=np.float32,
         )
     elif srf_type == "interpolated_gaussian":
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
             delimiter=",",
-            usecols=1,
+            usecols=[0, 1],
             dtype=np.float32,
         )
     elif srf_type == "interpolated_triangle":
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_TRIANGULAR_1_1_FILE),
             delimiter=",",
-            usecols=1,
+            usecols=[0, 1],
             dtype=np.float32,
         )
     elif srf_type == "cimel_wehrli":
         return np.genfromtxt(
             os.path.join(dir_path, _WEHRLI_CIMEL_FILE),
             delimiter=",",
-            usecols=1,
+            usecols=[0, 1],
             dtype=np.float32,
         )
     elif srf_type == "asd_wehrli":
         return np.genfromtxt(
             os.path.join(dir_path, _WEHRLI_ASD_FILE),
             delimiter=",",
-            usecols=1,
+            usecols=[0, 1],
             dtype=np.float32,
         )
     else:
@@ -180,34 +180,48 @@ def get_u_esi(srf_type: str) -> np.ndarray:
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_CIMEL_FILE),
             delimiter=",",
-            usecols=2,
+            usecols=[0, 2],
             dtype=np.float32,
         )
     elif srf_type == "asd":
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_ASD_FILE),
             delimiter=",",
-            usecols=2,
+            usecols=[0, 2],
             dtype=np.float32,
         )
     elif srf_type == "interpolated_gaussian":
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
             delimiter=",",
-            usecols=2,
+            usecols=[0, 2],
             dtype=np.float32,
         )
     elif srf_type == "interpolated_triangle":
         return np.genfromtxt(
             os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
             delimiter=",",
-            usecols=2,
+            usecols=[0, 2],
             dtype=np.float32,
         )
     elif srf_type == "cimel_wehrli":
-        return np.zeros(constants.NUM_CIMEL_WLENS)
+        vals = np.genfromtxt(
+            os.path.join(dir_path, _WEHRLI_CIMEL_FILE),
+            delimiter=",",
+            usecols=[0, 2],
+            dtype=np.float32,
+        )
+        vals[:, 1] = vals[:, 1] * 0
+        return vals
     elif srf_type == "asd_wehrli":
-        return np.zeros(constants.NUM_CIMEL_WLENS)
+        vals = np.genfromtxt(
+            os.path.join(dir_path, _WEHRLI_ASD_FILE),
+            delimiter=",",
+            usecols=[0, 2],
+            dtype=np.float32,
+        )
+        vals[:, 1] = vals[:, 1] * 0
+        return vals
     else:
         raise ValueError(
             f"srf_type was {srf_type} and must be 'cimel', 'asd', 'interpolated_gaussian' or 'interpolated_triangle'"
