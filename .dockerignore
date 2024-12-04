@@ -1,0 +1,16 @@
+.git
+.venv
+.venv_win
+.venv_jupyter
+venv
+__pycache__
+.mypy_cache
+.pytest_cache
+.tox
+.vscode
+dist
+htmlcov
+ignore_folder
+*.egg-info
+public
+.coverage

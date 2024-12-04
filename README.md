@@ -26,6 +26,41 @@
   </p>
 </div>
 
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <!--<li><a href="#roadmap">Roadmap</a></li>-->
+    <li>
+      <a href="#contributing">Contributing</a>
+      <ul>
+        <li><a href="#development">Development</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#deployment">Deployment</a></li>
+      </ul>
+    </li>
+    <li><a href="#license">License</a></li>
+    <!--<li><a href="#contact">Contact</a></li>-->
+    <li><a href="#authors">Authors</a></li>
+  </ol>
+</details>
+
+
 ## About the project
 
 <div align="center">
@@ -78,6 +113,12 @@ by using:
 pip install -e .
 ```
 
+## Usage
+
+Usage examples.
+
+## Contributing
+
 ### Development
 
 If you are developing the package, you'll want to install the pre-commit
@@ -107,20 +148,20 @@ alt="UML diagram of the composite structure of lime_tbx" width="1000px"/>
 </div>
 
 
-Testing
--------
+### Testing
 
 To perform the unit tests one must run:
-
-    python3 -m unittest
+```sh
+python3 -m unittest
+```
 
 To perform the coverage tests one must type:
+```sh
+./coverage_run.sh
+```
 
-    ./coverage_run.sh
 
-
-Deployment
-----------
+### Deployment
 
 Requirements:
 
@@ -147,13 +188,12 @@ For more information about the recommended environments for the production
 of TBX binaries please check the installer directory.
 
 
-License
--------
+## License
 
-[LGPL v3](../../LICENSE)
+Distributed under the LGPL-v3 License. See [LGPL v3](./LICENSE) for more information.
 
-Authors
--------
+
+## Authors
 
 * [Javier Gatón Herguedas](gaton@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
 * [Pieter De Vis](pieter.de.vis@npl.co.uk) - [NPL](https://npl.co.uk)
