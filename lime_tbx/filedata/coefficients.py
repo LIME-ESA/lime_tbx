@@ -112,11 +112,11 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
                 f"Required version: >={tbx_minv}. Current TBX version: {tbx_v}."
             )
     file_version = ds.file_version
-    creation_date = ds.creation_date
+    # creation_date = ds.creation_date
     release_date = ds.release_date
-    software_version = ds.software_version
-    data_origin = ds.data_origin
-    data_origin_release_date = ds.data_origin_release_date
+    # software_version = ds.software_version
+    # data_origin = ds.data_origin
+    # data_origin_release_date = ds.data_origin_release_date
     wlens = ds.wavelength.data
     # define dim_size_dict to specify size of arrays
     dim_sizes = {

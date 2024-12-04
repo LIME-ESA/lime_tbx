@@ -54,9 +54,9 @@ class Test_TSIS(unittest.TestCase):
         )
         tria_wavs, tria_esi, u_tria_esi = dat[:, 0], dat[:, 1], dat[:, 2]
         si = SpectralIntegration()
-        cimel_esi_asd = si.integrate_cimel(asd_esi, asd_wavs)
-        cimel_esi_gauss = si.integrate_cimel(gauss_esi, gauss_wavs)
-        cimel_esi_tria = si.integrate_cimel(tria_esi, tria_wavs)
+        cimel_esi_asd = si.integrate_cimel(asd_esi, asd_wavs, cimel_wavs)
+        cimel_esi_gauss = si.integrate_cimel(gauss_esi, gauss_wavs, cimel_wavs)
+        cimel_esi_tria = si.integrate_cimel(tria_esi, tria_wavs, cimel_wavs)
         npt.assert_allclose(cimel_esi, cimel_esi_asd, rtol=0.01, atol=0.01)
         npt.assert_allclose(cimel_esi, cimel_esi_gauss, rtol=0.01, atol=0.01)
         npt.assert_allclose(cimel_esi, cimel_esi_tria, rtol=0.01, atol=0.01)

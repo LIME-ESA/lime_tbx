@@ -62,21 +62,22 @@ class TestESI(unittest.TestCase):
             self.assertEqual(wehrli_first_vals[wlen], wehrli[wlen])
 
     def test_get_esi_cimel(self):
-        irr = esi.get_esi("cimel")
+        irr = esi.get_esi("cimel")[:, 1]
         cimel_irr = np.array(
             [
                 1.8622064060781873,
-                1.9603369500934011,
-                1.5155354495830629,
+                1.9612487495699018,
+                1.5151828550890423,
                 0.930943917032395,
                 0.7015726794219673,
                 0.227755098787054,
+                0.08441416554330991,
             ]
         )
         np.testing.assert_array_almost_equal(irr, cimel_irr)
 
     def test_get_esi_asd(self):
-        irr = esi.get_esi("asd")
+        irr = esi.get_esi("asd")[:, 1]
         asd_ini = np.array(
             [
                 0.9675921954269933,
@@ -129,7 +130,7 @@ class TestESI(unittest.TestCase):
         np.testing.assert_array_almost_equal(irr[-20:], asd_end)
 
     def test_get_esi_int_gauss(self):
-        irr = esi.get_esi("interpolated_gaussian")
+        irr = esi.get_esi("interpolated_gaussian")[:, 1]
         intgas_ini = np.array(
             [
                 0.9747955034746013,
@@ -157,7 +158,7 @@ class TestESI(unittest.TestCase):
         np.testing.assert_array_almost_equal(irr[:20], intgas_ini)
 
     def test_get_esi_int_triang(self):
-        irr = esi.get_esi("interpolated_triangle")
+        irr = esi.get_esi("interpolated_triangle")[:, 1]
         intgas_ini = np.array(
             [
                 0.9747955034746013,
@@ -185,12 +186,12 @@ class TestESI(unittest.TestCase):
         np.testing.assert_array_almost_equal(irr[:20], intgas_ini)
 
     def test_get_esi_cimel_wehrli(self):
-        irr = esi.get_esi("cimel_wehrli")
+        irr = esi.get_esi("cimel_wehrli")[:, 1]
         cimel_irr = np.array([1.771, 1.9155, 1.512, 0.97635, 0.7122, 0.23555])
         np.testing.assert_array_almost_equal(irr, cimel_irr)
 
     def test_get_esi_asd_wehrli(self):
-        irr = esi.get_esi("asd_wehrli")
+        irr = esi.get_esi("asd_wehrli")[:, 1]
         asd_ini = np.array(
             [
                 9.919000e-01,
@@ -218,27 +219,28 @@ class TestESI(unittest.TestCase):
         np.testing.assert_array_almost_equal(irr[:20], asd_ini)
 
     def test_get_esi_unc_wehrlis(self):
-        uncs = esi.get_u_esi("asd_wehrli")
+        uncs = esi.get_u_esi("asd_wehrli")[:, 1]
         self.assertFalse(uncs.any())
-        uncs = esi.get_u_esi("cimel_wehrli")
+        uncs = esi.get_u_esi("cimel_wehrli")[:, 1]
         self.assertFalse(uncs.any())
 
     def test_get_u_esi_cimel(self):
-        irr = esi.get_u_esi("cimel")
+        irr = esi.get_u_esi("cimel")[:, 1]
         cimel_irr = np.array(
             [
-                0.009227446265508667,
-                0.005827942601212556,
-                0.004505791323970318,
-                0.0027677604139298806,
-                0.0020858239139434887,
-                0.0006771316041964134,
+                0.00047544757316708713,
+                0.00028073022897993964,
+                0.00021615839045347938,
+                0.00013119794464804796,
+                0.0001030192076809563,
+                2.3519874638426612e-05,
+                5.292995762187002e-06,
             ]
         )
         np.testing.assert_array_almost_equal(irr, cimel_irr)
 
     def test_get_u_esi_asd(self):
-        irr = esi.get_u_esi("asd")
+        irr = esi.get_u_esi("asd")[:, 1]
         asd_ini = np.array(
             [
                 0.013035703319541353,
@@ -291,7 +293,7 @@ class TestESI(unittest.TestCase):
         np.testing.assert_array_almost_equal(irr[-20:], asd_end)
 
     def test_get_u_esi_int_gauss(self):
-        irr = esi.get_u_esi("interpolated_gaussian")
+        irr = esi.get_u_esi("interpolated_gaussian")[:, 1]
         intgas_ini = np.array(
             [
                 0.011265766752541512,
@@ -319,7 +321,7 @@ class TestESI(unittest.TestCase):
         np.testing.assert_array_almost_equal(irr[:20], intgas_ini)
 
     def test_get_u_esi_int_triang(self):
-        irr = esi.get_u_esi("interpolated_triangle")
+        irr = esi.get_u_esi("interpolated_triangle")[:, 1]
         intgas_ini = np.array(
             [
                 0.011265766752541512,

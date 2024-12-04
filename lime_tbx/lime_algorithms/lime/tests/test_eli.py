@@ -56,15 +56,24 @@ ELIS_CHECK_DATA_WEHRLI = np.array(
 ELIS_CHECK_DATA = np.array(
     [
         1.0797115270270405e-06,
-        1.349498873307202e-06,
-        1.4076935974170986e-06,
+        1.3501265797219511e-06,
+        1.4073660680104437e-06,
         1.0233894777590921e-06,
         8.503963982841415e-07,
         4.1148031586953454e-07,
     ]
 )
 
-ELIS_CHECK_UNCS = np.array([2.69357809e-22, 5.69153199e-22, 5.74017174e-22, 0, 0, 0])
+ELIS_CHECK_UNCS = np.array(
+    [
+        9.92302678e-09,
+        1.23667473e-08,
+        1.17368027e-08,
+        8.86998430e-09,
+        5.99776235e-09,
+        2.98459689e-09,
+    ]
+)
 
 ELREF_CORR = np.zeros((len(ELIS_CHECK_UNCS), len(ELIS_CHECK_UNCS)))
 np.fill_diagonal(ELREF_CORR, 1)

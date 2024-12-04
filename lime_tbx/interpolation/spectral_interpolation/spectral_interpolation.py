@@ -197,7 +197,7 @@ class SpectralInterpolation(ISpectralInterpolation):
         asd_refl: NDArray[np.float_],
         final_wav: NDArray[np.float_],
     ) -> NDArray[np.float_]:
-        integr_cimel = self.si.integrate_cimel(asd_refl, asd_wav)
+        integr_cimel = self.si.integrate_cimel(asd_refl, asd_wav, cimel_wav)
         interp_asd_cimel = cm.interpolate_1d(
             asd_wav, asd_refl, cimel_wav, method="linear"
         )
@@ -228,9 +228,9 @@ class SpectralInterpolation(ISpectralInterpolation):
         corr_cimel_refl: NDArray[np.float_] = None,
         corr_asd_refl: NDArray[np.float_] = None,
     ) -> NDArray[np.float_]:
-        corr_srf_cimel = self.si.integrate_cimel(asd_refl, asd_wav) - cm.interpolate_1d(
-            asd_wav, asd_refl, cimel_wav, method="linear"
-        )
+        corr_srf_cimel = self.si.integrate_cimel(
+            asd_refl, asd_wav, cimel_wav
+        ) - cm.interpolate_1d(asd_wav, asd_refl, cimel_wav, method="linear")
         return cm.interpolate_1d_along_example(
             cimel_wav,
             cimel_refl - corr_srf_cimel,

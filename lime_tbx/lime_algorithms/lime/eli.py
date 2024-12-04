@@ -122,6 +122,7 @@ def calculate_eli_from_elref(
         The extraterrestrial lunar irradiance calculated
     """
     esk = esi.get_esi(srf_type)
+    esk = esk[[es in wavelengths_nm for es in esk[:, 0]]][:, 1]
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
@@ -164,7 +165,9 @@ def calculate_eli_from_elref_unc(
         The error correlation matrix calculated
     """
     esk = esi.get_esi(srf_type)
+    esk = esk[[es in elref_spectrum.wlens for es in esk[:, 0]]][:, 1]
     u_esk = esi.get_u_esi(srf_type)
+    u_esk = u_esk[[es in elref_spectrum.wlens for es in u_esk[:, 0]]][:, 1]
     dsm = moon_data.distance_sun_moon
     dom = moon_data.distance_observer_moon
 
