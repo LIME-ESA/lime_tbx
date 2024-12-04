@@ -208,7 +208,7 @@ def get_u_esi(srf_type: str) -> np.ndarray:
         vals = np.genfromtxt(
             os.path.join(dir_path, _WEHRLI_CIMEL_FILE),
             delimiter=",",
-            usecols=[0, 2],
+            usecols=[0, 1],
             dtype=np.float32,
         )
         vals[:, 1] = vals[:, 1] * 0
@@ -217,7 +217,7 @@ def get_u_esi(srf_type: str) -> np.ndarray:
         vals = np.genfromtxt(
             os.path.join(dir_path, _WEHRLI_ASD_FILE),
             delimiter=",",
-            usecols=[0, 2],
+            usecols=[0, 1],
             dtype=np.float32,
         )
         vals[:, 1] = vals[:, 1] * 0
