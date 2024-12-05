@@ -13,8 +13,7 @@ RUN apt install libcairo-gobject2 libpango-1.0-0 libpangocairo-1.0-0 libcairo2 l
 # python 3.8
 RUN wget https://www.python.org/ftp/python/3.8.20/Python-3.8.20.tgz
 RUN tar xzf Python-3.8.20.tgz
-RUN cd Python-3.8.20 && ./configure --enable-shared && make && make install
-# --enable-optimizations
+RUN cd Python-3.8.20 && ./configure --enable-shared --enable-optimizations && make && make install
 RUN cp /usr/local/lib/libpython3.8.so.1.0 /usr/lib
 # SSL
 RUN wget https://www.openssl.org/source/old/1.1.1/openssl-1.1.1q.tar.gz
@@ -34,5 +33,5 @@ RUN wget http://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/libfontconfig1_
 RUN dpkg -i libfontconfig1_2.13.1-2ubuntu3_amd64.deb
 
 CMD ["./repo/deployment/ubuntu_build_script.sh"]
-# docker build .. -t lime_compiler -f Dockerfile
+# docker build .. -t lime_compiler -f Linux.Dockerfile
 # docker run -v $(dirname $(pwd)):/usr/src/app/repo lime_compiler
