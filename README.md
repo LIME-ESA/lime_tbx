@@ -45,7 +45,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <!--<li><a href="#roadmap">Roadmap</a></li>-->
+    <li><a href="#roadmap">Roadmap</a></li>
     <li>
       <a href="#contributing">Contributing</a>
       <ul>
@@ -117,7 +117,23 @@ pip install -e .
 
 Usage examples.
 
+## Roadmap
+
+- [ ] Toolbox compilation through Docker
+    - [ ] Linux
+    - [ ] Windows
+    - [ ] Mac
+- [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR107**)
+    - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR107-A**)
+    - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR107-B**)
+- [ ] Improve the speed of uncertainties calculation. (**NFR306**)
+
+
+See the [open issues](https://github.com/LIME-ESA/lime_tbx/issues) for a full list of proposed features (and known issues).
+
 ## Contributing
+
+If you wish to contribute to the *lime_tbx* project, please check the [contributing](./CONTRIBUTING.md) guide.
 
 ### Development
 

@@ -44,7 +44,7 @@ if sys.platform == 'linux':
         (src_path + 'spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv', './lime_tbx/spectral_integration/assets'),
         (src_path + 'spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv', './lime_tbx/spectral_integration/assets'),
         (src_path + 'spectral_integration/assets/asd_fwhm.csv', './lime_tbx/spectral_integration/assets'),
-        (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/responses_1088.csv', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/lime/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/lime/assets'),
         (src_path + 'lime_algorithms/lime/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/lime/assets'),
         (src_path + 'lime_algorithms/lime/assets/tsis_asd.csv', './lime_tbx/lime_algorithms/lime/assets'),
@@ -93,7 +93,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'spectral_integration\\assets\\interpolated_model_fwhm_1_1_triangle.csv', '.\\lime_tbx\\spectral_integration\\assets'),
         (src_path + 'spectral_integration\\assets\\interpolated_model_fwhm_3_1_gaussian.csv', '.\\lime_tbx\\spectral_integration\\assets'),
         (src_path + 'spectral_integration\\assets\\asd_fwhm.csv', '.\\lime_tbx\\spectral_integration\\assets'),
-        (src_path + 'spectral_integration\\assets\\responses_1088_13112020.txt', '.\\lime_tbx\\spectral_integration\\assets'),
+        (src_path + 'spectral_integration\\assets\\responses_1088.csv', '.\\lime_tbx\\spectral_integration\\assets'),
         (src_path + 'lime_algorithms\\lime\\assets\\wehrli_asc.csv', '.\\lime_tbx\\lime_algorithms\\lime\\assets'),
         (src_path + 'lime_algorithms\\lime\\assets\\tsis_cimel.csv', '.\\lime_tbx\\lime_algorithms\\lime\\assets'),
         (src_path + 'lime_algorithms\\lime\\assets\\tsis_asd.csv', '.\\lime_tbx\\lime_algorithms\\lime\\assets'),
@@ -138,7 +138,7 @@ elif sys.platform == 'darwin':
         (src_path + 'spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv', './lime_tbx/spectral_integration/assets'),
         (src_path + 'spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv', './lime_tbx/spectral_integration/assets'),
         (src_path + 'spectral_integration/assets/asd_fwhm.csv', './lime_tbx/spectral_integration/assets'),
-        (src_path + 'spectral_integration/assets/responses_1088_13112020.txt', './lime_tbx/spectral_integration/assets'),
+        (src_path + 'spectral_integration/assets/responses_1088.csv', './lime_tbx/spectral_integration/assets'),
         (src_path + 'lime_algorithms/lime/assets/wehrli_asc.csv', './lime_tbx/lime_algorithms/lime/assets'),
         (src_path + 'lime_algorithms/lime/assets/tsis_cimel.csv', './lime_tbx/lime_algorithms/lime/assets'),
         (src_path + 'lime_algorithms/lime/assets/tsis_asd.csv', './lime_tbx/lime_algorithms/lime/assets'),
@@ -183,6 +183,7 @@ exe = EXE(
     argv_emulation=None,
     codesign_identity=None,
     entitlements_file=None,
+    contents_directory='.',
 )
 
 coll = COLLECT(
