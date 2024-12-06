@@ -7,8 +7,6 @@ cd repo
 :: python code
 rd /s /q .venv
 python -m venv .venv
-.venv\scripts\python -m pip install --upgrade setuptools
-.venv\scripts\python -m pip install --upgrade pip
 .venv\scripts\pip install wheel
 .venv\Scripts\pip install -r requirements.txt
 rd /s /q dist build
