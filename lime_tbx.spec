@@ -60,7 +60,7 @@ if sys.platform == 'linux':
     }
 elif sys.platform == 'win32' or sys.platform == 'win64':
     src_path = 'lime_tbx\\'
-    venv_path = '.venv_win' # '.venv'
+    venv_path = '.venv'
     a_pathex = [f'.\\{venv_path}\\Lib\\site-packages\\']
     a_binaries = [
         (f'{venv_path}\\Lib\\site-packages\\spiceypy\\utils\\libcspice.dll', '.\\spiceypy\\utils'),
