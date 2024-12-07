@@ -71,6 +71,13 @@ DTS = [
     datetime(2022, 1, 14, 11, 22, 4, tzinfo=timezone.utc),
 ]
 
+DTS2 = [
+    datetime(2022, 1, 1, 1, 1, 1, 1234, tzinfo=timezone.utc),
+    datetime(2022, 1, 1, 2, 1, 1, 1234, tzinfo=timezone.utc),
+    datetime(2022, 1, 1, 3, 1, 1, 1234, tzinfo=timezone.utc),
+    datetime(2022, 1, 1, 4, 1, 1, 1234, tzinfo=timezone.utc),
+]
+
 CIMEL_DATA = SpectralData([314, 420], [0.01, 0.01], [0.0000001, 0], None)
 
 
@@ -306,6 +313,12 @@ class TestCSV(unittest.TestCase):
         self.assertEqual(len(dts), len(DTS))
         for i, dt in enumerate(dts):
             self.assertEqual(dt, DTS[i])
+
+    def test_read_datetimes_complex(self):
+        dts = read_datetimes("./test_files/csv/complex_times.csv")
+        self.assertEqual(len(dts), len(DTS2))
+        for i, dt in enumerate(dts):
+            self.assertEqual(dt, DTS2[i])
 
 
 if __name__ == "__main__":

@@ -264,7 +264,7 @@ class ShowDatetimeWidget(QtWidgets.QWidget):
             self.table.setItem(
                 1 + i,
                 5,
-                QtWidgets.QTableWidgetItem(str(dt.second + dt.microsecond / 1000)),
+                QtWidgets.QTableWidgetItem(str(dt.second + dt.microsecond / 1000000)),
             )
 
 

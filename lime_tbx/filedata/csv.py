@@ -12,7 +12,7 @@ It exports the following functions:
 from typing import Union, List
 from datetime import datetime, timezone
 import csv
-import os
+import dateutil.parser
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -578,8 +578,15 @@ def read_datetimes(path: str) -> List[datetime]:
             for row in reader:
                 if not row:
                     continue
-                irow = map(int, row)
-                dt = datetime(*irow, tzinfo=timezone.utc)
+                if len(row) > 1:
+                    irow = map(int, row)
+                    dt = datetime(*irow, tzinfo=timezone.utc)
+                else:
+                    dt = dateutil.parser.parse(row[0])
+                    if dt.tzinfo is not None:
+                        dt = dt.astimezone(timezone.utc)
+                    else:
+                        dt = dt.replace(tzinfo=timezone.utc)
                 datetimes.append(dt)
             return datetimes
     except Exception as e:

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The TBX accepts coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band. (**NFR107-A**)
 - Automatic deployment for Linux through Docker.
 - Partial automatic deployment for Windows through Docker. All except first step (compiling EOCFI C Code).
+- Timeseries input file now also accepts regular format timestamps, not only CSV.
 
 ### Fixed
 
