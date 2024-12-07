@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] - yyyy-mm-dd
 
+## [1.1.0] - 2024-12-09
+
 ### Added
 
 - GUI more user friendly: Simulation input takes less window space.
@@ -33,5 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial version that serves as the baseline for tracking changes in the change log.
 
 
-[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.0.3...HEAD
+[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/LIME-ESA/lime_tbx/releases/tag/v1.0.3

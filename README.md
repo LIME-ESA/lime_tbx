@@ -1,6 +1,6 @@
 # LIME Toolbox
 
-[![Version 1.0.3](https://img.shields.io/badge/version-1.0.3-informational?style=for-the-badge)](https://gitlab.npl.co.uk/eco/eo/lime_tbx/-/tags) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-informational?style=for-the-badge)](https://gitlab.npl.co.uk/eco/eo/lime_tbx/-/tags) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Issues][issues-shield]][issues-url]
 [![Stargazers][stars-shield]][stars-url]
 <!--[![LGPL v3 License][license-shield]][license-url]-->
