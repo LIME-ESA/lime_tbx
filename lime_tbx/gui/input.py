@@ -440,7 +440,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         ):
             if self.single_datetime:
                 self.change_multiple_datetime()
-            self.loaded_datetimes = dt
+            self.all_loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
             self.loaded_datetimes_label.setToolTip("")
             self.update_dates_with_limits()
@@ -450,7 +450,11 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
                 self.change_single_datetime()
             self.datetime_edit.setDateTime(
                 QtCore.QDateTime(
-                    dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second
+                    QtCore.QDate(dt.year, dt.month, dt.day),
+                    QtCore.QTime(
+                        dt.hour, dt.minute, dt.second, int(dt.microsecond / 1000)
+                    ),
+                    QtCore.QTimeZone.utc(),
                 )
             )
         self.check_if_a_lot_dts_and_update_msg()
