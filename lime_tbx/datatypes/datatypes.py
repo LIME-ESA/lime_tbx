@@ -195,6 +195,12 @@ class SpectralResponseFunction:
     def get_channels_names(self) -> List[str]:
         return [ch.id for ch in self.channels]
 
+    def get_channels_centers(self) -> List[float]:
+        wlcs = []
+        for ch in self.channels:
+            wlcs.append(ch.center)
+        return wlcs
+
     def get_channel_from_name(self, name: str) -> SRFChannel:
         chs = [ch for ch in self.channels if ch.id == name]
         if len(chs) == 0:
@@ -829,14 +835,14 @@ class ComparisonData:
         for the SpectraDatas.
     points: list of SurfacePoint
         Point for every datetime.
-    mpas: list of float
-        Moon phase angle in degrees for every datetime.
     ampa_valid_range: list of bool
         Flag that indicates if the moon phase angle is in the valid LIME range.
     perc_diffs: SpectralData
         Percentage differences between the simulated and real data.
     mean_perc_difference: float
         The mean of the percentage differences (perc_diffs mean).
+    mdas: list of MoonData
+        List of lunar geometry and angles for the comparison measurements
     """
 
     observed_signal: SpectralData
@@ -847,11 +853,25 @@ class ComparisonData:
     standard_deviation_mrd: float
     number_samples: int
     dts: List[datetime]
-    points: List[SurfacePoint]
-    mpas: List[float]
+    points: Union[List[SurfacePoint], List[CustomPoint]]
     ampa_valid_range: List[bool]
     perc_diffs: SpectralData
     mean_perc_difference: float
+    mdas: List[MoonData]
+
+    def get_diffs_and_label(
+        self, chosen_diffs: constants.CompFields
+    ) -> Union[Tuple[SpectralData, str], Tuple[None, None]]:
+        if chosen_diffs == constants.CompFields.DIFF_PERC:
+            datadiff = self.perc_diffs
+            label = "Percentage difference (%)"
+        elif chosen_diffs == constants.CompFields.DIFF_REL:
+            datadiff = self.diffs_signal
+            label = "Relative difference (%)"
+        else:
+            datadiff = None
+            label = None
+        return datadiff, label
 
 
 @dataclass
@@ -883,11 +903,20 @@ class SelenographicDataWrite:
         Selenographic longitude of the Sun (in radians)
     mpa_degrees : float
         Moon phase angle (in degrees)
+    selen_obs_lat_deg: float
+        Selenographic latitude of the observer (in degrees)
+    selen_obs_lon_deg: float
+        Selenographic longitude of the observer (in degrees)
+    distance_obs_moon_km: float
+        Distance between the observer and the Moon (in kilometers)
     """
 
     distance_sun_moon: float
     selen_sun_lon_rad: float
     mpa_degrees: float
+    selen_obs_lat_deg: float
+    selen_obs_lon_deg: float
+    distance_obs_moon_km: float
 
 
 @dataclass

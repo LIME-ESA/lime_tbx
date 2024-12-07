@@ -8,6 +8,7 @@ from typing import Tuple
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
+import pytest
 
 """___LIME_TBX Modules___"""
 from .. import comparison
@@ -32,7 +33,7 @@ __author__ = "Javier Gatón Herguedas"
 __created__ = "25/08/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+__status__ = "Production"
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 EOCFI_PATH = "./eocfi_data"
@@ -142,6 +143,7 @@ class TestComparison(unittest.TestCase):
         self.assertAlmostEqual(z, 5138362, delta=4)
 
     # Function get_simulations
+    @pytest.mark.slow
     def test_get_simulations_ok(self):
         co = get_comparison()
         lime = get_lime_simulation()
@@ -159,6 +161,7 @@ class TestComparison(unittest.TestCase):
             comp.simulated_signal.uncertainties[0], 1.5069602623384797e-08
         )
 
+    @pytest.mark.slow
     def test_get_simulations_multiple_obs_and_channels(self):
         co = get_comparison()
         lime = get_lime_simulation()
@@ -188,6 +191,7 @@ class TestComparison(unittest.TestCase):
             np.array([2.290940e-08, 2.594562e-08]),
         )
 
+    @pytest.mark.slow
     def test_get_simulations_other_srf(self):
         # Wrong srf in comparisons output empty comparison data instances.
         co = get_comparison()
@@ -201,7 +205,7 @@ class TestComparison(unittest.TestCase):
             self.assertIsNone(comp.diffs_signal)
             self.assertEqual(len(comp.dts), 0)
             self.assertIsNone(comp.mean_relative_difference)
-            self.assertEqual(len(comp.mpas), 0)
+            self.assertEqual(len(comp.mdas), 0)
             self.assertIsNone(comp.number_samples)
             self.assertIsNone(comp.observed_signal)
             self.assertEqual(len(comp.points), 0)
@@ -221,158 +225,9 @@ class TestComparison(unittest.TestCase):
             self.assertIsNone(comp.diffs_signal)
             self.assertEqual(len(comp.dts), 0)
             self.assertIsNone(comp.mean_relative_difference)
-            self.assertEqual(len(comp.mpas), 0)
+            self.assertEqual(len(comp.mdas), 0)
             self.assertIsNone(comp.number_samples)
             self.assertIsNone(comp.observed_signal)
             self.assertEqual(len(comp.points), 0)
             self.assertIsNone(comp.simulated_signal)
             self.assertIsNone(comp.standard_deviation_mrd)
-
-    # Function sort by mpa
-    def test_sort_by_mpa_ok(self):
-        co = get_comparison()
-        n_elems = 3
-        comps = []
-        mpas = [
-            [10, 20, 30],
-            [30, 20, 10],
-            [120, 100, 110],
-            [115, 150, -5],
-            [-1, -2, -80],
-        ]
-        for i in range(len(mpas)):
-            sds = get_random_spectral_data_dts(n_elems)
-            comp = ComparisonData(
-                sds[0],
-                sds[1],
-                sds[1],
-                0,
-                0,
-                0,
-                3,
-                sds[0].wlens,
-                [None, None, None],
-                mpas[i],
-                [True, True, True],
-                sds[1],
-                0,
-            )
-            comps.append(comp)
-        new_comps = co.sort_by_mpa(comps)
-        mpas_indexes = np.argsort(mpas)
-        for i in range(len(mpas_indexes)):
-            for j in range(len(mpas_indexes[i])):
-                id = mpas_indexes[i][j]
-                self.assertEqual(
-                    comps[i].observed_signal.data[id],
-                    new_comps[i].observed_signal.data[j],
-                )
-                self.assertEqual(
-                    comps[i].simulated_signal.data[id],
-                    new_comps[i].simulated_signal.data[j],
-                )
-                self.assertEqual(
-                    comps[i].diffs_signal.data[id], new_comps[i].diffs_signal.data[j]
-                )
-
-    def test_sort_by_mpa_already_ordered(self):
-        co = get_comparison()
-        n_elems = 3
-        comps = []
-        mpas = [
-            [10, 20, 30],
-            [10, 20, 30],
-            [100, 110, 120],
-            [-5, 115, 150],
-            [-80, -2, -1],
-        ]
-        for i in range(len(mpas)):
-            sds = get_random_spectral_data_dts(n_elems)
-            comp = ComparisonData(
-                sds[0],
-                sds[1],
-                sds[1],
-                0,
-                0,
-                0,
-                3,
-                sds[0].wlens,
-                [None, None, None],
-                mpas[i],
-                [True, True, True],
-                sds[1],
-                0,
-            )
-            comps.append(comp)
-        new_comps = co.sort_by_mpa(comps)
-        mpas_indexes = np.argsort(mpas)
-        for i in range(len(mpas_indexes)):
-            for j in range(len(mpas_indexes[i])):
-                id = mpas_indexes[i][j]
-                self.assertEqual(
-                    comps[i].observed_signal.data[id],
-                    new_comps[i].observed_signal.data[j],
-                )
-                self.assertEqual(
-                    comps[i].simulated_signal.data[id],
-                    new_comps[i].simulated_signal.data[j],
-                )
-                self.assertEqual(
-                    comps[i].diffs_signal.data[id], new_comps[i].diffs_signal.data[j]
-                )
-
-    def test_sort_by_mpa_empty(self):
-        co = get_comparison()
-        comps = []
-        new_comps = co.sort_by_mpa(comps)
-        self.assertEqual(len(new_comps), 0)
-
-    def test_sort_by_mpa_repeated(self):
-        co = get_comparison()
-        n_elems = 3
-        comps = []
-        mpas = [
-            [10, 10, 10],
-            [20, 20, 20],
-            [110, 110, 110],
-            [115, 115, 115],
-            [-2, -2, -2],
-        ]
-        for i in range(len(mpas)):
-            sds = get_random_spectral_data_dts(n_elems)
-            comp = ComparisonData(
-                sds[0],
-                sds[1],
-                sds[1],
-                0,
-                0,
-                0,
-                3,
-                sds[0].wlens,
-                [None, None, None],
-                mpas[i],
-                [True, True, True],
-                sds[1],
-                0,
-            )
-            comps.append(comp)
-        new_comps = co.sort_by_mpa(comps)
-        mpas_indexes = np.argsort(mpas)
-        for i in range(len(mpas_indexes)):
-            for j in range(len(mpas_indexes[i])):
-                id = mpas_indexes[i][j]
-                self.assertEqual(
-                    comps[i].observed_signal.data[id],
-                    new_comps[i].observed_signal.data[j],
-                )
-                self.assertEqual(
-                    comps[i].simulated_signal.data[id],
-                    new_comps[i].simulated_signal.data[j],
-                )
-                self.assertEqual(
-                    comps[i].diffs_signal.data[id], new_comps[i].diffs_signal.data[j]
-                )
-
-
-if __name__ == "__main__":
-    unittest.main()

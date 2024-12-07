@@ -1,14 +1,19 @@
 LIME coefficients version,test
 Interpolation spectrum,ASD
-moon phase angle (deg),30.123
 latitude (deg),43
 longitude (deg),45
 altitude (m),4500
 datetime,2018-02-27 02:00:00+00:00
-CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties (k=2)
+moon phase angle (deg),30.123
+selenographic latitude (deg),23.99
+selenographic longitude (deg),-55.2
+solar selenographic longitude (rad),0.9912
+distance sun moon (AU),0.98128
+distance observer moon (km),387282
+CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 Irradiance uncertainties (k=2)
 314,0.01,1e-07
 420,0.01,0
-Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 uncertainties
+Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance,2018-02-27 02:00:00.000+00:00 Irradiance uncertainties (k=2)
 350,0.0001,0
 370,0.0002,0
 390,0.0001,0

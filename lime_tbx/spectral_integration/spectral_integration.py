@@ -14,6 +14,7 @@ import os
 
 """___Third-Party Modules___"""
 import numpy as np
+import pandas as pd
 import punpy
 from matheo.band_integration import band_integration
 
@@ -36,7 +37,7 @@ __status__ = "Development"
 
 
 _ASD_FILE = "assets/asd_fwhm.csv"
-_CIMEL_FILE = "assets/responses_1088_13112020.txt"
+_CIMEL_FILE = "assets/responses_1088.csv"
 _INTERPOLATED_GAUSSIAN_FILE = "assets/interpolated_model_fwhm_3_1_gaussian.csv"
 _INTERPOLATED_TRIANGULAR_FILE = "assets/interpolated_model_fwhm_1_1_triangle.csv"
 
@@ -113,6 +114,30 @@ class ISpectralIntegration(ABC):
         """
         pass
 
+    @abstractmethod
+    def integrate_cimel(
+        self, data: np.ndarray, wlens: np.ndarray, cimel_wavs: List[float]
+    ) -> np.ndarray:
+        """
+        Integrate the spectrum of x = wlens and y = data over the CIMEL wavelengths specified in cimel_wavs.
+        Internally it obtains the CIMEL spectral response function.
+
+        Parameters
+        ----------
+        data: np.array of float
+            Data that is going to be integrated over the CIMEL bands.
+        wlens: np.array of float
+            Wavelengths in nm related to the data.
+        cimel_wavs: np.array of float
+            Nominal wavelengths of the chosen CIMEL bands.
+
+        Returns
+        -------
+        cimel_integ_data: np.array of float
+            Data integrated over the CIMEL bands
+        """
+        pass
+
 
 class SpectralIntegration(ISpectralIntegration):
     """Class that implements the methods exported by this module"""
@@ -185,23 +210,28 @@ class SpectralIntegration(ISpectralIntegration):
         read asd fwhm and make SRF
         """
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        data = np.genfromtxt(os.path.join(dir_path, _CIMEL_FILE), delimiter=",")
-        cimel_wavs = [440, 500, 675, 870, 1020, 1640]
-        srflist = [None] * len(cimel_wavs)
-
-        for i in range(len(cimel_wavs)):
-            srf = {
-                data[j, 2 * i]: data[j, 2 * i + 1]
-                for j in range(len(data[:, 2 * i + 1]))
-                if data[j, 2 * i] > 0
-            }
-            channel = SRFChannel(cimel_wavs[i], str(cimel_wavs[i]), srf)
-            srflist[i] = channel
-
+        srflist = []
+        df = pd.read_csv(os.path.join(dir_path, _CIMEL_FILE))
+        cimel_wavs = [int(c[2:]) for c in df.columns if c.startswith("w")]
+        for cw in cimel_wavs:
+            wlens = df[f"w.{cw}"].values
+            resp = df[f"r.{cw}"].values
+            srf = {w: r for w, r in zip(wlens, resp)}
+            channel = SRFChannel(cw, str(cw), srf)
+            srflist.append(channel)
         return SpectralResponseFunction("cimel", srflist)
 
-    def integrate_cimel(self, data: np.ndarray, wlens: np.ndarray) -> np.ndarray:
-        y = self.integrate_elis_xy(self.cimel_srf, data, wlens)
+    def integrate_cimel(
+        self, data: np.ndarray, wlens: np.ndarray, cimel_wavs: List[float]
+    ) -> np.ndarray:
+        channels = [
+            self.cimel_srf.get_channel_from_name(f"{int(wl)}") for wl in cimel_wavs
+        ]
+        if None in channels:
+            raise Exception(
+                "Coefficients channels are not present in default CIMEL SRF."
+            )
+        y = self.integrate_elis_xy(channels, data, wlens)
         return y
 
     def integrate_solar_asd(
@@ -252,7 +282,7 @@ class SpectralIntegration(ISpectralIntegration):
         )
 
     def integrate_elis_xy(
-        self, srf: SpectralResponseFunction, data: np.ndarray, wlens: np.ndarray
+        self, channels: List[SRFChannel], data: np.ndarray, wlens: np.ndarray
     ) -> np.ndarray:
         """
 
@@ -265,8 +295,8 @@ class SpectralIntegration(ISpectralIntegration):
         :return:
         :rtype:
         """
-        signals = np.zeros(len(srf.channels))
-        for ich, ch in enumerate(srf.channels):
+        signals = np.zeros(len(channels))
+        for ich, ch in enumerate(channels):
             ch_wlens = np.array([w for w in ch.spectral_response.keys()])
             ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
             signals[ich] = band_integration.band_int(data, wlens, ch_srf, ch_wlens)

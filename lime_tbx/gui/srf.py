@@ -53,7 +53,7 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # Current SRF
         self.selection_layout = QtWidgets.QHBoxLayout()
-        self.current_srf_label = QtWidgets.QLabel("SRF: ")
+        self.current_srf_label = QtWidgets.QLabel("Spectral Response Function: ")
         self.combo_srf = QtWidgets.QComboBox()
         self.combo_srf.currentIndexChanged.connect(self.update_from_combobox)
         self.update_combo_srf()
@@ -64,7 +64,7 @@ class SRFEditWidget(QtWidgets.QWidget):
         self.selection_layout.addWidget(self.combo_srf, 1)
         self.selection_layout.addWidget(self.load_button)
         # Graph
-        self.graph = output.GraphWidget(
+        self.graph = output.SimGraphWidget(
             self.settings_manager,
             "SRF",
             "Wavelengths (nm)",

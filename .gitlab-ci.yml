@@ -7,7 +7,7 @@ stages:
   - Build latex Documentation
   - Publish latex Documentation
   - Test
-  #- Full test
+  - Full test
   - Publish test report
   - Combine quality documentation
 
@@ -104,31 +104,33 @@ tox-3.8:
   stage: "Test"
   image: "python:3.8"
   
-# tox_slowtests:
-#     extends: .py_venv
-#     stage: "Full test"
-#     rules:
-#       # Run for scheduled or triggered builds
-#       - if: '$CI_PIPELINE_SOURCE == "trigger"'
-#         when: always
-#       - if: '$CI_PIPELINE_SOURCE == "schedule"'
-#         when: always        
-#       # Run for tags
-#       - if: '$CI_COMMIT_TAG'
-#         when: always
-#       # And allow manual runs
-#       - if: '$CI_COMMIT_BRANCH'
-#         when: manual
-#         allow_failure: true
-#     script:
-#       - pwd
-#       - ls -l
-#       - export PYTHONPATH="$PYTHONPATH:."
-#       - python -c "import sys;print(sys.path)"
-#       - pip install tox
-#       - tox -- --runslow
-#     coverage: '/^TOTAL.+?(\d+\%)$/'
-#     needs: []
+tox_slowtests:
+    extends: .py_venv
+    stage: "Full test"
+    rules:
+      # Run for scheduled or triggered builds
+      - if: '$CI_PIPELINE_SOURCE == "trigger"'
+        when: always
+      - if: '$CI_PIPELINE_SOURCE == "schedule"'
+        when: always        
+      # Run for tags
+      - if: '$CI_COMMIT_TAG'
+        when: always
+      # And allow manual runs
+      - if: '$CI_COMMIT_BRANCH'
+        when: manual
+        allow_failure: true
+    script:
+      - pwd
+      - ls -l
+      - export PYTHONPATH="$PYTHONPATH:."
+      - python -c "import sys;print(sys.path)"
+      - pip install tox
+      - mkdir test_report
+      - export GITLAB_CI="GITLAB_CI"
+      - tox -- --runslow
+    coverage: '/^TOTAL.+?(\d+\%)$/'
+    needs: []
 
 test_report:
   needs: ["tox-3.8"]

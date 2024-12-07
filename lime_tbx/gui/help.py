@@ -46,7 +46,9 @@ sensing instrument (pre-stored in GLOD format files) to the LIME model output.
 
 
 _CONTACT: str = """
-To communicate any problem or error please contact:
+To communicate any problem or error please visit the forum at
+<a style=\"color: #00ae9d\" href=\"https://lime.uva.es/forums/\">lime.uva.es/forums</a>
+or contact:
 <a style=\"color: #00ae9d\" href=\"mailto:lime_tbx@goa.uva.es\">lime_tbx@goa.uva.es</a>
 """.replace(
     "\n", " "
@@ -291,11 +293,15 @@ class AboutDialog(QtWidgets.QDialog):
         _go_to_link("https://vito.be/en")
 
 
-_HELP_TEXT = """
+_HELP_TEXT = (
+    """
 <p>
     Welcome to the LIME ToolBox! To check the user guide please visit:
     <a style=\"color: #00ae9d\" href=\"https://calvalportal.ceos.org/lime\">calvalportal.ceos.org/lime</a>
 </p>
+"""
+    + _CONTACT
+    + """
 <h2>How does it work?</h2>
 <p>
     The LIME model computes lunar reflectance for CIMEL wavelengths with
@@ -337,6 +343,7 @@ _HELP_TEXT = """
     and toggle the switch to activate.
 </p>
 """
+)
 
 
 class HelpDialog(QtWidgets.QDialog):

@@ -8,6 +8,7 @@ import os
 
 """___Third-Party Modules___"""
 from PySide2 import QtWidgets, QtCore, QtGui
+import numpy as np
 
 """___LIME_TBX Modules___"""
 from lime_tbx.gui import (
@@ -28,6 +29,7 @@ from lime_tbx.gui.settings import ISettingsManager
 from lime_tbx.filedata import moon, srf as srf_loader
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
+from lime_tbx.simulation.comparison.utils import sort_by_mpa
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, LimeSimulation
 from lime_tbx.eocfi_adapter import eocfi_adapter
 from lime_tbx.interpolation.interp_data import interp_data
@@ -47,8 +49,10 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
     SpectralData,
     MoonData,
+    SelenographicDataWrite,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
+from lime_tbx.datatypes.constants import CompFields
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 
 """___Authorship___"""
@@ -67,6 +71,18 @@ _WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation
 for absolute moon phase angles between 2° and 90°"
 
 
+def _simplify_mdas_mda(
+    mdas: Union[List[MoonData], MoonData, None]
+) -> Union[MoonData, None]:
+    mda = None
+    if mdas:
+        if isinstance(mdas, MoonData):
+            mda = mdas
+        elif len(mdas) == 1:
+            mda = mdas[0]
+    return mda
+
+
 def eli_callback(
     srf: SpectralResponseFunction,
     point: Point,
@@ -81,7 +97,7 @@ def eli_callback(
     List[float],
     SpectralResponseFunction,
     Union[SpectralData, List[SpectralData], Union[bool, List[bool]]],
-    Union[float, None],
+    Union[List[MoonData], MoonData, None],
 ]:
     """
     Callback that performs the Irradiance operations.
@@ -124,9 +140,6 @@ def eli_callback(
     callback_obs = lambda: signal_info.emit("another_refl_irr_simulated")
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef, callback_obs)
     mdas = lime_simulation.get_moon_datas()
-    mpa = None
-    if isinstance(mdas, MoonData):
-        mpa = mdas.mpa_degrees
     return (
         point,
         srf,
@@ -135,7 +148,7 @@ def eli_callback(
         lime_simulation.get_elis_asd(),
         lime_simulation.get_signals(),
         lime_simulation.are_mpas_inside_mpa_range(),
-        mpa,
+        mdas,
     )
 
 
@@ -151,7 +164,7 @@ def elref_callback(
     Point,
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
-    Union[float, None],
+    Union[List[MoonData], MoonData, None],
 ]:
     """Callback that performs the Reflectance operations.
 
@@ -185,16 +198,13 @@ def elref_callback(
     callback_obs = lambda: signal_info.emit("another_refl_simulated")
     lime_simulation.update_reflectance(def_srf, point, cimel_coef, callback_obs)
     mdas = lime_simulation.get_moon_datas()
-    mpa = None
-    if isinstance(mdas, MoonData):
-        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_elrefs(),
         lime_simulation.get_elrefs_cimel(),
         lime_simulation.get_elrefs_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
-        mpa,
+        mdas,
     )
 
 
@@ -210,22 +220,19 @@ def polar_callback(
     Union[SpectralData, List[SpectralData]],
     Union[SpectralData, List[SpectralData]],
     Union[bool, List[bool]],
-    Union[float, None],
+    Union[List[MoonData], MoonData, None],
 ]:
     def_srf = get_default_srf()
     callback_obs = lambda: signal_info.emit("another_pol_simulated")
     lime_simulation.update_polarisation(def_srf, point, coeffs, callback_obs)
     mdas = lime_simulation.get_moon_datas()
-    mpa = None
-    if isinstance(mdas, MoonData):
-        mpa = mdas.mpa_degrees
     return (
         point,
         lime_simulation.get_polars(),
         lime_simulation.get_polars_cimel(),
         lime_simulation.get_polars_asd(),
         lime_simulation.are_mpas_inside_mpa_range(),
-        mpa,
+        mdas,
     )
 
 
@@ -259,7 +266,7 @@ def compare_callback(
     comparisons = co.get_simulations(
         mos, srf, cimel_coef, lime_simulation, callback_obs
     )
-    mpa_comp = co.sort_by_mpa(comparisons)
+    mpa_comp = sort_by_mpa(comparisons)
     return comparisons, mpa_comp, mos, srf
 
 
@@ -277,27 +284,73 @@ def calculate_all_callback(
     return (point, srf)
 
 
-def show_comparisons_callback(
-    output: output.ComparisonOutput,
-    output_mpa: output.ComparisonOutput,
+def show_comparisons_wlen_callback(
+    output: output.ComparisonByWlenOutput,
     comps: List[ComparisonData],
-    mpa_comps: List[ComparisonData],
     srf: SpectralResponseFunction,
     version: str,
     settings_manager: ISettingsManager,
-) -> Tuple[List[str], List[str]]:
-    to_remove = _show_comps_output(
-        output, comps, "datetimes", srf, version, settings_manager
+    chosen_diffs: CompFields,
+) -> Tuple[output.ComparisonOutput, List[str]]:
+    comps = [c if c.observed_signal is not None else None for c in comps]
+    output.update_plot(comps, srf.get_channels_centers(), False, chosen_diffs)
+    statscomps = [c for c in comps if c is not None]
+    n_comp_points = np.mean([len(c.diffs_signal.wlens) for c in statscomps])
+    data_start = min([min(c.dts) for c in statscomps])
+    data_end = max([max(c.dts) for c in statscomps])
+    warning_out_mpa_range = ""
+    if False in [not np.all(c.ampa_valid_range) for c in statscomps]:
+        warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+    sp_name = settings_manager.get_selected_spectrum_name()
+    skip = settings_manager.is_skip_uncertainties()
+    spectrum_info = f" | Interp. spectrum: {sp_name}"
+    output.set_interp_spectrum_name(sp_name)
+    output.set_skipped_uncertainties(skip)
+    subtitle = (
+        f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
     )
-    to_remove_comps = _show_comps_output(
-        output_mpa,
-        mpa_comps,
-        "Moon Phase Angle (degrees)",
+    _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
+    subtitle = "{}\nData start: {} | Data end: {}\nMean number of points: {}".format(
+        subtitle,
+        data_start.strftime(_subtitle_date_format),
+        data_end.strftime(_subtitle_date_format),
+        n_comp_points,
+    )
+    output.update_labels(
+        "All channels",
+        "Wavelength (nm)",
+        "Irradiance (Wm⁻²nm⁻¹)",
+        subtitle=subtitle,
+        redraw=False,
+    )
+    output.update_legends(
+        [
+            ["Observed Irradiance", "Simulated Irradiance"],
+        ],
+        redraw=True,
+    )
+    return []
+
+
+def show_comparisons_callback(
+    output: output.ComparisonOutput,
+    comps: List[ComparisonData],
+    xlabel: str,
+    srf: SpectralResponseFunction,
+    version: str,
+    settings_manager: ISettingsManager,
+    chosen_diffs: CompFields,
+) -> Tuple[output.ComparisonOutput, List[str]]:
+    to_remove = _show_comps_output(
+        output,
+        comps,
+        xlabel,
         srf,
         version,
         settings_manager,
+        chosen_diffs,
     )
-    return (to_remove, to_remove_comps)
+    return output, to_remove
 
 
 def _callback_read_srf(
@@ -314,12 +367,14 @@ def _show_comps_output(
     srf: SpectralResponseFunction,
     version: str,
     settings_manager: ISettingsManager,
+    chosen_diffs: CompFields,
 ) -> List[str]:
-    ch_names = srf.get_channels_names()
     to_remove = []
+    ch_names = srf.get_channels_names()
     for i, ch in enumerate(ch_names):
         if len(comps[i].dts) > 0:
-            output.update_plot(i, comps[i], False)
+            ch_id = output.get_channel_id(ch)
+            output.update_plot(ch_id, comps[i], False, chosen_diffs)
             n_comp_points = len(comps[i].diffs_signal.wlens)
             data_start = min(comps[i].dts)
             data_end = max(comps[i].dts)
@@ -329,8 +384,8 @@ def _show_comps_output(
             sp_name = settings_manager.get_selected_spectrum_name()
             skip = settings_manager.is_skip_uncertainties()
             spectrum_info = f" | Interp. spectrum: {sp_name}"
-            output.set_interp_spectrum_name(i, sp_name)
-            output.set_skipped_uncertainties(i, skip)
+            output.set_interp_spectrum_name(ch_id, sp_name)
+            output.set_skipped_uncertainties(ch_id, skip)
             subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
             _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
             subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
@@ -340,7 +395,7 @@ def _show_comps_output(
                 n_comp_points,
             )
             output.update_labels(
-                i,
+                ch_id,
                 "{} ({} nm)".format(ch, srf.get_channel_from_name(ch).center),
                 y_label,
                 "Irradiance (Wm⁻²nm⁻¹)",
@@ -348,12 +403,9 @@ def _show_comps_output(
                 redraw=False,
             )
             output.update_legends(
-                i,
+                ch_id,
                 [
                     ["Observed Irradiance", "Simulated Irradiance"],
-                    [],
-                    [],
-                    ["Relative Differences", "Percentage Differences"],
                 ],
                 redraw=True,
             )
@@ -365,6 +417,16 @@ def _show_comps_output(
         if chsrf.valid_spectre == SpectralValidity.PARTLY_OUT:
             output.set_as_partly(chsrf.id)
     return to_remove
+
+
+def clear_comparison_callback(srf: SpectralResponseFunction):
+    # Try to delete the SRF
+    for i in range(len(srf.channels) - 1, -1, -1):
+        srf.channels[i].spectral_response = None
+        srf.channels[i].spectral_response_inrange = None
+        srf.channels[i].valid_spectre = None
+        del srf.channels[i]
+    return []
 
 
 class ComparisonPageWidget(QtWidgets.QWidget):
@@ -380,72 +442,141 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.settings_manager = settings_manager
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        self.comparing_dts = True
-        self.showing_rel_diff = True
         self.workers = []
         self.worker_ths = []
+        self._listening_changes_combobox = True
+        self.chosen_diffs = CompFields.DIFF_REL
         self._build_layout()
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        # Top input pre comparison
+        self.top_precomp_layout = QtWidgets.QVBoxLayout()
         self.input = input.ComparisonInput(
             self._callback_compare_input_changed,
             self._callback_compare_button_enable,
             self.kernels_path,
             self.eocfi_path,
         )
+        self.top_precomp_layout.addWidget(self.input)
         self.compare_button = QtWidgets.QPushButton("Compare")
         self.compare_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.compare_button.clicked.connect(self.compare)
         self.compare_button.setDisabled(True)
-        self.clear_comparison_button = QtWidgets.QPushButton("New Comparison")
+        self.top_precomp_layout.addWidget(self.compare_button)
+        self.top_precomp = QtWidgets.QWidget()
+        self.top_precomp.setLayout(self.top_precomp_layout)
+        self.top_precomp.setContentsMargins(0, 0, 0, 0)
+        # Top input post comparison
+        self.top_postcomp_layout = QtWidgets.QVBoxLayout()
+        self.comp_options_box = QtWidgets.QHBoxLayout()
+        self.clear_comparison_button = QtWidgets.QPushButton("New")
         self.clear_comparison_button.setCursor(
             QtGui.QCursor(QtCore.Qt.PointingHandCursor)
         )
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
-        self.clear_comparison_button.setVisible(False)
-        # Comparison visualization options box
-        self.comp_options_box = QtWidgets.QHBoxLayout()
-        self.change_mpa_dts_button = QtWidgets.QPushButton("Compare by MPA")
-        self.change_mpa_dts_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        self.comp_options_box.addWidget(self.clear_comparison_button)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 2)
+        self.compare_by_label = QtWidgets.QLabel("Compare by:")
+        self.compare_by_field = QtWidgets.QComboBox()
+        self.compare_by_field.view().setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAsNeeded
         )
-        self.change_mpa_dts_button.clicked.connect(self.switch_show_compare_mpa_dts)
-        self.change_mpa_dts_button.setVisible(False)
-        self.change_rel_perc_diffs_button = QtWidgets.QPushButton(
-            "Show percentage difference"
+        self.compare_by_field.addItems(
+            [
+                CompFields.COMP_DATE,
+                CompFields.COMP_MPA,
+                CompFields.COMP_WLEN,
+                CompFields.COMP_WLEN_MEAN,
+            ]
         )
-        self.change_rel_perc_diffs_button.setCursor(
-            QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+        self.compare_by_field.currentTextChanged.connect(
+            self._update_from_compare_combo
         )
-        self.change_rel_perc_diffs_button.clicked.connect(
-            self.switch_show_rel_perc_diff
+        self.comp_options_box.addWidget(self.compare_by_label)
+        self.comp_options_box.addWidget(self.compare_by_field)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 1)
+        self.difference_by_label = QtWidgets.QLabel("Difference:")
+        self.difference_by_field = QtWidgets.QComboBox()
+        self.difference_by_field.view().setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAsNeeded
         )
-        self.change_rel_perc_diffs_button.setVisible(False)
-        self.comp_options_box.addWidget(self.change_mpa_dts_button)
-        self.comp_options_box.addWidget(self.change_rel_perc_diffs_button)
-
+        self.difference_by_field.addItems(
+            [
+                CompFields.DIFF_NONE,
+                CompFields.DIFF_REL,
+                CompFields.DIFF_PERC,
+            ]
+        )
+        self.difference_by_field.setCurrentIndex(1)
+        self.difference_by_field.currentTextChanged.connect(
+            self._update_from_difference_combo
+        )
+        self.comp_options_box.addWidget(self.difference_by_label)
+        self.comp_options_box.addWidget(self.difference_by_field)
+        self.top_postcomp_layout.addLayout(self.comp_options_box)
+        self.top_postcomp = QtWidgets.QWidget()
+        self.top_postcomp.setLayout(self.top_postcomp_layout)
+        self.top_postcomp.setContentsMargins(0, 0, 0, 0)
+        self.top_postcomp.setVisible(False)
+        # Comparison content
         self.stack_layout = QtWidgets.QStackedLayout()
         self.stack_layout.setStackingMode(QtWidgets.QStackedLayout.StackAll)
-        self.output = output.ComparisonOutput(self.settings_manager, True)
-        self.output_mpa = output.ComparisonOutput(self.settings_manager, False)
-        self.output_mpa.setVisible(False)
+        self.output = output.ComparisonOutput(self.settings_manager)
+        self.output_wlen = output.ComparisonByWlenOutput(self.settings_manager)
+        self.output_wlen.setVisible(False)
+        self.output_stacklay = QtWidgets.QStackedLayout()
+        self.output_stacklay.setStackingMode(QtWidgets.QStackedLayout.StackAll)
+        self.output_stacklay.addWidget(self.output)
+        self.output_stacklay.addWidget(self.output_wlen)
+        self.output_stacklayw = QtWidgets.QWidget()
+        self.output_stacklayw.setLayout(self.output_stacklay)
         self.spinner = SpinnerPage()
         self.spinner.setVisible(False)
         self.stack_layout.addWidget(self.spinner)
-        self.stack_layout.addWidget(self.output)
-        self.stack_layout.addWidget(self.output_mpa)
+        self.stack_layout.addWidget(self.output_stacklayw)
         self.stack_layout.setCurrentIndex(1)
-        self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
+        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
         self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.export_lglod_button.clicked.connect(self.export_to_lglod)
         self.export_lglod_button.setDisabled(True)
-        self.main_layout.addWidget(self.input)
-        self.main_layout.addWidget(self.compare_button)
-        self.main_layout.addWidget(self.clear_comparison_button)
-        self.main_layout.addLayout(self.comp_options_box)
+        self.main_layout.addWidget(self.top_precomp)
+        self.main_layout.addWidget(self.top_postcomp)
         self.main_layout.addLayout(self.stack_layout)
         self.main_layout.addWidget(self.export_lglod_button)
+
+    def _focus_on_comp_wlen(self, focuswlen: bool):
+        self.output_wlen.setVisible(focuswlen)
+        self.output.setVisible(not focuswlen)
+        if focuswlen:
+            self.output_stacklay.setCurrentIndex(1)
+        else:
+            self.output_stacklay.setCurrentIndex(0)
+
+    def is_focus_on_comp_wlen(self) -> bool:
+        return self.output_stacklay.currentIndex() == 1
+
+    def _update_from_compare_combo(self, value: str):
+        if self._listening_changes_combobox:
+            if value == CompFields.COMP_MPA:
+                self.show_compare_mpa()
+            elif value == CompFields.COMP_DATE:
+                self.show_compare_dts()
+            elif value == CompFields.COMP_WLEN:
+                self.show_compare_wlen_boxplot()
+            elif value == CompFields.COMP_WLEN_MEAN:
+                self.show_compare_wlen_mean()
+
+    def _update_from_difference_combo(self, value: str):
+        if value in [CompFields.DIFF_NONE, CompFields.DIFF_PERC, CompFields.DIFF_REL]:
+            self.chosen_diffs = value
+        if self._listening_changes_combobox:
+            if value == CompFields.DIFF_PERC:
+                self.show_perc_diff()
+            elif value == CompFields.DIFF_REL:
+                self.show_rel_diff()
+            else:
+                self.show_no_diff()
 
     def _callback_compare_button_enable(self, enable: bool):
         self.compare_button.setEnabled(enable)
@@ -479,10 +610,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         else:
             self.spinner.set_text("")
             self.spinner.movie_stop()
-            if self.comparing_dts:
-                self.stack_layout.setCurrentIndex(1)
-            else:
-                self.stack_layout.setCurrentIndex(2)
+            self.stack_layout.setCurrentIndex(1)
 
     def _unblock_gui(self):
         self._set_spinner(False)
@@ -567,12 +695,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.quant_mos_simulated += 1
 
     def set_show_comparison_input(self, show: bool):
-        self.input.setVisible(show)
-        self.compare_button.setVisible(show)
-        self.clear_comparison_button.setVisible(not show)
+        self.top_precomp.setVisible(show)
+        self.top_postcomp.setVisible(not show)
         if show:
-            self.output_mpa.set_channels([])
             self.output.set_channels([])
+            self.output_wlen.clear()
+            self._focus_on_comp_wlen(False)
 
     @QtCore.Slot()
     def clear_comparison_pressed(self):
@@ -592,22 +720,37 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def clear_comparison_accepted(self):
-        # Try to delete the SRF
-        for i in range(len(self.srf.channels) - 1, -1, -1):
-            self.srf.channels[i].spectral_response = None
-            self.srf.channels[i].spectral_response_inrange = None
-            self.srf.channels[i].valid_spectre = None
-            del self.srf.channels[i]
+        self._listening_changes_combobox = False
+        self._block_gui_loading()
+        params = [
+            self.srf,
+        ]
+        worker = CallbackWorker(clear_comparison_callback, params)
+        self._start_thread(
+            worker, self._clear_comparison_finished, self._clear_comparison_error
+        )
+
+    def _clear_comparison_finished(self, data):
         self.srf = None
         self.set_show_comparison_input(True)
-        if not self.comparing_dts:
-            self.switch_show_compare_mpa_dts()
+        if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
+            self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
+        if not self.difference_by_field.currentText() == CompFields.DIFF_REL:
+            self.difference_by_field.setCurrentText(CompFields.DIFF_REL)
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
         self.export_lglod_button.setEnabled(False)
-        self.change_mpa_dts_button.setVisible(False)
-        self.change_rel_perc_diffs_button.setVisible(False)
+        self.top_postcomp.setVisible(False)
+        self._listening_changes_combobox = True
+        self._unblock_gui()
+
+    def _clear_comparison_error(self, error: Exception):
+        self._unblock_gui()
+        self.handle_operation_error(error)
+        self.export_lglod_button.setEnabled(False)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(True)
 
     @QtCore.Slot()
     def clear_comparison_rejected(self):
@@ -632,73 +775,100 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
         self.mpa_comps = mpa_comps
         self.srf = srf
-        version = self.settings_manager.get_coef_version_name()
+        self.version = self.settings_manager.get_coef_version_name()
         params = [
             self.output,
-            self.output_mpa,
             self.comps,
-            self.mpa_comps,
+            CompFields.COMP_DATE,
             self.srf,
-            version,
+            self.version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
-        self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
 
-    def switch_show_compare_mpa_dts(self):
-        if self.comparing_dts:
-            self.comparing_dts = False
-            self.change_mpa_dts_button.setText("Compare by datetime")
-            self.show_compare_mpa()
-        else:
-            self.comparing_dts = True
-            self.change_mpa_dts_button.setText("Compare by MPA")
-            self.show_compare_dts()
-
-    def switch_show_rel_perc_diff(self):
-        if self.showing_rel_diff:
-            self.showing_rel_diff = False
-            self.change_rel_perc_diffs_button.setText("Show relative difference")
-            self.show_perc_diff()
-        else:
-            self.showing_rel_diff = True
-            self.change_rel_perc_diffs_button.setText("Show percentage difference")
-            self.show_rel_diff()
-
     def show_compare_dts(self):
+        self._focus_on_comp_wlen(False)
         self._block_gui_loading()
-        ch_index = self.output_mpa.get_current_channel_index()
-        self.output.setVisible(True)
-        self.output_mpa.setVisible(False)
-        self.output.set_current_channel_index(ch_index)
-        self.stack_layout.setCurrentIndex(1)
-        self._unblock_gui()
+        params = [
+            self.output,
+            self.comps,
+            CompFields.COMP_DATE,
+            self.srf,
+            self.version,
+            self.settings_manager,
+            self.chosen_diffs,
+        ]
+        worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(
+            worker, self._show_comparisons_switch_finished, self.compare_error
+        )
 
     def show_compare_mpa(self):
+        self._focus_on_comp_wlen(False)
         self._block_gui_loading()
-        ch_index = self.output.get_current_channel_index()
-        self.output.setVisible(False)
-        self.output_mpa.setVisible(True)
-        self.output_mpa.set_current_channel_index(ch_index)
-        self.stack_layout.setCurrentIndex(2)
-        self._unblock_gui()
+        params = [
+            self.output,
+            self.mpa_comps,
+            CompFields.COMP_MPA,
+            self.srf,
+            self.version,
+            self.settings_manager,
+            self.chosen_diffs,
+        ]
+        worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(
+            worker, self._show_comparisons_switch_finished, self.compare_error
+        )
+
+    def _show_compare_wlen(self, boxplot: bool):
+        self._focus_on_comp_wlen(True)
+        self._block_gui_loading()
+        self.output_wlen.set_kind(boxplot)
+        params = [
+            self.output_wlen,
+            self.comps,
+            self.srf,
+            self.version,
+            self.settings_manager,
+            self.chosen_diffs,
+        ]
+        worker = CallbackWorker(show_comparisons_wlen_callback, params)
+        self._start_thread(
+            worker, self._show_comparisons_wlen_finished, self.compare_error
+        )
+
+    def show_compare_wlen_boxplot(self):
+        self._show_compare_wlen(True)
+
+    def show_compare_wlen_mean(self):
+        self._show_compare_wlen(False)
 
     def show_perc_diff(self):
         self._block_gui_loading()
-        self.output_mpa.show_percentage()
-        self.output.show_percentage()
+        focuswlen = self.is_focus_on_comp_wlen()
+        self.output.show_percentage(not focuswlen)
+        self.output_wlen.show_percentage(focuswlen)
         self._unblock_gui()
 
     def show_rel_diff(self):
         self._block_gui_loading()
-        self.output_mpa.show_relative()
-        self.output.show_relative()
+        focuswlen = self.is_focus_on_comp_wlen()
+        self.output.show_relative(not focuswlen)
+        self.output_wlen.show_relative(focuswlen)
+        self._unblock_gui()
+
+    def show_no_diff(self):
+        self._block_gui_loading()
+        focuswlen = self.is_focus_on_comp_wlen()
+        self.output.show_no_diff(not focuswlen)
+        self.output_wlen.show_no_diff(focuswlen)
         self._unblock_gui()
 
     def load_lglod_comparisons(
@@ -719,36 +889,53 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.mpa_comps = mpa_comps
         self.srf = srf
         self.comparison_spectrum = self.settings_manager.get_selected_spectrum_name()
+        self.version = version
         params = [
             self.output,
-            self.output_mpa,
             self.comps,
-            self.mpa_comps,
+            CompFields.COMP_DATE,
             self.srf,
             version,
             self.settings_manager,
+            self.chosen_diffs,
         ]
         # Channels are set to the output here, as that needs to be done in the main qt thread.
         # This section blocks the spinning loading widget.
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
-        self.output_mpa.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
 
     def _load_lglod_comparisons_finished(self, data):
-        self.output.remove_channels(data[0])
-        self.output.check_if_range_visible()
-        self.output_mpa.remove_channels(data[1])
-        self.output_mpa.check_if_range_visible()
+        self._focus_on_comp_wlen(False)
+        outp: output.ComparisonOutput = data[0]
+        outp.remove_channels(data[1])
+        outp.check_if_range_visible()
         self._unblock_gui()
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
-        self.change_mpa_dts_button.setVisible(True)
-        self.change_rel_perc_diffs_button.setVisible(True)
+        self.top_postcomp.setVisible(True)
+
+    def _show_comparisons_switch_finished(self, data):
+        self._focus_on_comp_wlen(False)
+        outp: output.ComparisonOutput = data[0]
+        outp.check_if_range_visible()
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+        self.top_postcomp.setVisible(True)
+
+    def _show_comparisons_wlen_finished(self, data):
+        self._focus_on_comp_wlen(True)
+        self._unblock_gui()
+        self.export_lglod_button.setEnabled(True)
+        window: LimeTBXWindow = self.parentWidget().parentWidget()
+        window.set_save_simulation_action_disabled(False)
+        self.top_postcomp.setVisible(True)
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):
@@ -782,6 +969,7 @@ class MainSimulationsWidget(
     ):
         super().__init__()
         self.kernels_path = kernels_path
+        self.eocfi_path = eocfi_path
         self._finished_building = False
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
@@ -789,7 +977,6 @@ class MainSimulationsWidget(
             eocfi_path,
             kernels_path,
         )
-        self.satellites = self.eocfi.get_sat_list()
         self.workers = []
         self.worker_ths = []
         self._build_layout()
@@ -799,10 +986,11 @@ class MainSimulationsWidget(
         self.main_layout = QtWidgets.QVBoxLayout(self)
         # input
         self.input_widget = input.InputWidget(
-            self.satellites,
             self._callback_regular_input_changed,
             self.update_calculability,
             self.settings_manager.is_skip_uncertainties(),
+            self.eocfi_path,
+            self.kernels_path,
         )
         # srf
         # self.srf_widget = srf.CurrentSRFWidget(self.settings_manager)
@@ -824,7 +1012,7 @@ class MainSimulationsWidget(
         self.lower_tabs = QtWidgets.QTabWidget()
         self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
         # graph
-        self.graph = output.GraphWidget(
+        self.graph = output.SimGraphWidget(
             self.settings_manager,
             "Simulation output",
             "Wavelengths (nm)",
@@ -855,7 +1043,7 @@ class MainSimulationsWidget(
         self.lower_tabs.addTab(self.signal_widget, "Signal")
         self.lower_tabs.currentChanged.connect(self.lower_tabs_changed)
         # Export to LGLOD
-        self.export_lglod_button = QtWidgets.QPushButton("Export to LGLOD file")
+        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
         self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.export_lglod_button.clicked.connect(self.export_glod)
         self.export_lglod_button.setDisabled(True)
@@ -1017,18 +1205,20 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             SpectralData,
             Union[bool, List[bool]],
-            Union[float, None],
+            Union[List[MoonData], MoonData, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         mpa_text = ""
-        if data[7] is not None:
-            mpa_text = f" | MPA: {data[7]:.3f}°"
+        mdas = data[7]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_mpa(data[7])
+        self.graph.set_mda(mdas)
         is_skip_uncs = self.lime_simulation.is_skipping_uncs()
         self.graph.set_skipped_uncertainties(is_skip_uncs)
         self.graph.update_plot(data[2], data[3], data[4], data[0], redraw=False)
@@ -1042,14 +1232,15 @@ class MainSimulationsWidget(
         self.graph.update_labels(
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
-            "Irradiances  (Wm⁻²nm⁻¹)",
+            "Irradiances (Wm⁻²nm⁻¹)",
             subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
         )
         self.graph.set_inside_mpa_range(data[6])
         self.signal_widget.set_interp_spectrum_name(
             self.settings_manager.get_selected_spectrum_name()
         )
-        self.signal_widget.set_mpa(data[7])
+        if mda:
+            self.signal_widget.set_mpa(mda.mpa_degrees)
         self.signal_widget.set_skipped_uncertainties(is_skip_uncs)
         self.signal_widget.update_signals(data[0], data[1], data[5], data[6])
         self.lower_tabs.setCurrentIndex(0)
@@ -1102,18 +1293,20 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
-            Union[float, None],
+            Union[List[MoonData], MoonData, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         mpa_text = ""
-        if data[5] is not None:
-            mpa_text = f" | MPA: {data[5]:.3f}°"
+        mdas = data[5]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
         sp_name = interp_data.get_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_mpa(data[5])
+        self.graph.set_mda(mdas)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         version = self.settings_manager.get_coef_version_name()
@@ -1176,18 +1369,20 @@ class MainSimulationsWidget(
             Union[SpectralData, List[SpectralData]],
             Union[SpectralData, List[SpectralData]],
             Union[bool, List[bool]],
-            Union[float, None],
+            Union[List[MoonData], MoonData, None],
         ],
     ):
         self._unblock_gui()
         self._set_graph_dts(data[0])
         mpa_text = ""
-        if data[5] is not None:
-            mpa_text = f" | MPA: {data[5]:.3f}°"
+        mdas = data[5]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
         sp_name = interp_data.get_dolp_interpolation_spectrum_name()
         spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
         self.graph.set_interp_spectrum_name(sp_name)
-        self.graph.set_mpa(data[5])
+        self.graph.set_mda(mdas)
         self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
         self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
         # self.graph.set_max_ylims(-120, 120) # TODO decide if we do this or not
@@ -1241,6 +1436,9 @@ class MainSimulationsWidget(
         sp_name = self.settings_manager.get_selected_spectrum_name()
         polar_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
         version = self.settings_manager.get_coef_version_name()
+        mds = self.lime_simulation.get_moon_datas()
+        if not isinstance(mds, list):
+            mds = [mds]
         lglod = create_lglod_data(
             point,
             srf,
@@ -1249,15 +1447,12 @@ class MainSimulationsWidget(
             sp_name,
             polar_sp_name,
             version,
+            mds,
         )
         name = QtWidgets.QFileDialog().getSaveFileName(
             self, "Export LGLOD", "{}.nc".format("lglod")
         )[0]
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        _mds = self.lime_simulation.get_moon_datas()
-        if not isinstance(_mds, list):
-            _mds = [_mds]
-        mpas = [m.mpa_degrees for m in _mds]
         if name is not None and name != "":
             worker = CallbackWorker(
                 moon.write_obs,
@@ -1266,7 +1461,6 @@ class MainSimulationsWidget(
                     name,
                     datetime.now().astimezone(timezone.utc),
                     inside_mpa_range,
-                    mpas,
                 ],
             )
             self._start_thread(worker, self._unblock_gui, self.calculate_all_error)
@@ -1326,13 +1520,12 @@ def check_srf_comparison_callback(
 
 def obtain_sorted_mpa_callback(
     lglod: LGLODComparisonData,
-    kernels_path: KernelsPath,
     srf,
 ):
     comps = lglod.comparisons
     data_source = lglod.sat_name
     skipped_uncs = lglod.skipped_uncs
-    mpa_comps = comparison.Comparison(kernels_path).sort_by_mpa(comps)
+    mpa_comps = sort_by_mpa(comps)
     return comps, mpa_comps, srf, data_source, skipped_uncs, lglod.version
 
 
@@ -1456,7 +1649,6 @@ class LimeTBXWidget(QtWidgets.QWidget):
             obtain_sorted_mpa_callback,
             [
                 lglod,
-                self.kernels_path,
                 srf,
             ],
         )

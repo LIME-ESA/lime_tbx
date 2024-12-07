@@ -1,1 +1,6 @@
-.. include:: ../../../README.rst
+======
+README
+======
+
+.. include:: ../../README.md
+  :parser: commonmark

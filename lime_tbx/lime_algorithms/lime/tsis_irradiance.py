@@ -63,10 +63,13 @@ def tsis_cimel(
     """
     si = SpectralIntegration()
     prop = punpy.MCPropagation(MCsteps, parallel_cores=_PARALLEL_CORES)
-    cimel_wavs = np.array([440, 500, 675, 870, 1020, 1640])
-    cimel_esi = si.integrate_cimel(solar_y, solar_x)
+    cimel_wavs = np.array([440, 500, 675, 870, 1020, 1640, 2130])
+    cimel_esi = si.integrate_cimel(solar_y, solar_x, cimel_wavs)
     u_cimel_esi = prop.propagate_random(
-        si.integrate_cimel, [solar_y, solar_x], [u_solar_y, None], return_corr=False
+        si.integrate_cimel,
+        [solar_y, solar_x, cimel_wavs],
+        [u_solar_y, None, None],
+        return_corr=False,
     )
 
     return cimel_wavs, cimel_esi, u_cimel_esi
@@ -142,15 +145,16 @@ def _gen_files():
     solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
     u_solar_y = np.array(list(map(lambda x: x[1], solar_data.values())))
     cimel_wavs, cimel_esi, u_cimel_esi = tsis_cimel(solar_y, solar_x, u_solar_y)
-    # with open("assets/tsis_cimel.csv", "w") as f:
-    #     for i in range(len(cimel_wavs)):
-    #         print(i)
-    #         f.write("%s, %s, %s \n" % (cimel_wavs[i], cimel_esi[i], u_cimel_esi[i]))
-    # asd_wavs, asd_esi, u_asd_esi = tsis_asd(solar_y, solar_x, u_solar_y)
-    # with open("assets/tsis_asd.csv", "w") as f:
-    #     for i in range(len(asd_wavs)):
-    #         print(f"{i}/{len(asd_wavs)}")
-    #         f.write("%s, %s, %s \n" % (asd_wavs[i], asd_esi[i], u_asd_esi[i]))
+    with open("assets/tsis_cimel.csv", "w") as f:
+        for i in range(len(cimel_wavs)):
+            print(i)
+            f.write("%s, %s, %s \n" % (cimel_wavs[i], cimel_esi[i], u_cimel_esi[i]))
+    return
+    asd_wavs, asd_esi, u_asd_esi = tsis_asd(solar_y, solar_x, u_solar_y)
+    with open("assets/tsis_asd.csv", "w") as f:
+        for i in range(len(asd_wavs)):
+            print(f"{i}/{len(asd_wavs)}")
+            f.write("%s, %s, %s \n" % (asd_wavs[i], asd_esi[i], u_asd_esi[i]))
     for ifwhm in range(len(_AVAILABLE_FWHM)):
         intp_wavs, intp_esi, u_intp_esi = tsis_fwhm(
             solar_y,

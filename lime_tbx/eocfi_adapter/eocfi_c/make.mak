@@ -61,10 +61,12 @@ LIBS_DIR = /libpath:".\lib\WINDOWS64"\
            /libpath:"$(EXPCFI_TOOLS)\pthread\WINDOWS\lib" \
            /libpath:"cfi_tools"
 
-LIBS = 	libexplorer_data_handling.lib\
-		libexplorer_file_handling.lib\
+LIBS = 	libexplorer_orbit.lib\
+		libexplorer_visibility.lib \
+		libexplorer_pointing.lib \
 		libexplorer_lib.lib\
-		libexplorer_orbit.lib\
+		libexplorer_data_handling.lib\
+		libexplorer_file_handling.lib\
         libgeotiff.lib libtiff.lib libproj.lib libxml2.lib pthread.lib Ws2_32.lib pthreadVC2.lib
 		
 EXAMPLE = $(CFI)

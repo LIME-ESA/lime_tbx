@@ -16,7 +16,7 @@ import subprocess
 import yaml
 
 """___Third-Party Modules___"""
-# import here
+import numpy as np
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -29,11 +29,11 @@ from lime_tbx.datatypes import logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 """___Authorship___"""
-__author__ = "Ramiro González Catón"
+__author__ = "Javier Gatón Herguedas and Ramiro González Catón"
 __created__ = "24/05/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+__status__ = "Production"
 
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
@@ -111,6 +111,18 @@ class IEOCFIConverter(ABC):
         pass
 
     @abstractmethod
+    def add_sat(self, sat: Satellite):
+        """
+        Add satellite data to the LIME TBX database.
+
+        Parameters
+        -------
+        sat: Satellite
+            Satellite data to add to LIME's satellite database.
+        """
+        pass
+
+    @abstractmethod
     def get_satellite_position(
         self, sat: str, dt: List[datetime]
     ) -> List[Tuple[float, float, float]]:
@@ -155,6 +167,42 @@ class IEOCFIConverter(ABC):
         -------
         positions: list of tuples of floats
             List of tuples of 3 floats, representing xyz in meters
+        """
+        pass
+
+    @abstractmethod
+    def check_data_file_works(
+        self, sat: Satellite, dts: List[datetime], orbit_path: str
+    ) -> bool:
+        """
+        Check if the file in orbit_path can be used to calculate the satellite
+        position for the datetimes specified in dts.
+
+        Parameters
+        ----------
+        sat: Satellite
+            Satellite for which the file is going to be checked
+        dts: List of datetime
+            Datetimes for which the position will be calculated
+        orbit_path: str
+            Path of the data file used for position calculation
+
+        Returns
+        -------
+        works: bool
+            True if the file works, False if it doesn't
+        """
+        pass
+
+    @abstractmethod
+    def get_default_timefile(self) -> str:
+        """
+        Get the default time file for TLEs when it's not known.
+
+        Returns
+        -------
+        time_file: str
+            Default time_file path value for TLEs
         """
         pass
 
@@ -238,6 +286,51 @@ class EOCFIConverter(IEOCFIConverter):
             sat = Satellite(name, id, orbit_files, norad, intdes, time_file)
             sat_list.append(sat)
         return sat_list
+
+    def add_sat(self, sat: Satellite):
+        """
+        Add satellite data to the LIME TBX database.
+
+        Parameters
+        -------
+        sat: Satellite
+            Satellite data to add to LIME's satellite database.
+        """
+        is_tle = False
+        if sat.norad_sat_number is not None:
+            is_tle = True
+        sat_yaml = self._get_sat_list_yaml()
+        if is_tle and sat.time_file is None:
+            sat.time_file = sat_yaml["ENVISAT"]["time_file"]
+        if is_tle:
+            sat_data = {
+                "id": sat.id,
+                "norad_sat_number": sat.norad_sat_number,
+                "intdes": sat.intdes,
+                "time_file": sat.time_file,
+                "orbit_files": sat.orbit_files,
+                "n_files": len(sat.orbit_files),
+            }
+        else:
+            sat_data = {
+                "id": sat.id,
+                "orbit_files": sat.orbit_files,
+                "n_files": len(sat.orbit_files),
+            }
+        if sat.name not in sat_yaml:
+            sat_yaml[sat.name] = sat_data
+        else:
+            if is_tle and "norad_sat_number" not in sat_yaml[sat.name]:
+                sat_yaml[sat.name]["norad_sat_number"] = sat_data["norad_sat_number"]
+                sat_yaml[sat.name]["intdes"] = sat_data["intdes"]
+                sat_yaml[sat.name]["time_file"] = sat_data["time_file"]
+            for orbf in sat_data["orbit_files"][::-1]:
+                sat_yaml[sat.name]["orbit_files"].insert(0, orbf)
+            n_files = int(sat_yaml[sat.name]["n_files"])
+            sat_yaml[sat.name]["n_files"] = n_files + sat_data["n_files"]
+        fl = open(os.path.join(self.eocfi_path, f"{ESA_SAT_LIST}"), "w")
+        yaml.dump(sat_yaml, fl, Dumper=yaml.Dumper)
+        fl.close()
 
     def get_satellite_position(
         self, sat: str, dts: List[datetime]
@@ -330,7 +423,11 @@ class EOCFIConverter(IEOCFIConverter):
             )
             if not os.path.exists(orbit_path):
                 raise LimeException("The orbit file {} is missing".format(orbit_path))
+        return self._get_sat_position_orbit_path(sat, dts, orbit_path)
 
+    def _get_sat_position_orbit_path(
+        self, sat: Satellite, dts: List[datetime], orbit_path: str
+    ) -> List[Tuple[float, float, float]]:
         n_dates = len(dts)
         norad = 0
         intdes = ""
@@ -339,7 +436,7 @@ class EOCFIConverter(IEOCFIConverter):
             norad = sat.norad_sat_number
         if sat.intdes != None:
             intdes = sat.intdes
-        if orb_f.name.endswith(".txt") or orb_f.name.endswith(".TLE"):
+        if orbit_path.endswith(".txt") or orbit_path.endswith(".TLE"):
             tle_file = orbit_path
             orbit_path = os.path.join(
                 self.eocfi_path,
@@ -417,3 +514,46 @@ class EOCFIConverter(IEOCFIConverter):
 
         positions = [(satpos[0], satpos[1], satpos[2]) for satpos in sat_positions]
         return positions
+
+    def check_data_file_works(
+        self, sat: Satellite, dts: List[datetime], orbit_path: str
+    ) -> bool:
+        """
+        Check if the file in orbit_path can be used to calculate the satellite
+        position for the datetimes specified in dts.
+
+        Parameters
+        ----------
+        sat: Satellite
+            Satellite for which the file is going to be checked
+        dts: List of datetime
+            Datetimes for which the position will be calculated
+        orbit_path: str
+            Path of the data file used for position calculation
+
+        Returns
+        -------
+        works: bool
+            True if the file works, False if it doesn't
+        """
+        positions = self._get_sat_position_orbit_path(sat, dts, orbit_path)
+        if np.any(np.all(np.array(positions) == 0.0, axis=1)):
+            return False
+        return True
+
+    def get_default_timefile(self) -> str:
+        """
+        Get the default time file for TLEs when it's not known.
+
+        Returns
+        -------
+        time_file: str
+            Default time_file path value for TLEs
+        """
+        sats = self._get_sat_list_yaml()
+        _def_value = "SENTINEL2B/OSF/S2B_OPER_MPL_ORBSCT_20170309T104400_99999999T999999_0007.EOF"
+        sats_with_timefile = ["PLEIADES 1A", "PLEIADES 1B", "PROBA-V", "ENVISAT"]
+        for satname in sats_with_timefile:
+            if satname in sats and "time_file" in sats[satname]:
+                return sats[satname]["time_file"]
+        return _def_value

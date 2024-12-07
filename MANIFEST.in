@@ -33,4 +33,4 @@ include lime_tbx/interpolation/interp_data/assets/ds_ASD.nc
 include lime_tbx/spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv
 include lime_tbx/spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv
 include lime_tbx/spectral_integration/assets/asd_fwhm.csv
-include lime_tbx/spectral_integration/assets/responses_1088_13112020.txt
+include lime_tbx/spectral_integration/assets/responses_1088.csv

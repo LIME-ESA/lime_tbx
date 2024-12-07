@@ -15,15 +15,15 @@ def read(filename):
 
 
 setup(
-    version="1.0.3",
+    version="1.1.0",
     cmdclass=versioneer.get_cmdclass(),
     name="lime_tbx",
     url="https://gitlab.npl.co.uk/eco/eo/lime_tbx",
-    license="None",
+    license="LGPL-3.0-only",
     author="Javier Gatón Herguedas",
     author_email="gaton@goa.uva.es",
     description="The LIME TBX isa python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare to remote sensing observations of the moon.",
-    long_description=read("README.rst"),
+    long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
     install_requires=[
         "certifi==2022.6.15",
@@ -41,7 +41,7 @@ setup(
         "numdifftools==0.9.39",
         "numpy==1.23.4",
         "obsarray==0.2.2",
-        "packaging==21.3",
+        "packaging==24.1",
         "pandas==1.4.4",
         "Pillow==9.2.0",
         "punpy==0.39.5",
@@ -65,8 +65,17 @@ setup(
     ],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Programming Language :: Python",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "Natural Language :: English",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Scientific/Engineering :: Astronomy",
     ],
 )

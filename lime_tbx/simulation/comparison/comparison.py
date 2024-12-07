@@ -1,16 +1,16 @@
 """
-This module abstracts and encapsulates use-cases related to simulations from esa satellites,
-and performs the actions and calculations that are related to each of them.
+This module abstracts and encapsulates use-cases related to performing
+comparisons between user measurements and the model output.
 
 It exports the following classes:
-    * IESASatellites - Interface that contains the methods of this module.
-    * ESASatellites - Class that implements the methods exported by this module.
+    * IComparison - Interface that contains the methods of this module.
+    * Comparison - Class that implements the methods exported by this module.
 """
 
 """___Built-In Modules___"""
 from abc import ABC, abstractmethod
 import math
-from typing import List, Callable
+from typing import List, Callable, Tuple
 from deprecated import deprecated
 
 """___Third-Party Modules___"""
@@ -26,8 +26,7 @@ from lime_tbx.datatypes.datatypes import (
     SpectralResponseFunction,
     SurfacePoint,
     CustomPoint,
-    SRFChannel,
-    LimeException,
+    MoonData,
 )
 from lime_tbx.simulation.lime_simulation import ILimeSimulation, is_ampa_valid_range
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -38,7 +37,7 @@ __author__ = "Javier Gatón Herguedas"
 __created__ = "01/03/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+__status__ = "Production"
 
 
 @deprecated
@@ -119,8 +118,6 @@ class IComparison(ABC):
 
     It exports the following functions:
         * get_simulations - Simulate the moon irradiance for the given scenarios.
-        * sort_by_mpa - Returns a copy of the given list of ComparisonData but sorted by
-            moon phase angle.
     """
 
     @abstractmethod
@@ -156,22 +153,6 @@ class IComparison(ABC):
         """
         pass
 
-    @abstractmethod
-    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> List[ComparisonData]:
-        """Returns a copy of the given list of ComparisonData but sorted by moon phase angle.
-
-        Parameters
-        ----------
-        comparisons: list of ComparisonData
-            List of ComparisonData that will be sorted by mpa.
-
-        Returns
-        -------
-        sorted_comparisons: list of ComparisonData
-            List with the same ComparisonData instances but sorted by the moon phase angle.
-        """
-        pass
-
 
 class Comparison(IComparison):
     def __init__(self, kernels_path: KernelsPath):
@@ -190,9 +171,8 @@ class Comparison(IComparison):
         sigs = [[] for _ in ch_names]
         ch_dates = [[] for _ in ch_names]
         sps = [[] for _ in ch_names]
-        mpas = [[] for _ in ch_names]
+        mdas_comp: List[List[MoonData]] = [[] for _ in ch_names]
         obs_irrs = [[] for _ in ch_names]
-        mpa_calcs = []
         sp_calcs = []
         #
         dts = [o.dt for o in observations]
@@ -267,9 +247,8 @@ class Comparison(IComparison):
                 )
                 for mda in mdas
             ]
-        mpa_calcs = [md.mpa_degrees for md in mdas]
         #
-        for obs, mpa, sp, mda, dt in zip(observations, mpa_calcs, sp_calcs, mdas, dts):
+        for obs, sp, mda, dt in zip(observations, sp_calcs, mdas, dts):
             if callback_observation:
                 callback_observation()
             lime_simulation.set_simulation_changed()
@@ -284,7 +263,7 @@ class Comparison(IComparison):
                     sigs[j].append((signals.data[j][0], signals.uncertainties[j][0]))
                     # [0] because obs.dt is one datetime, only one dt
                     sps[j].append(sp)
-                    mpas[j].append(mpa)
+                    mdas_comp[j].append(mda)
                     obs_irrs[j].append(obs.ch_irrs[ch])
         if callback_observation:
             callback_observation()
@@ -295,9 +274,12 @@ class Comparison(IComparison):
                 # Observed and Simulated
                 specs = (
                     SpectralData(
-                        ch_dates[i], obs_irrs[i], np.zeros(len(ch_dates[i])), None
+                        np.array(ch_dates[i]),
+                        obs_irrs[i],
+                        np.zeros(len(ch_dates[i])),
+                        None,
                     ),
-                    SpectralData(ch_dates[i], irrs, uncs, None),
+                    SpectralData(np.array(ch_dates[i]), irrs, uncs, None),
                 )
                 # Relative Differences
                 rel_diffs = []
@@ -349,7 +331,9 @@ class Comparison(IComparison):
                 perc_spec = SpectralData(
                     specs[0].wlens, np.array(perc_diffs), np.array(uncs_p), None
                 )
-                ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas[i]]
+                ampa_valid_range = [
+                    is_ampa_valid_range(abs(mda.mpa_degrees)) for mda in mdas_comp[i]
+                ]
                 cp = ComparisonData(
                     specs[0],
                     specs[1],
@@ -360,10 +344,10 @@ class Comparison(IComparison):
                     num_samples,
                     ch_dates[i],
                     sps[i],
-                    mpas[i],
                     ampa_valid_range,
                     perc_spec,
                     mean_perc_diff,
+                    mdas_comp[i],
                 )
                 comparisons.append(cp)
             else:
@@ -379,63 +363,9 @@ class Comparison(IComparison):
                         [],
                         [],
                         [],
+                        None,
+                        None,
                         [],
-                        None,
-                        None,
                     )
                 )
         return comparisons
-
-    def sort_by_mpa(self, comparisons: List[ComparisonData]) -> List[ComparisonData]:
-        new_comparisons = []
-        for c in comparisons:
-            if c.observed_signal == None:
-                new_comparisons.append(c)
-                continue
-            spectrals = [
-                c.observed_signal,
-                c.simulated_signal,
-                c.diffs_signal,
-                c.perc_diffs,
-            ]
-            sp_vals = []
-            for spectr in spectrals:
-                sp_vals.append(spectr.wlens)
-                sp_vals.append(spectr.data)
-                sp_vals.append(spectr.uncertainties)
-            vals = list(zip(*sp_vals, c.dts, c.points, c.mpas))
-            vals.sort(key=lambda v: v[-1])
-            mpas = [v[-1] for v in vals]
-            ampa_valid_range = [is_ampa_valid_range(abs(mpa)) for mpa in mpas]
-            new_spectrals = []
-            index = 0
-            for i, spectr in enumerate(spectrals):
-                index = i * 3
-                wlens = np.array(mpas)  # [v[index] for v in vals]
-                data = np.array([v[index + 1] for v in vals])
-                uncertainties = np.array([v[index + 2] for v in vals])
-                new_spectrals.append(SpectralData(wlens, data, uncertainties, None))
-            mrd = c.mean_relative_difference
-            mard = c.mean_absolute_relative_difference
-            mpd = c.mean_perc_difference
-            std = c.standard_deviation_mrd
-            nsamp = c.number_samples
-            dts = [v[-3] for v in vals]
-            points = [v[-2] for v in vals]
-            nc = ComparisonData(
-                new_spectrals[0],
-                new_spectrals[1],
-                new_spectrals[2],
-                mrd,
-                mard,
-                std,
-                nsamp,
-                dts,
-                points,
-                mpas,
-                ampa_valid_range,
-                new_spectrals[3],
-                mpd,
-            )
-            new_comparisons.append(nc)
-        return new_comparisons

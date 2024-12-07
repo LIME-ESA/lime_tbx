@@ -1,0 +1,74 @@
+name: "Feature Request"
+description: Suggest an idea for this project
+title: "[REQUEST]: <title>"
+labels: [
+  "enhancement"
+]
+assignees:
+  - javgat
+body:
+- type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+        Please, **ensure the feature was not already requested** by searching on GitHub the [Issues](https://github.com/LIME-ESA/lime_tbx/issues).
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Is there a problem?"
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+    validations:
+      required: false
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Summary"
+      description: Describe the solution/feature you'd like.
+      placeholder: A clear and concise description of what you want to happen.
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives"
+      description: Describe alternatives you've considered.
+      placeholder: A clear and concise description of any alternative solutions or features you've considered.
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: "Screenshots"
+      description: If applicable, add screenshots to help explain the feature request better.
+      value: |
+        ![DESCRIPTION](LINK.png)
+      render: bash
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: "Additional context"
+      description: Add any other context about the feature request here.
+      render: bash
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/LIME-ESA/lime_tbx?tab=coc-ov-file#readme). 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

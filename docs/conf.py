@@ -91,8 +91,7 @@ master_doc = "index"
 
 # General information about the project.
 project = project_title
-copyright = "Pieter De Vis"
-author = "Pieter De Vis"
+author = "Javier Gatón, Pieter De Vis, Stefan Adriaensen, Jacob Fahy, Ramiro González Catón, Carlos Toledano, África Barreto, Agnieszka Bialek, Marc Bouvet"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -108,7 +107,7 @@ release = lime_tbx.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -141,11 +140,15 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 # SH added to override wide tables in RTD theme
-html_context = {
-    "css_files": [
-        "_static/theme_overrides.css",
-    ],
-}
+# html_context = {
+#    "css_files": [
+#        "_static/theme_overrides.css",
+#    ],
+# }
+
+html_css_files = [
+    "theme_overrides.css",
+]
 
 # -- Options for HTMLHelp output ---------------------------------------
 
@@ -186,7 +189,7 @@ latex_documents = [
         master_doc,
         "user_manual.tex",
         "{} Documentation".format(project_title),
-        "Pieter De Vis",
+        author,
         "manual",
     ),
 ]

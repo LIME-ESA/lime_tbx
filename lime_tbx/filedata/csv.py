@@ -12,10 +12,11 @@ It exports the following functions:
 from typing import Union, List
 from datetime import datetime, timezone
 import csv
-import os
+import dateutil.parser
 
 """___Third-Party Modules___"""
 import numpy as np
+import pandas as pd
 
 """___NPL Modules___"""
 from lime_tbx.datatypes.datatypes import (
@@ -26,8 +27,10 @@ from lime_tbx.datatypes.datatypes import (
     SurfacePoint,
     CustomPoint,
     ComparisonData,
+    MoonData,
 )
 from lime_tbx.datatypes import logger
+from lime_tbx.datatypes.constants import CompFields
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -82,6 +85,27 @@ def _write_point(writer, point: Union[Point, None]):
                 writer.writerow(["datetime", str(dt)])
 
 
+def _write_moondata(writer, mdas: Union[List[MoonData], MoonData]):
+    if isinstance(mdas, MoonData):
+        mdas = [mdas]
+    writer.writerows(
+        [
+            ["moon phase angle (deg)", *[mda.mpa_degrees for mda in mdas]],
+            ["selenographic latitude (deg)", *[mda.lat_obs for mda in mdas]],
+            ["selenographic longitude (deg)", *[mda.long_obs for mda in mdas]],
+            [
+                "solar selenographic longitude (rad)",
+                *[mda.long_sun_radians for mda in mdas],
+            ],
+            ["distance sun moon (AU)", *[mda.distance_sun_moon for mda in mdas]],
+            [
+                "distance observer moon (km)",
+                *[mda.distance_observer_moon for mda in mdas],
+            ],
+        ]
+    )
+
+
 def export_csv_srf(
     data: Union[SpectralData, List[SpectralData]],
     ch_names: List[str],
@@ -134,7 +158,7 @@ def export_csv_simulation(
     interp_spectrum_name: str,
     skip_uncs: bool,
     cimel_data: Union[SpectralData, List[SpectralData]],
-    mpa: Union[float, None],
+    mda: Union[List[MoonData], MoonData, None],
 ):
     """
     Export the given data to a csv file
@@ -163,8 +187,6 @@ def export_csv_simulation(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-            if mpa is not None and not isinstance(point, CustomPoint):
-                writer.writerow(["moon phase angle (deg)", mpa])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)
@@ -172,7 +194,11 @@ def export_csv_simulation(
             )
             if some_out_mpa_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            _write_point(writer, point)
+            if not isinstance(point, CustomPoint):
+                # CustomPoint data already written with write_moondata
+                _write_point(writer, point)
+            if mda:
+                _write_moondata(writer, mda)
             ylabels = []
             cimel_ylabels = []
             if not isinstance(point, CustomPoint) and point != None:
@@ -184,13 +210,14 @@ def export_csv_simulation(
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    ylab = f"{dt.isoformat(sep=' ', timespec='milliseconds')} {ylabel}{warn_out_mpa_range}"
+                    dtprint = dt.isoformat(sep=" ", timespec="milliseconds")
+                    ylab = f"{dtprint} {ylabel}{warn_out_mpa_range}"
                     ylabels.append(ylab)
                     cimel_ylabels.append(ylab)
                     if not skip_uncs:
-                        halfy2 = f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties"
+                        halfy2 = f"{dtprint} {ylabel} uncertainties (k=2)"
                         ylabels.append(f"{halfy2}{warn_out_mpa_range}")
-                        cimel_ylabels.append(f"{halfy2} (k=2){warn_out_mpa_range}")
+                        cimel_ylabels.append(f"{halfy2}{warn_out_mpa_range}")
             else:
                 warn_out_mpa_range = ""
                 if some_out_mpa_range:
@@ -199,8 +226,10 @@ def export_csv_simulation(
                 ylabels.append(ylab)
                 cimel_ylabels.append(ylab)
                 if not skip_uncs:
-                    ylabels.append(f"uncertainties{warn_out_mpa_range}")
-                    cimel_ylabels.append(f"uncertainties (k=2){warn_out_mpa_range}")
+                    ylabels.append(f"{ylabel} uncertainties (k=2){warn_out_mpa_range}")
+                    cimel_ylabels.append(
+                        f"{ylabel} uncertainties (k=2){warn_out_mpa_range}"
+                    )
             if cimel_data:
                 writer.writerow([f"CIMEL {xlabel}", *cimel_ylabels])
                 if not isinstance(cimel_data, list) and not isinstance(
@@ -235,49 +264,36 @@ def export_csv_simulation(
 
 
 def export_csv_comparison(
-    data: List[SpectralData],
-    ylabel: str,
-    points: Union[List[SurfacePoint], List[CustomPoint]],
+    data: ComparisonData,
+    xlabel: str,
+    ylabels: List[str],
     name: str,
     coeff_version: str,
-    comparison_data: ComparisonData,
     interp_spectrum_name: str,
     skip_uncs: bool,
-    relative_difference: bool,
-    x_datetime: bool = True,
+    chosen_diffs: CompFields,
 ):
     """
     Export the given data to a csv file
 
     Parameters
     ----------
-    x_data: list of float
-        Data from the x axis, which would correspond to the key, of the key-value pair
-    y_data: tuple of two list of float
-        Data from the y axis, which would correspond to the value, of the key-value pair.
-        In the comparation it is the observed irradiance and the simulated one, in that exact order.
-    ylabel: str
-        Label of the y_data
-    points: list of SurfacePoint or list of CustomPoint
-        Points from which the data is generated. In case it's None, no metadata will be printed.
+    data: ComparisonData
+        Comparison data.
+    xlabel: str
+        Label of the x axis data
+    ylabels: list of str
+        Labels of the y axis data
     name: str
         CSV file path
     coeff_version: str
         Version of the CIMEL coefficients used for calculating the data
-    comparison_data: ComparisonData
-        ComparisonData related to the comparison.
     interp_spectrum_name: str
         Name of the spectrum used for interpolation.
-    relative_difference: bool
-        Flag indicating if the output should include the relative_difference, or if it should include the
-        percentage difference otherwise.
-    x_datetime: bool
-        True if it used datetimes as the x_axis, False if it used mpa
+    chosen_diffs: CompFields
+        Type of difference chosen to be shown for this comparison.
     """
-    ampa_valid_range = comparison_data.ampa_valid_range
-    x_label = "UTC datetime"
-    if not x_datetime:
-        x_label = "Moon phase angle (degrees)"
+    ampa_valid_range = data.ampa_valid_range
     try:
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -285,35 +301,34 @@ def export_csv_comparison(
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
             writer.writerow(
                 [
-                    "MRA (Mean Relative Difference %)",
-                    comparison_data.mean_relative_difference,
+                    "MRD (Mean Relative Difference %)",
+                    data.mean_relative_difference,
                 ]
             )
             writer.writerow(
                 [
                     "STD-RD (Standard deviation of Relative Difference %)",
-                    comparison_data.mean_relative_difference,
+                    data.standard_deviation_mrd,
                 ]
             )
             writer.writerow(
                 [
                     "MARD (Mean of the Absolutes of the Relative Differences %)",
-                    comparison_data.mean_absolute_relative_difference,
+                    data.mean_absolute_relative_difference,
                 ]
             )
             writer.writerow(
                 [
                     "MPD (Mean Percentage Difference %)",
-                    comparison_data.mean_perc_difference,
+                    data.mean_perc_difference,
                 ]
             )
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            relperc = "Relative" if relative_difference else "Percentage"
-            is_surface = isinstance(points[0], SurfacePoint)
-            if is_surface:
-                header_coords = ["latitude", "longitude", "altitude(m)"]
-            else:  # CustomPoint
+            if (
+                data.points is not None and len(data.points) > 0
+            ):  # When exporting by wavelength using means, points are None
+                is_surface = isinstance(data.points[0], SurfacePoint)
                 header_coords = [
                     "moon phase angle (deg)",
                     "selenographic latitude (deg)",
@@ -322,72 +337,133 @@ def export_csv_comparison(
                     "distance sun moon (AU)",
                     "distance observer moon (km)",
                 ]
-            header = (
-                [x_label]
-                + header_coords
-                + [
-                    "Observed {}".format(ylabel),
-                    "Simulated {}".format(ylabel),
-                    f"{relperc} differences (%)",
-                ]
-            )
+                if is_surface:
+                    header_coords += ["latitude", "longitude", "altitude(m)"]
+            else:
+                header_coords = []
+            diffdata, difflabel = data.get_diffs_and_label(chosen_diffs)
+            header = [xlabel] + header_coords + [ylabels[0], ylabels[1]]
+            if difflabel:
+                header += [difflabel]
             if not skip_uncs:
                 header += [
-                    "Observation uncertainties",
-                    "Simulation uncertainties",
-                    f"{relperc} difference uncertainties",
+                    f"{ylabels[0]} uncertainties",
+                    f"{ylabels[1]} uncertainties",
                 ]
+                if difflabel:
+                    header += [f"{difflabel} uncertainties"]
             writer.writerow(header)
-            x_data = data[0].wlens
-            difsig = (
-                comparison_data.diffs_signal
-                if relative_difference
-                else comparison_data.perc_diffs
-            )
-            for i in range(len(x_data)):
-                pt = points[i]
-                if x_datetime:
-                    dt = comparison_data.dts[i]
-                    x_val = dt.isoformat(sep=" ", timespec="milliseconds")
-                else:
-                    x_val = x_data[i]
+            xdata = data.observed_signal.wlens
+            if isinstance(xdata[0], datetime):
+                xdata = [x.isoformat(sep=" ", timespec="milliseconds") for x in xdata]
+            for i, x_val in enumerate(xdata):
                 warn_out_mpa_range = ""
                 if not ampa_valid_range[i]:
                     warn_out_mpa_range = " **"
                 x_val = f"{x_val}{warn_out_mpa_range}"
-                if is_surface:
-                    datarow = [
-                        x_val,
-                        pt.latitude,
-                        pt.longitude,
-                        pt.altitude,
-                        data[0].data[i],
-                        data[1].data[i],
-                        difsig.data[i],
+                pt_datarow = []
+                if data.points is not None and data.mdas is not None:
+                    # Just for understanding it, but if either points or mdas is none, the other should be too.
+                    # They are None when it's not representing real measurements, like when using means.
+                    mda = data.mdas[i]
+                    pt_datarow = [
+                        mda.mpa_degrees,
+                        mda.lat_obs,
+                        mda.long_obs,
+                        mda.long_sun_radians,
+                        mda.distance_sun_moon,
+                        mda.distance_observer_moon,
                     ]
-                else:
-                    datarow = [
-                        x_val,
-                        pt.moon_phase_angle,
-                        pt.selen_obs_lat,
-                        pt.selen_obs_lon,
-                        pt.selen_sun_lon,
-                        pt.distance_sun_moon,
-                        pt.distance_observer_moon,
-                        data[0].data[i],
-                        data[1].data[i],
-                        difsig.data[i],
-                    ]
+                    if is_surface:
+                        pt = data.points[i]
+                        pt_datarow += [
+                            pt.latitude,
+                            pt.longitude,
+                            pt.altitude,
+                        ]
+                datarow = (
+                    [x_val]
+                    + pt_datarow
+                    + [data.observed_signal.data[i], data.simulated_signal.data[i]]
+                )
+                if diffdata:
+                    datarow.append(diffdata.data[i])
                 if not skip_uncs:
                     datarow += [
-                        data[0].uncertainties[i],
-                        data[1].uncertainties[i],
-                        difsig.uncertainties[i],
+                        data.observed_signal.uncertainties[i],
+                        data.simulated_signal.uncertainties[i],
                     ]
+                    if diffdata:
+                        datarow.append(diffdata.uncertainties[i])
                 writer.writerow(datarow)
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_EXPORT_ERROR_STR)
+
+
+def export_csv_comparison_bywlen(
+    data: List[ComparisonData],
+    wlens: List[float],
+    xlabel: str,
+    ylabels: List[str],
+    name: str,
+    coeff_version: str,
+    interp_spectrum_name: str,
+    skip_uncs: bool,
+    chosen_diffs: CompFields,
+):
+    wlens = [w for w, d in zip(wlens, data) if d is not None]
+    data = [d for d in data if d is not None]
+    if data:
+        try:
+            with open(name, "w", newline="", encoding="utf-8") as file:
+                writer = csv.writer(file)
+                mpd = np.ma.masked_invalid(
+                    [sd.mean_perc_difference for sd in data]
+                ).mean()
+                mrd = np.ma.masked_invalid(
+                    [sd.mean_relative_difference for sd in data]
+                ).mean()
+                stdrd = np.ma.masked_invalid(
+                    [sd.standard_deviation_mrd for sd in data]
+                ).mean()
+                mard = np.ma.masked_invalid(
+                    [sd.mean_absolute_relative_difference for sd in data]
+                ).mean()
+                writer.writerow(["LIME coefficients version", coeff_version])
+                writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+                writer.writerow(["MRD (Mean Relative Difference %)", mrd])
+                writer.writerow(
+                    ["STD-RD (Standard deviation of Relative Difference %)", stdrd]
+                )
+                writer.writerow(
+                    ["MARD (Mean of the Absolutes of the Relative Differences %)", mard]
+                )
+                writer.writerow(["MPD (Mean Percentage Difference %)", mpd])
+                if False in [not np.all(d.ampa_valid_range) for d in data]:
+                    writer.writerow(["**", _WARN_OUT_MPA_RANGE])
+            # Now with pandas the rest
+            _, diff_name = data[0].get_diffs_and_label(chosen_diffs)
+            diff_name = [diff_name] if diff_name is not None else []
+            arr_names = ylabels + diff_name
+            stat_names = ["Q1", "Median", "Q3", "Mean"]
+            stat_names = [f"{arn} {st}" for arn in arr_names for st in stat_names]
+            vals = []
+            for d, w in zip(data, wlens):
+                diff_arr, _ = d.get_diffs_and_label(chosen_diffs)
+                diff_arr = [diff_arr.data] if diff_arr is not None else []
+                arrs = [d.observed_signal.data, d.simulated_signal.data] + diff_arr
+                qs = np.quantile(arrs, [0.25, 0.5, 0.75], axis=1)
+                m = np.mean(arrs, axis=1)
+                vals.append(
+                    np.concatenate([[w], np.concatenate([qs, [m]]).T.flatten()])
+                )
+            columns = [xlabel] + stat_names
+            df = pd.DataFrame(vals, columns=columns)
+            df.set_index(xlabel).to_csv(name, mode="a")
+        except Exception as e:
+            logger.get_logger().exception(e)
+            raise Exception(_EXPORT_ERROR_STR)
 
 
 def export_csv_integrated_irradiance(
@@ -502,8 +578,15 @@ def read_datetimes(path: str) -> List[datetime]:
             for row in reader:
                 if not row:
                     continue
-                irow = map(int, row)
-                dt = datetime(*irow, tzinfo=timezone.utc)
+                if len(row) > 1:
+                    irow = map(int, row)
+                    dt = datetime(*irow, tzinfo=timezone.utc)
+                else:
+                    dt = dateutil.parser.parse(row[0])
+                    if dt.tzinfo is not None:
+                        dt = dt.astimezone(timezone.utc)
+                    else:
+                        dt = dt.replace(tzinfo=timezone.utc)
                 datetimes.append(dt)
             return datetimes
     except Exception as e:

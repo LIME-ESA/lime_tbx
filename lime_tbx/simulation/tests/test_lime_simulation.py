@@ -8,6 +8,7 @@ import io
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
+import pytest
 
 """___LIME_TBX Modules___"""
 from ..lime_simulation import ILimeSimulation, LimeSimulation, is_ampa_valid_range
@@ -92,6 +93,7 @@ class TestLimeSimulation(unittest.TestCase):
         for _ in range(6):
             ls.set_simulation_changed()
 
+    @pytest.mark.slow
     def test_set_simulation_changed_diff_output_objects(self):
         ls = get_lime_simulation()
         srf = get_srf()
@@ -108,6 +110,7 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsNot(elrefs_0, elrefs_2)
 
     # Function update_reflectance
+    @pytest.mark.slow
     def test_update_reflectance(self):
         ls = get_lime_simulation()
         ls._skip_uncs = False
@@ -278,6 +281,7 @@ class TestLimeSimulation(unittest.TestCase):
             np.testing.assert_array_almost_equal(cimel.data, data)
             np.testing.assert_array_almost_equal(cimel.uncertainties, unc, 8)
 
+    @pytest.mark.slow
     def test_update_irradiance_and_reflectance(self):
         ls: LimeSimulation = get_lime_simulation()
         ls._skip_uncs = False
@@ -290,6 +294,7 @@ class TestLimeSimulation(unittest.TestCase):
         self._check_irr_output(elis, signals, cimels)
 
     # Function update_irradiance
+    @pytest.mark.slow
     def test_update_irradiance(self):
         ls = get_lime_simulation()
         ls._skip_uncs = False
@@ -459,6 +464,7 @@ class TestLimeSimulation(unittest.TestCase):
             np.testing.assert_array_equal(cimel.data, data)
             np.testing.assert_array_equal(cimel.uncertainties, unc)
 
+    @pytest.mark.slow
     def test_update_irr_polar_verbose(self):
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
@@ -494,6 +500,7 @@ class TestLimeSimulation(unittest.TestCase):
         sys.stderr = sys.__stderr__
 
     # get_surfacepoints
+    @pytest.mark.slow
     def test_get_surfacepoints_ok(self):
         ls = get_lime_simulation()
         sp = SATELLITE_POINT
@@ -509,6 +516,7 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsInstance(pt, SurfacePoint)
         self.assertEqual(pt, srps[0])
 
+    @pytest.mark.slow
     def test_get_surfacepoints_ok_multiple(self):
         ls = get_lime_simulation()
         sp = SATELLITE_POINT_2
@@ -525,6 +533,7 @@ class TestLimeSimulation(unittest.TestCase):
         for pt, srp in zip(pts, srps):
             self.assertEqual(pt, srp)
 
+    @pytest.mark.slow
     def test_get_surfacepoints_not_sat_point(self):
         ls = get_lime_simulation()
         ls.update_irradiance(
@@ -534,6 +543,7 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertIsNone(pts)
 
     # get point
+    @pytest.mark.slow
     def test_update_get_point(self):
         ls = get_lime_simulation()
         ls.update_reflectance(get_default_srf(), SURFACE_POINT, get_cimel_coeffs())
@@ -543,6 +553,7 @@ class TestLimeSimulation(unittest.TestCase):
         pt = ls.get_point()
         self.assertEqual(pt, SURFACE_POINT)
 
+    @pytest.mark.slow
     def test_update_get_point_satellite(self):
         ls = get_lime_simulation()
         ls.update_reflectance(get_default_srf(), SATELLITE_POINT, get_cimel_coeffs())
@@ -555,6 +566,7 @@ class TestLimeSimulation(unittest.TestCase):
         self.assertEqual(pt, SATELLITE_POINT)
 
     # get_moon_datas
+    @pytest.mark.slow
     def test_get_moon_datas_ok(self):
         ls = get_lime_simulation()
         sp = SURFACE_POINT
@@ -575,6 +587,7 @@ class TestLimeSimulation(unittest.TestCase):
             mdr = np.array(list(mdr.__dict__.values()))
             np.testing.assert_equal(md, mdr)
 
+    @pytest.mark.slow
     def test_get_moon_datas_ok_sat(self):
         ls = get_lime_simulation()
         sp = SATELLITE_POINT_2
@@ -610,6 +623,7 @@ class TestLimeSimulation(unittest.TestCase):
             self.assertEqual(valcalc, val)
 
     # are_mpas_inside_mpa_range
+    @pytest.mark.slow
     def test_are_mpas_inside_mpa_range(self):
         ls = get_lime_simulation()
         sp = SURFACE_POINT
@@ -623,6 +637,7 @@ class TestLimeSimulation(unittest.TestCase):
             self.assertEqual(valid, is_ampa_valid_range(md.absolute_mpa_degrees))
 
     # is_polarisation_updated
+    @pytest.mark.slow
     def test_is_polarisation_updated(self):
         ls = get_lime_simulation()
         self.assertFalse(ls.is_polarisation_updated())

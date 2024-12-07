@@ -58,6 +58,8 @@ LIBS_DIR = \
 
 LIBS = 	\
 	-lexplorer_orbit \
+	-lexplorer_visibility \
+	-lexplorer_pointing \
 	-lexplorer_lib \
 	-lexplorer_data_handling \
 	-lexplorer_file_handling \

@@ -5,6 +5,8 @@
 #include <float.h>
 
 #include <explorer_orbit.h>
+#include <explorer_pointing.h>
+#include <explorer_visibility.h>
 
 #define XO_MAX_STR_LENGTH        256
 #define DEFAULT_TERMINATE_CHECK_STATUS 1
@@ -673,12 +675,13 @@ __declspec(dllexport) int  get_satellite_position_tle(
 }
 
 
-
 #define STR_SIZE_INPUT 1000
+#define TYPE_INPUT_OSF 0
+#define TYPE_INPUT_TLE 1
 
 int main (int argc, char *argv[]){
     // Main code can be called to perform tle calculations, as the shared library doesn't seem to work.
-    int n_dates, is_tle;
+    int n_dates, file_input_type;
     long sat_id;
     long norad;
     char *tle_file = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
@@ -686,10 +689,10 @@ int main (int argc, char *argv[]){
     char *sat_name = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
     char *intdes = (char*)malloc(sizeof(char) * STR_SIZE_INPUT);
     if(argc < 6){
-        is_tle = 1;
+        file_input_type = TYPE_INPUT_TLE;
         n_dates = 1;
     }else{
-        is_tle = atoi(argv[1]);
+        file_input_type = atoi(argv[1]);
         n_dates = atoi(argv[2]);
     }
     int **dates = (int**)malloc(sizeof(int*)*n_dates);
@@ -706,7 +709,7 @@ int main (int argc, char *argv[]){
         norad = 39159;
         strcpy(sat_name, "PROBA-V");
         strcpy(intdes, "13021A");
-    }else if(is_tle){
+    }else if(file_input_type == TYPE_INPUT_TLE){
         sat_id = atol(argv[3]);
         norad = atol(argv[4]);
         strcpy(tle_file, argv[5]);
@@ -727,7 +730,7 @@ int main (int argc, char *argv[]){
             tle_file,
             positions
         );
-    }else{
+    }else if (file_input_type == TYPE_INPUT_OSF){
         sat_id = atol(argv[3]);
         strcpy(orbit_file, argv[4]);
         for(int i = 0; i < n_dates; i++){
@@ -740,6 +743,8 @@ int main (int argc, char *argv[]){
             orbit_file,
             positions
         );
+    }else{
+        fprintf(stderr, "Input type not understood.");
     }
     free(tle_file);
     free(orbit_file);

@@ -68,14 +68,19 @@ class TestSpectralIntegration(unittest.TestCase):
         solar_data = _get_tsis_data()
         solar_x = np.array(list(solar_data.keys()))
         solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
+        cimel_wavs = [440, 500, 675, 870, 1020, 1640]
         si = get_spectral_integrator()
-        esi_cimel = si.integrate_cimel(solar_y, solar_x)
+        esi_cimel = si.integrate_cimel(solar_y, solar_x, cimel_wavs)
         np.testing.assert_allclose(
             esi_cimel, [1.862, 1.960, 1.515, 0.9309, 0.7016, 0.2278], rtol=0.01
         )
-        zeros_cimel = si.integrate_cimel(np.zeros(3000), np.arange(0, 3000, 1))
+        zeros_cimel = si.integrate_cimel(
+            np.zeros(3000), np.arange(0, 3000, 1), cimel_wavs
+        )
         np.testing.assert_allclose(zeros_cimel, np.zeros_like(esi_cimel), atol=0.01)
-        ones_cimel = si.integrate_cimel(np.ones(3000), np.arange(0, 3000, 1))
+        ones_cimel = si.integrate_cimel(
+            np.ones(3000), np.arange(0, 3000, 1), cimel_wavs
+        )
         np.testing.assert_allclose(ones_cimel, np.ones_like(ones_cimel), rtol=0.01)
 
 

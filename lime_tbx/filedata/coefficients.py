@@ -112,18 +112,18 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
                 f"Required version: >={tbx_minv}. Current TBX version: {tbx_v}."
             )
     file_version = ds.file_version
-    creation_date = ds.creation_date
+    # creation_date = ds.creation_date
     release_date = ds.release_date
-    software_version = ds.software_version
-    data_origin = ds.data_origin
-    data_origin_release_date = ds.data_origin_release_date
+    # software_version = ds.software_version
+    # data_origin = ds.data_origin
+    # data_origin_release_date = ds.data_origin_release_date
+    wlens = ds.wavelength.data
     # define dim_size_dict to specify size of arrays
     dim_sizes = {
         "wavelength": len(ds.wavelength),
         "i_coeff": len(ds.i_coeff),
         "i_coeff.wavelength": len(ds.wavelength) * len(ds.i_coeff),
     }
-    wlens = [440, 500, 675, 870, 1020, 1640]
     version_name = f"{release_date}_v{file_version}"
     data = np.array(ds.coeff.values)
     u_data = np.array(ds.u_coeff.values)

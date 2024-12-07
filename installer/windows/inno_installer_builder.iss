@@ -2,10 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LimeTBX"
-#define MyAppVersion "1.0.3"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX.exe"
-#define MyAppDevPath "W:\"
+#define MyAppDevPath "C:\repo\"
+;"W:\"
 ;"C:\Users\Javier\Repositorios\lime_tbx"
 
 [Setup]
@@ -18,7 +19,7 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf64}\{#MyAppName}
 DisableProgramGroupPage=yes
-ArchitecturesAllowed=x64
+ArchitecturesAllowed=x64compatible
 PrivilegesRequired=admin
 OutputDir={#MyAppDevPath}\installer\windows
 OutputBaseFilename=LimeTBX installer
@@ -40,9 +41,9 @@ Name: "{app}\coeff_data"; Permissions: everyone-full
 [Files]
 ;Source: "{#MyAppDevPath}\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppDevPath}\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MyAppDevPath}\dist\LimeTBX\_internal\scipy\.libs\*"; DestDir: "{app}\LimeTBX\_internal\scipy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MyAppDevPath}\dist\LimeTBX\_internal\numpy\.libs\*"; DestDir: "{app}\LimeTBX\_internal\numpy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MyAppDevPath}\dist\LimeTBX\_internal\sklearn\.libs\*"; DestDir: "{app}\LimeTBX\_internal\sklearn\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "{#MyAppDevPath}\dist\LimeTBX\scipy\.libs\*"; DestDir: "{app}\LimeTBX\scipy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\dist\LimeTBX\numpy\.libs\*"; DestDir: "{app}\LimeTBX\numpy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\dist\LimeTBX\sklearn\.libs\*"; DestDir: "{app}\LimeTBX\sklearn\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "{#MyAppDevPath}\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
