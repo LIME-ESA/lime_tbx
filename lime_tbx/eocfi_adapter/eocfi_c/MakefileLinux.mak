@@ -63,7 +63,7 @@ LIBS = 	\
 	-lexplorer_lib \
 	-lexplorer_data_handling \
 	-lexplorer_file_handling \
-	-lgeotiff -ltiff -lproj -lxml2 -lm -lc -lpthread -fopenmp
+	-lgeotiff -ltiff -lproj -lxml2 -lm -lc -lpthread
 
 default : executable
 

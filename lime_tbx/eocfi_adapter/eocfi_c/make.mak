@@ -67,7 +67,7 @@ LIBS = 	libexplorer_orbit.lib\
 		libexplorer_lib.lib\
 		libexplorer_data_handling.lib\
 		libexplorer_file_handling.lib\
-        libgeotiff.lib libtiff.lib libproj.lib libxml2.lib pthread.lib Ws2_32.lib pthreadVC2.lib /openmp
+        libgeotiff.lib libtiff.lib libproj.lib libxml2.lib pthread.lib Ws2_32.lib pthreadVC2.lib
 		
 EXAMPLE = $(CFI)
 
