@@ -11,6 +11,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+        Please, **ensure the bug was not already reported** by searching on GitHub the [Issues](https://github.com/LIME-ESA/lime_tbx/issues).
   - type: input
     id: contact
     attributes:

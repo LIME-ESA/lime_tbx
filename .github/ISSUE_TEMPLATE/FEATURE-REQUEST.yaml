@@ -10,7 +10,8 @@ body:
 - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to fill out this feature request!
+        Please, **ensure the feature was not already requested** by searching on GitHub the [Issues](https://github.com/LIME-ESA/lime_tbx/issues).
   - type: input
     id: contact
     attributes:
