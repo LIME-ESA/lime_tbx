@@ -20,13 +20,13 @@
     Run the LIME model, simulate lunar observations and compare them with real remote sensing data.
     <br />
     <a href="https://eco.gitlab-docs.npl.co.uk/eo/lime_tbx/"><strong>Explore the docs »</strong></a>
-    <!--<br />
     <br />
-    <a href="https://github.com/LIME-ESA/lime_tbx">View Demo</a>
-    ·
+    <br />
+    <!--<a href="https://github.com/LIME-ESA/lime_tbx">View Demo</a>
+    ·-->
     <a href="https://github.com/LIME-ESA/lime_tbx/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/LIME-ESA/lime_tbx/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>-->
+    <a href="https://github.com/LIME-ESA/lime_tbx/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -124,7 +124,7 @@ Usage examples.
 ## Roadmap
 
 - [ ] Toolbox compilation through Docker
-    - [ ] Linux
+    - [x] Linux
     - [ ] Windows
     - [ ] Mac
 - [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR107**)

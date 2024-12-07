@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve speed of switching between comparison graphs. (**NFR207**)
 - Geometry information (coordinates, angles, etc.) and timestamps (if available) are now included in all NetCDF and CSV output files. (**NFR305**)
 - The TBX accepts coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band. (**NFR107-A**)
+- Automatic deployment for Linux through Docker.
+- Partial automatic deployment for Windows through Docker. All except first step (compiling EOCFI C Code).
 
 ### Fixed
 
