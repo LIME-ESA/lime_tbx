@@ -21,6 +21,7 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
     KernelsPath,
     SurfacePoint,
+    EocfiPath,
 )
 from lime_tbx.datatypes import constants
 from lime_tbx.lime_algorithms.lime import lime
@@ -408,7 +409,7 @@ class LimeSimulation(ILimeSimulation):
 
     def __init__(
         self,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         kernels_path: KernelsPath,
         settings_manager: ISettingsManager,
         MCsteps: int = 100,
@@ -417,7 +418,7 @@ class LimeSimulation(ILimeSimulation):
         """
         Parameters
         ----------
-        eocfi_path: str
+        eocfi_path: EocfiPath
             Path where the folder with the needed EOCFI data files is located.
         kernels_path: KernelsPath
             Path where the folder with the needed SPICE kernel files is located.

@@ -22,6 +22,7 @@ It exports the following classes:
     * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.
     * ComparisonData - Dataclass containing the data outputed from a comparison.
     * KernelsPath - Dataclass containing the needed information in order to find all SPICE kernels.
+    * EocfiPath - Dataclass containing the needed information in order to find all satellite data for EOCFI.
     * SelenographicDataWrite - Extra data that allowes to define CustomPoints in the GLOD data file.
     * LunarObservationWrite - Dataclass containing the needed information to create a Lunar observation
         in a LGLOD file.
@@ -888,6 +889,22 @@ class KernelsPath:
 
     main_kernels_path: str
     custom_kernel_path: str
+
+
+@dataclass
+class EocfiPath:
+    """Dataclass containing the needed information in order to find all EOCFI data in the system.
+
+    Attributes
+    ----------
+    main_eocfi_path: str
+        Path where the main TBX satellite data is located (can be read-only).
+    custom_eocfi_path: str
+        Path where the custom TBX satellite data is located (can be read-only).
+    """
+
+    main_eocfi_path: str
+    custom_eocfi_path: str
 
 
 @dataclass

@@ -25,6 +25,7 @@ from lime_tbx.datatypes.datatypes import (
     SatellitePoint,
     SurfacePoint,
     MoonData,
+    EocfiPath,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.datatypes.constants import CompFields
@@ -252,7 +253,10 @@ def _get_chosen_diff_from_cli(param: str) -> CompFields:
 
 class CLI:
     def __init__(
-        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str = None
+        self,
+        kernels_path: KernelsPath,
+        eocfi_path: EocfiPath,
+        selected_version: str = None,
     ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path

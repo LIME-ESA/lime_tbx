@@ -19,7 +19,7 @@ from lime_tbx.local_storage.programdata import (
     get_appdata_folder,
     get_programfiles_folder,
 )
-from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 from lime_tbx.datatypes import logger
 from lime_tbx.coefficients.access_data.access_data import AccessData
 
@@ -59,7 +59,9 @@ def main():
     kernels_path = KernelsPath(
         os.path.join(programfiles, "kernels"), os.path.join(appdata, "kernels")
     )
-    eocfi_path = os.path.join(programfiles, "eocfi_data")
+    eocfi_path = EocfiPath(
+        os.path.join(programfiles, "eocfi_data"), os.path.join(appdata, "eocfi_data")
+    )
     sysargs = sys.argv[1:]
     options = OPTIONS
     long_options = LONG_OPTIONS

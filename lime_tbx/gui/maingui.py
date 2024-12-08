@@ -49,7 +49,7 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
     SpectralData,
     MoonData,
-    SelenographicDataWrite,
+    EocfiPath,
 )
 from lime_tbx.datatypes import logger, constants as logic_constants
 from lime_tbx.datatypes.constants import CompFields
@@ -108,27 +108,23 @@ def eli_callback(
         SRF that will be used to calculate the data
     point: Point
         Point used
-    coeffs: IrradianceCoefficients
-        Coefficients used by the algorithms in order to calculate the irradiance or reflectance.
-    cimel_coef: CimelCoef
-        CimelCoef with the CIMEL coefficients and uncertainties.
-    kernels_path: str
-        Path where the directory with the SPICE kernels is located.
-    eocfi_path: str
-        Path where the directory with the needed EOCFI data files is located.
+    cimel_coef: RefkectanceCoefficients
+        Coefficients to calculate reflectance.
+    lime_simulation: ILimeSimulation
+        Lime simulation object that will calculate the data
+    signal_info: QtCore.Signal
+        QT signal that can emit a signal to UI.
 
     Returns
     -------
-    wlens: list of float
-        Wavelengths of def_srf
-    elis: list of float
-        Irradiances related to def_srf
     point: Point
         Point that was used in the calculations.
-    ch_irrs: list of float
-        Integrated irradiance signals for each srf channel
     srf: SpectralResponseFunction
         SRF used for the integrated irradiance signal calculation.
+    elis: list of float
+        Irradiances related to def_srf
+    ch_irrs: list of float
+        Integrated irradiance signals for each srf channel
     uncertainty_data: SpectralData or list of SpectralData
         Calculated uncertainty data.
     inside_mpa_range: bool or list of bool
@@ -435,7 +431,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         lime_simulation: ILimeSimulation,
         settings_manager: settings.ISettingsManager,
         kernels_path: KernelsPath,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
     ):
         super().__init__()
         self.lime_simulation = lime_simulation
@@ -964,7 +960,7 @@ class MainSimulationsWidget(
         self,
         lime_simulation: ILimeSimulation,
         kernels_path: KernelsPath,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         settings_manager: settings.ISettingsManager,
     ):
         super().__init__()
@@ -1539,7 +1535,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     """
 
     def __init__(
-        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str
+        self, kernels_path: KernelsPath, eocfi_path: EocfiPath, selected_version: str
     ):
         super().__init__()
         self.setLocale("English")

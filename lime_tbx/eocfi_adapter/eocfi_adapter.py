@@ -24,6 +24,7 @@ from lime_tbx.datatypes.datatypes import (
     LimeException,
     OrbitFile,
     Satellite,
+    EocfiPath,
 )
 from lime_tbx.datatypes import logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
@@ -217,7 +218,7 @@ class EOCFIConverter(IEOCFIConverter):
         * get_satellite_position() - Get the geographic satellite position for a concrete datetime.
     """
 
-    def __init__(self, eocfi_path: str, kernels_path: KernelsPath):
+    def __init__(self, eocfi_path: EocfiPath, kernels_path: KernelsPath):
         super().__init__()
         self.eocfi_path = eocfi_path
         self.kernels_path = kernels_path
@@ -234,18 +235,53 @@ class EOCFIConverter(IEOCFIConverter):
         """
         return list(self._get_sat_list_yaml().keys())
 
-    def _get_sat_list_yaml(self) -> dict:
+    def _get_custom_sat_list_yaml(self) -> dict:
         """
-        Read the sat list yaml and return the object.
+        Read the custom sat list yaml and return the object.
 
         Returns
         -------
         sat_list: dict
             Dictionary containing the sat list yaml.
         """
-        fl = open(os.path.join(self.eocfi_path, ESA_SAT_LIST))
+        custom_satl = os.path.join(self.eocfi_path.custom_eocfi_path, ESA_SAT_LIST)
+        y = {}
+        if os.path.exists(custom_satl):
+            fl = open(custom_satl)
+            y = yaml.load(fl, Loader=yaml.FullLoader)
+            fl.close()
+        return y
+
+    def _get_sat_list_yaml(self) -> dict:
+        """
+        Read the sat list yamls and return the object.
+
+        Returns
+        -------
+        sat_list: dict
+            Dictionary containing the sat list yaml.
+        """
+        yc = self._get_custom_sat_list_yaml()
+        fl = open(os.path.join(self.eocfi_path.main_eocfi_path, ESA_SAT_LIST))
         y = yaml.load(fl, Loader=yaml.FullLoader)
         fl.close()
+        # join both dicts
+        for satname in yc:
+            sat = yc[satname]
+            is_tle = False
+            if "norad_sat_number" in sat:
+                is_tle = True
+            if satname not in y:
+                y[satname] = sat
+            else:
+                if is_tle and "norad_sat_number" not in y[satname]:
+                    y[satname]["norad_sat_number"] = sat["norad_sat_number"]
+                    y[satname]["intdes"] = sat["intdes"]
+                    y[satname]["time_file"] = sat["time_file"]
+                for orbf in sat["orbit_files"][::-1]:
+                    y[satname]["orbit_files"].insert(0, orbf)
+                n_files = int(y[satname]["n_files"])
+                y[satname]["n_files"] = n_files + sat["n_files"]
         return y
 
     def get_sat_list(self) -> List[Satellite]:
@@ -328,7 +364,12 @@ class EOCFIConverter(IEOCFIConverter):
                 sat_yaml[sat.name]["orbit_files"].insert(0, orbf)
             n_files = int(sat_yaml[sat.name]["n_files"])
             sat_yaml[sat.name]["n_files"] = n_files + sat_data["n_files"]
-        fl = open(os.path.join(self.eocfi_path, f"{ESA_SAT_LIST}"), "w")
+        os.makedirs(self.eocfi_path.custom_eocfi_path, exist_ok=True)
+        fl = open(
+            os.path.join(self.eocfi_path.custom_eocfi_path, f"{ESA_SAT_LIST}"), "w"
+        )
+        # If adding a satellite, the satlist will be stored in custom path
+        # And this list is read with priority over the other one.
         yaml.dump(sat_yaml, fl, Dumper=yaml.Dumper)
         fl.close()
 
@@ -418,11 +459,18 @@ class EOCFIConverter(IEOCFIConverter):
                     "The satellite position can't be calculated for a given datetime."
                 )
             orbit_path = os.path.join(
-                self.eocfi_path,
-                f"data/missions/{orb_f.name}",
-            )
+                self.eocfi_path.custom_eocfi_path,
+                f"data/custom_missions/{orb_f.name}",
+            )  # Check first if the custom version exists, giving custom files priority in case they share name.
             if not os.path.exists(orbit_path):
-                raise LimeException("The orbit file {} is missing".format(orbit_path))
+                orbit_path = os.path.join(
+                    self.eocfi_path.main_eocfi_path,
+                    f"data/missions/{orb_f.name}",
+                )
+                if not os.path.exists(orbit_path):
+                    raise LimeException(
+                        "The orbit file {} is missing".format(orbit_path)
+                    )
         return self._get_sat_position_orbit_path(sat, dts, orbit_path)
 
     def _get_sat_position_orbit_path(
@@ -439,7 +487,7 @@ class EOCFIConverter(IEOCFIConverter):
         if orbit_path.endswith(".txt") or orbit_path.endswith(".TLE"):
             tle_file = orbit_path
             orbit_path = os.path.join(
-                self.eocfi_path,
+                self.eocfi_path.main_eocfi_path,
                 "data",
                 "missions",
                 sat.time_file,
