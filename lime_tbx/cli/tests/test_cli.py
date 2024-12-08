@@ -15,7 +15,7 @@ import unittest
 import requests
 
 """___LIME_TBX Modules___"""
-from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.coefficients.update.tests.test_update import HTTPServer, get_updater
 from ..cli import (
@@ -33,7 +33,7 @@ __status__ = "Development"
 
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
-EOCFI_PATH = "./eocfi_data"
+EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 
 GITLAB_CI = "GITLAB_CI"
 GITLAB_CI_VALUE = "GITLAB_CI"

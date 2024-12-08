@@ -22,6 +22,7 @@ from ....datatypes.datatypes import (
     SatellitePoint,
     KernelsPath,
     SpectralData,
+    EocfiPath,
 )
 from ....coefficients.access_data.access_data import _get_demo_cimel_coeffs
 from ...lime_simulation import LimeSimulation, ILimeSimulation
@@ -36,7 +37,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Production"
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
-EOCFI_PATH = "./eocfi_data"
+EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 
 CH_WLENS = np.array([350, 400, 450, 500])
 CH_SRF = np.array([0.2, 0.2, 0.3, 0.3])
