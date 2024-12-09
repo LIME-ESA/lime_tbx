@@ -11,7 +11,7 @@ import spiceypy as spice
 
 """___LIME_TBX Modules___"""
 from ..eocfi_adapter import EOCFIConverter, IEOCFIConverter, _get_file_datetimes
-from lime_tbx.datatypes.datatypes import KernelsPath, LimeException
+from lime_tbx.datatypes.datatypes import KernelsPath, LimeException, EocfiPath
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
 
@@ -22,7 +22,7 @@ __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
-EOCFI_PATH = "./eocfi_data"
+EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
 MANDATORY_SATS = [
     "ENVISAT",

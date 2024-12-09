@@ -22,6 +22,7 @@ from lime_tbx.datatypes.datatypes import (
     SatellitePoint,
     KernelsPath,
     LimeException,
+    EocfiPath,
 )
 from lime_tbx.datatypes import constants
 from lime_tbx.eocfi_adapter import eocfi_adapter
@@ -49,7 +50,7 @@ if you want both values in this case, it is advisable to choose to calculate irr
 
 
 def _callback_read_obs_files(
-    paths: List[str], kernels_path: KernelsPath, eocfi_path: str
+    paths: List[str], kernels_path: KernelsPath, eocfi_path: EocfiPath
 ) -> List[LunarObservation]:
     obss = []
     for path in paths:
@@ -66,7 +67,7 @@ def _callback_save_satellite(
     sat: Satellite,
     start_date: datetime,
     end_date: datetime,
-    eocfi_path: str,
+    eocfi_path: EocfiPath,
     kernels_path: KernelsPath,
 ):
     orbf = sat.orbit_files[0]
@@ -80,7 +81,9 @@ def _callback_save_satellite(
             "and end dates using the selected data file. Not adding the satellite data."
         )
         raise LimeException(errmsg)
-    destdir = os.path.join(eocfi_path, "data", "custom_missions", sat.name)
+    destdir = os.path.join(
+        eocfi_path.custom_eocfi_path, "data", "custom_missions", sat.name
+    )
     os.makedirs(destdir, exist_ok=True)
     fmt = "%Y%m%dT%H%M%S"
     filename = f"{sat.name}_{start_date.strftime(fmt)}_{end_date.strftime(fmt)}"
@@ -90,7 +93,7 @@ def _callback_save_satellite(
             fileid += 1
     filename = f"{filename}_{fileid:04}.{orbf[-3:]}"
     shutil.copyfile(orbf, os.path.join(destdir, filename))
-    sat.orbit_files = [f"../custom_missions/{sat.name}/{filename}"]
+    sat.orbit_files = [f"{sat.name}/{filename}"]
     eo.add_sat(sat)
 
 
@@ -621,7 +624,9 @@ _ADDSATDESCR = (
 
 
 class AddSatDialog(QtWidgets.QDialog):
-    def __init__(self, parent, eocfi_path: str, kernels_path: KernelsPath) -> None:
+    def __init__(
+        self, parent, eocfi_path: EocfiPath, kernels_path: KernelsPath
+    ) -> None:
         super().__init__(parent)
         self.eocfi_path = eocfi_path
         self.kernels_path = kernels_path
@@ -826,7 +831,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
         self,
         callback_check_calculable: Callable,
         skip_uncs: bool,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         kernels_path: KernelsPath,
     ) -> None:
         super().__init__()
@@ -923,7 +928,7 @@ class InputWidget(QtWidgets.QWidget):
         change_callback: Callable,
         callback_check_calculable: Callable,
         skip_uncs: bool,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         kernels_path: KernelsPath,
     ):
         super().__init__()
@@ -1043,7 +1048,7 @@ class ComparisonInput(QtWidgets.QWidget):
         callback_change: Callable,
         callback_compare_but_enable: Callable,
         kernels_path: KernelsPath,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
     ):
         super().__init__()
         self.callback_change = callback_change

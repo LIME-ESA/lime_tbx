@@ -14,6 +14,7 @@ from lime_tbx.datatypes.datatypes import (
     CustomPoint,
     SatellitePoint,
     KernelsPath,
+    EocfiPath,
 )
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter, IEOCFIConverter
@@ -22,9 +23,9 @@ from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter, IEOCFIConverter
 """___Authorship___"""
 __author__ = "Pieter De Vis"
 __created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
-__status__ = "Development"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
+__status__ = "Production"
 
 
 class MoonDataFactory:
@@ -35,7 +36,7 @@ class MoonDataFactory:
     @staticmethod
     def get_md(
         point: Point,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         kernels_path: KernelsPath,
     ) -> Union[MoonData, List[MoonData]]:
         """
@@ -45,7 +46,7 @@ class MoonDataFactory:
         ----------
         point: Point
             Point from which to create the MoonData.
-        eocfi_path: str
+        eocfi_path: EocfiPath
             Path to the folder with the needed eocfi data files.
         kernels_path: KernelsPath
             Path to the folder with the needed SPICE kernel files.
@@ -122,7 +123,7 @@ class MoonDataFactory:
     @staticmethod
     def get_md_from_satellite(
         sp: SatellitePoint,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         kernels_path: KernelsPath,
     ) -> Union[MoonData, List[MoonData]]:
         """
@@ -132,7 +133,7 @@ class MoonDataFactory:
         ----------
         sp: SatellitePoint
             SatellitePoint from which to create the MoonData.
-        eocfi_path: str
+        eocfi_path: EocfiPath
             Path to the folder with the needed eocfi data files.
         kernels_path: KernelsPath
             Path to the folder with the needed SPICE kernel files.
@@ -149,7 +150,7 @@ class MoonDataFactory:
     @staticmethod
     def get_md_and_surfaces_from_satellite(
         sp: SatellitePoint,
-        eocfi_path: str,
+        eocfi_path: EocfiPath,
         kernels_path: KernelsPath,
     ) -> Union[
         Tuple[MoonData, SurfacePoint], Tuple[List[MoonData], List[SurfacePoint]]
@@ -161,7 +162,7 @@ class MoonDataFactory:
         ----------
         sp: SatellitePoint
             SatellitePoint from which to create the MoonData.
-        eocfi_path: str
+        eocfi_path: EocfiPath
             Path to the folder with the needed eocfi data files.
         kernels_path: KernelsPath
             Path to the folder with the needed SPICE kernel files.

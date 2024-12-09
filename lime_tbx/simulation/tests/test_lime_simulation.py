@@ -22,6 +22,7 @@ from ...datatypes.datatypes import (
     SatellitePoint,
     KernelsPath,
     LGLODData,
+    EocfiPath,
 )
 from ...coefficients.access_data.access_data import (
     _get_default_polarisation_coefficients,
@@ -43,7 +44,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
-EOCFI_PATH = "./eocfi_data"
+EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 
 CH_WLENS = np.array([350, 400, 450, 500])
 CH_DEF_INDICES = np.where(

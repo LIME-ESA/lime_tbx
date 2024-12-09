@@ -14,6 +14,7 @@ from ...datatypes.datatypes import (
     SatellitePoint,
     SurfacePoint,
     KernelsPath,
+    EocfiPath,
 )
 
 """___Authorship___"""
@@ -24,7 +25,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
-EOCFI_PATH = "./eocfi_data"
+EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 
 LAT = 21
 LON = 21

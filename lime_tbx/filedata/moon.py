@@ -28,7 +28,7 @@ from ..datatypes.datatypes import (
     SelenographicDataWrite,
     SpectralData,
     SurfacePoint,
-    SatellitePoint,
+    EocfiPath,
     CustomPoint,
     MoonData,
 )
@@ -73,7 +73,7 @@ def _calc_divisor_to_nm(units: str) -> float:
 
 
 def read_moon_obs(
-    path: str, kernels_path: KernelsPath, eocfi_path: str
+    path: str, kernels_path: KernelsPath, eocfi_path: EocfiPath
 ) -> LunarObservation:
     """
     Read a glod-formatted netcdf moon observations file and create a data object

@@ -8,6 +8,7 @@ from lime_tbx.datatypes.datatypes import (
     SatellitePosition,
     LGLODComparisonData,
     LGLODData,
+    EocfiPath,
 )
 
 """___Third-Party Modules___"""
@@ -27,7 +28,7 @@ __status__ = "Development"
 PATH = "./test_files/moon/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc"
 
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")
-EOCFI_PATH = "eocfi_data"
+EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 
 
 class TestMoon(unittest.TestCase):

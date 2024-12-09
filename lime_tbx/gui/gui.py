@@ -10,7 +10,7 @@ from PySide2 import QtWidgets, QtGui
 
 """___LIME_TBX Modules___"""
 from lime_tbx.gui import constants, maingui
-from lime_tbx.datatypes.datatypes import KernelsPath
+from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -32,7 +32,10 @@ def _preprocess_qss(qss: str, qss_constants: str):
 
 class GUI:
     def __init__(
-        self, kernels_path: KernelsPath, eocfi_path: str, selected_version: str = None
+        self,
+        kernels_path: KernelsPath,
+        eocfi_path: EocfiPath,
+        selected_version: str = None,
     ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
