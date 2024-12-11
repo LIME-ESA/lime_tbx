@@ -3,4 +3,4 @@ README
 ======
 
 .. include:: ../../README.md
-  :parser: commonmark
+  :parser: myst_parser.sphinx_

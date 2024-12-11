@@ -11,7 +11,7 @@
 <br />
 <div align="center">
   <a href="https://lime.uva.es">
-    <img src="./docs/images/lime_logo.png" alt="LIME logo" height="80">
+    <img src="./docs/images/lime_logo.png" alt="LIME logo" height="80" style="height: 80px !important;">
   </a>
 
   <h3 align="center">lime_tbx</h3>
@@ -326,15 +326,15 @@ Distributed under the LGPL-v3 License. See [LGPL v3](./LICENSE) for more informa
 
 ## Authors
 
-* [Javier Gatón Herguedas](gaton@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
-* [Pieter De Vis](pieter.de.vis@npl.co.uk) - [NPL](https://npl.co.uk)
-* [Stefan Adriaensen](stefan.adriaensen@vito.be) - [VITO](https://vito.be)
-* [Jacob Fahy](jacob.fahy@npl.co.uk) - [NPL](https://npl.co.uk)
-* [Ramiro González Catón](ramiro@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
-* [Carlos Toledano](toledano@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
-* [África Barreto](abarretov@aemet.es) - [AEMET](https://aemet.es)
-* [Agnieszka Bialek](agnieszka.bialek@npl.co.uk) - [NPL](https://npl.co.uk)
-* [Marc Bouvet](marc.bouvet@esa.int) - [ESA](https://esa.int)
+* [Javier Gatón Herguedas](mailto:gaton@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
+* [Pieter De Vis](mailto:pieter.de.vis@npl.co.uk) - [NPL](https://npl.co.uk)
+* [Stefan Adriaensen](mailto:stefan.adriaensen@vito.be) - [VITO](https://vito.be)
+* [Jacob Fahy](mailto:jacob.fahy@npl.co.uk) - [NPL](https://npl.co.uk)
+* [Ramiro González Catón](mailto:ramiro@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
+* [Carlos Toledano](mailto:toledano@goa.uva.es) - [GOA-UVa](https://goa.uva.es)
+* [África Barreto](mailto:abarretov@aemet.es) - [AEMET](https://aemet.es)
+* [Agnieszka Bialek](mailto:agnieszka.bialek@npl.co.uk) - [NPL](https://npl.co.uk)
+* [Marc Bouvet](mailto:marc.bouvet@esa.int) - [ESA](https://esa.int)
 
 ---
 

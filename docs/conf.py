@@ -20,6 +20,7 @@
 import lime_tbx
 import os
 import sys
+import re
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -53,7 +54,67 @@ def run_apidoc(_):
         apidoc.main(argv)
 
 
+from docutils.nodes import Text, reference, image, raw
+
+
+def process_node(node):
+    if isinstance(node, Text):
+        pass
+    elif isinstance(node, reference):
+        # Modifica atributos como 'refuri' para enlaces relativos
+        if node.get("refuri", "").startswith("./docs"):
+            node["refuri"] = "../_static/" + node["refuri"][7:]
+        if node.get("refid", "").startswith("./docs"):
+            node["refid"] = "../_static/" + node["refid"][7:]
+    elif isinstance(node, image):
+        pass
+    elif isinstance(node, raw):
+        if node.get("format") == "html":
+            raw_content = node.astext()
+            # Traverse sibling nodes to gather additional content
+            sibling = node.next_node(descend=False, ascend=False)
+            while (
+                sibling and isinstance(sibling, raw) and sibling.get("format") == "html"
+            ):
+                raw_content += sibling.astext()
+                sibling = sibling.next_node(descend=False, ascend=False)
+            # Replace relative links (Markdown-style and HTML-style)
+            updated_content = re.sub(
+                r"\((\.\/(.*\/)*([^)]+))\)", r"(../_static/\3)", raw_content
+            )
+            updated_content = re.sub(
+                r'<a\s+href="(\.\/(.*\/)*([^"]+))"',
+                r'<a href="../_static/\3"',
+                updated_content,
+            )
+            updated_content = re.sub(
+                r'<img\s+src="(\.\/(.*\/)*([^"]+))"',
+                r'<img src="../_static/\3"',
+                updated_content,
+            )
+
+            if updated_content != raw_content:
+                node.rawsource = updated_content  # Update the first raw node
+                node.children = []  # Clear any children nodes
+                node.append(raw("", updated_content, format="html"))
+    for chnode in node.children:
+        process_node(chnode)
+
+
+def process_links_in_doctree(app, doctree, docname):
+    """
+    Modifica los enlaces relativos en el doctree antes de que se genere el HTML.
+    """
+    if docname in (
+        "index",
+        "content/readme",
+    ):  # Aplica cambios solo a 'index.rst' o el docname relevante
+        for node in doctree.traverse():
+            process_node(node)
+
+
 def setup(app):
+    app.connect("doctree-resolved", process_links_in_doctree)
     app.connect("builder-inited", run_apidoc)
 
 
@@ -75,6 +136,11 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
+    "myst_parser",
+]
+
+myst_enable_extensions = [
+    "tasklist",  # Enables checkbox rendering
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -83,8 +149,7 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
@@ -120,7 +185,6 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
 # -- Options for HTML output -------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -137,7 +201,7 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = ["_static", "images"]
 
 # SH added to override wide tables in RTD theme
 # html_context = {

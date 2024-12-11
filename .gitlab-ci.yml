@@ -159,6 +159,7 @@ pages:
   stage: Readthedocs Documentation
   needs: []
   script:
+    - pip install myst_parser
     - sphinx-build docs public -b html
   artifacts:
     paths:
@@ -176,6 +177,7 @@ pdf_make:
   stage: Build latex Documentation
   needs: []
   script:
+    - pip install myst_parser
     - sphinx-build docs latex -b latex
     - cp -r latex ./quality_documentation/latex
   artifacts:
