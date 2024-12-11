@@ -597,7 +597,15 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         self.longitude_spinbox.setValue(lon)
 
     def set_altitude(self, alt: float):
-        self.altitude_spinbox.setValue(alt)
+        """
+        Set the altitude value in the input
+
+        Parameters
+        ----------
+        alt: float
+            Altitude in meters
+        """
+        self.altitude_spinbox.setValue(alt / 1000)
 
     def set_datetimes(self, dt: Union[List[datetime], datetime]):
         self.flexdt_wg.set_datetimes(dt)
