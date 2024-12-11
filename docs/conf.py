@@ -63,9 +63,9 @@ def process_node(node):
     elif isinstance(node, reference):
         # Modifica atributos como 'refuri' para enlaces relativos
         if node.get("refuri", "").startswith("./docs"):
-            node["refuri"] = "../_static/" + node["refuri"][7:]
+            node["refuri"] = "../_static" + node["refuri"][node["refuri"].rindex("/") :]
         if node.get("refid", "").startswith("./docs"):
-            node["refid"] = "../_static/" + node["refid"][7:]
+            node["refid"] = "../_static" + node["refid"][node["refid"].rindex("/") :]
     elif isinstance(node, image):
         pass
     elif isinstance(node, raw):
@@ -80,15 +80,15 @@ def process_node(node):
                 sibling = sibling.next_node(descend=False, ascend=False)
             # Replace relative links (Markdown-style and HTML-style)
             updated_content = re.sub(
-                r"\((\.\/(.*\/)*([^)]+))\)", r"(../_static/\3)", raw_content
+                r"\((\.\/([^)]*\/)*([^)]+))\)", r"(../_static/\3)", raw_content
             )
             updated_content = re.sub(
-                r'<a\s+href="(\.\/(.*\/)*([^"]+))"',
+                r'<a\s+href="(\.\/([^"]*\/)*([^"]+))"',
                 r'<a href="../_static/\3"',
                 updated_content,
             )
             updated_content = re.sub(
-                r'<img\s+src="(\.\/(.*\/)*([^"]+))"',
+                r'<img\s+src="(\.\/([^"]*\/)*([^"]+))"',
                 r'<img src="../_static/\3"',
                 updated_content,
             )
