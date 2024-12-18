@@ -157,6 +157,7 @@ master_doc = "index"
 # General information about the project.
 project = project_title
 author = "Javier Gatón, Pieter De Vis, Stefan Adriaensen, Jacob Fahy, Ramiro González Catón, Carlos Toledano, África Barreto, Agnieszka Bialek, Marc Bouvet"
+copyright = "2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -278,7 +279,7 @@ texinfo_documents = [
         "lime_tbx Documentation",
         author,
         "lime_tbx",
-        "The LIME TBX isa python package with a toolbox for using the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare to remote sensing observations of the moon.",
+        "The LIME TBX is a Python package providing a comprehensive toolbox for utilizing the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare them with remote sensing data of the Moon.",
         "Miscellaneous",
     ),
 ]
