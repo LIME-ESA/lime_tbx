@@ -199,7 +199,7 @@ def get_u_esi(srf_type: str) -> np.ndarray:
         )
     elif srf_type == "interpolated_triangle":
         return np.genfromtxt(
-            os.path.join(dir_path, _TSIS_GAUSS_1_3_FILE),
+            os.path.join(dir_path, _TSIS_TRIANGULAR_1_1_FILE),
             delimiter=",",
             usecols=[0, 2],
             dtype=np.float32,
