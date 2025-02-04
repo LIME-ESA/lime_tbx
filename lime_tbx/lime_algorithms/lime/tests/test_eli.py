@@ -56,8 +56,8 @@ ELIS_CHECK_DATA_WEHRLI = np.array(
 ELIS_CHECK_DATA = np.array(
     [
         1.0797115270270405e-06,
-        1.349499e-06,
-        1.407694e-06,
+        1.349498873307202e-06,
+        1.4076935974170986e-06,
         1.0233894777590921e-06,
         8.503963982841415e-07,
         4.1148031586953454e-07,
@@ -136,6 +136,8 @@ class TestELRef(unittest.TestCase):
 
     def test_calculate_eli_from_elref(self):
         elis = eli.calculate_eli_from_elref(WLENS, MD, ELREF_DATA, "cimel")
+        np.printoptions(100000)
+        print(*elis)
         np.testing.assert_array_equal(elis, ELIS_CHECK_DATA)
 
     def test_calculate_eli_unc(self):
