@@ -1040,7 +1040,7 @@ class LimeSimulation(ILimeSimulation):
                     cf.data,
                     asdd.wlens,
                     asdd.data,
-                    wlens,
+                    np.array(wlens),
                 )
                 u_polars_intp = np.zeros(polars_intp.shape)
             # The Dataset is not needed later, and the corr_matrix is very big so we ignore it to save up space
