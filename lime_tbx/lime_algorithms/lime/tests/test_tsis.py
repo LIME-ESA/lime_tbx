@@ -36,7 +36,7 @@ class Test_TSIS(unittest.TestCase):
         solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
         u_solar_y = np.array(list(map(lambda x: x[1], solar_data.values())))
         cimel_wavs, cimel_esi, u_cimel_esi = tsis_cimel(
-            solar_y, solar_x, u_solar_y, MCsteps=10
+            solar_y, solar_x, u_solar_y, mc_steps=10
         )
         # asd_wavs,asd_esi,u_asd_esi=tsis_asd(solar_y,solar_x,u_solar_y,MCsteps=2)
         dat = np.genfromtxt(
