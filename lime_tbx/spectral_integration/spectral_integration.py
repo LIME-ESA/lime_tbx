@@ -173,6 +173,9 @@ class SpectralIntegration(ISpectralIntegration):
                 os.path.join(dir_path, _INTERPOLATED_TRIANGULAR_FILE), delimiter=","
             )
             srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "triangle")
+        elif srf_type == "asd":
+            data = np.genfromtxt(os.path.join(dir_path, _ASD_FILE), delimiter=",")
+            srf = SRF_fwhm("interpolated", data[:, 0], data[:, 1], "asd")
         else:
             logger.get_logger().error(
                 "The selected interpolated SRF file for spectral integration wasn't valid."
@@ -216,7 +219,7 @@ class SpectralIntegration(ISpectralIntegration):
         for cw in cimel_wavs:
             wlens = df[f"w.{cw}"].values
             resp = df[f"r.{cw}"].values
-            srf = {w: r for w, r in zip(wlens, resp)}
+            srf = {w: r for w, r in zip(wlens, resp) if r != 0}
             channel = SRFChannel(cw, str(cw), srf)
             srflist.append(channel)
         return SpectralResponseFunction("cimel", srflist)

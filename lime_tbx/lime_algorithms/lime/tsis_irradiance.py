@@ -1,10 +1,11 @@
 """
-This module reads in the tsis data and calculated the band integrated solar irradiances for various SRF
+This module reads in the tsis data and calculates the band integrated solar
+irradiances for various spectral response functions
 """
 
 """___Built-In Modules___"""
-from typing import Dict, Tuple
 import os
+from typing import Dict, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -56,13 +57,14 @@ def tsis_cimel(
     solar_y: NDArray[np.float_],
     solar_x: NDArray[np.float_],
     u_solar_y: NDArray[np.float_],
-    MCsteps=100,
+    mc_steps=100,
+    parallel_cores=_PARALLEL_CORES,
 ):
     """
     Calculate TSIS solar irradiances and uncertainties, band integrated to the CIMEL bands
     """
     si = SpectralIntegration()
-    prop = punpy.MCPropagation(MCsteps, parallel_cores=_PARALLEL_CORES)
+    prop = punpy.MCPropagation(mc_steps, parallel_cores=parallel_cores)
     cimel_wavs = np.array([440, 500, 675, 870, 1020, 1640, 2130])
     cimel_esi = si.integrate_cimel(solar_y, solar_x, cimel_wavs)
     u_cimel_esi = prop.propagate_random(
@@ -75,23 +77,33 @@ def tsis_cimel(
     return cimel_wavs, cimel_esi, u_cimel_esi
 
 
+class Wrapper:
+    def __init__(self, func):
+        self._func = func
+        self.calls = 0
+
+    def func(self, *args):
+        print(self.calls)
+        self.calls += 1
+        return self._func(*args)
+
+
 def tsis_asd(
     solar_y: NDArray[np.float_],
     solar_x: NDArray[np.float_],
     u_solar_y: NDArray[np.float_],
-    MCsteps=100,
+    mc_steps=100,
+    parallel_cores=_PARALLEL_CORES,
 ):
     """
     Calculate TSIS solar irradiances and uncertainties, band integrated to the ASD bands
     """
     si = SpectralIntegration()
-    prop = punpy.MCPropagation(MCsteps, parallel_cores=_PARALLEL_CORES)
+    prop = punpy.MCPropagation(mc_steps, parallel_cores=parallel_cores)
     asd_wavs = np.array(si.asd_srf.get_wavelengths())
-    asd_esi = si.integrate_solar_asd(solar_y, solar_x)
-    u_asd_esi = prop.propagate_random(
-        si.integrate_solar_asd, [solar_y, solar_x], [u_solar_y, None]
-    )
-
+    w = Wrapper(si.integrate_solar_asd)
+    asd_esi = w.func(solar_y, solar_x)
+    u_asd_esi = prop.propagate_random(w.func, [solar_y, solar_x], [u_solar_y, None])
     return asd_wavs, asd_esi, u_asd_esi
 
 
@@ -102,32 +114,25 @@ def tsis_fwhm(
     fwhm: float,
     sampling: float,
     shape: str,
-    MCsteps=100,
+    mc_steps=100,
+    parallel_cores=_PARALLEL_CORES,
 ):
     """
-    Calculate TSIS solar irradiances and uncertainties, band integrated to bands with specified FWHM and shape
+    Calculate TSIS solar irradiances and uncertainties, band integrated to bands with
+    specified FWHM and shape
     """
     si = SpectralIntegration()
-    prop = punpy.MCPropagation(MCsteps, parallel_cores=20)
+    prop = punpy.MCPropagation(mc_steps, parallel_cores=parallel_cores)
     si.set_srf_interpolated(fwhm, sampling, shape, write=True)
     intp_wavs = np.array(si.interpolated_srf.get_wavelengths())
     if shape == "gaussian":
-        intp_esi = si.integrate_solar_interpolated_gaussian(solar_y, solar_x)
-        u_intp_esi = prop.propagate_random(
-            si.integrate_solar_interpolated_gaussian,
-            [solar_y, solar_x],
-            [u_solar_y, None],
-        )
+        w = Wrapper(si.integrate_solar_interpolated_gaussian)
     elif shape == "triangle":
-        intp_esi = si.integrate_solar_interpolated_triangle(solar_y, solar_x)
-        u_intp_esi = prop.propagate_random(
-            si.integrate_solar_interpolated_triangle,
-            [solar_y, solar_x],
-            [u_solar_y, None],
-        )
+        w = Wrapper(si.integrate_solar_interpolated_triangle)
     else:
         raise ValueError("SRF shape not recognised")
-
+    intp_esi = w.func(solar_y, solar_x)
+    u_intp_esi = prop.propagate_random(w.func, [solar_y, solar_x], [u_solar_y, None])
     return intp_wavs, intp_esi, u_intp_esi
 
 
@@ -136,45 +141,64 @@ _AVAILABLE_FWHM_SAMPLING = [1, 1, 0.1, 0.1]
 _AVAILABLE_FWHM_SHAPE = ["gaussian", "triangle", "gaussian", "triangle"]
 
 
+def _gen_cimel(solar_y, solar_x, u_solar_y):
+    print("Generating TSIS CIMEL")
+    cimel_wavs, cimel_esi, u_cimel_esi = tsis_cimel(solar_y, solar_x, u_solar_y)
+    with open("assets/tsis_cimel.csv", "w", encoding="utf-8") as f:
+        for i, (cwav, cesi, ucesi) in enumerate(
+            zip(cimel_wavs, cimel_esi, u_cimel_esi)
+        ):
+            print(f"{i}/{len(cimel_wavs)}")
+            f.write(f"{cwav}, {cesi}, {ucesi}\n")
+
+
+def _gen_asd(solar_y, solar_x, u_solar_y):
+    print("Generating TSIS ASD")
+    asd_wavs, asd_esi, u_asd_esi = tsis_asd(solar_y, solar_x, u_solar_y)
+    with open("assets/tsis_asd.csv", "w", encoding="utf-8") as f:
+        for i, (awav, aesi, uaesi) in enumerate(zip(asd_wavs, asd_esi, u_asd_esi)):
+            print(f"{i}/{len(asd_wavs)}")
+            f.write(f"{awav}, {aesi}, {uaesi}\n")
+
+
+def _gen_fwhms(solar_y, solar_x, u_solar_y):
+    for i, (fwhm, sampling, shape) in enumerate(
+        zip(_AVAILABLE_FWHM, _AVAILABLE_FWHM_SAMPLING, _AVAILABLE_FWHM_SHAPE)
+    ):
+        if i >= 2:
+            # Requires too big of a RAM
+            break
+        print(f"{i}/{len(_AVAILABLE_FWHM)}")
+        print(f"Generating {fwhm}, {sampling}, {shape}")
+        intp_wavs, intp_esi, u_intp_esi = tsis_fwhm(
+            solar_y,
+            solar_x,
+            u_solar_y,
+            fwhm,
+            sampling,
+            shape,
+        )
+        id_str = f"{fwhm}_{sampling}_{shape}".replace(".", "p")
+        with open(f"assets/tsis_fwhm_{id_str}.csv", "w", encoding="utf-8") as f:
+            for j, (iwav, iesi, uiesi) in enumerate(
+                zip(intp_wavs, intp_esi, u_intp_esi)
+            ):
+                print(f"{j}/{len(intp_wavs)}")
+                f.write(f"{iwav},{iesi},{uiesi}\n")
+
+
 def _gen_files():
     """
-    generate all the required files. This is time consuming and is precomputed prior to the normal execution of the lime_tbx
+    Generate all the required TSIS based solar irradiance files.
+    This is time consuming and is precomputed prior to the normal execution of the lime_tbx
     """
     solar_data = _get_tsis_data()
     solar_x = np.array(list(solar_data.keys()))
     solar_y = np.array(list(map(lambda x: x[0], solar_data.values())))
     u_solar_y = np.array(list(map(lambda x: x[1], solar_data.values())))
-    cimel_wavs, cimel_esi, u_cimel_esi = tsis_cimel(solar_y, solar_x, u_solar_y)
-    with open("assets/tsis_cimel.csv", "w") as f:
-        for i in range(len(cimel_wavs)):
-            print(i)
-            f.write("%s, %s, %s \n" % (cimel_wavs[i], cimel_esi[i], u_cimel_esi[i]))
-    return
-    asd_wavs, asd_esi, u_asd_esi = tsis_asd(solar_y, solar_x, u_solar_y)
-    with open("assets/tsis_asd.csv", "w") as f:
-        for i in range(len(asd_wavs)):
-            print(f"{i}/{len(asd_wavs)}")
-            f.write("%s, %s, %s \n" % (asd_wavs[i], asd_esi[i], u_asd_esi[i]))
-    for ifwhm in range(len(_AVAILABLE_FWHM)):
-        intp_wavs, intp_esi, u_intp_esi = tsis_fwhm(
-            solar_y,
-            solar_x,
-            u_solar_y,
-            _AVAILABLE_FWHM[ifwhm],
-            _AVAILABLE_FWHM_SAMPLING[ifwhm],
-            _AVAILABLE_FWHM_SHAPE[ifwhm],
-        )
-        id_str = (
-            "%s_%s_%s"
-            % (
-                _AVAILABLE_FWHM[ifwhm],
-                _AVAILABLE_FWHM_SAMPLING[ifwhm],
-                _AVAILABLE_FWHM_SHAPE[ifwhm],
-            )
-        ).replace(".", "p")
-        with open("assets/tsis_fwhm_%s.csv" % id_str, "w") as f:
-            for i in range(len(intp_wavs)):
-                f.write("%s,%s,%s\n" % (intp_wavs[i], intp_esi[i], u_intp_esi[i]))
+    _gen_cimel(solar_y, solar_x, u_solar_y)
+    _gen_asd(solar_y, solar_x, u_solar_y)
+    _gen_fwhms(solar_y, solar_x, u_solar_y)
 
 
 def main():
