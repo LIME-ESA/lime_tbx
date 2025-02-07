@@ -1,5 +1,5 @@
 # Default image, if not specified
-image: "python:3.9"
+image: python:3.9
 
 stages:
   - Static Analysis
@@ -76,6 +76,15 @@ mypy:
   needs: []
 
 
+lint-code:
+  stage: Static Analysis
+  script:
+    - LINTER_FAILED=""
+    - find lime_tbx -name '*.py' -not -wholename  "**/tests/*" -exec pylint --persistent=n --score=n {} + || LINTER_FAILED="yes";
+    - '[ -z "$LINTER_FAILED" ] || exit 1'
+  allow_failure: true
+
+
 ### Tests ###
 .tox:
   extends: .py_venv
@@ -99,10 +108,10 @@ mypy:
       junit: cov_report.xml
     expire_in: 1 hour
 
-tox-3.8:
+tox-3.9:
   extends: ".tox"
   stage: "Test"
-  image: "python:3.8"
+  image: "python:3.9"
   
 tox_slowtests:
     extends: .py_venv
