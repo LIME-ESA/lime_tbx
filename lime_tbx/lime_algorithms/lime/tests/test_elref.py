@@ -303,7 +303,7 @@ def get_coeffs() -> ReflectanceCoefficients:
         "i_coeff.wavelength": len(WLENS) * len(_COEFFS),
     }
     data = _COEFFS
-    u_data = _UNC_DATA
+    u_data = _UNC_DATA * np.sign(_COEFFS)
     err_corr_coeff = _ERR_CORR
     # create dataset
     ds_cimel: xr.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)

@@ -541,7 +541,7 @@ class ReflectanceCoefficients:
         self.wlens: np.ndarray = _ds.wavelength.values
         coeffs: np.ndarray = _ds.coeff.values
         self.coeffs = ReflectanceCoefficients._WlenReflCoeffs(coeffs)
-        u_coeff_cimel: np.ndarray = _ds.u_coeff.values * np.abs(coeffs) / 100
+        u_coeff_cimel: np.ndarray = _ds.u_coeff.values * coeffs / 100
         self.unc_coeffs = ReflectanceCoefficients._WlenReflCoeffs(u_coeff_cimel)
         self.err_corr_coeff = _ds.err_corr_coeff.values
 
