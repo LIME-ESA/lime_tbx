@@ -142,7 +142,7 @@ tox_slowtests:
     needs: []
 
 test_report:
-  needs: ["tox-3.8"]
+  needs: ["tox-3.9"]
   stage: Publish test report
   image: 
      name: oberonamsterdam/wkhtmltopdf
