@@ -63,6 +63,7 @@ setup(
         "threadpoolctl==3.1.0",
         "wrapt==1.14.1",
         "xarray>=2022.10.0",
+        "xarray_schema>=0.0.3",
     ],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
     classifiers=[

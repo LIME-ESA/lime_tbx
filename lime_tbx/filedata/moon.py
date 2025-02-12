@@ -14,6 +14,7 @@ from typing import List, Union
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
+import xarray as xr
 import numpy as np
 
 """___NPL Modules___"""
@@ -37,6 +38,7 @@ from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
 from lime_tbx.lime_algorithms.lime.eli import DIST_EARTH_MOON_KM
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
+from lime_tbx.filedata.netcdfcommon import xr_open_dataset
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -90,19 +92,21 @@ def read_moon_obs(
         Generated MoonObservation from the given datafile
     """
     try:
-        ds = nc.Dataset(path)
+        ds = xr_open_dataset(path)
         n_channels = len(ds["channel_name"])
         ch_names = []
         ch_irrs = {}
         for i in range(n_channels):
-            is_full = isinstance(ds["channel_name"][i].mask, np.bool_)
-            ch_name = str(ds["channel_name"][i].data, "utf-8")
-            if not is_full:
-                end = list(ds["channel_name"][i].mask).index(True)
-                ch_name = ch_name[:end]
+            # The following is not needed?
+            # TODO find out what's for
+            # is_full = isinstance(ds["channel_name"][i].mask, np.bool_)
+            ch_name = str(ds["channel_name"][i].values, "utf-8")
+            # if not is_full:
+            #    end = list(ds["channel_name"][i].mask).index(True)
+            #    ch_name = ch_name[:end]
             ch_names.append(ch_name)
-        dt = datetime.fromtimestamp(float(ds["date"][0].data), tz=timezone.utc)
-        sat_pos_ref = ds["sat_pos_ref"][:]
+        dt = datetime.fromtimestamp(ds["date"].values[0], tz=timezone.utc)
+        sat_pos_ref = ds["sat_pos_ref"].values
         if str(sat_pos_ref.dtype.str).startswith("|S"):
             sat_pos_ref = str(sat_pos_ref, "utf-8")
         else:
@@ -110,14 +114,15 @@ def read_moon_obs(
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
         to_correct_distance = False
-        if "sat_pos" in ds.variables and (
-            not (ds["sat_pos"][:].mask).all()
-            or not hasattr(ds["sat_pos"], "_FillValue")
-            or not (ds["sat_pos"][:].data == ds["sat_pos"]._FillValue).all()
-        ):
-            sat_pos = SatellitePosition(
-                *list(map(lambda x: x / d_to_m, map(float, ds["sat_pos"][:].data)))
-            )
+        # TODO Solve sat_pos issue with no valid values
+        # if "sat_pos" in ds.variables and (
+        #    not (ds["sat_pos"][:].mask).all()
+        #    or not hasattr(ds["sat_pos"], "_FillValue")
+        #    or not (ds["sat_pos"][:].data == ds["sat_pos"]._FillValue).all()
+        # ):
+        #    pass
+        if "sat_pos" in ds.variables:
+            sat_pos = SatellitePosition(*list(ds["sat_pos"].values / d_to_m))
             md = None
         else:
             sat_pos = None
@@ -130,7 +135,7 @@ def read_moon_obs(
             smd = None
             for suva in sun_vars:
                 if suva in ds.variables:
-                    sun_vars[suva] = ds[suva][:].data[0]
+                    sun_vars[suva] = ds[suva].values[0]
                 else:
                     if smd is None:
                         smd = SPICEAdapter.get_solar_moon_datas(
@@ -155,11 +160,11 @@ def read_moon_obs(
             mdeo = None
             for sava in sat_vars:
                 if sava in ds.variables:
-                    sat_vars[sava] = ds[sava][:].data[0]
+                    sat_vars[sava] = ds[sava].values[0]
                 else:
                     if mdeo is None:
                         eo = EOCFIConverter(eocfi_path, kernels_path)
-                        _sname = ds["sat_name"][:]
+                        _sname = ds["sat_name"].values
                         if str(_sname.dtype.str).startswith("|S"):
                             sat_name = str(_sname, "utf-8")
                         else:
@@ -175,14 +180,14 @@ def read_moon_obs(
             mpa = sat_vars["phase_angle"]
             geom_factor = None
             if (
-                "to_correct_distance" in ds.ncattrs()
-                and getattr(ds, "to_correct_distance") == 1
+                "to_correct_distance" in ds.attrs
+                and int(ds.attrs["to_correct_distance"]) == 1
             ):
                 to_correct_distance = True
             geom_factor_names = ["geom_factor", "geom_const"]
             for gfn in geom_factor_names:
                 if gfn in ds.variables:
-                    geom_factor = ds[gfn][:].data[0]
+                    geom_factor = ds[gfn].values[0]
                     break
             md = MoonData(
                 dsm,
@@ -194,7 +199,7 @@ def read_moon_obs(
                 mpa,
                 geom_factor,
             )
-        irr_obs = ds["irr_obs"][:]
+        irr_obs = ds["irr_obs"].values
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
         for i, ch_irr in enumerate(irr_obs):
