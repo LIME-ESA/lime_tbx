@@ -5,7 +5,7 @@ import xarray as xr
 from xarray_schema import DatasetSchema, SchemaError
 
 
-def xr_open_dataset(filepath: str) -> xr.Dataset:
+def xr_open_dataset(filepath: str, mask_limits: bool = True) -> xr.Dataset:
     """Open a netCDF dataset as an xarray Dataset
 
     Read the netCDF dataset masking the appropiate values, checking
@@ -22,15 +22,16 @@ def xr_open_dataset(filepath: str) -> xr.Dataset:
         Dataset with the information of the netCDF file.
     """
     ds = xr.open_dataset(filepath, mask_and_scale=True)
-    for vname in list(ds.data_vars.keys()):
-        values = ds[vname].values
-        if hasattr(ds[vname], "valid_min"):
-            valid_min = ds[vname].valid_min
-            values = np.where(values >= valid_min, values, np.nan)
-        if hasattr(ds[vname], "valid_max"):
-            valid_max = ds[vname].valid_max
-            values = np.where(values <= valid_max, values, np.nan)
-        ds[vname].values = values
+    if mask_limits:
+        for vname in list(ds.data_vars.keys()):
+            values = ds[vname].values
+            if hasattr(ds[vname], "valid_min"):
+                valid_min = ds[vname].valid_min
+                values = np.where(values >= valid_min, values, np.nan)
+            if hasattr(ds[vname], "valid_max"):
+                valid_max = ds[vname].valid_max
+                values = np.where(values <= valid_max, values, np.nan)
+            ds[vname].values = values
     return ds
 
 

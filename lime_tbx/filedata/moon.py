@@ -38,7 +38,7 @@ from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
 from lime_tbx.lime_algorithms.lime.eli import DIST_EARTH_MOON_KM
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
-from lime_tbx.filedata.netcdfcommon import xr_open_dataset
+from lime_tbx.filedata.netcdfcommon import xr_open_dataset, mask_limits_dataarray
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -92,7 +92,7 @@ def read_moon_obs(
         Generated MoonObservation from the given datafile
     """
     try:
-        ds = xr_open_dataset(path)
+        ds = xr_open_dataset(path, mask_limits=False)
         n_channels = len(ds["channel_name"])
         ch_names = []
         ch_irrs = {}
@@ -114,14 +114,7 @@ def read_moon_obs(
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
         to_correct_distance = False
-        # TODO Solve sat_pos issue with no valid values
-        # if "sat_pos" in ds.variables and (
-        #    not (ds["sat_pos"][:].mask).all()
-        #    or not hasattr(ds["sat_pos"], "_FillValue")
-        #    or not (ds["sat_pos"][:].data == ds["sat_pos"]._FillValue).all()
-        # ):
-        #    pass
-        if "sat_pos" in ds.variables:
+        if not np.isnan(ds["sat_pos"]).all():
             sat_pos = SatellitePosition(*list(ds["sat_pos"].values / d_to_m))
             md = None
         else:
