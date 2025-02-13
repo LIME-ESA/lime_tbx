@@ -5,7 +5,9 @@ import xarray as xr
 from xarray_schema import DatasetSchema, SchemaError
 
 
-def xr_open_dataset(filepath: str, mask_limits: bool = True) -> xr.Dataset:
+def xr_open_dataset(
+    filepath: str, mask_fillvalue: bool = True, mask_limits: bool = True
+) -> xr.Dataset:
     """Open a netCDF dataset as an xarray Dataset
 
     Read the netCDF dataset masking the appropiate values, checking
@@ -21,7 +23,7 @@ def xr_open_dataset(filepath: str, mask_limits: bool = True) -> xr.Dataset:
     ds: xr.Dataset
         Dataset with the information of the netCDF file.
     """
-    ds = xr.open_dataset(filepath, mask_and_scale=True)
+    ds = xr.open_dataset(filepath, mask_and_scale=mask_fillvalue)
     if mask_limits:
         for vname in list(ds.data_vars.keys()):
             values = ds[vname].values

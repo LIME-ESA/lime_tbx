@@ -14,7 +14,6 @@ from typing import List, Union
 
 """___Third-Party Modules___"""
 import netCDF4 as nc
-import xarray as xr
 import numpy as np
 
 """___NPL Modules___"""
@@ -38,7 +37,7 @@ from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.simulation.lime_simulation import is_ampa_valid_range
 from lime_tbx.lime_algorithms.lime.eli import DIST_EARTH_MOON_KM
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
-from lime_tbx.filedata.netcdfcommon import xr_open_dataset, mask_limits_dataarray
+from lime_tbx.filedata.netcdfcommon import xr_open_dataset
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -92,20 +91,24 @@ def read_moon_obs(
         Generated MoonObservation from the given datafile
     """
     try:
-        ds = xr_open_dataset(path, mask_limits=False)
+        ds = xr_open_dataset(path, mask_fillvalue=False, mask_limits=False)
+        sat_pos = ds["sat_pos"].values
+        ds.close()
+        ds = xr_open_dataset(path)
+        sat_pos_masked = np.isnan(ds["sat_pos"].values).all()
+        ds["sat_pos"].values = sat_pos
         n_channels = len(ds["channel_name"])
         ch_names = []
         ch_irrs = {}
         for i in range(n_channels):
-            # The following is not needed?
-            # TODO find out what's for
-            # is_full = isinstance(ds["channel_name"][i].mask, np.bool_)
-            ch_name = str(ds["channel_name"][i].values, "utf-8")
-            # if not is_full:
-            #    end = list(ds["channel_name"][i].mask).index(True)
-            #    ch_name = ch_name[:end]
+            ch_name = str(ds["channel_name"][i].values, "utf-8").rstrip("\x00")
             ch_names.append(ch_name)
-        dt = datetime.fromtimestamp(ds["date"].values[0], tz=timezone.utc)
+        dt = ds["date"].values[0]
+        if np.issubdtype(dt.dtype, np.datetime64):
+            dt = dt.astype("datetime64[us]").astype(datetime)
+            dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt = datetime.fromtimestamp(dt, tz=timezone.utc)
         sat_pos_ref = ds["sat_pos_ref"].values
         if str(sat_pos_ref.dtype.str).startswith("|S"):
             sat_pos_ref = str(sat_pos_ref, "utf-8")
@@ -114,7 +117,7 @@ def read_moon_obs(
         sat_pos_units: str = ds["sat_pos"].units
         d_to_m = _calc_divisor_to_m(sat_pos_units)
         to_correct_distance = False
-        if not np.isnan(ds["sat_pos"]).all():
+        if not sat_pos_masked:
             sat_pos = SatellitePosition(*list(ds["sat_pos"].values / d_to_m))
             md = None
         else:
@@ -195,15 +198,16 @@ def read_moon_obs(
         irr_obs = ds["irr_obs"].values
         irr_obs_units: str = ds["irr_obs"].units
         d_to_nm = _calc_divisor_to_nm(irr_obs_units)
+        if to_correct_distance:
+            irr_obs = (
+                irr_obs
+                * ((1 / md.distance_sun_moon) ** 2)
+                * (DIST_EARTH_MOON_KM / md.distance_observer_moon) ** 2
+            )
+        irr_obs = irr_obs / d_to_nm
         for i, ch_irr in enumerate(irr_obs):
-            if not isinstance(ch_irr, np.ma.core.MaskedConstant):
-                if to_correct_distance:
-                    ch_irr = (
-                        ch_irr
-                        * ((1 / md.distance_sun_moon) ** 2)
-                        * (DIST_EARTH_MOON_KM / md.distance_observer_moon) ** 2
-                    )
-                ch_irrs[ch_names[i]] = float(ch_irr) / d_to_nm
+            if not np.isnan(ch_irr):
+                ch_irrs[ch_names[i]] = float(ch_irr)
         data_source = ds.data_source
         ds.close()
         return LunarObservation(
