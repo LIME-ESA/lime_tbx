@@ -13,12 +13,9 @@ PySide6~=6.8.2.1
 PyYAML~=6.0.2
 requests~=2.32
 ruamel.yaml==0.17.21
-scikit-learn~=1.6.1
 scipy~=1.13.1
 setuptools>=75.8.0
-shiboken6~=6.8.2.1
 spicedmoon==1.0.13
-spiceypy~=5.1.2
-threadpoolctl==3.1.0
+spiceypy~=6.0
 xarray>=2022.10.0
 xarray_schema>=0.0.3
