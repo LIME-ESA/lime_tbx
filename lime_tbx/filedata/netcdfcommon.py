@@ -1,12 +1,29 @@
-from typing import Iterable
+from typing import Iterable, Mapping, Any
 
 import numpy as np
 import xarray as xr
 from xarray_schema import DatasetSchema, SchemaError
+from xarray_schema.components import AttrSchema as BrAttrSchema
+
+
+class AttrSchema(BrAttrSchema):
+    def validate(self, attr: Any):
+
+        if self.type is not None:
+            if not np.issubdtype(type(attr), self.type):
+                raise SchemaError(
+                    f"Error in attribute {attr}: is not of type {self.type}"
+                )
+
+        if self.value is not None:
+            if self.value is not None and self.value != attr:
+                raise SchemaError(f"name {attr} != {self.value}")
 
 
 def xr_open_dataset(
-    filepath: str, mask_fillvalue: bool = True, mask_limits: bool = True
+    filepath: str,
+    mask_fillvalue: bool | Mapping[str, bool] = True,
+    mask_limits: bool | Mapping[str, bool] = True,
 ) -> xr.Dataset:
     """Open a netCDF dataset as an xarray Dataset
 
@@ -24,8 +41,13 @@ def xr_open_dataset(
         Dataset with the information of the netCDF file.
     """
     ds = xr.open_dataset(filepath, mask_and_scale=mask_fillvalue)
-    if mask_limits:
-        for vname in list(ds.data_vars.keys()):
+    for vname in list(ds.data_vars.keys()):
+        mask_limits_var = False
+        if isinstance(mask_limits, bool):
+            mask_limits_var = mask_limits
+        else:
+            mask_limits_var = vname not in mask_limits or mask_limits[vname]
+        if mask_limits_var:
             values = ds[vname].values
             if hasattr(ds[vname], "valid_min"):
                 valid_min = ds[vname].valid_min
