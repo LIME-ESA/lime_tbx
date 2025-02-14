@@ -39,7 +39,7 @@ setup(
         "packaging>=24.1",
         "pandas~=2.2.3",
         "punpy~=1.0.2",
-        "PySide2~=6.8.2.1",
+        "PySide6~=6.8.2.1",
         "PyYAML~=6.0.2",
         "requests~=2.32",
         "ruamel.yaml==0.17.21",
