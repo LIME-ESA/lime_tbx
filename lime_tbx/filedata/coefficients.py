@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import xarray as xr
 import obsarray
@@ -100,6 +102,12 @@ TEMPLATE_COEFFS = {
 
 
 def read_coeff_nc(path: str) -> LimeCoefficients:
+    warnings.filterwarnings(
+        "ignore",
+        "Duplicate dimension names present: dimensions {",
+        UserWarning,
+        "xarray",
+    )
     ds = xr.open_dataset(path)
     if "tbx_version_required" in ds.attrs:
         tbx_minv = ds.tbx_version_required
@@ -125,9 +133,9 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
         "i_coeff.wavelength": len(ds.wavelength) * len(ds.i_coeff),
     }
     version_name = f"{release_date}_v{file_version}"
-    data = np.array(ds.coeff.values)
-    u_data = np.array(ds.u_coeff.values)
-    err_corr_coeff = np.array(ds.err_corr_coeff.values)
+    data = np.array(ds["coeff"].values)
+    u_data = np.array(ds["u_coeff"].values)
+    err_corr_coeff = np.array(ds["err_corr_coeff"].values)
     # create dataset
     ds_cimel: xr.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
     ds_cimel = ds_cimel.assign_coords(wavelength=wlens)

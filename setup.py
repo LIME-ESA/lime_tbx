@@ -46,7 +46,7 @@ setup(
         "setuptools>=75.8.0",
         "spicedmoon==1.0.13",
         "spiceypy~=6.0",
-        "xarray>=2022.10.0",
+        "xarray>=2024.7.0",
         "xarray_schema>=0.0.3",
     ],
     extras_require={"dev": ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]},
