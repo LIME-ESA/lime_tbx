@@ -140,6 +140,7 @@ def _get_moondata_from_moon_obs(
                 smd = SPICEAdapter.get_solar_moon_datas(
                     [dt], kernels_path.main_kernels_path
                 )[0]
+                smd.lon_sun_rad = np.degrees(smd.lon_sun_rad)
             sun_vars[suva] = getattr(smd, sun_var_smd_eq[suva])
     sun_sel_lon = sun_vars["sun_sel_lon"]
     dsm = sun_vars["distance_sun_moon"]

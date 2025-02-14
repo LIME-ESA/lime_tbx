@@ -1,4 +1,4 @@
-from typing import Iterable, Mapping, Any
+from typing import Iterable, Mapping, Any, Union
 
 import numpy as np
 import xarray as xr
@@ -22,8 +22,8 @@ class AttrSchema(BrAttrSchema):
 
 def xr_open_dataset(
     filepath: str,
-    mask_fillvalue: bool | Mapping[str, bool] = True,
-    mask_limits: bool | Mapping[str, bool] = True,
+    mask_fillvalue: Union[bool, Mapping[str, bool]] = True,
+    mask_limits: Union[bool, Mapping[str, bool]] = True,
 ) -> xr.Dataset:
     """Open a netCDF dataset as an xarray Dataset
 
