@@ -28,7 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Switched minimum python version from 3.8 to 3.9, so library versions could be updated.
+- Drop support for Python 3.8.
+- Provide support for Python 3.11 and 3.12.
+- Updated library dependencies and versions.
 
 ### Fixed
 

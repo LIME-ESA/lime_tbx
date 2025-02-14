@@ -6,7 +6,7 @@ import pkgutil
 import os
 
 """___Third-Party Modules___"""
-from PySide2 import QtWidgets, QtGui
+from PySide6 import QtWidgets, QtGui
 
 """___LIME_TBX Modules___"""
 from lime_tbx.gui import constants, maingui
@@ -68,7 +68,7 @@ class GUI:
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         else:
             app.setStyle("Fusion")
-        sys.exit(app.exec_())
+        sys.exit(app.exec())
 
     def _init_fonts(self):
         _current_dir = os.path.dirname(os.path.abspath(__file__))

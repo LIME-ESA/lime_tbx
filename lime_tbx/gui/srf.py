@@ -1,11 +1,10 @@
 """describe class"""
 
 """___Built-In Modules___"""
-# import here
+from typing import Callable, Tuple
 
 """___Third-Party Modules___"""
-from typing import Callable, Tuple
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 
 """___NPL Modules___"""
 from lime_tbx.filedata import srf as file_srf

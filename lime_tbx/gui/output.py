@@ -7,9 +7,9 @@ from abc import ABC, abstractmethod
 
 
 """___Third-Party Modules___"""
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
-from matplotlib.backends.backend_qt5agg import (
+from matplotlib.backends.backend_qtagg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 import numpy as np
@@ -113,7 +113,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         self.toolbar = NavigationToolbar(self.canvas, self)
         unwanted_buttons = ["Back", "Forward"]
         for ta in self.toolbar.actions():
-            ta: QtWidgets.QAction = ta
+            ta: QtGui.QAction = ta
             if ta.text() in unwanted_buttons:
                 self.toolbar.removeAction(ta)
                 continue

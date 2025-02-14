@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import os
 
 """___Third-Party Modules___"""
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 import numpy as np
 
 """___LIME_TBX Modules___"""
@@ -1538,7 +1538,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
         self, kernels_path: KernelsPath, eocfi_path: EocfiPath, selected_version: str
     ):
         super().__init__()
-        self.setLocale("English")
+        self.setLocale(QtCore.QLocale("English"))
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         self.settings_manager = settings.SettingsManager(selected_version)
@@ -1699,42 +1699,42 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def _create_actions(self):
         # File actions
-        self.save_simulation_action = QtWidgets.QAction(self)
+        self.save_simulation_action = QtGui.QAction(self)
         self.save_simulation_action.setText(
             "&Save simulation to LIME GLOD format file."
         )
         self.save_simulation_action.triggered.connect(self.save_simulation)
         self.save_simulation_action.setDisabled(True)
-        self.load_simulation_action = QtWidgets.QAction(self)
+        self.load_simulation_action = QtGui.QAction(self)
         self.load_simulation_action.setText(
             "&Load simulation file stored in a LIME GLOD format file."
         )
         self.load_simulation_action.triggered.connect(self.load_simulation)
-        self.comparison_action = QtWidgets.QAction(self)
+        self.comparison_action = QtGui.QAction(self)
         self.comparison_action.setText(
             "Perform &comparisons from a remote sensing instrument"
         )
         self.comparison_action.triggered.connect(self.comparison)
-        self.exit_action = QtWidgets.QAction(self)
+        self.exit_action = QtGui.QAction(self)
         self.exit_action.setText("E&xit")
         self.exit_action.triggered.connect(self.exit)
         # Coefficients actions
-        self.download_coefficients_action = QtWidgets.QAction(self)
+        self.download_coefficients_action = QtGui.QAction(self)
         self.download_coefficients_action.setText("&Download updated coefficients")
         self.download_coefficients_action.triggered.connect(self.download_coefficients)
         # self.download_coefficients_action.setDisabled(True)
-        self.select_coefficients_action = QtWidgets.QAction(self)
+        self.select_coefficients_action = QtGui.QAction(self)
         self.select_coefficients_action.setText("&Select coefficients")
         self.select_coefficients_action.triggered.connect(self.select_coefficients)
         # Help actions
-        self.about_action = QtWidgets.QAction(self)
+        self.about_action = QtGui.QAction(self)
         self.about_action.setText("&About")
         self.about_action.triggered.connect(self.about)
-        self.help_action = QtWidgets.QAction(self)
+        self.help_action = QtGui.QAction(self)
         self.help_action.setText("&Help")
         self.help_action.triggered.connect(self.help)
         # Settings actions
-        self.interpolation_action = QtWidgets.QAction(self)
+        self.interpolation_action = QtGui.QAction(self)
         self.interpolation_action.setText("&Interpolation options")
         self.interpolation_action.triggered.connect(self.interpol_options)
 
@@ -1943,7 +1943,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         download_coeffs_dialog = coefficients.DownloadCoefficientsDialog(
             lime_tbx_w.settings_manager, self
         )
-        download_coeffs_dialog.exec_()
+        download_coeffs_dialog.exec()
 
     def select_coefficients(self):
         lime_tbx_w = self._get_lime_widget()
@@ -1953,15 +1953,15 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
             self.update_calculability,
             self,
         )
-        select_coefficients_dialog.exec_()
+        select_coefficients_dialog.exec()
 
     def about(self):
         about_dialog = help.AboutDialog(self)
-        about_dialog.exec_()
+        about_dialog.exec()
 
     def help(self):
         help_dialog = help.HelpDialog(self)
-        help_dialog.exec_()
+        help_dialog.exec()
 
     def update_calculability(self):
         lime_tbx_w = self._get_lime_widget()
@@ -1975,4 +1975,4 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
             self._get_lime_widget().main_page.input_widget,
             self,
         )
-        interpol_opt_dialog.exec_()
+        interpol_opt_dialog.exec()
