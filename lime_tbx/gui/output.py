@@ -322,6 +322,14 @@ class SimGraphWidget(GraphWidget):
                 if l.get_label().startswith("_child")
                 or l.get_label() == self.legend[0][0]
             ]
+            max_cursors = 25
+            if len(cursor_lines) > max_cursors:
+                cursor_lines = np.array(cursor_lines)[
+                    np.round(np.linspace(0, len(cursor_lines) - 1, max_cursors)).astype(
+                        int
+                    )
+                ]
+
             self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
             func_num_from_label = lambda label: int(int(label[6:]))
             if self.dts:
