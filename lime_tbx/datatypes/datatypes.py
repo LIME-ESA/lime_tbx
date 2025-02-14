@@ -38,7 +38,7 @@ It exports the following Enums:
 """
 
 """___Built-In Modules___"""
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, List, Union, Tuple
 from datetime import datetime
 from enum import Enum
@@ -47,8 +47,7 @@ from abc import ABC
 """___Third-Party Modules___"""
 import numpy as np
 import xarray
-import ruamel.yaml as ruaml
-from ruamel.yaml import yaml_object
+import yaml
 
 """___NPL Modules___"""
 import obsarray
@@ -1062,10 +1061,6 @@ class LimeException(Exception):
         super().__init__(*args)
 
 
-yaml = ruaml.YAML()
-
-
-@yaml_object(yaml)
 @dataclass
 class InterpolationSettings:
     """Representation of the YAML file that contains the interpolation settings data.
@@ -1096,13 +1091,13 @@ class InterpolationSettings:
 
     def _save_disk(self, path: str):
         with open(path, "w") as file:
-            yaml.dump([self], file)
+            yaml.dump(asdict(self), file)
 
     @staticmethod
     def _load_yaml(path: str) -> "InterpolationSettings":
-        f = open(path, "r")
-        lines = f.readlines()
-        f.close()
+        with open(path, "r") as fp:
+            lines = fp.readlines()
         yaml_str = "\n".join([line for line in lines])
-        setts: "InterpolationSettings" = yaml.load(yaml_str)[0]
+        setts_dict: dict = yaml.load(yaml_str, Loader=yaml.FullLoader)
+        setts: "InterpolationSettings" = InterpolationSettings(**setts_dict)
         return setts

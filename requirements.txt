@@ -10,9 +10,8 @@ packaging>=24.1
 pandas~=2.2.3
 punpy~=1.0.2
 PySide6~=6.8.2.1
-PyYAML~=6.0.2
+PyYAML~=6.0
 requests~=2.32
-ruamel.yaml==0.17.21
 scipy~=1.13.1
 setuptools>=75.8.0
 spicedmoon==1.0.13
