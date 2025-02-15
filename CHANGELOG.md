@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [unreleased] - yyyy-mm-dd
+[//]: # "## [unreleased] - yyyy-mm-dd"
 
 ## [1.1.0] - yyyy-mm-dd
 
@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Timeseries input file now also accepts regular format timestamps, not only CSV.
 - Added METOP-A, METOP-B and METOP-C data (TLE/3LE). METOP-B and METOP-C will need to be periodically updated.
 - Updated TLE/3LE data for PLEIADES 1A, PLEIADES 1B and PROBA-V, now covering the period from their launch until 2024-12-06.
+
+### Changed
+
+- Drop support for Python 3.8.
+- Provide support for Python 3.11 and 3.12.
+- Updated library dependencies and versions.
 
 ### Fixed
 

@@ -300,7 +300,7 @@ def get_coeffs_one() -> ReflectanceCoefficients:
         "i_coeff.wavelength": 1 * len(_COEFFS),
     }
     data = _COEFFS.T[0:1].T
-    u_data = _UNC_DATA.T[0:1].T
+    u_data = _UNC_DATA.T[0:1].T * np.sign(_COEFFS.T[0:1].T)
     err_corr_coeff = _ERR_CORR_ONE
     # create dataset
     ds_cimel: xr.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
@@ -319,7 +319,7 @@ def get_coeffs() -> ReflectanceCoefficients:
         "i_coeff.wavelength": len(WLENS) * len(_COEFFS),
     }
     data = _COEFFS
-    u_data = _UNC_DATA
+    u_data = _UNC_DATA * np.sign(_COEFFS)
     err_corr_coeff = _ERR_CORR
     # create dataset
     ds_cimel: xr.Dataset = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)

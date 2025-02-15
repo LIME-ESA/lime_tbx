@@ -4,7 +4,7 @@
 from typing import Callable
 
 """___Third-Party Modules___"""
-from PySide2 import QtCore
+from PySide6 import QtCore
 
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes import logger

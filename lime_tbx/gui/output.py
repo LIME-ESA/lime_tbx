@@ -7,9 +7,9 @@ from abc import ABC, abstractmethod
 
 
 """___Third-Party Modules___"""
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
-from matplotlib.backends.backend_qt5agg import (
+from matplotlib.backends.backend_qtagg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 import numpy as np
@@ -113,7 +113,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         self.toolbar = NavigationToolbar(self.canvas, self)
         unwanted_buttons = ["Back", "Forward"]
         for ta in self.toolbar.actions():
-            ta: QtWidgets.QAction = ta
+            ta: QtGui.QAction = ta
             if ta.text() in unwanted_buttons:
                 self.toolbar.removeAction(ta)
                 continue
@@ -322,6 +322,14 @@ class SimGraphWidget(GraphWidget):
                 if l.get_label().startswith("_child")
                 or l.get_label() == self.legend[0][0]
             ]
+            max_cursors = 25
+            if len(cursor_lines) > max_cursors:
+                cursor_lines = np.array(cursor_lines)[
+                    np.round(np.linspace(0, len(cursor_lines) - 1, max_cursors)).astype(
+                        int
+                    )
+                ]
+
             self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
             func_num_from_label = lambda label: int(int(label[6:]))
             if self.dts:

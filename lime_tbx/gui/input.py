@@ -8,7 +8,7 @@ import shutil
 
 """___Third-Party Modules___"""
 from typing import Callable, List
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 import numpy as np
 
 """___NPL Modules___"""
@@ -904,7 +904,7 @@ class SatelliteInputWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def open_add_satellite_modal(self):
         add_sat_dialog = AddSatDialog(self, self.eocfi_path, self.kernels_path)
-        add_sat_dialog.exec_()
+        add_sat_dialog.exec()
         self._load_satellites()
         self._refresh_satellites_combo()
 

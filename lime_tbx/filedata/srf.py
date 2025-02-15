@@ -10,13 +10,19 @@ It exports the following functions:
 import os
 
 """___Third-Party Modules___"""
-import netCDF4 as nc
 import numpy as np
+import xarray as xr
+from xarray_schema import DatasetSchema, DataArraySchema, SchemaError
 
-"""___NPL Modules___"""
+"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
     SRFChannel,
     SpectralResponseFunction,
+)
+from lime_tbx.filedata.netcdfcommon import (
+    validate_schema,
+    xr_open_dataset,
+    get_length_conversion_factor,
 )
 from lime_tbx.datatypes import logger
 
@@ -25,30 +31,45 @@ __author__ = "Javier Gatón Herguedas"
 __created__ = "20/05/2022"
 __maintainer__ = "Javier Gatón Herguedas"
 __email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+__status__ = "Production"
 
 _READ_FILE_ERROR_STR = (
     "There was a problem while loading the SRF file. See log for details."
 )
 
 
-def _calc_factor_to_nm(units: str) -> float:
-    if units in ("m", "meter", "meters"):
-        f_to_nm = 1000000000
-    elif units in ("mm", "millimeter", "millimeters"):
-        f_to_nm = 1000000
-    elif units in ("um", "μm", "micrometer", "micrometers"):
-        f_to_nm = 1000
-    else:  # wlen_units == 'nm':
-        f_to_nm = 1
-    return f_to_nm
+def _validate_schema_srf(ds: xr.Dataset):
+    """Validates that a xarray dataset follows the SRF schema.
 
+    The dataset structure is:
 
-def _append_if_not_masked(l: list, value: float, factor: float = None):
-    if not isinstance(value, np.ma.core.MaskedConstant):
-        if factor:
-            value = value * factor
-        l.append(value)
+    coordinates: 'channel': float
+    dims without coordinates: Any name, for example 'sample'.
+    data_vars: 'srf': float, 'wavelength': float, 'wavenumber': float, 'channel_id': str
+
+    Parameters
+    ----------
+    ds: xr.Dataset
+        Dataset to validate
+    """
+    sample_dim = None
+    data_vars = {
+        "srf": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
+        "wavelength": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
+        "wavenumber": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
+    }
+    coords = {"channel": DataArraySchema(np.floating)}
+    channel_id = {"channel_id": DataArraySchema(np.str_)}
+    # channel_id can actually be either a variable or a coordinate, preferably a variable.
+    dss = DatasetSchema(
+        data_vars=data_vars | channel_id,
+        coords=coords,
+    )
+    odss = DatasetSchema(
+        data_vars=data_vars,
+        coords=coords | channel_id,
+    )
+    validate_schema(dss, ds, [odss])
 
 
 def read_srf(filepath: str) -> SpectralResponseFunction:
@@ -67,41 +88,44 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
         Generated SpectralResponseFunction data object.
     """
     try:
-        ds = nc.Dataset(filepath)
+        ds = xr_open_dataset(filepath)
+        _validate_schema_srf(ds)
         n_channels = len(ds["channel"])
         wvlens = [[] for _ in range(n_channels)]
         factors = [[] for _ in range(n_channels)]
         wlen_units = "nm"
         if hasattr(ds["wavelength"], "units"):
             wlen_units: str = ds["wavelength"].units
-        f_to_nm = _calc_factor_to_nm(wlen_units)
+        f_to_nm = get_length_conversion_factor(wlen_units, "nm")
         if ds["wavelength"].ndim == 1:
-            same_arr = ds["wavelength"][:].data * f_to_nm
+            same_arr = ds["wavelength"].values * f_to_nm
             for i in range(n_channels):
-                wvlens[i] = same_arr
+                wvlens[i] = same_arr[~np.isnan(same_arr)]
         else:
-            for wvlen_arr in ds["wavelength"]:
-                for i in range(len(wvlen_arr)):
-                    _append_if_not_masked(wvlens[i], wvlen_arr[i], f_to_nm)
-        for factor_arr in ds["srf"]:
-            for i in range(len(factor_arr)):
-                _append_if_not_masked(factors[i], factor_arr[i])
+            wvlen_arr = (ds["wavelength"].values * f_to_nm).T
+            for i in range(n_channels):
+                wvlens[i] = wvlen_arr[i][~np.isnan(wvlen_arr[i])]
+        factor_arr = ds["srf"].values.T
+        for i in range(n_channels):
+            factors[i] = factor_arr[i][~np.isnan(factor_arr[i])]
         channels = []
         ch_units = "nm"
         if hasattr(ds["channel"], "units"):
             ch_units: str = ds["channel"].units
-        ch_f_to_nm = _calc_factor_to_nm(ch_units)
+        ch_f_to_nm = get_length_conversion_factor(ch_units, "nm")
         for i in range(n_channels):
             channel_spec_resp = dict(zip(wvlens[i], factors[i]))
             center = float(ds["channel"][i].data) * ch_f_to_nm
-            c_id = ds["channel_id"][i]
+            c_id = str(ds["channel_id"][i].values)
             channel = SRFChannel(center, c_id, channel_spec_resp)
             channels.append(channel)
         name = os.path.basename(filepath)
         srf = SpectralResponseFunction(name, channels)
+    except SchemaError as e:
+        raise e
     except Exception as e:
         logger.get_logger().exception(e)
-        raise Exception(_READ_FILE_ERROR_STR)
+        raise Exception(_READ_FILE_ERROR_STR) from e
     finally:
         ds.close()
     return srf

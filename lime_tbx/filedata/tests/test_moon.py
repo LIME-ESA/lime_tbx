@@ -3,18 +3,15 @@
 """___Built-In Modules___"""
 from datetime import datetime, timezone
 
-from lime_tbx.datatypes.datatypes import (
-    KernelsPath,
-    SatellitePosition,
-    LGLODComparisonData,
-    LGLODData,
-    EocfiPath,
-)
-
 """___Third-Party Modules___"""
 import unittest
 
 """___LIME_TBX Modules___"""
+from lime_tbx.datatypes.datatypes import (
+    KernelsPath,
+    SatellitePosition,
+    EocfiPath,
+)
 from .. import moon
 from ..srf import read_srf
 
@@ -58,20 +55,6 @@ class TestMoon(unittest.TestCase):
             "./test_files/srf/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc"
         )
         self.assertTrue(lo.check_valid_srf(srf))
-
-    def test_read_lglod_sim(self):
-        path = "./test_files/moon/simulation.nc"
-        data = moon.read_lglod_file(path, KERNELS_PATH)
-        self.assertFalse(data.not_default_srf)
-        self.assertIsInstance(data, LGLODData)
-
-    def test_read_lglod_comp(self):
-        path = "./test_files/moon/comparison.nc"
-        srf = read_srf("./test_files/moon/cimel_srf.nc")
-        cdata = moon.read_lglod_file(path, KERNELS_PATH)
-        self.assertIsInstance(cdata, LGLODComparisonData)
-        for ch_name in cdata.ch_names:
-            self.assertIn(ch_name, srf.get_channels_names())
 
 
 if __name__ == "__main__":

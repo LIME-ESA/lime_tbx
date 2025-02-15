@@ -11,7 +11,7 @@ from matplotlib.axes import Axes
 import matplotlib.dates as mdates
 import matplotlib.backends.backend_pdf  # important import for exporting as pdf
 import matplotlib.ticker
-from matplotlib.backends.backend_qt5agg import (
+from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
 )
 from matplotlib import font_manager as fm
