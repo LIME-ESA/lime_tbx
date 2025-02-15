@@ -5,7 +5,7 @@ source =
 omit =
         */tests/*
         *__init__*
-        lime_tbx/main.py
+        lime_tbx/__main__.py
         lime_tbx/gui/*.py
         lime_tbx/_version.py
         lime_tbx/local_storage/*.py
@@ -20,7 +20,7 @@ exclude_lines =
 omit =
         */tests/*
         *__init__*
-        lime_tbx/main.py
+        lime_tbx/__main__.py
         lime_tbx/gui/*.py
         lime_tbx/_version.py
         lime_tbx/local_storage/*.py

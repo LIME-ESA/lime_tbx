@@ -123,13 +123,13 @@ compatibility between different Qt bindings (`PySide2` and `PySide6`).
 However, since qtpy does not include a Qt binding by default, you must specify which one to install.
 - Install with PySide6 (Recommended for Newer Projects)
   ```sh
-  pip install -e .[pyside6]
+  pip install -e ".[pyside6]"
   ```
   PySide6 provides the latest Qt features and long-term support.
 
 - Install with PySide2 (For Legacy Compatibility)
   ```sh
-  pip install -e .[pyside2]
+  pip install -e ".[pyside2]"
   ```
   Use PySide2 if you need compatibility with older Qt5-based applications, or you
   need to install it in an old OS.
@@ -309,8 +309,8 @@ It's strongly recommended to use a virtual environment (venv) to minimize applic
 
 ```sh
 python -m venv .venv
-source .venv/bin/activate  # For Linux/Mac  
-.venv\Scripts\activate     # For Windows  
+source .venv/bin/activate  # For Linux/Mac
+.venv\Scripts\activate     # For Windows
 pip install -r requirements.txt
 pip install PySide6~=6.8   # Unless installing in an old OS, which would need PySide2
 ```

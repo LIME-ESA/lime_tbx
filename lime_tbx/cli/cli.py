@@ -1,4 +1,19 @@
-"""___Built-In Modules___"""
+"""
+Command Line Interface (CLI) module for the LIME Toolbox.
+
+This module handles the interpretation of command-line options and executes 
+the appropriate actions, including simulations, comparisons, and data exports.
+
+It supports:
+- Simulations of lunar irradiance, reflectance, and polarization.
+- Comparisons with observational data.
+- Output in various formats (CSV, Graph, NetCDF).
+- Updating coefficient datasets.
+- Managing interpolation and spectral response function settings.
+
+This module serves as the entry point for the command-line execution of LIME TBX.
+"""
+
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from abc import ABC
@@ -10,10 +25,8 @@ import glob
 import sys
 import json
 
-"""___Third-Party Modules___"""
 import numpy as np
 
-"""___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import (
     ComparisonData,
     CustomPoint,
@@ -39,13 +52,6 @@ from lime_tbx.coefficients.update.update import IUpdate, Update
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 from lime_tbx.interpolation.interp_data import interp_data
 
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas"
-__created__ = "01/09/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
-
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
 OPTIONS = "hvude:l:s:co:f:t:C:i:"
@@ -66,7 +72,6 @@ LONG_OPTIONS = [
 ]
 _WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
-
 _ERROR_RINDEX_BOTH_DOT = "When creating output as CSV or GRAPH files for both DT and MPA, \
 the full CSV/GRAPH filepaths must be explictly written, including the extension \
 (.csv, .png, ...).\nAnother solution is to select the CSVD/GRAPHD option where one \
@@ -74,15 +79,45 @@ only has to specify the output directory path.\nProblematic filepath: "
 
 
 def eprint(*args, **kwargs):
+    """Prints messages to the standard error (stderr).
+
+    This function behaves like the built-in `print`, but directs output
+    to `sys.stderr` instead of `sys.stdout`. It supports the same arguments
+    as `print`.
+
+    Parameters
+    ----------
+    *args : Any
+        Positional arguments passed to `print`, representing the values to be printed.
+    **kwargs : Any
+        Keyword arguments passed to `print` (e.g., `sep`, `end`, `flush`).
+    """
     print(*args, file=sys.stderr, **kwargs)
 
 
 class ExportData(ABC):
-    pass
+    """Abstract base class for export data formats.
+
+    Subclasses define specific export types such as CSV, Graphs, and NetCDF.
+    """
 
 
 @dataclass
 class ExportCSV(ExportData):
+    """Represents CSV file export settings for simulation results.
+
+    Attributes
+    ----------
+    o_file_refl : str
+        Path to the output CSV file for reflectance.
+    o_file_irr : str
+        Path to the output CSV file for irradiance.
+    o_file_polar : str
+        Path to the output CSV file for polarization.
+    o_file_integrated_irr : str
+        Path to the output CSV file for integrated irradiance.
+    """
+
     o_file_refl: str
     o_file_irr: str
     o_file_polar: str
@@ -91,6 +126,18 @@ class ExportCSV(ExportData):
 
 @dataclass
 class ExportGraph(ExportData):
+    """Represents graphical export settings for simulation results.
+
+    Attributes
+    ----------
+    o_file_refl : str
+        Path to the output graph file for reflectance.
+    o_file_irr : str
+        Path to the output graph file for irradiance.
+    o_file_polar : str
+        Path to the output graph file for polarization.
+    """
+
     o_file_refl: str
     o_file_irr: str
     o_file_polar: str
@@ -100,6 +147,22 @@ COMP_KEYS = ["DT", "MPA", "BOTH", "CHANNEL", "CHANNEL_MEAN"]
 
 
 class ComparisonKey(Enum):
+    """Enumeration for comparison output modes.
+
+    Attributes
+    ----------
+    DT : int
+        Compare based on UTC datetime.
+    MPA : int
+        Compare based on Moon Phase Angle.
+    BOTH : int
+        Compare using both datetime and Moon Phase Angle.
+    CHANNEL : int
+        Compare by spectral channel.
+    CHANNEL_MEAN : int
+        Compare using averaged spectral channels.
+    """
+
     DT = 0
     MPA = 1
     BOTH = 2
@@ -108,11 +171,28 @@ class ComparisonKey(Enum):
 
 
 class ExportComparison(ABC):
-    pass
+    """Abstract base class for exporting comparison results.
+
+    This class serves as a parent for different export formats, including CSV
+    and graphical representations of comparison data.
+    """
 
 
 @dataclass
 class ExportComparisonCSV(ExportComparison):
+    """Represents CSV file export settings for comparison results.
+
+    Attributes
+    ----------
+    comparison_key : ComparisonKey
+        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
+    output_files : List[str]
+        List of file paths for saving the comparison data.
+        Each comparison type has a different amount of files.
+    chosen_diff : CompFields
+        The difference metric (relative, percentage, or none).
+    """
+
     comparison_key: ComparisonKey
     output_files: List[str]
     chosen_diff: CompFields
@@ -120,6 +200,22 @@ class ExportComparisonCSV(ExportComparison):
 
 @dataclass
 class ExportComparisonCSVDir(ExportComparison):
+    """Represents CSV directory export settings for comparison results.
+
+    Instead of exporting individual CSV files, this class allows exporting
+    all comparison data to a specified directory, and automatically generating
+    the file names.
+
+    Attributes
+    ----------
+    comparison_key : ComparisonKey
+        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
+    output_dir : str
+        The directory where CSV files will be saved.
+    chosen_diff : CompFields
+        The difference metric (relative, percentage, or none).
+    """
+
     comparison_key: ComparisonKey
     output_dir: str
     chosen_diff: CompFields
@@ -127,6 +223,19 @@ class ExportComparisonCSVDir(ExportComparison):
 
 @dataclass
 class ExportComparisonGraph(ExportComparison):
+    """Represents graphical export settings for comparison results.
+
+    Attributes
+    ----------
+    comparison_key : ComparisonKey
+        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
+    output_files : List[str]
+        List of file paths for saving the comparison graphs.
+        Each comparison type has a different amount of files.
+    chosen_diff : CompFields
+        The difference metric (relative, percentage, or none).
+    """
+
     comparison_key: ComparisonKey
     output_files: List[str]
     chosen_diff: CompFields
@@ -134,6 +243,23 @@ class ExportComparisonGraph(ExportComparison):
 
 @dataclass
 class ExportComparisonGraphDir(ExportComparison):
+    """Represents graphical export settings for comparison results in a directory.
+
+    This allows exporting comparison graphs to a specified directory with a
+    chosen file extension, and automatically generating the file names.
+
+    Attributes
+    ----------
+    extension : str
+        File extension for the exported graphs (e.g., "png", "jpg").
+    comparison_key : ComparisonKey
+        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
+    output_dir : str
+        The directory where graphs will be saved.
+    chosen_diff : CompFields
+        The difference metric (relative, percentage, or none).
+    """
+
     extension: str
     comparison_key: ComparisonKey
     output_dir: str
@@ -142,6 +268,16 @@ class ExportComparisonGraphDir(ExportComparison):
 
 @dataclass
 class ExportNetCDF(ExportData, ExportComparison):
+    """Represents NetCDF file export settings for simulations and comparisons.
+
+    This format allows storing structured, multi-dimensional scientific data.
+
+    Attributes
+    ----------
+    output_file : str
+        The path to the NetCDF output file.
+    """
+
     output_file: str
 
 
@@ -150,6 +286,29 @@ COMP_DIFF_KEYS = ["rel", "perc", "none"]
 
 
 def print_help():
+    """Displays the command-line help message.
+
+    This function prints usage instructions and a description of available options
+    for the LIME Toolbox CLI. It explains how to run simulations, comparisons,
+    and specify output formats.
+
+    The available options include:
+    - `-h, --help`: Show this help message.
+    - `-v, --version`: Display the version number.
+    - `-u, --update`: Update the coefficients.
+    - `-e, --earth`: Perform simulations from a geographic point.
+    - `-l, --lunar`: Perform simulations from a selenographic point.
+    - `-s, --satellite`: Perform simulations from a satellite.
+    - `-c, --comparison`: Perform comparisons using GLOD observation files.
+    - `-o, --output`: Define output format and file paths.
+    - `-f, --srf`: Select a Spectral Response Function (SRF) file.
+    - `-t, --timeseries`: Use a CSV file with multiple datetimes.
+    - `-C, --coefficients`: Change the coefficients version used by the toolbox.
+    - `-i, --interpolation-settings`: Modify interpolation settings via JSON input.
+
+    The function also provides examples of valid input formats and highlights
+    any constraints or dependencies for specific options.
+    """
     compsel = "(" + "|".join(COMP_KEYS) + ")"
     imsel = "(" + "|".join(IMAGE_EXTENSIONS) + ")"
     compdiffsel = "(" + "|".join(COMP_DIFF_KEYS) + ")"
@@ -252,6 +411,49 @@ def _get_chosen_diff_from_cli(param: str) -> CompFields:
 
 
 class CLI:
+    """Command Line Interface handler for LIME TBX.
+
+    This class processes command-line arguments, performs simulations, and manages
+    comparisons. It serves as the main interface for users executing the toolbox from
+    the command line.
+
+    Attributes
+    ----------
+    kernels_path : KernelsPath
+        Path to the SPICE kernels required for calculations.
+    eocfi_path : EocfiPath
+        Path to the EO-CFI libraries used for orbit calculations.
+    settings_manager : settings.SettingsManager
+        Manages configuration settings, including coefficients and interpolation.
+    lime_simulation : ILimeSimulation
+        Handles lunar irradiance, reflectance and polarization simulations.
+    srf : datatypes.SpectralResponseFunction
+        Spectral Response Function (SRF) used for simulations.
+    updater : IUpdate
+        Handles updates to coefficient datasets.
+
+    Methods
+    -------
+    load_srf(srf_file)
+        Loads a spectral response function (SRF) from a given file.
+    calculate_geographic(lat, lon, height, dt, export_data)
+        Runs a simulation from a geographic location.
+    calculate_satellital(sat_name, dt, export_data)
+        Runs a simulation from a satellite's position.
+    calculate_selenographic(distance_sun_moon, distance_observer_moon, ...)
+        Runs a simulation from a selenographic location.
+    calculate_comparisons(input_files, export_data)
+        Performs comparisons using observation files in GLOD format.
+    update_coefficients()
+        Checks for and updates coefficient datasets.
+    parse_interp_settings(arg)
+        Parses and applies interpolation settings to the settings manager from a JSON string.
+    check_sys_args(sysargs)
+        Validates system arguments to prevent syntax errors.
+    handle_input(opts, args)
+        Processes command-line input and dispatches actions.
+    """
+
     def __init__(
         self,
         kernels_path: KernelsPath,

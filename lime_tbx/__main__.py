@@ -1,12 +1,43 @@
 """
-LIME TBX main module. Launches and starts the toolbox.
-"""
+LIME Toolbox Entry Point.
 
-__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
-__created__ = "01/02/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Production"
+This module serves as the entry point for the LIME Toolbox when executed as a standalone 
+script (`python3 -m lime_tbx`). It processes command-line arguments, invokes the CLI module 
+if arguments are provided, and ensures proper error handling. If no arguments are given, 
+it launches the graphical user interface (GUI) by default.
+
+Main Responsibilities
+----------------------
+- Parses command-line arguments.
+- Initializes necessary paths and settings.
+- Calls the appropriate CLI functions to perform simulations or comparisons.
+- Launches the GUI if no command-line arguments are provided.
+- Suppresses specific warnings to improve user experience.
+- Handles errors and logs execution details.
+
+Usage
+-----
+To run the LIME Toolbox via the command line:
+    $ python3 -m lime_tbx -e lat,lon,height,datetime -o csv,output.csv
+
+To launch the GUI:
+    $ python3 -m lime_tbx
+
+For help, run:
+    $ python3 -m lime_tbx -h
+
+Error Handling
+--------------
+Any errors encountered during execution are logged, and shown to the user
+in a window or printed to standard error (stderr).
+If a critical error occurs in the CLI, the program exits with a non-zero status code.
+
+References
+----------
+- `lime_tbx.cli.CLI`: Handles command-line execution.
+- `lime_tbx.gui.GUI`: Manages the graphical user interface.
+- `lime_tbx.logger`: Handles logging.
+"""
 
 
 import os
@@ -31,8 +62,26 @@ from lime_tbx.coefficients.access_data.access_data import AccessData
 
 def main():
     """
-    Run the toolbox, filter unneeded warnings, and start either the
-    GUI or the CLI, whatever the system arguments specify.
+    Launches the LIME Toolbox.
+
+    This function:
+    - Initializes logging.
+    - Filters out unneeded warnings to improve the user experience.
+    - Retrieves necessary paths for kernels and EO-CFI data.
+    - Parses command-line arguments to determine execution mode:
+      - If arguments are provided, it runs the **command-line interface (CLI)**.
+      - If no arguments are provided, it launches the **graphical user interface (GUI)**.
+
+    On Windows, it also hides the console window when launching the GUI.
+
+    If errors occur during CLI argument parsing or execution, they are logged,
+    and the program exits with an appropriate error code.
+
+    Returns
+    -------
+    None
+        The function does not return but either starts the GUI or CLI
+        and exits with a status code.
     """
     logger.get_logger().info("ToolBox started")
     warnings.filterwarnings("ignore", ".*Gtk-WARNING.*")
@@ -42,6 +91,8 @@ def main():
         ".*One of the provided covariance matrix is not positive.*",
         UserWarning,
     )
+    # TODO remove this warning filter: It shouldn't happen, if it happens print warning
+    # so it'll be fixed.
     warnings.filterwarnings(
         "ignore",
         ".*One of the correlation matrices is not positive.*",

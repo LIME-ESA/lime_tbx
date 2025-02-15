@@ -146,7 +146,7 @@ elif sys.platform == 'darwin':
         (src_path + 'lime_algorithms/lime/assets/tsis_fwhm_1_1_triangle.csv', './lime_tbx/lime_algorithms/lime/assets'),
     ]
     a_icon = src_path + 'gui/assets/lime_logo.icns'
-runner_file = src_path + 'main.py'
+runner_file = src_path + '__main__.py'
 
 a = Analysis(
     [runner_file],
