@@ -118,6 +118,22 @@ by using:
 pip install -e .
 ```
 
+This project uses Qt for GUI development, and it relies on `qtpy` to manage
+compatibility between different Qt bindings (`PySide2` and `PySide6`).
+However, since qtpy does not include a Qt binding by default, you must specify which one to install.
+- Install with PySide6 (Recommended for Newer Projects)
+  ```sh
+  pip install -e .[pyside6]
+  ```
+  PySide6 provides the latest Qt features and long-term support.
+
+- Install with PySide2 (For Legacy Compatibility)
+  ```sh
+  pip install -e .[pyside2]
+  ```
+  Use PySide2 if you need compatibility with older Qt5-based applications, or you
+  need to install it in an old OS.
+
 ## Usage
 
 Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/DA10_user_guide_v0.docx/b4724686-d758-5625-c1f4-9498c9b69c0d?version=1.0&t=1708947381404&download=true) to fully explore the capabilities of the toolbox.
@@ -295,7 +311,8 @@ It's strongly recommended to use a virtual environment (venv) to minimize applic
 python -m venv .venv
 source .venv/bin/activate  # For Linux/Mac  
 .venv\Scripts\activate     # For Windows  
-pip install -r requirements.txt  
+pip install -r requirements.txt
+pip install PySide6~=6.8   # Unless installing in an old OS, which would need PySide2
 ```
 
 3. **Build the App Bundle**  
