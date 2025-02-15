@@ -33,7 +33,7 @@ from lime_tbx.gui import settings, constants as gui_constants
 from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.simulation.comparison.utils import sort_by_mpa, average_comparisons
-from lime_tbx.filedata import moon, srf as srflib, csv
+from lime_tbx.filedata import moon, srf as srflib, csv, lglod as lglodlib
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.coefficients.update.update import IUpdate, Update
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
@@ -382,7 +382,7 @@ class CLI:
         )
         now = datetime.now(timezone.utc)
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        moon.write_obs(lglod, output_file, now, inside_mpa_range)
+        lglodlib.write_obs(lglod, output_file, now, inside_mpa_range)
 
     def _export_graph(self, point: Point, ed: ExportGraph):
         from lime_tbx.gui import canvas
@@ -732,7 +732,7 @@ class CLI:
                 skip_uncs,
                 vers,
             )
-            moon.write_comparison(
+            lglodlib.write_comparison(
                 lglod,
                 ed.output_file,
                 datetime.now().astimezone(timezone.utc),

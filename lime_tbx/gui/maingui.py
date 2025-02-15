@@ -26,7 +26,7 @@ from lime_tbx.gui.spinner import SpinnerPage
 from lime_tbx.gui import constants
 from lime_tbx.gui.util import CallbackWorker, start_thread as _start_thread
 from lime_tbx.gui.settings import ISettingsManager
-from lime_tbx.filedata import moon, srf as srf_loader
+from lime_tbx.filedata import moon, srf as srf_loader, lglod as lglodlib
 from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.simulation.comparison.utils import sort_by_mpa
@@ -640,7 +640,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )[0]
         if name is not None and name != "":
             worker = CallbackWorker(
-                moon.write_comparison,
+                lglodlib.write_comparison,
                 [
                     lglod,
                     name,
@@ -1451,7 +1451,7 @@ class MainSimulationsWidget(
         inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
         if name is not None and name != "":
             worker = CallbackWorker(
-                moon.write_obs,
+                lglodlib.write_obs,
                 [
                     lglod,
                     name,
@@ -1478,7 +1478,7 @@ class LimePagesEnum(Enum):
 
 
 def load_simulation_callback(path: str, kernels_path: KernelsPath):
-    lglod = moon.read_lglod_file(path, kernels_path)
+    lglod = lglodlib.read_lglod_file(path, kernels_path)
     return [lglod]
 
 

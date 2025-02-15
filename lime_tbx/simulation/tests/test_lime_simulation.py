@@ -28,7 +28,7 @@ from ...coefficients.access_data.access_data import (
     _get_default_polarisation_coefficients,
     _get_demo_cimel_coeffs,
 )
-from ...filedata import moon, srf as srflib
+from ...filedata import srf as srflib, lglod as lglodlib
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
@@ -656,7 +656,7 @@ class TestLimeSimulation(unittest.TestCase):
     # set_observations
     def test_load_lglod(self):
         ls = get_lime_simulation()
-        lglod: LGLODData = moon.read_lglod_file(
+        lglod: LGLODData = lglodlib.read_lglod_file(
             "test_files/moon/simulation.nc", KERNELS_PATH
         )
         srf = srflib.read_srf(
@@ -671,7 +671,7 @@ class TestLimeSimulation(unittest.TestCase):
     def test_set_observations_unrelated_lglod_srf(self):
         # loading does not check that they are related (at this level)
         ls = get_lime_simulation()
-        lglod: LGLODData = moon.read_lglod_file(
+        lglod: LGLODData = lglodlib.read_lglod_file(
             "test_files/moon/simulation.nc", KERNELS_PATH
         )
         srf = get_srf()
