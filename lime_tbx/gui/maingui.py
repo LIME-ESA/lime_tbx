@@ -7,7 +7,12 @@ from datetime import datetime, timezone
 import os
 
 """___Third-Party Modules___"""
-from PySide6 import QtWidgets, QtCore, QtGui
+from qtpy import QtWidgets, QtCore, QtGui
+
+if QtCore.__version__.startswith("6"):  # Qt6 specific code
+    from qtpy.QtGui import QAction
+else:  # Qt5 specific code
+    from qtpy.QtWidgets import QAction
 import numpy as np
 
 """___LIME_TBX Modules___"""
@@ -1699,42 +1704,42 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def _create_actions(self):
         # File actions
-        self.save_simulation_action = QtGui.QAction(self)
+        self.save_simulation_action = QAction(self)
         self.save_simulation_action.setText(
             "&Save simulation to LIME GLOD format file."
         )
         self.save_simulation_action.triggered.connect(self.save_simulation)
         self.save_simulation_action.setDisabled(True)
-        self.load_simulation_action = QtGui.QAction(self)
+        self.load_simulation_action = QAction(self)
         self.load_simulation_action.setText(
             "&Load simulation file stored in a LIME GLOD format file."
         )
         self.load_simulation_action.triggered.connect(self.load_simulation)
-        self.comparison_action = QtGui.QAction(self)
+        self.comparison_action = QAction(self)
         self.comparison_action.setText(
             "Perform &comparisons from a remote sensing instrument"
         )
         self.comparison_action.triggered.connect(self.comparison)
-        self.exit_action = QtGui.QAction(self)
+        self.exit_action = QAction(self)
         self.exit_action.setText("E&xit")
         self.exit_action.triggered.connect(self.exit)
         # Coefficients actions
-        self.download_coefficients_action = QtGui.QAction(self)
+        self.download_coefficients_action = QAction(self)
         self.download_coefficients_action.setText("&Download updated coefficients")
         self.download_coefficients_action.triggered.connect(self.download_coefficients)
         # self.download_coefficients_action.setDisabled(True)
-        self.select_coefficients_action = QtGui.QAction(self)
+        self.select_coefficients_action = QAction(self)
         self.select_coefficients_action.setText("&Select coefficients")
         self.select_coefficients_action.triggered.connect(self.select_coefficients)
         # Help actions
-        self.about_action = QtGui.QAction(self)
+        self.about_action = QAction(self)
         self.about_action.setText("&About")
         self.about_action.triggered.connect(self.about)
-        self.help_action = QtGui.QAction(self)
+        self.help_action = QAction(self)
         self.help_action.setText("&Help")
         self.help_action.triggered.connect(self.help)
         # Settings actions
-        self.interpolation_action = QtGui.QAction(self)
+        self.interpolation_action = QAction(self)
         self.interpolation_action.setText("&Interpolation options")
         self.interpolation_action.triggered.connect(self.interpol_options)
 

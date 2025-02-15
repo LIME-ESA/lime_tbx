@@ -29,7 +29,7 @@ RUN apt install libcairo-gobject2 libpango-1.0-0 libpangocairo-1.0-0 libcairo2 \
 
 #libxcb1 libfreetype6-dev curl ca-certificates
 
-# ✅ Install OpenSSL 1.1.1w (without breaking system OpenSSL)
+# Install OpenSSL 1.1.1w (without breaking system OpenSSL)
 WORKDIR /usr/local/src
 RUN wget https://www.openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz
 RUN tar xzvf openssl-1.1.1w.tar.gz
@@ -43,7 +43,7 @@ RUN echo "/usr/local/openssl/lib" >> /etc/ld.so.conf.d/openssl-1.1.1.conf && ldc
 # Verify OpenSSL installation
 RUN /usr/local/openssl/bin/openssl version -a
 
-# ✅ Install Python 3.9 (linked to OpenSSL 1.1.1)
+# Install Python 3.9 (linked to OpenSSL 1.1.1)
 WORKDIR /usr/local/src
 RUN wget https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz
 RUN tar xzf Python-3.9.21.tgz
@@ -58,7 +58,7 @@ RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/python3.9.conf && ldconfig
 RUN python3.9 --version
 RUN python3.9 -c "import ssl; print(ssl.OPENSSL_VERSION)"
 
-# ✅ Install pip and pyinstaller
+# Install pip and pyinstaller
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3.9 get-pip.py
 RUN python3.9 -m pip install --upgrade pip
@@ -72,6 +72,7 @@ RUN wget http://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig-conf
 RUN dpkg --force-all -i fontconfig-config_2.13.1-2ubuntu3_all.deb
 RUN wget http://archive.ubuntu.com/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.13.1-2ubuntu3_amd64.deb
 RUN dpkg -i libfontconfig1_2.13.1-2ubuntu3_amd64.deb
+RUN apt-get -f install -y
 
 WORKDIR /usr/src/app
 

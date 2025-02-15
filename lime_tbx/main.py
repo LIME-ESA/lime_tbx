@@ -1,14 +1,19 @@
-"""___Built-In Modules___"""
+"""
+LIME TBX main module. Launches and starts the toolbox.
+"""
+
+__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
+__created__ = "01/02/2022"
+__maintainer__ = "Javier Gatón Herguedas"
+__email__ = "gaton@goa.uva.es"
+__status__ = "Production"
+
+
 import os
 import getopt
 import sys
 import warnings
 
-
-"""___Third-Party Modules___"""
-# import here
-
-"""___LIME_TBX Modules___"""
 from lime_tbx.cli.cli import (
     CLI,
     OPTIONS,
@@ -23,15 +28,12 @@ from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 from lime_tbx.datatypes import logger
 from lime_tbx.coefficients.access_data.access_data import AccessData
 
-"""___Authorship___"""
-__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
-__created__ = "01/02/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
-
 
 def main():
+    """
+    Run the toolbox, filter unneeded warnings, and start either the
+    GUI or the CLI, whatever the system arguments specify.
+    """
     logger.get_logger().info("ToolBox started")
     warnings.filterwarnings("ignore", ".*Gtk-WARNING.*")
     warnings.filterwarnings("ignore", ".*Fontconfig warning.*")

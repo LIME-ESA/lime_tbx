@@ -6,7 +6,7 @@ import pkgutil
 import os
 
 """___Third-Party Modules___"""
-from PySide6 import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui
 
 """___LIME_TBX Modules___"""
 from lime_tbx.gui import constants, maingui

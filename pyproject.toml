@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools>=58.1.0", "wheel", "versioneer[toml]"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lime_tbx"
+version = "1.1.0"
+description = "Toolbox for running the LIME (Lunar Irradiance Model of ESA) to simulate lunar observations and compare them with remote sensing data of the Moon."
+readme = "README.md"
+license = {text = "LGPL-3.0-only"}
+authors = [
+    { name = "Javier Gatón Herguedas", email = "gaton@goa.uva.es" },
+    { name = "Pieter De Vis", email = "pieter.de.vis@npl.co.uk"},
+    { name = "Stefan Adriaensen", email = "stefan.adriaensen@vito.be" },
+    { name = "Jacob Fahy", email = "jacob.fahy@npl.co.uk"},
+    { name = "Ramiro González Catón", email = "ramiro@goa.uva.es" },
+    { name = "Carlos Toledano", email="toledano@goa.uva.es" },
+    { name = "África Barreto", email="abarretov@aemet.es" },
+    { name = "Agnieszka Bialek", email="agnieszka.bialek@npl.co.uk" },
+    { name = "Marc Bouvet", email="marc.bouvet@esa.int" }
+]
+maintainers = [
+    { name = "Javier Gatón Herguedas", email = "gaton@goa.uva.es" }
+]
+requires-python = ">=3.9"
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Natural Language :: English",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = [
+    "comet-maths~=1.0.3",
+    "Deprecated~=1.2.18",
+    "matheo~=0.1.2",
+    "matplotlib~=3.9.4",
+    "mplcursors~=0.6",
+    "netCDF4~=1.6.5",
+    "numpy~=1.26.4",
+    "obsarray~=1.0.1",
+    "packaging>=24.1",
+    "pandas~=2.2.3",
+    "punpy~=1.0.2",
+    "PyYAML~=6.0",
+    "QtPy~=2.4",
+    "requests~=2.32",
+    "scipy~=1.13.1",
+    "setuptools>=58.1.0",
+    "spicedmoon==1.0.13",
+    "spiceypy~=6.0",
+    "xarray>=2024.7.0",
+    "xarray_schema>=0.0.3",
+]
+
+[project.optional-dependencies]
+dev = ["pre-commit", "tox", "sphinx", "sphinx_rtd_theme"]
+pyside6 = ["PySide6~=6.8"]
+pyside2 = ["PySide2~=5.15"]
+
+[project.urls]
+Homepage = "https://lime.uva.es"
+Repository = "https://github.com/LIME-ESA/lime_tbx.git"
+Issues = "https://github.com/LIME-ESA/lime_tbx/issues"
+
+[tool.setuptools]
+packages = ["lime_tbx"]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "lime_tbx/_version.py"
+versionfile_build = "lime_tbx/_version.py"
+tag_prefix = ""
+parentdir_prefix = ""
+
+[tool.flake8]
+exclude = ["docs"]
+max-line-length = 120
+extend-ignore = ["W291"]
+
+[tool.mypy]
+allow_untyped_globals = true
+ignore_missing_imports = true
+
+[tool.mypy-setup]
+ignore_errors = true
+
+[tool.mypy-tests]
+ignore_errors = true
+
+[tool.mypy-versioneer]
+ignore_errors = true

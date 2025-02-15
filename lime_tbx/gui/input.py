@@ -8,7 +8,7 @@ import shutil
 
 """___Third-Party Modules___"""
 from typing import Callable, List
-from PySide6 import QtWidgets, QtCore, QtGui
+from qtpy import QtWidgets, QtCore, QtGui
 import numpy as np
 
 """___NPL Modules___"""

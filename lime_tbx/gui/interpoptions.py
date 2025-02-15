@@ -4,7 +4,7 @@
 pass
 
 """___Third-Party Modules___"""
-from PySide6 import QtWidgets, QtCore, QtGui
+from qtpy import QtWidgets, QtCore, QtGui
 
 """___LIME_TBX Modules___"""
 from lime_tbx.gui.settings import ISettingsManager
