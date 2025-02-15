@@ -55,18 +55,19 @@ def get_length_conversion_factor(from_unit: str, to_unit: str) -> float:
 
     # Build the metric factors dictionary efficiently
     metric_factors = {
-        **dict.fromkeys(("nm", *_gen_unit_variations("nano")), 1e-9),
-        **dict.fromkeys(("um", "μm", *_gen_unit_variations("micro")), 1e-6),
-        **dict.fromkeys(("mm", *_gen_unit_variations("milli")), 1e-3),
-        **dict.fromkeys(("cm", *_gen_unit_variations("centi")), 1e-2),
-        **dict.fromkeys(("m", *_gen_unit_variations("")), 1),
-        **dict.fromkeys(("km", *_gen_unit_variations("kilo")), 1e3),
+        **dict.fromkeys(("nm", *_gen_unit_variations("nano")), -9),
+        **dict.fromkeys(("um", "μm", *_gen_unit_variations("micro")), -6),
+        **dict.fromkeys(("mm", *_gen_unit_variations("milli")), -3),
+        **dict.fromkeys(("cm", *_gen_unit_variations("centi")), -2),
+        **dict.fromkeys(("m", *_gen_unit_variations("")), 0),
+        **dict.fromkeys(("km", *_gen_unit_variations("kilo")), 3),
     }
     if from_unit not in metric_factors:
         raise ValueError(
             f"Unsupported unit: {from_unit} or {to_unit}. Supported units: {list(metric_factors.keys())}"
         )
-    factor = metric_factors[from_unit] / metric_factors[to_unit]
+    factor = metric_factors[from_unit] - metric_factors[to_unit]
+    factor = 10**factor
     return factor
 
 
