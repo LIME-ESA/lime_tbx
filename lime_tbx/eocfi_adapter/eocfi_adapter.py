@@ -1,13 +1,12 @@
 """
-This module contains the abstractions and interfaces that call EOCFI and perform satellite functions.
+This module contains the abstractions and interfaces that call EO-CFI libraries and
+perform satellite functions.
 
 It exports the following classes:
-    * IEOCFIConverter - Interface that contains the methods of this module.
     * EOCFIConverter - Class that implements the methods exported by this module.
 """
 
 """___Built-In Modules___"""
-from abc import ABC, abstractmethod
 from typing import Tuple, List
 from datetime import datetime, timezone
 import os
@@ -29,12 +28,6 @@ from lime_tbx.datatypes.datatypes import (
 from lime_tbx.datatypes import logger
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas and Ramiro González Catón"
-__created__ = "24/05/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Production"
 
 ESA_SAT_LIST = "esa_sat_list.yml"
 METADATA_FILE = "metadata.yml"
@@ -45,6 +38,16 @@ EXE_FILE_SATELLLITE_DARWIN_ARM = "eocfi_c/bin/get_positions_darwin_arm"
 
 
 def _get_exe_path() -> str:  # pragma: no cover
+    """Determines the executable path for the EO-CFI binary based on the operating system.
+
+    This function selects the appropriate binary for retrieving satellite positions,
+    based on whether the system is running Linux, Windows, or macOS (Darwin).
+
+    Returns
+    -------
+    str
+        The absolute path to the EO-CFI executable for the current operating system.
+    """
     if platform.system() == "Linux":
         exe_file_satellite = EXE_FILE_SATELLITE_LINUX
     elif platform.system() == "Windows":
@@ -55,11 +58,28 @@ def _get_exe_path() -> str:  # pragma: no cover
         else:
             exe_file_satellite = EXE_FILE_SATELLLITE_DARWIN
     _current_dir = os.path.dirname(os.path.abspath(__file__))
-    _exe_path = '"{}"'.format(os.path.join(_current_dir, exe_file_satellite))
+    _exe_path = f'"{os.path.join(_current_dir, exe_file_satellite)}"'
     return _exe_path
 
 
 def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
+    """Extracts start and end datetime from an orbit file name.
+
+    EO-CFI orbit files encode the validity period in their filenames.
+    This function extracts those timestamps and converts them to `datetime` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The orbit file name, which must follow the format:
+        `..._<start_datetime>_<end_datetime>_...`
+
+    Returns
+    -------
+    Tuple[datetime, datetime]
+        - The start datetime of the orbit file.
+        - The end datetime of the orbit file, or a default far-future date if unspecified.
+    """
     splitted = filename.split("_")
     date0 = datetime.strptime(splitted[-3] + "+00:00", "%Y%m%dT%H%M%S%z")
     if splitted[-2] == "99999999T999999":
@@ -69,146 +89,7 @@ def _get_file_datetimes(filename: str) -> Tuple[datetime, datetime]:
     return date0, date1
 
 
-def _to_mjd2000(dt: datetime) -> float:  # pragma: no cover
-    # No automatic tests, but function conserved because mjd2000 is not well documented online
-    mjd = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-    tdelta = dt - mjd
-    return tdelta.total_seconds() / 86400
-
-
-class IEOCFIConverter(ABC):
-    """Interface that contains the methods of this module.
-
-    It exports the following functions:
-        * get_sat_names() - Obtain the list of satellite names, that are the keys that can be used in
-            get_satellite_position
-        * get_sat_list() - Obtain a list of the satellite data objects that are available in LIME TBX.
-        * get_satellite_position() - Get the geographic satellite position for a concrete datetime.
-    """
-
-    @abstractmethod
-    def get_sat_names(self) -> List[str]:
-        """
-        Obtain the list of satellite names, that are the keys that can be used in
-        get_satellite_position
-
-        Returns
-        -------
-        sat_names: list of str
-            List of the satellite names
-        """
-        pass
-
-    @abstractmethod
-    def get_sat_list(self) -> List[Satellite]:
-        """
-        Obtain a list of the satellite data objects that are available in LIME TBX.
-
-        Returns
-        -------
-        sat_list: list of Satellite
-            List of Satellites available in LIME TBX.
-        """
-        pass
-
-    @abstractmethod
-    def add_sat(self, sat: Satellite):
-        """
-        Add satellite data to the LIME TBX database.
-
-        Parameters
-        -------
-        sat: Satellite
-            Satellite data to add to LIME's satellite database.
-        """
-        pass
-
-    @abstractmethod
-    def get_satellite_position(
-        self, sat: str, dt: List[datetime]
-    ) -> List[Tuple[float, float, float]]:
-        """
-        Get the geographic satellite position for a concrete datetime.
-
-        Parameters
-        ----------
-        sat: str
-            Satellite name. Should be present in get_sat_names
-        dts: List of datetime
-            Datetimes for which the position will be calculated
-
-        Returns
-        -------
-        positions: list of tuples of floats
-            List of tuples of 3 floats, representing:
-            latitude: float
-                Geocentric latitude of the satellite
-            longitude: float
-                Geocentric longitude of the satellite
-            height: float
-                Height of the satellite over sea level in meters.
-        """
-        pass
-
-    @abstractmethod
-    def get_satellite_position_rectangular(
-        self, sat: str, dts: List[datetime]
-    ) -> List[Tuple[float, float, float]]:
-        """
-        Get the geographic satellite position for a concrete datetime.
-
-        Parameters
-        ----------
-        sat: str
-            Satellite name. Should be present in get_sat_names
-        dts: List of datetime
-            Datetimes for which the position will be calculated
-
-        Returns
-        -------
-        positions: list of tuples of floats
-            List of tuples of 3 floats, representing xyz in meters
-        """
-        pass
-
-    @abstractmethod
-    def check_data_file_works(
-        self, sat: Satellite, dts: List[datetime], orbit_path: str
-    ) -> bool:
-        """
-        Check if the file in orbit_path can be used to calculate the satellite
-        position for the datetimes specified in dts.
-
-        Parameters
-        ----------
-        sat: Satellite
-            Satellite for which the file is going to be checked
-        dts: List of datetime
-            Datetimes for which the position will be calculated
-        orbit_path: str
-            Path of the data file used for position calculation
-
-        Returns
-        -------
-        works: bool
-            True if the file works, False if it doesn't
-        """
-        pass
-
-    @abstractmethod
-    def get_default_timefile(self) -> str:
-        """
-        Get the default time file for TLEs when it's not known.
-
-        Returns
-        -------
-        time_file: str
-            Default time_file path value for TLEs
-        """
-        pass
-
-
-class EOCFIConverter(IEOCFIConverter):
+class EOCFIConverter:
     """Class that implements the methods of this module.
 
     It exports the following functions:
@@ -219,6 +100,15 @@ class EOCFIConverter(IEOCFIConverter):
     """
 
     def __init__(self, eocfi_path: EocfiPath, kernels_path: KernelsPath):
+        """Initializes the EOCFIConverter with EO-CFI and SPICE kernel paths.
+
+        Parameters
+        ----------
+        eocfi_path : EocfiPath
+            Path to EO-CFI libraries used for orbit calculations.
+        kernels_path : KernelsPath
+            Path to SPICE kernels used for coordinate transformations.
+        """
         super().__init__()
         self.eocfi_path = eocfi_path
         self.kernels_path = kernels_path

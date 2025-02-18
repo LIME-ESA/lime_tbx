@@ -10,7 +10,7 @@ import numpy as np
 import spiceypy as spice
 
 """___LIME_TBX Modules___"""
-from ..eocfi_adapter import EOCFIConverter, IEOCFIConverter, _get_file_datetimes
+from ..eocfi_adapter import EOCFIConverter, _get_file_datetimes
 from lime_tbx.datatypes.datatypes import KernelsPath, LimeException, EocfiPath
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 
@@ -50,7 +50,7 @@ _MOON_KERNELS = [
 DT1 = datetime(2016, 1, 1, 15, 0, 2, tzinfo=timezone.utc)
 
 
-def get_eocfi_converter() -> IEOCFIConverter:
+def get_eocfi_converter() -> EOCFIConverter:
     return EOCFIConverter(EOCFI_PATH, KERNELS_PATH)
 
 

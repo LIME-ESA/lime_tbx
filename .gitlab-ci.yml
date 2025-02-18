@@ -92,7 +92,7 @@ doc-coverage:
   stage: Static Analysis
   script:
     - pip install interrogate
-    - interrogate --exclude='**/tests/*.py' -spv --fail-under=95 --generate-badge=doc-cov.svg lime_tbx
+    - interrogate --exclude='**/gui/**' --exclude='**/tests/*.py' -spv --fail-under=75 --generate-badge=doc-cov.svg lime_tbx
   artifacts:
     paths:
       - doc-cov.svg

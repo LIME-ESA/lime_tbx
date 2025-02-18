@@ -5,10 +5,8 @@ include lime_tbx/lime_algorithms/lime/assets/tsis_cimel.csv
 include lime_tbx/lime_algorithms/lime/assets/tsis_fwhm_1_1_triangle.csv
 include lime_tbx/lime_algorithms/lime/assets/tsis_fwhm_3_1_gaussian.csv
 include lime_tbx/lime_algorithms/lime/assets/tsis_asd.csv
-include lime_tbx/coefficients/access_data/assets/coefficients.csv
-include lime_tbx/coefficients/access_data/assets/coefficients_cimel.csv
-include lime_tbx/coefficients/access_data/assets/u_coefficients_cimel.csv
-include lime_tbx/coefficients/access_data/assets/ds_cimel_coeff.nc
+include lime_tbx/simulation/tests/assets/coefficients_cimel.csv
+include lime_tbx/simulation/tests/assets/u_coefficients_cimel.csv
 include lime_tbx/gui/assets/style.qss
 include lime_tbx/gui/assets/style_constants.txt
 include lime_tbx/gui/assets/style_constants_darwin.txt

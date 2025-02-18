@@ -17,7 +17,7 @@ from lime_tbx.datatypes.datatypes import (
     EocfiPath,
 )
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
-from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter, IEOCFIConverter
+from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 
 
 """___Authorship___"""
@@ -174,7 +174,7 @@ class MoonDataFactory:
         srp: SurfacePoint | list of SurfacePoint
             SurfacePoint generated from the position of the SatellitePoint at the given datetimes.
         """
-        eocfi: IEOCFIConverter = EOCFIConverter(eocfi_path, kernels_path)
+        eocfi: EOCFIConverter = EOCFIConverter(eocfi_path, kernels_path)
         dts = sp.dt
         if not isinstance(dts, list):
             dts = [dts]

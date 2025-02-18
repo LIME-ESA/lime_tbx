@@ -974,7 +974,7 @@ class MainSimulationsWidget(
         self._finished_building = False
         self.lime_simulation = lime_simulation
         self.settings_manager = settings_manager
-        self.eocfi: eocfi_adapter.IEOCFIConverter = eocfi_adapter.EOCFIConverter(
+        self.eocfi: eocfi_adapter.EOCFIConverter = eocfi_adapter.EOCFIConverter(
             eocfi_path,
             kernels_path,
         )
