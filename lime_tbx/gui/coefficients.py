@@ -18,7 +18,7 @@ from lime_tbx.gui.util import (
 )
 from lime_tbx.gui import constants
 from lime_tbx.datatypes import logger
-from lime_tbx.coefficients.update.update import IUpdate, Update
+from lime_tbx.coefficients.update import Update
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -100,7 +100,7 @@ def _callback_stopper_check_is_running(stopper: WorkerStopper):
 
 
 def _callback_download(stopper: WorkerStopper) -> Tuple[bool]:
-    updater: IUpdate = Update()
+    updater = Update()
     if updater.check_for_updates():
         news, fails = updater.download_coefficients(
             _callback_stopper_check_is_running, [stopper]

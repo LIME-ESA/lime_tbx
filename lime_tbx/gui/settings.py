@@ -258,7 +258,7 @@ class SettingsManager(ISettingsManager):
         # generate an arbitrary default srf
         self.srfs = [self.get_default_srf()]
         self.srf = self.srfs[0]
-        self.coeffs = access_data.AccessData().get_all_coefficients()
+        self.coeffs = access_data.get_all_coefficients()
         index = -1
         if previous_coeff_name != None:
             versions = [coef.version for coef in self.coeffs]
@@ -300,10 +300,10 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
         self.polar_coeff = self.coeffs[index].polarisation
-        access_data.AccessData().set_previusly_selected_version(self.coeff.version)
+        access_data.set_previusly_selected_version(self.coeff.version)
 
     def reload_coeffs(self) -> None:
-        self.coeffs = access_data.AccessData().get_all_coefficients()
+        self.coeffs = access_data.get_all_coefficients()
         self.coeff = self.coeffs[-1]
         self.cimel_coeff = self.coeffs[-1].reflectance
         self.polar_coeff = self.coeffs[-1].polarisation

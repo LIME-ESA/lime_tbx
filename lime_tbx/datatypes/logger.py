@@ -4,16 +4,11 @@ It exports the following functions:
     * get_logger() - Returns the toolbox logger, used for logging messages.
 """
 
-"""___Built-In Modules___"""
 import logging
 from datetime import datetime, timezone
 import os
 import sys
 
-"""___Third-Party Modules___"""
-# import here
-
-"""___LIME_TBX Modules___"""
 from lime_tbx.local_storage import appdata
 from lime_tbx.datatypes import constants
 

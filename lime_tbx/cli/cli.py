@@ -45,7 +45,7 @@ from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.simulation.comparison.utils import sort_by_mpa, average_comparisons
 from lime_tbx.filedata import moon, srf as srflib, csv, lglod as lglodlib
-from lime_tbx.coefficients.update.update import IUpdate, Update
+from lime_tbx.coefficients.update import Update
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 from lime_tbx.interpolation.interp_data import interp_data
 from . import export
@@ -953,7 +953,7 @@ class CLI:
             - `0` if the update is successful or no updates are available.
             - `1` if an error occurs during the update process.
         """
-        updater: IUpdate = self.updater
+        updater: Update = self.updater
         stopper_checker_true = lambda *_: True
         updates = False
         try:

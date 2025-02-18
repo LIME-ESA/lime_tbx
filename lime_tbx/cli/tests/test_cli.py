@@ -17,7 +17,7 @@ import requests
 """___LIME_TBX Modules___"""
 from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 from lime_tbx.interpolation.interp_data import interp_data
-from lime_tbx.coefficients.update.tests.test_update import HTTPServer, get_updater
+from lime_tbx.coefficients.tests.test_update import HTTPServer, get_updater
 from ..cli import (
     CLI,
     OPTIONS,

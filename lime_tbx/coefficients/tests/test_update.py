@@ -10,7 +10,7 @@ from http.server import HTTPServer as BaseHTTPServer, SimpleHTTPRequestHandler
 import unittest
 
 """___LIME_TBX Modules___"""
-from ..update import Update, IUpdate
+from ..update import Update
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -20,7 +20,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-def get_updater() -> IUpdate:
+def get_updater() -> Update:
     up = Update()
     up.url = "http://localhost:8000/listv.txt"
     return up

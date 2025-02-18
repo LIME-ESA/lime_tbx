@@ -4,11 +4,13 @@
 from datetime import datetime, timezone
 import sys
 import io
+import os
 
 """___Third-Party Modules___"""
 import unittest
 import numpy as np
 import pytest
+import obsarray
 
 """___LIME_TBX Modules___"""
 from ..lime_simulation import ILimeSimulation, LimeSimulation, is_ampa_valid_range
@@ -24,16 +26,13 @@ from ...datatypes.datatypes import (
     LGLODData,
     EocfiPath,
 )
-from ...coefficients.access_data.access_data import (
-    _get_default_polarisation_coefficients,
-    _get_demo_cimel_coeffs,
-)
 from ...filedata import srf as srflib, lglod as lglodlib
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.eocfi_adapter.eocfi_adapter import EOCFIConverter
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 from lime_tbx.gui.settings import SettingsManager
+from lime_tbx.datatypes.templates import TEMPLATE_CIMEL
 
 
 """___Authorship___"""
@@ -62,6 +61,73 @@ DT2 = datetime(2022, 2, 16, 2, tzinfo=timezone.utc)
 SURFACE_POINT = SurfacePoint(LAT, LON, ALT, [DT1, DT2])
 SATELLITE_POINT = SatellitePoint("BIOMASS", DT1)
 SATELLITE_POINT_2 = SatellitePoint("BIOMASS", [DT1, DT2])
+# Polarisation
+_POLARISATION_WLENS = [440, 500, 675, 870, 1020, 1640]
+_DEFAULT_POS_POLAR_COEFFS = [
+    (0.003008799098, 0.000177889155, 0.000002581092, 0.000000012553),
+    (0.002782607290, 0.000161111675, 0.000002331213, 0.000000011175),
+    (0.002467126521, 0.000140139814, 0.000002021823, 0.000000009468),
+    (0.002536989960, 0.000150448307, 0.000002233876, 0.000000010661),
+    (0.002481149030, 0.000149814043, 0.000002238987, 0.000000010764),
+    (0.002135380897, 0.000126059235, 0.000001888331, 0.000000009098),
+]
+_DEFAULT_NEG_POLAR_COEFFS = [
+    (-0.003328093061, 0.000221328429, -0.000003441781, 0.000000018163),
+    (-0.002881735316, 0.000186855017, -0.000002860010, 0.000000014778),
+    (-0.002659373268, 0.000170314209, -0.000002652223, 0.000000013710),
+    (-0.002521475080, 0.000157719602, -0.000002452656, 0.000000012597),
+    (-0.002546369943, 0.000158157867, -0.000002469036, 0.000000012675),
+    (-0.002726077195, 0.000171190004, -0.000002850707, 0.000000015473),
+]
+_DEFAULT_UNCS = [
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+    (0.0, 0.0, 0.0, 0.0),
+]
+
+
+def _get_default_polarisation_coefficients() -> PolarisationCoefficients:
+    wlens = _POLARISATION_WLENS
+    pos_coeffs = _DEFAULT_POS_POLAR_COEFFS
+    neg_coeffs = _DEFAULT_NEG_POLAR_COEFFS
+    uncs = np.array(_DEFAULT_UNCS)
+    uncs.fill(0.0000001)  # It fails later on if uncs are all 0
+    err_corr_size = len(uncs) * len(uncs[0])
+    err_corr = np.zeros((err_corr_size, err_corr_size))
+    np.fill_diagonal(err_corr, 1)
+    coeffs = PolarisationCoefficients(
+        wlens, pos_coeffs, uncs, err_corr, neg_coeffs, uncs, err_corr
+    )
+    return coeffs
+
+
+def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoefficients:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    dim_sizes = {
+        "wavelength": 6,
+        "i_coeff": 18,
+        "i_coeff.wavelength": 18 * 6,
+    }
+    ds_cimel = obsarray.create_ds(TEMPLATE_CIMEL, dim_sizes)
+    ds_cimel = ds_cimel.assign_coords(wavelength=[440, 500, 675, 870, 1020, 1640])
+    # read in updates on cimel coeff and uncs
+    data = np.genfromtxt(os.path.join(current_dir, filepath), delimiter=",")
+    u_data = np.genfromtxt(os.path.join(current_dir, u_filepath), delimiter=",")
+    ds_cimel["coeff"].values = data.T
+    ds_cimel["u_coeff"].values = u_data.T
+    ds_cimel["err_corr_coeff"].values = np.zeros((18 * 6, 18 * 6))
+    np.fill_diagonal(ds_cimel["err_corr_coeff"].values, 1)
+    return ReflectanceCoefficients(ds_cimel)
+
+
+def _get_demo_cimel_coeffs() -> ReflectanceCoefficients:
+    # Demo coefficients, used for testing only
+    return _read_cimel_coeffs_files(
+        "assets/coefficients_cimel.csv", "assets/u_coefficients_cimel.csv"
+    )
 
 
 def get_srf() -> SpectralResponseFunction:

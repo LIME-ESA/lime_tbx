@@ -57,7 +57,7 @@ from lime_tbx.local_storage.programdata import (
 )
 from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 from lime_tbx.datatypes import logger
-from lime_tbx.coefficients.access_data.access_data import AccessData
+from lime_tbx.coefficients.access_data import access_data
 
 
 def main():
@@ -118,7 +118,7 @@ def main():
     sysargs = sys.argv[1:]
     options = OPTIONS
     long_options = LONG_OPTIONS
-    selected_version = AccessData().get_previously_selected_version()
+    selected_version = access_data.get_previously_selected_version()
     try:
         opts, args = getopt.gnu_getopt(sysargs, options, long_options)
     except getopt.GetoptError as e:
