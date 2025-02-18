@@ -302,7 +302,11 @@ class SpectralIntegration(ISpectralIntegration):
         for ich, ch in enumerate(channels):
             ch_wlens = np.array([w for w in ch.spectral_response.keys()])
             ch_srf = np.array([ch.spectral_response[k] for k in ch_wlens])
-            signals[ich] = band_integration.band_int(data, wlens, ch_srf, ch_wlens)
+            # TODO shouldnt uncerts be added?
+            band_int = band_integration.band_int(data, wlens, ch_srf, ch_wlens)
+            if isinstance(band_int, np.ndarray):
+                band_int = band_int[0]
+            signals[ich] = band_int
         return signals
 
     def _convolve_srf(

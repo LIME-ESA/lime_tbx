@@ -10,7 +10,7 @@ from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 
@@ -504,6 +504,7 @@ class CLIExporter:
         version: str,
         title: str,
         chosen_diffs: CompFields,
+        date_range: Tuple[datetime, datetime] = None,
     ):
         """Exports comparison results as a graph.
 
@@ -526,6 +527,9 @@ class CLIExporter:
             Title of the graph.
         chosen_diffs : CompFields
             Specifies whether to show relative differences, percentage differences, or none.
+        date_range: Optional, Tuple[datetime, datetime]
+            Initial and final datetimes, in case the comparison is not an standard comparison,
+            and its dts attribute is None.
 
         Raises
         ------
@@ -538,8 +542,11 @@ class CLIExporter:
         canv.set_title("", fontproperties=canvas.title_font_prop)
         canv.axes.tick_params(labelsize=8)
         n_comp_points = len(comparison.diffs_signal.wlens)
-        data_start = min(comparison.dts)
-        data_end = max(comparison.dts)
+        if date_range is None:
+            data_start = min(comparison.dts)
+            data_end = max(comparison.dts)
+        else:
+            data_start, data_end = date_range
         version = self.settings_manager.get_lime_coef().version
         warning_out_mpa_range = ""
         if False in comparison.ampa_valid_range:

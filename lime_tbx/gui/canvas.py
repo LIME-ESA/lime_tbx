@@ -248,7 +248,7 @@ def _draw_boxplot(
     box = axes.boxplot(
         x,
         notch=True,
-        labels=labels,
+        tick_labels=labels,
         patch_artist=True,
         manage_ticks=manage_ticks,
         positions=positions,

@@ -6,7 +6,7 @@ It exports the following functions:
 
 """___Built-In Modules___"""
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import sys
 
@@ -46,7 +46,7 @@ def get_logger() -> logging.Logger:
     """
     global _logger
     if _logger == None:
-        dtnow = datetime.utcnow()
+        dtnow = datetime.now(timezone.utc)
         logname = dtnow.strftime("%Y%m%d")
         logname = "log_{}.txt".format(logname)
         logname = os.path.join(

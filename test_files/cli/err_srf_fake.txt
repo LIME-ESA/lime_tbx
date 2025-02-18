@@ -1,1 +1,1 @@
-Error: The given srf path does not exist.
+Error: The given srf path 'fakefile.nc' does not exist.

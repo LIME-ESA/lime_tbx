@@ -442,9 +442,7 @@ def _parse_output_params(arg: str, is_comparison: bool) -> export.ExportData:
 def _parse_load_timeseries(arg: str, opts: List[Tuple[str, str]]):
     timeseries_file = arg
     timeseries = None
-    if timeseries_file != None and any(
-        item[0] in ("-e", "--earth", "-s", "--satellite") for item in opts
-    ):
+    if any(item[0] in ("-e", "--earth", "-s", "--satellite") for item in opts):
         if os.path.exists(timeseries_file):
             try:
                 timeseries = csv.read_datetimes(timeseries_file)
@@ -919,6 +917,8 @@ class CLI:
                             )
                     else:
                         comp = average_comparisons(wlcs, comps)
+                        data_start = min([min(c.dts) for c in comps])
+                        data_end = max([max(c.dts) for c in comps])
                         if isinstance(ed, export.ExportComparisonCSV) or isinstance(
                             ed, export.ExportComparisonCSVDir
                         ):
@@ -941,6 +941,7 @@ class CLI:
                                 version,
                                 "All channels",
                                 ed.chosen_diff,
+                                date_range=(data_start, data_end),
                             )
 
     def update_coefficients(self) -> int:
@@ -1111,7 +1112,7 @@ Run 'lime -h' for help."
             - `1` for errors (invalid input, missing parameters, execution failures).
         """
         export_data: export.ExportData = None
-        timeseries_file: str = None
+        timeseries = None
         # Check if it's comparison
         is_comparison = any(item[0] in ("-c", "--comparison") for item in opts)
         mod_interp_settings = False
@@ -1183,14 +1184,14 @@ Run 'lime -h' for help."
                 if opt in ("-e", "--earth"):  # Earth
                     params_str = arg.split(",")
                     lenpar = len(params_str)
-                    if lenpar < 3 or (timeseries_file == None and lenpar != 4):
+                    if lenpar < 3 or (timeseries is None and lenpar != 4):
                         eprint("Error: Wrong number of arguments for -e")
                         return 1
                     params = list(map(float, params_str[:3]))
                     lat = params[0]
                     lon = params[1]
                     height = params[2]
-                    if timeseries_file != None:
+                    if timeseries is not None:
                         dt = timeseries
                     else:
                         dt = datetime.strptime(
@@ -1201,11 +1202,11 @@ Run 'lime -h' for help."
                 elif opt in ("-s", "--satellite"):  # Satellite
                     params_str = arg.split(",")
                     lenpar = len(params_str)
-                    if lenpar < 1 or (timeseries_file == None and lenpar != 2):
+                    if lenpar < 1 or (timeseries is None and lenpar != 2):
                         eprint("Error: Wrong number of arguments for -s")
                         return 1
                     sat_name = params_str[0]
-                    if timeseries_file != None:
+                    if timeseries is not None:
                         dt = timeseries
                     else:
                         dt = datetime.strptime(
