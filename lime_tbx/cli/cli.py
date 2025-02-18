@@ -14,13 +14,13 @@ It supports:
 This module serves as the entry point for the command-line execution of LIME TBX.
 """
 
+# TODO: Refactor module. Split parsing from calculating, multiple submodules. Study migrating
+# to a library that already implements arguments handling.
+
 from datetime import datetime, timezone
-from dataclasses import dataclass
-from abc import ABC
 import traceback
 from typing import List, Union, Tuple
 import os
-from enum import Enum
 import glob
 import sys
 import json
@@ -28,7 +28,6 @@ import json
 import numpy as np
 
 from lime_tbx.datatypes.datatypes import (
-    ComparisonData,
     CustomPoint,
     KernelsPath,
     LGLODComparisonData,
@@ -37,20 +36,19 @@ from lime_tbx.datatypes.datatypes import (
     Point,
     SatellitePoint,
     SurfacePoint,
-    MoonData,
     EocfiPath,
 )
 from lime_tbx.datatypes import constants, logger
 from lime_tbx.datatypes.constants import CompFields
-from lime_tbx.gui import settings, constants as gui_constants
+from lime_tbx.gui import settings
 from lime_tbx.simulation.lime_simulation import LimeSimulation, ILimeSimulation
 from lime_tbx.simulation.comparison import comparison
 from lime_tbx.simulation.comparison.utils import sort_by_mpa, average_comparisons
 from lime_tbx.filedata import moon, srf as srflib, csv, lglod as lglodlib
-from lime_tbx.filedata.lglod_factory import create_lglod_data
 from lime_tbx.coefficients.update.update import IUpdate, Update
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 from lime_tbx.interpolation.interp_data import interp_data
+from . import export
 
 
 _DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
@@ -70,12 +68,12 @@ LONG_OPTIONS = [
     "coefficients=",
     "interpolation=",
 ]
-_WARN_OUTSIDE_MPA_RANGE = "Warning: The LIME can only give a reliable simulation \
-for absolute moon phase angles between 2° and 90°"
-_ERROR_RINDEX_BOTH_DOT = "When creating output as CSV or GRAPH files for both DT and MPA, \
-the full CSV/GRAPH filepaths must be explictly written, including the extension \
-(.csv, .png, ...).\nAnother solution is to select the CSVD/GRAPHD option where one \
-only has to specify the output directory path.\nProblematic filepath: "
+_ERROR_RINDEX_BOTH_DOT = """When creating output as CSV or GRAPH \
+files for both DT and MPA, the full CSV/GRAPH filepaths must be \
+explictly written, including the extension (.csv, .png, ...).
+Another solution is to select the CSVD/GRAPHD option where one \
+only has to specify the output directory path.
+Problematic filepath: """
 
 
 def eprint(*args, **kwargs):
@@ -95,192 +93,7 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
-class ExportData(ABC):
-    """Abstract base class for export data formats.
-
-    Subclasses define specific export types such as CSV, Graphs, and NetCDF.
-    """
-
-
-@dataclass
-class ExportCSV(ExportData):
-    """Represents CSV file export settings for simulation results.
-
-    Attributes
-    ----------
-    o_file_refl : str
-        Path to the output CSV file for reflectance.
-    o_file_irr : str
-        Path to the output CSV file for irradiance.
-    o_file_polar : str
-        Path to the output CSV file for polarization.
-    o_file_integrated_irr : str
-        Path to the output CSV file for integrated irradiance.
-    """
-
-    o_file_refl: str
-    o_file_irr: str
-    o_file_polar: str
-    o_file_integrated_irr: str
-
-
-@dataclass
-class ExportGraph(ExportData):
-    """Represents graphical export settings for simulation results.
-
-    Attributes
-    ----------
-    o_file_refl : str
-        Path to the output graph file for reflectance.
-    o_file_irr : str
-        Path to the output graph file for irradiance.
-    o_file_polar : str
-        Path to the output graph file for polarization.
-    """
-
-    o_file_refl: str
-    o_file_irr: str
-    o_file_polar: str
-
-
 COMP_KEYS = ["DT", "MPA", "BOTH", "CHANNEL", "CHANNEL_MEAN"]
-
-
-class ComparisonKey(Enum):
-    """Enumeration for comparison output modes.
-
-    Attributes
-    ----------
-    DT : int
-        Compare based on UTC datetime.
-    MPA : int
-        Compare based on Moon Phase Angle.
-    BOTH : int
-        Compare using both datetime and Moon Phase Angle.
-    CHANNEL : int
-        Compare by spectral channel.
-    CHANNEL_MEAN : int
-        Compare using averaged spectral channels.
-    """
-
-    DT = 0
-    MPA = 1
-    BOTH = 2
-    CHANNEL = 3
-    CHANNEL_MEAN = 4
-
-
-class ExportComparison(ABC):
-    """Abstract base class for exporting comparison results.
-
-    This class serves as a parent for different export formats, including CSV
-    and graphical representations of comparison data.
-    """
-
-
-@dataclass
-class ExportComparisonCSV(ExportComparison):
-    """Represents CSV file export settings for comparison results.
-
-    Attributes
-    ----------
-    comparison_key : ComparisonKey
-        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
-    output_files : List[str]
-        List of file paths for saving the comparison data.
-        Each comparison type has a different amount of files.
-    chosen_diff : CompFields
-        The difference metric (relative, percentage, or none).
-    """
-
-    comparison_key: ComparisonKey
-    output_files: List[str]
-    chosen_diff: CompFields
-
-
-@dataclass
-class ExportComparisonCSVDir(ExportComparison):
-    """Represents CSV directory export settings for comparison results.
-
-    Instead of exporting individual CSV files, this class allows exporting
-    all comparison data to a specified directory, and automatically generating
-    the file names.
-
-    Attributes
-    ----------
-    comparison_key : ComparisonKey
-        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
-    output_dir : str
-        The directory where CSV files will be saved.
-    chosen_diff : CompFields
-        The difference metric (relative, percentage, or none).
-    """
-
-    comparison_key: ComparisonKey
-    output_dir: str
-    chosen_diff: CompFields
-
-
-@dataclass
-class ExportComparisonGraph(ExportComparison):
-    """Represents graphical export settings for comparison results.
-
-    Attributes
-    ----------
-    comparison_key : ComparisonKey
-        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
-    output_files : List[str]
-        List of file paths for saving the comparison graphs.
-        Each comparison type has a different amount of files.
-    chosen_diff : CompFields
-        The difference metric (relative, percentage, or none).
-    """
-
-    comparison_key: ComparisonKey
-    output_files: List[str]
-    chosen_diff: CompFields
-
-
-@dataclass
-class ExportComparisonGraphDir(ExportComparison):
-    """Represents graphical export settings for comparison results in a directory.
-
-    This allows exporting comparison graphs to a specified directory with a
-    chosen file extension, and automatically generating the file names.
-
-    Attributes
-    ----------
-    extension : str
-        File extension for the exported graphs (e.g., "png", "jpg").
-    comparison_key : ComparisonKey
-        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).
-    output_dir : str
-        The directory where graphs will be saved.
-    chosen_diff : CompFields
-        The difference metric (relative, percentage, or none).
-    """
-
-    extension: str
-    comparison_key: ComparisonKey
-    output_dir: str
-    chosen_diff: CompFields
-
-
-@dataclass
-class ExportNetCDF(ExportData, ExportComparison):
-    """Represents NetCDF file export settings for simulations and comparisons.
-
-    This format allows storing structured, multi-dimensional scientific data.
-
-    Attributes
-    ----------
-    output_file : str
-        The path to the NetCDF output file.
-    """
-
-    output_file: str
-
-
 IMAGE_EXTENSIONS = ["pdf", "jpg", "png", "svg"]
 COMP_DIFF_KEYS = ["rel", "perc", "none"]
 
@@ -398,10 +211,49 @@ anchor points used for interpolation. The valid values are 'True' and 'False'."
 
 
 def print_version():
+    """Prints the package version name to the standard output."""
     print(constants.VERSION_NAME)
 
 
-def _get_chosen_diff_from_cli(param: str) -> CompFields:
+class CLIError(Exception):
+    """Exception raised for all errors encountered during command-line argument processing."""
+
+
+class ParsingError(CLIError):
+    """Exception raised for errors encountered during command-line argument parsing.
+
+    This exception is used to indicate issues such as:
+    - Invalid or unrecognized argument values.
+    - Missing required parameters.
+    - Incorrect formatting of input arguments.
+    """
+
+
+def _parse_chosen_diff(param: str) -> CompFields:
+    """Parses the difference metric parameter for comparisons.
+
+    Validates if the input parameter is one of the allowed difference keys, present
+    in `COMP_DIFF_KEYS`.
+
+    Parameters
+    ----------
+    param : str
+        The input string representing the difference type.
+
+    Returns
+    -------
+    CompFields
+        The corresponding `CompFields` enumeration.
+
+    Raises
+    ------
+    ParsingError
+        If the parameter is invalid.
+    """
+    if param not in COMP_DIFF_KEYS:
+        raise ParsingError(
+            f"Invalid difference metric {param}. Expected one of {COMP_DIFF_KEYS}."
+        )
     chosen_diff = CompFields.DIFF_NONE
     if param == COMP_DIFF_KEYS[0]:
         chosen_diff = CompFields.DIFF_REL
@@ -410,48 +262,215 @@ def _get_chosen_diff_from_cli(param: str) -> CompFields:
     return chosen_diff
 
 
+def _parse_comp_key(param: str) -> export.ComparisonKey:
+    """Parses the comparison key from the CLI argument.
+
+    Ensures that the comparison key is a valid mode, which are
+    persent in `COMP_KEY`.
+
+    Parameters
+    ----------
+    param : str
+        The input string representing the comparison key.
+
+    Returns
+    -------
+    export.ComparisonKey
+        The corresponding `ComparisonKey` enumeration.
+
+    Raises
+    ------
+    ParsingError
+        If the parameter is invalid.
+    """
+    if param not in COMP_KEYS:
+        raise ParsingError(
+            f"Invalid comparison key {param}. Expected one of {COMP_KEYS}."
+        )
+    comp_key = export.ComparisonKey[param]
+    return comp_key
+
+
+def _parse_check_img_extension(param: str):
+    """Validates and returns a supported image format.
+
+    Ensures that the provided file extension is one of the supported image formats,
+    which are the ones in `IMAGE_EXTENSIONS`.
+
+    Parameters
+    ----------
+    param : str
+        The input string representing the image format.
+
+    Returns
+    -------
+    str
+        The validated image format.
+
+    Raises
+    ------
+    ParsingError
+        If the format is not supported.
+    """
+    param = param.strip().lower()
+    if param not in IMAGE_EXTENSIONS:
+        raise ParsingError(
+            f"Error: Graph format not detected. It must be one of the following: {','.join(IMAGE_EXTENSIONS)}."
+        )
+    return param
+
+
+def _parse_filepaths_from_img_extension(param: str, filenames: List[str]) -> List[str]:
+    """Generates file paths with the given image format extension.
+
+    Appends the validated image extension to each filename in the list.
+
+    Parameters
+    ----------
+    param : str
+        The desired image format (e.g., "png", "jpg").
+    filenames : List[str]
+        List of base filenames (without extensions).
+
+    Returns
+    -------
+    List[str]
+        List of filenames with the correct extension.
+
+    Raises
+    ------
+    ParsingError
+        If the provided format is invalid.
+    """
+    param = _parse_check_img_extension(param)
+    filepaths = list(map(lambda s: s + f".{param}", filenames))
+    return filepaths
+
+
+def _parse_output_params(arg: str, is_comparison: bool) -> export.ExportData:
+    """Parses and validates the output parameters for simulation or comparison.
+
+    Determines the export type based on the user input and returns the appropriate
+    `ExportData` subclass. Supports:
+    - CSV (`ExportCSV`, `ExportComparisonCSV`)
+    - Graph (`ExportGraph`, `ExportComparisonGraph`)
+    - NetCDF (`ExportNetCDF`)
+    - Directory-based export (`ExportComparisonCSVDir`, `ExportComparisonGraphDir`)
+
+    Parameters
+    ----------
+    arg : str
+        The full CLI argument string containing output specifications.
+    is_comparison : bool
+        Whether the current operation is a comparison.
+
+    Returns
+    -------
+    export.ExportData
+        The corresponding export configuration object.
+
+    Raises
+    ------
+    ParsingError
+        If the output parameters are invalid.
+    """
+    splitted = arg.split(",")
+    o_type = splitted[0]
+    if o_type == "csv":
+        if not is_comparison:
+            if len(splitted) != 5:
+                raise ParsingError("Error: Wrong number of arguments for -o csv,...")
+            export_data = export.ExportCSV(
+                splitted[1], splitted[2], splitted[3], splitted[4]
+            )
+        else:
+            if len(splitted) < 4:
+                raise ParsingError("Error: Wrong number of arguments for -o csv,...")
+            comp_key = _parse_comp_key(splitted[1])
+            chosen_diff = _parse_chosen_diff(splitted[2])
+            export_data = export.ExportComparisonCSV(
+                comp_key, splitted[3:], chosen_diff
+            )
+    elif o_type == "graph":
+        if not is_comparison:
+            if len(splitted) != 5:
+                raise ParsingError("Error: Wrong number of arguments for -o graph,...")
+            filepaths = _parse_filepaths_from_img_extension(splitted[1], splitted[2:])
+            export_data = export.ExportGraph(*filepaths)
+        else:
+            if len(splitted) < 5:
+                raise ParsingError("Error: Wrong number of arguments for -o graph,...")
+            comp_key = _parse_comp_key(splitted[2])
+            filepaths = _parse_filepaths_from_img_extension(splitted[1], splitted[4:])
+            chosen_diff = _parse_chosen_diff(splitted[3])
+            export_data = export.ExportComparisonGraph(
+                comp_key,
+                filepaths,
+                chosen_diff,
+            )
+    elif o_type == "nc":
+        if len(splitted) != 2:
+            raise ParsingError("Error: Wrong number of arguments for -o nc,...")
+        export_data = export.ExportNetCDF(splitted[1])
+    elif o_type == "csvd":
+        if not is_comparison:
+            raise ParsingError("Error: csvd output is only available for comparisons.")
+        if len(splitted) != 4:
+            raise ParsingError("Error: Wrong number of arguments for -o csvd,...")
+        comp_key = _parse_comp_key(splitted[1])
+        chosen_diff = _parse_chosen_diff(splitted[2])
+        export_data = export.ExportComparisonCSVDir(comp_key, splitted[3], chosen_diff)
+    elif o_type == "graphd":
+        if not is_comparison:
+            raise ParsingError(
+                "Error: graphd output is only available for comparisons."
+            )
+        if len(splitted) != 5:
+            raise ParsingError("Error: Wrong number of arguments for -o graphd,...")
+        splitted[1] = _parse_check_img_extension(splitted[1])
+        comp_key = _parse_comp_key(splitted[2])
+        chosen_diff = _parse_chosen_diff(splitted[3])
+        export_data = export.ExportComparisonGraphDir(
+            splitted[1],
+            comp_key,
+            splitted[4],
+            chosen_diff,
+        )
+    return export_data
+
+
+def _parse_load_timeseries(arg: str, opts: List[Tuple[str, str]]):
+    timeseries_file = arg
+    timeseries = None
+    if timeseries_file != None and any(
+        item[0] in ("-e", "--earth", "-s", "--satellite") for item in opts
+    ):
+        if os.path.exists(timeseries_file):
+            try:
+                timeseries = csv.read_datetimes(timeseries_file)
+            except Exception as e:
+                raise CLIError(f"Error reading timeseries file: {str(e)}") from e
+        else:
+            raise CLIError("Error: Timeseries file does not exist.")
+    return timeseries
+
+
 class CLI:
     """Command Line Interface handler for LIME TBX.
 
     This class processes command-line arguments, performs simulations, and manages
-    comparisons. It serves as the main interface for users executing the toolbox from
-    the command line.
+    comparisons. It serves as the main interface for users executing the toolbox
+    from the command line.
 
-    Attributes
-    ----------
-    kernels_path : KernelsPath
-        Path to the SPICE kernels required for calculations.
-    eocfi_path : EocfiPath
-        Path to the EO-CFI libraries used for orbit calculations.
-    settings_manager : settings.SettingsManager
-        Manages configuration settings, including coefficients and interpolation.
-    lime_simulation : ILimeSimulation
-        Handles lunar irradiance, reflectance and polarization simulations.
-    srf : datatypes.SpectralResponseFunction
-        Spectral Response Function (SRF) used for simulations.
-    updater : IUpdate
-        Handles updates to coefficient datasets.
+    It contains a LimeSimulation instance that handles and stores the asked calculations
+    that then will be retrieved for export.
 
-    Methods
-    -------
-    load_srf(srf_file)
-        Loads a spectral response function (SRF) from a given file.
-    calculate_geographic(lat, lon, height, dt, export_data)
-        Runs a simulation from a geographic location.
-    calculate_satellital(sat_name, dt, export_data)
-        Runs a simulation from a satellite's position.
-    calculate_selenographic(distance_sun_moon, distance_observer_moon, ...)
-        Runs a simulation from a selenographic location.
-    calculate_comparisons(input_files, export_data)
-        Performs comparisons using observation files in GLOD format.
-    update_coefficients()
-        Checks for and updates coefficient datasets.
-    parse_interp_settings(arg)
-        Parses and applies interpolation settings to the settings manager from a JSON string.
-    check_sys_args(sysargs)
-        Validates system arguments to prevent syntax errors.
-    handle_input(opts, args)
-        Processes command-line input and dispatches actions.
+    Responsibilities:
+    - Simulations of lunar irradiance, reflectance, and polarization.
+    - Comparisons with observational data.
+    - Output in various formats (CSV, Graph, NetCDF).
+    - Updating coefficient datasets.
+    - Managing interpolation and spectral response function settings.
     """
 
     def __init__(
@@ -460,6 +479,17 @@ class CLI:
         eocfi_path: EocfiPath,
         selected_version: str = None,
     ):
+        """Initializes the CLI instance.
+
+        Parameters
+        ----------
+        kernels_path : KernelsPath
+            Path to the SPICE kernels required for calculations.
+        eocfi_path : EocfiPath
+            Path to the EO-CFI data directories used for orbit calculations.
+        selected_version : str, optional
+            Selected coefficients version (default: None).
+        """
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         self.settings_manager = settings.SettingsManager(selected_version)
@@ -468,369 +498,79 @@ class CLI:
         )
         self.srf = self.settings_manager.get_default_srf()
         self.updater = Update()
+        self.exporter = export.CLIExporter(
+            self.kernels_path,
+            self.eocfi_path,
+            self.settings_manager,
+            self.lime_simulation,
+        )
 
     def load_srf(self, srf_file: str):
+        """Loads the Spectral Response Function (SRF) from a specified file.
+
+        If no file is provided, it loads the default SRF.
+
+        Parameters
+        ----------
+        srf_file : str
+            Path to the SRF file. If an empty string is given, it loads the default SRF.
+        """
         if srf_file == "":
             self.srf = self.settings_manager.get_default_srf()
         else:
             self.srf = srflib.read_srf(srf_file)
 
     def _calculate_irradiance(self, point: Point):
+        """Calculates lunar irradiance at a given point.
+
+        Parameters
+        ----------
+        point : Point
+            The geographic, lunar, or satellite location for the simulation.
+        """
         def_srf = get_default_srf()
         self.lime_simulation.update_irradiance(
             def_srf, self.srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_reflectance(self, point: Point):
+        """Calculates lunar reflectance at a given point.
+
+        Parameters
+        ----------
+        point : Point
+            The geographic, lunar, or satellite location for the simulation.
+        """
         def_srf = get_default_srf()
         self.lime_simulation.update_reflectance(
             def_srf, point, self.settings_manager.get_cimel_coef()
         )
 
     def _calculate_polarisation(self, point: Point):
+        """Calculates lunar polarization at a given point.
+
+        Parameters
+        ----------
+        point : Point
+            The geographic, lunar, or satellite location for the simulation.
+        """
         def_srf = get_default_srf()
         self.lime_simulation.update_polarisation(
             def_srf, point, self.settings_manager.get_polar_coef()
         )
 
     def _calculate_all(self, point: Point):
+        """Runs all calculations (irradiance, reflectance, and polarization)
+        for a given location.
+
+        Parameters
+        ----------
+        point : Point
+            The location where calculations should be performed.
+        """
         self._calculate_reflectance(point)
         self._calculate_irradiance(point)
         self._calculate_polarisation(point)
-
-    def _export_csvs(
-        self,
-        point: Point,
-        ed: ExportCSV,
-    ):
-        version = self.settings_manager.get_lime_coef().version
-        are_mpas_oinside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        sp_name = self.settings_manager.get_selected_spectrum_name()
-        mdas = self.lime_simulation.get_moon_datas()
-        mpa = None
-        mda = None
-        if isinstance(mdas, MoonData):
-            mda = mdas
-            mpa = mdas.mpa_degrees
-        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
-        skip_uncs = self.settings_manager.is_skip_uncertainties()
-        csv.export_csv_simulation(
-            self.lime_simulation.get_elrefs(),
-            "Wavelengths (nm)",
-            "Reflectances (Fraction of unity)",
-            point,
-            ed.o_file_refl,
-            version,
-            are_mpas_oinside_mpa_range,
-            sp_name,
-            skip_uncs,
-            self.lime_simulation.get_elrefs_cimel(),
-            mda,
-        )
-        csv.export_csv_simulation(
-            self.lime_simulation.get_elis(),
-            "Wavelengths (nm)",
-            "Irradiances (Wm⁻²nm⁻¹)",
-            point,
-            ed.o_file_irr,
-            version,
-            are_mpas_oinside_mpa_range,
-            sp_name,
-            skip_uncs,
-            self.lime_simulation.get_elis_cimel(),
-            mda,
-        )
-        csv.export_csv_simulation(
-            self.lime_simulation.get_polars(),
-            "Wavelengths (nm)",
-            "Degree of Linear Polarisation (%)",
-            point,
-            ed.o_file_polar,
-            version,
-            are_mpas_oinside_mpa_range,
-            dolp_sp_name,
-            skip_uncs,
-            self.lime_simulation.get_polars_cimel(),
-            mda,
-        )
-        csv.export_csv_integrated_irradiance(
-            self.srf,
-            self.lime_simulation.get_signals(),
-            ed.o_file_integrated_irr,
-            point,
-            version,
-            are_mpas_oinside_mpa_range,
-            sp_name,
-            skip_uncs,
-            mpa,
-        )
-
-    def _export_lglod(self, point: Point, output_file: str):
-        sp_name = self.settings_manager.get_selected_spectrum_name()
-        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
-        version = self.settings_manager.get_lime_coef().version
-        mds = self.lime_simulation.get_moon_datas()
-        if not isinstance(mds, list):
-            mds = [mds]
-        lglod = create_lglod_data(
-            point,
-            self.srf,
-            self.lime_simulation,
-            self.kernels_path,
-            sp_name,
-            dolp_sp_name,
-            version,
-            mds,
-        )
-        now = datetime.now(timezone.utc)
-        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        lglodlib.write_obs(lglod, output_file, now, inside_mpa_range)
-
-    def _export_graph(self, point: Point, ed: ExportGraph):
-        from lime_tbx.gui import canvas
-
-        canv = canvas.MplCanvas(width=15, height=10, dpi=200)
-        canv.set_title("", fontproperties=canvas.title_font_prop)
-        canv.axes.tick_params(labelsize=8)
-        version = self.settings_manager.get_lime_coef().version
-        inside_mpa_range = self.lime_simulation.are_mpas_inside_mpa_range()
-        is_out_mpa_range = (
-            not inside_mpa_range
-            if not isinstance(inside_mpa_range, list)
-            else False in inside_mpa_range
-        )
-        warning_out_mpa_range = ""
-        if is_out_mpa_range:
-            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-        sp_name = self.settings_manager.get_selected_spectrum_name()
-        mdas = self.lime_simulation.get_moon_datas()
-        mpa = None
-        if isinstance(mdas, MoonData):
-            mpa = mdas.mpa_degrees
-        mpa_text = ""
-        if mpa is not None:
-            mpa_text = f" | MPA: {mpa:.3f}°"
-        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
-        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
-        canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
-        canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
-        canv.axes.cla()  # Clear the canvas.
-        sp_name = self.settings_manager.get_selected_spectrum_name()
-        dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
-        canvas.redraw_canvas(
-            canv,
-            self.lime_simulation.get_elrefs(),
-            [
-                [gui_constants.INTERPOLATED_DATA_LABEL],
-                [gui_constants.CIMEL_POINT_LABEL],
-                [gui_constants.ERRORBARS_LABEL],
-            ],
-            self.lime_simulation.get_elrefs_cimel(),
-            self.lime_simulation.get_elrefs_asd(),
-            None,
-            "Extraterrestrial Lunar Reflectances",
-            "Wavelengths (nm)",
-            "Reflectances (Fraction of unity)",
-            None,
-            sp_name,
-        )
-        try:
-            canv.print_figure(ed.o_file_refl)
-        except Exception as e:
-            eprint(
-                "Something went wrong while exporting reflectance graph. {}".format(
-                    str(e)
-                )
-            )
-            sys.exit(1)
-        canv.axes.cla()  # Clear the canvas.
-        canvas.redraw_canvas(
-            canv,
-            self.lime_simulation.get_elis(),
-            [
-                [gui_constants.INTERPOLATED_DATA_LABEL],
-                [gui_constants.CIMEL_POINT_LABEL],
-                [gui_constants.ERRORBARS_LABEL],
-            ],
-            self.lime_simulation.get_elis_cimel(),
-            self.lime_simulation.get_elis_asd(),
-            None,
-            "Extraterrestrial Lunar Irradiances",
-            "Wavelengths (nm)",
-            "Irradiances (Wm⁻²nm⁻¹)",
-            None,
-            sp_name,
-        )
-        try:
-            canv.print_figure(ed.o_file_irr)
-        except Exception as e:
-            eprint(
-                "Something went wrong while exporting irradiance graph. {}".format(
-                    str(e)
-                )
-            )
-            sys.exit(1)
-        canv.axes.cla()  # Clear the canvas.
-        spectrum_info = f" | Interp. spectrum: {dolp_sp_name}{mpa_text}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
-        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
-        canv.axes.cla()  # Clear the canvas.
-        canvas.redraw_canvas(
-            canv,
-            self.lime_simulation.get_polars(),
-            [
-                [gui_constants.INTERPOLATED_DATA_LABEL],
-                [gui_constants.CIMEL_POINT_LABEL],
-                [gui_constants.ERRORBARS_LABEL],
-            ],
-            self.lime_simulation.get_polars_cimel(),
-            self.lime_simulation.get_polars_asd(),
-            None,
-            "Extraterrestrial Lunar Polarisation",
-            "Wavelengths (nm)",
-            "Degree of Linear Polarisation (%)",
-            None,
-            dolp_sp_name,
-        )
-        try:
-            canv.print_figure(ed.o_file_polar)
-        except Exception as e:
-            eprint(
-                "Something went wrong while exporting polarisation graph. {}".format(
-                    str(e)
-                )
-            )
-            sys.exit(1)
-        canv.clear()  # Clear the canvas.
-
-    def _export_comparison_graph(
-        self,
-        comparison: ComparisonData,
-        xlabel: str,
-        ylabel: str,
-        output_file: str,
-        version: str,
-        title: str,
-        chosen_diffs: CompFields,
-    ):
-        from lime_tbx.gui import canvas
-
-        canv = canvas.MplCanvas(width=15, height=10, dpi=200)
-        canv.set_title("", fontproperties=canvas.title_font_prop)
-        canv.axes.tick_params(labelsize=8)
-        n_comp_points = len(comparison.diffs_signal.wlens)
-        data_start = min(comparison.dts)
-        data_end = max(comparison.dts)
-        version = self.settings_manager.get_lime_coef().version
-        warning_out_mpa_range = ""
-        if False in comparison.ampa_valid_range:
-            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-        sp_name = self.settings_manager.get_selected_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
-        _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
-        subtitle = "{}\nData start: {} | Data end: {}\nNumber of points: {}".format(
-            subtitle,
-            data_start.strftime(_subtitle_date_format),
-            data_end.strftime(_subtitle_date_format),
-            n_comp_points,
-        )
-        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
-        canv.axes.set_xlabel("Wavelengths (nm)", fontproperties=canvas.label_font_prop)
-        canv.axes.set_ylabel("", fontproperties=canvas.label_font_prop)
-        canv.axes.cla()  # Clear the canvas.
-        canvas.redraw_canvas_compare(
-            canv,
-            comparison,
-            [
-                ["Observed Irradiance", "Simulated Irradiance"],
-                ["Relative Differences", "Percentage Differences"],
-            ],
-            title,
-            xlabel,
-            ylabel,
-            subtitle,
-            chosen_diffs,
-        )
-        try:
-            canv.print_figure(output_file)
-        except Exception as e:
-            eprint(
-                "Something went wrong while exporting comparison graph. {}".format(
-                    str(e)
-                )
-            )
-            sys.exit(1)
-        canv.axes.cla()  # Clear the canvas.
-
-    def _export_comparison_bywlen_graph(
-        self,
-        data: List[ComparisonData],
-        wlcs: List[float],
-        xlabel: str,
-        ylabel: str,
-        output_file: str,
-        version: str,
-        chosen_diffs: CompFields,
-    ):
-        from lime_tbx.gui import canvas
-
-        canv = canvas.MplCanvas(width=15, height=10, dpi=200)
-        canv.set_title("", fontproperties=canvas.title_font_prop)
-        canv.axes.tick_params(labelsize=8)
-        version = self.settings_manager.get_lime_coef().version
-        comps = [c if c.observed_signal is not None else None for c in data]
-        statscomps = [c for c in comps if c is not None]
-        n_comp_points = np.mean([len(c.diffs_signal.wlens) for c in statscomps])
-        data_start = min([min(c.dts) for c in statscomps])
-        data_end = max([max(c.dts) for c in statscomps])
-        warning_out_mpa_range = ""
-        if False in [not np.all(c.ampa_valid_range) for c in statscomps]:
-            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
-        sp_name = self.settings_manager.get_selected_spectrum_name()
-        spectrum_info = f" | Interp. spectrum: {sp_name}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
-        _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
-        subtitle = (
-            "{}\nData start: {} | Data end: {}\nMean number of points: {}".format(
-                subtitle,
-                data_start.strftime(_subtitle_date_format),
-                data_end.strftime(_subtitle_date_format),
-                n_comp_points,
-            )
-        )
-        canvas.redraw_canvas_compare_boxplot(
-            canv,
-            data,
-            wlcs,
-            [
-                ["Observed Irradiance", "Simulated Irradiance"],
-            ],
-            "All channels",
-            xlabel,
-            ylabel,
-            subtitle,
-            chosen_diffs,
-        )
-        try:
-            canv.print_figure(output_file)
-        except Exception as e:
-            eprint(
-                "Something went wrong while exporting comparison graph. {}".format(
-                    str(e)
-                )
-            )
-            sys.exit(1)
-        canv.clear()  # Clear the canvas.
-
-    def _export(self, point: Point, ed: ExportData):
-        if isinstance(ed, ExportCSV):
-            self._export_csvs(point, ed)
-        elif isinstance(ed, ExportNetCDF):
-            self._export_lglod(point, ed.output_file)
-        elif isinstance(ed, ExportGraph):
-            self._export_graph(point, ed)
 
     def calculate_geographic(
         self,
@@ -838,21 +578,58 @@ class CLI:
         lon: float,
         height: float,
         dt: Union[datetime, List[datetime]],
-        export_data: ExportData,
+        export_data: export.ExportData,
     ):
+        """Runs a simulation from a geographic location, ahnd
+        export the results as specified.
+
+        Parameters
+        ----------
+        lat : float
+            Latitude in degrees.
+        lon : float
+            Longitude in degrees.
+        height : float
+            Height above sea level in meters.
+        dt : datetime or List[datetime]
+            The timestamp(s) for the simulation.
+        export_data : export.ExportData
+            The export configuration.
+
+        Raises
+        ------
+        ExportError
+            If something wrong happens during export.
+        """
         point = SurfacePoint(lat, lon, height, dt)
         self._calculate_all(point)
-        self._export(point, export_data)
+        self.exporter.export(point, export_data, self.srf)
 
     def calculate_satellital(
         self,
         sat_name: str,
         dt: Union[datetime, List[datetime]],
-        export_data: ExportData,
+        export_data: export.ExportData,
     ):
+        """Runs a simulation from a satellite's perspective.
+
+        Parameters
+        ----------
+        sat_name : str
+            Name of the satellite.
+        dt : datetime or List[datetime]
+            The timestamp(s) for the simulation.
+        export_data : export.ExportData
+            The export configuration.
+
+        Raises
+        ------
+        ExportError
+            If something wrong happens during export.
+        """
         point = SatellitePoint(sat_name, dt)
         self._calculate_all(point)
-        self._export(point, export_data)
+        self.exporter.export(point, export_data, self.srf)
 
     def calculate_selenographic(
         self,
@@ -862,8 +639,32 @@ class CLI:
         selen_obs_lon: float,
         selen_sun_lon: float,
         moon_phase_angle: float,
-        export_data: ExportData,
+        export_data: export.ExportData,
     ):
+        """Runs a simulation from a selenographic (Moon-based) perspective.
+
+        Parameters
+        ----------
+        distance_sun_moon : float
+            Distance between the Sun and the Moon (meters).
+        distance_observer_moon : float
+            Distance between the observer and the Moon (meters).
+        selen_obs_lat : float
+            Observer's latitude on the Moon (degrees).
+        selen_obs_lon : float
+            Observer's longitude on the Moon (degrees).
+        selen_sun_lon : float
+            Sub-solar longitude on the Moon (degrees).
+        moon_phase_angle : float
+            Moon phase angle (degrees).
+        export_data : export.ExportData
+            The export configuration.
+
+        Raises
+        ------
+        ExportError
+            If something wrong happens during export.
+        """
         point = CustomPoint(
             distance_sun_moon,
             distance_observer_moon,
@@ -874,7 +675,7 @@ class CLI:
             moon_phase_angle,
         )
         self._calculate_all(point)
-        self._export(point, export_data)
+        self.exporter.export(point, export_data, self.srf)
 
     def _add_observation(self, obs: LunarObservation):
         for i, pob in enumerate(self.loaded_moons):
@@ -886,8 +687,22 @@ class CLI:
     def calculate_comparisons(
         self,
         input_files: List[str],
-        ed: ExportComparison,
+        ed: export.ExportComparison,
     ):
+        """Performs comparisons between simulation results and observational data.
+
+        Parameters
+        ----------
+        input_files : List[str]
+            List of file paths containing observational data.
+        ed : export.ExportComparison
+            The comparison export configuration.
+
+        Raises
+        ------
+        LimeException
+            If the observation data is not valid.
+        """
         self.loaded_moons: List[LunarObservation] = []
         for path in input_files:
             self._add_observation(
@@ -896,13 +711,15 @@ class CLI:
         if len(self.loaded_moons) == 0:
             raise LimeException("No observations given. Aborting.")
         mos = self.loaded_moons
-        if isinstance(ed, ExportComparisonCSV) or isinstance(ed, ExportComparisonGraph):
+        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+            ed, export.ExportComparisonGraph
+        ):
             ch_names_obs = {
                 ch_name for mo in mos for ch_name in list(mo.ch_irrs.keys())
             }
             if ed.comparison_key not in (
-                ComparisonKey.CHANNEL,
-                ComparisonKey.CHANNEL_MEAN,
+                export.ComparisonKey.CHANNEL,
+                export.ComparisonKey.CHANNEL_MEAN,
             ) and len(ch_names_obs) > len(ed.output_files):
                 raise LimeException(
                     "The amount of export files given is not enough. There are more channels."
@@ -924,7 +741,7 @@ class CLI:
         comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
         # EXPORT
         skip_uncs = self.settings_manager.is_skip_uncertainties()
-        if isinstance(ed, ExportNetCDF):
+        if isinstance(ed, export.ExportNetCDF):
             vers = self.settings_manager.get_lime_coef().version
             lglod = LGLODComparisonData(
                 comps,
@@ -941,29 +758,32 @@ class CLI:
                 self.kernels_path,
             )
         else:
-            if isinstance(ed, ExportComparisonCSVDir) or isinstance(
-                ed, ExportComparisonGraphDir
+            if isinstance(ed, export.ExportComparisonCSVDir) or isinstance(
+                ed, export.ExportComparisonGraphDir
             ):
                 if not os.path.exists(ed.output_dir):
                     os.makedirs(ed.output_dir)
             version = self.settings_manager.get_lime_coef().version
             ch_names = self.srf.get_channels_names()
             file_index = 0
-            is_both = ed.comparison_key == ComparisonKey.BOTH
+            is_both = ed.comparison_key == export.ComparisonKey.BOTH
             sp_name = self.settings_manager.get_selected_spectrum_name()
-            if ed.comparison_key in (ComparisonKey.DT, ComparisonKey.BOTH):
+            if ed.comparison_key in (
+                export.ComparisonKey.DT,
+                export.ComparisonKey.BOTH,
+            ):
                 for i, ch in enumerate(ch_names):
                     if len(comps[i].dts) > 0:
                         ylabel = "Irradiance (Wm⁻²nm⁻¹)"
                         ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
                         output = ""
-                        if isinstance(ed, ExportComparisonCSV) or isinstance(
-                            ed, ExportComparisonGraph
+                        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                            ed, export.ExportComparisonGraph
                         ):
                             output = ed.output_files[file_index]
-                        elif isinstance(ed, ExportComparisonCSVDir):
+                        elif isinstance(ed, export.ExportComparisonCSVDir):
                             output = "{}.csv".format(os.path.join(ed.output_dir, ch))
-                        elif isinstance(ed, ExportComparisonGraphDir):
+                        elif isinstance(ed, export.ExportComparisonGraphDir):
                             output = "{}.{}".format(
                                 os.path.join(ed.output_dir, ch), ed.extension
                             )
@@ -972,8 +792,8 @@ class CLI:
                                 raise LimeException(_ERROR_RINDEX_BOTH_DOT + output)
                             idx = output.rindex(".")
                             output = output[:idx] + ".dt" + output[idx:]
-                        if isinstance(ed, ExportComparisonCSV) or isinstance(
-                            ed, ExportComparisonCSVDir
+                        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                            ed, export.ExportComparisonCSVDir
                         ):
                             xlabel = "UTC Date"
                             csv.export_csv_comparison(
@@ -988,7 +808,7 @@ class CLI:
                             )
                         else:
                             xlabel = "UTC Date"
-                            self._export_comparison_graph(
+                            self.exporter.export_comparison_graph(
                                 comps[i],
                                 xlabel,
                                 ylabels,
@@ -999,20 +819,23 @@ class CLI:
                             )
                         file_index += 1
             file_index = 0
-            if ed.comparison_key in (ComparisonKey.MPA, ComparisonKey.BOTH):
+            if ed.comparison_key in (
+                export.ComparisonKey.MPA,
+                export.ComparisonKey.BOTH,
+            ):
                 mpa_comps = sort_by_mpa(comps)
                 for i, ch in enumerate(ch_names):
                     if len(mpa_comps[i].dts) > 0:
                         ylabel = "Irradiance (Wm⁻²nm⁻¹)"
                         ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
                         output = ""
-                        if isinstance(ed, ExportComparisonCSV) or isinstance(
-                            ed, ExportComparisonGraph
+                        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                            ed, export.ExportComparisonGraph
                         ):
                             output = ed.output_files[file_index]
-                        elif isinstance(ed, ExportComparisonCSVDir):
+                        elif isinstance(ed, export.ExportComparisonCSVDir):
                             output = "{}.csv".format(os.path.join(ed.output_dir, ch))
-                        elif isinstance(ed, ExportComparisonGraphDir):
+                        elif isinstance(ed, export.ExportComparisonGraphDir):
                             output = "{}.{}".format(
                                 os.path.join(ed.output_dir, ch), ed.extension
                             )
@@ -1021,8 +844,8 @@ class CLI:
                                 raise LimeException(_ERROR_RINDEX_BOTH_DOT + output)
                             idx = output.rindex(".")
                             output = output[:idx] + ".mpa" + output[idx:]
-                        if isinstance(ed, ExportComparisonCSV) or isinstance(
-                            ed, ExportComparisonCSVDir
+                        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                            ed, export.ExportComparisonCSVDir
                         ):
                             xlabel = "Moon Phase Angle (degrees)"
                             csv.export_csv_comparison(
@@ -1037,7 +860,7 @@ class CLI:
                             )
                         else:
                             xlabel = "Moon phase angle (degrees)"
-                            self._export_comparison_graph(
+                            self.exporter.export_comparison_graph(
                                 mpa_comps[i],
                                 xlabel,
                                 ylabel,
@@ -1047,7 +870,10 @@ class CLI:
                                 ed.chosen_diff,
                             )
                         file_index += 1
-            if ed.comparison_key in (ComparisonKey.CHANNEL, ComparisonKey.CHANNEL_MEAN):
+            if ed.comparison_key in (
+                export.ComparisonKey.CHANNEL,
+                export.ComparisonKey.CHANNEL_MEAN,
+            ):
                 wlcs = self.srf.get_channels_centers()
                 comps = [c if c.observed_signal is not None else None for c in comps]
                 wlcs = np.array([w for w, c in zip(wlcs, comps) if c is not None])
@@ -1056,19 +882,19 @@ class CLI:
                 ylabel = "Irradiance (Wm⁻²nm⁻¹)"
                 ylabels = [f"Observed {ylabel}", f"Simulated {ylabel}"]
                 output = ""
-                if isinstance(ed, ExportComparisonCSV) or isinstance(
-                    ed, ExportComparisonGraph
+                if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                    ed, export.ExportComparisonGraph
                 ):
                     output = ed.output_files[0]
-                elif isinstance(ed, ExportComparisonCSVDir):
+                elif isinstance(ed, export.ExportComparisonCSVDir):
                     output = "{}.csv".format(os.path.join(ed.output_dir, "allchannels"))
-                elif isinstance(ed, ExportComparisonGraphDir):
+                elif isinstance(ed, export.ExportComparisonGraphDir):
                     output = "{}.{}".format(
                         os.path.join(ed.output_dir, "allchannels"), ed.extension
                     )
-                    if ed.comparison_key == ComparisonKey.CHANNEL:
-                        if isinstance(ed, ExportComparisonCSV) or isinstance(
-                            ed, ExportComparisonCSVDir
+                    if ed.comparison_key == export.ComparisonKey.CHANNEL:
+                        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                            ed, export.ExportComparisonCSVDir
                         ):
                             csv.export_csv_comparison_bywlen(
                                 comps,
@@ -1082,7 +908,7 @@ class CLI:
                                 ed.chosen_diff,
                             )
                         else:
-                            self._export_comparison_bywlen_graph(
+                            self.exporter.export_comparison_bywlen_graph(
                                 comps,
                                 wlcs,
                                 xlabel,
@@ -1093,8 +919,8 @@ class CLI:
                             )
                     else:
                         comp = average_comparisons(wlcs, comps)
-                        if isinstance(ed, ExportComparisonCSV) or isinstance(
-                            ed, ExportComparisonCSVDir
+                        if isinstance(ed, export.ExportComparisonCSV) or isinstance(
+                            ed, export.ExportComparisonCSVDir
                         ):
                             csv.export_csv_comparison(
                                 comp,
@@ -1107,7 +933,7 @@ class CLI:
                                 ed.chosen_diff,
                             )
                         else:
-                            self._export_comparison_graph(
+                            self.exporter.export_comparison_graph(
                                 comp,
                                 xlabel,
                                 ylabel,
@@ -1118,6 +944,14 @@ class CLI:
                             )
 
     def update_coefficients(self) -> int:
+        """Checks for and downloads coefficient dataset updates.
+
+        Returns
+        -------
+        int
+            - `0` if the update is successful or no updates are available.
+            - `1` if an error occurs during the update process.
+        """
         updater: IUpdate = self.updater
         stopper_checker_true = lambda *_: True
         updates = False
@@ -1145,21 +979,21 @@ class CLI:
             self.settings_manager.reload_coeffs()
         return 0
 
-    def parse_interp_settings(self, arg: str) -> int:
+    def _parse_interp_settings(self, arg: str):
         # example: -i '{"interp_spectrum": "ASD", "skip_uncertainties": "False", "show_interp_spectrum": "False", "interp_srf": "interpolated_gaussian"}'
         try:
             interp_settings = json.loads(arg)
         except Exception as e:
-            eprint(f"Error parsing the interpolation settings {arg}. Error: {e}")
-            return 1
+            raise ParsingError(
+                f"Error parsing the interpolation settings {arg}. Error: {e}"
+            ) from e
         if "interp_spectrum" in interp_settings:
             interp_spectrum = interp_settings["interp_spectrum"]
             names = self.settings_manager.get_available_spectra_names()
             if interp_spectrum not in names:
-                eprint(
+                raise ParsingError(
                     f"Interpolation spectrum not recognized. Selected: {interp_spectrum}. Available: {names}."
                 )
-                return 1
             self.settings_manager.select_interp_spectrum(interp_spectrum)
         if "interp_srf" in interp_settings:
             interp_srf = interp_settings["interp_srf"]
@@ -1168,41 +1002,51 @@ class CLI:
             }
             names = list(srf_translator.keys())
             if interp_srf not in names:
-                eprint(
+                raise ParsingError(
                     f"Interpolation settings output SRF not recognized. Selected: {interp_srf}. Available: {names}."
                 )
-                return 1
             self.settings_manager.select_interp_SRF(srf_translator[interp_srf])
         if "show_interp_spectrum" in interp_settings:
             show_interp_spectrum = interp_settings["show_interp_spectrum"]
             if show_interp_spectrum not in ("True", "False"):
-                eprint(
+                raise ParsingError(
                     f'Interpolation settings show_interp_spectrum value {show_interp_spectrum} not valid. Must be "True" or "False"'
                 )
-                return 1
             show_interp_spectrum = show_interp_spectrum == "True"
             self.settings_manager.set_show_interp_spectrum(show_interp_spectrum)
         if "skip_uncertainties" in interp_settings:
             skip_uncertainties = interp_settings["skip_uncertainties"]
             if skip_uncertainties not in ("True", "False"):
-                eprint(
+                raise ParsingError(
                     f'Interpolation settings skip_uncertainties value {skip_uncertainties} not valid. Must be "True" or "False"'
                 )
-                return 1
             skip_uncertainties = skip_uncertainties == "True"
             self.settings_manager.set_skip_uncertainties(skip_uncertainties)
         if "show_cimel_points" in interp_settings:
             show_cimel_points = interp_settings["show_cimel_points"]
             if show_cimel_points not in ("True", "False"):
-                eprint(
+                raise ParsingError(
                     f'Interpolation settings show_cimel_points value {show_cimel_points} not valid. Must be "True" or "False"'
                 )
-                return 1
             show_cimel_points = show_cimel_points == "True"
             self.settings_manager.set_show_cimel_points(show_cimel_points)
-        return 0
 
     def check_sys_args(self, sysargs: List[str]) -> int:
+        """Validates system arguments to prevent syntax errors.
+
+        Ensures flags are correctly formatted and separated.
+
+        Parameters
+        ----------
+        sysargs : List[str]
+            The raw command-line arguments.
+
+        Returns
+        -------
+        int
+            - `0` if validation passes.
+            - `1` if errors are found.
+        """
         # Check if the user has forgotten one dash, or has set one dash but all together
         if any(
             item.startswith("-") and not item.startswith("--") and len(item) > 2
@@ -1223,168 +1067,89 @@ Run 'lime -h' for help."
             return 1
         return 0
 
+    def _parse_load_srf(self, arg):
+        srf_file = arg
+        if srf_file == "" or os.path.exists(srf_file):
+            try:
+                self.load_srf(srf_file)
+            except Exception as e:
+                raise CLIError(
+                    f"Error: Error loading Spectral Response Function. {str(e)}"
+                ) from e
+        else:
+            raise CLIError(f"Error: The given srf path '{srf_file}' does not exist.")
+
     def handle_input(self, opts: List[Tuple[str, str]], args: List[str]) -> int:
-        srf_file = ""
-        export_data: ExportData = None
+        """Processes command-line options and executes the corresponding actions.
+
+        This function parses command-line arguments, validates inputs, and
+        dispatches execution to the appropriate simulation, comparison,
+        or configuration functions.
+
+        It supports:
+        - Simulations of lunar irradiance, reflectance, and polarization
+        from different perspectives (Earth, Lunar, Satellite).
+        - Comparisons with observational data in GLOD format.
+        - Output in multiple formats (CSV, Graph, NetCDF).
+        - Updating coefficient datasets.
+        - Managing interpolation and spectral response function settings.
+
+        Parameters
+        ----------
+        opts : List[Tuple[str, str]]
+            A list of command-line options and their corresponding arguments.
+            Example: `[('-e', '10.5,20.3,100,2023-02-18T12:00:00')]`
+        args : List[str]
+            Additional arguments passed after the options, primarily used for
+            input file paths in comparisons.
+
+        Returns
+        -------
+        int
+            Exit status code:
+            - `0` for success.
+            - `1` for errors (invalid input, missing parameters, execution failures).
+        """
+        export_data: export.ExportData = None
         timeseries_file: str = None
         # Check if it's comparison
         is_comparison = any(item[0] in ("-c", "--comparison") for item in opts)
         mod_interp_settings = False
         # find settings data
-        for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                print_help()
-                return 0
-            if opt in ("-v", "--version"):
-                print_version()
-                return 0
-            if opt in ("-u", "--update"):
-                return self.update_coefficients()
-            if opt in ("-o", "--output"):  # Output
-                splitted = arg.split(",")
-                o_type = splitted[0]
-                if o_type == "csv":
-                    if not is_comparison:
-                        if len(splitted) != 5:
-                            eprint("Error: Wrong number of arguments for -o csv,...")
-                            return 1
-                        export_data = ExportCSV(
-                            splitted[1], splitted[2], splitted[3], splitted[4]
-                        )
-                    else:
-                        if len(splitted) < 4:
-                            eprint("Error: Wrong number of arguments for -o csv,...")
-                            return 1
-                        if splitted[1] not in COMP_KEYS:
-                            eprint("Error in csv DT|MPA|BOTH parameter.")
-                            return 1
-                        if splitted[2] not in COMP_DIFF_KEYS:
-                            eprint("Error in csv rel|perc parameter.")
-                            return 1
-                        comp_key = ComparisonKey[splitted[1]]
-                        chosen_diff = _get_chosen_diff_from_cli(splitted[2])
-                        export_data = ExportComparisonCSV(
-                            comp_key, splitted[3:], chosen_diff
-                        )
-                elif o_type == "graph":
-                    if not is_comparison:
-                        if len(splitted) != 5:
-                            eprint("Error: Wrong number of arguments for -o graph,...")
-                            return 1
-                        if splitted[1] not in IMAGE_EXTENSIONS:
-                            eprint(
-                                "Error: Graph format not detected. It must be one of the following: {}.".format(
-                                    ",".join(IMAGE_EXTENSIONS)
-                                )
-                            )
-                            return 1
-                        filepaths = list(
-                            map(lambda s: s + ".{}".format(splitted[1]), splitted[2:])
-                        )
-                        export_data = ExportGraph(*filepaths)
-                    else:
-                        if len(splitted) < 5:
-                            eprint("Error: Wrong number of arguments for -o graph,...")
-                            return 1
-                        if splitted[1] not in IMAGE_EXTENSIONS:
-                            eprint(
-                                "Error: Graph format not detected. It must be one of the following: {}.".format(
-                                    ",".join(IMAGE_EXTENSIONS)
-                                )
-                            )
-                            return 1
-                        if splitted[2] not in COMP_KEYS:
-                            eprint("Error in graph DT|MPA|BOTH parameter.")
-                            return 1
-                        if splitted[3] not in COMP_DIFF_KEYS:
-                            eprint("Error in graph rel|perc|none parameter.")
-                            return 1
-                        filepaths = list(
-                            map(lambda s: s + ".{}".format(splitted[1]), splitted[4:])
-                        )
-                        comp_key = ComparisonKey[splitted[2]]
-                        chosen_diff = _get_chosen_diff_from_cli(splitted[3])
-                        export_data = ExportComparisonGraph(
-                            comp_key,
-                            filepaths,
-                            chosen_diff,
-                        )
-                elif o_type == "nc":
-                    if len(splitted) != 2:
-                        eprint("Error: Wrong number of arguments for -o nc,...")
-                        return 1
-                    export_data = ExportNetCDF(splitted[1])
-                elif o_type == "csvd":
-                    if not is_comparison:
-                        eprint("Error: csvd output is only available for comparisons.")
-                        return 1
-                    if len(splitted) != 4:
-                        eprint("Error: Wrong number of arguments for -o csvd,...")
-                        return 1
-                    if splitted[1] not in COMP_KEYS:
-                        eprint("Error in csvd DT|MPA|BOTH parameter.")
-                        return 1
-                    if splitted[2] not in COMP_DIFF_KEYS:
-                        eprint("Error in csvd rel|perc parameter.")
-                        return 1
-                    comp_key = ComparisonKey[splitted[1]]
-                    chosen_diff = _get_chosen_diff_from_cli(splitted[2])
-                    export_data = ExportComparisonCSVDir(
-                        comp_key, splitted[3], chosen_diff
+        try:
+            for opt, arg in opts:
+                if opt in ("-h", "--help"):
+                    print_help()
+                    return 0
+                if opt in ("-v", "--version"):
+                    print_version()
+                    return 0
+                if opt in ("-u", "--update"):
+                    return self.update_coefficients()
+                if opt in ("-o", "--output"):  # Output
+                    export_data = _parse_output_params(arg, is_comparison)
+                elif opt in ("-f", "--srf"):
+                    self._parse_load_srf(arg)
+                elif opt in ("-t", "--timeseries"):
+                    timeseries = _parse_load_timeseries(arg, opts)
+                elif opt in ("-C", "--coefficients"):
+                    names = sorted(
+                        [
+                            coef.version
+                            for coef in self.settings_manager.get_available_coeffs()
+                        ]
                     )
-                elif o_type == "graphd":
-                    if not is_comparison:
-                        eprint(
-                            "Error: graphd output is only available for comparisons."
+                    if arg not in names:
+                        raise ParsingError(
+                            f"Coefficients version not recognized. Selected: {arg}. Available: {names}."
                         )
-                        return 1
-                    if len(splitted) != 5:
-                        eprint("Error: Wrong number of arguments for -o graphd,...")
-                        return 1
-                    if splitted[1] not in IMAGE_EXTENSIONS:
-                        eprint(
-                            "Error: Graph format not detected. It must be one of the following: {}.".format(
-                                ",".join(IMAGE_EXTENSIONS)
-                            )
-                        )
-                        return 1
-                    if splitted[2] not in COMP_KEYS:
-                        eprint("Error in graphd DT|MPA|BOTH parameter.")
-                        return 1
-                    if splitted[3] not in COMP_DIFF_KEYS:
-                        eprint("Error in graphd rel|perc parameter.")
-                        return 1
-                    comp_key = ComparisonKey[splitted[2]]
-                    chosen_diff = _get_chosen_diff_from_cli(splitted[3])
-                    export_data = ExportComparisonGraphDir(
-                        splitted[1],
-                        comp_key,
-                        splitted[4],
-                        chosen_diff,
-                    )
-            elif opt in ("-f", "--srf"):
-                srf_file = arg
-            elif opt in ("-t", "--timeseries"):
-                timeseries_file = arg
-            elif opt in ("-C", "--coefficients"):
-                names = sorted(
-                    [
-                        coef.version
-                        for coef in self.settings_manager.get_available_coeffs()
-                    ]
-                )
-                if arg not in names:
-                    eprint(
-                        f"Coefficients version not recognized. Selected: {arg}. Available: {names}."
-                    )
-                    return 1
-                self.settings_manager.select_lime_coeff(names.index(arg))
-            elif opt in ("-i", "--interpolation-settings"):
-                ret = self.parse_interp_settings(arg)
-                if ret != 0:
-                    return ret
-                mod_interp_settings = True
-
+                    self.settings_manager.select_lime_coeff(names.index(arg))
+                elif opt in ("-i", "--interpolation-settings"):
+                    self._parse_interp_settings(arg)
+                    mod_interp_settings = True
+        except CLIError as e:
+            eprint(str(e))
+            return 1
         # Simulation input
         sim_opts = (
             "-e",
@@ -1400,18 +1165,6 @@ Run 'lime -h' for help."
         if mod_interp_settings and num_sim_ops == 0:
             return 0
 
-        if srf_file == "" or os.path.exists(srf_file):
-            try:
-                self.load_srf(srf_file)
-            except Exception as e:
-                eprint(
-                    "Error: Error loading Spectral Response Function. {}".format(str(e))
-                )
-                return 1
-        else:
-            eprint("Error: The given srf path does not exist.")
-            return 1
-
         if export_data == None:
             eprint("Error: The output flag (-o | --output) must be included.")
             return 1
@@ -1425,19 +1178,6 @@ Run 'lime -h' for help."
             )
             print_help()
             return 1
-        timeseries = None
-        if timeseries_file != None and any(
-            item[0] in ("-e", "--earth", "-s", "--satellite") for item in opts
-        ):
-            if os.path.exists(timeseries_file):
-                try:
-                    timeseries = csv.read_datetimes(timeseries_file)
-                except Exception as e:
-                    eprint("Error reading timeseries file: {}".format(str(e)))
-                    return 1
-            else:
-                eprint("Error: Timeseries file does not exist.")
-                return 1
         try:
             for opt, arg in opts:
                 if opt in ("-e", "--earth"):  # Earth
@@ -1490,8 +1230,11 @@ Run 'lime -h' for help."
                         input_files += glob.glob(param)
                     self.calculate_comparisons(input_files, export_data)
                     break
+        except export.ExportError as e:
+            eprint(str(e))
+            return 1
         except LimeException as e:
-            eprint("Error: {}".format(str(e)))
+            eprint(f"Error: {str(e)}")
             return 1
         except Exception as e:
             trace = traceback.format_exc()

@@ -8,6 +8,7 @@ in various formats.
 Modules
 -------
 - `cli.py` : Handles command-line argument parsing and execution.
+- `export.py` : Handles the exporting of the obtained results.
 
 Main Features
 -------------
