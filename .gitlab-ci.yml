@@ -106,7 +106,6 @@ doc-coverage:
     - ls -l
     - export PYTHONPATH="$PYTHONPATH:."
     - python -c "import sys;print(sys.path)"
-    - pip install tox
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
     - tox
@@ -181,7 +180,7 @@ pages:
   stage: Readthedocs Documentation
   needs: []
   script:
-    - pip install myst_parser
+    - pip install .[docs]
     - sphinx-build docs public -b html
   artifacts:
     paths:

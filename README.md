@@ -277,7 +277,7 @@ The Mac automatic deployment is not available yet.
 Follow these steps to manually create a production-ready build for your machine:
 
 ##### Requirements:
-- Python 3.8 (Linux) or Python 3.9 (Mac and Windows).
+- Python 3.9.
 - `pyinstaller` installed outside of the virtual environment.
 
 <details>
