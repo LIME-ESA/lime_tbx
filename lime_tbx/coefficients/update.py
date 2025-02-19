@@ -67,7 +67,7 @@ class Update:
         """
         urlpath = self.url
         text = requests.get(urlpath, timeout=timeout).text
-        text = re.sub("<\!\-\-(.|\n)*\-\-\>", "", text)  # remove comments
+        text = re.sub(r"<\!\-\-(.|\n)*\-\-\>", "", text)  # remove comments
         version_files = text.split()
         version_files = [
             tuple(line.split(","))
@@ -99,7 +99,7 @@ class Update:
         Returns
         -------
         quant_news: int
-            Amount of new coefficients downloaded.
+            Amount of new coefficients downloaded, included the failed ones.
         quant_fails: int
             Amount of coefficients that couldn't be downloaded or updated correctly.
         """
