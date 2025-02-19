@@ -1,7 +1,7 @@
 """Tests for spectral_interpolation module"""
 
 """___Built-In Modules___"""
-# import here
+import warnings
 
 """___Third-Party Modules___"""
 import unittest
@@ -51,8 +51,8 @@ MD2 = MoonData(
 
 CIMEL_WAV = np.array([440, 500, 675, 870, 1020, 1640])
 CIMEL_DATA = np.array([0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-ASD_WAV = np.array([v for v in range(300, 1000)])
-ASD_DATA = np.array([1 for v in range(300, 1000)])
+ASD_WAV = np.array([v for v in range(300, 1700)])
+ASD_DATA = np.array([1 for _ in range(300, 1700)])
 U_CIMEL = np.array([0.1 * v for v in CIMEL_DATA])
 U_ASD = np.array([0.1 * v for v in ASD_DATA])
 
@@ -66,6 +66,12 @@ class TestSpectralInterpolation(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
         idata.set_interpolation_spectrum_name("ASD")
+        warnings.filterwarnings(
+            "ignore",
+            "Duplicate dimension names present: dimensions {",
+            UserWarning,
+            "xarray",
+        )
 
     def test_get_asd_references_ok(self):
         ip = get_interpolator()

@@ -211,10 +211,6 @@ class SpectralInterpolation(ISpectralInterpolation):
             method="linear",
             method_hr="linear",
         )
-        # from scipy import interpolate
-        # f = interpolate.interp1d(cimel_wav, cimel_refl, fill_value="extrapolate")
-        # yy = f(final_wav)
-        # return yy
 
     def get_interpolated_refl_unc(
         self,
