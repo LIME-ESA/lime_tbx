@@ -189,7 +189,7 @@ def calculate_eli_from_elref_unc(
         [elref_spectrum.uncertainties, u_esk],
         corr_x=[
             elref_spectrum.err_corr,
-            "syst",
+            "rand",  # TODO: It was formerly "syst", check if this change is valid
         ],
         return_corr=True,
         Jx=Jx,

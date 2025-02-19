@@ -17,6 +17,8 @@ DEBUG_INTERMEDIATE_RESULTS_PATH = "LIMETBX_INTERMEDIATE_PATH"
 
 
 class CompFields:
+    """Enumeration of the values of all the different comparison string fields"""
+
     COMP_MPA = "Moon Phase Angle"
     COMP_DATE = "Date"
     COMP_WLEN = "Wavelength (Box Plot)"

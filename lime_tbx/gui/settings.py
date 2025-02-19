@@ -17,7 +17,7 @@ from lime_tbx.datatypes.datatypes import (
     ReflectanceCoefficients,
 )
 from lime_tbx.datatypes import constants
-from lime_tbx.coefficients.access_data import access_data
+from lime_tbx.coefficients import access_data
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.spectral_integration.spectral_integration import get_default_srf
 

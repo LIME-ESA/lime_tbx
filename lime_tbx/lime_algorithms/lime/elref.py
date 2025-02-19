@@ -179,7 +179,6 @@ def calculate_elref_unc(
     gd_value = moon_data.absolute_mpa_degrees
 
     prop = punpy.MCPropagation(100, 1, MCdimlast=True)
-
     unc, corr = prop.propagate_random(
         _measurement_func_elref,
         [

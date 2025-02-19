@@ -24,8 +24,8 @@ from ....datatypes.datatypes import (
     SpectralData,
     EocfiPath,
 )
-from ....coefficients.access_data.access_data import _get_demo_cimel_coeffs
 from ...lime_simulation import LimeSimulation, ILimeSimulation
+from ...tests.test_lime_simulation import _get_demo_cimel_coeffs
 from lime_tbx.interpolation.interp_data import interp_data
 from lime_tbx.gui.settings import SettingsManager
 

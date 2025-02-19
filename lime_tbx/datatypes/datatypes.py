@@ -1076,7 +1076,7 @@ class InterpolationSettings:
     show_interp_spectrum: bool
         Flag that indicates if the interpolation spectrum used is going to be shown in graphs.
     skip_uncertainties: bool
-        Flag that indicates if the uncertainties calculation should be skipped.l:
+        Flag that indicates if the uncertainties calculation should be skipped.
     use_wehrli: bool
         Boolean indicating if the Wehrli spectrum will be used for calculating ESI or not.
     """

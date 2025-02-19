@@ -57,7 +57,7 @@ from lime_tbx.local_storage.programdata import (
 )
 from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
 from lime_tbx.datatypes import logger
-from lime_tbx.coefficients.access_data import access_data
+from lime_tbx.coefficients import access_data
 
 
 def main():

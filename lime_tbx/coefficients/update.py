@@ -5,7 +5,7 @@ import re
 import requests
 from typing import Callable, Tuple
 
-from lime_tbx.coefficients.access_data import access_data
+from lime_tbx.coefficients import access_data
 from lime_tbx.local_storage import programdata
 from lime_tbx.filedata import coefficients
 from lime_tbx.datatypes import logger
