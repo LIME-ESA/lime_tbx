@@ -694,11 +694,11 @@ class SpectralData:
         self.uncertainties = uncertainties
         self.err_corr = None
         if hasattr(ds, "err_corr_reflectance_wavelength"):
-            self.err_corr = ds.err_corr_reflectance_wavelength.values.astype(np.float32)
+            self.err_corr = ds.err_corr_reflectance_wavelength.values.astype(np.float64)
         elif hasattr(ds, "err_corr_polarisation"):
-            self.err_corr = ds.err_corr_polarisation.values.astype(np.float32)
+            self.err_corr = ds.err_corr_polarisation.values.astype(np.float64)
         elif hasattr(ds, "err_corr_irradiance"):
-            self.err_corr = ds.err_corr_irradiance.values.astype(np.float32)
+            self.err_corr = ds.err_corr_irradiance.values.astype(np.float64)
 
     def clear_err_corr(self):
         """Dereference the error correlation matrix from the object."""

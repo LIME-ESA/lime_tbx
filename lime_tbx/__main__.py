@@ -86,18 +86,18 @@ def main():
     logger.get_logger().info("ToolBox started")
     warnings.filterwarnings("ignore", ".*Gtk-WARNING.*")
     warnings.filterwarnings("ignore", ".*Fontconfig warning.*")
-    warnings.filterwarnings(
-        "ignore",
-        ".*One of the provided covariance matrix is not positive.*",
-        UserWarning,
-    )
-    # TODO remove this warning filter: It shouldn't happen, if it happens print warning
+    # TODO remove the following warning filters. It shouldn't happen, if it happens print warning
     # so it'll be fixed.
-    warnings.filterwarnings(
-        "ignore",
-        ".*One of the correlation matrices is not positive.*",
-        UserWarning,
-    )
+    # warnings.filterwarnings(
+    #    "ignore",
+    #    ".*One of the provided covariance matrix is not positive.*",
+    #    UserWarning,
+    # )
+    # warnings.filterwarnings(
+    #    "ignore",
+    #    ".*One of the correlation matrices is not positive.*",
+    #    UserWarning,
+    # )
     warnings.filterwarnings(
         "ignore",
         ".*elementwise comparison failed; returning scalar instead.*",
