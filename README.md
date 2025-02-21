@@ -1,6 +1,4 @@
-# LIME Toolbox
-
-[![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-informational?style=for-the-badge)](https://gitlab.npl.co.uk/eco/eo/lime_tbx/-/tags)
+[![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-informational?style=for-the-badge)](https://github.com/LIME-ESA/lime_tbx/tags)
 [![License: LGPL 3.0][license-shield]][license-url]
 [![Issues][issues-shield]][issues-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -73,18 +71,26 @@
     </a>
 </div>
 
-The *lime_tbx* is a Python package that provides a comprehensive toolbox
+The `lime_tbx` is a Python package that provides a comprehensive toolbox
 for utilizing the Lunar Irradiance Model of ESA (LIME) to simulate lunar
 observations and compare them with remote sensing data of the Moon.
 
 LIME is the Lunar Irradiance Model of the European Space Agency (ESA),
 which aims to determine an improved lunar irradiance model with sub-2%
 radiometric uncertainty.
-
-This project is managed, financed and supported by the European Space
-Agency (ESA).
   
 More information about LIME can be found on [lime.uva.es](https://lime.uva.es).
+
+### Collaborators
+
+This project is managed, financed and supported by the European Space
+Agency ([ESA](https://esa.int)).
+
+The project is a collaboration between multiple institutions, including:
+- [NPL](https://npl.co.uk) (National Physics Laboratory, United Kingdom)
+- [UVa](https://uva.es) (Universidad de Valladolid, Spain)
+- [VITO](https://vito.be) (Vlaamse Instelling voor Technologisch Onderzoek, Belgium)
+
 
 ### Built with
 
@@ -97,8 +103,9 @@ More information about LIME can be found on [lime.uva.es](https://lime.uva.es).
 ## Getting started
 
 The LIME Toolbox is designed as an standalone desktop application that one
-can directly install without the need of installing Python or any other kind
-of software used in its development.
+can directly install without the need of installing Python or any other
+software used in its development. Nevertheless, it can be installed as a
+Python package.
 
 ### Prerequisites
 
@@ -121,7 +128,7 @@ pip install -e .
 This project uses Qt for GUI development, and it relies on `qtpy` to manage
 compatibility between different Qt bindings (`PySide2` and `PySide6`).
 However, since qtpy does not include a Qt binding by default, you must specify which one to install.
-- Install with PySide6 (Recommended for Newer Projects)
+- Install with PySide6 (Recommended)
   ```sh
   pip install -e ".[pyside6]"
   ```
@@ -150,6 +157,10 @@ Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/D
     - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR107-A**)
     - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR107-B**)
 - [ ] Improve the speed of uncertainties calculation. (**NFR306**)
+    - [x] Ensure LIME TBX initial error correlation matrices are positive-definite, avoiding the overhead
+      of computing the closest positive-definite matrix.
+    - [ ] Investigate if there's any other feasible and valid optimization method,
+      like using `float32` error correlation matrices.
 - [ ] Fully migrate project to GitHub (issues, CI pipeline, etc.)
 - [ ] Allow users to simulate series of lunar observations, where not only the time varies. (**FR107**)
 
@@ -159,7 +170,7 @@ See the [open issues](https://github.com/LIME-ESA/lime_tbx/issues) for a full li
 
 ## Development Guide
 
-If you wish to contribute to the **lime_tbx** project, please check the [Contributing Guide](./CONTRIBUTING.md).
+If you wish to contribute to the **lime_tbx** project, please check the <a href="./CONTRIBUTING.md">Contributing Guide</a>.
 
 
 ### 1. Setting Up the Environment
@@ -167,20 +178,20 @@ If you wish to contribute to the **lime_tbx** project, please check the [Contrib
 To prepare your development environment, follow these steps:
 
 1. **Install Pre-commit Hooks**  
-Install the pre-commit hooks to automatically check code styling:
-```sh
-pre-commit install  
-```
+    Install the pre-commit hooks to automatically check code styling:
+    ```sh
+    pre-commit install  
+    ```
 
-- When you commit changes, `black` will check your code for styling errors.
-- If errors are found, they will be corrected, and the commit will be aborted to allow you to review the changes.
-- If you're satisfied, reattempt the commit.
+    - When you commit changes, `black` will check your code for styling errors.
+    - If errors are found, they will be corrected, and the commit will be aborted to allow you to review the changes.
+    - If you're satisfied, reattempt the commit.
 
 2. **Install Python Dependencies**  
-Install the python package dependencies, preferably in a python virtual enironment:
-```sh
-pip install -r requirements.txt  
-```
+    Install the python package dependencies, preferably in a python virtual enironment:
+    ```sh
+    pip install -r requirements.txt  
+    ```
 
 ---
 
@@ -205,16 +216,16 @@ components of the python package.
 Run the following commands to ensure the code works as expected:
 
 1. **Unit Tests**  
-To perform unit tests:
-```sh
-python3 -m unittest  
-```
+    To perform unit tests:
+    ```sh
+    python3 -m unittest  
+    ```
 
 2. **Coverage Tests**  
-To generate a coverage report:
-```sh
-./coverage_run.sh  
-```
+    To generate a coverage report:
+    ```sh
+    ./coverage_run.sh  
+    ```
 
 ---
 
@@ -241,32 +252,33 @@ and then to run it each time one wants to deploy the app.
 
 ##### Linux
 
-To build the image:
-```sh
-cd deployment
-docker build .. -t lime_compiler -f Linux.Dockerfile
-```
+1. First, build the image:
+    ```sh
+    cd deployment
+    docker build .. -t lime_compiler -f Linux.Dockerfile
+    ```
 
-To run the container and deploy the app:
-```sh
-docker run -v $(dirname $(pwd)):/usr/src/app/repo lime_compiler
-```
+2. Run the container and deploy the app:
+    ```sh
+    docker run -v $(dirname $(pwd)):/usr/src/app/repo lime_compiler
+    ```
 
 ##### Windows
 
-Windows automatic deployment doesn't perform the EOCFI C code compilation step.
-If one wishes to perform this step, please refer to the manual deployment section, step 1.
+Windows automatic deployment doesn't perform the EO-CFI C code compilation step.
+If one wishes to perform this step, which is only needed if EO-CFI libraries have
+been updated, please refer to the manual deployment section, step 1.
 
-To build the image:
-```sh
-docker build . -t lime_compiler -f Windows.Dockerfile
-```
+1. Build the image:
+    ```sh
+    docker build . -t lime_compiler -f Windows.Dockerfile
+    ```
 
-To run the container and deploy the app:
-```sh
-for %F in ("%cd%") do set dirname=%~dpF
-docker run -v %dirname%:C:\repo lime_compiler
-```
+2. Run the container and deploy the app:
+    ```sh
+    for %F in ("%cd%") do set dirname=%~dpF
+    docker run -v %dirname%:C:\repo lime_compiler
+    ```
 
 ##### Mac
 
@@ -285,50 +297,50 @@ Follow these steps to manually create a production-ready build for your machine:
 
 1. **Compile C code for EOCFI**
 
-This step compiles the EOCFI C code and generates a binary that will be called
-from the toolbox. This isn't necessary unless the C source code has been modified
-or the former binary doesn't work for one's system.
+    This step compiles the EOCFI C code and generates a binary that will be called
+    from the toolbox. This isn't necessary unless the C source code has been modified
+    or the former binary doesn't work for one's system.
 
-In Linux or Mac:
-```sh
-cd lime_tbx\eocfi_adapter\eocfi_c
-cp MakefileLinux Makefile # Linux
-cp MakefileDarwin Makefile # Mac
-make
-```
+    In Linux or Mac:
+    ```sh
+    cd lime_tbx\eocfi_adapter\eocfi_c
+    cp MakefileLinux Makefile # Linux
+    cp MakefileDarwin Makefile # Mac
+    make
+    ```
 
-In Windows:
-```dos
-cd lime_tbx\eocfi_adapter\eocfi_c
-copy make.mak Makefile
-nmake
-```
+    In Windows:
+    ```dos
+    cd lime_tbx\eocfi_adapter\eocfi_c
+    copy make.mak Makefile
+    nmake
+    ```
 
 2. **Create a Virtual Environment**  
-It's strongly recommended to use a virtual environment (venv) to minimize application size:
+    It's strongly recommended to use a virtual environment (venv) to minimize application size:
 
-```sh
-python -m venv .venv
-source .venv/bin/activate  # For Linux/Mac
-.venv\Scripts\activate     # For Windows
-pip install -r requirements.txt
-pip install PySide6~=6.8   # Unless installing in an old OS, which would need PySide2
-```
+    ```sh
+    python -m venv .venv
+    source .venv/bin/activate  # For Linux/Mac
+    .venv\Scripts\activate     # For Windows
+    pip install -r requirements.txt
+    pip install PySide6~=6.8   # Unless installing in an old OS, which would need PySide2
+    ```
 
 3. **Build the App Bundle**  
-Use `pyinstaller` to create a desktop app-bundle for your OS:
-```sh
-pyinstaller lime_tbx.spec  
-```
+    Use `pyinstaller` to create a desktop app-bundle for your OS:
+    ```sh
+    pyinstaller lime_tbx.spec  
+    ```
 
-Deactivate the virtual environment when the build is complete.
+    Deactivate the virtual environment when the build is complete.
 
 4. **Create an Installer**  
-Use the appropriate method for your operating system:
-- **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
-- **Mac**: Execute `build_mac_installer.sh`.
-- **Linux**: Execute `build_linux_installer.sh`.
-- **Debian**: Execute `build_deb.sh` after creating the Linux installer.
+    Use the appropriate method for your operating system:
+    - **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
+    - **Mac**: Execute `build_mac_installer.sh`.
+    - **Linux**: Execute `build_linux_installer.sh`.
+    - **Debian**: Execute `build_deb.sh` after creating the Linux installer.
 
 </details>
 

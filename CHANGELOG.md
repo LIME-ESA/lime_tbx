@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-[//]: # "## [unreleased] - yyyy-mm-dd"
+[//]: # "## [1.1.0] - yyyy-mm-dd"
 
-## [1.1.0] - yyyy-mm-dd
+## [unreleased] - yyyy-mm-dd
 
 ### Added
 
@@ -34,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Removed conversion of error correlation matrices to `np.float32`, keeping them as `np.float64`.
+This ensures they are positive-definite, eliminating the overhead of computing the closest
+positive-definite matrix, achieving a 2.5× speedup in uncertainty calculations compared to v1.0.3. (**NFR306**)
 - Fixed minor bugs
 
 ## [1.0.3] - 2024-01-25
@@ -41,6 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial version that serves as the baseline for tracking changes in the change log.
 
 
-[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.0.3...v1.1.0
+[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.0.3...HEAD
+[//]: # "[1.1.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.0.3...v1.1.0"
 [1.0.3]: https://github.com/LIME-ESA/lime_tbx/releases/tag/v1.0.3
