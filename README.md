@@ -36,6 +36,7 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#collaborators">Collaborators</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -51,10 +52,11 @@
     <li>
       <a href="#development-guide">Development Guide</a>
       <ul>
-        <li><a href="#1-setting-up-the-environment">1. Setting Up the Environment</a></li>
-        <li><a href="#2-project-structure">2. Project Structure</a></li>
-        <li><a href="#3-testing">3. Testing</a></li>
-        <li><a href="#4-deployment">4. Deployment</a></li>
+        <li><a href="#versioning">Versioning</a></li>
+        <li><a href="#setting-up-the-environment">Setting Up the Environment</a></li>
+        <li><a href="#project-structure">Project Structure</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#deployment">Deployment</a></li>
       </ul>
     </li>
     <li><a href="#license">License</a></li>
@@ -80,6 +82,8 @@ which aims to determine an improved lunar irradiance model with sub-2%
 radiometric uncertainty.
   
 More information about LIME can be found on [lime.uva.es](https://lime.uva.es).
+
+### 
 
 ### Collaborators
 
@@ -164,18 +168,21 @@ Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/D
 
 See the [open issues](https://github.com/LIME-ESA/lime_tbx/issues) for a full list of proposed features (and known issues).
 
+If you wish to contribute to the `lime_tbx` project, please check the <a href="./CONTRIBUTING.md">Contributing Guide</a>.
 
 ## Development Guide
 
-If you wish to contribute to the **lime_tbx** project, please check the <a href="./CONTRIBUTING.md">Contributing Guide</a>.
+### Versioning
 
+Version changes and descriptions are stored in the <a href="./CHANGELOG.md">CHANGELOG</a>.
+This file is updated each time a new version is released.
 
-### 1. Setting Up the Environment
+### Setting Up the Environment
 
-To prepare your development environment, follow these steps:
+To prepare your environment for development, testing or deployment, follow these steps:
 
-1. **Install Pre-commit Hooks**  
-    Install the pre-commit hooks to automatically check code styling:
+1. **Install Pre-commit Hooks**
+    Install the `pre-commit` hooks to automatically check code styling:
     ```sh
     pre-commit install  
     ```
@@ -184,17 +191,26 @@ To prepare your development environment, follow these steps:
     - If errors are found, they will be corrected, and the commit will be aborted to allow you to review the changes.
     - If you're satisfied, reattempt the commit.
 
-2. **Install Python Dependencies**  
-    Install the python package dependencies, preferably in a python virtual enironment:
-    ```sh
-    pip install -r requirements.txt  
-    ```
+2. **Install Python Dependencies**
+    1. **Install requirements.txt**
 
----
+        Install the python package dependencies listed in the `requirements.txt` file, preferably in a python virtual enironment:
+        ```sh
+        pip install -r requirements.txt  
+        ```
 
-### 2. Project Structure
+    2. **Install a Qt binding**
+        
+        As previously explained, this project relies on `qtpy` to manage compatibility between different Qt
+        bindings. Since qtpy does not include a Qt binding by default, you must install your preferred `QT`
+        binding package manually. For example, `PySide6`:
+        ```sh
+        pip install PySide6
+        ```
 
-The structure of the **lime_tbx** Python package is visualized in the simplified composite structure diagram:
+### Project Structure
+
+The structure of the `lime_tbx` Python package is visualized in the simplified composite structure diagram:
 
 <div align="center">
 <a href="./quality_documentation/uml/composite_simple.png">
@@ -206,9 +222,8 @@ alt="UML diagram of the simplified composite structure of lime_tbx" width="1000p
 Refer to `quality_documentation/uml/composite_structure.png` for details about the organization of the
 components of the python package.
 
----
 
-### 3. Testing
+### Testing
 
 Run the following commands to ensure the code works as expected:
 
@@ -224,10 +239,7 @@ Run the following commands to ensure the code works as expected:
     ./coverage_run.sh  
     ```
 
----
-
-### 4. Deployment
-
+### Deployment
 
 Deployed with:
 
@@ -235,9 +247,9 @@ Deployed with:
 * [![PyInstaller][pyinstaller-badge]](https://pyinstaller.org/)
 * [![InnoSetup][innosetup-badge]](https://jrsoftware.org/isinfo.php)
 
-The desktop app can be deployed automatically or manually.
+The desktop app can be built and packaged automatically or manually.
 The first step of the deployment process is compiling the C code
-that accesses the EOCFI library. This step is not automated for some
+that accesses the EO-CFI library. This step is not automated for some
 platforms like Windows. After that, one has to build the app bundle
 and create the installer, which is can be completely automated through Docker.
 
@@ -333,17 +345,13 @@ Follow these steps to manually create a production-ready build for your machine:
     Deactivate the virtual environment when the build is complete.
 
 4. **Create an Installer**  
-    Use the appropriate method for your operating system:
+    Go to the `installer` directory and use the appropriate method for your operating system:
     - **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
     - **Mac**: Execute `build_mac_installer.sh`.
     - **Linux**: Execute `build_linux_installer.sh`.
     - **Debian**: Execute `build_deb.sh` after creating the Linux installer.
 
 </details>
-
-#### Additional Information:
-For more details on recommended environments for building TBX binaries, check the `installer` directory.
-
 
 ## License
 
