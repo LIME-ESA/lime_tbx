@@ -42,7 +42,10 @@ objectives, akin to a feature checklist. In contrast, non-functional requirement
 addressing elements such as performance, security, and user experience. Essentially, functional requirements
 answer "what must be done" whereas non-functional requirements define "how it should be done".
 
-### Simulations
+Take into account that the requirements listed in this documentation may not fully align with
+those in any previous official LIME documentation, as they are subject to changes and additions.
+
+### 1. Simulations
 
 #### Functional Requirements (FR)
 
@@ -72,7 +75,7 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **NFR109**: The ESA satellites available for selection must include METOP first generation: METOP-A, METOP-B and METOP-C.
 - **NFR110**: The simulation input for series of lunar observations (FR107) must be done via an input file.
 
-### Comparisons
+### 2. Comparisons
 
 #### Functional Requirements (FR)
 - **FR201**: Allow performing comparisons of lunar observations from a remote sensing instrument to the LIME model output.
@@ -93,7 +96,7 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **NFR208**: Switching between comparison graphs should be fast, there shouldn’t be a loading time of longer than 2
   seconds when switching and drawing them after the comparison shouldn’t take more than 20 seconds.
 
-### Output
+### 3. Output
 
 #### Functional Requirements (FR)
 - **FR301**: The LIME TBX shall output simulated lunar disk irradiance or reflectance.
@@ -111,7 +114,7 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **NFR305**: Geometry information (coordinates, angles, etc.) and timestamps must be included in NetCDF and CSV output files.
 - **NFR306**: Calculation of uncertainties (**FR303**, **FR304**) must be performed as fast as possible. 
 
-### System
+### 4. System
 
 #### Functional Requirements (FR)
 - **FR401**: The LIME TBX must be able to perform automatic updates of the LIME coefficients.

@@ -83,8 +83,6 @@ radiometric uncertainty.
   
 More information about LIME can be found on [lime.uva.es](https://lime.uva.es).
 
-### 
-
 ### Collaborators
 
 This project is managed, financed and supported by the European Space

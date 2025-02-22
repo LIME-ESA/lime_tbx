@@ -1,5 +1,5 @@
 Welcome to lime_tbx's documentation!
-=========================================================
+========================================
 
 .. toctree::
    :maxdepth: 3
@@ -20,6 +20,7 @@ Welcome to lime_tbx's documentation!
    :caption: Technical Details:
 
    content/analysis
+   content/design
 
 .. toctree::
    :maxdepth: 3
