@@ -20,8 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve speed of switching between comparison graphs. (**NFR207**)
 - Geometry information (coordinates, angles, etc.) and timestamps (if available) are now included in all NetCDF and CSV output files. (**NFR305**)
 - The TBX accepts coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band. (**NFR107-A**)
-- Automatic deployment for Linux through Docker.
-- Partial automatic deployment for Windows through Docker. All except first step (compiling EOCFI C Code).
+- Automated Build & Packaging (**NFR409**):
+  - Linux: Fully automated build through Docker.
+  - Windows: Partially automated build through Docker for Windows. All automated except first step:
+    compiling EOCFI C Code, which isn't mandatory for each build.
 - Timeseries input file now also accepts regular format timestamps, not only CSV.
 - Added METOP-A, METOP-B and METOP-C data (TLE/3LE). METOP-B and METOP-C will need to be periodically updated.
 - Updated TLE/3LE data for PLEIADES 1A, PLEIADES 1B and PROBA-V, now covering the period from their launch until 2024-12-06.

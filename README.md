@@ -149,10 +149,6 @@ Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/D
 
 ## Roadmap
 
-- [ ] Toolbox compilation through Docker
-    - [x] Linux
-    - [ ] Windows
-    - [ ] Mac
 - [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR107**)
     - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR107-A**)
     - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR107-B**)
@@ -162,6 +158,7 @@ Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/D
     - [ ] Investigate if there's any other feasible and valid optimization method,
       like using `float32` error correlation matrices.
 - [ ] Fully migrate project to GitHub (issues, CI pipeline, etc.)
+- [ ] Automate Mac Build & Packaging Process through Github actions (**NFR409**)
 - [ ] Allow users to simulate series of lunar observations, where not only the time varies. (**FR107**)
 
 
