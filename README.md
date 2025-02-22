@@ -153,9 +153,9 @@ Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/D
 
 ## Roadmap
 
-- [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR107**)
-    - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR107-A**)
-    - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR107-B**)
+- [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR108**)
+    - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR108-A**)
+    - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR108-B**)
 - [ ] Improve the speed of uncertainties calculation. (**NFR306**)
     - [x] Ensure LIME TBX initial error correlation matrices are positive-definite, avoiding the overhead
       of computing the closest positive-definite matrix.

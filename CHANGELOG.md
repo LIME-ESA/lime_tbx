@@ -12,14 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - GUI more user friendly: Simulation input takes less window space.
-- The ESA satellites available for selection now include METOP first generation: METOP-A, METOP-B and METOP-C. (**NFR108**)
-- Allow adding satellites through 3LE/TLE or OSF files through the GUI. (To fully comply with **NFR108**)
+- The ESA satellites available for selection now include METOP first generation: METOP-A, METOP-B and METOP-C. (**NFR109**)
+- Allow adding satellites through 3LE/TLE or OSF files through the GUI. (To fully comply with **NFR109**)
 - Allow to visualize the comparison for all spectral channels simultaneously. (**FR203**) This is done through two new comparison options:
   - By wavelength (mean): Show the temporal average of all the channel/wavelengths in a plot, having the wavelengths on the x-axis and the irradiance and differences on the y-axis. CLI name: CHANNEL_MEAN
   - By wavelength (boxplot): Show the statistics of all the channel/wavelengths in a plot, showing one boxplot per channel. The boxplot are shown having the wavelengths on the x-axis and the irradiance and differences (the box plot) on the y-axis. CLI name: CHANNEL
-- Improve speed of switching between comparison graphs. (**NFR207**)
+- Improve speed of switching between comparison graphs. (**NFR208**)
 - Geometry information (coordinates, angles, etc.) and timestamps (if available) are now included in all NetCDF and CSV output files. (**NFR305**)
-- The TBX accepts coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band. (**NFR107-A**)
+- The TBX accepts coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band. (**NFR108-A**)
 - Automated Build & Packaging (**NFR409**):
   - Linux: Fully automated build through Docker.
   - Windows: Partially automated build through Docker for Windows. All automated except first step:

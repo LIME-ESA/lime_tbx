@@ -2,24 +2,39 @@
 
 The LIME Toolbox is being developed as part of ESA's project: "Improving the Lunar Irradiance Model of ESA".
 Throughout its planning, development, and implementation, ESA and the LIME Team have collaboratively proposed
-and refined various features and constraints. This analysis breaks down these elements to ensure a clear,
-structured approach, aligning design and implementation with the project's objectives.
+and refined various objectives, features and constraints. This analysis breaks down these elements to ensure
+a clear, structured approach, aligning design and implementation with the project's objectives.
 
-## Use cases
+## Main Features
 
-| ID | Name | Description |
-|:--:|:----:|:-----------:|
-| 1.1 | Simulate  From Earth |
+The main objectives and expected features are described in a similar fashion to user stories, which are short
+descriptions written from a user point of view that focus on what the user needs.
+
+
+|  #  |  User Story  |
+|:---:|:-------------|
+| 1.1 | Simulate Single Observation from Earth |
+| 1.2 | Simulate Time Series of Observations from Earth |
+| 2 | Simulate Single Observation with Custom Selenographic Coordinates |
+| 3.1 | Simulate Single Observation for a Satellite |
+| 3.2 | Simulate Time Series of Observations for a Satellite |
+| 4.1 | Input a User-Defined Spectral Response Function |
+| 4.2 | Visualise User-Defined Spectral Response Function |
+| 5 | Compare LIME Against Data from a Remote-Sensing Instrument |
+| 6 | Export Simulation/Comparison Data to a File |
+| 7.1 | Download Updated Coefficients |
+| 7.2 | Change Coefficients Version in Use |
 
 
 ## Requirements Elicitation
 
 A set of requirements has been obtained from the accepted LIME functionalities and restrictions. This
-set is organised into four categories based on the use case they are related to. These categories are:
-1. Simulations
-2. Comparisons
-3. Output
-4. System
+set is organised into four categories based on the user story they appeal to. These categories are:
+1. **Simulations**: Requirements related to User Stories 1, 2, 3 and 4.
+2. **Comparisons**: Requirements related to mainly User Story 5, but also 4.
+3. **Output**: Requirements related to User Story 6.
+4. **System**: Requirements related to User Story 7 and also the requirements related to the general
+   functioning of the toolbox, not related to any User Story in particular.
 
 Each set is subsequently split into two subsets: functional requirements (FR) and non-functional requirements (NFR).
 Functional requirements specify the essential tasks a system must perform to fulfill user and business
@@ -34,10 +49,12 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **FR101**: Allow users to simulate lunar observations for any observer's position around the Earth and at any time.
 - **FR102**: Allow users to simulate lunar observation for any observer/solar selenographic latitude and longitude
   (thus bypassing the need for their computation from the position/time of the observer).
-- **FR103**: Allow users to simulate the lunar observations for any user defined instrument spectral response function (SRF).
-- **FR104**: Allow users to simulate lunar observation for a single observation or for a time series of observations.
+- **FR103**: Allow users to load user-defined spectral response functions (SRF).
+- **FR104**: Allow users to simulate lunar observation for a single observation or for a time series of observations,
+  for **FR101** and **FR105**.
 - **FR105**: The user must be able to simulate lunar observations for an ESA satellite.
-- **FR106**: Allow users to either choose between default satellite spectral band SRF or select a user defined SRF (**FR103**).
+- **FR106**: Allow users to choose which SRF are simulations running with (**FR103**).
+- **FR107**: Allow users to simulate series of lunar observations, where not only the time varies. 
 
 #### Non Functional Requirements (NFR)
 
@@ -48,13 +65,19 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **NFR104**: The ESA satellites available for selection must include ENVISAT, Proba-V, S2, S3, FLEX.
 - **NFR105**: The user defined SRF (**FR103**) must be defined via a user generated SRF file.
 - **NFR106**: The user should be able to perform the simulation via command line using parameters or input files.
-
+- **NFR107**: Simulations must run with a SRF, either a default one or a user-defined SRF.
+- **NFR108**: The TBX must be flexible in terms of wavelengths. It should accept different amounts of coefficients and process them differently.
+  - **NFR108-A** : The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band.
+  - **NFR108-B** : The TBX must accept coefficients made for a different response function, for the wavelengths specified in the coefficients.
+- **NFR109**: The ESA satellites available for selection must include METOP first generation: METOP-A, METOP-B and METOP-C.
+- **NFR110**: The simulation input for series of lunar observations (FR107) must be done via an input file.
 
 ### Comparisons
 
 #### Functional Requirements (FR)
 - **FR201**: Allow performing comparisons of lunar observations from a remote sensing instrument to the LIME model output.
 - **FR202**: Allow exporting plots.
+- **FR203**: The TBX must allow the user to visualize the comparison for all spectral channels simultaneously. 
 
 #### Non Functional Requirements (NFR)
 - **NFR201**: The remote sensing instrument observations (**FR201**) must be pre-stored in a GLOD format file.
@@ -64,6 +87,11 @@ answer "what must be done" whereas non-functional requirements define "how it sh
   deviation of the mean relative difference, temporal trend if applicable, number of comparison samples, etc.
 - **NFR204**: The exported plots must be in .jpg or .pdf format.
 - **NFR205**: The user should be able to perform the simulations via command line using parameters or input files.
+- **NFR206**: Users must be informed that they have to load a user-defined SRF to run the comparison's simulations with.
+- **NFR207**: The comparison of **FR203** must be plotted in the same graph, with x-axis being the wavelength, and y-axis being comparisons & irradiance.
+  The plots should show the temporal average of the relative difference between the model and the observation.
+- **NFR208**: Switching between comparison graphs should be fast, there shouldn’t be a loading time of longer than 2
+  seconds when switching and drawing them after the comparison shouldn’t take more than 20 seconds.
 
 ### Output
 
@@ -80,6 +108,8 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **NFR302**: The simulated lunar disk degree of polarization (**FR302**) must be in the spectral range of 400 nm to 2500 nm.
 - **NFR303**: The LIME simulated output shall be available to be exported to GLOD format files.
 - **NFR304**: The LIME version number shall be visible on all outputs (plots/files) of the TBX.
+- **NFR305**: Geometry information (coordinates, angles, etc.) and timestamps must be included in NetCDF and CSV output files.
+- **NFR306**: Calculation of uncertainties (**FR303**, **FR304**) must be performed as fast as possible. 
 
 ### System
 
@@ -97,4 +127,16 @@ answer "what must be done" whereas non-functional requirements define "how it sh
 - **NFR407**: The LIME TBX shall be to the largest extent developed in Python.
 - **NFR408**: The LIME TBX code shall be available on a password protected web repository allowing versioning of
   the software (e.g., GitHub).
- 
+- **NFR409**: The TBX must be compiled and packaged through Docker or similar.
+- **NFR410**: The TBX compilation must be automated as much as possible, ideally using GitLab CI.
+- **NFR411**: Migrate the project to GitHub
+  - **NFR411-A**: During development mirror the repository to GitHub.
+  - **NFR411-B**: Migrate the issues to GitHub. GitLab issues must be used during development by the LIME team to
+    add issues, and GitHub issues when finished.
+  - **NFR411-C**: Migrate the CI pipeline to GitHub.
+  - **NFR411-D**: Migrate the code documentation to GitHub. 
+- **NFR412**: Code modules should be as independent as possible so it could be possible to add a “choose model” option
+  in the future without requiring too much development.
+- **NFR413**: Keep EOCFI version updated to the latest release.
+- **NFR414**: The TBX should be able to simulate the satellite positions for all satellites with OSF files in the EOP-CFI server.
+- **NFR415**: The TBX code will be under LGPL license, in a repository with public access.
