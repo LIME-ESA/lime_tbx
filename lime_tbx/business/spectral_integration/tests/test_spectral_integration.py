@@ -9,7 +9,7 @@ import numpy as np
 
 """___LIME_TBX Modules___"""
 from ..spectral_integration import ISpectralIntegration, SpectralIntegration
-from ...datatypes.datatypes import SRFChannel, SpectralData, SpectralResponseFunction
+from lime_tbx.common.datatypes import SRFChannel, SpectralData, SpectralResponseFunction
 from lime_tbx.business.lime_algorithms.lime.tsis_irradiance import _get_tsis_data
 
 """___Authorship___"""

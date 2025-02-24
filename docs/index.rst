@@ -21,6 +21,7 @@ Welcome to lime_tbx's documentation!
 
    content/analysis
    content/design
+   content/implementation
 
 .. toctree::
    :maxdepth: 2

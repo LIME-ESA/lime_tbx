@@ -170,6 +170,10 @@ If you wish to contribute to the `lime_tbx` project, please check the <a href=".
 
 ## Development Guide
 
+For a detailed description on how the Toolbox is structured and implemented please refer
+to the official [documentation](https://eco.gitlab-docs.npl.co.uk/eo/lime_tbx/),
+specially the **Design** and **Implementation** sections, under Technical Details.
+
 ### Versioning
 
 Version changes and descriptions are stored in the <a href="./CHANGELOG.md">CHANGELOG</a>.
@@ -206,21 +210,6 @@ To prepare your environment for development, testing or deployment, follow these
         pip install PySide6
         ```
 
-### Project Structure
-
-The structure of the `lime_tbx` Python package is visualized in the simplified composite structure diagram:
-
-<div align="center">
-<a href="./docs/uml/composite_simple.png">
-  <img src="./docs/uml/composite_simple.png"
-alt="UML diagram of the simplified composite structure of lime_tbx" width="1000px"/>
-</a>
-</div>
-
-Refer to `docs/uml/composite_structure.png` for details about the organization of the
-components of the python package.
-
-
 ### Testing
 
 Run the following commands to ensure the code works as expected:
@@ -237,119 +226,6 @@ Run the following commands to ensure the code works as expected:
     ./coverage_run.sh  
     ```
 
-### Deployment
-
-Deployed with:
-
-* [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
-* [![PyInstaller][pyinstaller-badge]](https://pyinstaller.org/)
-* [![InnoSetup][innosetup-badge]](https://jrsoftware.org/isinfo.php)
-
-The desktop app can be built and packaged automatically or manually.
-The first step of the deployment process is compiling the C code
-that accesses the EO-CFI library. This step is not automated for some
-platforms like Windows. After that, one has to build the app bundle
-and create the installer, which is can be completely automated through Docker.
-
-#### Automatic deployment (Recommended)
-
-This process is automated through the usage of Docker, so
-the it first requires to build the docker image at least once,
-and then to run it each time one wants to deploy the app.
-
-##### Linux
-
-1. First, build the image:
-    ```sh
-    cd deployment
-    docker build .. -t lime_compiler -f Linux.Dockerfile
-    ```
-
-2. Run the container and deploy the app:
-    ```sh
-    docker run -v $(dirname $(pwd)):/usr/src/app/repo lime_compiler
-    ```
-
-##### Windows
-
-Windows automatic deployment doesn't perform the EO-CFI C code compilation step.
-If one wishes to perform this step, which is only needed if EO-CFI libraries have
-been updated, please refer to the manual deployment section, step 1.
-
-1. Build the image:
-    ```sh
-    docker build . -t lime_compiler -f Windows.Dockerfile
-    ```
-
-2. Run the container and deploy the app:
-    ```sh
-    for %F in ("%cd%") do set dirname=%~dpF
-    docker run -v %dirname%:C:\repo lime_compiler
-    ```
-
-##### Mac
-
-The Mac automatic deployment is not available yet.
-
-#### Manual deployment
-
-Follow these steps to manually create a production-ready build for your machine:
-
-##### Requirements:
-- Python 3.9.
-- `pyinstaller` installed outside of the virtual environment.
-
-<details>
-  <summary>Show steps</summary>
-
-1. **Compile C code for EOCFI**
-
-    This step compiles the EOCFI C code and generates a binary that will be called
-    from the toolbox. This isn't necessary unless the C source code has been modified
-    or the former binary doesn't work for one's system.
-
-    In Linux or Mac:
-    ```sh
-    cd lime_tbx\eocfi_adapter\eocfi_c
-    cp MakefileLinux Makefile # Linux
-    cp MakefileDarwin Makefile # Mac
-    make
-    ```
-
-    In Windows:
-    ```dos
-    cd lime_tbx\eocfi_adapter\eocfi_c
-    copy make.mak Makefile
-    nmake
-    ```
-
-2. **Create a Virtual Environment**  
-    It's strongly recommended to use a virtual environment (venv) to minimize application size:
-
-    ```sh
-    python -m venv .venv
-    source .venv/bin/activate  # For Linux/Mac
-    .venv\Scripts\activate     # For Windows
-    pip install -r requirements.txt
-    pip install PySide6~=6.8   # Unless installing in an old OS, which would need PySide2
-    ```
-
-3. **Build the App Bundle**  
-    Use `pyinstaller` to create a desktop app-bundle for your OS:
-    ```sh
-    pyinstaller lime_tbx.spec  
-    ```
-
-    Deactivate the virtual environment when the build is complete.
-
-4. **Create an Installer**  
-    Go to the `installer` directory and use the appropriate method for your operating system:
-    - **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
-    - **Mac**: Execute `build_mac_installer.sh`.
-    - **Linux**: Execute `build_linux_installer.sh`.
-    - **Debian**: Execute `build_deb.sh` after creating the Linux installer.
-
-</details>
 
 ## License
 
@@ -384,5 +260,3 @@ Distributed under the LGPL-v3 License. See [LGPL v3](./LICENSE) for more informa
 
 [eocfi-badge]: https://img.shields.io/badge/eocfi-e8e8e4?style=for-the-badge&logo=data:image/svg%2bxml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIENyZWF0ZWQgd2l0aCBJbmtzY2FwZSAoaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvKSAtLT4NCjxzdmcgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSIyNDIuODg2MDYiIGhlaWdodD0iMjQyLjk3NTEzIiBpZD0ic3ZnMjQyOSI+DQogIDxkZWZzIGlkPSJkZWZzMjQzMSIvPg0KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjg0LjM0NTI5LC0zMTAuODc0NjIpIiBpZD0ibGF5ZXIxIj4NCiAgICA8cGF0aCBkPSJNIDQ0MS4yNzY1Niw0MjEuNjkwOTEgTCA0ODkuMDY4NTEsNDIxLjY5MDkxIEMgNDg5LjA2ODUxLDQyMS42OTA5MSA0OTAuOTU5NDIsNDE0LjUwNjQ3IDQ4Mi40NDgsNDAzLjczNTU2IEMgNDY1LjYzNTc4LDM4Ni4zNjI0NSA0NDYuNzUwOTYsMzk3Ljg4NDI1IDQ0Ni43NTA5NiwzOTcuODg0MjUgQyA0MzcuNDkwOTcsNDAyLjc5NDY2IDQyNS41OTgyNyw0MjMuMTk5NTEgNDMyLjU3NTIsNDUyLjQ4MDU3IEMgNDQxLjI3NjU2LDQ4MS43Njc3NyA0NzQuNzA4MDIsNDg3Ljc5NDQ0IDQ5NS40ODA3LDQ4MC45OTU5IEMgNTA5LjIyOTM1LDQ3Ni40OTgxNSA1MTcuMTU2MjgsNDY2LjU4MjU4IDUyMC45NzA4Miw0NjAuMzYyNjQgQyA1MjIuMTk3NDksNDU1LjMzMDYyIDUyMy4wNzMwMiw0NTAuMjk4NTQgNTIzLjYyNDc5LDQ0NS4yOTYxMyBMIDQ0MS4yNzY1Niw0NDUuMjk2MTMgTCA0NDEuMjc2NTYsNDIxLjY5MDkxIHoiIGlkPSJwYXRoMjQyNSIgc3R5bGU9ImZpbGw6IzAwMzI0NztmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6bm9uemVybztzdHJva2U6bm9uZSIvPg0KICAgIDxwYXRoIHN0eWxlPSJmaWxsOiMwMDMyNDc7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOm5vbnplcm87c3Ryb2tlOm5vbmUiIGlkPSJwYXRoMjQyMyIgZD0iTSAzOTkuNTAzMTMsMzE0LjA0ODQgQyAzNDkuMDcxNDQsMzE2LjczMDg4IDMwNC4wNzc5MiwzNTEuNjMzNjEgMjkxLjAxMTIzLDQwMy4xNTk5NiBDIDI3NC45MjMyNiw0NjYuNTgyMjggMzEzLjI4NjI0LDUzMS4wOTE1NCAzNzYuNzAyNzMsNTQ3LjE4MjQ4IEMgNDIxLjc2MDE1LDU1OC42MTIzIDQ2Ny40NDk4NCw1NDIuNTYwMDggNDk1LjgzNDgyLDUwOS41NjE4MyBDIDQ4My4zNTM4Nyw1MTIuNTQ1NDYgNDY4Ljc0NzIxLDUxMi43NDQ0IDQ1Mi44OTQwNiw1MDcuMjgxNzkgQyAzOTkuODAzMzYsNDg4Ljk0OTQxIDM5MC4wNzQ0LDQzOS44MTkxNyA0MDMuMzAzMTksNDA1LjQ0IEMgNDE2LjUxNDUzLDM3MS4wNTg1MiA0NjIuNzc0MjMsMzU1LjAzMjg4IDQ5NC44ODQ4LDM3OC4wNzk1MiBDIDUyMi40MDY1OCwzOTcuODE3ODYgNTIzLjkxODQ2LDQzMi45ODUyNSA1MjMuNzY1Myw0NDIuNjgwNjUgQyA1MjguODMwMDksMzg1Ljc4NjQyIDQ5Mi4xNzg4NSwzMzEuOTc2OTkgNDM1LjAzMzc0LDMxNy40Njg0NiBDIDQyMy4xNDMyNCwzMTQuNDUzMDkgNDExLjE0MTI0LDMxMy40MjkzOSAzOTkuNTAzMTMsMzE0LjA0ODQgeiBNIDM0MS43NDIxMSw0MTguNTUwMjMgQyAzNTAuMTYxNjYsNDE4LjU1MDIzIDM1Ni45NDIzOCw0MjUuMzM2MzUgMzU2Ljk0MjM4LDQzMy43NTA1IEMgMzU2Ljk0MjM4LDQ0Mi4xNjk5MiAzNTAuMTYxNjYsNDQ4Ljk1MDc2IDM0MS43NDIxMSw0NDguOTUwNzYgQyAzMzMuMzI4NTksNDQ4Ljk1MDc2IDMyNi4zNTE4NCw0NDIuMTY5OTIgMzI2LjM1MTg0LDQzMy43NTA1IEMgMzI2LjM1MTkxLDQyNS4zMzYzNSAzMzMuMzI4NTksNDE4LjU1MDIzIDM0MS43NDIxMSw0MTguNTUwMjMgeiIvPg0KICA8L2c+DQo8L3N2Zz4=
 [comet-toolkit-badge]: https://img.shields.io/badge/comet_toolkit-003f7f?style=for-the-badge&logo=data:image/png%2bxml;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACg0lEQVR4AaXBT0hTcRwA8O/7/d7bnune/rz5b/Ptf+bcn6RYM0kwizSig5bWpRTrEEGmeZK6dOhQmB2KhApP/bkIWZY6MkIzappgatoybQ4qamPlnM63v+3gQaKB4OcDm7a8/OIibAL2+YKSy0217SpjgWf49Zint7fTardbdvT1DX2BDSAgqbGx/sjVxuP3gyhtxTnuGSuyakzzs3PzsqycR+0dTx533uv4ASlgSHI6x2es24tIq3XnQa3Rokc0K8piOVVeZvahUruuPkMqyWi+cK7ZZsgZdQyN+mEdDGuuXL92Op0ireEYBbREDpFoAjAlAloo3JKjZBUrgUBInyXderi2nCndW8P3Pn/qhyQMawwKobLYVlrJ8wQRgThIJGLAlABIWgQyOccq1RptNqe1mcy2owoWVal0bI/D8caPYU3/S+cIiyP+XJlQz+bq5FEkAIwRIEgiECCSBJKiIUYIQCpmGSUnrmIz2W4M6ziGR0eWfnu7tEqmTG0wKuIEAgISAPEoIIIA98LsnOvT/Izb893NymSsqUBzAsM/Pri+BlcXvT1yGb2bM1hUEQIBCTH45fX9rKmprSAIn5OiyInpmW9t+0rMlzD8x4RrIVhZsedAvlpnJikaEvEw8PxyKBZxLSBMS6cmPzJpwqhabbCEEKRCJqZpzANKACCcgLa2W+fT0ncNtLbevPus2/Gg5Yzp9lvnq2kMKRjNhe7QnwCv3VZox2QU+3yBcENDwx1IEonFQk5bZNBr9MUYUhgafLf4sKtnwKBlJmMRQb7NZrYxDMt8dk29l0jEdN3J+rN5eSoPARtQXb0/81TdsZZ9ZeVNICRhKeDtX+XDgxxXcgM26y9wQdlLIrrUkgAAAABJRU5ErkJggg==
-[innosetup-badge]: https://img.shields.io/badge/inno_setup-005799?style=for-the-badge&logo=data:image/png%2bxml;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAADwAAAA8AAAAMAAAADAAAABEAAAASAAAAEAAAAAkAAAABAAAAAAAAAAAAAAAAAAAAACMYAQg5KQpvX08uomNTM6dJORiMLRoAiDEaALUyGwDCLhkAqiYUAHAJBQAjAAAAFwAAAAcAAAAAAAAAACIXAQd8bU3N9PDl///9+f///fr///z3/+fh1P+lmH7/W0Uc/0wvAP9FKQD/Nx4A6SQTAF8AAAAZAAAACQAAAAAyIgJS8evf///+/v///v7///77///9+////v3///7+//v48f+wo4n/WT8P/1EzAP8+JAD9LRwBawAAABgAAAAHNSQEYPz47////vz/xLSS/598N/+lfi//tpZT/9C9l//49On///78/+vm2f91YTn/TTEA/56Obfk0JgpbAAAAGC4fAibQxrL+8OnZ/5lhAP+/fQD/yYYA/8yHAP/FgwD/sXoN/8ercP/48+f/+/jx/4BvTv/Z0Lv/xbuk+SYaAkwAAAAAkXY/svrx2/+/gAj/35YE/+WdD//moBP/5JwN/92UAv/MhwD/rnwW/9vLqf/7+PH/8/Dq///89f8tIARvAAAAAH9GAF3bu33/5bpj/+uuNv/tuE7/7rtV/+22Sv/qqy//2pUM/86hRP/Ao2f/9fDl/////////Pb/LSAEbwAAAACMQwBc1IEM//HXn//vzIT/89CJ//TTkv/zzoX/78Fk/+uuNv/doSb/+O3U///+/f///v7///vz/y4gBG4AAAAAi0UAN96IF//tv2v/+OrM//jmwf/56Mb/9+G1//PRjv/uvVr/6KQc/9GXIf/HpmP/rJRk/5GAYfcuHwNXAAAAAGI2AwPZhhvj7bxn//fgs//89+z//fju//ru1f/226b/8MRt/+qrLf/ZkAD/snQA/3xKAP89IACjAAAAAwAAAAAAAAAAyX0bZ+qxV//12ab/+/Hc//358P/67tb/9tun//DFbv/qqy3/140A/6loAP9rOgD2MRgAKgAAAAAAAAAAAAAAAGNCEwHZmDml78N5//besP/558T/9+G1//PRjv/uu1j/5Z0b/8h5AP+QTgD9WS0AYAAAAAAAAAAAAAAAAAAAAAAAAAAAdFIgA9mdQoXqtmL578R5/+/Cc//rs1X/5Jsq/9R5Bf+lVQDodToATwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAonIrH9WRMHnajiet1oEWu85rBaGuVABhZjMACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AcAAIADAAAAAQAAAAAAAAAAAAAAAAAAgAAAAIAAAACAAAAAgAAAAIAAAADAAQAAwAMAAOAHAAD4DwAA//8AAA==
-[pyinstaller-badge]: https://img.shields.io/badge/pyinstaller-3670A0?style=for-the-badge&logo=data:image/png%2bxml;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAKgUExURb29vpubm////6ampgAAAAcHCi8eOTFrDGTQADreATqZIV1ZY2FhaWRka2dnaWtram9vb1dXWFpaWmRkZ2hoaGNqYC22FWGESGVlaWxsa2dnawAAAGhoZmpqaiIiJGJiZm5uaDo6Pl1dZHR0ZUZGTF5eaHl5Yk1NVFZWYZSURn9/XVBQWFFRXYyMToWFWFlZYU9PW4GBVH5+c2JiZE9PU3Z2bWRkZEJCQXV1dWdnZzIyMnJycmxsbBMTE29vb3FxcQAAAGpqaru7u7a2tn19fXJycnNzc2RkZFRUVHFxcXJycnx8fKampqKiop+fn52dnY+Pj4uLi4SEhFVVVTw8PDExMQ0NDV7+ABnHCz+DQJ6cQKurNbe3KsLCIJSUSpmZP8PBI4+7GGPvAy7xAAy3C3eteWqiSL/eAP//ALW1LL29IPfyAJHiAD34ABTfAATLBUSQRCV7KEK3AKbSAO7zAL+/I6urK9vYAIDgAIX6ABPRAADKAAC1AACxAADeACPMAN/sAMvLGqSkM93aAGfhADv8ADXZAA3qAADFABbCAGa0AJJkAObbANfXEpubPdvXAGbdAE/2AFq6AAn2AAD5AETXAPXxAMWgAMe6AODgDdzZAJXaABDvAA63AADrAAD/ACvqAOr0APj5APf3AOnpCM/OAtvlAD3kAAD4ADjoAPL3AP7+AOvrBN3dBfHvAsHYBkTDCQ/TDg7UEGSuGry6IrCwKqSkMqCgQJaWToyMVYqLWISDXn17aHSAc3qIeoeHhI+PkJaWmY2Nknl5fn5+gn5+f4CAg3p6fZycnri3ubu6u769vsDAwMHBwcLCwrCwsHx8fICAgH9/f4GBgXt7e6GhobW1tZqamru7u4SEhH19fZOTk7+/v76+vr29vf///+3mXiUAAABXdFJOUwAAAAABCBEysPi9eZGrxt/yc3eitsnk/prerQTJwAyy0Rea4CWB7Ddt/fRLVvj7YkHw/ngu5pMh3K4UzcYKu90Dqf347dzLn1Xp7ubhzLSaiG5XPCESBtCJW1gAAAABYktHRAJmC3xkAAAAB3RJTUUH6AwGDhQswLAXLgAAARtJREFUGNMBEAHv/gAABAUGBwgJCgsMDQ4PEBEBABITFBUWV1hZF1pbXF1eGAIAGV9gYWJjZGVmZ2hoaGkaGwAcamtsbW5vcHFyc3RodR0eAB92d3h5ent8fX5/gGiBICEAIoKDhIWGh4iJiouMaI0jJAAljo+QkZKTlJWWl5homSYnACgpmpucnZ6foKGio2ikKisALC2lpqeon5+pqmhoq6wuLwAwMa2ur7CxsrO0tba3uDIzADQ1ubq7vL2+v8DBwsPExTYANzjGx8jJysvMzc7P0NHSOQA6O9PU1c7MzMzMzdbS0dE8AD0+0dDXzczMzMzN2NnR0z8AQEHR2tvNzNzd3kJDREVGRwADSElKS0xNTk9QUVJTVFVWls13UDRcyB8AAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMTItMDZUMTQ6MjA6NDMrMDA6MDCiB4fnAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTEyLTA2VDE0OjIwOjQzKzAwOjAw01o/WwAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNC0xMi0wNlQxNDoyMDo0NCswMDowMEHoIAoAAAAASUVORK5CYII=
