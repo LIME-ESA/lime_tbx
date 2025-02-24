@@ -34,8 +34,8 @@ If a critical error occurs in the CLI, the program exits with a non-zero status 
 
 References
 ----------
-- `lime_tbx.cli.CLI`: Handles command-line execution.
-- `lime_tbx.gui.GUI`: Manages the graphical user interface.
+- `lime_tbx.presentation.cli.CLI`: Handles command-line execution.
+- `lime_tbx.presentation.gui.GUI`: Manages the graphical user interface.
 - `lime_tbx.logger`: Handles logging.
 """
 
@@ -45,19 +45,19 @@ import getopt
 import sys
 import warnings
 
-from lime_tbx.cli.cli import (
+from lime_tbx.presentation.cli.cli import (
     CLI,
     OPTIONS,
     LONG_OPTIONS,
     print_help,
 )
-from lime_tbx.local_storage.programdata import (
+from lime_tbx.persistence.local_storage.programdata import (
     get_appdata_folder,
     get_programfiles_folder,
 )
-from lime_tbx.datatypes.datatypes import KernelsPath, EocfiPath
-from lime_tbx.datatypes import logger
-from lime_tbx.coefficients import access_data
+from lime_tbx.common.datatypes import KernelsPath, EocfiPath
+from lime_tbx.common import logger
+from lime_tbx.application.coefficients import access_data
 
 
 def main():
@@ -126,7 +126,7 @@ def main():
         print_help()
         sys.exit(2)
     if len(opts) == 0:
-        from lime_tbx.gui.gui import GUI
+        from lime_tbx.presentation.gui.gui import GUI
 
         if sys.platform.lower().startswith("win"):
             import ctypes

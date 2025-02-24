@@ -125,6 +125,8 @@ def process_links_in_doctree(app, doctree, docname):
     if docname in (
         "index",
         "content/readme",
+        "content/design",
+        "content/implementation",
     ):  # Aplica cambios solo a 'index.rst' o el docname relevante
         for node in doctree.traverse():
             process_node(node)

@@ -6,10 +6,10 @@ omit =
         */tests/*
         *__init__*
         lime_tbx/__main__.py
-        lime_tbx/gui/*.py
+        lime_tbx/presentation/gui/*.py
         lime_tbx/_version.py
-        lime_tbx/local_storage/*.py
-        lime_tbx/lime_algorithms/lime/tsis_irradiance.py
+        lime_tbx/persistence/local_storage/*.py
+        lime_tbx/business/lime_algorithms/lime/tsis_irradiance.py
 
 [report]
 exclude_lines =
@@ -21,7 +21,7 @@ omit =
         */tests/*
         *__init__*
         lime_tbx/__main__.py
-        lime_tbx/gui/*.py
+        lime_tbx/presentation/gui/*.py
         lime_tbx/_version.py
-        lime_tbx/local_storage/*.py
-        lime_tbx/lime_algorithms/lime/tsis_irradiance.py
+        lime_tbx/persistence/local_storage/*.py
+        lime_tbx/business/lime_algorithms/lime/tsis_irradiance.py

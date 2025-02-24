@@ -211,13 +211,13 @@ To prepare your environment for development, testing or deployment, follow these
 The structure of the `lime_tbx` Python package is visualized in the simplified composite structure diagram:
 
 <div align="center">
-<a href="./quality_documentation/uml/composite_simple.png">
-  <img src="./quality_documentation/uml/composite_simple.png" 
+<a href="./docs/uml/composite_simple.png">
+  <img src="./docs/uml/composite_simple.png"
 alt="UML diagram of the simplified composite structure of lime_tbx" width="1000px"/>
 </a>
 </div>
 
-Refer to `quality_documentation/uml/composite_structure.png` for details about the organization of the
+Refer to `docs/uml/composite_structure.png` for details about the organization of the
 components of the python package.
 
 

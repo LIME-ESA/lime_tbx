@@ -2,7 +2,7 @@ Welcome to lime_tbx's documentation!
 ========================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Introduction:
 
    content/readme
@@ -11,19 +11,19 @@ Welcome to lime_tbx's documentation!
    content/CODE_OF_CONDUCT
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Usage:
    content/usage
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Technical Details:
 
    content/analysis
    content/design
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Packages
 
    content/api/lime_tbx
