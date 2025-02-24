@@ -20,7 +20,7 @@ mkdir -p $name/opt/esa/LimeTBX
 cp -r ../../kernels $name/opt/esa/LimeTBX
 cp -r ../../eocfi_data $name/opt/esa/LimeTBX
 cp -r ../../coeff_data $name/opt/esa/LimeTBX
-cp ../../lime_tbx/gui/assets/lime_logo.png $name/opt/esa/LimeTBX
+cp ../../lime_tbx/presentation/gui/assets/lime_logo.png $name/opt/esa/LimeTBX
 cp -r ../../dist/LimeTBX $name/opt/esa/LimeTBX
 cp ../linux/limetbx.desktop $name/opt/esa/LimeTBX
 mkdir -p $name/usr/share/applications

@@ -1,10 +1,10 @@
 #!/usr/bin/env sh
 cd repo
 # C code (EOCFI)
-cd lime_tbx/eocfi_adapter/eocfi_c
+cd lime_tbx/business/eocfi_adapter/eocfi_c
 cp MakefileLinux.mak Makefile
 make
-cd ../../..
+cd ../../../..
 # python code
 rm -rf .venv
 python3.9 -m venv .venv
