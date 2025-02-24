@@ -46,7 +46,7 @@ def get_default_srf():
     dir_path = os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     )
-    dir_path = os.path.join(dir_path, "lime_tbx", "spectral_integration", "assets")
+    dir_path = os.path.join(dir_path, "business", "spectral_integration", "assets")
     data = np.genfromtxt(
         os.path.join(dir_path, "interpolated_model_fwhm_3_1_gaussian.csv"),
         delimiter=",",

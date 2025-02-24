@@ -15,7 +15,7 @@ import os
 
 """___LIME_TBX Modules___"""
 from lime_tbx.common import logger
-from lime_tbx.local_storage import appdata
+from lime_tbx.persistence.local_storage import appdata
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
