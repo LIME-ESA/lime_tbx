@@ -854,7 +854,7 @@ class TestCLIUpdate(unittest.TestCase):
             cls._prev_lang = os.environ["LC_ALL"]
         locale.setlocale(locale.LC_ALL, "C")
 
-        dirname = os.path.join(os.path.dirname(__file__), "../../../coeff_data")
+        dirname = os.path.join(os.path.dirname(__file__), "../../../../coeff_data")
         cls.httpd = HTTPServer(dirname, ("localhost", 8000))
         cls.t = threading.Thread(
             name="test server proc", target=cls.httpd.serve_forever

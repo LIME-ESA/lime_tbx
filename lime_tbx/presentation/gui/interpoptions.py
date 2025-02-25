@@ -44,7 +44,7 @@ class InterpOptionsDialog(QtWidgets.QDialog):
         self.combo_versions = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_versions)
         # select output SRF
-        self.title_label_SRF = QtWidgets.QLabel("Select the output SRF")
+        self.title_label_SRF = QtWidgets.QLabel("Select the TSIS-1 solar spectrum SRF")
         self.main_layout.addWidget(self.title_label_SRF)
         self.combo_SRF = QtWidgets.QComboBox()
         self.main_layout.addWidget(self.combo_SRF)

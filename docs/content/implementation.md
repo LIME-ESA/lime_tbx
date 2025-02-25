@@ -13,21 +13,25 @@ The repository is organized into the following directories:
 
 ## Configuration and Logging
 
-The LIME Toolbox simulated observations can be customized by the user. For example, it can be
-configured to use the ASD spectra as the interpolation reference, which is preferred, or
-Apollo 16 + Breccia. This configuration is managed through the use of a configuration file.
+LIME Toolbox simulations can be customized by the user. For example, the interpolation reference can be
+set to **ASD spectra** (preferred) or **Apollo 16 + Breccia**.
+Configuration is managed through a YAML configuration file.
 
 ### Configuration File
 
-The configuration attributes are stored in a YAML file. This file contains the following attributes:
-- **interpolation_SRF**: Gaussian SRF with 1nm spectral sampling and 3nm resolution
-- **interpolation_spectrum**: ASD
-- **interpolation_spectrum_polarisation**: Linear
-- **show_cimel_points**: bool - Wether the CIMEL anchor points should be plotted (true) or not (false).
-- **show_interp_spectrum**: bool - Whether the interpolation spectrum used should be plotted with the output (true)
-  or not (false).
-- **skip_uncertainties**: bool - Wether the uncertainty computations should be skipped (true) or not (false).
-- **use_wehrli**: bool - Wether to use TSIS as the solar spectrum (false) or Wehrli (true). It's not possible to modify this value through the user interface.
+The YAML configuration file defines various attributes for customizing simulations:  
+
+- **interpolation_SRF** (`str`) – Spectral Response Function of the TSIS-1 Hybrid Solar Reference Spectrum.
+- **interpolation_spectrum** (`str`) – Spectrum used as the interpolation reference for reflectance.
+- **interpolation_spectrum_polarisation** (`str`) – Spectrum used as the interpolation reference for polarization.
+  *Note:* This value cannot be modified via the UI yet, as only **Linear** is currently valid.
+- **show_cimel_points** (`bool`) – Whether CIMEL anchor points should be plotted (`true`/`false`).
+- **show_interp_spectrum** (`bool`) – Whether the interpolation spectrum should be included in the output plot (`true`/`false`).
+- **skip_uncertainties** (`bool`) – Whether to skip uncertainty computations (`true`/`false`).
+  *Note:* Uncertainty calculations are the primary performance bottleneck in LIME Toolbox simulations, so disabling
+  them significantly increases speed.
+- **use_wehrli** (`bool`) – Whether to use **TSIS-1 HSRS** (`false`) or **Wehrli** (`true`) as the solar spectrum.
+  *Note:* This setting cannot be modified via the UI.
 
 ### Logging
 
