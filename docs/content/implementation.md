@@ -1,6 +1,6 @@
 # Implementation
 
-The repository is organized into the follo0wing directories:
+The repository is organized into the following directories:
 
 - **lime_tbx**: The `lime_tbx` Python package containing the LIME Toolbox.
 - **installer**: Scripts and configuration files for manually building and packaging installers.

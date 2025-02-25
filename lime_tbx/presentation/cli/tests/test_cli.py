@@ -259,7 +259,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 1)
@@ -271,7 +271,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BATH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BATH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 1)
@@ -285,7 +285,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             cli.handle_input(
                 *get_opts(
-                    '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
+                    '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
                 )
             )
         self.assertEqual(cm.exception.code, 1)
@@ -359,7 +359,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-e 80,80,2000,2010-10-1T02:02:02  -o nc,./test_files/cli/cliglod.test.nc -c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
+                '-e 80,80,2000,2010-10-1T02:02:02  -o nc,./test_files/cli/cliglod.test.nc -c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
             )
         )
         self.assertEqual(errcode, 1)
@@ -381,7 +381,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f fakefile.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f fakefile.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 1)
@@ -393,7 +393,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f test_files/moon/comparison.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f test_files/moon/comparison.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 1)
@@ -429,7 +429,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,test_files/cli/chan1.test'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,test_files/cli/chan1.test'
             )
         )
         self.assertEqual(errcode, 1)
@@ -441,7 +441,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,ascii,MPA,rel,test_files/cli/chan1.test'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,ascii,MPA,rel,test_files/cli/chan1.test'
             )
         )
         self.assertEqual(errcode, 1)
@@ -453,7 +453,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,LUCK,rel,test_files/cli/chan1.test'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -o graph,pdf,LUCK,rel,test_files/cli/chan1.test'
             )
         )
         self.assertEqual(errcode, 1)
@@ -599,7 +599,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -608,7 +608,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -617,7 +617,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -626,7 +626,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,perc,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,perc,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -635,7 +635,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,perc,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,perc,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -644,7 +644,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,perc,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,perc,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -655,7 +655,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,rel,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,DT,rel,test_files/cli/out_comp_chann.test.jpg,test_files/cli/out_comp_chann2.test.jpg,test_files/cli/out_comp_chann3.test.jpg'
             )
         )
         self.assertEqual(errcode, 0)
@@ -666,7 +666,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,CHANNEL,rel,test_files/cli/out_comp_allchannels.test.jpg'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,CHANNEL,rel,test_files/cli/out_comp_allchannels.test.jpg'
             )
         )
         self.assertEqual(errcode, 0)
@@ -677,7 +677,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,CHANNEL_MEAN,rel,test_files/cli/out_comp_allchannels.test.jpg'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graph,jpg,CHANNEL_MEAN,rel,test_files/cli/out_comp_allchannels.test.jpg'
             )
         )
         self.assertEqual(errcode, 0)
@@ -686,7 +686,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o nc,test_files/cli/compcli.test.nc'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o nc,test_files/cli/compcli.test.nc'
             )
         )
         self.assertEqual(errcode, 0)
@@ -697,7 +697,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -721,7 +721,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -738,7 +738,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -753,7 +753,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,DT,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,DT,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -762,7 +762,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,MPA,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,MPA,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -771,7 +771,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -780,7 +780,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -789,7 +789,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,CHANNEL_MEAN,rel,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
@@ -798,7 +798,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-c "lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/business/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/business/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,perc,test_files/cli/comp_out.test.dir/'
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20130101145644_01.nc lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140318140112_01.nc, lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT-Darmstadt,VISNIR+SUBSET+MOON,MSG3+SEVIRI_C_EUMG_20140715153303_01.nc" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,perc,test_files/cli/comp_out.test.dir/'
             )
         )
         self.assertEqual(errcode, 0)
