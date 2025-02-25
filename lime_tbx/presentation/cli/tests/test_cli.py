@@ -903,7 +903,7 @@ class TestCLITrueUpdate(unittest.TestCase):
         locale.setlocale(locale.LC_ALL, "C")
 
         dirname = os.path.join(
-            os.path.dirname(__file__), "../../../test_files/update/coeff_data"
+            os.path.dirname(__file__), "../../../../test_files/update/coeff_data"
         )
         cls.httpd = HTTPServer(dirname, ("localhost", 8000))
         cls.t = threading.Thread(
