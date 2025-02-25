@@ -38,8 +38,6 @@ EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 GITLAB_CI = "GITLAB_CI"
 GITLAB_CI_VALUE = "GITLAB_CI"
 
-NOT_FORBIDDEN_ROOTROOT_WARN = "Not in a unix env with a protected /root path"
-
 
 def get_cli():
     cli = CLI(KERNELS_PATH, EOCFI_PATH)
@@ -50,12 +48,6 @@ def get_opts(args_str: str):
     args = shlex.split(args_str)
     opts, args = getopt.gnu_getopt(args, OPTIONS, LONG_OPTIONS)
     return opts, args
-
-
-def forbidden_rootroot():
-    if os.path.exists("/root") and not os.access("/root", os.W_OK):
-        return True
-    return False
 
 
 class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
@@ -120,44 +112,38 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
-    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
     def test_sat_err_forbidden_path_refl(self):
         cli = get_cli()
-        with self.assertRaises(SystemExit) as cm:
-            cli.handle_input(
-                *get_opts(
-                    "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar"
-                )
+        errcode = cli.handle_input(
+            *get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar"
             )
-        self.assertEqual(cm.exception.code, 1)
+        )
+        self.assertEqual(errcode, 1)
         f = open("./test_files/cli/sat_err_forb_path_refl.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
-    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
     def test_sat_err_forbidden_path_irr(self):
         cli = get_cli()
-        with self.assertRaises(SystemExit) as cm:
-            cli.handle_input(
-                *get_opts(
-                    "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar"
-                )
+        errcode = cli.handle_input(
+            *get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar"
             )
-        self.assertEqual(cm.exception.code, 1)
+        )
+        self.assertEqual(errcode, 1)
         f = open("./test_files/cli/sat_err_forb_path_irr.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
-    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
     def test_sat_err_forbidden_path_polar(self):
         cli = get_cli()
-        with self.assertRaises(SystemExit) as cm:
-            cli.handle_input(
-                *get_opts(
-                    "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root"
-                )
+        errcode = cli.handle_input(
+            *get_opts(
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root"
             )
-        self.assertEqual(cm.exception.code, 1)
+        )
+        self.assertEqual(errcode, 1)
         f = open("./test_files/cli/sat_err_forb_path_polar.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
@@ -244,7 +230,6 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
-    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
     def test_lunar_forbidden_path(self):
         cli = get_cli()
         errcode = cli.handle_input(
@@ -279,16 +264,14 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
-    @unittest.skipIf(not forbidden_rootroot(), NOT_FORBIDDEN_ROOTROOT_WARN)
     def test_comparison_glob_graphd_forbidden_path(self):
         cli = get_cli()
-        with self.assertRaises(SystemExit) as cm:
-            cli.handle_input(
-                *get_opts(
-                    '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
-                )
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
             )
-        self.assertEqual(cm.exception.code, 1)
+        )
+        self.assertEqual(errcode, 1)
         f = open("./test_files/cli/err_g_forbidden_path.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()

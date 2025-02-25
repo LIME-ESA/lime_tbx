@@ -300,7 +300,7 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
         self.polar_coeff = self.coeffs[index].polarisation
-        access_data.set_previusly_selected_version(self.coeff.version)
+        access_data.set_previously_selected_version(self.coeff.version)
 
     def reload_coeffs(self) -> None:
         self.coeffs = access_data.get_all_coefficients()

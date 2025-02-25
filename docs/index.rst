@@ -23,7 +23,7 @@ Welcome to lime_tbx's documentation!
    content/implementation
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Packages
 
    content/api/lime_tbx

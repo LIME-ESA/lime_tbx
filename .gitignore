@@ -139,3 +139,4 @@ log_*.txt
 # Other files
 coeff_data/selected.txt
 doc-cov.svg
+test_report

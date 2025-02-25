@@ -49,7 +49,7 @@ class TestAccessData(unittest.TestCase):
     @unittest.skipIf(not in_development_repo, not_dev_str)
     def test_set_selected_version(self):
         vers_sel_test = "23012023"
-        access_data.set_previusly_selected_version(vers_sel_test)
+        access_data.set_previously_selected_version(vers_sel_test)
         prev = access_data.get_previously_selected_version()
         self.assertEqual(prev, vers_sel_test)
         os.remove(os.path.join(".", "coeff_data", "selected.txt"))

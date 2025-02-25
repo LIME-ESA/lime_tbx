@@ -56,7 +56,7 @@ def get_previously_selected_version() -> str:
     return None
 
 
-def set_previusly_selected_version(name: str):
+def set_previously_selected_version(name: str):
     """
     Set the name of the previously/current selected version.
 
