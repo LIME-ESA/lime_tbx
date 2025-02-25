@@ -18,6 +18,7 @@ descriptions written from a user point of view that focus on what the user needs
 | 2 | Simulate Single Observation with Custom Selenographic Coordinates |
 | 3.1 | Simulate Single Observation for a Satellite |
 | 3.2 | Simulate Time Series of Observations for a Satellite |
+| 3.3 | Simulate Satellite Observation for a User-Defined Satellite |
 | 4.1 | Input a User-Defined Spectral Response Function |
 | 4.2 | Visualise User-Defined Spectral Response Function |
 | 5 | Compare LIME Against Data from a Remote-Sensing Instrument |
@@ -58,6 +59,7 @@ those in any previous official LIME documentation, as they are subject to change
 - **FR105**: The user must be able to simulate lunar observations for an ESA satellite.
 - **FR106**: Allow users to choose which SRF are simulations running with (**FR103**).
 - **FR107**: Allow users to simulate series of lunar observations, where not only the time varies. 
+- **FR108**: Allow users to simulate lunar observation using a user-defined satellite.
 
 #### Non Functional Requirements (NFR)
 
@@ -74,6 +76,8 @@ those in any previous official LIME documentation, as they are subject to change
   - **NFR108-B** : The TBX must accept coefficients made for a different response function, for the wavelengths specified in the coefficients.
 - **NFR109**: The ESA satellites available for selection must include METOP first generation: METOP-A, METOP-B and METOP-C.
 - **NFR110**: The simulation input for series of lunar observations (FR107) must be done via an input file.
+- **NFR111**: The satellites for **FR108** must be defined using Orbit Scenario Files (OSF) or Three-Line
+  Element Set (TLE/3LE) files.
 
 ### 2. Comparisons
 

@@ -11,6 +11,32 @@ The repository is organized into the following directories:
 - **docs**: Documentation for both users and developers.
 - **test_files**: Data files used in automated tests for `lime_tbx`.
 
+## Configuration and Logging
+
+The LIME Toolbox simulated observations can be customized by the user. For example, it can be
+configured to use the ASD spectra as the interpolation reference, which is preferred, or
+Apollo 16 + Breccia. This configuration is managed through the use of a configuration file.
+
+### Configuration File
+
+The configuration attributes are stored in a YAML file. This file contains the following attributes:
+- **interpolation_SRF**: Gaussian SRF with 1nm spectral sampling and 3nm resolution
+- **interpolation_spectrum**: ASD
+- **interpolation_spectrum_polarisation**: Linear
+- **show_cimel_points**: bool - Wether the CIMEL anchor points should be plotted (true) or not (false).
+- **show_interp_spectrum**: bool - Whether the interpolation spectrum used should be plotted with the output (true)
+  or not (false).
+- **skip_uncertainties**: bool - Wether the uncertainty computations should be skipped (true) or not (false).
+- **use_wehrli**: bool - Wether to use TSIS as the solar spectrum (false) or Wehrli (true). It's not possible to modify this value through the user interface.
+
+### Logging
+
+Info needed ...
+
+## Ancillary Data Files
+
+Info needed ...
+
 ## Deployment
 The deployment process includes compilation, building, and packaging to generate installers for various
 operating systems. It is carried out using:
@@ -122,6 +148,8 @@ Go to the `installer` directory and use the appropriate method for your operatin
 - **Mac**: Execute `build_mac_installer.sh`.
 - **Linux**: Execute `build_linux_installer.sh`.
 - **Debian**: Execute `build_deb.sh` after creating the Linux installer.
+
+## Code Quality
 
 
 [innosetup-badge]: https://img.shields.io/badge/inno_setup-005799?style=for-the-badge&logo=data:image/png%2bxml;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAADwAAAA8AAAAMAAAADAAAABEAAAASAAAAEAAAAAkAAAABAAAAAAAAAAAAAAAAAAAAACMYAQg5KQpvX08uomNTM6dJORiMLRoAiDEaALUyGwDCLhkAqiYUAHAJBQAjAAAAFwAAAAcAAAAAAAAAACIXAQd8bU3N9PDl///9+f///fr///z3/+fh1P+lmH7/W0Uc/0wvAP9FKQD/Nx4A6SQTAF8AAAAZAAAACQAAAAAyIgJS8evf///+/v///v7///77///9+////v3///7+//v48f+wo4n/WT8P/1EzAP8+JAD9LRwBawAAABgAAAAHNSQEYPz47////vz/xLSS/598N/+lfi//tpZT/9C9l//49On///78/+vm2f91YTn/TTEA/56Obfk0JgpbAAAAGC4fAibQxrL+8OnZ/5lhAP+/fQD/yYYA/8yHAP/FgwD/sXoN/8ercP/48+f/+/jx/4BvTv/Z0Lv/xbuk+SYaAkwAAAAAkXY/svrx2/+/gAj/35YE/+WdD//moBP/5JwN/92UAv/MhwD/rnwW/9vLqf/7+PH/8/Dq///89f8tIARvAAAAAH9GAF3bu33/5bpj/+uuNv/tuE7/7rtV/+22Sv/qqy//2pUM/86hRP/Ao2f/9fDl/////////Pb/LSAEbwAAAACMQwBc1IEM//HXn//vzIT/89CJ//TTkv/zzoX/78Fk/+uuNv/doSb/+O3U///+/f///v7///vz/y4gBG4AAAAAi0UAN96IF//tv2v/+OrM//jmwf/56Mb/9+G1//PRjv/uvVr/6KQc/9GXIf/HpmP/rJRk/5GAYfcuHwNXAAAAAGI2AwPZhhvj7bxn//fgs//89+z//fju//ru1f/226b/8MRt/+qrLf/ZkAD/snQA/3xKAP89IACjAAAAAwAAAAAAAAAAyX0bZ+qxV//12ab/+/Hc//358P/67tb/9tun//DFbv/qqy3/140A/6loAP9rOgD2MRgAKgAAAAAAAAAAAAAAAGNCEwHZmDml78N5//besP/558T/9+G1//PRjv/uu1j/5Z0b/8h5AP+QTgD9WS0AYAAAAAAAAAAAAAAAAAAAAAAAAAAAdFIgA9mdQoXqtmL578R5/+/Cc//rs1X/5Jsq/9R5Bf+lVQDodToATwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAonIrH9WRMHnajiet1oEWu85rBaGuVABhZjMACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AcAAIADAAAAAQAAAAAAAAAAAAAAAAAAgAAAAIAAAACAAAAAgAAAAIAAAADAAQAAwAMAAOAHAAD4DwAA//8AAA==

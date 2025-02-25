@@ -1,5 +1,5 @@
 ========
-Versions
+Releases
 ========
 
 .. include:: ../../CHANGELOG.md

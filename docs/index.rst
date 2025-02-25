@@ -7,12 +7,11 @@ Welcome to lime_tbx's documentation!
 
    content/readme
    content/CHANGELOG
-   content/CONTRIBUTING
-   content/CODE_OF_CONDUCT
 
 .. toctree::
    :maxdepth: 2
    :caption: Usage:
+
    content/usage
 
 .. toctree::
@@ -28,3 +27,10 @@ Welcome to lime_tbx's documentation!
    :caption: Packages
 
    content/api/lime_tbx
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Additional Information
+
+   content/CONTRIBUTING
+   content/CODE_OF_CONDUCT

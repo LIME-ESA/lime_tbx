@@ -55,7 +55,7 @@ class TestUpdateNoServer(unittest.TestCase):
 class TestUpdate(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        dirname = os.path.join(os.path.dirname(__file__), "../../../coeff_data")
+        dirname = os.path.join(os.path.dirname(__file__), "../../../../coeff_data")
         cls.httpd = HTTPServer(dirname, ("localhost", 8000))
         cls.t = threading.Thread(
             name="test server proc", target=cls.httpd.serve_forever
@@ -107,7 +107,7 @@ class TestTrueUpdate(unittest.TestCase):
     def setUpClass(cls):
         dirname = os.path.abspath(
             os.path.join(
-                os.path.dirname(__file__), "../../../test_files/update/coeff_data"
+                os.path.dirname(__file__), "../../../../test_files/update/coeff_data"
             )
         )
         cls.httpd = HTTPServer(dirname, ("localhost", 8000))
