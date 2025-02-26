@@ -113,6 +113,8 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         f.close()
 
     def test_sat_err_forbidden_path_refl(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
@@ -125,6 +127,8 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         f.close()
 
     def test_sat_err_forbidden_path_irr(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
@@ -137,6 +141,8 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         f.close()
 
     def test_sat_err_forbidden_path_polar(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
@@ -265,6 +271,8 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         f.close()
 
     def test_comparison_glob_graphd_forbidden_path(self):
+        if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
+            self.skipTest("Graph output fails in python docker of gitlab ci")
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
@@ -273,6 +281,18 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         )
         self.assertEqual(errcode, 1)
         f = open("./test_files/cli/err_g_forbidden_path.txt")
+        self.assertEqual(self.capturedErr.getvalue(), f.read())
+        f.close()
+
+    def test_comparison_glob_csvd_forbidden_path(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,/root'
+            )
+        )
+        self.assertEqual(errcode, 1)
+        f = open("./test_files/cli/err_csv_forbidden.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
