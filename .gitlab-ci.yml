@@ -126,44 +126,55 @@ tox-3.9:
   image: "python:3.9"
   
 tox_slowtests:
-    extends: .py_venv
-    stage: "Full test"
-    rules:
-      # Run for scheduled or triggered builds
-      - if: '$CI_PIPELINE_SOURCE == "trigger"'
-        when: always
-      - if: '$CI_PIPELINE_SOURCE == "schedule"'
-        when: always        
-      # Run for tags
-      - if: '$CI_COMMIT_TAG'
-        when: always
-      # And allow manual runs
-      - if: '$CI_COMMIT_BRANCH'
-        when: manual
-        allow_failure: true
-    script:
-      - pwd
-      - ls -l
-      - export PYTHONPATH="$PYTHONPATH:."
-      - python -c "import sys;print(sys.path)"
-      - pip install tox
-      - mkdir test_report
-      - export GITLAB_CI="GITLAB_CI"
-      - tox -- --runslow
-    coverage: '/^TOTAL.+?(\d+\%)$/'
-    needs: []
+  extends: .py_venv
+  stage: "Full test"
+  script:
+    - pwd
+    - ls -l
+    - export PYTHONPATH="$PYTHONPATH:."
+    - python -c "import sys;print(sys.path)"
+    - pip install tox
+    - mkdir test_report
+    - export GITLAB_CI="GITLAB_CI"
+    - tox -- --runslow
+  coverage: '/^TOTAL.+?(\d+\%)$/'
+  needs: []
+  only:
+    - master
+    - tags
+    - merge_requests
+
+tox_slowtests_manual:
+  extends: .py_venv
+  stage: "Full test"
+  script:
+    - pwd
+    - ls -l
+    - export PYTHONPATH="$PYTHONPATH:."
+    - python -c "import sys;print(sys.path)"
+    - pip install tox
+    - mkdir test_report
+    - export GITLAB_CI="GITLAB_CI"
+    - tox -- --runslow
+  coverage: '/^TOTAL.+?(\d+\%)$/'
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" || $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_TAG
+      when: never  # Exclude master, merge requests, and tags
+    - when: manual  # Allow only manual triggers
+  allow_failure: true
 
 test_report:
   needs: ["tox-3.9"]
   stage: Publish test report
   image: 
-     name: oberonamsterdam/wkhtmltopdf
-     entrypoint: [""]
+    name: oberonamsterdam/wkhtmltopdf
+    entrypoint: [""]
   script:
-      - wkhtmltopdf --enable-local-file-access file:////builds/eco/eo/lime_tbx/test_report/report.html test_report.pdf
-      - wkhtmltopdf --enable-local-file-access file:////builds/eco/eo/lime_tbx/test_report/cov_report/index.html cov_report.pdf
-      - mv test_report.pdf ./quality_documentation/test_report.pdf
-      - mv cov_report.pdf ./quality_documentation/cov_report.pdf
+    - wkhtmltopdf --enable-local-file-access file:////builds/eco/eo/lime_tbx/test_report/report.html test_report.pdf
+    - wkhtmltopdf --enable-local-file-access file:////builds/eco/eo/lime_tbx/test_report/cov_report/index.html cov_report.pdf
+    - mv test_report.pdf ./quality_documentation/test_report.pdf
+    - mv cov_report.pdf ./quality_documentation/cov_report.pdf
   artifacts:
     paths:
     - quality_documentation
