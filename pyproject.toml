@@ -63,7 +63,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "tox"]
+dev = ["pre-commit", "tox", "interrogate"]
 docs = ["sphinx", "sphinx_rtd_theme", "myst_parser", "sphinxcontrib-openapi", "linkify-it-py"]
 pyside6 = ["PySide6~=6.8"]
 pyside2 = ["PySide2~=5.15"]
