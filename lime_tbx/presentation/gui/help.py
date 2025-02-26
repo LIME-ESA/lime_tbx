@@ -183,6 +183,7 @@ class AboutDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setMinimumSize(450, 400)
         self.setWindowTitle(constants.APPLICATION_NAME)
         # Title
         title = "Lunar Irradiance Model of ESA ToolBox"
@@ -353,6 +354,7 @@ class HelpDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.setMinimumSize(400, 450)
         self.setWindowTitle(constants.APPLICATION_NAME)
         self.content = QtWidgets.QLabel(_HELP_TEXT)
         self.content.setWordWrap(True)

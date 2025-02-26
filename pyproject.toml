@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=58.1.0", "wheel", "versioneer[toml]"]
+requires = ["setuptools>=58.1.0", "wheel", "setuptools_scm[toml]>=6.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "lime_tbx"
-version = "1.1.0"
+dynamic = ["version"]
 description = "Toolbox for running the LIME (Lunar Irradiance Model of ESA) to simulate lunar observations and compare them with remote sensing data of the Moon."
 readme = "README.md"
 license = {text = "LGPL-3.0-only"}
@@ -73,8 +73,13 @@ Homepage = "https://lime.uva.es"
 Repository = "https://github.com/LIME-ESA/lime_tbx.git"
 Issues = "https://github.com/LIME-ESA/lime_tbx/issues"
 
-[tool.setuptools]
-packages = ["lime_tbx"]
+[tool.setuptools.packages.find]
+where = ["lime_tbx"]
+exclude = ["*tests"]
+
+[tool.setuptools_scm]
+root = "."
+fallback_version = "1"
 
 [tool.versioneer]
 VCS = "git"

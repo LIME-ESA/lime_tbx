@@ -1,8 +1,7 @@
-include versioneer.py
 include lime_tbx/_version.py
 include lime_tbx/business/lime_algorithms/lime/assets/wehrli_asc.csv
-include lime_tbx/businesslime_algorithms/lime/assets/tsis_cimel.csv
-include lime_tbx/businesslime_algorithms/lime/assets/tsis_fwhm_1_1_triangle.csv
+include lime_tbx/business/lime_algorithms/lime/assets/tsis_cimel.csv
+include lime_tbx/business/lime_algorithms/lime/assets/tsis_fwhm_1_1_triangle.csv
 include lime_tbx/business/lime_algorithms/lime/assets/tsis_fwhm_3_1_gaussian.csv
 include lime_tbx/business/lime_algorithms/lime/assets/tsis_asd.csv
 include lime_tbx/application/simulation/tests/assets/coefficients_cimel.csv
