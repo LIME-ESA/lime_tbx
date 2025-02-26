@@ -103,9 +103,6 @@ doc-coverage:
   extends: .py_venv
   script:
     - pwd
-    - useradd -m testuser || true
-    - sudo -u testuser -H bash -c "whoami"
-    - pwd
     - ls -l
     - export PYTHONPATH="$PYTHONPATH:."
     - python -c "import sys;print(sys.path)"

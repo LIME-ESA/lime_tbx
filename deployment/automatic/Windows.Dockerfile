@@ -29,7 +29,8 @@ RUN python -m pip install pyinstaller
 # Not installing it Visual Studio Build Tools, nmake is not found even after installing them
 
 WORKDIR "C:\\"
-ENTRYPOINT .\repo\deployment\windows_build_script.bat
-#docker build . -t lime_compiler -f Windows.Dockerfile
+ENTRYPOINT .\repo\deployment\automatic\windows_build_script.bat
+#docker build .. -t lime_compiler -f Windows.Dockerfile
 #for %F in ("%cd%") do set dirname=%~dpF
-#docker run -v %dirname%:C:\repo lime_compiler
+#for %F in ("%dirname%") do set grandparent=%~dpF
+#docker run -v %grandparent%:C:\repo lime_compiler

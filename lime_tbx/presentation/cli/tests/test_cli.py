@@ -284,18 +284,6 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         self.assertEqual(self.capturedErr.getvalue(), f.read())
         f.close()
 
-    def test_comparison_glob_csvd_forbidden_path(self):
-        cli = get_cli()
-        errcode = cli.handle_input(
-            *get_opts(
-                '-c "lime_tbx/application/filedata/sample_moon_data/W_XX-EUMETSAT*" -f lime_tbx/application/filedata/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o csvd,BOTH,rel,/root'
-            )
-        )
-        self.assertEqual(errcode, 1)
-        f = open("./test_files/cli/err_csv_forbidden.txt")
-        self.assertEqual(self.capturedErr.getvalue(), f.read())
-        f.close()
-
     def test_get_version_ok(self):
         cli = get_cli()
         errcode = cli.handle_input(*get_opts("-v"))

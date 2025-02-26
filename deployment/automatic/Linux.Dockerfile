@@ -76,6 +76,6 @@ RUN apt-get -f install -y
 
 WORKDIR /usr/src/app
 
-CMD ["./repo/deployment/ubuntu_build_script.sh"]
-# docker build .. -t lime_compiler -f Linux.Dockerfile
-# docker run -v $(dirname $(pwd)):/usr/src/app/repo lime_compiler
+CMD ["./repo/deployment/automatic/ubuntu_build_script.sh"]
+# docker build ../.. -t lime_compiler -f Linux.Dockerfile
+# docker run -v $(dirname $(dirname $(pwd))):/usr/src/app/repo lime_compiler

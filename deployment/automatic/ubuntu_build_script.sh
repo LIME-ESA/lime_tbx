@@ -13,6 +13,6 @@ python3.9 -m venv .venv
 .venv/bin/pip install PySide2~=5.15
 rm -rf dist build
 pyinstaller lime_tbx.spec
-rm -rf installer/linux/installer_files && rm installer/linux/lime_installer.zip && rm -rf installer/debian/lime_*
-cd installer && ./build_linux_installer.sh
+rm -rf deployment/installer/linux/installer_files && rm deployment/installer/linux/lime_installer.zip && rm -rf deployment/installer/debian/lime_*
+cd deployment/installer && ./build_linux_installer.sh
 cd debian && ./build_deb.sh

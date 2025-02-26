@@ -11,6 +11,6 @@ python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 rd /s /q dist build
 python -m PyInstaller lime_tbx.spec
-del "installer\windows\LimeTBX installer.exe"
-cd installer\windows\
+del "deployment\installer\windows\LimeTBX installer.exe"
+cd deployment\installer\windows\
 iscc inno_installer_builder.iss

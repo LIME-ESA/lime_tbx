@@ -7,8 +7,7 @@ The repository is organized into the following directories:
 - **coeff_data**: LIME coefficients and related files.
 - **eocfi_data**: Ephemerides, geometries and other data used for EO-CFI satellite computations.
 - **kernels**: SPICE toolkit kernels.
-- **installer**: Scripts and configuration files for manually building and packaging installers.
-- **deployment**: Dockerfiles and scripts for automating the build process of the `installer` directory.
+- **deployment**: Files and scripts needed to perform the deployment process, which generates installers for different operating systems.
 - **docs**: Documentation for both users and developers.
 
 ## Ancillary Data Files
@@ -128,65 +127,23 @@ By default, LIME Toolbox logs at the `INFO` level. To enable `DEBUG` logging, se
 `LIME_DEBUG` to `DEBUG`.
 
 ## Deployment
-The deployment process includes compilation, building, and packaging to generate installers for various
+The deployment process involves compilation, building, and packaging to generate installers for various
 operating systems. It is carried out using:
 
 * [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 * [![PyInstaller][pyinstaller-badge]](https://pyinstaller.org/)
 * [![InnoSetup][innosetup-badge]](https://jrsoftware.org/isinfo.php)
 
-The desktop app can be built and packaged automatically or manually.
-The first step of the deployment process is compiling the C code
-that accesses the EO-CFI library. This step is not automated for some
-platforms like Windows. After that, one has to build the app bundle
-and create the installer, which is can be completely automated through Docker.
+All required files are under the `deployment` directory, which contains:
+- **installer/**: Scripts and configuration files for manually building and packaging installers.
+- **automatic/**: Dockerfiles and scripts for automating the build processes carried out in `installer/`.
 
-### Automated deployment (Recommended)
+### Manual Deployment
 
-This process is automated using Docker. It requires building the Docker image
-at least once, after which the image must be run each time the app is deployed.
-
-#### Linux Automated Deployment
-
-1. First, build the image:
-    ```sh
-    cd deployment
-    docker build .. -t lime_compiler -f Linux.Dockerfile
-    ```
-
-2. Run the container and deploy the app:
-    ```sh
-    docker run -v $(dirname $(pwd)):/usr/src/app/repo lime_compiler
-    ```
-
-#### Windows Automated Deployment
-
-Windows automated deployment is only available via Docker for Windows and does not
-include the EO-CFI C code compilation step.
-If EO-CFI libraries have been updated and this step is required, please refer
-to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.
-
-1. Build the image:
-    ```sh
-    docker build . -t lime_compiler -f Windows.Dockerfile
-    ```
-
-2. Run the container and deploy the app:
-    ```sh
-    for %F in ("%cd%") do set dirname=%~dpF
-    docker run -v %dirname%:C:\repo lime_compiler
-    ```
-
-#### Mac Automated Deployment (Unavailable)
-
-Automatic deployment for macOS is currently unavailable. Docker does not support
-macOS as a guest OS due to the lack of macOS containers.
-
-In the future, we plan to explore automated deployment using GitHub Actions with macOS runners.
-
-### Manual deployment
-
-Follow these steps to manually create a production-ready build for your machine:
+The `deployment/installer` directory contains scripts and configuration files to build production-ready
+installers. These installers are OS and machine-dependent, so it's recommended to use 
+automated deployment whenever possible, whioh is explained in Section
+[Automated Deployment](#automated-deployment).
 
 #### Requirements:
 - Python 3.9.
@@ -194,13 +151,13 @@ Follow these steps to manually create a production-ready build for your machine:
 
 
 #### 1. Compile C code for EOCFI
-This step compiles the EOCFI C code and generates a binary that will be called
-from the toolbox. This isn't necessary unless the C source code has been modified
-or the former binary doesn't work for one's system.
+This step compiles a small C program with the EO-CFI libraries to generate a binary required by LIME Toolbox.
+This is only needed if the C source code has been modified, the libraries have been updated, or the binary
+does not work on your system.
 
 In Linux or Mac:
 ```sh
-cd lime_tbx\eocfi_adapter\eocfi_c
+cd lime_tbx/eocfi_adapter/eocfi_c
 cp MakefileLinux Makefile # Linux
 cp MakefileDarwin Makefile # Mac
 make
@@ -214,30 +171,74 @@ nmake
 ```
 
 #### 2. Create a Virtual Environment
-It's strongly recommended to use a virtual environment (venv) to minimize application size:
+To minimize application size it's strongly recommended to use a virtual environment (`venv`) :
 
 ```sh
 python -m venv .venv
 source .venv/bin/activate  # For Linux/Mac
 .venv\Scripts\activate     # For Windows
 pip install -r requirements.txt
-pip install PySide6~=6.8   # Unless installing in an old OS, which would need PySide2
+pip install PySide6~=6.8   # Use PySide2 for older OS versions
 ```
 
 #### 3. Build the App Bundle
-Use `pyinstaller` to create a desktop app-bundle for your OS:
+Use `pyinstaller` to create an executable bundle for your OS:
 ```sh
 pyinstaller lime_tbx.spec  
 ```
 
-Deactivate the virtual environment when the build is complete.
+Once the build is complete, deactivate the virtual environment.
 
 #### 4. Create an Installer
-Go to the `installer` directory and use the appropriate method for your operating system:
+Navigate to the `deployment/installer` directory and use the appropriate method for your operating system:
 - **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
-- **Mac**: Execute `build_mac_installer.sh`.
-- **Linux**: Execute `build_linux_installer.sh`.
-- **Debian**: Execute `build_deb.sh` after creating the Linux installer.
+- **Mac**: Run `build_mac_installer.sh`.
+- **Linux**: Run `build_linux_installer.sh`.
+- **Debian**: Run `build_deb.sh` after building the Linux installer.
+
+### Automated Deployment
+
+The deployment process is automated using Docker. It requires building the Docker image
+once, and then running it each time the app is deployed.
+
+#### Linux Automated Deployment
+
+1. Build the image:
+    ```sh
+    cd deployment/automatic
+    docker build ../.. -t lime_compiler -f Linux.Dockerfile
+    ```
+
+2. Run the container and deploy the app:
+    ```sh
+    docker run -v $(dirname $(dirname $(pwd))):/usr/src/app/repo lime_compiler
+    ```
+
+#### Windows Automated Deployment
+
+Windows automated deployment is only available via Docker for Windows and does not
+include the EO-CFI C code compilation step.
+If EO-CFI libraries have been updated, refer
+to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.
+
+1. Build the image:
+    ```sh
+    docker build .. -t lime_compiler -f Windows.Dockerfile
+    ```
+
+2. Run the container and deploy the app:
+    ```sh
+    for %F in ("%cd%") do set dirname=%~dpF
+    for %F in ("%dirname%") do set grandparent=%~dpF
+    docker run -v %grandparent%:C:\repo lime_compiler
+    ```
+
+#### Mac Automated Deployment (Unavailable)
+
+Automatic deployment for macOS is currently unavailable. Docker does not support
+macOS as a guest OS due to the lack of macOS containers.
+
+Future plans include exploring automated deployment using GitHub Actions with macOS runners.
 
 ## Code Quality
 [![GitLab CI](https://img.shields.io/badge/GitLab%20CI-FC6D26?style=for-the-badge&logo=gitlab&logoColor=fff)](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/)
