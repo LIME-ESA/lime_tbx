@@ -108,6 +108,7 @@ doc-coverage:
     - python -c "import sys;print(sys.path)"
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
+    - '[ -d /root ] || (mkdir /root && chmod 000 /root)'
     - tox
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
