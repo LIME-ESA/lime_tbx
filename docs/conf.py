@@ -17,10 +17,13 @@
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 #
-import lime_tbx
 import os
 import sys
 import re
+
+import lime_tbx
+
+sys.path.append(os.path.abspath("_templates"))
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -62,9 +65,10 @@ def process_node(node):
         pass
     elif isinstance(node, reference):
         # Modifica atributos como 'refuri' para enlaces relativos
-        if node.get("refuri", "").startswith("./docs"):
+        starts = ("./docs", "../")
+        if node.get("refuri", "").startswith(starts):
             node["refuri"] = "../_static" + node["refuri"][node["refuri"].rindex("/") :]
-        if node.get("refid", "").startswith("./docs"):
+        if node.get("refid", "").startswith(starts):
             node["refid"] = "../_static" + node["refid"][node["refid"].rindex("/") :]
     elif isinstance(node, image):
         pass
@@ -80,16 +84,29 @@ def process_node(node):
                 sibling = sibling.next_node(descend=False, ascend=False)
             # Replace relative links (Markdown-style and HTML-style)
             updated_content = re.sub(
-                r"\((\.\/([^)]*\/)*([^)]+))\)", r"(../_static/\3)", raw_content
+                r"\((\.+\/([^)]*\/)*([^)]+))\)", r"(../_static/\3)", raw_content
             )
             updated_content = re.sub(
-                r'<a\s+href="(\.\/([^"]*\/)*([^"]+))"',
+                r'<a\s+href="(\.+\/([^"]*\/)*([^"]+))"',
                 r'<a href="../_static/\3"',
                 updated_content,
             )
             updated_content = re.sub(
-                r'<img\s+src="(\.\/([^"]*\/)*([^"]+))"',
+                r'<img\s+src="(\.+\/([^"]*\/)*([^"]+))"',
                 r'<img src="../_static/\3"',
+                updated_content,
+            )
+            # Now replace the links that should go to a content html page
+            # The `html` is included in the pattern because it will be overwritten
+            # by the previouse lines and we want it to be affected again by these lines.
+            updated_content = re.sub(
+                r"\(\.\.\/_static\/([^)]+)\.(md|rst|html)\)",
+                r"(./\1.html)",
+                updated_content,
+            )
+            updated_content = re.sub(
+                r'<a\s+href="\.\.\/_static\/([^"]+)\.(md|rst|html)"',
+                r'<a href="./\1.html"',
                 updated_content,
             )
 
@@ -108,6 +125,8 @@ def process_links_in_doctree(app, doctree, docname):
     if docname in (
         "index",
         "content/readme",
+        "content/design",
+        "content/implementation",
     ):  # Aplica cambios solo a 'index.rst' o el docname relevante
         for node in doctree.traverse():
             process_node(node)
@@ -141,6 +160,11 @@ extensions = [
 
 myst_enable_extensions = [
     "tasklist",  # Enables checkbox rendering
+    "colon_fence",
+    "deflist",
+    "fieldlist",
+    "html_image",
+    "linkify",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -149,7 +173,13 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = [".rst", ".md"]
+source_parsers = {
+    ".md": "myst_parser.sphinx_",
+}
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # The master toctree document.
 master_doc = "index"
@@ -178,7 +208,7 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".venv"]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"

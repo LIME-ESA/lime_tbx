@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from lime_tbx import main as lmain
+from lime_tbx import __main__ as lmain
 
 
 def main():

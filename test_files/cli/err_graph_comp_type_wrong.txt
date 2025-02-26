@@ -1,1 +1,1 @@
-Error in graph DT|MPA|BOTH parameter.
+Invalid comparison key LUCK. Expected one of ['DT', 'MPA', 'BOTH', 'CHANNEL', 'CHANNEL_MEAN'].

@@ -1,5 +1,8 @@
 ## How to contribute to LIME Toolbox
 
+Please note we have a <a href="./CODE_OF_CONDUCT.md">code of conduct</a>, please follow it in all your interactions
+with the project.
+
 #### **Did you find a bug?**
 
 * **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/LIME-ESA/lime_tbx/issues).

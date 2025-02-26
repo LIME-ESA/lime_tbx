@@ -50,7 +50,7 @@ cache:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
-    - pip install .[dev]
+    - pip install .[dev,pyside2]
 
 ### Linting ###
 
@@ -88,6 +88,16 @@ lint-code:
   allow_failure: true
 
 
+doc-coverage:
+  stage: Static Analysis
+  script:
+    - pip install interrogate
+    - interrogate --exclude='**/gui/**' --exclude='**/tests/*.py' -spv --fail-under=65 --generate-badge=doc-cov.svg lime_tbx
+  artifacts:
+    paths:
+      - doc-cov.svg
+
+
 ### Tests ###
 .tox:
   extends: .py_venv
@@ -96,7 +106,6 @@ lint-code:
     - ls -l
     - export PYTHONPATH="$PYTHONPATH:."
     - python -c "import sys;print(sys.path)"
-    - pip install tox
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
     - tox
@@ -171,7 +180,7 @@ pages:
   stage: Readthedocs Documentation
   needs: []
   script:
-    - pip install myst_parser
+    - pip install .[docs]
     - sphinx-build docs public -b html
   artifacts:
     paths:
