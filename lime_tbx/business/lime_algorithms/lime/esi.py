@@ -107,6 +107,9 @@ def get_esi(srf_type: str) -> np.ndarray:
     -------
     np.ndarray of float
         The expected extraterrestrial solar irradiance in Wm⁻²/nm
+        Array of arrays, each inner array has two elements: The wavelength and its
+        related solar irradiance.
+        Example: [[`wavelength_0`, `esi_0`], [`wavelength_1`, `esi_1`] ... ]
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
     if srf_type == "cimel":

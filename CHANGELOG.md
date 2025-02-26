@@ -33,12 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drop support for Python 3.8.
 - Provide support for Python 3.11 and 3.12.
 - Updated library dependencies and versions.
+- Refactored main Python package grouping subpackages in layer architecture based packages.
 
 ### Fixed
 
-- Removed conversion of error correlation matrices to `np.float32`, keeping them as `np.float64`.
-This ensures they are positive-definite, eliminating the overhead of computing the closest
-positive-definite matrix, achieving a 2.5× speedup in uncertainty calculations compared to v1.0.3. (**NFR306**)
+- Removed forced conversion of error correlation matrices to `float32`. ASD error correlation matrices in `ds_ASD.nc`
+are `float64`, now they are kept as `float64`, which ensures they are positive-definite as the conversion to `float32` was
+slightly modifying the values making them not be positive-definite. This eliminates the
+overhead of computing the closest positive-definite matrix, achieving a 2.5× speedup in uncertainty
+calculations compared to v1.0.3. (**NFR306**)
 - Fixed minor bugs
 
 ## [1.0.3] - 2024-01-25
