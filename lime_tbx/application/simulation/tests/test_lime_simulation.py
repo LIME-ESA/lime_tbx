@@ -117,7 +117,7 @@ def _read_cimel_coeffs_files(filepath: str, u_filepath: str) -> ReflectanceCoeff
     data = np.genfromtxt(os.path.join(current_dir, filepath), delimiter=",")
     u_data = np.genfromtxt(os.path.join(current_dir, u_filepath), delimiter=",")
     ds_cimel["coeff"].values = data.T
-    ds_cimel["u_coeff"].values = u_data.T
+    ds_cimel["u_coeff"].values = u_data.T * data.T / 100
     ds_cimel["err_corr_coeff"].values = np.zeros((18 * 6, 18 * 6))
     np.fill_diagonal(ds_cimel["err_corr_coeff"].values, 1)
     return ReflectanceCoefficients(ds_cimel)
