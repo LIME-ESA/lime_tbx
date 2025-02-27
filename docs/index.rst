@@ -10,9 +10,15 @@ Welcome to lime_tbx's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Usage:
+   :caption: User Guide:
 
-   content/usage
+   content/user_guide/overview
+   content/user_guide/installation
+   content/user_guide/configuration
+   content/user_guide/simulations
+   content/user_guide/comparisons
+   content/user_guide/coefficients
+   content/user_guide/formats
 
 .. toctree::
    :maxdepth: 2

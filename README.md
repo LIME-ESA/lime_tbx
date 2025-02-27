@@ -145,9 +145,9 @@ However, since qtpy does not include a Qt binding by default, you must specify w
 
 ## Usage
 
-Download the [User Guide](https://calvalportal.ceos.org/documents/10136/964157/DA10_user_guide_v0.docx/b4724686-d758-5625-c1f4-9498c9b69c0d?version=1.0&t=1708947381404&download=true) to fully explore the capabilities of the toolbox.
-
-<!-- TODO: Add usage examples -->
+Check the [online documentation's User Guide](https://eco.gitlab-docs.npl.co.uk/eo/lime_tbx/content/user_guide/overview.html)
+or download the [User Guide File](https://calvalportal.ceos.org/documents/10136/964157/DA10_user_guide_v0.docx/b4724686-d758-5625-c1f4-9498c9b69c0d?version=1.0&t=1708947381404&download=true)
+to fully explore the capabilities of the toolbox.
 
 ## Roadmap
 
