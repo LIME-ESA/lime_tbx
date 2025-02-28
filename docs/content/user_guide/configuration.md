@@ -22,7 +22,7 @@ LIME Toolbox allows users to modify five settings that customize interpolation b
 
 Interpolation settings can be modified through the interpolation settings window.
 
-1. Open the the top menu bar and navigate to "Settings → Interpolation options" ([Figure 3](#fig-3)).
+1. Go to the the action menu bar and navigate to "Settings → Interpolation options" ([Figure 3](#fig-3)).
 
 <figure align="center" id="fig-3">
     <img src="../../images/user_guide/open_interp_settings.png" alt="Opening the Interpolation Settings Window"/>

@@ -197,6 +197,7 @@ Users can export the results in multiple formats:
 > - Unlike CSV, netCDF allows LIME Toolbox to reload previous simulations for visualization.
 > - This format enables efficient data storage and retrieval.
 
+<!-- TODO: Add "How to load simulation/comparison netCDF file into Toolbox" in format section -->
 
 ### Command-Line Interface (CLI) Export Options
 In the CLI, results are only accessible by exporting them to data files.
@@ -264,6 +265,8 @@ By default, LIME Toolbox includes a default SRF that encompasses the entire LIME
 1. Click "LOAD" (top-right corner in [Figure 13](#fig-13)).  
 2. Select a netCDF SRF file in GLOD format (explained in the *Format* section).  
 3. Once loaded, use the dropdown menu next to the "LOAD" button to switch between SRFs.
+
+<!-- TODO: Correctly link to the Format Section-->
 
 This can also be done in the CLI using the `-f` or `--srf` option followed by the SRF path:
 ```sh
