@@ -82,7 +82,7 @@ def _validate_schema_regular_moonobs(ds: xr.Dataset):
 
     coordinates: 'date': float or datetime
     dims without coordinates: 'chan' and 'sat_xyz'
-    data_vars: 'srf': float, 'wavelength': float, 'wavenumber': float, 'channel_id': str
+    data_vars: 'channel_name': str, 'sat_pos': float, 'sat_pos_ref': str, 'irr_obs': float
 
     Parameters
     ----------
