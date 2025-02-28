@@ -57,7 +57,6 @@ from lime_tbx.business.interpolation.interp_data import interp_data
 from . import export
 
 
-_DT_FORMAT = "%Y-%m-%dT%H:%M:%S"
 OPTIONS = "hvude:l:s:co:f:t:C:i:"
 LONG_OPTIONS = [
     "help",
@@ -143,14 +142,14 @@ observations files in GLOD format.\n"
     print("  -v, --version\t\t Displays the version name.")
     print("  -u, --update\t\t Updates the coefficients.")
     print("  -e, --earth\t\t Performs simulations from a geographic point.")
-    print(f"\t\t\t -e lat_deg,lon_deg,height_m,{_DT_FORMAT}")
+    print(f"\t\t\t -e lat_deg,lon_deg,height_km,datetime_isoformat")
     print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
     print(
         "\t\t\t -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,\
 selen_sun_lon,moon_phase_angle"
     )
     print("  -s, --satellite\t Performs simulations from a satellite point.")
-    print(f"\t\t\t -s sat_name,{_DT_FORMAT}")
+    print(f"\t\t\t -s sat_name,datetime_isoformat")
     print(
         "  -c, --comparison\t Performs comparisons from observations files in GLOD format."
     )
@@ -183,7 +182,7 @@ selen_sun_lon,moon_phase_angle"
 in GLOD format."
     )
     print(
-        "  -t, --timeseries\t Select a CSV file with multiple datetimes instead of \
+        "  -t, --timeseries\t Select a file with multiple datetimes instead of \
 inputing directly only one datetime. Valid only if the main option is -e or -s."
     )
     print(
@@ -457,6 +456,15 @@ def _parse_load_timeseries(arg: str, opts: List[Tuple[str, str]]):
         else:
             raise CLIError("Error: Timeseries file does not exist.")
     return timeseries
+
+
+def _parse_datetime(dtstr: str) -> datetime:
+    dt = datetime.fromisoformat(dtstr)
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(timezone.utc)
+    else:
+        dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 class CLI:
@@ -1196,13 +1204,11 @@ Run 'lime -h' for help."
                     params = list(map(float, params_str[:3]))
                     lat = params[0]
                     lon = params[1]
-                    height = params[2]
+                    height = params[2] / 1000
                     if timeseries is not None:
                         dt = timeseries
                     else:
-                        dt = datetime.strptime(
-                            params_str[3] + "+00:00", _DT_FORMAT + "%z"
-                        )
+                        dt = _parse_datetime(params_str[3])
                     self.calculate_geographic(lat, lon, height, dt, export_data)
                     break
                 elif opt in ("-s", "--satellite"):  # Satellite
@@ -1215,9 +1221,7 @@ Run 'lime -h' for help."
                     if timeseries is not None:
                         dt = timeseries
                     else:
-                        dt = datetime.strptime(
-                            params_str[1] + "+00:00", _DT_FORMAT + "%z"
-                        )
+                        dt = _parse_datetime(params_str[1])
                     self.calculate_satellital(sat_name, dt, export_data)
                     break
                 elif opt in ("-l", "--lunar"):  # Lunar

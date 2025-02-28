@@ -131,6 +131,7 @@ def process_links_in_doctree(app, doctree, docname):
         "content/implementation",
         "content/user_guide/installation",
         "content/user_guide/configuration",
+        "content/user_guide/simulations",
     ):  # Aplica cambios solo a 'index.rst' o el docname relevante
         for node in doctree.traverse():
             process_node(node)
