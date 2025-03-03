@@ -6,7 +6,7 @@ LIME Toolbox follows a structured process to compute lunar reflectance and irrad
 based on precomputed coefficients and user-defined settings. The computed irradiance can
 then be compared against real instrument observations.
 
-### **Summary of the Process**
+### Summary of the Process
 1. **Handle input** obtaining **LIME variables**.
 2. **Compute LIME reflectance at CIMEL wavelengths** using LIME **coefficients**.
 3. **Interpolate reflectance** using **ASD or Apollo 16 + Breccia** spectrum.
