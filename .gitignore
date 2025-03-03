@@ -92,6 +92,7 @@ celerybeat-schedule
 
 # virtualenv
 .venv
+.venv39
 .venv_win
 .venv_py310
 .venv_jupyter
@@ -137,3 +138,5 @@ log_*.txt
 
 # Other files
 coeff_data/selected.txt
+doc-cov.svg
+test_report
