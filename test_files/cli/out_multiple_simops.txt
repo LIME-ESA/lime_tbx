@@ -7,7 +7,7 @@ Options:
   -v, --version		 Displays the version name.
   -u, --update		 Updates the coefficients.
   -e, --earth		 Performs simulations from a geographic point.
-			 -e lat_deg,lon_deg,height_m,datetime_isoformat
+			 -e lat_deg,lon_deg,height_km,datetime_isoformat
   -l, --lunar		 Performs a simulation from a selenographic point.
 			 -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle
   -s, --satellite	 Performs simulations from a satellite point.
@@ -32,7 +32,7 @@ Options:
 			   CSV directory: -o csvd,(DT|MPA|BOTH|CHANNEL|CHANNEL_MEAN),(rel|perc|none),comparison_folder
 			   LGLOD (netcdf): -o nc,output_lglod.nc
   -f, --srf		 Select the file that contains the Spectral Response Function in GLOD format.
-  -t, --timeseries	 Select a CSV file with multiple datetimes instead of inputing directly only one datetime. Valid only if the main option is -e or -s.
+  -t, --timeseries	 Select a file with multiple datetimes instead of inputing directly only one datetime. Valid only if the main option is -e or -s.
   -C, --coefficients	 Change the coefficients version used by the TBX, for this execution and the next ones until it's changed again.
   -i, --interpolation-settings	 Change the interpolation settings. The input data shall be a json string containing at least one of the following parameters:
 			   interp_spectrum: Sets the interpolation spectrum. The valid values are 'ASD' and 'Apollo 16 + Breccia'.

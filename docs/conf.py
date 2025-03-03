@@ -320,3 +320,5 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+html_favicon = "favicon.png"

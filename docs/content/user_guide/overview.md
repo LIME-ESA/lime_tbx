@@ -73,7 +73,7 @@ Once the simulated **irradiance values per channel** have been computed, they ca
 Once observations and simulations are aligned, LIME computes **comparison metrics**:
 - **Relative Difference (%)**:
   `100 * ((irr_obs - irr_sim) / irr_sim)`
-- **Percentage Difference**:
+- **Percentage Difference (%)**:
   `100 * abs(irr_sim - irr_obs) / ((irr_sim + irr_obs) / 2)`
 - **Statistical Metrics** per channel:
   - **Mean Relative Difference (MRD)**
