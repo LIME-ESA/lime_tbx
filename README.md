@@ -160,7 +160,7 @@ to fully explore the capabilities of the toolbox.
     - [ ] Investigate if there's any other feasible and valid optimization method,
       like using `float32` error correlation matrices.
 - [ ] Fully migrate project to GitHub (issues, CI pipeline, etc.)
-- [ ] Automate Mac Build & Packaging Process through Github actions (**NFR409**)
+- [ ] Automate Mac Build & Packaging Process through Github actions (**NFR409-C**)
 - [ ] Allow users to simulate series of lunar observations, where not only the time varies. (**FR107**)
 
 

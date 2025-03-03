@@ -135,6 +135,9 @@ those in any previous official LIME documentation, as they are subject to change
 - **NFR408**: The LIME TBX code shall be available on a password protected web repository allowing versioning of
   the software (e.g., GitHub).
 - **NFR409**: The TBX must be compiled and packaged through Docker or similar.
+  - **NFR409-A**: Automated compilation and packaging for Windows.
+  - **NFR409-B**: Automated compilation and packaging for Linux.
+  - **NFR409-C**: Automated compilation and packaging for Mac.
 - **NFR410**: The TBX compilation must be automated as much as possible, ideally using GitLab CI.
 - **NFR411**: Migrate the project to GitHub
   - **NFR411-A**: During development mirror the repository to GitHub.
