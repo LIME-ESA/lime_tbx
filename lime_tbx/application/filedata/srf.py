@@ -45,7 +45,7 @@ def _validate_schema_srf(ds: xr.Dataset):
 
     coordinates: 'channel': float
     dims without coordinates: Any name, for example 'sample'.
-    data_vars: 'srf': float, 'wavelength': float, 'wavenumber': float, 'channel_id': str
+    data_vars: 'srf': float, 'wavelength': float, 'channel_id': str
 
     Parameters
     ----------
@@ -56,7 +56,6 @@ def _validate_schema_srf(ds: xr.Dataset):
     data_vars = {
         "srf": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
         "wavelength": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
-        "wavenumber": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
     }
     coords = {"channel": DataArraySchema(np.floating)}
     channel_id = {"channel_id": DataArraySchema(np.str_)}

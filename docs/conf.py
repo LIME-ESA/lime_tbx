@@ -84,16 +84,18 @@ def process_node(node):
                 sibling = sibling.next_node(descend=False, ascend=False)
             # Replace relative links (Markdown-style and HTML-style)
             updated_content = re.sub(
-                r"\((\.+\/([^)]*\/)*([^)]+))\)", r"(../_static/\3)", raw_content
+                r"\((\.+\/((\.\.\/)*)(((?!images|_static)[^)\/])*\/)*((?:images|_static)\/)?([^)]+))\)",
+                r"(../\2_static/\7)",
+                raw_content,
             )
             updated_content = re.sub(
-                r'<a\s+href="(\.+\/([^"]*\/)*([^"]+))"',
-                r'<a href="../_static/\3"',
+                r'<a\s+href="(\.+\/((\.\.\/)*)(((?!images|_static)[^"\/])*\/)*((?:images|_static)\/)?([^"]+))"',
+                r'<a href="../\2_static/\7"',
                 updated_content,
             )
             updated_content = re.sub(
-                r'<img\s+src="(\.+\/([^"]*\/)*([^"]+))"',
-                r'<img src="../_static/\3"',
+                r'<img\s+src="(\.+\/((\.\.\/)*)(((?!images|_static)[^"\/])*\/)*((?:images|_static)\/)?([^"]+))"',
+                r'<img src="../\2_static/\7"',
                 updated_content,
             )
             # Now replace the links that should go to a content html page
@@ -127,6 +129,11 @@ def process_links_in_doctree(app, doctree, docname):
         "content/readme",
         "content/design",
         "content/implementation",
+        "content/user_guide/installation",
+        "content/user_guide/configuration",
+        "content/user_guide/simulations",
+        "content/user_guide/comparisons",
+        "content/user_guide/coefficients",
     ):  # Aplica cambios solo a 'index.rst' o el docname relevante
         for node in doctree.traverse():
             process_node(node)
@@ -313,3 +320,5 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+html_favicon = "favicon.png"

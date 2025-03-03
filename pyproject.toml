@@ -74,8 +74,9 @@ Repository = "https://github.com/LIME-ESA/lime_tbx.git"
 Issues = "https://github.com/LIME-ESA/lime_tbx/issues"
 
 [tool.setuptools.packages.find]
-where = ["lime_tbx"]
-exclude = ["*tests"]
+where = [""]
+include = ["lime_tbx*"]
+#exclude = ["*tests"]
 
 [tool.setuptools_scm]
 root = "."
