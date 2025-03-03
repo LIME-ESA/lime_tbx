@@ -196,7 +196,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
 
     def test_earth_glod_missing_path(self):
         cli = get_cli()
-        errcode = cli.handle_input(*get_opts("-e 80,80,2,2010-10-1T02:02:02 -o nc"))
+        errcode = cli.handle_input(*get_opts("-e 80,80,2,2010-10-01T02:02:02 -o nc"))
         self.assertEqual(errcode, 1)
         f = open("./test_files/cli/err_miss_o_nc_path.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
@@ -302,7 +302,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C inventedcoeffs"
+                "-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C inventedcoeffs"
             )
         )
         self.assertEqual(errcode, 1)
@@ -314,7 +314,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "inventedspectrum"}\''
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "inventedspectrum"}\''
             )
         )
         self.assertEqual(errcode, 1)
@@ -350,7 +350,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-e 80,80,2,2010-10-1T02:02:02  -o nc,./test_files/cli/cliglod.test.nc -c "test_files/moon/sample_moon_data/W_XX-EUMETSAT*" -f test_files/moon/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
+                '-e 80,80,2,2010-10-01T02:02:02  -o nc,./test_files/cli/cliglod.test.nc -c "test_files/moon/sample_moon_data/W_XX-EUMETSAT*" -f test_files/moon/sample_data/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc -o graphd,png,BOTH,rel,/root'
             )
         )
         self.assertEqual(errcode, 1)
@@ -467,7 +467,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc"
+                "-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc"
             )
         )
         self.assertEqual(errcode, 0)
@@ -476,7 +476,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C 20231120_v1"
+                "-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -C 20231120_v1"
             )
         )
         self.assertEqual(errcode, 0)
@@ -486,7 +486,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "ASD"}\''
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "ASD"}\''
             )
         )
         self.assertEqual(errcode, 0)
@@ -495,7 +495,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \
 \'{"interp_spectrum": "ASD", "interp_srf": "asd", "show_inter_spectrum": "False", "skip_uncertainties": \
 "True", "show_cimel_points": "True"}\''
             )
@@ -511,7 +511,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                '-e 80,80,2,2010-10-1T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "Apollo 16 + Breccia"}\''
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "Apollo 16 + Breccia"}\''
             )
         )
         self.assertEqual(errcode, 0)
@@ -530,7 +530,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-e 80,80,2,2010-10-1T02:02:02 -t ./test_files/csv/timeseries.csv -o nc,./test_files/cli/cliglod.test.nc"
+                "-e 80,80,2,2010-10-01T02:02:02 -t ./test_files/csv/timeseries.csv -o nc,./test_files/cli/cliglod.test.nc"
             )
         )
         self.assertEqual(errcode, 0)
