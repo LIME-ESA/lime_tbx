@@ -463,7 +463,7 @@ def _parse_datetime(dtstr: str) -> datetime:
     if dt.tzinfo is not None:
         dt = dt.astimezone(timezone.utc)
     else:
-        dt.replace(tzinfo=timezone.utc)
+        dt = dt.replace(tzinfo=timezone.utc)
     return dt
 
 

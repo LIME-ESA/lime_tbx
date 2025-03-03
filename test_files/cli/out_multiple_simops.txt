@@ -7,11 +7,11 @@ Options:
   -v, --version		 Displays the version name.
   -u, --update		 Updates the coefficients.
   -e, --earth		 Performs simulations from a geographic point.
-			 -e lat_deg,lon_deg,height_m,%Y-%m-%dT%H:%M:%S
+			 -e lat_deg,lon_deg,height_m,datetime_isoformat
   -l, --lunar		 Performs a simulation from a selenographic point.
 			 -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle
   -s, --satellite	 Performs simulations from a satellite point.
-			 -s sat_name,%Y-%m-%dT%H:%M:%S
+			 -s sat_name,datetime_isoformat
   -c, --comparison	 Performs comparisons from observations files in GLOD format.
 			 -c "input_glod1.nc input_glod2.nc ..."
   -o, --output		 Select the output path and format.
