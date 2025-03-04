@@ -1,21 +1,21 @@
 # Comparisons
 
 Users must switch to the comparison page. Go to the action menu bar and navigate
-to "File → Perform comparisons from a remote sensing instrument" as seen in [Figure 14](#fig-14).
+to "File → Perform comparisons from a remote sensing instrument" as seen in [Figure 15](#fig-15).
 
-<figure align="center" id="fig-14">
+<figure align="center" id="fig-15">
     <img src="../../images/user_guide/action_to_comparisons.png" alt="Action menu option to switch to the comparisons page"/>
-    <figcaption><i>Figure 14</i>: Action menu option to switch to the comparisons page.</figcaption>
+    <figcaption><i>Figure 15</i>: Action menu option to switch to the comparisons page.</figcaption>
 </figure>
 
 ## Comparison Input
 
-<figure align="center" id="fig-15">
+<figure align="center" id="fig-16">
     <img src="../../images/user_guide/initial_comparison_page.png" alt="Initial view of the comparison page"/>
-    <figcaption><i>Figure 15</i>: Initial view of the comparison page.</figcaption>
+    <figcaption><i>Figure 16</i>: Initial view of the comparison page.</figcaption>
 </figure>
 
-The comparison page ([Figure 15](#fig-15)) contains the user input fields at the top:
+The comparison page ([Figure 16](#fig-16)) contains the user input fields at the top:
 - **Lunar Observation Files**:
   - Instrument observation netCDF files in GLOD format to be compared.
     - The format is explained in the *Format* section.
@@ -27,24 +27,24 @@ The comparison page ([Figure 15](#fig-15)) contains the user input fields at the
     - Must contain channels matching those in the observation files.
   - "LOAD FILE": Opens a file selection dialog for selecting the SRF file.
 - **Compare Button**:
-  - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 16](#fig-16)).
+  - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 17](#fig-17)).
   - This button is enabled once valid observations and an SRF file are loaded.
 
 <!-- TODO: Correctly link to the format section -->
 
-<figure align="center" id="fig-16">
+<figure align="center" id="fig-17">
     <img src="../../images/user_guide/processing_comparison_page.png" alt="Comparison page processing comparisons"/>
-    <figcaption><i>Figure 16</i>: Comparison page processing comparisons.</figcaption>
+    <figcaption><i>Figure 17</i>: Comparison page processing comparisons.</figcaption>
 </figure>
 
 ## Comparison Output
 
 Once comparisons are computed, the comparison page presents the results and
-provides tools for exploring the data, as shown in [Figure 17](#fig-17).
+provides tools for exploring the data, as shown in [Figure 18](#fig-18).
 
-<figure align="center" id="fig-17">
+<figure align="center" id="fig-18">
     <img src="../../images/user_guide/comparison_finished.png" alt="Comparison page after comparisons are computed"/>
-    <figcaption><i>Figure 17</i>: Comparison page after comparisons are computed.</figcaption>
+    <figcaption><i>Figure 18</i>: Comparison page after comparisons are computed.</figcaption>
 </figure>
 
 ### Default View
@@ -64,19 +64,19 @@ provides tools for exploring the data, as shown in [Figure 17](#fig-17).
   - **Moon phase angle**
   - **Wavelength**, with two visualization options:
     - **Mean-based Comparison**: Computes the mean of all observations and simulations for each channel.
-    - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 18](#fig-18).
+    - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 19](#fig-19).
 - **New Comparison**: Click "NEW" (top-left) to clear results and start a new comparison.  
-  - A **confirmation dialog** appears, as shown in [Figure 19](#fig-19).
+  - A **confirmation dialog** appears, as shown in [Figure 20](#fig-20).
 
-<figure align="center" id="fig-18">
+<figure align="center" id="fig-19">
     <img src="../../images/user_guide/boxplot_meaning.png" alt="LIME comparisons boxplots dissected"/>
-    <figcaption><i>Figure 18</i>: Breakdown of LIME comparison boxplots.</figcaption>
+    <figcaption><i>Figure 19</i>: Breakdown of LIME comparison boxplots.</figcaption>
 </figure>
 
 
-<figure align="center" id="fig-19">
+<figure align="center" id="fig-20">
     <img src="../../images/user_guide/clear_comparison.png" alt='Dialog asking for confirmation after clicking \"NEW\"'/>
-    <figcaption><i>Figure 19</i>: Dialog asking for confirmation after clicking "NEW"</figcaption>
+    <figcaption><i>Figure 20</i>: Dialog asking for confirmation after clicking "NEW"</figcaption>
 </figure>
 
 

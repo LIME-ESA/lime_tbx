@@ -129,6 +129,7 @@ def process_links_in_doctree(app, doctree, docname):
         "content/readme",
         "content/design",
         "content/implementation",
+        "content/user_guide/overview",
         "content/user_guide/installation",
         "content/user_guide/configuration",
         "content/user_guide/simulations",

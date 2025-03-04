@@ -5,17 +5,21 @@
 LIME Toolbox follows a structured process to compute lunar reflectance and irradiance
 based on precomputed coefficients and user-defined settings. The computed irradiance can
 then be compared against real instrument observations.
+This process is described in ([Figure 1](#fig-1)).
 
 ### Summary of the Process
 1. **Handle input** obtaining **LIME variables**.
 2. **Compute LIME reflectance at CIMEL wavelengths** using LIME **coefficients**.
-3. **Interpolate reflectance** using **ASD or Apollo 16 + Breccia** spectrum.
+3. **Interpolate reflectance** using **ASD** or **Apollo 16 + Breccia** spectrum.
 4. **Convert reflectance to irradiance** using the **selected TSIS-1 SRF instance**.
 5. **Integrate irradiance over the instrument SRF** to compute **channel-specific values**.
-6. **Align simulated irradiance with real instrument observations**.
-7. **Compute difference metrics** (*MRD, MARD, MPD, etc.*).
-8. **Visualise and export results**.
+6. **Compare simulated irradiance against real instrument observations**.
+7. **Visualise and export results**.
 
+<figure align="center" id="fig-1">
+    <img src="../../images/activity_comparison.png" alt="Activity diagram of the Simulation & Comparison Workflow"/>
+    <figcaption><i>Figure 1</i>: Activity diagram of the Simulation & Comparison Workflow.</figcaption>
+</figure>
 
 ### 1. Input Handling
 
@@ -62,14 +66,16 @@ To ensure accuracy, LIME Toolbox computes missing parameters using:
 - Each instrument has a **Spectral Response Function (SRF)** that weights different wavelengths differently.
 - LIME integrates the simulated **irradiance over the instrument SRF**, producing an **integrated irradiance value per spectral channel**.
 
-### 6. Align Simulations Against Observations
+### 6. Compare Simulations against Observations
 Once the simulated **irradiance values per channel** have been computed, they can be **compared against real instrument observations**.
+
+#### 6.1. Align Simulations and Observations
 
 - LIME matches **timestamps** between observations and simulations.
 - Observed irradiance is **compared to the simulated values**.
 - If needed, LIME **recomputes distances and normalisation factors**.
 
-### 7. Computing Comparison Metrics
+#### 6.2. Computing Comparison Metrics
 Once observations and simulations are aligned, LIME computes **comparison metrics**:
 - **Relative Difference (%)**:
   `100 * ((irr_obs - irr_sim) / irr_sim)`
@@ -82,7 +88,7 @@ Once observations and simulations are aligned, LIME computes **comparison metric
   - **Standard Deviation of MRD**
   - **Number of Observations per Channel**
 
-### 8. Visualisation and Data Export
+### 7. Visualisation and Data Export
 Once simulations and comparisons are computed, users can:
 - **Visualise Data**:
   - **Time-series plots** of irradiance and difference.

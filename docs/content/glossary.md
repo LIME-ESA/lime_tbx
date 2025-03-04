@@ -20,11 +20,15 @@ This glossary provides definitions for key terms and concepts used throughout th
 | **KO** | Kick-off meeting | |
 | **LGLOD** | LIME-GLOD | Former term, now deprecated |
 | **LIME** | Lunar Irradiance Model of ESA | |
+| **MARD** | Mean Absolute Relative Difference | |
+| **MPD** | Mean Percentage Difference | |
+| **MRD** | Mean Relative Difference | |
 | **NFR** | Non-Functional Requirement | |
 | **NPL** | National Physical Laboratory | Project partner |
 | **OSF** | Orbit Scenario File | |
 | **ROLO** | RObotic Lunar Observatory | |
 | **SoW** | Statement of Work | |
+| **SRF** | Spectral Response Function | |
 | **TBX** | Toolbox | |
 | **TLE** | Three-Line Element Set | Also known as 3LE |
 | **TOA** | Top of Atmosphere | |
