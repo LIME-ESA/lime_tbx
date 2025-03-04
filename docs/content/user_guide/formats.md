@@ -14,9 +14,9 @@ Spectral Response Function files are structured with two dimensions:
   with each channel.  
   > *(This dimension may have different names depending on the dataset.)*
 
-These dimensions organise the mandatory data variables described in [Table 1](#tab-1).
+These dimensions organise the mandatory data variables described in [Table 2](#tab-2).
 
-<center id='tab-1'>
+<center id='tab-2'>
 
 | **Variable** | **Dimensions** | **dtype** | **Description** |
 |:--------:|:-----------|:------|:------------|
@@ -24,7 +24,7 @@ These dimensions organise the mandatory data variables described in [Table 1](#t
 | `wavelength` | `sample`, `channel` | float | Wavelengths present in each channel |
 | `srf` | `sample`, `channel` | float | Spectral response of each wavelength per channel |
 
-<i>Table 1</i>: Mandatory variables of the Spectral Response Function netCDF file format.
+<i>Table 2</i>: Mandatory variables of the Spectral Response Function netCDF file format.
 
 </center>
 
@@ -41,7 +41,7 @@ It's structured using three dimensions:
 - `sat_xyz`: A dimension without coordinates, representing the three spatial coordinates (x, y, z).
   - This dimension must have a fixed length of three.
 
-<center id='tab-2'>
+<center id='tab-3'>
 
 | **Variable** | **Dimensions** | **dtype** | **Description** |
 |:--------:|:-----------|:------|:------------|
@@ -50,7 +50,7 @@ It's structured using three dimensions:
 | `sat_pos` | `sat_xyz` | float | Coordinates of the observer in `sat_pos_ref` reference frame |
 | `sat_pos_ref` | None | str | Reference frame of the satellite position |
 
-<i>Table 2</i>: Mandatory variables of the Lunar Observation netCDF file format.
+<i>Table 3</i>: Mandatory variables of the Lunar Observation netCDF file format.
 
 </center>
 
@@ -64,10 +64,10 @@ In addition to these variables, the file must include the attribute:
 
 Lunar Observation files should follow the subset of the GLOD format previously described.
 However, if the `sat_pos` variable is not available, LIME Toolbox will instead look for selenographic coordinates.
-In this case, the selenographic variables must follow the schema in [Table 3](#tab-3), where all variables must
+In this case, the selenographic variables must follow the schema in [Table 4](#tab-4), where all variables must
 have `date` as their dimension.
 
-<center id='tab-3'>
+<center id='tab-4'>
 
 | **Variable Name** | **Mandatory** | **Description** |
 |-------------------|---------------|-----------------|
@@ -80,7 +80,7 @@ have `date` as their dimension.
 | `sat_name` | No | Satellite name (used for [handling missing data](#handling-missing-data)) |
 | `geom_factor` or `geom_const` | No | Geometric constant used to normalize observed irradiance |
 
-<i>Table 3</i>: Data variables in the Lunar Observation netCDF file format representing selenographic coordinates.
+<i>Table 4</i>: Data variables in the Lunar Observation netCDF file format representing selenographic coordinates.
 
 </center>
 
@@ -152,7 +152,7 @@ Simulations files contain two additional dimensions:
 
 #### Common Data Variables
 
-LIME Toolbox netCDF files share several core variables based on the GLOD format, described in [Table 4](#tab-4).
+LIME Toolbox netCDF files share several core variables based on the GLOD format, described in [Table 5](#tab-5).
 
 <center>
 
@@ -168,13 +168,13 @@ LIME Toolbox netCDF files share several core variables based on the GLOD format,
 | `irr_obs` | `number_obs`, `chan` | float64 | Simulated integrated lunar irradiance for each channel. |
 | `irr_obs_unc` | `number_obs`, `chan` | float64 | Uncertainties of the simulated integrated lunar irradiance for each channel. |
 
-<i>Table 4</i>: Common data variables in all LIME Toolbox netCDF files.
+<i>Table 5</i>: Common data variables in all LIME Toolbox netCDF files.
 
 </center>
 
 #### Comparison Specific Variables
 
-Comparison files contain additional variables that store observed and computed differences, detailed in [Table 5](#tab-5).
+Comparison files contain additional variables that store observed and computed differences, detailed in [Table 6](#tab-6).
 
 <center>
 
@@ -193,13 +193,13 @@ Comparison files contain additional variables that store observed and computed d
 | `number_samples` | `chan` | float64 | Number of comparisons for each channel. |
 
 
-<i>Table 5</i>: Data variables in LIME Toolbox Comparison netCDF files.
+<i>Table 6</i>: Data variables in LIME Toolbox Comparison netCDF files.
 
 </center>
 
 #### Simulation Specific Variables 
 
-Simulation files contain additional variables that store spectral data, described in [Table 6](#tab-6).
+Simulation files contain additional variables that store spectral data, described in [Table 7](#tab-7).
 
 <center>
 
@@ -221,6 +221,6 @@ Simulation files contain additional variables that store spectral data, describe
 | `polar_cimel_unc` | `number_obs`, `wlens_cimel` | float64 | Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths. |
 
 
-<i>Table 6</i>: Data variables in LIME Toolbox Simulation netCDF files.
+<i>Table 7</i>: Data variables in LIME Toolbox Simulation netCDF files.
 
 </center>
