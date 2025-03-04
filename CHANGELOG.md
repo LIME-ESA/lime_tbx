@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated Build & Packaging (**NFR409**):
   - Linux: Fully automated build through Docker.
   - Windows: Partially automated build through Docker for Windows. All automated except first step:
-    compiling EOCFI C Code, which isn't mandatory for each build.
+    compiling EO-CFI C Code, which isn't mandatory for each build.
 - Timeseries input file now also accepts regular format timestamps, not only CSV.
 - Added METOP-A, METOP-B and METOP-C data (TLE/3LE). METOP-B and METOP-C will need to be periodically updated.
 - Updated TLE/3LE data for PLEIADES 1A, PLEIADES 1B and PROBA-V, now covering the period from their launch until 2024-12-06.

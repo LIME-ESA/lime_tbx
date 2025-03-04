@@ -96,7 +96,7 @@ The `geom_factor` (or `geom_const`) represents the geometric constant used in ir
 
 If any mandatory variable is missing, LIME Toolbox will automatically compute them using:  
 - **SPICE library** → Computes `distance_sun_moon` and `sun_sel_lon`.  
-- **SPICE + EOCFI libraries** → Compute `distance_sat_moon`, `sat_sel_lon`, `sat_sel_lat`, and `phase_angle`.  
+- **SPICE + EO-CFI libraries** → Compute `distance_sat_moon`, `sat_sel_lon`, `sat_sel_lat`, and `phase_angle`.  
   > For these four latter variables, LIME Toolbox requires the satellite name (`sat_name`),  
   > - It must be a string and must match a satellite in the LIME Toolbox satellite list.
 

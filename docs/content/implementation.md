@@ -150,7 +150,7 @@ automated deployment whenever possible, whioh is explained in Section
 - `pyinstaller` installed outside of the virtual environment.
 
 
-#### 1. Compile C code for EOCFI
+#### 1. Compile C code for EO-CFI
 This step compiles a small C program with the EO-CFI libraries to generate a binary required by LIME Toolbox.
 This is only needed if the C source code has been modified, the EO-CFI libraries have been updated, or the
 binary does not work on your system.
