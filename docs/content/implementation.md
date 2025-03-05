@@ -164,7 +164,7 @@ make
 ```
 
 In Windows:
-```dos
+```bat
 cd lime_tbx\business\eocfi_adapter\eocfi_c
 copy make.mak Makefile
 nmake
