@@ -179,6 +179,15 @@
  *             |         |          |                       | New features:                       |
  *             |         |          |                       |  + Support for ANX drift in OSF     |
  *             +----------------------------------------------------------------------------------+
+ *             |   4.26  | 31/10/23 | DEIMOS Space S.L.U    | Maintenance release                 |
+ *             |         |          |                       | New features:                       |
+ *             |         |          |                       |  + Support for longitude drift      |
+ *             +----------------------------------------------------------------------------------+
+ *             |   4.27  |07/06/24  | DEIMOS Space S.L.U    | Maintenance release                 |
+ *             |         |          |                       | New features:                       |
+ *             |         |          |                       |  + Use the NORAD catalogue number   |
+ *             |         |          |                       |    to identify TLE instead of Name  |
+ *             +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 #ifndef EXPLORER_VISIBILITY_H

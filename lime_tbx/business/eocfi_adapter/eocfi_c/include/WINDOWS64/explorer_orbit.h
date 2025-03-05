@@ -201,6 +201,15 @@
  *               |         |          |                   | New features:                           |
  *               |         |          |                   |  + Support for ANX drift in OSF         |
  *               +----------------------------------------------------------------------------------+
+ *               |   4.26  | 31/10/23 | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |  + Support for longitude drift          |
+ *               +----------------------------------------------------------------------------------+
+ *               |   4.27  | 07/06/24 | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |  + Use the NORAD catalogue number to    |
+ *               |         |          |                   |    identify TLE record instead of Name  |
+ *               +----------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
@@ -1008,14 +1017,12 @@ extern "C"
     XO_CFI_TIME_TO_ORBIT_FLAG_ERR = XL_ZERO_E,
     XO_CFI_TIME_TO_ORBIT_ORBIT_STATUS_ERR,
     XO_CFI_TIME_TO_ORBIT_TIME_ERR,
-    XO_CFI_TIME_TO_ORBIT_BEFORE_RANGE_ERR,
     XO_CFI_TIME_TO_ORBIT_COMPUTE_ERR,
     XO_CFI_TIME_TO_ORBIT_WRONG_ORBIT_MODE_ERR,
-    XO_CFI_TIME_TO_ORBIT_TIME_BEFORE_RANGE_WARN,
-    XO_CFI_TIME_TO_ORBIT_TIME_AFTER_RANGE_WARN,
     XO_CFI_TIME_TO_ORBIT_COMPUTE_WARN,
     XO_CFI_TIME_TO_ORBIT_GEO_SAT_ERR,
-    XO_CFI_TIME_TO_ORBIT_SP3_ERR // AN-550
+    XO_CFI_TIME_TO_ORBIT_SP3_ERR, // AN-550
+    XO_CFI_TIME_TO_ORBIT_TLE_GAP_WARN
   } XO_CFI_Time_to_orbit_err_enum;
 
   /* Error codes list of xo_orbit_rel_from_abs */
@@ -1687,6 +1694,13 @@ extern "C"
                            xo_orbit_id* orbit_id,
                            long ierr[XO_NUM_ERR_ORBIT_INIT_DEF]);
 
+  long xo_orbit_init_def_3(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time0, long* orbit0, xo_ref_orbit_info* ref_orbit_info,
+                           /* output */
+                           double* val_time0,
+                           double* val_time1,
+                           xo_orbit_id* orbit_id,
+                           long ierr[XO_NUM_ERR_ORBIT_INIT_DEF]);
+
   long xo_orbit_cart_init(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, long* time_ref, double* time, double pos[XO_MAX_LENGTH_3], double vel[XO_MAX_LENGTH_3], long* abs_orbit,
                           /* output */
                           double* val_time0,
@@ -2011,6 +2025,22 @@ extern "C"
                                /* output */
                                long ierr[XO_NUM_ERR_GEN_OSF_CREATE]);
 
+  long xo_gen_osf_create_3(long* sat_id, xl_model_id* model_id, xl_time_id* time_id, double* date, xo_mission_info* mission_info, xo_ref_orbit_info* ref_orbit_info, char* output_dir, char* output_filename, char* file_class, long* version_number, char* system,
+                           /*output*/
+                           long ierr[XO_NUM_ERR_GEN_OSF_CREATE]);
+
+  long xo_gen_osf_create_run_3(long* run_id,
+                               double* date,
+                               xo_mission_info* mission_info,
+                               xo_ref_orbit_info* ref_orbit_info,
+                               char* output_dir,
+                               char* output_filename,
+                               char* file_class,
+                               long* version_number,
+                               char* system,
+                               /* output */
+                               long ierr[XO_NUM_ERR_GEN_OSF_CREATE]);
+
   long xo_gen_osf_append_orbit_change(long* sat_id,
                                       xl_model_id* model_id,
                                       xl_time_id* time_id,
@@ -2067,6 +2097,32 @@ extern "C"
                                         long ierr[]);
 
   long xo_gen_osf_append_orbit_change_run_2(long* run_id,
+                                            char* input_filename,
+                                            long* abs_orbit_number,
+                                            xo_ref_orbit_info* ref_orbit_info,
+                                            long* phase_increment,
+                                            char* output_dir,
+                                            char* output_filename,
+                                            char* file_class,
+                                            long* version_number,
+                                            char* system,
+                                            /* output */
+                                            long ierr[]);
+  long xo_gen_osf_append_orbit_change_3(long* sat_id,
+                                        xl_model_id* model_id,
+                                        xl_time_id* time_id,
+                                        char* input_filename,
+                                        long* abs_orbit_number,
+                                        xo_ref_orbit_info* ref_orbit_info,
+                                        long* phase_increment,
+                                        char* output_dir,
+                                        char* output_filename,
+                                        char* file_class,
+                                        long* version_number,
+                                        char* system,
+                                        long ierr[]);
+
+  long xo_gen_osf_append_orbit_change_run_3(long* run_id,
                                             char* input_filename,
                                             long* abs_orbit_number,
                                             xo_ref_orbit_info* ref_orbit_info,
@@ -2136,6 +2192,36 @@ extern "C"
                                         long ierr[]);
 
   long xo_gen_osf_change_repeat_cycle_run_2(long* run_id,
+                                            char* input_filename,
+                                            long* abs_orbit_number,
+                                            long* search_direction,
+                                            xo_ref_orbit_info* ref_orbit_info,
+                                            long* phase_increment,
+                                            char* output_dir,
+                                            char* output_filename,
+                                            char* file_class,
+                                            long* version_number,
+                                            char* system,
+                                            /* output */
+                                            long ierr[]);
+
+  long xo_gen_osf_change_repeat_cycle_3(long* sat_id,
+                                        xl_model_id* model_id,
+                                        xl_time_id* time_id,
+                                        char* input_filename,
+                                        long* abs_orbit_number,
+                                        long* search_direction,
+                                        xo_ref_orbit_info* ref_orbit_info,
+                                        long* phase_increment,
+                                        char* output_dir,
+                                        char* output_filename,
+                                        char* file_class,
+                                        long* version_number,
+                                        char* system,
+                                        /* output */
+                                        long ierr[]);
+
+  long xo_gen_osf_change_repeat_cycle_run_3(long* run_id,
                                             char* input_filename,
                                             long* abs_orbit_number,
                                             long* search_direction,

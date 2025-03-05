@@ -157,7 +157,7 @@ binary does not work on your system.
 
 In Linux or Mac:
 ```sh
-cd lime_tbx/eocfi_adapter/eocfi_c
+cd lime_tbx/business/eocfi_adapter/eocfi_c
 cp MakefileLinux Makefile # Linux
 cp MakefileDarwin Makefile # Mac
 make
@@ -165,7 +165,7 @@ make
 
 In Windows:
 ```dos
-cd lime_tbx\eocfi_adapter\eocfi_c
+cd lime_tbx\business\eocfi_adapter\eocfi_c
 copy make.mak Makefile
 nmake
 ```
