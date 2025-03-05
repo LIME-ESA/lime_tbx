@@ -18,19 +18,16 @@ to "File → Perform comparisons from a remote sensing instrument" as seen in [F
 The comparison page ([Figure 16](#fig-16)) contains the user input fields at the top:
 - **Lunar Observation Files**:
   - Instrument observation netCDF files in GLOD format to be compared.
-    - The format is explained in the *Format* section.
+    - GLOD formats are explained in the [File Formats](./formats.md) section.
   - "LOAD FILES": Opens a file selection dialog for loading observation files.
   - "UNLOAD FILES": Clears all loaded observation files.
 - **SRF File**:
   - SRF netCDF file in GLOD format.
-    - The format is explained in the *Format* section.
     - Must contain channels matching those in the observation files.
   - "LOAD FILE": Opens a file selection dialog for selecting the SRF file.
 - **Compare Button**:
   - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 17](#fig-17)).
   - This button is enabled once valid observations and an SRF file are loaded.
-
-<!-- TODO: Correctly link to the format section -->
 
 <figure align="center" id="fig-17">
     <img src="../../images/user_guide/processing_comparison_page.png" alt="Comparison page processing comparisons"/>
@@ -131,7 +128,7 @@ Using `graphd`:
 ```
 
 #### Data Export (CSV File)
-Specify the the comparison variable, difference metric, and file paths for each channel:
+Specify the comparison variable, difference metric, and file paths for each channel:
 ```sh
 -o csv,(DT|MPA|BOTH|CHANNEL|CHANNEL_MEAN),(rel|perc|none),comparison_channel_1,comparison_channel_2,...,comparison_channel_n
 ```

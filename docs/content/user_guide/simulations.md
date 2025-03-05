@@ -168,7 +168,7 @@ Users can select one of the following button to run simulations and view results
 - **"REFLECTANCE"** – Shows reflectance results.
 - **"POLARIZATION"** – Visualizes Degree of Lunar Polarisation (DoLP).
 
-These buttons are positioned between the input and the output, as shown on thop of [Figure 12](#fig-12).
+These buttons are positioned between the input and the output, as shown on top of [Figure 12](#fig-12).
 
 <figure align="center" id="fig-12">
     <img src="../../images/user_guide/simulation_output.png" alt="Simulation output"/>
@@ -264,10 +264,8 @@ By default, LIME Toolbox includes a default SRF that encompasses the entire LIME
 
 #### Loading a New SRF
 1. Click "LOAD" (top-right corner in [Figure 14](#fig-14)).  
-2. Select a netCDF SRF file in GLOD format (explained in the *Format* section).  
+2. Select a netCDF SRF file in GLOD format (explained in the [File Formats](./formats.md) section).
 3. Once loaded, use the dropdown menu next to the "LOAD" button to switch between SRFs.
-
-<!-- TODO: Correctly link to the Format Section-->
 
 This can also be done in the CLI using the `-f` or `--srf` option followed by the SRF path:
 ```sh

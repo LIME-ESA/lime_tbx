@@ -43,7 +43,7 @@ The LIME Toolbox is only compatible with the following operating systems and arc
 
 1. Download the Linux `.zip` installer.
 2. Extract the files into a directory.
-3. Run the instller inside that directory:
+3. Run the installer inside that directory:
     ```sh
     sudo ./lime_installer.sh 
     ```

@@ -29,17 +29,19 @@ These dimensions organise the mandatory data variables described in [Table 2](#t
 </center>
 
 *Note*: The variable `wavelength` must contain the attribute `units`, which value must be the
-variable unit symbol by the IS. For example "nm".
+variable unit symbol by the IS. For example, "nm".
 
 ## Lunar Observation
 
 Lunar Observation files format is a subset of the GLOD format for lunar observations.
 It's structured using three dimensions:
 - `date`: A coordinate and dimension representing the time of the lunar observation.
-  - Stored as a double precission float. Units: seconds since EPOCH.
+  - Stored as a double precision float. Units: seconds since EPOCH.
 - `chan`: A dimension without coordinates, where each value represents a different spectral channel.
 - `sat_xyz`: A dimension without coordinates, representing the three spatial coordinates (x, y, z).
   - This dimension must have a fixed length of three.
+
+These dimensions structure the required data variables outlined in [Table 3](#tab-3).
 
 <center id='tab-3'>
 
@@ -55,7 +57,7 @@ It's structured using three dimensions:
 </center>
 
 *Note*: The variable `sat_pos` must contain the attribute `units`, which value must be the
-variable unit symbol by the IS. For example km".
+variable unit symbol by the IS. For example, "km".
 
 In addition to these variables, the file must include the attribute:
 - `data_source`: Specifies the origin of the observation data.
