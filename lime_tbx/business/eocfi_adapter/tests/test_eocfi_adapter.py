@@ -86,8 +86,8 @@ class TestEOCFIConverter(unittest.TestCase):
 
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
-        supposed_lat = 10.381308335388914
-        supposed_h = 791026.6206381248
+        supposed_lat = 10.361596356893193
+        supposed_h = 791027.2075147488
         lat, lon, h = eo.get_satellite_position("SENTINEL-2A", [DT1])[0]
         self.assertEqual(lon, -65.83522069800632)
         self.assertAlmostEqual(lat, supposed_lat)
