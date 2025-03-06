@@ -24,20 +24,28 @@ Interpolation settings can be modified through the interpolation settings window
 
 1. Go to the the action menu bar and navigate to "Settings → Interpolation options" ([Figure 4](#fig-4)).
 
-<figure align="center" id="fig-4">
-    <img src="../../images/user_guide/open_interp_settings.png" alt="Opening the Interpolation Settings Window"/>
-    <figcaption><i>Figure 4</i>: Opening the Interpolation Settings Window.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/open_interp_settings.png
+   :name: fig-4
+   :align: center
+   :alt: Opening the Interpolation Settings Window
 
-2. The **Interpolation Settings** window ([Figure 5](#fig-5)) will appear.
+   Opening the Interpolation Settings Window.
+```
+
+1. The **Interpolation Settings** window ([Figure 5](#fig-5)) will appear.
    - The first two settings are dropdowns.
    - The remaining three settings are checkboxes.
    - Click "Save" to apply changes or "Cancel" to close without saving.
 
-<figure align="center" id="fig-5">
-    <img src="../../images/user_guide/inter_settings.png" alt="Interpolation Settings Window"/>
-    <figcaption><i>Figure 5</i>: Interpolation Settings Window.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/inter_settings.png
+   :name: fig-5
+   :align: center
+   :alt: Interpolation Settings Window
+
+   Interpolation Settings Window.
+```
 
 ### Command-Line Interface (CLI)
 
@@ -47,6 +55,9 @@ The option must be followed by a string in JSON-formatted string, including any 
 
 <center id='tab-1'>
 
+```{eval-rst}
+.. tabularcolumns:: |p{4cm}|p{4.5cm}|p{5cm}|
+```
 | **Attribute** | **Related Setting** | **Valid Values** |
 |---------------|---------------------|------------------|
 | `interp_spectrum` | Interpolation Reference | `ASD` or `Apollo 16 + Breccia` |

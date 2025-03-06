@@ -9,10 +9,14 @@ Users can select one of three simulation methods:
 - **Selenographic Coordinates** – Based on a location on the Moon.
 - **Satellite Position** – Based on an orbiting satellite’s position.
 
-<figure align="center" id="fig-6">
-    <img src="../../images/user_guide/simulation_view.png" alt="Simulation page"/>
-    <figcaption><i>Figure 6</i>: Simulation page.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/simulation_view.png
+   :name: fig-6
+   :align: center
+   :alt: Simulation page
+
+   Simulation page.
+```
 
 ## Simulation Using Geographic Coordinates
 
@@ -22,19 +26,26 @@ Users must provide:
 - **Altitude** (in kilometers)
 - **UTC Date & Time**
 
-<figure align="center" id="fig-7">
-    <img src="../../images/user_guide/geographic_input.png" alt="Geographic coordinates input"/>
-    <figcaption><i>Figure 7</i>: Geographic coordinates input.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/geographic_input.png
+   :name: fig-7
+   :align: center
+   :alt: Geographic coordinates input
 
+   Geographic coordinates input.
+```
 
 ### Time-Series Input
 For multiple timestamps, click "LOAD TIME-SERIES", which enables time-series file input ([Figure 8](#fig-8)).
 
-<figure align="center" id="fig-8">
-    <img src="../../images/user_guide/geographic_input_multidates.png" alt="Geographic coordinates input for multiple timestamps"/>
-    <figcaption><i>Figure 8</i>: Geographic coordinates input for multiple timestamps.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/geographic_input_multidates.png
+   :name: fig-8
+   :align: center
+   :alt: Geographic coordinates input for multiple timestamps
+
+   Geographic coordinates input for multiple timestamps.
+```
 
 #### Loading Time-Series Data
 1. Click "LOAD FILE" to open a file selection dialog.
@@ -82,10 +93,14 @@ Users must provide:
 - **Selenographic Longitude of the Sun** (radians)
 - **Moon Phase Angle** (decimal degrees)
 
-<figure align="center" id="fig-9">
-    <img src="../../images/user_guide/selenographic_input.png" alt="Selenographic coordinates input"/>
-    <figcaption><i>Figure 9</i>: Selenographic coordinates input.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/selenographic_input.png
+   :name: fig-9
+   :align: center
+   :alt: Selenographic coordinates input
+
+   Selenographic coordinates input.
+```
 
 ### Command-Line Interface (CLI)
 Use the `-l` or `--lunar` option:
@@ -117,10 +132,14 @@ Users must:
 - **Provide a UTC Date & Time**.
   >  *Note*: Time-series input works the same as in [Geographic Coordinates](#simulation-using-geographic-coordinates).
 
-<figure align="center" id="fig-10">
-    <img src="../../images/user_guide/satellite_input.png" alt="Satellite position input"/>
-    <figcaption><i>Figure 10</i>: Satellite position input.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/satellite_input.png
+   :name: fig-10
+   :align: center
+   :alt: Satellite position input
+
+   Satellite position input.
+```
 
 ### Adding a New Satellite
 
@@ -136,10 +155,14 @@ It's possible to add user-defined satellites to the list of available satellites
     - **End time**: Date when the file validity stops.
 5. Click "SAVE SATELLITE DATA" to store the loaded data in the local LIME Toolbox system.
 
-<figure align="center" id="fig-11">
-    <img src="../../images/user_guide/add_satellite_data_window.png" alt="Add Satellite Data window"/>
-    <figcaption><i>Figure 11</i>: Add Satellite Data window.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/add_satellite_data_window.png
+   :name: fig-11
+   :align: center
+   :alt: Add Satellite Data window
+
+   Add Satellite Data window.
+```
 
 
 ### Command-Line Interface (CLI)
@@ -170,10 +193,14 @@ Users can select one of the following button to run simulations and view results
 
 These buttons are positioned between the input and the output, as shown on top of [Figure 12](#fig-12).
 
-<figure align="center" id="fig-12">
-    <img src="../../images/user_guide/simulation_output.png" alt="Simulation output"/>
-    <figcaption><i>Figure 12</i>: Simulation output.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/simulation_output.png
+   :name: fig-12
+   :align: center
+   :alt: Simulation output
+
+   Simulation output.
+```
 
 Results are plotted with:
 - **X-axis** → Wavelengths.
@@ -241,10 +268,14 @@ LIME Toolbox integrates the calculated irradiance over the selected spectral res
 These values appear in the "Signal" tab ([Figure 13](#fig-13)), showing one value per SRF channel,
 and can be exported as CSV.
 
-<figure align="center" id="fig-13">
-    <img src="../../images/user_guide/signal_tab.png" alt="Signal tab showing some results for the CIMEL SRF"/>
-    <figcaption><i>Figure 13</i>: Signal tab showing some results for the CIMEL SRF.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/signal_tab.png
+   :name: fig-13
+   :align: center
+   :alt: Signal tab showing some results for the CIMEL SRF
+
+   Signal tab showing some results for the CIMEL SRF.
+```
 
 ### Spectral Response Functions (SRF)
 
@@ -255,10 +286,14 @@ Users can visualise, load, and switch between different SRFs in the "SRF" tab
   - Y-axis represents the spectral response.
 - Two vertical black lines marking the lower and upper simulation limits of LIME Toolbox.
 
-<figure align="center" id="fig-14">
-    <img src="../../images/user_guide/srf_tab.png" alt="SRF tab showing CIMEL SRF"/>
-    <figcaption><i>Figure 14</i>: SRF tab showing CIMEL SRF.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/srf_tab.png
+   :name: fig-14
+   :align: center
+   :alt: SRF tab showing CIMEL SRF
+
+   SRF tab showing CIMEL SRF.
+```
 
 By default, LIME Toolbox includes a default SRF that encompasses the entire LIME spectrum, named "Default".
 

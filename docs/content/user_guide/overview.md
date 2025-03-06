@@ -16,10 +16,14 @@ This process is described in ([Figure 1](#fig-1)).
 6. **Compare simulated irradiance against real instrument observations**.
 7. **Visualise and export results**.
 
-<figure align="center" id="fig-1">
-    <img src="../../images/activity_comparison.png" alt="Activity diagram of the Simulation & Comparison Workflow"/>
-    <figcaption><i>Figure 1</i>: Activity diagram of the Simulation & Comparison Workflow.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/activity_comparison.png
+   :name: fig-1
+   :align: center
+   :alt: Activity diagram of the Simulation & Comparison Workflow
+
+   Activity diagram of the Simulation & Comparison Workflow.
+```
 
 ### 1. Input Handling
 

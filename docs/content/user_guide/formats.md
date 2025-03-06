@@ -156,8 +156,11 @@ Simulations files contain two additional dimensions:
 
 LIME Toolbox netCDF files share several core variables based on the GLOD format, described in [Table 5](#tab-5).
 
-<center>
+<center id='tab-5'>
 
+```{eval-rst}
+.. tabularcolumns:: |p{3.1cm}|p{2cm}|p{1cm}|p{7.5cm}|
+```
 | **Variable** | **Dimensions** | **dtype** | **Description** |
 |------------|------------|--------|-------------|
 | `date` | `date` | float64 | Time of lunar observation, seconds since epoch. |
@@ -178,8 +181,11 @@ LIME Toolbox netCDF files share several core variables based on the GLOD format,
 
 Comparison files contain additional variables that store observed and computed differences, detailed in [Table 6](#tab-6).
 
-<center>
+<center id='tab-6'>
 
+```{eval-rst}
+.. tabularcolumns:: |p{2.5cm}|p{2cm}|p{1cm}|p{8cm}|
+```
 | **Variable** | **Dimensions** | **dtype** | **Description** |
 |------------|------------|--------|-------------|
 | `irr_comp` | `number_obs`, `chan` | float64 | Integrated lunar irradiance for each channel observed with the instrument, obtained from the user defined observation files. |
@@ -203,8 +209,11 @@ Comparison files contain additional variables that store observed and computed d
 
 Simulation files contain additional variables that store spectral data, described in [Table 7](#tab-7).
 
-<center>
+<center id='tab-7'>
 
+```{eval-rst}
+.. tabularcolumns:: |p{3.3cm}|p{2cm}|p{1cm}|p{8cm}|
+```
 | **Variable** | **Dimensions** | **dtype** | **Description** |
 |------------|------------|--------|-------------|
 | `wlens` | `wlens` | float64 | Wavelengths for `irr_spectrum`, `refl_spectrum`, and `polar_spectrum`. |

@@ -2,8 +2,11 @@
 
 This glossary provides definitions for key terms and concepts used throughout the LIME Toolbox documentation.
 
+```{eval-rst}
+.. tabularcolumns:: |p{2.5cm}|p{8cm}|p{3cm}|
+```
 | **Abbreviation** | **Stands for** | **Notes** |
-|:------------:|:-----------|:------|
+|------------------|----------------|-----------|
 | **ASD** | Analytical Spectral Devices - Instrument manufacturer | Also refers to the instrument itself |
 | **Cimel** | (Not an abbreviation) Instrument manufacturer | Also refers to the instrument itself |
 | **CSV** | Comma-Separated Values | |

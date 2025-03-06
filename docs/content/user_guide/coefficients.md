@@ -11,11 +11,14 @@ To update the coefficients, navigate to "Coefficients → Download updated coeff
 
 A window will appear indicating that the coefficient download is in progress, as shown in [Figure 21](#fig-21).
 
-<figure align="center" id="fig-21">
-    <img src="../../images/user_guide/downloading_coefficients.png" alt="Window displaying coefficients download in progress"/>
-    <figcaption><i>Figure 21</i>: Coefficients download in progress.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/downloading_coefficients.png
+   :name: fig-21
+   :align: center
+   :alt: Window displaying coefficients download in progress
 
+   Coefficients download in progress.
+```
 
 Once the process is complete, the window will display:
 - The number of new coefficient versions downloaded.  
@@ -25,20 +28,32 @@ The result may indicate that new coefficients were downloaded ([Figure 22](#fig-
 or that no new updates were available ([Figure 23](#fig-23)).
 If there was an issue connecting to the coefficients server, an error message will be displayed ([Figure 24](#fig-24)).
 
-<figure align="center" id="fig-22">
-    <img src="../../images/user_guide/download_coeffs_one.png" alt="Window displaying that there was one new coefficient version"/>
-    <figcaption><i>Figure 22</i>: One new coefficient version.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/download_coeffs_one.png
+   :name: fig-22
+   :align: center
+   :alt: Window displaying that there was one new coefficient version
 
-<figure align="center" id="fig-23">
-    <img src="../../images/user_guide/download_coeffs_none.png" alt="Window displaying that there were no new coefficients"/>
-    <figcaption><i>Figure 23</i>: No new coefficient updates available.</figcaption>
-</figure>
+   One new coefficient version.
+```
 
-<figure align="center" id="fig-24">
-    <img src="../../images/user_guide/download_coeffs_err.png" alt="Window displaying that there were errors downloading the coefficients"/>
-    <figcaption><i>Figure 24</i>: Error downloading the coefficients.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/download_coeffs_none.png
+   :name: fig-23
+   :align: center
+   :alt: Window displaying that there were no new coefficients
+
+   No new coefficient updates available.
+```
+
+```{eval-rst}
+.. figure:: ../../images/user_guide/download_coeffs_err.png
+   :name: fig-24
+   :align: center
+   :alt: Window displaying that there were errors downloading the coefficients
+
+   Error downloading the coefficients.
+```
 
 ### Updating the Coefficients via CLI
 
@@ -57,11 +72,14 @@ To change the version:
 2. Select the desired coefficient version.
 3. Click "SAVE" to confirm the selection.
 
-<figure align="center" id="fig-25">
-    <img src="../../images/user_guide/select_coefficients.png" alt="Window displaying coefficient selection options"/>
-    <figcaption><i>Figure 25</i>: Selecting a coefficient version.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/select_coefficients.png
+   :name: fig-25
+   :align: center
+   :alt: Window displaying coefficient selection options
 
+   Selecting a coefficient version.
+```
 
 ### Choosing the Coefficients Version via CLI
 

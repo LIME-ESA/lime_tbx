@@ -16,3 +16,7 @@
 .wy-nav-content {
     max-width: 900px;
 }
+
+figure .caption-text {
+    font-style: normal !important;
+}
