@@ -209,7 +209,7 @@ pdf_make:
   stage: Build latex Documentation
   needs: []
   script:
-    - pip install myst_parser
+    - pip install .[docs]
     - sphinx-build docs latex -b latex
     - cp -r latex ./docs/quality_documentation/latex
   artifacts:
