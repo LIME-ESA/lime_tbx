@@ -13,23 +13,32 @@ The LIME Toolbox is only compatible with the following operating systems and arc
 
 1. Download the Windows install wizard.
 2. Run it.
-3. Follow the wizard instructions to complete the installation ([Figure 1](#fig-1)).
+3. Follow the wizard instructions to complete the installation ([Figure 2](#fig-2)).
 
-<figure align="center" id="fig-1">
-    <img src="../../images/user_guide/windows_wizard.png" alt="Windows installation wizard"/>
-    <figcaption><i>Figure 1</i>: Windows installation wizard.</figcaption>
-</figure>
+
+```{eval-rst}
+.. figure:: ../../images/user_guide/windows_wizard.png
+   :name: fig-2
+   :align: center
+   :alt: Windows installation wizard
+
+   Windows installation wizard.
+```
 
 ### Mac
 
 1. Download the `.pkg` installer for macOS.
 2. Run the `.pkg` file.
-3. Follow the installation wizard instructions ([Figure 2](#fig-2)).
+3. Follow the installation wizard instructions ([Figure 3](#fig-3)).
 
-<figure align="center" id="fig-2">
-    <img src="../../images/user_guide/mac_wizard.png" alt="Mac installation wizard"/>
-    <figcaption><i>Figure 2</i>: Mac installation wizard.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/mac_wizard.png
+   :name: fig-3
+   :align: center
+   :alt: Mac installation wizard
+
+   Mac installation wizard.
+```
 
 ### Debian (Ubuntu) 
 
@@ -43,7 +52,7 @@ The LIME Toolbox is only compatible with the following operating systems and arc
 
 1. Download the Linux `.zip` installer.
 2. Extract the files into a directory.
-3. Run the instller inside that directory:
+3. Run the installer inside that directory:
     ```sh
     sudo ./lime_installer.sh 
     ```

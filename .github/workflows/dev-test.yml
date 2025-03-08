@@ -1,0 +1,37 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!master'
+  workflow_dispatch:
+
+jobs:
+  tox:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: getsentry/action-setup-venv@v2.1.1
+        id: venv
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+            MANIFEST.in
+          install-cmd: pip install .[dev] .[pyside2]
+      - name: Run Tox tests
+        run: |
+          mkdir test_report
+          source .venv/bin/activate
+          export GITLAB_CI="GITLAB_CI"
+          tox
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test_report/

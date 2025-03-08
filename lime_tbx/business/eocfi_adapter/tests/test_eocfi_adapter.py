@@ -86,23 +86,27 @@ class TestEOCFIConverter(unittest.TestCase):
 
     def test_get_satellite_position_ok(self):
         eo = get_eocfi_converter()
-        supposed_lat = 10.381308335388914
-        supposed_h = 791026.6206381248
+        exp_lon = -65.83522069800632
+        exp_lat = 10.361596356893193
+        exp_h = 791027.2075147488
         lat, lon, h = eo.get_satellite_position("SENTINEL-2A", [DT1])[0]
-        self.assertEqual(lon, -65.8307798442806)
-        self.assertAlmostEqual(lat, supposed_lat)
-        self.assertAlmostEqual(h, supposed_h)
-        if lat != supposed_lat:
+        self.assertAlmostEqual(lon, exp_lon, 13)
+        self.assertAlmostEqual(lat, exp_lat, 12)
+        self.assertAlmostEqual(h, exp_h)
+        if lon != exp_lon:
+            print()
             print(
-                "\nWARNING: In test_get_satellite_position_ok, lat != supposed_lat. Unexplained Windows behaviour.\n {} != {}\n".format(
-                    lat, supposed_lat
-                )
+                f"WARNING: test_get_satellite_position_ok: lon != exp_lon. {lon} != {exp_lon}"
             )
-        if h != supposed_h:
+        if lat != exp_lat:
+            print()
             print(
-                "\nWARNING: In test_get_satellite_position_ok, h != supposed_h. Unexplained Windows behaviour.\n {} != {}\n".format(
-                    h, supposed_h
-                )
+                f"WARNING: test_get_satellite_position_ok: lat != exp_lat. {lat} != {exp_lat}"
+            )
+        if h != exp_h:
+            print()
+            print(
+                f"WARNING: test_get_satellite_position_ok: h != exp_h. {h} != {exp_h}"
             )
 
     def test_get_satellite_position_naive_datetime(self):

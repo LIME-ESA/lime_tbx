@@ -170,6 +170,15 @@
  *              |         |          |                   | New features:                      |
  *              |         |          |                   |  + Support for ANX drift in OSF    |
  *              +-----------------------------------------------------------------------------+
+ *              |   4.26  | 31/10/23 | DEIMOS Space S.L.U| Maintenance release                |
+ *              |         |          |                   | New features:                      |
+ *              |         |          |                   |  + Support for longitude drift     |
+ *              +-----------------------------------------------------------------------------+
+ *              |   4.27  |07/06/24  | DEIMOS Space S.L.U| Maintenance release                |
+ *              |         |          |                   | New features:                      |
+ *              |         |          |                   |  + Use the NORAD catalogue number  |
+ *              |         |          |                   |    to identify TLE instead of Name |
+ *              +-----------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
@@ -1406,6 +1415,7 @@ extern "C"
     XD_CFI_XML_VALIDATE_NO_SCHEMA_ERR,
     XD_CFI_XML_VALIDATE_WRONG_MODE_ERR,
     XD_CFI_XML_VALIDATE_OPEN_FILE_ERR,
+    XD_CFI_XML_VALIDATE_LOCK_ERR,
     XD_CFI_XML_VALIDATE_COPY_FILE_ERR,
     XD_CFI_XML_VALIDATE_NO_SCHEMA_IN_FILE_ERR,
     XD_CFI_XML_VALIDATE_INCONSITENT_SCHEMA_VERS_ERR,

@@ -21,6 +21,8 @@ import os
 import sys
 import re
 
+from sphinx.application import Sphinx
+
 import lime_tbx
 
 sys.path.append(os.path.abspath("_templates"))
@@ -129,6 +131,7 @@ def process_links_in_doctree(app, doctree, docname):
         "content/readme",
         "content/design",
         "content/implementation",
+        "content/user_guide/overview",
         "content/user_guide/installation",
         "content/user_guide/configuration",
         "content/user_guide/simulations",
@@ -139,9 +142,14 @@ def process_links_in_doctree(app, doctree, docname):
             process_node(node)
 
 
-def setup(app):
+def on_builder_inited(app: Sphinx):
+    if app.builder.name not in ("pdf", "latex"):
+        run_apidoc(app)
+
+
+def setup(app: Sphinx):
+    app.connect("builder-inited", on_builder_inited)
     app.connect("doctree-resolved", process_links_in_doctree)
-    app.connect("builder-inited", run_apidoc)
 
 
 project_title = "lime_tbx".replace("_", " ").title()
@@ -172,6 +180,7 @@ myst_enable_extensions = [
     "fieldlist",
     "html_image",
     "linkify",
+    "colon_fence",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -189,7 +198,12 @@ source_suffix = {
 }
 
 # The master toctree document.
+
+IS_LATEX = "html" not in sys.argv and ("latex" in sys.argv or "pdf" in sys.argv)
+
 master_doc = "index"
+if IS_LATEX:
+    master_doc = "index_pdf"
 
 # General information about the project.
 project = project_title
@@ -201,7 +215,7 @@ copyright = "2024, European Space Agency (ESA). Code and documentation licensed 
 # the built documents.
 #
 # The short X.Y version.
-version = lime_tbx.__version__
+version = ".".join(lime_tbx.__version__.split(".")[:2])
 # The full version, including alpha/beta/rc tags.
 release = lime_tbx.__version__
 
@@ -252,6 +266,21 @@ html_css_files = [
     "theme_overrides.css",
 ]
 
+numfig = True
+numfig_secnum_depth = 0  # Disable section-based numbering
+numfig_format = {
+    "figure": "<i>Figure %s:</i>",
+    "table": "Table %s:",
+}
+if IS_LATEX:
+    numfig_format = {
+        "figure": "Figure %s",
+        "table": "Table %s",
+    }
+
+
+html_favicon = "favicon.png"
+
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
@@ -277,7 +306,12 @@ latex_elements = {
     # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    "preamble": r"""
+\usepackage{graphicx}
+\graphicspath{{./_static/}}
+\usepackage{caption}
+\captionsetup[figure]{labelfont=it, textfont=normalfont}
+""",
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -286,12 +320,20 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
+latex_title = "LIME Toolbox User Guide"
+latex_author = author
+if "," in latex_author:
+    latex_author = [aa.strip() for aa in latex_author.split(",")]
+    latex_author = [
+        f'{" ".join(aa.split()[1:])}, {aa.split()[0]}' for aa in latex_author
+    ]
+    latex_author = r"\and ".join(latex_author)
 latex_documents = [
     (
         master_doc,
         "user_manual.tex",
-        "{} Documentation".format(project_title),
-        author,
+        latex_title,
+        latex_author,
         "manual",
     ),
 ]
@@ -313,12 +355,10 @@ texinfo_documents = [
     (
         master_doc,
         "lime_tbx",
-        "lime_tbx Documentation",
-        author,
+        latex_title,
+        latex_author,
         "lime_tbx",
         "The LIME TBX is a Python package providing a comprehensive toolbox for utilizing the LIME (Lunar Irradiance Model of ESA) model to simulate lunar observations and compare them with remote sensing data of the Moon.",
         "Miscellaneous",
     ),
 ]
-
-html_favicon = "favicon.png"

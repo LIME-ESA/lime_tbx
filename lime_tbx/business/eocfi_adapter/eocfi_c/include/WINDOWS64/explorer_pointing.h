@@ -210,6 +210,15 @@
  *               |         |        |                   | New features:                           |
  *               |         |        |                   |  + Support for ANX drift in OSF         |
  *               +--------------------------------------------------------------------------------+
+ *               |   4.26  |31/10/23| DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |        |                   | New features:                           |
+ *               |         |        |                   |  + Support for longitude drift          |
+ *               +--------------------------------------------------------------------------------+
+ *               |   4.27  |07/06/24| DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |        |                   | New features:                           |
+ *               |         |        |                   |  + Use the NORAD catalogue number to    |
+ *               |         |        |                   |    identify TLE record instead of Name  |
+ *               +--------------------------------------------------------------------------------+
  *
  *****************************************************************************/
 #ifndef EXPLORER_POINTING_H
@@ -2751,6 +2760,7 @@ typedef enum /* error codes list of "xp_sat_nominal_att_init_file"  */
   XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_READ_ATT_FILES_ERR,
   XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_TIME_CONV_ERR,
   XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_WRONG_FILE_FORMAT_ERR, // AN-835
+  XP_CFI_SAT_NOMINAL_ATT_INIT_FILE_REPEATED_SAMPLES_WARN
 } XP_CFI_Sat_nom_att_init_file_err_enum;
 
 typedef enum /* error codes list of "xp_sat_nominal_att_close"  */
@@ -2787,6 +2797,7 @@ typedef enum /* error codes list of "xp_sat_att_init_file"  */
   XP_CFI_SAT_ATT_INIT_FILE_TIME_REF_ERR,
   XP_CFI_SAT_ATT_INIT_FILE_READ_STR_ID_ERR,
   XP_CFI_SAT_ATT_INIT_FILE_QUAT_UNITARY_ERR,
+  XP_CFI_SAT_ATT_INIT_FILE_REPEATED_SAMPLES_WARN
 } XP_CFI_Sat_att_init_file_err_enum;
 
 typedef enum /* error codes list of "xp_sat_att_quat_plus_matrix_init"  */
@@ -2833,6 +2844,7 @@ typedef enum /* error codes list of "xp_instr_att_init_file"  */
   XP_CFI_INSTR_ATT_INIT_FILE_READ_ATT_FILES_ERR,
   XP_CFI_INSTR_ATT_INIT_FILE_TIME_CONV_ERR,
   XP_CFI_INSTR_ATT_INIT_FILE_WRONG_FILE_FORMAT_ERR, // AN-836
+  XP_CFI_INSTR_ATT_INIT_FILE_REPEATED_SAMPLES_WARN
 } XP_CFI_Instr_att_init_file_err_enum;
 
 typedef enum /* error codes list of "xp_instr_att_close"  */

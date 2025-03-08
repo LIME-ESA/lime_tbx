@@ -1,0 +1,57 @@
+name: Linting & Static Analysis
+
+on:
+  push:
+    branches:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  black:
+    runs-on: ubuntu-latest
+    container: cytopia/black
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Black
+        run: black --check lime_tbx
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Mypy
+        uses: jpetrucciani/mypy-check@master
+        with:
+          python_version: "3.9"
+
+  pylint:
+    runs-on: ubuntu-latest
+    container: cytopia/pylint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Pylint
+        run: |
+          LINTER_FAILED=""
+          find lime_tbx -name '*.py' -not -wholename  "**/tests/*" -exec pylint --persistent=n --score=n {} + || LINTER_FAILED="yes"
+          [ -z "$LINTER_FAILED" ] || exit 1
+
+  doc-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install interrogate
+      - name: Run interrogate for documentation coverage
+        run: |
+          interrogate --exclude='**/gui/**' --exclude='**/tests/*.py' -spv --fail-under=65 --generate-badge=doc-cov.svg lime_tbx
+      - name: Upload Documentation Coverage Badge
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-coverage-badge
+          path: doc-cov.svg

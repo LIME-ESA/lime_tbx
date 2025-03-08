@@ -1,51 +1,64 @@
 # Comparisons
 
 Users must switch to the comparison page. Go to the action menu bar and navigate
-to "File → Perform comparisons from a remote sensing instrument" as seen in [Figure 14](#fig-14).
+to "File → Perform comparisons from a remote sensing instrument" as seen in [Figure 15](#fig-15).
 
-<figure align="center" id="fig-14">
-    <img src="../../images/user_guide/action_to_comparisons.png" alt="Action menu option to switch to the comparisons page"/>
-    <figcaption><i>Figure 14</i>: Action menu option to switch to the comparisons page.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/action_to_comparisons.png
+   :name: fig-15
+   :align: center
+   :alt: Action menu option to switch to the comparisons page
+
+   Action menu option to switch to the comparisons page.
+```
 
 ## Comparison Input
 
-<figure align="center" id="fig-15">
-    <img src="../../images/user_guide/initial_comparison_page.png" alt="Initial view of the comparison page"/>
-    <figcaption><i>Figure 15</i>: Initial view of the comparison page.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/initial_comparison_page.png
+   :name: fig-16
+   :align: center
+   :alt: Initial view of the comparison page
 
-The comparison page ([Figure 15](#fig-15)) contains the user input fields at the top:
+   Initial view of the comparison page.
+```
+
+The comparison page ([Figure 16](#fig-16)) contains the user input fields at the top:
 - **Lunar Observation Files**:
   - Instrument observation netCDF files in GLOD format to be compared.
-    - The format is explained in the *Format* section.
+    - GLOD formats are explained in the [File Formats](./formats.md) section.
   - "LOAD FILES": Opens a file selection dialog for loading observation files.
   - "UNLOAD FILES": Clears all loaded observation files.
 - **SRF File**:
   - SRF netCDF file in GLOD format.
-    - The format is explained in the *Format* section.
     - Must contain channels matching those in the observation files.
   - "LOAD FILE": Opens a file selection dialog for selecting the SRF file.
 - **Compare Button**:
-  - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 16](#fig-16)).
+  - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 17](#fig-17)).
   - This button is enabled once valid observations and an SRF file are loaded.
 
-<!-- TODO: Correctly link to the format section -->
+```{eval-rst}
+.. figure:: ../../images/user_guide/processing_comparison_page.png
+   :name: fig-17
+   :align: center
+   :alt: Comparison page processing comparisons
 
-<figure align="center" id="fig-16">
-    <img src="../../images/user_guide/processing_comparison_page.png" alt="Comparison page processing comparisons"/>
-    <figcaption><i>Figure 16</i>: Comparison page processing comparisons.</figcaption>
-</figure>
+   Comparison page processing comparisons.
+```
 
 ## Comparison Output
 
 Once comparisons are computed, the comparison page presents the results and
-provides tools for exploring the data, as shown in [Figure 17](#fig-17).
+provides tools for exploring the data, as shown in [Figure 18](#fig-18).
 
-<figure align="center" id="fig-17">
-    <img src="../../images/user_guide/comparison_finished.png" alt="Comparison page after comparisons are computed"/>
-    <figcaption><i>Figure 17</i>: Comparison page after comparisons are computed.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/comparison_finished.png
+   :name: fig-18
+   :align: center
+   :alt: Comparison page after comparisons are computed
+
+   Comparison page after comparisons are computed.
+```
 
 ### Default View
 - The **instrument’s first-channel irradiance observations** (blue) are plotted alongside  
@@ -64,20 +77,27 @@ provides tools for exploring the data, as shown in [Figure 17](#fig-17).
   - **Moon phase angle**
   - **Wavelength**, with two visualization options:
     - **Mean-based Comparison**: Computes the mean of all observations and simulations for each channel.
-    - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 18](#fig-18).
+    - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 19](#fig-19).
 - **New Comparison**: Click "NEW" (top-left) to clear results and start a new comparison.  
-  - A **confirmation dialog** appears, as shown in [Figure 19](#fig-19).
+  - A **confirmation dialog** appears, as shown in [Figure 20](#fig-20).
 
-<figure align="center" id="fig-18">
-    <img src="../../images/user_guide/boxplot_meaning.png" alt="LIME comparisons boxplots dissected"/>
-    <figcaption><i>Figure 18</i>: Breakdown of LIME comparison boxplots.</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/boxplot_meaning.png
+   :name: fig-19
+   :align: center
+   :alt: LIME comparisons boxplots dissected
 
+   Breakdown of LIME comparison boxplots.
+```
 
-<figure align="center" id="fig-19">
-    <img src="../../images/user_guide/clear_comparison.png" alt='Dialog asking for confirmation after clicking \"NEW\"'/>
-    <figcaption><i>Figure 19</i>: Dialog asking for confirmation after clicking "NEW"</figcaption>
-</figure>
+```{eval-rst}
+.. figure:: ../../images/user_guide/clear_comparison.png
+   :name: fig-20
+   :align: center
+   :alt: Dialog asking for confirmation after clicking \"NEW\"
+
+   Dialog asking for confirmation after clicking "NEW"
+```
 
 
 ### Exporting Data
@@ -131,7 +151,7 @@ Using `graphd`:
 ```
 
 #### Data Export (CSV File)
-Specify the the comparison variable, difference metric, and file paths for each channel:
+Specify the comparison variable, difference metric, and file paths for each channel:
 ```sh
 -o csv,(DT|MPA|BOTH|CHANNEL|CHANNEL_MEAN),(rel|perc|none),comparison_channel_1,comparison_channel_2,...,comparison_channel_n
 ```

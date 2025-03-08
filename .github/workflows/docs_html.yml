@@ -1,0 +1,39 @@
+name: Documentation
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: getsentry/action-setup-venv@v2.1.1
+        id: venv
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+            MANIFEST.in
+          install-cmd: pip install .[docs]
+      - name: Build HTML Documentation
+        run: sphinx-build docs public -b html
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-docs
+          path: public/
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: public

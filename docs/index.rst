@@ -7,6 +7,7 @@ Welcome to lime_tbx's documentation!
 
    content/readme
    content/CHANGELOG
+   content/glossary
 
 .. toctree::
    :maxdepth: 2

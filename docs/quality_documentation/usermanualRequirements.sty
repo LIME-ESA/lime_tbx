@@ -1,0 +1,58 @@
+\usepackage[utf8]{inputenc}
+\ifdefined\DeclareUnicodeCharacter
+% support both utf8 and utf8x syntaxes
+  \ifdefined\DeclareUnicodeCharacterAsOptional
+    \def\sphinxDUC#1{\DeclareUnicodeCharacter{"#1}}
+  \else
+    \let\sphinxDUC\DeclareUnicodeCharacter
+  \fi
+  \sphinxDUC{00A0}{\nobreakspace}
+  \sphinxDUC{2500}{\sphinxunichar{2500}}
+  \sphinxDUC{2502}{\sphinxunichar{2502}}
+  \sphinxDUC{2514}{\sphinxunichar{2514}}
+  \sphinxDUC{251C}{\sphinxunichar{251C}}
+  \sphinxDUC{2572}{\textbackslash}
+\fi
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amstext}
+\usepackage{babel}
+
+
+
+\usepackage{tgtermes}
+\usepackage{tgheros}
+\renewcommand{\ttdefault}{txtt}
+
+
+
+\usepackage[Bjarne]{fncychap}
+
+\fvset{fontsize=auto}
+\usepackage{geometry}
+
+\usepackage{textcomp}
+\usepackage{newunicodechar}
+\newunicodechar{⁻}{\textsuperscript{-}}
+\newunicodechar{¹}{\ifmmode{}^1\else\textonesuperior\fi}
+\newunicodechar{²}{\ifmmode{}^2\else\texttwosuperior\fi}
+\newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
+
+
+% Include hyperref last.
+\usepackage{hyperref}
+% Fix anchor placement for figures with captions.
+\usepackage{hypcap}% it must be loaded after hyperref.
+% Set up styles of URL: it should be placed after hyperref.
+\urlstyle{same}
+
+\addto\captionsenglish{\renewcommand{\contentsname}{Index:}}
+
+\usepackage{sphinxmessages}
+\setcounter{tocdepth}{2}
+
+
+\usepackage{graphicx}
+\graphicspath{{./_static/}}
+\usepackage{caption}
+\captionsetup[figure]{labelfont=it, textfont=normalfont}

@@ -66,7 +66,7 @@ those in any previous official LIME documentation, as they are subject to change
 - **NFR101**: The simulation input of a single lunar observation (**FR104**) must be introduced via the GUI.
 - **NFR102**: The simulation input for a time series of lunar observations (**FR104**) must be done via an input file.
 - **NFR103**: In order to simulate lunar observations from a satellite position (**FR105**) the user must provide an
-  orbital scenario file in EOCFI compatible format.
+  orbital scenario file in EO-CFI compatible format.
 - **NFR104**: The ESA satellites available for selection must include ENVISAT, Proba-V, S2, S3, FLEX.
 - **NFR105**: The user defined SRF (**FR103**) must be defined via a user generated SRF file.
 - **NFR106**: The user should be able to perform the simulation via command line using parameters or input files.
@@ -127,7 +127,7 @@ those in any previous official LIME documentation, as they are subject to change
 #### Non Functional Requirements (NFR)
 - **NFR401**: The LIME coefficients of the automatic updates (**FR401**) must be stored on a dedicated repository.
 - **NFR402**: The LIME TBX shall read the database of lunar observations formatted in GLOD format.
-- **NFR403**: The LIME TBX shall use the EOCFI as orbit propagator and to derive satellite orbital positions.
+- **NFR403**: The LIME TBX shall use the EO-CFI as orbit propagator and to derive satellite orbital positions.
 - **NFR404**: Be to the largest extent platform/operating system independent.
 - **NFR405**: Run at least under Windows / mac OS / Linux operating systems.
 - **NFR406**: Be to the largest extent a self-installing SW package.
@@ -135,6 +135,9 @@ those in any previous official LIME documentation, as they are subject to change
 - **NFR408**: The LIME TBX code shall be available on a password protected web repository allowing versioning of
   the software (e.g., GitHub).
 - **NFR409**: The TBX must be compiled and packaged through Docker or similar.
+  - **NFR409-A**: Automated compilation and packaging for Windows.
+  - **NFR409-B**: Automated compilation and packaging for Linux.
+  - **NFR409-C**: Automated compilation and packaging for Mac.
 - **NFR410**: The TBX compilation must be automated as much as possible, ideally using GitLab CI.
 - **NFR411**: Migrate the project to GitHub
   - **NFR411-A**: During development mirror the repository to GitHub.
@@ -144,6 +147,6 @@ those in any previous official LIME documentation, as they are subject to change
   - **NFR411-D**: Migrate the code documentation to GitHub. 
 - **NFR412**: Code modules should be as independent as possible so it could be possible to add a “choose model” option
   in the future without requiring too much development.
-- **NFR413**: Keep EOCFI version updated to the latest release.
+- **NFR413**: Keep EO-CFI version updated to the latest release.
 - **NFR414**: The TBX should be able to simulate the satellite positions for all satellites with OSF files in the EOP-CFI server.
 - **NFR415**: The TBX code will be under LGPL license, in a repository with public access.

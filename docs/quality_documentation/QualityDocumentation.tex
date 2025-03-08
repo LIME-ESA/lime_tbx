@@ -16,11 +16,19 @@
 
 \documentclass{article}
 
+\usepackage{array}       % Fixes column formatting in tables
+\usepackage{colortbl}    % Fixes color-related table errors
+\usepackage{longtable}   % Ensures longtable support
+\usepackage{tabularx}    % Allows dynamic column width adjustments
+\usepackage{booktabs}    % Better table formatting
+\usepackage[tablegrid,nochapter]{vhistory}
+
 \usepackage{softwareRequirements}
 \usepackage{standalone}
 \usepackage{sphinx}
 \usepackage{pgffor}
 \usepackage{verbdef}
+\usepackage{usermanualRequirements}
 
 \newcounter{pdfpages}
 \newcommand*{\getpdfpages}[1]{%
@@ -94,7 +102,7 @@ The Quality documentation consists of the following elements:
 The software design is specified using the following UML diagrams\footnote{These UML diagrams were made using http://www.umlet.com/umletino/umletino.html}.
 
 \vspace*{1cm}
-\input{uml/uml}
+\input{uml}
 
 \clearpage
 \section{Test report}\label{testreport}
