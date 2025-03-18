@@ -17,7 +17,7 @@
   <p align="center">
     Run the LIME model, simulate lunar observations and compare them with real remote sensing data.
     <br />
-    <a href="https://eco.gitlab-docs.npl.co.uk/eo/lime_tbx/"><strong>Explore the docs »</strong></a>
+    <a href="https://lime-esa.github.io/lime_tbx/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <!--<a href="https://github.com/LIME-ESA/lime_tbx">View Demo</a>
@@ -145,7 +145,7 @@ However, since qtpy does not include a Qt binding by default, you must specify w
 
 ## Usage
 
-Check the [online documentation's User Guide](https://eco.gitlab-docs.npl.co.uk/eo/lime_tbx/content/user_guide/overview.html)
+Check the [online documentation's User Guide](https://lime-esa.github.io/lime_tbx/content/user_guide/overview.html)
 or download the [User Guide File](https://calvalportal.ceos.org/documents/10136/964157/DA10_user_guide_v0.docx/b4724686-d758-5625-c1f4-9498c9b69c0d?version=1.0&t=1708947381404&download=true)
 to fully explore the capabilities of the toolbox.
 
@@ -171,7 +171,7 @@ If you wish to contribute to the `lime_tbx` project, please check the <a href=".
 ## Development Guide
 
 For a detailed description on how the Toolbox is structured and implemented please refer
-to the official [documentation](https://eco.gitlab-docs.npl.co.uk/eo/lime_tbx/),
+to the official [documentation](https://lime-esa.github.io/lime_tbx/),
 specially the **Design** and **Implementation** sections, under Technical Details.
 
 ### Versioning
