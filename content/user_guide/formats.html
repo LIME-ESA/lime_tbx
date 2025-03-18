@@ -1,0 +1,635 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Formats &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Analysis" href="../analysis.html" />
+    <link rel="prev" title="Coefficients" href="coefficients.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coefficients.html">Coefficients</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">File Formats</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#spectral-response-function-srf">Spectral Response Function (SRF)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lunar-observation">Lunar Observation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lunar-observation-format-extension">Lunar Observation Format Extension</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#understanding-geom-factor">Understanding <code class="docutils literal notranslate"><span class="pre">geom_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#handling-missing-data">Handling Missing Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optional-attribute-to-correct-distance">Optional Attribute: <code class="docutils literal notranslate"><span class="pre">to_correct_distance</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#lime-toolbox-simulations-and-comparisons">LIME Toolbox Simulations and Comparisons</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#file-attributes">File Attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-dimensions">File Dimensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-variables">File Variables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#common-data-variables">Common Data Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comparison-specific-variables">Comparison Specific Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simulation-specific-variables">Simulation Specific Variables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">File Formats</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/user_guide/formats.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="file-formats">
+<h1>File Formats<a class="headerlink" href="#file-formats" title="Link to this heading"></a></h1>
+<p>LIME Toolbox reads various types of data from netCDF files, each following a specific format.
+These formats adhere as closely as possible to the
+<a class="reference external" href="https://gsics.atmos.umd.edu/pub/Development/LunarWorkArea/GSICS_ROLO_HighLevDescript_IODefinition.pdf">GSICS Lunar Observation Dataset (GLOD) format</a> standards.</p>
+<section id="spectral-response-function-srf">
+<h2>Spectral Response Function (SRF)<a class="headerlink" href="#spectral-response-function-srf" title="Link to this heading"></a></h2>
+<p>Spectral Response Function files are structured with two dimensions:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">channel</span></code>: A coordinate and dimension, where each value represents a different spectral channel.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample</span></code>: A dimension without coordinates, which allows multiple wavelengths to be associated
+with each channel.</p>
+<blockquote>
+<div><p><em>(This dimension may have different names depending on the dataset.)</em></p>
+</div></blockquote>
+</li>
+</ul>
+<p>These dimensions organise the mandatory data variables described in <a class="reference internal" href="#tab-2"><span class="xref myst">Table 2</span></a>.</p>
+<center id='tab-2'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p><strong>Variable</strong></p></th>
+<th class="head text-left"><p><strong>Dimensions</strong></p></th>
+<th class="head text-left"><p><strong>dtype</strong></p></th>
+<th class="head text-left"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">channel_id</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">channel</span></code></p></td>
+<td class="text-left"><p>str</p></td>
+<td class="text-left"><p>Name of the channel</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">sample</span></code>, <code class="docutils literal notranslate"><span class="pre">channel</span></code></p></td>
+<td class="text-left"><p>float</p></td>
+<td class="text-left"><p>Wavelengths present in each channel</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">srf</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">sample</span></code>, <code class="docutils literal notranslate"><span class="pre">channel</span></code></p></td>
+<td class="text-left"><p>float</p></td>
+<td class="text-left"><p>Spectral response of each wavelength per channel</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 2</i>: Mandatory variables of the Spectral Response Function netCDF file format.</p>
+</center>
+<p><em>Note</em>: The variable <code class="docutils literal notranslate"><span class="pre">wavelength</span></code> must contain the attribute <code class="docutils literal notranslate"><span class="pre">units</span></code>, which value must be the
+variable unit symbol by the IS. For example, “nm”.</p>
+</section>
+<section id="lunar-observation">
+<h2>Lunar Observation<a class="headerlink" href="#lunar-observation" title="Link to this heading"></a></h2>
+<p>Lunar Observation files format is a subset of the GLOD format for lunar observations.
+It’s structured using three dimensions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">date</span></code>: A coordinate and dimension representing the time of the lunar observation.</p>
+<ul>
+<li><p>Stored as a double precision float. Units: seconds since EPOCH.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chan</span></code>: A dimension without coordinates, where each value represents a different spectral channel.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sat_xyz</span></code>: A dimension without coordinates, representing the three spatial coordinates (x, y, z).</p>
+<ul>
+<li><p>This dimension must have a fixed length of three.</p></li>
+</ul>
+</li>
+</ul>
+<p>These dimensions structure the required data variables outlined in <a class="reference internal" href="#tab-3"><span class="xref myst">Table 3</span></a>.</p>
+<center id='tab-3'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p><strong>Variable</strong></p></th>
+<th class="head text-left"><p><strong>Dimensions</strong></p></th>
+<th class="head text-left"><p><strong>dtype</strong></p></th>
+<th class="head text-left"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">channel_name</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td class="text-left"><p>str</p></td>
+<td class="text-left"><p>Name of the spectral channel</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">irr_obs</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td class="text-left"><p>float</p></td>
+<td class="text-left"><p>Observed lunar irradiance per spectral channel</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">sat_pos</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">sat_xyz</span></code></p></td>
+<td class="text-left"><p>float</p></td>
+<td class="text-left"><p>Coordinates of the observer in <code class="docutils literal notranslate"><span class="pre">sat_pos_ref</span></code> reference frame</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">sat_pos_ref</span></code></p></td>
+<td class="text-left"><p>None</p></td>
+<td class="text-left"><p>str</p></td>
+<td class="text-left"><p>Reference frame of the satellite position</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 3</i>: Mandatory variables of the Lunar Observation netCDF file format.</p>
+</center>
+<p><em>Note</em>: The variable <code class="docutils literal notranslate"><span class="pre">sat_pos</span></code> must contain the attribute <code class="docutils literal notranslate"><span class="pre">units</span></code>, which value must be the
+variable unit symbol by the IS. For example, “km”.</p>
+<p>In addition to these variables, the file must include the attribute:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">data_source</span></code>: Specifies the origin of the observation data.</p></li>
+</ul>
+<section id="lunar-observation-format-extension">
+<h3>Lunar Observation Format Extension<a class="headerlink" href="#lunar-observation-format-extension" title="Link to this heading"></a></h3>
+<p>Lunar Observation files should follow the subset of the GLOD format previously described.
+However, if the <code class="docutils literal notranslate"><span class="pre">sat_pos</span></code> variable is not available, LIME Toolbox will instead look for selenographic coordinates.
+In this case, the selenographic variables must follow the schema in <a class="reference internal" href="#tab-4"><span class="xref myst">Table 4</span></a>, where all variables must
+have <code class="docutils literal notranslate"><span class="pre">date</span></code> as their dimension.</p>
+<center id='tab-4'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Variable Name</strong></p></th>
+<th class="head"><p><strong>Mandatory</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">distance_sun_moon</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Distance between the Sun and the Moon (AU)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sun_sel_lon</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Selenographic longitude of the Sun (radians)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">distance_sat_moon</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Distance between the satellite and the Moon (km)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sat_sel_lon</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Selenographic longitude of the satellite (degrees)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sat_sel_lat</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Selenographic latitude of the satellite (degrees)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">phase_angle</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Moon phase angle (degrees)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sat_name</span></code></p></td>
+<td><p>No</p></td>
+<td><p>Satellite name (used for <a class="reference internal" href="#handling-missing-data"><span class="xref myst">handling missing data</span></a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geom_factor</span></code> or <code class="docutils literal notranslate"><span class="pre">geom_const</span></code></p></td>
+<td><p>No</p></td>
+<td><p>Geometric constant used to normalize observed irradiance</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 4</i>: Data variables in the Lunar Observation netCDF file format representing selenographic coordinates.</p>
+</center>
+<section id="understanding-geom-factor">
+<h4>Understanding <code class="docutils literal notranslate"><span class="pre">geom_factor</span></code><a class="headerlink" href="#understanding-geom-factor" title="Link to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">geom_factor</span></code> (or <code class="docutils literal notranslate"><span class="pre">geom_const</span></code>) represents the geometric constant used in irradiance normalization.</p>
+<ul>
+<li><p>If a given, the toolbox will use this value to normalize its simulated irradiance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">normalised_irr</span> <span class="o">=</span> <span class="n">irr</span><span class="o">/</span><span class="n">geom_factor</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="handling-missing-data">
+<h4>Handling Missing Data<a class="headerlink" href="#handling-missing-data" title="Link to this heading"></a></h4>
+<p>If any mandatory variable is missing, LIME Toolbox will automatically compute them using:</p>
+<ul>
+<li><p><strong>SPICE library</strong> → Computes <code class="docutils literal notranslate"><span class="pre">distance_sun_moon</span></code> and <code class="docutils literal notranslate"><span class="pre">sun_sel_lon</span></code>.</p></li>
+<li><p><strong>SPICE + EO-CFI libraries</strong> → Compute <code class="docutils literal notranslate"><span class="pre">distance_sat_moon</span></code>, <code class="docutils literal notranslate"><span class="pre">sat_sel_lon</span></code>, <code class="docutils literal notranslate"><span class="pre">sat_sel_lat</span></code>, and <code class="docutils literal notranslate"><span class="pre">phase_angle</span></code>.</p>
+<blockquote>
+<div><p>For these four latter variables, LIME Toolbox requires the satellite name (<code class="docutils literal notranslate"><span class="pre">sat_name</span></code>),</p>
+<ul class="simple">
+<li><p>It must be a string and must match a satellite in the LIME Toolbox satellite list.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="optional-attribute-to-correct-distance">
+<h4>Optional Attribute: <code class="docutils literal notranslate"><span class="pre">to_correct_distance</span></code><a class="headerlink" href="#optional-attribute-to-correct-distance" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>If present with a value of <code class="docutils literal notranslate"><span class="pre">1</span></code>, LIME Toolbox will normalise the observation’s <code class="docutils literal notranslate"><span class="pre">irr_obs</span></code> value
+using the observation’s distances.</p></li>
+<li><p>This is useful when the irradiance is not pre-normalized.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="lime-toolbox-simulations-and-comparisons">
+<h2>LIME Toolbox Simulations and Comparisons<a class="headerlink" href="#lime-toolbox-simulations-and-comparisons" title="Link to this heading"></a></h2>
+<p>LIME Toolbox allows exporting simulations and comparisons to netCDF format files, which can be reloaded
+within the toolbox for future visualization and analysis.</p>
+<p>These files follow a structure similar to <a class="reference internal" href="#lunar-observation"><span class="xref myst">Lunar Observation</span></a> files but contain
+multiple observation timestamps instead of just one. Additionally, they include more detailed data such
+as simulated irradiance, reflectance, and spectral values.</p>
+<p>Both simulation and comparison files share a similar format but with distinct differences.
+This format is referred to as the LIME Toolbox netCDF format, previously known in documentation
+as LIME-GLOD (LGLOD) format.</p>
+<section id="file-attributes">
+<h3>File Attributes<a class="headerlink" href="#file-attributes" title="Link to this heading"></a></h3>
+<p>LIME Toolbox netCDF format files include multiple attributes based on the GLOD format. The key attributes are:</p>
+<ul class="simple">
+<li><p><strong>data_source</strong>: Indicates the origin of the data (LIME Toolbox).</p></li>
+<li><p><strong>reference_model</strong>: Specifies the LIME coefficient version used.</p></li>
+<li><p><strong>not_default_srf</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: Default LIME Toolbox SRF was used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: A user-defined custom SRF was used.</p></li>
+</ul>
+</li>
+<li><p><strong>spectrum_name</strong>: Name of the spectrum used for reflectance interpolation.</p></li>
+<li><p><strong>is_comparison</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: Indicates a <strong>simulation file</strong>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: Indicates a <strong>comparison file</strong>.</p></li>
+</ul>
+</li>
+<li><p><strong>skipped_uncertainties</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: Uncertainty computations were <strong>performed</strong>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>: Uncertainty computations were <strong>skipped</strong>.</p></li>
+</ul>
+</li>
+<li><p><strong>polarisation_spectrum_name</strong>: Name of the spectrum used in polarization interpolation (<em>only present in simulation files</em>).</p></li>
+</ul>
+</section>
+<section id="file-dimensions">
+<h3>File Dimensions<a class="headerlink" href="#file-dimensions" title="Link to this heading"></a></h3>
+<p>All LIME Toolbox netCDF files are structured using four core dimensions:</p>
+<ul class="simple">
+<li><p><strong>chan</strong>: Number of spectral channels in the data.</p></li>
+<li><p><strong>date</strong>: Number of timestamps present.</p></li>
+<li><p><strong>number_obs</strong>: Number of observation positions where simulations exist for at least one channel.</p></li>
+<li><p><strong>sat_xyz</strong>: Fixed length of <code class="docutils literal notranslate"><span class="pre">3</span></code>, representing the <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> coordinates of the satellite.</p></li>
+</ul>
+<p>Simulations files contain two additional dimensions:</p>
+<ul class="simple">
+<li><p><strong>wlens</strong>: Fixed length of <code class="docutils literal notranslate"><span class="pre">2151</span></code>, representing the number of wavelengths in full-spectrum simulations.</p></li>
+<li><p><strong>wlens_cimel</strong>: Fixed length of <code class="docutils literal notranslate"><span class="pre">6</span></code>, representing the number of CIMEL wavelengths.</p></li>
+</ul>
+</section>
+<section id="file-variables">
+<h3>File Variables<a class="headerlink" href="#file-variables" title="Link to this heading"></a></h3>
+<section id="common-data-variables">
+<h4>Common Data Variables<a class="headerlink" href="#common-data-variables" title="Link to this heading"></a></h4>
+<p>LIME Toolbox netCDF files share several core variables based on the GLOD format, described in <a class="reference internal" href="#tab-5"><span class="xref myst">Table 5</span></a>.</p>
+<center id='tab-5'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Variable</strong></p></th>
+<th class="head"><p><strong>Dimensions</strong></p></th>
+<th class="head"><p><strong>dtype</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">date</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">date</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Time of lunar observation, seconds since epoch.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outside_mpa_range</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code></p></td>
+<td><p>int8</p></td>
+<td><p>1 if the observation is outside the Moon phase angle valid range, 0 if inside.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mpa</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Moon phase angle in degrees.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">channel_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Channel/Sensor band identifier.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sat_pos</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">sat_xyz</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Satellite position in (x, y, z) coordinates for <code class="docutils literal notranslate"><span class="pre">sat_pos_ref</span></code> frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sat_pos_ref</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Reference frame of the satellite position.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sat_name</span></code></p></td>
+<td><p>None</p></td>
+<td><p>str</p></td>
+<td><p>Name of the satellite (or empty if it wasn’t a satellite measure).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">irr_obs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated integrated lunar irradiance for each channel.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">irr_obs_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties of the simulated integrated lunar irradiance for each channel.</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 5</i>: Common data variables in all LIME Toolbox netCDF files.</p>
+</center>
+</section>
+<section id="comparison-specific-variables">
+<h4>Comparison Specific Variables<a class="headerlink" href="#comparison-specific-variables" title="Link to this heading"></a></h4>
+<p>Comparison files contain additional variables that store observed and computed differences, detailed in <a class="reference internal" href="#tab-6"><span class="xref myst">Table 6</span></a>.</p>
+<center id='tab-6'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Variable</strong></p></th>
+<th class="head"><p><strong>Dimensions</strong></p></th>
+<th class="head"><p><strong>dtype</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">irr_comp</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Integrated lunar irradiance for each channel observed with the instrument, obtained from the user defined observation files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">irr_comp_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties of the integrated lunar irradiance for each channel observed with the instrument, obtained from the user defined observation files.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">irr_diff</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Lunar irradiance comparison difference for each channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">irr_diff_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties of the lunar irradiance comparison difference for each channel.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">perc_diff</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Percentage difference in the lunar irradiance comparison for each channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">perc_diff_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties of the percentage difference in the lunar irradiance comparison for each channel.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mrd</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Mean relative difference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mard</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Mean absolute relative difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mpd</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Mean percentage difference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">std_mrd</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Standard deviation of the mean relative difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">number_samples</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">chan</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Number of comparisons for each channel.</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 6</i>: Data variables in LIME Toolbox Comparison netCDF files.</p>
+</center>
+</section>
+<section id="simulation-specific-variables">
+<h4>Simulation Specific Variables<a class="headerlink" href="#simulation-specific-variables" title="Link to this heading"></a></h4>
+<p>Simulation files contain additional variables that store spectral data, described in <a class="reference internal" href="#tab-7"><span class="xref myst">Table 7</span></a>.</p>
+<center id='tab-7'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Variable</strong></p></th>
+<th class="head"><p><strong>Dimensions</strong></p></th>
+<th class="head"><p><strong>dtype</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Wavelengths for <code class="docutils literal notranslate"><span class="pre">irr_spectrum</span></code>, <code class="docutils literal notranslate"><span class="pre">refl_spectrum</span></code>, and <code class="docutils literal notranslate"><span class="pre">polar_spectrum</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">irr_spectrum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated lunar irradiance per wavelength.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">irr_spectrum_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties for the simulated lunar irradiance per wavelength.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">refl_spectrum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated lunar reflectance per wavelength.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">refl_spectrum_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties for the simulated lunar reflectance per wavelength.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">polar_spectrum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated lunar degree of polarization per wavelength.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">polar_spectrum_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties for the simulated lunar degree of polarization per wavelength.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cimel_wlens</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>CIMEL wavelengths.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">irr_cimel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated lunar irradiance for the CIMEL wavelengths.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">irr_cimel_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties for the simulated lunar irradiance for the CIMEL wavelengths.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">refl_cimel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated lunar reflectance for the CIMEL wavelengths.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">refl_cimel_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties for the simulated lunar reflectance for the CIMEL wavelengths.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">polar_cimel</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Simulated lunar degree of polarization for the CIMEL wavelengths.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">polar_cimel_unc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">number_obs</span></code>, <code class="docutils literal notranslate"><span class="pre">wlens_cimel</span></code></p></td>
+<td><p>float64</p></td>
+<td><p>Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths.</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 7</i>: Data variables in LIME Toolbox Simulation netCDF files.</p>
+</center>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="coefficients.html" class="btn btn-neutral float-left" title="Coefficients" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../analysis.html" class="btn btn-neutral float-right" title="Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

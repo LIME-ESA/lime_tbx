@@ -1,0 +1,539 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Implementation &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="lime_tbx package" href="api/lime_tbx.html" />
+    <link rel="prev" title="Design" href="design.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Implementation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ancillary-data-files">Ancillary Data Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lime-coefficient-files">LIME Coefficient Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#eo-cfi-data-files">EO-CFI Data Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spice-kernels">SPICE Kernels</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-and-logging">Configuration and Logging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging">Logging</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#deployment">Deployment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#manual-deployment">Manual Deployment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#requirements">Requirements:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#compile-c-code-for-eo-cfi">1. Compile C code for EO-CFI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-virtual-environment">2. Create a Virtual Environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#build-the-app-bundle">3. Build the App Bundle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-an-installer">4. Create an Installer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#automated-deployment">Automated Deployment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#linux-automated-deployment">Linux Automated Deployment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#windows-automated-deployment">Windows Automated Deployment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mac-automated-deployment-unavailable">Mac Automated Deployment (Unavailable)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#code-quality">Code Quality</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-style-and-static-analysis">Code Style and Static Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-documentation">Code Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Implementation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/content/implementation.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="implementation">
+<h1>Implementation<a class="headerlink" href="#implementation" title="Link to this heading"></a></h1>
+<p>The repository is organized into the following directories:</p>
+<ul class="simple">
+<li><p><strong>lime_tbx</strong>: The <code class="docutils literal notranslate"><span class="pre">lime_tbx</span></code> Python package containing the LIME Toolbox.</p></li>
+<li><p><strong>test_files</strong>: Data files used in automated tests for <code class="docutils literal notranslate"><span class="pre">lime_tbx</span></code>.</p></li>
+<li><p><strong>coeff_data</strong>: LIME coefficients and related files.</p></li>
+<li><p><strong>eocfi_data</strong>: Ephemerides, geometries and other data used for EO-CFI satellite computations.</p></li>
+<li><p><strong>kernels</strong>: SPICE toolkit kernels.</p></li>
+<li><p><strong>deployment</strong>: Files and scripts needed to perform the deployment process, which generates installers for different operating systems.</p></li>
+<li><p><strong>docs</strong>: Documentation for both users and developers.</p></li>
+</ul>
+<section id="ancillary-data-files">
+<h2>Ancillary Data Files<a class="headerlink" href="#ancillary-data-files" title="Link to this heading"></a></h2>
+<p>LIME Toolbox relies on various data files to compute geometries, coordinates, satellite positions, and the LIME model.
+Some of these files are stored in the installation directory, while others reside in the <em>appdata</em> directory
+(see <a class="reference internal" href="#configuration-and-logging"><span class="xref myst">Configuration and Logging</span></a>).</p>
+<p>Files and directories in the installation directory cannot be modified by the toolbox due to restricted write access
+without admin privileges, therefore the <em>appdata</em> directory is used for files and directories that require modification.
+If the toolbox is not installed, it defaults to using the current working directory as both
+the installation and the <em>appdata</em> directory.</p>
+<section id="lime-coefficient-files">
+<h3>LIME Coefficient Files<a class="headerlink" href="#lime-coefficient-files" title="Link to this heading"></a></h3>
+<p>LIME coefficient files are located under the <code class="docutils literal notranslate"><span class="pre">coeff_data</span></code> directory, in the <em>appdata</em> directory. This directory contains:</p>
+<ul class="simple">
+<li><p><strong>coefficients_server.txt</strong>: Text file with the URL where LIME coefficient files can be downloaded.</p></li>
+<li><p><strong>selected.txt</strong>: Text file with the name of the last selected coefficient file, ensuring persistence across sessions.</p></li>
+<li><p><strong>versions/</strong>: Directory containing all downloaded LIME coefficient in netCDF format. The exact format is described in <a class="reference internal" href="#tab-1"><span class="xref myst">Table 1</span></a>.</p></li>
+</ul>
+<center id='tab-1'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>Variable</p></th>
+<th class="head text-left"><p>Dimensions</p></th>
+<th class="head text-left"><p>dtype</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>coeff</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">i_coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>float64</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>u_coeff</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">i_coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>float64</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>err_corr_coeff</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">i_coeff.wavelenth</span></code>, <code class="docutils literal notranslate"><span class="pre">i_coeff.wavelenth</span></code></p></td>
+<td class="text-left"><p>float32</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>dolp_coeff_pos</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">j_coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>float64</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>u_dolp_coeff_pos</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">j_coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>float64</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>err_corr_dolp_coeff_pos</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">j_coeff.wavelenth</span></code>, <code class="docutils literal notranslate"><span class="pre">j_coeff.wavelenth</span></code></p></td>
+<td class="text-left"><p>float32</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>dolp_coeff_neg</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">j_coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>float64</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>u_dolp_coeff_neg</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">j_coeff</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>float64</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>err_corr_dolp_coeff_neg</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">j_coeff.wavelenth</span></code>, <code class="docutils literal notranslate"><span class="pre">j_coeff.wavelenth</span></code></p></td>
+<td class="text-left"><p>float32</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>wavelength</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td class="text-left"><p>integer</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 1</i>: LIME coefficients netCDF file format.</p>
+</center>
+</section>
+<section id="eo-cfi-data-files">
+<h3>EO-CFI Data Files<a class="headerlink" href="#eo-cfi-data-files" title="Link to this heading"></a></h3>
+<p>LIME Toolbox uses the EO-CFI libraries to compute satellite positions. These computations require data files
+in one of the following formats:</p>
+<ul class="simple">
+<li><p>Orbit Scenario Files (OSF)</p></li>
+<li><p>Three-Line Element Set Files (3LE/TLE)
+These files are located in the <code class="docutils literal notranslate"><span class="pre">eocfi_data</span></code> directory within the installation directory, which contains two
+main elements:</p></li>
+<li><p><strong>esa_sat_list.yml</strong>: A YAML file listing all available satellites and their associated data files.
+Satellites can be defined using OSF or 3LE files, with format details provided in <a class="reference internal" href="#tab-2"><span class="xref myst">Table 2</span></a>.</p></li>
+<li><p><strong>data/</strong>: Subdirectory containing all the referenced OSF and 3LE data files in <code class="docutils literal notranslate"><span class="pre">esa_sat_list.yml</span></code>.</p></li>
+</ul>
+<p>LIME Toolbox allows users to add satellites if they have the necessary data files.
+Since installation directories cannot be modified, a separate <code class="docutils literal notranslate"><span class="pre">eocfi_data</span></code> directory is created in <em>appdata</em>, following
+the same structure.</p>
+<p>If a satellite appears in both directories for the same date and time, <em>appdata</em> takes priority.</p>
+<center id='tab-2'>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Attribute</p></th>
+<th class="head text-left"><p>Description</p></th>
+<th class="head text-center"><p>OSF/TLE</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>id</strong></p></td>
+<td class="text-left"><p>Satellite ID number (see <a class="reference external" href="https://eop-cfi.esa.int/index.php?option=com_content&amp;amp;view=article&amp;amp;id=92&amp;amp;Itemid=495&amp;amp;jsmallfib=1&amp;amp;dir=JSROOT/releases/4.28/C-Docs/SUM&amp;amp;download_file=JSROOT/releases/4.28/C-Docs/SUM/GeneralSUM_4.28.pdf">EO-CFI GeneralSUM manual</a>, Section 7.2).</p></td>
+<td class="text-center"><p>Both</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>n_files</strong></p></td>
+<td class="text-left"><p>Number of orbit files listed.</p></td>
+<td class="text-center"><p>Both</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>orbit_files</strong></p></td>
+<td class="text-left"><p>List of file paths for each data file.</p></td>
+<td class="text-center"><p>Both</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>norad_sat_number</strong></p></td>
+<td class="text-left"><p>NORAD satellite catalog number.</p></td>
+<td class="text-center"><p>TLE</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>intdes</strong></p></td>
+<td class="text-left"><p>International Designator string.</p></td>
+<td class="text-center"><p>TLE</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>timefile</strong></p></td>
+<td class="text-left"><p>OSF file used for time equivalence calculations.</p></td>
+<td class="text-center"><p>TLE</p></td>
+</tr>
+</tbody>
+</table>
+<p><i>Table 2</i>: <code class="docutils literal notranslate"><span class="pre">esa_sat_list.yml</span></code> satellite attributes.</p>
+</center>
+</section>
+<section id="spice-kernels">
+<h3>SPICE Kernels<a class="headerlink" href="#spice-kernels" title="Link to this heading"></a></h3>
+<p>The SPICE toolkit enables LIME Toolbox to compute geometries and coordinates. It requires access to kernel files,
+which contain essential data such as geometries, ephemerides, and reference frames.</p>
+<p>These kernel files are stored in the <code class="docutils literal notranslate"><span class="pre">kernels</span></code> directory within the installation directory.</p>
+</section>
+</section>
+<section id="configuration-and-logging">
+<h2>Configuration and Logging<a class="headerlink" href="#configuration-and-logging" title="Link to this heading"></a></h2>
+<p>LIME Toolbox simulations can be customized by the user. For example, the interpolation reference can be
+set to <strong>ASD spectra</strong> (preferred) or <strong>Apollo 16 + Breccia</strong>.
+Configuration is managed through a YAML configuration file.</p>
+<p>The Toolbox also logs error, warning and debug messages into text files within the logging directory.</p>
+<p>Both the configuration file and the logging directory are stored in the LIME Toolbox <em>appdata</em>
+directory, which varies depending on the operating system when the toolbox is installed:</p>
+<ul class="simple">
+<li><p><strong>Windows</strong>: <code class="docutils literal notranslate"><span class="pre">%appdata%\LimeTBX\</span></code></p></li>
+<li><p><strong>Linux</strong>: <code class="docutils literal notranslate"><span class="pre">~/.LimeTBX/</span></code></p></li>
+<li><p><strong>Mac</strong>: <code class="docutils literal notranslate"><span class="pre">~/Library/Application</span> <span class="pre">Support/LimeTBX/</span></code></p></li>
+</ul>
+<p>If the toolbox is not installed, it will default to using the current working directory as the <em>appdata</em> location.</p>
+<section id="configuration-file">
+<h3>Configuration File<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h3>
+<p>The YAML configuration file defines various attributes for customizing simulations:</p>
+<ul class="simple">
+<li><p><strong>interpolation_SRF</strong> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) – Spectral Response Function of the TSIS-1 Hybrid Solar Reference Spectrum.</p></li>
+<li><p><strong>interpolation_spectrum</strong> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) – Spectrum used as the interpolation reference for reflectance.</p></li>
+<li><p><strong>interpolation_spectrum_polarisation</strong> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) – Spectrum used as the interpolation reference for polarization.
+<em>Note:</em> This value cannot be modified via the UI yet, as only <strong>Linear</strong> is currently valid.</p></li>
+<li><p><strong>show_cimel_points</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>) – Whether CIMEL anchor points should be plotted (<code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>).</p></li>
+<li><p><strong>show_interp_spectrum</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>) – Whether the interpolation spectrum should be included in the output plot (<code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>).</p></li>
+<li><p><strong>skip_uncertainties</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to skip uncertainty computations (<code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>).
+<em>Note:</em> Uncertainty calculations are the primary performance bottleneck in LIME Toolbox simulations, so disabling
+them significantly increases speed.</p></li>
+<li><p><strong>use_wehrli</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to use <strong>TSIS-1 HSRS</strong> (<code class="docutils literal notranslate"><span class="pre">false</span></code>) or <strong>Wehrli</strong> (<code class="docutils literal notranslate"><span class="pre">true</span></code>) as the solar spectrum.
+<em>Note:</em> This setting cannot be modified via the UI and it’s <code class="docutils literal notranslate"><span class="pre">false</span></code> by default.</p></li>
+</ul>
+<p>This file is loc located in the <em>appdata</em> directory, under a directory named <code class="docutils literal notranslate"><span class="pre">coeff_data</span></code>.</p>
+</section>
+<section id="logging">
+<h3>Logging<a class="headerlink" href="#logging" title="Link to this heading"></a></h3>
+<p>By default, LIME Toolbox logs at the <code class="docutils literal notranslate"><span class="pre">INFO</span></code> level. To enable <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> logging, set the environment variable
+<code class="docutils literal notranslate"><span class="pre">LIME_DEBUG</span></code> to <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>.</p>
+</section>
+</section>
+<section id="deployment">
+<h2>Deployment<a class="headerlink" href="#deployment" title="Link to this heading"></a></h2>
+<p>The deployment process involves compilation, building, and packaging to generate installers for various
+operating systems. It is carried out using:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.docker.com"><img alt="Docker" src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&amp;logo=docker&amp;logoColor=white" /></a></p></li>
+<li><p><a class="reference external" href="https://pyinstaller.org/"><img alt="PyInstaller" src="https://img.shields.io/badge/pyinstaller-3670A0?style=for-the-badge&amp;logo=data:image/png%2bxml;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAKgUExURb29vpubm////6ampgAAAAcHCi8eOTFrDGTQADreATqZIV1ZY2FhaWRka2dnaWtram9vb1dXWFpaWmRkZ2hoaGNqYC22FWGESGVlaWxsa2dnawAAAGhoZmpqaiIiJGJiZm5uaDo6Pl1dZHR0ZUZGTF5eaHl5Yk1NVFZWYZSURn9/XVBQWFFRXYyMToWFWFlZYU9PW4GBVH5+c2JiZE9PU3Z2bWRkZEJCQXV1dWdnZzIyMnJycmxsbBMTE29vb3FxcQAAAGpqaru7u7a2tn19fXJycnNzc2RkZFRUVHFxcXJycnx8fKampqKiop+fn52dnY+Pj4uLi4SEhFVVVTw8PDExMQ0NDV7+ABnHCz+DQJ6cQKurNbe3KsLCIJSUSpmZP8PBI4+7GGPvAy7xAAy3C3eteWqiSL/eAP//ALW1LL29IPfyAJHiAD34ABTfAATLBUSQRCV7KEK3AKbSAO7zAL+/I6urK9vYAIDgAIX6ABPRAADKAAC1AACxAADeACPMAN/sAMvLGqSkM93aAGfhADv8ADXZAA3qAADFABbCAGa0AJJkAObbANfXEpubPdvXAGbdAE/2AFq6AAn2AAD5AETXAPXxAMWgAMe6AODgDdzZAJXaABDvAA63AADrAAD/ACvqAOr0APj5APf3AOnpCM/OAtvlAD3kAAD4ADjoAPL3AP7+AOvrBN3dBfHvAsHYBkTDCQ/TDg7UEGSuGry6IrCwKqSkMqCgQJaWToyMVYqLWISDXn17aHSAc3qIeoeHhI+PkJaWmY2Nknl5fn5+gn5+f4CAg3p6fZycnri3ubu6u769vsDAwMHBwcLCwrCwsHx8fICAgH9/f4GBgXt7e6GhobW1tZqamru7u4SEhH19fZOTk7+/v76+vr29vf///+3mXiUAAABXdFJOUwAAAAABCBEysPi9eZGrxt/yc3eitsnk/prerQTJwAyy0Rea4CWB7Ddt/fRLVvj7YkHw/ngu5pMh3K4UzcYKu90Dqf347dzLn1Xp7ubhzLSaiG5XPCESBtCJW1gAAAABYktHRAJmC3xkAAAAB3RJTUUH6AwGDhQswLAXLgAAARtJREFUGNMBEAHv/gAABAUGBwgJCgsMDQ4PEBEBABITFBUWV1hZF1pbXF1eGAIAGV9gYWJjZGVmZ2hoaGkaGwAcamtsbW5vcHFyc3RodR0eAB92d3h5ent8fX5/gGiBICEAIoKDhIWGh4iJiouMaI0jJAAljo+QkZKTlJWWl5homSYnACgpmpucnZ6foKGio2ikKisALC2lpqeon5+pqmhoq6wuLwAwMa2ur7CxsrO0tba3uDIzADQ1ubq7vL2+v8DBwsPExTYANzjGx8jJysvMzc7P0NHSOQA6O9PU1c7MzMzMzdbS0dE8AD0+0dDXzczMzMzN2NnR0z8AQEHR2tvNzNzd3kJDREVGRwADSElKS0xNTk9QUVJTVFVWls13UDRcyB8AAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMTItMDZUMTQ6MjA6NDMrMDA6MDCiB4fnAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTEyLTA2VDE0OjIwOjQzKzAwOjAw01o/WwAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNC0xMi0wNlQxNDoyMDo0NCswMDowMEHoIAoAAAAASUVORK5CYII=" /></a></p></li>
+<li><p><a class="reference external" href="https://jrsoftware.org/isinfo.php"><img alt="InnoSetup" src="https://img.shields.io/badge/inno_setup-005799?style=for-the-badge&amp;logo=data:image/png%2bxml;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAADwAAAA8AAAAMAAAADAAAABEAAAASAAAAEAAAAAkAAAABAAAAAAAAAAAAAAAAAAAAACMYAQg5KQpvX08uomNTM6dJORiMLRoAiDEaALUyGwDCLhkAqiYUAHAJBQAjAAAAFwAAAAcAAAAAAAAAACIXAQd8bU3N9PDl///9+f///fr///z3/+fh1P+lmH7/W0Uc/0wvAP9FKQD/Nx4A6SQTAF8AAAAZAAAACQAAAAAyIgJS8evf///+/v///v7///77///9+////v3///7+//v48f+wo4n/WT8P/1EzAP8+JAD9LRwBawAAABgAAAAHNSQEYPz47////vz/xLSS/598N/+lfi//tpZT/9C9l//49On///78/+vm2f91YTn/TTEA/56Obfk0JgpbAAAAGC4fAibQxrL+8OnZ/5lhAP+/fQD/yYYA/8yHAP/FgwD/sXoN/8ercP/48+f/+/jx/4BvTv/Z0Lv/xbuk+SYaAkwAAAAAkXY/svrx2/+/gAj/35YE/+WdD//moBP/5JwN/92UAv/MhwD/rnwW/9vLqf/7+PH/8/Dq///89f8tIARvAAAAAH9GAF3bu33/5bpj/+uuNv/tuE7/7rtV/+22Sv/qqy//2pUM/86hRP/Ao2f/9fDl/////////Pb/LSAEbwAAAACMQwBc1IEM//HXn//vzIT/89CJ//TTkv/zzoX/78Fk/+uuNv/doSb/+O3U///+/f///v7///vz/y4gBG4AAAAAi0UAN96IF//tv2v/+OrM//jmwf/56Mb/9+G1//PRjv/uvVr/6KQc/9GXIf/HpmP/rJRk/5GAYfcuHwNXAAAAAGI2AwPZhhvj7bxn//fgs//89+z//fju//ru1f/226b/8MRt/+qrLf/ZkAD/snQA/3xKAP89IACjAAAAAwAAAAAAAAAAyX0bZ+qxV//12ab/+/Hc//358P/67tb/9tun//DFbv/qqy3/140A/6loAP9rOgD2MRgAKgAAAAAAAAAAAAAAAGNCEwHZmDml78N5//besP/558T/9+G1//PRjv/uu1j/5Z0b/8h5AP+QTgD9WS0AYAAAAAAAAAAAAAAAAAAAAAAAAAAAdFIgA9mdQoXqtmL578R5/+/Cc//rs1X/5Jsq/9R5Bf+lVQDodToATwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAonIrH9WRMHnajiet1oEWu85rBaGuVABhZjMACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AcAAIADAAAAAQAAAAAAAAAAAAAAAAAAgAAAAIAAAACAAAAAgAAAAIAAAADAAQAAwAMAAOAHAAD4DwAA//8AAA==" /></a></p></li>
+</ul>
+<p>All required files are under the <code class="docutils literal notranslate"><span class="pre">deployment</span></code> directory, which contains:</p>
+<ul class="simple">
+<li><p><strong>installer/</strong>: Scripts and configuration files for manually building and packaging installers.</p></li>
+<li><p><strong>automatic/</strong>: Dockerfiles and scripts for automating the build processes carried out in <code class="docutils literal notranslate"><span class="pre">installer/</span></code>.</p></li>
+</ul>
+<section id="manual-deployment">
+<h3>Manual Deployment<a class="headerlink" href="#manual-deployment" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">deployment/installer</span></code> directory contains scripts and configuration files to build production-ready
+installers. These installers are OS and machine-dependent, so it’s recommended to use
+automated deployment whenever possible, whioh is explained in Section
+<a class="reference internal" href="#automated-deployment"><span class="xref myst">Automated Deployment</span></a>.</p>
+<section id="requirements">
+<h4>Requirements:<a class="headerlink" href="#requirements" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Python 3.9.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pyinstaller</span></code> installed outside of the virtual environment.</p></li>
+</ul>
+</section>
+<section id="compile-c-code-for-eo-cfi">
+<h4>1. Compile C code for EO-CFI<a class="headerlink" href="#compile-c-code-for-eo-cfi" title="Link to this heading"></a></h4>
+<p>This step compiles a small C program with the EO-CFI libraries to generate a binary required by LIME Toolbox.
+This is only needed if the C source code has been modified, the EO-CFI libraries have been updated, or the
+binary does not work on your system.</p>
+<p>In Linux or Mac:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>lime_tbx/business/eocfi_adapter/eocfi_c
+cp<span class="w"> </span>MakefileLinux<span class="w"> </span>Makefile<span class="w"> </span><span class="c1"># Linux</span>
+cp<span class="w"> </span>MakefileDarwin<span class="w"> </span>Makefile<span class="w"> </span><span class="c1"># Mac</span>
+make
+</pre></div>
+</div>
+<p>In Windows:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="k">cd</span> lime_tbx\business\eocfi_adapter\eocfi_c
+<span class="k">copy</span> make.mak Makefile
+nmake
+</pre></div>
+</div>
+</section>
+<section id="create-a-virtual-environment">
+<h4>2. Create a Virtual Environment<a class="headerlink" href="#create-a-virtual-environment" title="Link to this heading"></a></h4>
+<p>To minimize application size it’s strongly recommended to use a virtual environment (<code class="docutils literal notranslate"><span class="pre">venv</span></code>) :</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">  </span><span class="c1"># For Linux/Mac</span>
+.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate<span class="w">     </span><span class="c1"># For Windows</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+pip<span class="w"> </span>install<span class="w"> </span>PySide6~<span class="o">=</span><span class="m">6</span>.8<span class="w">   </span><span class="c1"># Use PySide2 for older OS versions</span>
+</pre></div>
+</div>
+</section>
+<section id="build-the-app-bundle">
+<h4>3. Build the App Bundle<a class="headerlink" href="#build-the-app-bundle" title="Link to this heading"></a></h4>
+<p>Use <code class="docutils literal notranslate"><span class="pre">pyinstaller</span></code> to create an executable bundle for your OS:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pyinstaller<span class="w"> </span>lime_tbx.spec<span class="w">  </span>
+</pre></div>
+</div>
+<p>Once the build is complete, deactivate the virtual environment.</p>
+</section>
+<section id="create-an-installer">
+<h4>4. Create an Installer<a class="headerlink" href="#create-an-installer" title="Link to this heading"></a></h4>
+<p>Navigate to the <code class="docutils literal notranslate"><span class="pre">deployment/installer</span></code> directory and use the appropriate method for your operating system:</p>
+<ul class="simple">
+<li><p><strong>Windows</strong>: Use “InnoSetup” and run <code class="docutils literal notranslate"><span class="pre">inno_installer_builder.iss</span></code>.</p></li>
+<li><p><strong>Mac</strong>: Run <code class="docutils literal notranslate"><span class="pre">build_mac_installer.sh</span></code>.</p></li>
+<li><p><strong>Linux</strong>: Run <code class="docutils literal notranslate"><span class="pre">build_linux_installer.sh</span></code>.</p></li>
+<li><p><strong>Debian</strong>: Run <code class="docutils literal notranslate"><span class="pre">build_deb.sh</span></code> after building the Linux installer.</p></li>
+</ul>
+</section>
+</section>
+<section id="automated-deployment">
+<h3>Automated Deployment<a class="headerlink" href="#automated-deployment" title="Link to this heading"></a></h3>
+<p>The deployment process is automated using Docker. It requires building the Docker image
+once, and then running it each time the app is deployed.</p>
+<section id="linux-automated-deployment">
+<h4>Linux Automated Deployment<a class="headerlink" href="#linux-automated-deployment" title="Link to this heading"></a></h4>
+<ol class="arabic">
+<li><p>Build the image:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>deployment/automatic
+docker<span class="w"> </span>build<span class="w"> </span>../..<span class="w"> </span>-t<span class="w"> </span>lime_compiler<span class="w"> </span>-f<span class="w"> </span>Linux.Dockerfile
+</pre></div>
+</div>
+</li>
+<li><p>Run the container and deploy the app:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span>dirname<span class="w"> </span><span class="k">$(</span>dirname<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)))</span>:/usr/src/app/repo<span class="w"> </span>lime_compiler
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="windows-automated-deployment">
+<h4>Windows Automated Deployment<a class="headerlink" href="#windows-automated-deployment" title="Link to this heading"></a></h4>
+<p>Windows automated deployment is only available via Docker for Windows and does not
+include the EO-CFI C code compilation step.
+If EO-CFI libraries have been updated, refer
+to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.</p>
+<ol class="arabic">
+<li><p>Build the image:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>..<span class="w"> </span>-t<span class="w"> </span>lime_compiler<span class="w"> </span>-f<span class="w"> </span>Windows.Dockerfile
+</pre></div>
+</div>
+</li>
+<li><p>Run the container and deploy the app:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span>%F<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">(</span><span class="s2">&quot;%cd%&quot;</span><span class="o">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">dirname</span><span class="o">=</span>%~dpF
+<span class="k">for</span><span class="w"> </span>%F<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">(</span><span class="s2">&quot;%dirname%&quot;</span><span class="o">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">grandparent</span><span class="o">=</span>%~dpF
+docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>%grandparent%:C:<span class="se">\r</span>epo<span class="w"> </span>lime_compiler
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="mac-automated-deployment-unavailable">
+<h4>Mac Automated Deployment (Unavailable)<a class="headerlink" href="#mac-automated-deployment-unavailable" title="Link to this heading"></a></h4>
+<p>Automatic deployment for macOS is currently unavailable. Docker does not support
+macOS as a guest OS due to the lack of macOS containers.</p>
+<p>Future plans include exploring automated deployment using GitHub Actions with macOS runners.</p>
+</section>
+</section>
+</section>
+<section id="code-quality">
+<h2>Code Quality<a class="headerlink" href="#code-quality" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/"><img alt="GitLab CI" src="https://img.shields.io/badge/GitLab%20CI-FC6D26?style=for-the-badge&amp;logo=gitlab&amp;logoColor=fff" /></a>
+<a class="reference external" href="https://github.com/features/actions"><img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&amp;logo=githubactions&amp;logoColor=white" /></a></p>
+<p>Maintaining high code quality is essential for the reliability, maintainability, and performance of the LIME Toolbox.<br />
+To ensure a robust and well-structured codebase, we follow best practices in code formatting, static analysis,
+testing, and documentation through an automated Continuous Integration (CI) pipeline.</p>
+<p>Currently, CI is defined in <code class="docutils literal notranslate"><span class="pre">.gitlab-ci.yml</span></code>, running automated checks on every commit.
+In the future, this pipeline will be migrated to <em>GitHub Actions</em> and defined in <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci-pipeline.yaml</span></code>.</p>
+<section id="code-style-and-static-analysis">
+<h3>Code Style and Static Analysis<a class="headerlink" href="#code-style-and-static-analysis" title="Link to this heading"></a></h3>
+<p>LIME Toolbox enforces strict code quality standards through automated formatting and static
+analysis tools, ensuring consistency and reliability in the codebase.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://black.readthedocs.io/en/stable/"><img alt="Black" src="https://img.shields.io/badge/Black-%23101010.svg?style=for-the-badge&amp;logo=python&amp;logoColor=white" /></a> - Automatically formats code to
+ensure consistency with PEP 8 and PEP 257.</p></li>
+<li><p><a class="reference external" href="https://pylint.pycqa.org/en/latest/"><img alt="Pylint" src="https://img.shields.io/badge/Pylint-%23C4A000.svg?style=for-the-badge&amp;logo=python&amp;logoColor=white" /></a> - Performs static code analysis to
+enforce best practices and detect potential issues.</p></li>
+<li><p><a class="reference external" href="https://mypy.readthedocs.io/en/stable/"><img alt="mypy" src="https://img.shields.io/badge/my%5Bpy%5D-404040?style=for-the-badge&amp;logo=python&amp;logoColor=266aad" /></a> - Checks type annotations to improve
+code clarity and catch type-related errors early.</p></li>
+</ul>
+<p>These tools run as part of the CI pipeline for every commit to ensure every branch meets our quality
+standards before being merged.
+Developers are encouraged to run these tools locally before pushing changes to streamline the
+development process.</p>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">lime_tbx</span></code> package is validated through a suite of 260 unit tests. These tests run automatically
+whenever the code changes, ensuring stability and preventing regressions.</p>
+<p>LIME Toolbox uses the following tools to manage and execute tests:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/unittest.html"><img alt="unittest" src="https://img.shields.io/badge/unittest-306998?style=for-the-badge&amp;logo=python&amp;logoColor=FFD43B" /></a> - The built-in Python
+testing framework used for defining and structuring test cases.</p></li>
+<li><p><a class="reference external" href="https://docs.pytest.org/en/latest/"><img alt="pytest" src="https://img.shields.io/badge/pytest-%230A9EDC.svg?style=for-the-badge&amp;logo=pytest&amp;logoColor=white" /></a> - A more powerful test runner that
+provides enhanced test discovery, fixtures, and assertions.</p></li>
+<li><p><a class="reference external" href="https://tox.wiki/en/latest/"><img alt="Tox" src="https://img.shields.io/badge/tox-%23008080.svg?style=for-the-badge&amp;logo=data:image/png%2bxml;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADAUlEQVR4AV3BS4iVZRwH4N/v/77f7XzHOWfOmSaTkSmDiMjIahHpygLb1KqFmxYt2kS5bWEEBa1q1SJq4yIwXEWEEEy4U8NUuhjSmGOONZfmcu6X7/JeOieExOch7pOmil9/+/zM5cvbzz3ycPPx364lyc0/Bhvz++av/H7t+s1z525Z3IO4x9Fjc7PvvL1wwlO9aS0fvLEc+2ys/M5OQmdpRXhh9c/ND37+aeXC+nrXYYK465NTTx14bH902uTuWQL2zl8RdndCUGlsbyV+2FcEPUV8aUvz/uZa+enS0vdWMPHSsWbj8NPpV6HGIaVpuz3td1uJp44AalQqjs4T1gU+N6ku2PyoUNXXhZpKhDy7dPC94QivBaG4OBFst+osjBYdkDogqUN0+jUUJoZDAGMDDvJ9R8Jq7Yxavv1MA0qfsgahMcA4D2FcgqIAnAWdV+iPZhFXBEVOmJJodavIC51GtYd6Uq3mLwBoRAn+0x8mAIFGk6AQvWHdOycgieYDgGXox0WICaute0W3h/UnFJwLA8A47QsTEFTQkUDiqutvVGiNhwfgPaDCgPVZh7IEysIvaqha4kFMlZICWgMgnBOU3IPanGDQscjGFlPGCCgeUQzogIFOwuHfWVEXa5VzTAgYTI2yAM6BShO1OY1oJOi1Dawj8lJjlEXIS93RXjcuoXB2nIdeRChCWAsMRgGI/8UVAXTql2/X0O4KAZCUH1XeTVtHXqwfbfcqC4Agzxz6Q41xFsA5whjBVG5iZEVKhhVmI4+i8DLaWntXXb2y4RYPNFf27p8/TkIVBfz2TkTnCe+BvNQYlxWUJoKxCnkRYU9dZDwszq7euPixYOKzz6+f7+Y42R+FLjMpLCugjuEl8ZmZgXUhppwnAC8q5K8yWD/RuXOxVJho/5NhcW7v1VbfrdSas4dVoGYKl3qomKVPocMASgfsDwRZbr5Z+2X1jfPffbGOCeI+b3348vyhg08eVylebXXiR9u9NDRG7W5uyaX2rZUvK+XCD2dOnzS461/EK3IWyjUUCgAAAABJRU5ErkJggg==" /></a> - A testing automation tool used to run tests in
+isolated environments, ensuring compatibility across different Python versions.</p></li>
+</ul>
+<p>Currently, testing is executed via GitLab CI Pipelines, with plans to migrate to GitHub CI in the future.<br />
+The current test coverage is approximately 86%, as shown in <a class="reference internal" href="user_guide/installation.html#fig-2"><span class="std std-ref">Figure 2</span></a>.</p>
+<figure align="center" id="fig-2">
+  <img src="../_static/code_coverage.png" alt="Code testing coverage"/>
+  <figcaption><i>Figure 2</i>: Summary of unit testing code coverage.</figcaption>
+</figure>
+</section>
+<section id="code-documentation">
+<h3>Code Documentation<a class="headerlink" href="#code-documentation" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://interrogate.readthedocs.io/en/latest/"><img alt="Interrogate" src="https://img.shields.io/badge/Interrogate-de78a0?style=for-the-badge&amp;logo=data:image/png%2bxml;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACA0lEQVR4AcXBX0icBQAA8N/3fecdfoETTNtYttNrQxRKPAlvKtTGDSx6jN6yYETP9TbyofforfZQMjaJnoxBf27KGMSKSW3BqBGmZ7TlzD9XZNu8eefnXCuKngf7/Txwgf8pnSnJ5/NGXxpVKpX8Y2RkxMlTJ91Vni8rFAruCvxt5uzMwZb2lleyzdm+VJRKr/y58tP6xvqHIp+KPNnU0PRqW3Nbtx1JlMwvXF34pJpUPwrsOP/F+aNDvUOvy9hnQ6yGtLrIMpYEHrIla1OjAA1uS7uuwWfB9NnpvuLh4qRVWb+iEa1IUPevEBGqqKAJj/ojVRwovuxNWRexhhDP4kXsQR0hNnAO47iJGN12hS4pOi7xJYbRgdP4ATFixFjEFG6hiAreJ2VR1u9CPTiGb/EBGjGHy8gixm604y3cwBVCLSq2bfsFb+M7vIB+XMMULuNxPIc03sFX/hIa9rGnBR7DRcQYxlVU0IcAV7AfA/gadfQSDT4zuNxxpGMkOBTs8hqeQgafo4ID+A3X0IUuPI9+FKxHE6cmlsbeG6uFuTBnS7OaUA15PIw1HMBhNKDmnqxFPSZTdszOz76byWS+72ztfCOMwicQ25K2T0qnUGLbtrpADRtJLfl5YW5hvBpWTwT+48LMBblcbi/y1nWrekQgltjUaFWTMr4pl8s/FgYK7os7l1ShjT56e3IAAAAASUVORK5CYII=" /></a></p>
+<p>LIME Toolbox follows the <em>Numpydoc</em> standard for docstrings, ensuring clear and structured documentation
+across the codebase. For details, refer to the
+<a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">Numpydoc style guide</a>.</p>
+<p>To maintain high-quality documentation, <code class="docutils literal notranslate"><span class="pre">lime_tbx</span></code> enforces a minimum documentation coverage threshold
+into the CI pipeline using <code class="docutils literal notranslate"><span class="pre">interrogate</span></code>. The current threshold is 65%, excluding the <code class="docutils literal notranslate"><span class="pre">lime_tbx/presentation/gui</span></code>
+subpackage. Future improvements will raise this threshold and extend coverage to all subpackages.</p>
+<p>By automating documentation coverage checks, <code class="docutils literal notranslate"><span class="pre">lime_tbx</span></code> ensures maintainability and accessibility,
+keeping the project well-documented for both developers and users.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="design.html" class="btn btn-neutral float-left" title="Design" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/lime_tbx.html" class="btn btn-neutral float-right" title="lime_tbx package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

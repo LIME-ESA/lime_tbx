@@ -1,0 +1,7 @@
+lime\_tbx.common.datatypes module
+=================================
+
+.. automodule:: lime_tbx.common.datatypes
+   :members:
+   :undoc-members:
+   :show-inheritance:

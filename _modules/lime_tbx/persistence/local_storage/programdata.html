@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.persistence.local_storage.programdata &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.persistence.local_storage.programdata</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.persistence.local_storage.programdata</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module in charge of obtaining the path for the programfiles folder and the appdata folder.</span>
+
+<span class="sd">It exports the following functions:</span>
+<span class="sd">    * get_programfiles_folder() - Get the path of the programfiles folder as a string.</span>
+<span class="sd">    * get_appdata_folder() - Get the path of the appdata folder as a string.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="c1"># import here</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.persistence.local_storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">appdata</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;16/10/2022&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+<span class="n">APPNAME</span> <span class="o">=</span> <span class="s2">&quot;LimeTBX&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_valid_programfiles</span><span class="p">(</span><span class="n">programdata</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">programdata</span><span class="p">,</span> <span class="s2">&quot;kernels&quot;</span><span class="p">))</span>
+        <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">programdata</span><span class="p">,</span> <span class="s2">&quot;eocfi_data&quot;</span><span class="p">))</span>
+        <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">programdata</span><span class="p">,</span> <span class="s2">&quot;coeff_data&quot;</span><span class="p">))</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="get_programfiles_folder">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.persistence.local_storage.programdata.html#lime_tbx.persistence.local_storage.programdata.get_programfiles_folder">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_programfiles_folder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+        <span class="n">_stream</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s1">&#39;mdfind &quot;kMDItemCFBundleIdentifier = int.esa.LimeTBX&quot;&#39;</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">_stream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">_stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">possible_bundles</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">programfiles</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">possible_bundles</span><span class="p">:</span>
+            <span class="n">bundle</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="s2">&quot;Contents/Resources&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_is_valid_programfiles</span><span class="p">(</span><span class="n">bundle</span><span class="p">):</span>
+                <span class="n">programfiles</span> <span class="o">=</span> <span class="n">bundle</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">programfiles</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">programfiles</span> <span class="o">=</span> <span class="s2">&quot;/Applications/</span><span class="si">{}</span><span class="s2">.app/Contents/Resources&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">APPNAME</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">winreg</span>
+
+        <span class="n">programfiles</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">a_reg</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">ConnectRegistry</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">winreg</span><span class="o">.</span><span class="n">HKEY_LOCAL_MACHINE</span><span class="p">)</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sub_key_install_folder</span> <span class="o">=</span> <span class="s2">&quot;SOFTWARE</span><span class="se">\\</span><span class="s2">ESA</span><span class="se">\\</span><span class="s2">LimeTBX</span><span class="se">\\</span><span class="s2">Settings&quot;</span>
+            <span class="n">a_key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">a_reg</span><span class="p">,</span> <span class="n">sub_key_install_folder</span><span class="p">)</span>
+            <span class="n">programfiles</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">QueryValueEx</span><span class="p">(</span><span class="n">a_key</span><span class="p">,</span> <span class="s2">&quot;InstallPath&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>  <span class="c1"># Search for admin uninstall key</span>
+            <span class="n">sub_key_admin</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;SOFTWARE</span><span class="se">\\</span><span class="s2">Microsoft</span><span class="se">\\</span><span class="s2">Windows</span><span class="se">\\</span><span class="s2">CurrentVersion</span><span class="se">\\</span><span class="s2">Uninstall</span><span class="se">\\</span><span class="s2">LimeTBX_is1&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">a_key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">a_reg</span><span class="p">,</span> <span class="n">sub_key_admin</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>  <span class="c1"># Search for user uninstall key</span>
+                <span class="n">sub_key_user</span> <span class="o">=</span> <span class="s2">&quot;SOFTWARE</span><span class="se">\\</span><span class="s2">Microsoft</span><span class="se">\\</span><span class="s2">Windows</span><span class="se">\\</span><span class="s2">CurrentVersion</span><span class="se">\\</span><span class="s2">Uninstall</span><span class="se">\\</span><span class="s2">LimeTBX_is1&quot;</span>
+                <span class="n">a_reg</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">ConnectRegistry</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">winreg</span><span class="o">.</span><span class="n">HKEY_CURRENT_USER</span><span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">a_key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">a_reg</span><span class="p">,</span> <span class="n">sub_key_user</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">programfiles</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">QueryValueEx</span><span class="p">(</span><span class="n">a_key</span><span class="p">,</span> <span class="s2">&quot;Inno Setup: App Path&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Did not find LimeTBX key in winreg registry.&quot;</span><span class="p">)</span>
+            <span class="n">programfiles</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PROGRAMFILES&quot;</span><span class="p">],</span> <span class="n">APPNAME</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">programfiles</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/opt/esa&quot;</span><span class="p">,</span> <span class="n">APPNAME</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Programfiles: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">programfiles</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_valid_programfiles</span><span class="p">(</span><span class="n">programfiles</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Programfiles directory not valid. Using current dir.&quot;</span><span class="p">)</span>
+        <span class="n">programfiles</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>  <span class="c1"># os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))</span>
+
+    <span class="k">return</span> <span class="n">programfiles</span></div>
+
+
+
+<div class="viewcode-block" id="get_appdata_folder">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.persistence.local_storage.programdata.html#lime_tbx.persistence.local_storage.programdata.get_appdata_folder">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_appdata_folder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">appdata</span><span class="o">.</span><span class="n">get_appdata_folder</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">())</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

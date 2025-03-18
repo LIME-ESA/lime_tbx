@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.application.simulation.moon_data_factory &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.application.simulation.moon_data_factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.application.simulation.moon_data_factory</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module containing the factory class for MoonData.&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="c1"># import here</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">SurfacePoint</span><span class="p">,</span>
+    <span class="n">CustomPoint</span><span class="p">,</span>
+    <span class="n">SatellitePoint</span><span class="p">,</span>
+    <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="n">EocfiPath</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.spice_adapter.spice_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">SPICEAdapter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.eocfi_adapter.eocfi_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">EOCFIConverter</span>
+
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;01/02/2022&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Production&quot;</span>
+
+
+<div class="viewcode-block" id="MoonDataFactory">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.moon_data_factory.html#lime_tbx.application.simulation.moon_data_factory.MoonDataFactory">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MoonDataFactory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for creating MoonData objects from points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MoonDataFactory.get_md">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.moon_data_factory.html#lime_tbx.application.simulation.moon_data_factory.MoonDataFactory.get_md">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_md</span><span class="p">(</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">eocfi_path</span><span class="p">:</span> <span class="n">EocfiPath</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a MoonData from a generic point, whatever subclass it is.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point: Point</span>
+<span class="sd">            Point from which to create the MoonData.</span>
+<span class="sd">        eocfi_path: EocfiPath</span>
+<span class="sd">            Path to the folder with the needed eocfi data files.</span>
+<span class="sd">        kernels_path: KernelsPath</span>
+<span class="sd">            Path to the folder with the needed SPICE kernel files.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        md: MoonData | list of MoonData</span>
+<span class="sd">            MoonData generated from the given data. If parameter point.dt exists and it is a list,</span>
+<span class="sd">            it will be a list. Otherwise not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">SurfacePoint</span><span class="p">):</span>
+            <span class="n">md</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_from_surface</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
+            <span class="n">md</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_from_custom</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">md</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_from_satellite</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">eocfi_path</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">md</span></div>
+
+
+<div class="viewcode-block" id="MoonDataFactory.get_md_from_surface">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.moon_data_factory.html#lime_tbx.application.simulation.moon_data_factory.MoonDataFactory.get_md_from_surface">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_md_from_surface</span><span class="p">(</span>
+        <span class="n">sp</span><span class="p">:</span> <span class="n">SurfacePoint</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a MoonData from a surface point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sp: SurfacePoint</span>
+<span class="sd">            SurfacePoint from which to create the MoonData.</span>
+<span class="sd">        kernels_path: KernelsPath</span>
+<span class="sd">            Path to the folder with the needed SPICE kernel files.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        md: MoonData | list of MoonData</span>
+<span class="sd">            MoonData generated from the given data. If the parameter dt was a list,</span>
+<span class="sd">            this will be a list. Otherwise not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="p">()</span><span class="o">.</span><span class="n">get_moon_data_from_earth</span><span class="p">(</span>
+            <span class="n">sp</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">altitude</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">kernels_path</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">md</span></div>
+
+
+<div class="viewcode-block" id="MoonDataFactory.get_md_from_custom">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.moon_data_factory.html#lime_tbx.application.simulation.moon_data_factory.MoonDataFactory.get_md_from_custom">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_md_from_custom</span><span class="p">(</span>
+        <span class="n">cp</span><span class="p">:</span> <span class="n">CustomPoint</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MoonData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a MoonData from a custom point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cp: CustomPoint</span>
+<span class="sd">            CustomPoint from which to create the MoonData.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        md: MoonData</span>
+<span class="sd">            MoonData generated from the given data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="n">MoonData</span><span class="p">(</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">,</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">distance_observer_moon</span><span class="p">,</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">selen_sun_lon</span><span class="p">,</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">selen_obs_lat</span><span class="p">,</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">selen_obs_lon</span><span class="p">,</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">abs_moon_phase_angle</span><span class="p">,</span>
+            <span class="n">cp</span><span class="o">.</span><span class="n">moon_phase_angle</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">md</span></div>
+
+
+<div class="viewcode-block" id="MoonDataFactory.get_md_from_satellite">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.moon_data_factory.html#lime_tbx.application.simulation.moon_data_factory.MoonDataFactory.get_md_from_satellite">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_md_from_satellite</span><span class="p">(</span>
+        <span class="n">sp</span><span class="p">:</span> <span class="n">SatellitePoint</span><span class="p">,</span>
+        <span class="n">eocfi_path</span><span class="p">:</span> <span class="n">EocfiPath</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a MoonData from a satellite point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sp: SatellitePoint</span>
+<span class="sd">            SatellitePoint from which to create the MoonData.</span>
+<span class="sd">        eocfi_path: EocfiPath</span>
+<span class="sd">            Path to the folder with the needed eocfi data files.</span>
+<span class="sd">        kernels_path: KernelsPath</span>
+<span class="sd">            Path to the folder with the needed SPICE kernel files.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        md: MoonData | list of MoonData</span>
+<span class="sd">            MoonData generated from the given data. It will be a list if sp.dt is a list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_and_surfaces_from_satellite</span><span class="p">(</span>
+            <span class="n">sp</span><span class="p">,</span> <span class="n">eocfi_path</span><span class="p">,</span> <span class="n">kernels_path</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MoonDataFactory.get_md_and_surfaces_from_satellite">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.moon_data_factory.html#lime_tbx.application.simulation.moon_data_factory.MoonDataFactory.get_md_and_surfaces_from_satellite">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_md_and_surfaces_from_satellite</span><span class="p">(</span>
+        <span class="n">sp</span><span class="p">:</span> <span class="n">SatellitePoint</span><span class="p">,</span>
+        <span class="n">eocfi_path</span><span class="p">:</span> <span class="n">EocfiPath</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">Tuple</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">SurfacePoint</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">]]</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a MoonData from a satellite point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sp: SatellitePoint</span>
+<span class="sd">            SatellitePoint from which to create the MoonData.</span>
+<span class="sd">        eocfi_path: EocfiPath</span>
+<span class="sd">            Path to the folder with the needed eocfi data files.</span>
+<span class="sd">        kernels_path: KernelsPath</span>
+<span class="sd">            Path to the folder with the needed SPICE kernel files.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        md: MoonData | list of MoonData</span>
+<span class="sd">            MoonData generated from the given data. It will be a list if sp.dt is a list.</span>
+<span class="sd">        srp: SurfacePoint | list of SurfacePoint</span>
+<span class="sd">            SurfacePoint generated from the position of the SatellitePoint at the given datetimes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">eocfi</span><span class="p">:</span> <span class="n">EOCFIConverter</span> <span class="o">=</span> <span class="n">EOCFIConverter</span><span class="p">(</span><span class="n">eocfi_path</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">)</span>
+        <span class="n">dts</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">dt</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">dts</span><span class="p">]</span>
+
+        <span class="n">mds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">srps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">xyzs</span> <span class="o">=</span> <span class="n">eocfi</span><span class="o">.</span><span class="n">get_satellite_position_rectangular</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dts</span><span class="p">)</span>
+        <span class="n">llhs</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_planetographic_multiple</span><span class="p">(</span>
+            <span class="n">xyzs</span><span class="p">,</span> <span class="s2">&quot;EARTH&quot;</span><span class="p">,</span> <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="s2">&quot;ITRF93&quot;</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">llh</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">llhs</span><span class="p">):</span>
+            <span class="n">srp</span> <span class="o">=</span> <span class="n">SurfacePoint</span><span class="p">(</span><span class="n">llh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">llh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">llh</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dts</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">srps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">srp</span><span class="p">)</span>
+        <span class="n">mds</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">get_moon_datas_from_rectangular_multiple</span><span class="p">(</span>
+            <span class="n">xyzs</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">,</span> <span class="s2">&quot;ITRF93&quot;</span>  <span class="c1"># EOCFI uses ITRF93</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">srps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">mds</span><span class="p">,</span> <span class="n">srps</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

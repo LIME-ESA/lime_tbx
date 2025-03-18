@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.presentation.cli.export module &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lime_tbx.presentation.gui package" href="lime_tbx.presentation.gui.html" />
+    <link rel="prev" title="lime_tbx.presentation.cli.cli module" href="lime_tbx.presentation.cli.cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lime_tbx.html">lime_tbx package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="lime_tbx.presentation.html">lime_tbx.presentation package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="lime_tbx.presentation.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.presentation.html">lime_tbx.presentation package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.presentation.cli.html">lime_tbx.presentation.cli package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.presentation.cli.export module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/api/lime_tbx.presentation.cli.export.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lime_tbx.presentation.cli.export">
+<span id="lime-tbx-presentation-cli-export-module"></span><h1>lime_tbx.presentation.cli.export module<a class="headerlink" href="#module-lime_tbx.presentation.cli.export" title="Link to this heading"></a></h1>
+<p>Data exporting module for LIME TBX’s CLI</p>
+<p>After parsing the command and calculating its result, this
+module is in charge of exporting the results to the selected
+kind of output.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.CLIExporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">CLIExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">eocfi_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath" title="lime_tbx.common.datatypes.EocfiPath"><span class="pre">EocfiPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.SettingsManager" title="lime_tbx.presentation.gui.settings.SettingsManager"><span class="pre">SettingsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lime_simulation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation" title="lime_tbx.application.simulation.lime_simulation.ILimeSimulation"><span class="pre">ILimeSimulation</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#CLIExporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.CLIExporter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handles exporting simulation and comparison results from the CLI.</p>
+<p>This class provides methods for saving data in multiple formats, including
+CSV, Graphs, and NetCDF.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.CLIExporter.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><span class="pre">ExportData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#CLIExporter.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.CLIExporter.export" title="Link to this definition"></a></dt>
+<dd><p>Exports simulation or comparison results based on the selected export format.</p>
+<p>This method determines the appropriate export format (CSV, Graph, NetCDF)
+and calls the corresponding function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – The observation point (Earth, Lunar, or Satellite) for the simulation.</p></li>
+<li><p><strong>ed</strong> (<a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><em>ExportData</em></a>) – The export configuration object, determining the file format and parameters.</p></li>
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – The spectral response function used in the simulation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportError" title="lime_tbx.presentation.cli.export.ExportError"><strong>ExportError</strong></a> – If an error occurs while exporting the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.CLIExporter.export_comparison_bywlen_graph">
+<span class="sig-name descname"><span class="pre">export_comparison_bywlen_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData" title="lime_tbx.common.datatypes.ComparisonData"><span class="pre">ComparisonData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wlcs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_diffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#CLIExporter.export_comparison_bywlen_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.CLIExporter.export_comparison_bywlen_graph" title="Link to this definition"></a></dt>
+<dd><p>Exports comparison results by wavelength as a boxplot graph.</p>
+<p>This method visualizes the comparison of observed and simulated data across
+different wavelengths. It includes a statistical representation of differences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>List</em><em>[</em><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData" title="lime_tbx.common.datatypes.ComparisonData"><em>ComparisonData</em></a><em>]</em>) – List of comparison data for each spectral channel.</p></li>
+<li><p><strong>wlcs</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of wavelength centers for each channel.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – Label for the x-axis (e.g., “Wavelength (nm)”).</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – Label for the y-axis (e.g., “Irradiance (Wm⁻²nm⁻¹)”).</p></li>
+<li><p><strong>output_file</strong> (<em>str</em>) – Path to save the exported graph file.</p></li>
+<li><p><strong>version</strong> (<em>str</em>) – Version of the LIME coefficients used in the simulation.</p></li>
+<li><p><strong>chosen_diffs</strong> (<a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><em>CompFields</em></a>) – Specifies whether to show relative differences, percentage differences, or none.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportError" title="lime_tbx.presentation.cli.export.ExportError"><strong>ExportError</strong></a> – If an error occurs while generating or saving the graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.CLIExporter.export_comparison_graph">
+<span class="sig-name descname"><span class="pre">export_comparison_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData" title="lime_tbx.common.datatypes.ComparisonData"><span class="pre">ComparisonData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_diffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#CLIExporter.export_comparison_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.CLIExporter.export_comparison_graph" title="Link to this definition"></a></dt>
+<dd><p>Exports comparison results as a graph.</p>
+<p>This method generates a graph comparing observed and simulated irradiance values.
+It includes relative or percentage differences based on the chosen difference metric.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comparison</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData" title="lime_tbx.common.datatypes.ComparisonData"><em>ComparisonData</em></a>) – The comparison data containing observed and simulated signals.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em>) – Label for the x-axis (e.g., “Wavelength (nm)”, “UTC Date”).</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em>) – Label for the y-axis (e.g., “Irradiance (Wm⁻²nm⁻¹)”).</p></li>
+<li><p><strong>output_file</strong> (<em>str</em>) – Path to save the exported graph file.</p></li>
+<li><p><strong>version</strong> (<em>str</em>) – Version of the LIME coefficients used in the simulation.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – Title of the graph.</p></li>
+<li><p><strong>chosen_diffs</strong> (<a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><em>CompFields</em></a>) – Specifies whether to show relative differences, percentage differences, or none.</p></li>
+<li><p><strong>date_range</strong> (<em>Optional</em><em>, </em><em>Tuple</em><em>[</em><em>datetime</em><em>, </em><em>datetime</em><em>]</em>) – Initial and final datetimes, in case the comparison is not an standard comparison,
+and its dts attribute is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportError" title="lime_tbx.presentation.cli.export.ExportError"><strong>ExportError</strong></a> – If an error occurs while generating or saving the graph.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ComparisonKey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ComparisonKey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ComparisonKey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Enumeration for comparison output modes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ComparisonKey.DT">
+<span class="sig-name descname"><span class="pre">DT</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ComparisonKey.DT" title="Link to this definition"></a></dt>
+<dd><p>Compare based on UTC datetime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ComparisonKey.MPA">
+<span class="sig-name descname"><span class="pre">MPA</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ComparisonKey.MPA" title="Link to this definition"></a></dt>
+<dd><p>Compare based on Moon Phase Angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ComparisonKey.BOTH">
+<span class="sig-name descname"><span class="pre">BOTH</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ComparisonKey.BOTH" title="Link to this definition"></a></dt>
+<dd><p>Compare using both datetime and Moon Phase Angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ComparisonKey.CHANNEL">
+<span class="sig-name descname"><span class="pre">CHANNEL</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ComparisonKey.CHANNEL" title="Link to this definition"></a></dt>
+<dd><p>Compare by spectral channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ComparisonKey.CHANNEL_MEAN">
+<span class="sig-name descname"><span class="pre">CHANNEL_MEAN</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ComparisonKey.CHANNEL_MEAN" title="Link to this definition"></a></dt>
+<dd><p>Compare using averaged spectral channels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">BOTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">CHANNEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">CHANNEL_MEAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">DT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">MPA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_file_refl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_polar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_integrated_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportData</span></code></a></p>
+<p>Represents CSV file export settings for simulation results.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_refl">
+<span class="sig-name descname"><span class="pre">o_file_refl</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_refl" title="Link to this definition"></a></dt>
+<dd><p>Path to the output CSV file for reflectance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_irr">
+<span class="sig-name descname"><span class="pre">o_file_irr</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_irr" title="Link to this definition"></a></dt>
+<dd><p>Path to the output CSV file for irradiance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_polar">
+<span class="sig-name descname"><span class="pre">o_file_polar</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_polar" title="Link to this definition"></a></dt>
+<dd><p>Path to the output CSV file for polarization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_integrated_irr">
+<span class="sig-name descname"><span class="pre">o_file_integrated_irr</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_integrated_irr" title="Link to this definition"></a></dt>
+<dd><p>Path to the output CSV file for integrated irradiance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">o_file_integrated_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">o_file_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">o_file_polar</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">o_file_refl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparison">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportComparison</span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportComparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparison" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for exporting comparison results.</p>
+<p>This class serves as a parent for different export formats, including CSV
+and graphical representations of comparison data.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportComparisonCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportComparisonCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSV" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportComparison</span></code></a></p>
+<p>Represents CSV file export settings for comparison results.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSV.comparison_key">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSV.comparison_key" title="Link to this definition"></a></dt>
+<dd><p>The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey">ComparisonKey</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSV.output_files">
+<span class="sig-name descname"><span class="pre">output_files</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSV.output_files" title="Link to this definition"></a></dt>
+<dd><p>List of file paths for saving the comparison data.
+Each comparison type has a different amount of files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSV.chosen_diff">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSV.chosen_diff" title="Link to this definition"></a></dt>
+<dd><p>The difference metric (relative, percentage, or none).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields">CompFields</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">output_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSVDir">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportComparisonCSVDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportComparisonCSVDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSVDir" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportComparison</span></code></a></p>
+<p>Represents CSV directory export settings for comparison results.</p>
+<p>Instead of exporting individual CSV files, this class allows exporting
+all comparison data to a specified directory, and automatically generating
+the file names.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSVDir.comparison_key">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSVDir.comparison_key" title="Link to this definition"></a></dt>
+<dd><p>The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey">ComparisonKey</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSVDir.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSVDir.output_dir" title="Link to this definition"></a></dt>
+<dd><p>The directory where CSV files will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonCSVDir.chosen_diff">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonCSVDir.chosen_diff" title="Link to this definition"></a></dt>
+<dd><p>The difference metric (relative, percentage, or none).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields">CompFields</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id14">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportComparisonGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportComparisonGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraph" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportComparison</span></code></a></p>
+<p>Represents graphical export settings for comparison results.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraph.comparison_key">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraph.comparison_key" title="Link to this definition"></a></dt>
+<dd><p>The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey">ComparisonKey</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraph.output_files">
+<span class="sig-name descname"><span class="pre">output_files</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraph.output_files" title="Link to this definition"></a></dt>
+<dd><p>List of file paths for saving the comparison graphs.
+Each comparison type has a different amount of files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraph.chosen_diff">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraph.chosen_diff" title="Link to this definition"></a></dt>
+<dd><p>The difference metric (relative, percentage, or none).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields">CompFields</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">output_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraphDir">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportComparisonGraphDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosen_diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportComparisonGraphDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraphDir" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportComparison</span></code></a></p>
+<p>Represents graphical export settings for comparison results in a directory.</p>
+<p>This allows exporting comparison graphs to a specified directory with a
+chosen file extension, and automatically generating the file names.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraphDir.extension">
+<span class="sig-name descname"><span class="pre">extension</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraphDir.extension" title="Link to this definition"></a></dt>
+<dd><p>File extension for the exported graphs (e.g., “png”, “jpg”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraphDir.comparison_key">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraphDir.comparison_key" title="Link to this definition"></a></dt>
+<dd><p>The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey">ComparisonKey</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraphDir.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraphDir.output_dir" title="Link to this definition"></a></dt>
+<dd><p>The directory where graphs will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportComparisonGraphDir.chosen_diff">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportComparisonGraphDir.chosen_diff" title="Link to this definition"></a></dt>
+<dd><p>The difference metric (relative, percentage, or none).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields">CompFields</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id19">
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id19" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id20">
+<span class="sig-name descname"><span class="pre">extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id21">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportData</span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for export data formats.</p>
+<p>Subclasses define specific export types such as CSV, Graphs, and NetCDF.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportError</span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception that encapsules anything that might go wrong during CLI file export.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_file_refl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_polar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportData</span></code></a></p>
+<p>Represents graphical export settings for simulation results.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph.o_file_refl">
+<span class="sig-name descname"><span class="pre">o_file_refl</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph.o_file_refl" title="Link to this definition"></a></dt>
+<dd><p>Path to the output graph file for reflectance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph.o_file_irr">
+<span class="sig-name descname"><span class="pre">o_file_irr</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph.o_file_irr" title="Link to this definition"></a></dt>
+<dd><p>Path to the output graph file for irradiance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph.o_file_polar">
+<span class="sig-name descname"><span class="pre">o_file_polar</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph.o_file_polar" title="Link to this definition"></a></dt>
+<dd><p>Path to the output graph file for polarization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">o_file_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id23">
+<span class="sig-name descname"><span class="pre">o_file_polar</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id23" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id24">
+<span class="sig-name descname"><span class="pre">o_file_refl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportNetCDF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportNetCDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportNetCDF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportNetCDF" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportData</span></code></a>, <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportComparison</span></code></a></p>
+<p>Represents NetCDF file export settings for simulations and comparisons.</p>
+<p>This format allows storing structured, multi-dimensional scientific data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportNetCDF.output_file">
+<span class="sig-name descname"><span class="pre">output_file</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportNetCDF.output_file" title="Link to this definition"></a></dt>
+<dd><p>The path to the NetCDF output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id25">
+<span class="sig-name descname"><span class="pre">output_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lime_tbx.presentation.cli.cli.html" class="btn btn-neutral float-left" title="lime_tbx.presentation.cli.cli module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.presentation.gui.html" class="btn btn-neutral float-right" title="lime_tbx.presentation.gui package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

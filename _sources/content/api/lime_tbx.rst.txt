@@ -1,0 +1,19 @@
+lime\_tbx package
+=================
+
+.. automodule:: lime_tbx
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.application
+   lime_tbx.business
+   lime_tbx.common
+   lime_tbx.persistence
+   lime_tbx.presentation

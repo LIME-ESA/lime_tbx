@@ -1,0 +1,737 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.business.interpolation.interp_data.interp_data &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.interpolation.interp_data.interp_data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.business.interpolation.interp_data.interp_data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module in charge of retrieving interpolation data (spectra, etc) from storage.</span>
+
+<span class="sd">It exports the following functions:</span>
+<span class="sd">    * get_best_asd_data() - Retrieve the best ASD reflectance spectrum for the given moon phase angle.</span>
+<span class="sd">    * get_apollo16_data() - Retrieve the Apollo 16 spectrum.</span>
+<span class="sd">    * get_breccia_data() - Retrieve the Breccia spectrum.</span>
+<span class="sd">    * get_composite_data() - Retrieve the composite Apollo 16 + Breccia spectrum.</span>
+<span class="sd">    * get_available_spectra_names() - Obtain the spectra names that the user can use.</span>
+<span class="sd">    * get_interpolation_spectrum_name() - Obtains the currently chosen interpolation spectrum name.</span>
+<span class="sd">    * set_interpolation_spectrum_name() - Sets the spectrum name as the currently selected one.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InterpolationSettings</span><span class="p">,</span>
+    <span class="n">LimeException</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpectralData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.persistence.local_storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">programdata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;01/02/2022&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;pieter.de.vis@npl.co.uk&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_default_asd_data</span><span class="p">(</span><span class="n">moon_phase_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/SomeMoonReflectances.txt&quot;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span>
+    <span class="p">)</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">350</span><span class="p">,</span> <span class="mi">2501</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">phase_angles</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">best_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">phase_angles</span> <span class="o">-</span> <span class="n">moon_phase_angle</span><span class="p">))</span>
+    <span class="c1"># Default value was best_id = 5</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">best_id</span><span class="p">,</span> <span class="mi">4</span><span class="p">:]</span>
+
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">wavs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_reflectance_ds</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">)</span>
+    <span class="n">unc_tot</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">ds_asd</span><span class="o">.</span><span class="n">u_ran_reflectance</span><span class="o">.</span><span class="n">values</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">u_sys_reflectance</span><span class="o">.</span><span class="n">values</span><span class="o">**</span><span class="mi">2</span>
+    <span class="p">)</span>
+
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">ds_asd</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spectral_data</span>
+
+
+<div class="viewcode-block" id="get_best_polar_asd_data">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_best_polar_asd_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_best_polar_asd_data</span><span class="p">(</span>
+    <span class="n">moon_phase_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the best ASD polarisation spectrum for the given moon phase angle.</span>
+<span class="sd">    This is not used in the end, the ASD polarisation spectrum wasn&#39;t good enough.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    moon_phase_angle: float</span>
+<span class="sd">        Moon phase angle in degrees of which the best ASD polarisation will be retrieved.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spectral_data: SpectralData</span>
+<span class="sd">        ASD polarisation spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/ds_ASD.nc&quot;</span><span class="p">))</span>
+
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">phase_angles</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">phase_angle</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">best_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">phase_angles</span> <span class="o">-</span> <span class="n">moon_phase_angle</span><span class="p">))</span>
+
+    <span class="n">pol</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">best_id</span><span class="p">]</span>
+    <span class="n">unc</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">u_polarisation</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">best_id</span><span class="p">]</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">/</span> <span class="mi">100</span>
+
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">pol</span><span class="p">,</span> <span class="n">unc</span><span class="p">,</span> <span class="n">ds_asd</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spectral_data</span></div>
+
+
+
+<div class="viewcode-block" id="get_linear_polar_data">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_linear_polar_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_linear_polar_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the linear polarisation spectrum.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spectral_data: SpectralData</span>
+<span class="sd">        Linear polarisation spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/ds_ASD.nc&quot;</span><span class="p">))</span>
+
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">pol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">wavs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">unc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">wavs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">pol</span> <span class="o">/</span> <span class="mi">100</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wavs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavs</span><span class="p">)))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_polarisation_ds</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">pol</span><span class="p">,</span> <span class="n">unc</span><span class="p">,</span> <span class="n">corr</span><span class="p">)</span>
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">pol</span><span class="p">,</span> <span class="n">unc</span><span class="p">,</span> <span class="n">ds</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spectral_data</span></div>
+
+
+
+<div class="viewcode-block" id="get_best_asd_data">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_best_asd_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_best_asd_data</span><span class="p">(</span><span class="n">moon_phase_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the best ASD reflectance spectrum for the given moon phase angle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    moon_phase_angle: float</span>
+<span class="sd">        Moon phase angle in degrees of which the best ASD reflectance will be retrieved.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spectral_data: SpectralData</span>
+<span class="sd">        Reflectance spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="c1"># data = np.genfromtxt(</span>
+    <span class="c1">#     os.path.join(current_dir, &quot;assets/SomeMoonReflectances.txt&quot;), delimiter=&quot;,&quot;</span>
+    <span class="c1"># )</span>
+
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/ds_ASD.nc&quot;</span><span class="p">))</span>
+
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">phase_angles</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">phase_angle</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">best_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">phase_angles</span> <span class="o">-</span> <span class="n">moon_phase_angle</span><span class="p">))</span>
+
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">reflectance</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">best_id</span><span class="p">]</span>
+    <span class="n">unc</span> <span class="o">=</span> <span class="n">ds_asd</span><span class="o">.</span><span class="n">u_reflectance</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">best_id</span><span class="p">]</span> <span class="o">*</span> <span class="n">refl</span> <span class="o">/</span> <span class="mi">100</span>
+
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc</span><span class="p">,</span> <span class="n">ds_asd</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spectral_data</span></div>
+
+
+
+<div class="viewcode-block" id="get_apollo16_data">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_apollo16_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_apollo16_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the Apollo 16 spectrum.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spectral_data: SpectralData</span>
+<span class="sd">        Apollo 16 reflectance spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/Apollo16.txt&quot;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span>
+    <span class="p">)</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">wavs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="c1"># TODO: Correct uncertainties from data</span>
+    <span class="n">unc_tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">refl</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">refl</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">refl</span><span class="p">)))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_reflectance_ds</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">corr</span><span class="p">)</span>
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">ds_asd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spectral_data</span></div>
+
+
+
+<div class="viewcode-block" id="get_breccia_data">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_breccia_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_breccia_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the Breccia spectrum.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spectral_data: SpectralData</span>
+<span class="sd">        Apollo 16 reflectance spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/Breccia.txt&quot;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">wavs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="c1"># TODO: Correct uncertainties from data</span>
+    <span class="n">unc_tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">refl</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">refl</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">refl</span><span class="p">)))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_reflectance_ds</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">corr</span><span class="p">)</span>
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">ds_asd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spectral_data</span></div>
+
+
+
+<div class="viewcode-block" id="get_composite_data">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_composite_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_composite_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve the composite Apollo 16 + Breccia spectrum.</span>
+<span class="sd">    95% Apollo 16 and 5% Breccia.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spectral_data: SpectralData</span>
+<span class="sd">        Apollo 16 reflectance spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;assets/Composite.txt&quot;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span>
+    <span class="p">)</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">wavs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">refl</span><span class="p">))]</span>
+    <span class="n">valid_wavs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">350</span><span class="p">,</span> <span class="mi">2501</span><span class="p">)]</span>
+    <span class="n">valid_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">valid_wavs</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">wavs</span><span class="p">[</span><span class="n">valid_ids</span><span class="p">]</span>
+    <span class="n">refl</span> <span class="o">=</span> <span class="n">refl</span><span class="p">[</span><span class="n">valid_ids</span><span class="p">]</span>
+    <span class="c1"># TODO: Correct uncertainties from data</span>
+    <span class="n">unc_tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">refl</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">refl</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">refl</span><span class="p">)))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ds_asd</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_reflectance_ds</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">corr</span><span class="p">)</span>
+    <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wavs</span><span class="p">,</span> <span class="n">refl</span><span class="p">,</span> <span class="n">unc_tot</span><span class="p">,</span> <span class="n">ds_asd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spectral_data</span></div>
+
+
+
+<span class="n">SPECTRUM_NAME_ASD</span> <span class="o">=</span> <span class="s2">&quot;ASD&quot;</span>
+<span class="n">SPECTRUM_NAME_APOLLO16</span> <span class="o">=</span> <span class="s2">&quot;Apollo 16&quot;</span>
+<span class="n">SPECTRUM_NAME_BRECCIA</span> <span class="o">=</span> <span class="s2">&quot;Breccia&quot;</span>
+<span class="n">SPECTRUM_NAME_COMPOSITE</span> <span class="o">=</span> <span class="s2">&quot;Apollo 16 + Breccia&quot;</span>
+
+<span class="n">SPECTRUM_NAME_LINEAR</span> <span class="o">=</span> <span class="s2">&quot;Linear&quot;</span>
+
+<span class="n">SRF_NAME_ASD</span> <span class="o">=</span> <span class="s2">&quot;ASD&quot;</span>
+<span class="n">SRF_NAME_GAUSSIAN_1NM_3NM</span> <span class="o">=</span> <span class="s2">&quot;Gaussian SRF with 1nm spectral sampling and 3nm resolution&quot;</span>
+<span class="n">SRF_NAME_TRIANGULAR_1NM_1NM</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Triangular SRF with 1nm spectral sampling and 1nm resolution&quot;</span>
+<span class="p">)</span>
+<span class="n">SRF_NAME_GAUSSIAN_P1NM_P3NM</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Gaussian SRF with 0.1nm spectral sampling and 0.3nm resolution&quot;</span>
+<span class="p">)</span>
+<span class="n">SRF_NAME_GAUSSIAN_P1NM_P3NM</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Triangular SRF with 0.1nm spectral sampling and 0.1nm resolution&quot;</span>
+<span class="p">)</span>
+
+<span class="n">_VALID_INTERP_SPECTRA</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">SPECTRUM_NAME_ASD</span><span class="p">,</span>
+    <span class="c1">#    SPECTRUM_NAME_APOLLO16,</span>
+    <span class="c1">#    SPECTRUM_NAME_BRECCIA,</span>
+    <span class="n">SPECTRUM_NAME_COMPOSITE</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">_VALID_DOLP_INTERP_SPECTRA</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">SPECTRUM_NAME_LINEAR</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">_VALID_INTERP_SRFS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">SRF_NAME_GAUSSIAN_1NM_3NM</span><span class="p">,</span>
+    <span class="n">SRF_NAME_TRIANGULAR_1NM_1NM</span><span class="p">,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM,</span>
+    <span class="n">SRF_NAME_ASD</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">SRF_DICT_FWHM_FILES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">SRF_NAME_ASD</span><span class="p">:</span> <span class="s2">&quot;asd_fwhm.csv&quot;</span><span class="p">,</span>
+    <span class="n">SRF_NAME_GAUSSIAN_1NM_3NM</span><span class="p">:</span> <span class="s2">&quot;interpolated_model_fwhm_3_1_gaussian.csv&quot;</span><span class="p">,</span>
+    <span class="n">SRF_NAME_TRIANGULAR_1NM_1NM</span><span class="p">:</span> <span class="s2">&quot;interpolated_model_fwhm_1_1_triangle.csv&quot;</span><span class="p">,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM: &quot;interpolated_model_fwhm_0p3_0p1_gaussian.csv&quot;,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM: &quot;interpolated_model_fwhm_0p1_0p1_triangle.csv&quot;,</span>
+<span class="p">}</span>
+
+<span class="n">SRF_DICT_SOLAR_FILES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">SRF_NAME_ASD</span><span class="p">:</span> <span class="s2">&quot;tsis_asd.csv&quot;</span><span class="p">,</span>
+    <span class="n">SRF_NAME_GAUSSIAN_1NM_3NM</span><span class="p">:</span> <span class="s2">&quot;tsis_fwhm_3_1_gaussian.csv&quot;</span><span class="p">,</span>
+    <span class="n">SRF_NAME_TRIANGULAR_1NM_1NM</span><span class="p">:</span> <span class="s2">&quot;tsis_fwhm_1_1_triangle.csv&quot;</span><span class="p">,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM: &quot;tsis_fwhm_0p3_0p1_gaussian.csv&quot;,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM: &quot;tsis_fwhm_0p1_0p1_triangle.csv&quot;,</span>
+<span class="p">}</span>
+
+<span class="n">SRF_DICT_SOLAR_DIALOG_SRF_TYPE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">SRF_NAME_ASD</span><span class="p">:</span> <span class="s2">&quot;asd&quot;</span><span class="p">,</span>
+    <span class="n">SRF_NAME_GAUSSIAN_1NM_3NM</span><span class="p">:</span> <span class="s2">&quot;interpolated_gaussian&quot;</span><span class="p">,</span>
+    <span class="n">SRF_NAME_TRIANGULAR_1NM_1NM</span><span class="p">:</span> <span class="s2">&quot;interpolated_triangle&quot;</span><span class="p">,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM: &quot;tsis_fwhm_0p3_0p1_gaussian.csv&quot;,</span>
+    <span class="c1"># SRF_NAME_GAUSSIAN_P1NM_P3NM: &quot;tsis_fwhm_0p1_0p1_triangle.csv&quot;,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_interp_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">programdata</span><span class="o">.</span><span class="n">get_programfiles_folder</span><span class="p">(),</span> <span class="s2">&quot;coeff_data&quot;</span><span class="p">,</span> <span class="s2">&quot;interp_settings.yml&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_interp_settings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">InterpolationSettings</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">InterpolationSettings</span><span class="o">.</span><span class="n">_load_yaml</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_available_spectra_names">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_available_spectra_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_available_spectra_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the spectra names that the user can use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    names: list of str</span>
+<span class="sd">        Valid interpolation spectra names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_VALID_INTERP_SPECTRA</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_interpolation_spectrum_name">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_interpolation_spectrum_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_interpolation_spectrum_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtains the currently chosen interpolation spectrum name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Currently chosen interpolation spectrum name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum</span> <span class="ow">in</span> <span class="n">_VALID_INTERP_SPECTRA</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Unknown interpolation spectrum found: </span><span class="si">{</span><span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_VALID_INTERP_SPECTRA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_available_dolp_spectra_names">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_available_dolp_spectra_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_available_dolp_spectra_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the dolp spectra names that the user can use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    names: list of str</span>
+<span class="sd">        Valid interpolation spectra names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_VALID_DOLP_INTERP_SPECTRA</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_dolp_interpolation_spectrum_name">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_dolp_interpolation_spectrum_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dolp_interpolation_spectrum_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtains the currently chosen dolp (polarisation) interpolation spectrum name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Currently chosen dolp interpolation spectrum name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum_polarisation</span> <span class="ow">in</span> <span class="n">_VALID_DOLP_INTERP_SPECTRA</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum_polarisation</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Unknown interpolation spectrum found: </span><span class="si">{</span><span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum_polarisation</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_VALID_DOLP_INTERP_SPECTRA</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_available_interp_SRFs">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_available_interp_SRFs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_available_interp_SRFs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the spectra names that the user can use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    names: list of str</span>
+<span class="sd">        Valid interpolation spectra names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_VALID_INTERP_SRFS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_interpolation_SRF">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_interpolation_SRF">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_interpolation_SRF</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtains the currently chosen interpolation spectrum name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Currently chosen interpolation spectrum name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_SRF</span> <span class="ow">in</span> <span class="n">_VALID_INTERP_SRFS</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_SRF</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Unknown interpolation spectrum found: </span><span class="si">{</span><span class="n">setts</span><span class="o">.</span><span class="n">interpolation_SRF</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_VALID_INTERP_SRFS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_interpolation_srf_as_srf_type">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_interpolation_srf_as_srf_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_interpolation_srf_as_srf_type</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">srf_str</span> <span class="o">=</span> <span class="n">get_interpolation_SRF</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">SRF_DICT_SOLAR_DIALOG_SRF_TYPE</span><span class="p">[</span><span class="n">srf_str</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="is_show_interpolation_spectrum">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.is_show_interpolation_spectrum">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_show_interpolation_spectrum</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if the UI should show the spectrum used for interpolation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    should_show: bool</span>
+<span class="sd">        True if the spectrum should be shown.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">show_interp_spectrum</span></div>
+
+
+
+<div class="viewcode-block" id="is_show_cimel_points">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.is_show_cimel_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_show_cimel_points</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if the UI should show the CIMEL points used for interpolation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    should_show: bool</span>
+<span class="sd">        True if the CIMEL points should be shown.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">show_cimel_points</span></div>
+
+
+
+<div class="viewcode-block" id="is_skip_uncertainties">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.is_skip_uncertainties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_skip_uncertainties</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if the user settings are set to skip the uncertainties calculation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    should_skip: bool</span>
+<span class="sd">        True if the uncertainties calculation should be skipped.&quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">skip_uncertainties</span></div>
+
+
+
+<div class="viewcode-block" id="get_use_wehrli_for_esi">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.get_use_wehrli_for_esi">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_use_wehrli_for_esi</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if the user/dev settings are set to use the wehrli spectrum as</span>
+<span class="sd">    source for the ESI or if the TSIS will be used instead.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    use_wehrli: bool</span>
+<span class="sd">        Boolean indicating if the Wehrli spectrum will be used or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">setts</span><span class="o">.</span><span class="n">use_wehrli</span></div>
+
+
+
+<div class="viewcode-block" id="set_interpolation_spectrum_name">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.set_interpolation_spectrum_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_interpolation_spectrum_name</span><span class="p">(</span><span class="n">spectrum</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the spectrum name as the currently selected one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spectrum: str</span>
+<span class="sd">        Spectrum name to set as chosen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">_VALID_INTERP_SPECTRA</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+        <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum</span> <span class="o">=</span> <span class="n">spectrum</span>
+        <span class="n">setts</span><span class="o">.</span><span class="n">_save_disk</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tried setting unknown interpolation spectrum: </span><span class="si">{</span><span class="n">spectrum</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_dolp_interpolation_spectrum_name">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.set_dolp_interpolation_spectrum_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_dolp_interpolation_spectrum_name</span><span class="p">(</span><span class="n">spectrum</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the dolp spectrum name as the currently selected one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spectrum: str</span>
+<span class="sd">        Spectrum name to set as chosen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">spectrum</span> <span class="ow">in</span> <span class="n">_VALID_DOLP_INTERP_SPECTRA</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+        <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_spectrum_polarisation</span> <span class="o">=</span> <span class="n">spectrum</span>
+        <span class="n">setts</span><span class="o">.</span><span class="n">_save_disk</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tried setting unknown polarisation interpolation spectrum: </span><span class="si">{</span><span class="n">spectrum</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_interpolation_SRF">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.set_interpolation_SRF">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_interpolation_SRF</span><span class="p">(</span><span class="n">intp_srf</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the SRF as the currently selected one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    spectrum: str</span>
+<span class="sd">        SRF name to set as chosen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">intp_srf</span> <span class="ow">in</span> <span class="n">_VALID_INTERP_SRFS</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+        <span class="n">setts</span><span class="o">.</span><span class="n">interpolation_SRF</span> <span class="o">=</span> <span class="n">intp_srf</span>
+        <span class="n">setts</span><span class="o">.</span><span class="n">_save_disk</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tried setting unknown interpolation spectrum: </span><span class="si">{</span><span class="n">intp_srf</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_show_cimel_points">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.set_show_cimel_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_show_cimel_points</span><span class="p">(</span><span class="n">show</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the CIMEL points visibility as &lt;show&gt;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    show: bool</span>
+<span class="sd">        Visibility of the CIMEL points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="n">setts</span><span class="o">.</span><span class="n">show_cimel_points</span> <span class="o">=</span> <span class="n">show</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+    <span class="n">setts</span><span class="o">.</span><span class="n">_save_disk</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_show_interpolation_spectrum">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.set_show_interpolation_spectrum">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_show_interpolation_spectrum</span><span class="p">(</span><span class="n">show</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the interpolation spectrum visibility as &lt;show&gt;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    show: bool</span>
+<span class="sd">        Visibility of the interpolation spectrum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="n">setts</span><span class="o">.</span><span class="n">show_interp_spectrum</span> <span class="o">=</span> <span class="n">show</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+    <span class="n">setts</span><span class="o">.</span><span class="n">_save_disk</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_skip_uncertainties">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.interpolation.interp_data.interp_data.html#lime_tbx.business.interpolation.interp_data.interp_data.set_skip_uncertainties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_skip_uncertainties</span><span class="p">(</span><span class="n">skip</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets if the uncertainties should be calculated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    skip: bool</span>
+<span class="sd">        True if the uncertainties should be skipped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setts</span> <span class="o">=</span> <span class="n">_load_interp_settings</span><span class="p">()</span>
+    <span class="n">setts</span><span class="o">.</span><span class="n">skip_uncertainties</span> <span class="o">=</span> <span class="n">skip</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_get_interp_path</span><span class="p">()</span>
+    <span class="n">setts</span><span class="o">.</span><span class="n">_save_disk</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

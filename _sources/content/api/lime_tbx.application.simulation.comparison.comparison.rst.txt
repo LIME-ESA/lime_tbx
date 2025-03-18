@@ -1,0 +1,7 @@
+lime\_tbx.application.simulation.comparison.comparison module
+=============================================================
+
+.. automodule:: lime_tbx.application.simulation.comparison.comparison
+   :members:
+   :undoc-members:
+   :show-inheritance:

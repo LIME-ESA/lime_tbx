@@ -1,0 +1,7 @@
+lime\_tbx.presentation.cli.cli module
+=====================================
+
+.. automodule:: lime_tbx.presentation.cli.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,19 @@
+lime\_tbx.business package
+==========================
+
+.. automodule:: lime_tbx.business
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.business.eocfi_adapter
+   lime_tbx.business.interpolation
+   lime_tbx.business.lime_algorithms
+   lime_tbx.business.spectral_integration
+   lime_tbx.business.spice_adapter

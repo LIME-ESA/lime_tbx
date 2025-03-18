@@ -1,0 +1,533 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulations &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Comparisons" href="comparisons.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Simulations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-using-geographic-coordinates">Simulation Using Geographic Coordinates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#time-series-input">Time-Series Input</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loading-time-series-data">Loading Time-Series Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-valid-file">Example Valid File</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#command-line-interface-cli">Command-Line Interface (CLI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-using-selenographic-coordinates">Simulation Using Selenographic Coordinates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Command-Line Interface (CLI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-using-satellite-positions">Simulation Using Satellite Positions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-new-satellite">Adding a New Satellite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Command-Line Interface (CLI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-output">Simulation output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#exporting-simulation-results">Exporting Simulation Results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#graphical-export-image-pdf">Graphical Export (Image/PDF)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-export-csv-file">Data Export (CSV File)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#netcdf-export">NetCDF Export</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#command-line-interface-cli-export-options">Command-Line Interface (CLI) Export Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Graphical Export (Image/PDF)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Data Export (CSV File)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">NetCDF Export</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#integrated-irradiance">Integrated Irradiance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spectral-response-functions-srf">Spectral Response Functions (SRF)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loading-a-new-srf">Loading a New SRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exporting-srf-data">Exporting SRF Data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Simulations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/user_guide/simulations.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simulations">
+<h1>Simulations<a class="headerlink" href="#simulations" title="Link to this heading"></a></h1>
+<p>LIME Toolbox allows users to simulate lunar reflectance, irradiance, and the degree of linear polarisation (DoLP).
+Simulations are performed using the Simulation page (<a class="reference internal" href="#fig-6">Figure 6</a>), which is the default view when
+launching LIME Toolbox.</p>
+<p>Users can select one of three simulation methods:</p>
+<ul class="simple">
+<li><p><strong>Geographic Coordinates</strong> – Based on an Earth-based location.</p></li>
+<li><p><strong>Selenographic Coordinates</strong> – Based on a location on the Moon.</p></li>
+<li><p><strong>Satellite Position</strong> – Based on an orbiting satellite’s position.</p></li>
+</ul>
+<figure class="align-center" id="fig-6">
+<img alt="Simulation page" src="../../_images/simulation_view.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 6:</i> </span><span class="caption-text">Simulation page.</span><a class="headerlink" href="#fig-6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="simulation-using-geographic-coordinates">
+<h2>Simulation Using Geographic Coordinates<a class="headerlink" href="#simulation-using-geographic-coordinates" title="Link to this heading"></a></h2>
+<p>Selecting the “Geographic” tab allows users to perform simulations based on Earth coordinates (<a class="reference internal" href="#fig-7">Figure 7</a>).
+Users must provide:</p>
+<ul class="simple">
+<li><p><strong>Latitude &amp; Longitude</strong> (in decimal degrees)</p></li>
+<li><p><strong>Altitude</strong> (in kilometers)</p></li>
+<li><p><strong>UTC Date &amp; Time</strong></p></li>
+</ul>
+<figure class="align-center" id="fig-7">
+<img alt="Geographic coordinates input" src="../../_images/geographic_input.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 7:</i> </span><span class="caption-text">Geographic coordinates input.</span><a class="headerlink" href="#fig-7" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="time-series-input">
+<h3>Time-Series Input<a class="headerlink" href="#time-series-input" title="Link to this heading"></a></h3>
+<p>For multiple timestamps, click “LOAD TIME-SERIES”, which enables time-series file input (<a class="reference internal" href="#fig-8">Figure 8</a>).</p>
+<figure class="align-center" id="fig-8">
+<img alt="Geographic coordinates input for multiple timestamps" src="../../_images/geographic_input_multidates.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 8:</i> </span><span class="caption-text">Geographic coordinates input for multiple timestamps.</span><a class="headerlink" href="#fig-8" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="loading-time-series-data">
+<h4>Loading Time-Series Data<a class="headerlink" href="#loading-time-series-data" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Click “LOAD FILE” to open a file selection dialog.</p></li>
+<li><p>Select a file containing timestamps in one of the following formats:</p>
+<ul class="simple">
+<li><p><strong>ISO 8601 format</strong></p></li>
+<li><p><strong>Comma-separated values (CSV)</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">yyyy,mm,dd,HH,MM,SS</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">yyyy,mm,dd,HH,MM,SS,microseconds</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="example-valid-file">
+<h4>Example Valid File<a class="headerlink" href="#example-valid-file" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2022</span><span class="p">,</span><span class="mi">01</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">02</span><span class="p">,</span><span class="mi">02</span><span class="p">,</span><span class="mi">04</span>
+<span class="mi">2023</span><span class="p">,</span><span class="mi">01</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">02</span><span class="p">,</span><span class="mi">02</span><span class="p">,</span><span class="mi">04</span><span class="p">,</span><span class="mi">123545</span>
+<span class="mi">2020</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">12</span> <span class="mi">00</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mf">43.124</span>
+</pre></div>
+</div>
+<p><strong>Additional options:</strong></p>
+<ul class="simple">
+<li><p><strong>“SEE TIMES”</strong> – Opens a window displaying imported timestamps.</p></li>
+<li><p><strong>“INPUT SINGLE TIME”</strong> – Switches back to single timestamp mode.</p></li>
+</ul>
+</section>
+</section>
+<section id="command-line-interface-cli">
+<h3>Command-Line Interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Link to this heading"></a></h3>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">-e</span></code> or <code class="docutils literal notranslate"><span class="pre">--earth</span></code> option:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-e<span class="w"> </span>latitude_deg,longitude_deg,height_km,datetime_isoformat
+</pre></div>
+</div>
+<section id="example">
+<h4>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h4>
+<p>For a simulation of 35° of latitude, -25.2° of longitude, 400 meters of altitude,
+and at the date and time of 2022-01-20 02:00:00 UTC:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-e<span class="w"> </span><span class="m">35</span>,-25.2,0.4,2022-01-20T02:00:00
+</pre></div>
+</div>
+<p>For time-series input:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-e<span class="w"> </span><span class="m">35</span>,-25.2,0.4<span class="w"> </span>-t<span class="w"> </span>timeseries.txt
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="simulation-using-selenographic-coordinates">
+<h2>Simulation Using Selenographic Coordinates<a class="headerlink" href="#simulation-using-selenographic-coordinates" title="Link to this heading"></a></h2>
+<p>Selecting the “Selenographic” tab enables simulations using Moon-based coordinates (<a class="reference internal" href="#fig-9">Figure 9</a>).
+Users must provide:</p>
+<ul class="simple">
+<li><p><strong>Sun-Moon Distance</strong> (AU)</p></li>
+<li><p><strong>Observer-Moon Distance</strong> (km)</p></li>
+<li><p><strong>Selenographic Latitude &amp; Longitude of Observer</strong> (decimal degrees)</p></li>
+<li><p><strong>Selenographic Longitude of the Sun</strong> (radians)</p></li>
+<li><p><strong>Moon Phase Angle</strong> (decimal degrees)</p></li>
+</ul>
+<figure class="align-center" id="fig-9">
+<img alt="Selenographic coordinates input" src="../../_images/selenographic_input.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 9:</i> </span><span class="caption-text">Selenographic coordinates input.</span><a class="headerlink" href="#fig-9" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="id1">
+<h3>Command-Line Interface (CLI)<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">-l</span></code> or <code class="docutils literal notranslate"><span class="pre">--lunar</span></code> option:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span>distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle
+</pre></div>
+</div>
+<section id="id2">
+<h4>Example<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<p>For a simulation for 0.98 AU of Sun-Moon Distance, 420000 km of Observer-Moon Distance, 20.5° and -30.2° as the
+selenographic latitude and longitude of the observer,
+0.69 radians as the selenographic longitude of the Sun, and 15º as the moon phase angle:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span><span class="m">0</span>.98,420000,20.5,-30.2,0.69,15<span class="w"> </span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="simulation-using-satellite-positions">
+<h2>Simulation Using Satellite Positions<a class="headerlink" href="#simulation-using-satellite-positions" title="Link to this heading"></a></h2>
+<p>Selecting the <strong>“Satellite”</strong> tab enables simulation based on <strong>orbiting satellites</strong> (<a class="reference internal" href="#fig-10">Figure 10</a>).<br />
+Users must:</p>
+<ul class="simple">
+<li><p><strong>Select a satellite</strong> from the available list.</p></li>
+<li><p><strong>Provide a UTC Date &amp; Time</strong>.</p></li>
+</ul>
+<blockquote>
+<div><p><em>Note:</em> Time-series input works the same as in <a class="reference internal" href="#simulation-using-geographic-coordinates"><span class="xref myst">Geographic Coordinates</span></a>.</p>
+</div></blockquote>
+<p>Selecting the “Satellite” tab enables simulations based on orbiting satellite (<a class="reference internal" href="#fig-10">Figure 10</a>).
+Users must:</p>
+<ul>
+<li><p><strong>Select a satellite</strong> from the available list.</p></li>
+<li><p><strong>Provide a UTC Date &amp; Time</strong>.</p>
+<blockquote>
+<div><p><em>Note</em>: Time-series input works the same as in <a class="reference internal" href="#simulation-using-geographic-coordinates"><span class="xref myst">Geographic Coordinates</span></a>.</p>
+</div></blockquote>
+</li>
+</ul>
+<figure class="align-center" id="fig-10">
+<img alt="Satellite position input" src="../../_images/satellite_input.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 10:</i> </span><span class="caption-text">Satellite position input.</span><a class="headerlink" href="#fig-10" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="adding-a-new-satellite">
+<h3>Adding a New Satellite<a class="headerlink" href="#adding-a-new-satellite" title="Link to this heading"></a></h3>
+<p>It’s possible to add user-defined satellites to the list of available satellites.</p>
+<ol class="arabic simple">
+<li><p>Click the button with a plus (+) sign on the right of the dropdown.</p></li>
+<li><p>The user will be prompted with the <em>Add Satellite Data</em> window (<a class="reference internal" href="#fig-11">Figure 11</a>).</p></li>
+<li><p>Click “LOAD FILE” which opens a file selection dialog where users can load Orbit Scenario Files
+(OSF) or Three-Line Element Set files (TLE/3LE).</p></li>
+<li><p>The <em>Add Satellite Data</em> window will now display information of the loaded file, and the user
+must fill the last details.</p>
+<ul class="simple">
+<li><p><strong>Satellite Name</strong>: Only editable for OSF files. Name that will be displayed in the satellite list.</p></li>
+<li><p><strong>Start time</strong>: Date when the file validity starts.</p></li>
+<li><p><strong>End time</strong>: Date when the file validity stops.</p></li>
+</ul>
+</li>
+<li><p>Click “SAVE SATELLITE DATA” to store the loaded data in the local LIME Toolbox system.</p></li>
+</ol>
+<figure class="align-center" id="fig-11">
+<img alt="Add Satellite Data window" src="../../_images/add_satellite_data_window.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 11:</i> </span><span class="caption-text">Add Satellite Data window.</span><a class="headerlink" href="#fig-11" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id3">
+<h3>Command-Line Interface (CLI)<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">-s</span></code> or <code class="docutils literal notranslate"><span class="pre">--satellite</span></code> option:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-s<span class="w"> </span>sat_name,datetime_isoformat
+</pre></div>
+</div>
+<section id="id4">
+<h4>Example<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<p>To perform a simulation for the satellite PROVA-B at the date and time of
+2020-01-20 02:00:00h:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-s<span class="w"> </span>PROBA-V,2020-01-20T02:00:00
+</pre></div>
+</div>
+<p>As in <a class="reference internal" href="#simulation-using-geographic-coordinates"><span class="xref myst">Geographic Coordinates</span></a>, one can use time-series input:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-s<span class="w"> </span>PROBA-V<span class="w"> </span>-t<span class="w"> </span>timeseries.txt
+</pre></div>
+</div>
+<p>It’s not possible to add a user-defined satellite throught the CLI at the moment.</p>
+</section>
+</section>
+</section>
+<section id="simulation-output">
+<h2>Simulation output<a class="headerlink" href="#simulation-output" title="Link to this heading"></a></h2>
+<p>The simulation results are displayed below the input section.
+Users can select one of the following button to run simulations and view results:</p>
+<ul class="simple">
+<li><p><strong>“IRRADIANCE”</strong> – Displays irradiance results.</p></li>
+<li><p><strong>“REFLECTANCE”</strong> – Shows reflectance results.</p></li>
+<li><p><strong>“POLARIZATION”</strong> – Visualizes Degree of Lunar Polarisation (DoLP).</p></li>
+</ul>
+<p>These buttons are positioned between the input and the output, as shown on top of <a class="reference internal" href="#fig-12">Figure 12</a>.</p>
+<figure class="align-center" id="fig-12">
+<img alt="Simulation output" src="../../_images/simulation_output.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 12:</i> </span><span class="caption-text">Simulation output.</span><a class="headerlink" href="#fig-12" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Results are plotted with:</p>
+<ul class="simple">
+<li><p><strong>X-axis</strong> → Wavelengths.</p></li>
+<li><p><strong>Y-axis</strong> → Computed values.</p></li>
+</ul>
+<section id="exporting-simulation-results">
+<h3>Exporting Simulation Results<a class="headerlink" href="#exporting-simulation-results" title="Link to this heading"></a></h3>
+<p>Users can export the results in multiple formats:</p>
+<section id="graphical-export-image-pdf">
+<h4>Graphical Export (Image/PDF)<a class="headerlink" href="#graphical-export-image-pdf" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Click “EXPORT GRAPH” (bottom-left) to save the graph as an image or PDF.</p></li>
+<li><p>A file system dialog will prompt the user to select the location, filename, and format.</p></li>
+<li><p>Supported formats include JPG, PNG, PDF, and other common image formats.</p></li>
+</ul>
+</section>
+<section id="data-export-csv-file">
+<h4>Data Export (CSV File)<a class="headerlink" href="#data-export-csv-file" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Click “EXPORT CSV” (bottom-right) to save the simulation data as a comma-separated values (CSV) file.</p></li>
+<li><p>The user will be prompted to choose the location and filename.</p></li>
+</ul>
+</section>
+<section id="netcdf-export">
+<h4>NetCDF Export<a class="headerlink" href="#netcdf-export" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Click “EXPORT TO NETCDF” (bottom of the page) to save results as a netCDF file.</p></li>
+</ul>
+<blockquote>
+<div><p><strong>Why use netCDF?</strong></p>
+<ul class="simple">
+<li><p>Unlike CSV, netCDF allows LIME Toolbox to reload previous simulations for visualization.</p></li>
+<li><p>This format enables efficient data storage and retrieval.</p></li>
+</ul>
+</div></blockquote>
+<!-- TODO: Add "How to load simulation/comparison netCDF file into Toolbox" in format section -->
+</section>
+</section>
+<section id="command-line-interface-cli-export-options">
+<h3>Command-Line Interface (CLI) Export Options<a class="headerlink" href="#command-line-interface-cli-export-options" title="Link to this heading"></a></h3>
+<p>In the CLI, results are only accessible by exporting them to data files.
+To do this, users must utilize the <code class="docutils literal notranslate"><span class="pre">-o</span></code> or <code class="docutils literal notranslate"><span class="pre">--output</span></code> option, with the argument varying
+based on the desired output type.</p>
+<section id="id5">
+<h4>Graphical Export (Image/PDF)<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
+<p>Specify the image type, paths and filenames of each graph:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,<span class="o">(</span>pdf<span class="p">|</span>jpg<span class="p">|</span>png<span class="p">|</span>svg<span class="o">)</span>,reflectance_path,irradiance_path,polarisation_path
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,jpg,reflectance.jpg,irradiance.jpg,polarisation.jpg
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h4>Data Export (CSV File)<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<p>Specify paths and names of each file:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,reflectance_path,irradiance_path,polarization_path,integrated_irradiance_path
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,reflectance.csv,irradiance.csv,polarization.csv,integrated_irradiance.csv
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h4>NetCDF Export<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<p>Specify the netCDF file path:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>nc,output_path
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>nc,output.nc
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="integrated-irradiance">
+<h2>Integrated Irradiance<a class="headerlink" href="#integrated-irradiance" title="Link to this heading"></a></h2>
+<p>LIME Toolbox integrates the calculated irradiance over the selected spectral response function (SRF).
+These values appear in the “Signal” tab (<a class="reference internal" href="#fig-13">Figure 13</a>), showing one value per SRF channel,
+and can be exported as CSV.</p>
+<figure class="align-center" id="fig-13">
+<img alt="Signal tab showing some results for the CIMEL SRF" src="../../_images/signal_tab.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 13:</i> </span><span class="caption-text">Signal tab showing some results for the CIMEL SRF.</span><a class="headerlink" href="#fig-13" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="spectral-response-functions-srf">
+<h3>Spectral Response Functions (SRF)<a class="headerlink" href="#spectral-response-functions-srf" title="Link to this heading"></a></h3>
+<p>Users can visualise, load, and switch between different SRFs in the “SRF” tab
+(<a class="reference internal" href="#fig-14">Figure 14</a>). This tab presents:</p>
+<ul class="simple">
+<li><p>A graph of the currently selected SRF, where:</p>
+<ul>
+<li><p>X-axis represents wavelengths.</p></li>
+<li><p>Y-axis represents the spectral response.</p></li>
+</ul>
+</li>
+<li><p>Two vertical black lines marking the lower and upper simulation limits of LIME Toolbox.</p></li>
+</ul>
+<figure class="align-center" id="fig-14">
+<img alt="SRF tab showing CIMEL SRF" src="../../_images/srf_tab.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 14:</i> </span><span class="caption-text">SRF tab showing CIMEL SRF.</span><a class="headerlink" href="#fig-14" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>By default, LIME Toolbox includes a default SRF that encompasses the entire LIME spectrum, named “Default”.</p>
+<section id="loading-a-new-srf">
+<h4>Loading a New SRF<a class="headerlink" href="#loading-a-new-srf" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Click “LOAD” (top-right corner in <a class="reference internal" href="#fig-14">Figure 14</a>).</p></li>
+<li><p>Select a netCDF SRF file in GLOD format (explained in the <a class="reference internal" href="formats.html"><span class="std std-doc">File Formats</span></a> section).</p></li>
+<li><p>Once loaded, use the dropdown menu next to the “LOAD” button to switch between SRFs.</p></li>
+</ol>
+<p>This can also be done in the CLI using the <code class="docutils literal notranslate"><span class="pre">-f</span></code> or <code class="docutils literal notranslate"><span class="pre">--srf</span></code> option followed by the SRF path:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-f<span class="w"> </span>srf_path
+</pre></div>
+</div>
+</section>
+<section id="exporting-srf-data">
+<h4>Exporting SRF Data<a class="headerlink" href="#exporting-srf-data" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Graphs can be exported as images or PDFs.</p></li>
+<li><p>SRF data can be exported as CSV files.</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comparisons.html" class="btn btn-neutral float-right" title="Comparisons" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

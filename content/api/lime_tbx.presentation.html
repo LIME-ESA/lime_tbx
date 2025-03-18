@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.presentation package &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lime_tbx.presentation.cli package" href="lime_tbx.presentation.cli.html" />
+    <link rel="prev" title="lime_tbx.persistence.local_storage.programdata module" href="lime_tbx.persistence.local_storage.programdata.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lime_tbx.html">lime_tbx package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">lime_tbx.presentation package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.presentation package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/api/lime_tbx.presentation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lime_tbx.presentation">
+<span id="lime-tbx-presentation-package"></span><h1>lime_tbx.presentation package<a class="headerlink" href="#module-lime_tbx.presentation" title="Link to this heading"></a></h1>
+<p>LIME Toolbox - Presentation Layer</p>
+<p>This package is responsible for managing user interactions and interfacing with them
+through various means, such as graphical user interfaces (GUIs) and command-line
+interfaces (CLIs). It serves as the entry point for user interaction, ensuring
+proper input handling, validation, and response formatting.</p>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lime_tbx.presentation.cli.html">lime_tbx.presentation.cli package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.presentation.cli.html#modules">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.presentation.cli.html#main-features">Main Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.presentation.cli.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.presentation.cli.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html">lime_tbx.presentation.cli.cli module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI"><code class="docutils literal notranslate"><span class="pre">CLI</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLIError"><code class="docutils literal notranslate"><span class="pre">CLIError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.ParsingError"><code class="docutils literal notranslate"><span class="pre">ParsingError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.eprint"><code class="docutils literal notranslate"><span class="pre">eprint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.print_help"><code class="docutils literal notranslate"><span class="pre">print_help()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.print_version"><code class="docutils literal notranslate"><span class="pre">print_version()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.cli.export.html">lime_tbx.presentation.cli.export module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.CLIExporter"><code class="docutils literal notranslate"><span class="pre">CLIExporter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ComparisonKey"><code class="docutils literal notranslate"><span class="pre">ComparisonKey</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportCSV"><code class="docutils literal notranslate"><span class="pre">ExportCSV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparison"><code class="docutils literal notranslate"><span class="pre">ExportComparison</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonCSV"><code class="docutils literal notranslate"><span class="pre">ExportComparisonCSV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonCSVDir"><code class="docutils literal notranslate"><span class="pre">ExportComparisonCSVDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonGraph"><code class="docutils literal notranslate"><span class="pre">ExportComparisonGraph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonGraphDir"><code class="docutils literal notranslate"><span class="pre">ExportComparisonGraphDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData"><code class="docutils literal notranslate"><span class="pre">ExportData</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportError"><code class="docutils literal notranslate"><span class="pre">ExportError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportGraph"><code class="docutils literal notranslate"><span class="pre">ExportGraph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportNetCDF"><code class="docutils literal notranslate"><span class="pre">ExportNetCDF</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lime_tbx.presentation.gui.html">lime_tbx.presentation.gui package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.presentation.gui.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.canvas.html">lime_tbx.presentation.gui.canvas module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.coefficients.html">lime_tbx.presentation.gui.coefficients module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.constants.html">lime_tbx.presentation.gui.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.gui.html">lime_tbx.presentation.gui.gui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.help.html">lime_tbx.presentation.gui.help module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.ifaces.html">lime_tbx.presentation.gui.ifaces module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.gui.ifaces.html#lime_tbx.presentation.gui.ifaces.IMainSimulationsWidget"><code class="docutils literal notranslate"><span class="pre">IMainSimulationsWidget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.gui.ifaces.html#lime_tbx.presentation.gui.ifaces.noconflict_makecls"><code class="docutils literal notranslate"><span class="pre">noconflict_makecls()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.input.html">lime_tbx.presentation.gui.input module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.interpoptions.html">lime_tbx.presentation.gui.interpoptions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.maingui.html">lime_tbx.presentation.gui.maingui module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.output.html">lime_tbx.presentation.gui.output module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.settings.html">lime_tbx.presentation.gui.settings module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.ISettingsManager"><code class="docutils literal notranslate"><span class="pre">ISettingsManager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.SettingsManager"><code class="docutils literal notranslate"><span class="pre">SettingsManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.spinner.html">lime_tbx.presentation.gui.spinner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.srf.html">lime_tbx.presentation.gui.srf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.gui.util.html">lime_tbx.presentation.gui.util module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lime_tbx.persistence.local_storage.programdata.html" class="btn btn-neutral float-left" title="lime_tbx.persistence.local_storage.programdata module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.presentation.cli.html" class="btn btn-neutral float-right" title="lime_tbx.presentation.cli package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

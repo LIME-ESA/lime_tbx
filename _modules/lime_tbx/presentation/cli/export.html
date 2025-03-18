@@ -1,0 +1,873 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.presentation.cli.export &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.presentation.cli.export</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.presentation.cli.export</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Data exporting module for LIME TBX&#39;s CLI</span>
+
+<span class="sd">After parsing the command and calculating its result, this</span>
+<span class="sd">module is in charge of exporting the results to the selected</span>
+<span class="sd">kind of output.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompFields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ComparisonData</span><span class="p">,</span>
+    <span class="n">EocfiPath</span><span class="p">,</span>
+    <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.filedata</span><span class="w"> </span><span class="kn">import</span> <span class="n">csv</span><span class="p">,</span> <span class="n">lglod</span> <span class="k">as</span> <span class="n">lglodlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.filedata.lglod_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_lglod_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">gui_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">SettingsManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.lime_simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ILimeSimulation</span>
+
+<span class="n">_WARN_OUTSIDE_MPA_RANGE</span> <span class="o">=</span> <span class="s2">&quot;Warning: The LIME can only give a reliable simulation </span><span class="se">\</span>
+<span class="s2">for absolute moon phase angles between 2° and 90°&quot;</span>
+
+
+<div class="viewcode-block" id="ExportError">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception that encapsules anything that might go wrong during CLI file export.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ExportData">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportData</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for export data formats.</span>
+
+<span class="sd">    Subclasses define specific export types such as CSV, Graphs, and NetCDF.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ExportCSV">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportCSV">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportCSV</span><span class="p">(</span><span class="n">ExportData</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents CSV file export settings for simulation results.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    o_file_refl : str</span>
+<span class="sd">        Path to the output CSV file for reflectance.</span>
+<span class="sd">    o_file_irr : str</span>
+<span class="sd">        Path to the output CSV file for irradiance.</span>
+<span class="sd">    o_file_polar : str</span>
+<span class="sd">        Path to the output CSV file for polarization.</span>
+<span class="sd">    o_file_integrated_irr : str</span>
+<span class="sd">        Path to the output CSV file for integrated irradiance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">o_file_refl</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_irr</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_polar</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_integrated_irr</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="ExportGraph">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportGraph">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportGraph</span><span class="p">(</span><span class="n">ExportData</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents graphical export settings for simulation results.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    o_file_refl : str</span>
+<span class="sd">        Path to the output graph file for reflectance.</span>
+<span class="sd">    o_file_irr : str</span>
+<span class="sd">        Path to the output graph file for irradiance.</span>
+<span class="sd">    o_file_polar : str</span>
+<span class="sd">        Path to the output graph file for polarization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">o_file_refl</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_irr</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_polar</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="ComparisonKey">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ComparisonKey">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ComparisonKey</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enumeration for comparison output modes.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    DT : int</span>
+<span class="sd">        Compare based on UTC datetime.</span>
+<span class="sd">    MPA : int</span>
+<span class="sd">        Compare based on Moon Phase Angle.</span>
+<span class="sd">    BOTH : int</span>
+<span class="sd">        Compare using both datetime and Moon Phase Angle.</span>
+<span class="sd">    CHANNEL : int</span>
+<span class="sd">        Compare by spectral channel.</span>
+<span class="sd">    CHANNEL_MEAN : int</span>
+<span class="sd">        Compare using averaged spectral channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DT</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">MPA</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BOTH</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">CHANNEL</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">CHANNEL_MEAN</span> <span class="o">=</span> <span class="mi">4</span></div>
+
+
+
+<div class="viewcode-block" id="ExportComparison">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparison">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportComparison</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for exporting comparison results.</span>
+
+<span class="sd">    This class serves as a parent for different export formats, including CSV</span>
+<span class="sd">    and graphical representations of comparison data.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ExportComparisonCSV">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonCSV">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportComparisonCSV</span><span class="p">(</span><span class="n">ExportComparison</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents CSV file export settings for comparison results.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparison_key : ComparisonKey</span>
+<span class="sd">        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</span>
+<span class="sd">    output_files : List[str]</span>
+<span class="sd">        List of file paths for saving the comparison data.</span>
+<span class="sd">        Each comparison type has a different amount of files.</span>
+<span class="sd">    chosen_diff : CompFields</span>
+<span class="sd">        The difference metric (relative, percentage, or none).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">comparison_key</span><span class="p">:</span> <span class="n">ComparisonKey</span>
+    <span class="n">output_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">chosen_diff</span><span class="p">:</span> <span class="n">CompFields</span></div>
+
+
+
+<div class="viewcode-block" id="ExportComparisonCSVDir">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonCSVDir">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportComparisonCSVDir</span><span class="p">(</span><span class="n">ExportComparison</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents CSV directory export settings for comparison results.</span>
+
+<span class="sd">    Instead of exporting individual CSV files, this class allows exporting</span>
+<span class="sd">    all comparison data to a specified directory, and automatically generating</span>
+<span class="sd">    the file names.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparison_key : ComparisonKey</span>
+<span class="sd">        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        The directory where CSV files will be saved.</span>
+<span class="sd">    chosen_diff : CompFields</span>
+<span class="sd">        The difference metric (relative, percentage, or none).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">comparison_key</span><span class="p">:</span> <span class="n">ComparisonKey</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">chosen_diff</span><span class="p">:</span> <span class="n">CompFields</span></div>
+
+
+
+<div class="viewcode-block" id="ExportComparisonGraph">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonGraph">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportComparisonGraph</span><span class="p">(</span><span class="n">ExportComparison</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents graphical export settings for comparison results.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparison_key : ComparisonKey</span>
+<span class="sd">        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</span>
+<span class="sd">    output_files : List[str]</span>
+<span class="sd">        List of file paths for saving the comparison graphs.</span>
+<span class="sd">        Each comparison type has a different amount of files.</span>
+<span class="sd">    chosen_diff : CompFields</span>
+<span class="sd">        The difference metric (relative, percentage, or none).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">comparison_key</span><span class="p">:</span> <span class="n">ComparisonKey</span>
+    <span class="n">output_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">chosen_diff</span><span class="p">:</span> <span class="n">CompFields</span></div>
+
+
+
+<div class="viewcode-block" id="ExportComparisonGraphDir">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparisonGraphDir">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportComparisonGraphDir</span><span class="p">(</span><span class="n">ExportComparison</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents graphical export settings for comparison results in a directory.</span>
+
+<span class="sd">    This allows exporting comparison graphs to a specified directory with a</span>
+<span class="sd">    chosen file extension, and automatically generating the file names.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    extension : str</span>
+<span class="sd">        File extension for the exported graphs (e.g., &quot;png&quot;, &quot;jpg&quot;).</span>
+<span class="sd">    comparison_key : ComparisonKey</span>
+<span class="sd">        The comparison method (e.g., DT, MPA, BOTH, CHANNEL).</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        The directory where graphs will be saved.</span>
+<span class="sd">    chosen_diff : CompFields</span>
+<span class="sd">        The difference metric (relative, percentage, or none).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">comparison_key</span><span class="p">:</span> <span class="n">ComparisonKey</span>
+    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">chosen_diff</span><span class="p">:</span> <span class="n">CompFields</span></div>
+
+
+
+<div class="viewcode-block" id="ExportNetCDF">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportNetCDF">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportNetCDF</span><span class="p">(</span><span class="n">ExportData</span><span class="p">,</span> <span class="n">ExportComparison</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents NetCDF file export settings for simulations and comparisons.</span>
+
+<span class="sd">    This format allows storing structured, multi-dimensional scientific data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        The path to the NetCDF output file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="CLIExporter">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.CLIExporter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CLIExporter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles exporting simulation and comparison results from the CLI.</span>
+
+<span class="sd">    This class provides methods for saving data in multiple formats, including</span>
+<span class="sd">    CSV, Graphs, and NetCDF.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">eocfi_path</span><span class="p">:</span> <span class="n">EocfiPath</span><span class="p">,</span>
+        <span class="n">settings_manager</span><span class="p">:</span> <span class="n">SettingsManager</span><span class="p">,</span>
+        <span class="n">lime_simulation</span><span class="p">:</span> <span class="n">ILimeSimulation</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the CLIExporter instance.</span>
+
+<span class="sd">        This constructor sets up the necessary paths, settings manager, and simulation</span>
+<span class="sd">        instance required for exporting simulation and comparison results.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kernels_path : KernelsPath</span>
+<span class="sd">            Path to the SPICE kernels required for orbital and observational calculations.</span>
+<span class="sd">        eocfi_path : EocfiPath</span>
+<span class="sd">            Path to the EO-CFI data directories used for satellite orbit calculations.</span>
+<span class="sd">        settings_manager : SettingsManager</span>
+<span class="sd">            Manages interpolation settings, coefficient versions, and spectrum settings.</span>
+<span class="sd">        lime_simulation : ILimeSimulation</span>
+<span class="sd">            Handles the execution of lunar irradiance, reflectance, and polarization simulations,</span>
+<span class="sd">            and contains the results that will be consumed by the methods of this class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span> <span class="o">=</span> <span class="n">kernels_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span> <span class="o">=</span> <span class="n">eocfi_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span> <span class="o">=</span> <span class="n">settings_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span> <span class="o">=</span> <span class="n">lime_simulation</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_csvs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">ed</span><span class="p">:</span> <span class="n">ExportCSV</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports simulation results as CSV files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The simulated observation point (Earth, Lunar, or Satellite).</span>
+<span class="sd">        ed : ExportCSV</span>
+<span class="sd">            The CSV export settings.</span>
+<span class="sd">        srf : SpectralResponseFunction</span>
+<span class="sd">            The spectral response function used in the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">are_mpas_oinside_mpa_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">are_mpas_inside_mpa_range</span><span class="p">()</span>
+        <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+        <span class="n">mdas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_moon_datas</span><span class="p">()</span>
+        <span class="n">mpa</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">mda</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mdas</span><span class="p">,</span> <span class="n">MoonData</span><span class="p">):</span>
+            <span class="n">mda</span> <span class="o">=</span> <span class="n">mdas</span>
+            <span class="n">mpa</span> <span class="o">=</span> <span class="n">mdas</span><span class="o">.</span><span class="n">mpa_degrees</span>
+        <span class="n">dolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_polar_spectrum_name</span><span class="p">()</span>
+        <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_skip_uncertainties</span><span class="p">()</span>
+        <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs</span><span class="p">(),</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Reflectances (Fraction of unity)&quot;</span><span class="p">,</span>
+            <span class="n">point</span><span class="p">,</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_refl</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">are_mpas_oinside_mpa_range</span><span class="p">,</span>
+            <span class="n">sp_name</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs_cimel</span><span class="p">(),</span>
+            <span class="n">mda</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis</span><span class="p">(),</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Irradiances (Wm⁻²nm⁻¹)&quot;</span><span class="p">,</span>
+            <span class="n">point</span><span class="p">,</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_irr</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">are_mpas_oinside_mpa_range</span><span class="p">,</span>
+            <span class="n">sp_name</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_cimel</span><span class="p">(),</span>
+            <span class="n">mda</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars</span><span class="p">(),</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Degree of Linear Polarisation (%)&quot;</span><span class="p">,</span>
+            <span class="n">point</span><span class="p">,</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_polar</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">are_mpas_oinside_mpa_range</span><span class="p">,</span>
+            <span class="n">dolp_sp_name</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars_cimel</span><span class="p">(),</span>
+            <span class="n">mda</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_integrated_irradiance</span><span class="p">(</span>
+            <span class="n">srf</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_signals</span><span class="p">(),</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_integrated_irr</span><span class="p">,</span>
+            <span class="n">point</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">are_mpas_oinside_mpa_range</span><span class="p">,</span>
+            <span class="n">sp_name</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="n">mpa</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_lglod</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports simulation results as NetCDF (L-GLOD format).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The simulated observation point (Earth, Lunar, or Satellite).</span>
+<span class="sd">        output_file : str</span>
+<span class="sd">            The file path for the NetCDF output.</span>
+<span class="sd">        srf : SpectralResponseFunction</span>
+<span class="sd">            The spectral response function used in the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+        <span class="n">dolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_polar_spectrum_name</span><span class="p">()</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">mds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_moon_datas</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">mds</span> <span class="o">=</span> <span class="p">[</span><span class="n">mds</span><span class="p">]</span>
+        <span class="n">lglod</span> <span class="o">=</span> <span class="n">create_lglod_data</span><span class="p">(</span>
+            <span class="n">point</span><span class="p">,</span>
+            <span class="n">srf</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">,</span>
+            <span class="n">sp_name</span><span class="p">,</span>
+            <span class="n">dolp_sp_name</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">mds</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        <span class="n">inside_mpa_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">are_mpas_inside_mpa_range</span><span class="p">()</span>
+        <span class="n">lglodlib</span><span class="o">.</span><span class="n">write_obs</span><span class="p">(</span><span class="n">lglod</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">now</span><span class="p">,</span> <span class="n">inside_mpa_range</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">ed</span><span class="p">:</span> <span class="n">ExportGraph</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports simulation results as graphs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The simulated observation point (Earth, Lunar, or Satellite).</span>
+<span class="sd">        ed : ExportGraph</span>
+<span class="sd">            The graphical export settings.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If file writing fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">canvas</span>
+
+        <span class="n">canv</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">MplCanvas</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">title_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">inside_mpa_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">are_mpas_inside_mpa_range</span><span class="p">()</span>
+        <span class="n">is_out_mpa_range</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="n">inside_mpa_range</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inside_mpa_range</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">inside_mpa_range</span>
+        <span class="p">)</span>
+        <span class="n">warning_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_out_mpa_range</span><span class="p">:</span>
+            <span class="n">warning_out_mpa_range</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">_WARN_OUTSIDE_MPA_RANGE</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+        <span class="n">mdas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_moon_datas</span><span class="p">()</span>
+        <span class="n">mpa</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mdas</span><span class="p">,</span> <span class="n">MoonData</span><span class="p">):</span>
+            <span class="n">mpa</span> <span class="o">=</span> <span class="n">mdas</span><span class="o">.</span><span class="n">mpa_degrees</span>
+        <span class="n">mpa_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mpa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mpa_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | MPA: </span><span class="si">{</span><span class="n">mpa</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">°&quot;</span>
+        <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">sp_name</span><span class="si">}{</span><span class="n">mpa_text</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">label_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">label_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+        <span class="n">dolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_polar_spectrum_name</span><span class="p">()</span>
+        <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
+            <span class="n">canv</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">INTERPOLATED_DATA_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">CIMEL_POINT_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">ERRORBARS_LABEL</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs_cimel</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs_asd</span><span class="p">(),</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;Extraterrestrial Lunar Reflectances&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Reflectances (Fraction of unity)&quot;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">sp_name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">o_file_refl</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting reflectance graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
+            <span class="n">canv</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">INTERPOLATED_DATA_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">CIMEL_POINT_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">ERRORBARS_LABEL</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_cimel</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_asd</span><span class="p">(),</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;Extraterrestrial Lunar Irradiances&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Irradiances (Wm⁻²nm⁻¹)&quot;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">sp_name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">o_file_irr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting irradiance graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">dolp_sp_name</span><span class="si">}{</span><span class="n">mpa_text</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
+            <span class="n">canv</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">INTERPOLATED_DATA_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">CIMEL_POINT_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">ERRORBARS_LABEL</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars_cimel</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars_asd</span><span class="p">(),</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;Extraterrestrial Lunar Polarisation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Degree of Linear Polarisation (%)&quot;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">dolp_sp_name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">o_file_polar</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting polarisation graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+
+<div class="viewcode-block" id="CLIExporter.export_comparison_graph">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.CLIExporter.export_comparison_graph">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_comparison_graph</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">comparison</span><span class="p">:</span> <span class="n">ComparisonData</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">chosen_diffs</span><span class="p">:</span> <span class="n">CompFields</span><span class="p">,</span>
+        <span class="n">date_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports comparison results as a graph.</span>
+
+<span class="sd">        This method generates a graph comparing observed and simulated irradiance values.</span>
+<span class="sd">        It includes relative or percentage differences based on the chosen difference metric.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        comparison : ComparisonData</span>
+<span class="sd">            The comparison data containing observed and simulated signals.</span>
+<span class="sd">        xlabel : str</span>
+<span class="sd">            Label for the x-axis (e.g., &quot;Wavelength (nm)&quot;, &quot;UTC Date&quot;).</span>
+<span class="sd">        ylabel : str</span>
+<span class="sd">            Label for the y-axis (e.g., &quot;Irradiance (Wm⁻²nm⁻¹)&quot;).</span>
+<span class="sd">        output_file : str</span>
+<span class="sd">            Path to save the exported graph file.</span>
+<span class="sd">        version : str</span>
+<span class="sd">            Version of the LIME coefficients used in the simulation.</span>
+<span class="sd">        title : str</span>
+<span class="sd">            Title of the graph.</span>
+<span class="sd">        chosen_diffs : CompFields</span>
+<span class="sd">            Specifies whether to show relative differences, percentage differences, or none.</span>
+<span class="sd">        date_range: Optional, Tuple[datetime, datetime]</span>
+<span class="sd">            Initial and final datetimes, in case the comparison is not an standard comparison,</span>
+<span class="sd">            and its dts attribute is None.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If an error occurs while generating or saving the graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">canvas</span>
+
+        <span class="n">canv</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">MplCanvas</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">title_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">n_comp_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comparison</span><span class="o">.</span><span class="n">diffs_signal</span><span class="o">.</span><span class="n">wlens</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data_start</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">comparison</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span>
+            <span class="n">data_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">comparison</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_start</span><span class="p">,</span> <span class="n">data_end</span> <span class="o">=</span> <span class="n">date_range</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">warning_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">comparison</span><span class="o">.</span><span class="n">ampa_valid_range</span><span class="p">:</span>
+            <span class="n">warning_out_mpa_range</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">_WARN_OUTSIDE_MPA_RANGE</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+        <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">sp_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">_subtitle_date_format</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">SUBTITLE_DATE_FORMAT</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">Data start: </span><span class="si">{}</span><span class="s2"> | Data end: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">Number of points: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">subtitle</span><span class="p">,</span>
+            <span class="n">data_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">_subtitle_date_format</span><span class="p">),</span>
+            <span class="n">data_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">_subtitle_date_format</span><span class="p">),</span>
+            <span class="n">n_comp_points</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">label_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">label_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas_compare</span><span class="p">(</span>
+            <span class="n">canv</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="s2">&quot;Observed Irradiance&quot;</span><span class="p">,</span> <span class="s2">&quot;Simulated Irradiance&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;Relative Differences&quot;</span><span class="p">,</span> <span class="s2">&quot;Percentage Differences&quot;</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="n">title</span><span class="p">,</span>
+            <span class="n">xlabel</span><span class="p">,</span>
+            <span class="n">ylabel</span><span class="p">,</span>
+            <span class="n">subtitle</span><span class="p">,</span>
+            <span class="n">chosen_diffs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting comparison graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span></div>
+
+
+<div class="viewcode-block" id="CLIExporter.export_comparison_bywlen_graph">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.CLIExporter.export_comparison_bywlen_graph">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_comparison_bywlen_graph</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComparisonData</span><span class="p">],</span>
+        <span class="n">wlcs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">xlabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">chosen_diffs</span><span class="p">:</span> <span class="n">CompFields</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports comparison results by wavelength as a boxplot graph.</span>
+
+<span class="sd">        This method visualizes the comparison of observed and simulated data across</span>
+<span class="sd">        different wavelengths. It includes a statistical representation of differences.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : List[ComparisonData]</span>
+<span class="sd">            List of comparison data for each spectral channel.</span>
+<span class="sd">        wlcs : List[float]</span>
+<span class="sd">            List of wavelength centers for each channel.</span>
+<span class="sd">        xlabel : str</span>
+<span class="sd">            Label for the x-axis (e.g., &quot;Wavelength (nm)&quot;).</span>
+<span class="sd">        ylabel : str</span>
+<span class="sd">            Label for the y-axis (e.g., &quot;Irradiance (Wm⁻²nm⁻¹)&quot;).</span>
+<span class="sd">        output_file : str</span>
+<span class="sd">            Path to save the exported graph file.</span>
+<span class="sd">        version : str</span>
+<span class="sd">            Version of the LIME coefficients used in the simulation.</span>
+<span class="sd">        chosen_diffs : CompFields</span>
+<span class="sd">            Specifies whether to show relative differences, percentage differences, or none.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If an error occurs while generating or saving the graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">canvas</span>
+
+        <span class="n">canv</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">MplCanvas</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">title_font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">observed_signal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="n">statscomps</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">n_comp_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">diffs_signal</span><span class="o">.</span><span class="n">wlens</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">statscomps</span><span class="p">])</span>
+        <span class="n">data_start</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">statscomps</span><span class="p">])</span>
+        <span class="n">data_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">statscomps</span><span class="p">])</span>
+        <span class="n">warning_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="p">[</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ampa_valid_range</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">statscomps</span><span class="p">]:</span>
+            <span class="n">warning_out_mpa_range</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">_WARN_OUTSIDE_MPA_RANGE</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+        <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">sp_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">_subtitle_date_format</span> <span class="o">=</span> <span class="n">canvas</span><span class="o">.</span><span class="n">SUBTITLE_DATE_FORMAT</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">Data start: </span><span class="si">{}</span><span class="s2"> | Data end: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">Mean number of points: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">subtitle</span><span class="p">,</span>
+                <span class="n">data_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">_subtitle_date_format</span><span class="p">),</span>
+                <span class="n">data_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">_subtitle_date_format</span><span class="p">),</span>
+                <span class="n">n_comp_points</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas_compare_boxplot</span><span class="p">(</span>
+            <span class="n">canv</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">wlcs</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="s2">&quot;Observed Irradiance&quot;</span><span class="p">,</span> <span class="s2">&quot;Simulated Irradiance&quot;</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;All channels&quot;</span><span class="p">,</span>
+            <span class="n">xlabel</span><span class="p">,</span>
+            <span class="n">ylabel</span><span class="p">,</span>
+            <span class="n">subtitle</span><span class="p">,</span>
+            <span class="n">chosen_diffs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting comparison graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span></div>
+
+
+<div class="viewcode-block" id="CLIExporter.export">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.CLIExporter.export">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">ed</span><span class="p">:</span> <span class="n">ExportData</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports simulation or comparison results based on the selected export format.</span>
+
+<span class="sd">        This method determines the appropriate export format (CSV, Graph, NetCDF)</span>
+<span class="sd">        and calls the corresponding function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The observation point (Earth, Lunar, or Satellite) for the simulation.</span>
+<span class="sd">        ed : ExportData</span>
+<span class="sd">            The export configuration object, determining the file format and parameters.</span>
+<span class="sd">        srf : SpectralResponseFunction</span>
+<span class="sd">            The spectral response function used in the simulation.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If an error occurs while exporting the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">ExportCSV</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_csvs</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">ed</span><span class="p">,</span> <span class="n">srf</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">ExportNetCDF</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_lglod</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">output_file</span><span class="p">,</span> <span class="n">srf</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">ExportGraph</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_graph</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">ed</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

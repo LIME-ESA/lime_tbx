@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.business.lime_algorithms.lime.eli &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.lime_algorithms.lime.eli</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.business.lime_algorithms.lime.eli</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module calculates the extra-terrestrial lunar irradiance.</span>
+
+<span class="sd">It exports the following functions:</span>
+<span class="sd">    * calculate_eli_from_elref - Calculates the expected extra-terrestrial lunar irradiances</span>
+<span class="sd">        for some given wavelengths in nanometers. Based on Eq 3 in Roman et al., 2020.</span>
+<span class="sd">        The reflectance is given as a parameter.</span>
+<span class="sd">    * calculate_eli_from_elref_unc - Calculates the uncertainties of the calculation of the</span>
+<span class="sd">        expected extra-terrestrial lunar irradiances for some given wavelengths in nanometers.</span>
+<span class="sd">        Based on Eq 3 in Roman et al., 2020. The reflectance is given as a parameter.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="sd">&quot;&quot;&quot;___NPL Modules&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">punpy</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.lime_algorithms.lime</span><span class="w"> </span><span class="kn">import</span> <span class="n">esi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">SpectralData</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;2022/03/02&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<span class="n">SOLID_ANGLE_MOON</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">6.4177e-05</span>
+<span class="n">DIST_EARTH_MOON_KM</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">384400</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_measurement_func_eli</span><span class="p">(</span>
+    <span class="n">a_l</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">omega</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">esk</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">dsm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">distance_earth_moon_km</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">geom_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Final computation of the Eq 3 in Roman et al., 2020, but also letting the user specify the geom_factor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unnormalized_irr</span> <span class="o">=</span> <span class="p">(</span><span class="n">a_l</span> <span class="o">*</span> <span class="n">omega</span> <span class="o">*</span> <span class="n">esk</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">if</span> <span class="n">geom_factor</span><span class="p">:</span>
+        <span class="n">lunar_irr</span> <span class="o">=</span> <span class="n">unnormalized_irr</span> <span class="o">/</span> <span class="n">geom_factor</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lunar_irr</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">unnormalized_irr</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">dsm</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">distance_earth_moon_km</span> <span class="o">/</span> <span class="n">dom</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">lunar_irr</span>
+
+
+<div class="viewcode-block" id="J_eli">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.lime.eli.html#lime_tbx.business.lime_algorithms.lime.eli.J_eli">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">J_eli</span><span class="p">(</span>
+    <span class="n">a_l</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">omega</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">esk</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">dsm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">distance_earth_moon_km</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">Jac_x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span>
+        <span class="p">((</span><span class="n">omega</span> <span class="o">*</span> <span class="n">esk</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">dsm</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="o">*</span> <span class="p">(</span><span class="n">distance_earth_moon_km</span> <span class="o">/</span> <span class="n">dom</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="p">)</span>
+    <span class="n">Jac_x3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span>
+        <span class="p">((</span><span class="n">omega</span> <span class="o">*</span> <span class="n">a_l</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">dsm</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="o">*</span> <span class="p">(</span><span class="n">distance_earth_moon_km</span> <span class="o">/</span> <span class="n">dom</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="p">)</span>
+    <span class="n">Jac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">Jac_x1</span><span class="p">,</span>
+            <span class="n">Jac_x3</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">Jac</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_eli_from_elref">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.lime.eli.html#lime_tbx.business.lime_algorithms.lime.eli.calculate_eli_from_elref">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_eli_from_elref</span><span class="p">(</span>
+    <span class="n">wavelengths_nm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">moon_data</span><span class="p">:</span> <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">elrefs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">srf_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020</span>
+
+<span class="sd">    Simulates a lunar observation for a wavelength for any observer/solar selenographic</span>
+<span class="sd">    latitude and longitude. The irradiance is calculated in Wm⁻²/nm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wavelength_nm : np.array of float</span>
+<span class="sd">        Wavelengths (in nanometers) of which the extraterrestrial lunar irradiance will be</span>
+<span class="sd">        calculated.</span>
+<span class="sd">    moon_data : MoonData</span>
+<span class="sd">        Moon data needed to calculate Moon&#39;s irradiance</span>
+<span class="sd">    elrefs : np.ndarray of float</span>
+<span class="sd">        Reflectances previously calculated</span>
+<span class="sd">    srf_type: str</span>
+<span class="sd">        SRF type that wants to be used. Can be &#39;cimel&#39;, &#39;asd&#39;, &#39;interpolated_gaussian&#39; or &#39;interpolated_triangle&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray of float</span>
+<span class="sd">        The extraterrestrial lunar irradiance calculated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">esk</span> <span class="o">=</span> <span class="n">esi</span><span class="o">.</span><span class="n">get_esi</span><span class="p">(</span><span class="n">srf_type</span><span class="p">)</span>
+    <span class="n">esk</span> <span class="o">=</span> <span class="n">esk</span><span class="p">[[</span><span class="n">es</span> <span class="ow">in</span> <span class="n">wavelengths_nm</span> <span class="k">for</span> <span class="n">es</span> <span class="ow">in</span> <span class="n">esk</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]][:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">dsm</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">distance_sun_moon</span>
+    <span class="n">dom</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">distance_observer_moon</span>
+
+    <span class="n">lunar_irr</span> <span class="o">=</span> <span class="n">_measurement_func_eli</span><span class="p">(</span>
+        <span class="n">elrefs</span><span class="p">,</span>
+        <span class="n">SOLID_ANGLE_MOON</span><span class="p">,</span>
+        <span class="n">esk</span><span class="p">,</span>
+        <span class="n">dsm</span><span class="p">,</span>
+        <span class="n">DIST_EARTH_MOON_KM</span><span class="p">,</span>
+        <span class="n">dom</span><span class="p">,</span>
+        <span class="n">moon_data</span><span class="o">.</span><span class="n">geom_factor</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">lunar_irr</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_eli_from_elref_unc">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.lime.eli.html#lime_tbx.business.lime_algorithms.lime.eli.calculate_eli_from_elref_unc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_eli_from_elref_unc</span><span class="p">(</span>
+    <span class="n">elref_spectrum</span><span class="p">:</span> <span class="n">SpectralData</span><span class="p">,</span>
+    <span class="n">moon_data</span><span class="p">:</span> <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">srf_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Uncertainties of the calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020</span>
+
+<span class="sd">    Simulates a lunar observation for a wavelength for any observer/solar selenographic</span>
+<span class="sd">    latitude and longitude. The irradiance is calculated in Wm⁻²/nm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    elref_spectrum: SpectralData</span>
+<span class="sd">        Previously calculated reflectance data.</span>
+<span class="sd">    moon_data : MoonData</span>
+<span class="sd">        Moon data needed to calculate Moon&#39;s irradiance.</span>
+<span class="sd">    srf_type: str</span>
+<span class="sd">        SRF type that wants to be used. Can be &#39;cimel&#39;, &#39;asd&#39; or &#39;interpolated&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray of float</span>
+<span class="sd">        The uncertainties calculated</span>
+<span class="sd">    corr: np.ndarray of float</span>
+<span class="sd">        The error correlation matrix calculated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">esk</span> <span class="o">=</span> <span class="n">esi</span><span class="o">.</span><span class="n">get_esi</span><span class="p">(</span><span class="n">srf_type</span><span class="p">)</span>
+    <span class="n">esk</span> <span class="o">=</span> <span class="n">esk</span><span class="p">[[</span><span class="n">es</span> <span class="ow">in</span> <span class="n">elref_spectrum</span><span class="o">.</span><span class="n">wlens</span> <span class="k">for</span> <span class="n">es</span> <span class="ow">in</span> <span class="n">esk</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]][:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">u_esk</span> <span class="o">=</span> <span class="n">esi</span><span class="o">.</span><span class="n">get_u_esi</span><span class="p">(</span><span class="n">srf_type</span><span class="p">)</span>
+    <span class="n">u_esk</span> <span class="o">=</span> <span class="n">u_esk</span><span class="p">[[</span><span class="n">es</span> <span class="ow">in</span> <span class="n">elref_spectrum</span><span class="o">.</span><span class="n">wlens</span> <span class="k">for</span> <span class="n">es</span> <span class="ow">in</span> <span class="n">u_esk</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]][:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">dsm</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">distance_sun_moon</span>
+    <span class="n">dom</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">distance_observer_moon</span>
+
+    <span class="n">Jx</span> <span class="o">=</span> <span class="n">J_eli</span><span class="p">(</span><span class="n">elref_spectrum</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">SOLID_ANGLE_MOON</span><span class="p">,</span> <span class="n">esk</span><span class="p">,</span> <span class="n">dsm</span><span class="p">,</span> <span class="n">DIST_EARTH_MOON_KM</span><span class="p">,</span> <span class="n">dom</span><span class="p">)</span>
+    <span class="n">prop</span> <span class="o">=</span> <span class="n">punpy</span><span class="o">.</span><span class="n">LPUPropagation</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_measure_eli</span><span class="p">(</span><span class="n">elref</span><span class="p">,</span> <span class="n">eske</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_measurement_func_eli</span><span class="p">(</span>
+            <span class="n">elref</span><span class="p">,</span>
+            <span class="n">SOLID_ANGLE_MOON</span><span class="p">,</span>
+            <span class="n">eske</span><span class="p">,</span>
+            <span class="n">dsm</span><span class="p">,</span>
+            <span class="n">DIST_EARTH_MOON_KM</span><span class="p">,</span>
+            <span class="n">dom</span><span class="p">,</span>
+            <span class="n">moon_data</span><span class="o">.</span><span class="n">geom_factor</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">unc</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">propagate_standard</span><span class="p">(</span>
+        <span class="n">_measure_eli</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="n">elref_spectrum</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">esk</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="p">[</span><span class="n">elref_spectrum</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span> <span class="n">u_esk</span><span class="p">],</span>
+        <span class="n">corr_x</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">elref_spectrum</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+            <span class="s2">&quot;syst&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">return_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">Jx</span><span class="o">=</span><span class="n">Jx</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">del</span> <span class="n">prop</span>
+    <span class="n">unc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">unc</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">unc</span><span class="p">,</span> <span class="n">corr</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

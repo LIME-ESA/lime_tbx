@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.business.spice_adapter.spice_adapter &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.spice_adapter.spice_adapter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.business.spice_adapter.spice_adapter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module acts as an interface/adapter with NASA&#39;s SPICE software.</span>
+
+<span class="sd">It exports the following classes:</span>
+<span class="sd">    * ISPICEAdapter - Interface that contains the methods of this module.</span>
+<span class="sd">    * SPICEAdapter - Class that implements the methods exported by this module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">spicedmoon</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">spiceypy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spice</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">datatypes</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;01/03/2022&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="ISPICEAdapter">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ISPICEAdapter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface that contains the methods of this module.</span>
+
+<span class="sd">    It exports the following functions:</span>
+<span class="sd">        * get_moon_data_from_earth() - Calculate lunar data for a position on earth</span>
+<span class="sd">            surface at a concrete datetime.</span>
+<span class="sd">        * get_moon_datas_from_rectangular_multiple() - Calculate lunar data for some</span>
+<span class="sd">            rectangular coordinates from Earth or Moon.</span>
+<span class="sd">        * to_rectangular_multiple() - Transforms planetographic coordinates to rectangular coordinates.</span>
+<span class="sd">        * to_planetographic_multiple() - Transforms multiple rectangular coordinates</span>
+<span class="sd">            to planetographic coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ISPICEAdapter.get_moon_data_from_earth">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_moon_data_from_earth">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_moon_data_from_earth</span><span class="p">(</span>
+        <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">altitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate lunar data for a position on earth surface at a concrete datetime.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        latitude: float</span>
+<span class="sd">            Geographic latitude in decimal degrees.</span>
+<span class="sd">        longitude: float</span>
+<span class="sd">            Geographic longitude in decimal degrees.</span>
+<span class="sd">        altitude: float</span>
+<span class="sd">            Altitude over the sea level in meters.</span>
+<span class="sd">        dt: datetime | list of datetimes</span>
+<span class="sd">            Time or time series at which the lunar data will be calculated.</span>
+<span class="sd">        kernels_path: str</span>
+<span class="sd">            Path where the needed SPICE kernels are located.</span>
+<span class="sd">            The user must have write access to that directory.</span>
+<span class="sd">        source_frame: str</span>
+<span class="sd">            Source frame from which to transform the xyz coordinates.</span>
+<span class="sd">            By default J2000, but it can be others like MOON_ME or ITRF93.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        md: MoonData | list of MoonData</span>
+<span class="sd">            Lunar data for the given parameters. If the parameter dt was a list,</span>
+<span class="sd">            this will be a list. Otherwise not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISPICEAdapter.get_moon_datas_from_rectangular_multiple">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_moon_datas_from_rectangular_multiple">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_moon_datas_from_rectangular_multiple</span><span class="p">(</span>
+        <span class="n">xyzs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">dts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate lunar data for the given rectangular coordinates.</span>
+<span class="sd">        Faster execution for some cases</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xyzs: list of tuple of three floats</span>
+<span class="sd">            Rectangular coordinates in meters</span>
+<span class="sd">        dts: List of datetime</span>
+<span class="sd">            Datetimes of each position of those xyzs</span>
+<span class="sd">        kernels_path: KernelsPath</span>
+<span class="sd">            Information about the SPICE kernels location</span>
+<span class="sd">        source_frame: str</span>
+<span class="sd">            Source frame from which to transform the xyz coordinates.</span>
+<span class="sd">            By default J2000, but it can be something like &#39;MOON_ME&#39; if the coordinates are lunar.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        list of MoonData</span>
+<span class="sd">            Lunar data for the given parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISPICEAdapter.to_rectangular_same_frame">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_rectangular_same_frame">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_rectangular_same_frame</span><span class="p">(</span>
+        <span class="n">latlonheights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms planetographic coordinates to rectangular coordinates in the same frame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        latlonheights: list of tuple of floats</span>
+<span class="sd">            Latitude and longitude in degrees, height in meters.</span>
+<span class="sd">        body: str</span>
+<span class="sd">            Name of the body. For example &#39;MOON&#39; or &#39;EARTH&#39;.</span>
+<span class="sd">        kernels_path: str</span>
+<span class="sd">            Path to the directory of the main kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        xyzs: list of tuples of 3 floats</span>
+<span class="sd">            Rectangular coordinates in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISPICEAdapter.to_rectangular_multiple">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_rectangular_multiple">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_rectangular_multiple</span><span class="p">(</span>
+        <span class="n">latlonheights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">datetimes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IAU_EARTH&quot;</span><span class="p">,</span>
+        <span class="n">target_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms planetographic coordinates to rectangular coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        latlonheights: list of tuple of floats</span>
+<span class="sd">            Latitude and longitude in degrees, height in meters.</span>
+<span class="sd">        body: str</span>
+<span class="sd">            Name of the body. For example &#39;MOON&#39; or &#39;EARTH&#39;.</span>
+<span class="sd">        kernels_path: str</span>
+<span class="sd">            Path to the directory of the main kernels.</span>
+<span class="sd">        datetimes: list of datetime</span>
+<span class="sd">            Datetimes of the positions</span>
+<span class="sd">        source_frame: str</span>
+<span class="sd">            Reference frame of the planetographic coordinates</span>
+<span class="sd">        target_frame: str</span>
+<span class="sd">            Reference frame of the rectangular coordinates</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        xyzs: list of tuples of 3 floats</span>
+<span class="sd">            Rectangular coordinates in meters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISPICEAdapter.to_planetographic_same_frame">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_planetographic_same_frame">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_planetographic_same_frame</span><span class="p">(</span>
+        <span class="n">xyz_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms multiple rectangular coordinates to planetographic coordinates in the same ref frame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xyz_list: list of tuples of 3 floats</span>
+<span class="sd">            List of xyz coordinates in meters.</span>
+<span class="sd">        body: str</span>
+<span class="sd">            Name of the body. For example &#39;MOON&#39; or &#39;EARTH&#39;.</span>
+<span class="sd">        kernels_path: str</span>
+<span class="sd">            Path to the directory of the main kernels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        llhs: list of tuples of 3 floats</span>
+<span class="sd">            List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISPICEAdapter.to_planetographic_multiple">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_planetographic_multiple">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_planetographic_multiple</span><span class="p">(</span>
+        <span class="n">xyz_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">datetimes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+        <span class="n">target_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IAU_EARTH&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms multiple rectangular coordinates to planetographic coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xyz_list: list of tuples of 3 floats</span>
+<span class="sd">            List of xyz coordinates in meters.</span>
+<span class="sd">        body: str</span>
+<span class="sd">            Name of the body. For example &#39;MOON&#39; or &#39;EARTH&#39;.</span>
+<span class="sd">        kernels_path: str</span>
+<span class="sd">            Path to the directory of the main kernels.</span>
+<span class="sd">        datetimes: list of datetime</span>
+<span class="sd">            Datetimes of the positions</span>
+<span class="sd">        source_frame: str</span>
+<span class="sd">            Reference frame of the rectangular coordinates</span>
+<span class="sd">        target_frame: str</span>
+<span class="sd">            Reference frame of the planetographic coordinates</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        llhs: list of tuples of 3 floats</span>
+<span class="sd">            List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISPICEAdapter.get_solar_moon_datas">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_solar_moon_datas">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_solar_moon_datas</span><span class="p">(</span>
+        <span class="n">dts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain solar selenographic coordinates of at multiple times.</span>
+
+<span class="sd">        times : list of str | list of datetime</span>
+<span class="sd">            Times at which the lunar data will be calculated.</span>
+<span class="sd">            If they are str, they must be in a valid UTC format allowed by SPICE, such as</span>
+<span class="sd">            %Y-%m-%d %H:%M:%S.</span>
+<span class="sd">            If they are datetimes they must be timezone aware, or they will be understood</span>
+<span class="sd">            as computer local time.</span>
+<span class="sd">        kernels_path : str</span>
+<span class="sd">            Path where the SPICE kernels are stored</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SPICEAdapter">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SPICEAdapter</span><span class="p">(</span><span class="n">ISPICEAdapter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class that implements the methods of this module.</span>
+
+<span class="sd">    It exports the following functions:</span>
+<span class="sd">        * get_moon_data_from_earth() - Calculate lunar data for a position on earth</span>
+<span class="sd">            surface at a concrete datetime.</span>
+<span class="sd">        * get_moon_data_from_moon() - Calculate lunar data for a position on moon&#39;s</span>
+<span class="sd">            surface at a concrete datetime.</span>
+<span class="sd">        * to_rectangular_multiple() - Transforms planetographic coordinates to rectangular coordinates.</span>
+<span class="sd">        * to_planetographic_multiple() - Transforms multiple rectangular coordinates</span>
+<span class="sd">            to planetographic coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_moon_data_from_callback</span><span class="p">(</span>
+        <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">altitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">target_frame</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">]]:</span>
+        <span class="n">was_list</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">was_list</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="p">[</span><span class="n">dt</span><span class="p">]</span>
+        <span class="n">mds</span> <span class="o">=</span> <span class="n">callback</span><span class="p">(</span>
+            <span class="n">latitude</span><span class="p">,</span>
+            <span class="n">longitude</span><span class="p">,</span>
+            <span class="n">altitude</span><span class="p">,</span>
+            <span class="n">dt</span><span class="p">,</span>
+            <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="n">target_frame</span><span class="p">,</span>
+            <span class="n">custom_kernel_path</span><span class="o">=</span><span class="n">kernels_path</span><span class="o">.</span><span class="n">custom_kernel_path</span><span class="p">,</span>
+            <span class="n">ignore_bodvrd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">source_frame</span><span class="o">=</span><span class="n">source_frame</span><span class="p">,</span>
+            <span class="n">target_frame</span><span class="o">=</span><span class="n">target_frame</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mds2</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">:</span>
+            <span class="n">md2</span> <span class="o">=</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">(</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">dist_sun_moon_au</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">dist_obs_moon</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">lon_sun_rad</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">lat_obs</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">lon_obs</span><span class="p">,</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">mpa_deg</span><span class="p">),</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">mpa_deg</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">mds2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">md2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">was_list</span><span class="p">:</span>
+            <span class="n">mds2</span> <span class="o">=</span> <span class="n">mds2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mds2</span>
+
+<div class="viewcode-block" id="SPICEAdapter.get_moon_data_from_earth">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_moon_data_from_earth">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_moon_data_from_earth</span><span class="p">(</span>
+        <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">altitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">]]:</span>
+        <span class="n">waslist</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">xyzs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="p">[</span><span class="n">dt</span><span class="p">]</span>
+            <span class="n">waslist</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">llhs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">altitude</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">dt</span><span class="p">]</span>
+        <span class="n">xyzs</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_rectangular_multiple</span><span class="p">(</span>
+            <span class="n">llhs</span><span class="p">,</span>
+            <span class="s2">&quot;EARTH&quot;</span><span class="p">,</span>
+            <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+            <span class="n">dt</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mda</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">get_moon_datas_from_rectangular_multiple</span><span class="p">(</span>
+            <span class="n">xyzs</span><span class="p">,</span>
+            <span class="n">dt</span><span class="p">,</span>
+            <span class="n">kernels_path</span><span class="p">,</span>
+            <span class="n">source_frame</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">waslist</span><span class="p">:</span>
+            <span class="n">mda</span> <span class="o">=</span> <span class="n">mda</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mda</span></div>
+
+
+<div class="viewcode-block" id="SPICEAdapter.get_moon_datas_from_rectangular_multiple">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_moon_datas_from_rectangular_multiple">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_moon_datas_from_rectangular_multiple</span><span class="p">(</span>
+        <span class="n">xyzs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">dts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">datatypes</span><span class="o">.</span><span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">]:</span>
+        <span class="c1"># if source_frame = &#39;MOON_ME&#39; or contains &#39;MOON&#39; its from MOON</span>
+        <span class="n">xyzs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">z</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">xyzs</span><span class="p">]</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dt</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span> <span class="n">dts</span><span class="p">))</span>
+        <span class="n">mds</span> <span class="o">=</span> <span class="n">spicedmoon</span><span class="o">.</span><span class="n">spicedmoon</span><span class="o">.</span><span class="n">get_moon_datas_xyzs_no_zenith_azimuth</span><span class="p">(</span>
+            <span class="n">xyzs</span><span class="p">,</span>
+            <span class="n">times</span><span class="p">,</span>
+            <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+            <span class="n">source_frame</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">(</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">dist_sun_moon_au</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">dist_obs_moon</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">lon_sun_rad</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">lat_obs</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">lon_obs</span><span class="p">,</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">mpa_deg</span><span class="p">),</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">mpa_deg</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mds</span>
+        <span class="p">]</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_kernels</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;moon_pa_de421_1900-2050.bpc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;moon_080317.tf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pck00010.tpc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;naif0011.tls&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;de421.bsp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;earth_assoc_itrf93.tf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;earth_latest_high_prec.bpc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;earth_070425_370426_predict.bpc&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">:</span>
+            <span class="n">k_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+            <span class="n">spicedmoon</span><span class="o">.</span><span class="n">spicedmoon</span><span class="o">.</span><span class="n">_furnsh_safer</span><span class="p">(</span><span class="n">k_path</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clear_kernels</span><span class="p">():</span>
+        <span class="n">spice</span><span class="o">.</span><span class="n">kclear</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_change_frames</span><span class="p">(</span>
+        <span class="n">coords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_frame</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">et</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;MOON&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">target_frame</span><span class="p">:</span>
+            <span class="n">trans_matrix</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">pxform</span><span class="p">(</span><span class="n">source_frame</span><span class="p">,</span> <span class="n">target_frame</span><span class="p">,</span> <span class="n">et</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">mxv</span><span class="p">(</span><span class="n">trans_matrix</span><span class="p">,</span> <span class="n">coords</span><span class="p">)</span>
+        <span class="n">moon_pos_satref</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">spkpos</span><span class="p">(</span><span class="s2">&quot;MOON&quot;</span><span class="p">,</span> <span class="n">et</span><span class="p">,</span> <span class="n">source_frame</span><span class="p">,</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTH&quot;</span><span class="p">)</span>
+        <span class="n">rotation</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">pxform</span><span class="p">(</span><span class="n">source_frame</span><span class="p">,</span> <span class="n">target_frame</span><span class="p">,</span> <span class="n">et</span><span class="p">)</span>
+        <span class="c1"># set moon center as zero point</span>
+        <span class="n">sat_pos_translate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">sat_pos_translate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">moon_pos_satref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sat_pos_translate</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">moon_pos_satref</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sat_pos_translate</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">moon_pos_satref</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">spice</span><span class="o">.</span><span class="n">mxv</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">sat_pos_translate</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SPICEAdapter.to_rectangular_same_frame">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_rectangular_same_frame">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_rectangular_same_frame</span><span class="p">(</span>
+        <span class="n">latlonheights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>  <span class="c1"># h in meters</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_load_kernels</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">radios</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodvrd</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="s2">&quot;RADII&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">eq_rad</span> <span class="o">=</span> <span class="n">radios</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Equatorial Radius</span>
+        <span class="n">pol_rad</span> <span class="o">=</span> <span class="n">radios</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Polar radius</span>
+        <span class="n">flattening</span> <span class="o">=</span> <span class="p">(</span><span class="n">eq_rad</span> <span class="o">-</span> <span class="n">pol_rad</span><span class="p">)</span> <span class="o">/</span> <span class="n">eq_rad</span>
+        <span class="n">poss_iaus</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">llh</span> <span class="ow">in</span> <span class="n">latlonheights</span><span class="p">:</span>
+            <span class="n">pos_iau</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">georec</span><span class="p">(</span>
+                <span class="n">spice</span><span class="o">.</span><span class="n">rpd</span><span class="p">()</span> <span class="o">*</span> <span class="n">llh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">spice</span><span class="o">.</span><span class="n">rpd</span><span class="p">()</span> <span class="o">*</span> <span class="n">llh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">llh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
+                <span class="n">eq_rad</span><span class="p">,</span>
+                <span class="n">flattening</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">poss_iaus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos_iau</span><span class="p">)</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_clear_kernels</span><span class="p">()</span>
+        <span class="n">poss_iaus</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">poss_iaus</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">poss_iaus</span>  <span class="c1"># in meters</span></div>
+
+
+<div class="viewcode-block" id="SPICEAdapter.to_rectangular_multiple">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_rectangular_multiple">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_rectangular_multiple</span><span class="p">(</span>
+        <span class="n">latlonheights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">datetimes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IAU_EARTH&quot;</span><span class="p">,</span>
+        <span class="n">target_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+    <span class="p">):</span>  <span class="c1"># h in meters</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_load_kernels</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">radios</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodvrd</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="s2">&quot;RADII&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">eq_rad</span> <span class="o">=</span> <span class="n">radios</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Equatorial Radius</span>
+        <span class="n">pol_rad</span> <span class="o">=</span> <span class="n">radios</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Polar radius</span>
+        <span class="n">flattening</span> <span class="o">=</span> <span class="p">(</span><span class="n">eq_rad</span> <span class="o">-</span> <span class="n">pol_rad</span><span class="p">)</span> <span class="o">/</span> <span class="n">eq_rad</span>
+        <span class="n">poss_iaus</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ets</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">datetime2et</span><span class="p">(</span><span class="n">datetimes</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">llh</span><span class="p">,</span> <span class="n">et</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">latlonheights</span><span class="p">,</span> <span class="n">ets</span><span class="p">):</span>
+            <span class="n">pos_iau</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">georec</span><span class="p">(</span>
+                <span class="n">spice</span><span class="o">.</span><span class="n">rpd</span><span class="p">()</span> <span class="o">*</span> <span class="n">llh</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">spice</span><span class="o">.</span><span class="n">rpd</span><span class="p">()</span> <span class="o">*</span> <span class="n">llh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">llh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
+                <span class="n">eq_rad</span><span class="p">,</span>
+                <span class="n">flattening</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">poss_iaus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_change_frames</span><span class="p">(</span><span class="n">pos_iau</span><span class="p">,</span> <span class="n">source_frame</span><span class="p">,</span> <span class="n">target_frame</span><span class="p">,</span> <span class="n">et</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_clear_kernels</span><span class="p">()</span>
+        <span class="n">poss_iaus</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">poss_iaus</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">poss_iaus</span>  <span class="c1"># in meters</span></div>
+
+
+<div class="viewcode-block" id="SPICEAdapter.to_planetographic_same_frame">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_planetographic_same_frame">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_planetographic_same_frame</span><span class="p">(</span>
+        <span class="n">xyz_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_load_kernels</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">radii</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodvrd</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="s2">&quot;RADII&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">eq_rad</span> <span class="o">=</span> <span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Equatorial Radius</span>
+        <span class="n">pol_rad</span> <span class="o">=</span> <span class="n">radii</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Polar radius</span>
+        <span class="n">flattening</span> <span class="o">=</span> <span class="p">(</span><span class="n">eq_rad</span> <span class="o">-</span> <span class="n">pol_rad</span><span class="p">)</span> <span class="o">/</span> <span class="n">eq_rad</span>
+        <span class="n">llh_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># alt km</span>
+        <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="n">xyz_list</span><span class="p">:</span>
+            <span class="n">pos_iau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)))</span>
+            <span class="n">llh</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">recgeo</span><span class="p">(</span><span class="n">pos_iau</span><span class="p">,</span> <span class="n">eq_rad</span><span class="p">,</span> <span class="n">flattening</span><span class="p">)</span>
+            <span class="n">llh_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">llh</span><span class="p">)</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_clear_kernels</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">llh</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">llh_list</span><span class="p">):</span>
+            <span class="n">lat</span> <span class="o">=</span> <span class="n">llh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">spice</span><span class="o">.</span><span class="n">dpr</span><span class="p">()</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="n">llh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">spice</span><span class="o">.</span><span class="n">dpr</span><span class="p">()</span>
+            <span class="n">alt</span> <span class="o">=</span> <span class="n">llh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">while</span> <span class="n">lon</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">:</span>
+                <span class="n">lon</span> <span class="o">+=</span> <span class="mi">360</span>
+            <span class="k">while</span> <span class="n">lon</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+                <span class="n">lon</span> <span class="o">-=</span> <span class="mi">360</span>
+            <span class="n">llh_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">llh_list</span></div>
+
+
+<div class="viewcode-block" id="SPICEAdapter.to_planetographic_multiple">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_planetographic_multiple">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_planetographic_multiple</span><span class="p">(</span>
+        <span class="n">xyz_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">body</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">datetimes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">source_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J2000&quot;</span><span class="p">,</span>
+        <span class="n">target_frame</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IAU_EARTH&quot;</span><span class="p">,</span>
+    <span class="p">):</span>  <span class="c1"># in meters</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_load_kernels</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">radii</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">bodvrd</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="s2">&quot;RADII&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">eq_rad</span> <span class="o">=</span> <span class="n">radii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Equatorial Radius</span>
+        <span class="n">pol_rad</span> <span class="o">=</span> <span class="n">radii</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Polar radius</span>
+        <span class="n">flattening</span> <span class="o">=</span> <span class="p">(</span><span class="n">eq_rad</span> <span class="o">-</span> <span class="n">pol_rad</span><span class="p">)</span> <span class="o">/</span> <span class="n">eq_rad</span>
+        <span class="n">llh_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># alt km</span>
+        <span class="n">ets</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">datetime2et</span><span class="p">(</span><span class="n">datetimes</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">et</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xyz_list</span><span class="p">,</span> <span class="n">ets</span><span class="p">):</span>
+            <span class="n">pos_iau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)))</span>
+            <span class="n">pos_iau_proc</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_change_frames</span><span class="p">(</span>
+                <span class="n">pos_iau</span><span class="p">,</span> <span class="n">source_frame</span><span class="p">,</span> <span class="n">target_frame</span><span class="p">,</span> <span class="n">et</span>
+            <span class="p">)</span>
+            <span class="n">llh</span> <span class="o">=</span> <span class="n">spice</span><span class="o">.</span><span class="n">recgeo</span><span class="p">(</span><span class="n">pos_iau_proc</span><span class="p">,</span> <span class="n">eq_rad</span><span class="p">,</span> <span class="n">flattening</span><span class="p">)</span>
+            <span class="n">llh_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">llh</span><span class="p">)</span>
+        <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">_clear_kernels</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">llh</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">llh_list</span><span class="p">):</span>
+            <span class="n">lat</span> <span class="o">=</span> <span class="n">llh</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">spice</span><span class="o">.</span><span class="n">dpr</span><span class="p">()</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="n">llh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">spice</span><span class="o">.</span><span class="n">dpr</span><span class="p">()</span>
+            <span class="n">alt</span> <span class="o">=</span> <span class="n">llh</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">while</span> <span class="n">lon</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">:</span>
+                <span class="n">lon</span> <span class="o">+=</span> <span class="mi">360</span>
+            <span class="k">while</span> <span class="n">lon</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+                <span class="n">lon</span> <span class="o">-=</span> <span class="mi">360</span>
+            <span class="n">llh_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">llh_list</span></div>
+
+
+<div class="viewcode-block" id="SPICEAdapter.get_solar_moon_datas">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spice_adapter.spice_adapter.html#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_solar_moon_datas">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_solar_moon_datas</span><span class="p">(</span>
+        <span class="n">dts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">spicedmoon</span><span class="o">.</span><span class="n">get_sun_moon_datas</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+lime\_tbx.business.lime\_algorithms package
+===========================================
+
+.. automodule:: lime_tbx.business.lime_algorithms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.business.lime_algorithms.dolp
+   lime_tbx.business.lime_algorithms.lime

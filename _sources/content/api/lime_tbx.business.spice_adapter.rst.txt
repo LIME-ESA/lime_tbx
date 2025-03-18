@@ -1,0 +1,15 @@
+lime\_tbx.business.spice\_adapter package
+=========================================
+
+.. automodule:: lime_tbx.business.spice_adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.business.spice_adapter.spice_adapter

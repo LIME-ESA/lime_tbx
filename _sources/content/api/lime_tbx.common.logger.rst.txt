@@ -1,0 +1,7 @@
+lime\_tbx.common.logger module
+==============================
+
+.. automodule:: lime_tbx.common.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,21 @@
+lime\_tbx.application.filedata package
+======================================
+
+.. automodule:: lime_tbx.application.filedata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.application.filedata.coefficients
+   lime_tbx.application.filedata.csv
+   lime_tbx.application.filedata.lglod
+   lime_tbx.application.filedata.lglod_factory
+   lime_tbx.application.filedata.moon
+   lime_tbx.application.filedata.netcdfcommon
+   lime_tbx.application.filedata.srf

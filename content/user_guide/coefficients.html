@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coefficients &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="File Formats" href="formats.html" />
+    <link rel="prev" title="Comparisons" href="comparisons.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Comparisons</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Coefficients</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#updating-the-coefficients">Updating the Coefficients</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#updating-the-coefficients-via-cli">Updating the Coefficients via CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#selecting-a-coefficients-version">Selecting a Coefficients Version</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#choosing-the-coefficients-version-via-cli">Choosing the Coefficients Version via CLI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Coefficients</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/user_guide/coefficients.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="coefficients">
+<h1>Coefficients<a class="headerlink" href="#coefficients" title="Link to this heading"></a></h1>
+<p>LIME Toolbox requires coefficients to run its LIME model equations for reflectance (and consequently irradiance) and
+for the Degree of Lunar Polarisation (DoLP).</p>
+<p>These models are continuously updated, improving their accuracy with each new coefficient release.</p>
+<section id="updating-the-coefficients">
+<h2>Updating the Coefficients<a class="headerlink" href="#updating-the-coefficients" title="Link to this heading"></a></h2>
+<p>To update the coefficients, navigate to “Coefficients → Download updated coefficients” in the action menu bar.</p>
+<p>A window will appear indicating that the coefficient download is in progress, as shown in <a class="reference internal" href="#fig-21">Figure 21</a>.</p>
+<figure class="align-center" id="fig-21">
+<img alt="Window displaying coefficients download in progress" src="../../_images/downloading_coefficients.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 21:</i> </span><span class="caption-text">Coefficients download in progress.</span><a class="headerlink" href="#fig-21" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Once the process is complete, the window will display:</p>
+<ul class="simple">
+<li><p>The number of new coefficient versions downloaded.</p></li>
+<li><p>Any errors encountered during the download.</p></li>
+</ul>
+<p>The result may indicate that new coefficients were downloaded (<a class="reference internal" href="#fig-22">Figure 22</a>)
+or that no new updates were available (<a class="reference internal" href="#fig-23">Figure 23</a>).
+If there was an issue connecting to the coefficients server, an error message will be displayed (<a class="reference internal" href="#fig-24">Figure 24</a>).</p>
+<figure class="align-center" id="fig-22">
+<img alt="Window displaying that there was one new coefficient version" src="../../_images/download_coeffs_one.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 22:</i> </span><span class="caption-text">One new coefficient version.</span><a class="headerlink" href="#fig-22" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="fig-23">
+<img alt="Window displaying that there were no new coefficients" src="../../_images/download_coeffs_none.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 23:</i> </span><span class="caption-text">No new coefficient updates available.</span><a class="headerlink" href="#fig-23" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="fig-24">
+<img alt="Window displaying that there were errors downloading the coefficients" src="../../_images/download_coeffs_err.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 24:</i> </span><span class="caption-text">Error downloading the coefficients.</span><a class="headerlink" href="#fig-24" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="updating-the-coefficients-via-cli">
+<h3>Updating the Coefficients via CLI<a class="headerlink" href="#updating-the-coefficients-via-cli" title="Link to this heading"></a></h3>
+<p>Users can also update coefficients via the command-line interface (CLI) using the <code class="docutils literal notranslate"><span class="pre">-u</span></code> or <code class="docutils literal notranslate"><span class="pre">--update</span></code> option:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-u
+</pre></div>
+</div>
+</section>
+</section>
+<section id="selecting-a-coefficients-version">
+<h2>Selecting a Coefficients Version<a class="headerlink" href="#selecting-a-coefficients-version" title="Link to this heading"></a></h2>
+<p>To use a specific coefficient version, navigate to “Coefficients → Select coefficients” in the action menu bar.</p>
+<p>A window will appear, displaying a dropdown menu containing all available coefficient versions (<a class="reference internal" href="#fig-25">Figure 25</a>).
+To change the version:</p>
+<ol class="arabic simple">
+<li><p>Open the dropdown menu.</p></li>
+<li><p>Select the desired coefficient version.</p></li>
+<li><p>Click “SAVE” to confirm the selection.</p></li>
+</ol>
+<figure class="align-center" id="fig-25">
+<img alt="Window displaying coefficient selection options" src="../../_images/select_coefficients.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 25:</i> </span><span class="caption-text">Selecting a coefficient version.</span><a class="headerlink" href="#fig-25" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="choosing-the-coefficients-version-via-cli">
+<h3>Choosing the Coefficients Version via CLI<a class="headerlink" href="#choosing-the-coefficients-version-via-cli" title="Link to this heading"></a></h3>
+<p>To choose a different coefficient version through the CLI, use the <code class="docutils literal notranslate"><span class="pre">-C</span></code> or <code class="docutils literal notranslate"><span class="pre">--coefficients</span></code> option:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-C<span class="w"> </span>SELECTED_COEFF_VERSION_NAME
+</pre></div>
+</div>
+<p>This updates the coefficient version for all subsequent simulations and applies immediately to the
+current simulation if used alongside any simulation or comparison option.</p>
+<p><strong>Example:</strong>
+To select the coefficient version <code class="docutils literal notranslate"><span class="pre">20231120_v1</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-C<span class="w"> </span>20231120_v1
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comparisons.html" class="btn btn-neutral float-left" title="Comparisons" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="formats.html" class="btn btn-neutral float-right" title="File Formats" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

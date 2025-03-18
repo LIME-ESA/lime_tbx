@@ -1,0 +1,7 @@
+lime\_tbx.business.lime\_algorithms.lime.elref module
+=====================================================
+
+.. automodule:: lime_tbx.business.lime_algorithms.lime.elref
+   :members:
+   :undoc-members:
+   :show-inheritance:

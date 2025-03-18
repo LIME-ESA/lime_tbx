@@ -1,0 +1,16 @@
+lime\_tbx.application.coefficients package
+==========================================
+
+.. automodule:: lime_tbx.application.coefficients
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.application.coefficients.access_data
+   lime_tbx.application.coefficients.update

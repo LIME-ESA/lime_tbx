@@ -1,0 +1,7 @@
+lime\_tbx.presentation.gui.interpoptions module
+===============================================
+
+.. automodule:: lime_tbx.presentation.gui.interpoptions
+   :members:
+   :undoc-members:
+   :show-inheritance:

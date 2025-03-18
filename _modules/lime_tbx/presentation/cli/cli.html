@@ -1,0 +1,1427 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.presentation.cli.cli &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.presentation.cli.cli</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.presentation.cli.cli</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Command Line Interface (CLI) module for the LIME Toolbox.</span>
+
+<span class="sd">This module handles the interpretation of command-line options and executes </span>
+<span class="sd">the appropriate actions, including simulations, comparisons, and data exports.</span>
+
+<span class="sd">It supports:</span>
+<span class="sd">- Simulations of lunar irradiance, reflectance, and polarization.</span>
+<span class="sd">- Comparisons with observational data.</span>
+<span class="sd">- Output in various formats (CSV, Graph, NetCDF).</span>
+<span class="sd">- Updating coefficient datasets.</span>
+<span class="sd">- Managing interpolation and spectral response function settings.</span>
+
+<span class="sd">This module serves as the entry point for the command-line execution of LIME TBX.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># TODO: Refactor module. Split parsing from calculating, multiple submodules. Study migrating</span>
+<span class="c1"># to a library that already implements arguments handling.</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CustomPoint</span><span class="p">,</span>
+    <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="n">LGLODComparisonData</span><span class="p">,</span>
+    <span class="n">LimeException</span><span class="p">,</span>
+    <span class="n">LunarObservation</span><span class="p">,</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">SatellitePoint</span><span class="p">,</span>
+    <span class="n">SurfacePoint</span><span class="p">,</span>
+    <span class="n">EocfiPath</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompFields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.lime_simulation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LimeSimulation</span><span class="p">,</span>
+    <span class="n">ILimeSimulation</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.comparison</span><span class="w"> </span><span class="kn">import</span> <span class="n">comparison</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.comparison.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">sort_by_mpa</span><span class="p">,</span>
+    <span class="n">average_comparisons</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.filedata</span><span class="w"> </span><span class="kn">import</span> <span class="n">moon</span><span class="p">,</span> <span class="n">srf</span> <span class="k">as</span> <span class="n">srflib</span><span class="p">,</span> <span class="n">csv</span><span class="p">,</span> <span class="n">lglod</span> <span class="k">as</span> <span class="n">lglodlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.coefficients.update</span><span class="w"> </span><span class="kn">import</span> <span class="n">Update</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.spectral_integration.spectral_integration</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_srf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.interpolation.interp_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">export</span>
+
+
+<span class="n">OPTIONS</span> <span class="o">=</span> <span class="s2">&quot;hvude:l:s:co:f:t:C:i:&quot;</span>
+<span class="n">LONG_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;help&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;update&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;debug&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;earth=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lunar=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;satellite=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comparison&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;output=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;srf=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timeseries=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;coefficients=&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;interpolation=&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">_ERROR_RINDEX_BOTH_DOT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;When creating output as CSV or GRAPH </span><span class="se">\</span>
+<span class="s2">files for both DT and MPA, the full CSV/GRAPH filepaths must be </span><span class="se">\</span>
+<span class="s2">explictly written, including the extension (.csv, .png, ...).</span>
+<span class="s2">Another solution is to select the CSVD/GRAPHD option where one </span><span class="se">\</span>
+<span class="s2">only has to specify the output directory path.</span>
+<span class="s2">Problematic filepath: &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="eprint">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.eprint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">eprint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prints messages to the standard error (stderr).</span>
+
+<span class="sd">    This function behaves like the built-in `print`, but directs output</span>
+<span class="sd">    to `sys.stderr` instead of `sys.stdout`. It supports the same arguments</span>
+<span class="sd">    as `print`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *args : Any</span>
+<span class="sd">        Positional arguments passed to `print`, representing the values to be printed.</span>
+<span class="sd">    **kwargs : Any</span>
+<span class="sd">        Keyword arguments passed to `print` (e.g., `sep`, `end`, `flush`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<span class="n">COMP_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DT&quot;</span><span class="p">,</span> <span class="s2">&quot;MPA&quot;</span><span class="p">,</span> <span class="s2">&quot;BOTH&quot;</span><span class="p">,</span> <span class="s2">&quot;CHANNEL&quot;</span><span class="p">,</span> <span class="s2">&quot;CHANNEL_MEAN&quot;</span><span class="p">]</span>
+<span class="n">IMAGE_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;svg&quot;</span><span class="p">]</span>
+<span class="n">COMP_DIFF_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rel&quot;</span><span class="p">,</span> <span class="s2">&quot;perc&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="print_help">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.print_help">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_help</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays the command-line help message.</span>
+
+<span class="sd">    This function prints usage instructions and a description of available options</span>
+<span class="sd">    for the LIME Toolbox CLI. It explains how to run simulations, comparisons,</span>
+<span class="sd">    and specify output formats.</span>
+
+<span class="sd">    The available options include:</span>
+<span class="sd">    - `-h, --help`: Show this help message.</span>
+<span class="sd">    - `-v, --version`: Display the version number.</span>
+<span class="sd">    - `-u, --update`: Update the coefficients.</span>
+<span class="sd">    - `-e, --earth`: Perform simulations from a geographic point.</span>
+<span class="sd">    - `-l, --lunar`: Perform simulations from a selenographic point.</span>
+<span class="sd">    - `-s, --satellite`: Perform simulations from a satellite.</span>
+<span class="sd">    - `-c, --comparison`: Perform comparisons using GLOD observation files.</span>
+<span class="sd">    - `-o, --output`: Define output format and file paths.</span>
+<span class="sd">    - `-f, --srf`: Select a Spectral Response Function (SRF) file.</span>
+<span class="sd">    - `-t, --timeseries`: Use a CSV file with multiple datetimes.</span>
+<span class="sd">    - `-C, --coefficients`: Change the coefficients version used by the toolbox.</span>
+<span class="sd">    - `-i, --interpolation-settings`: Modify interpolation settings via JSON input.</span>
+
+<span class="sd">    The function also provides examples of valid input formats and highlights</span>
+<span class="sd">    any constraints or dependencies for specific options.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compsel</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">COMP_KEYS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="n">imsel</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_EXTENSIONS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="n">compdiffsel</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">COMP_DIFF_KEYS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;The lime toolbox performs simulations of lunar irradiance, reflectance and </span><span class="se">\</span>
+<span class="s2">polarisation for a given point and datetime. It also performs comparisons for some given </span><span class="se">\</span>
+<span class="s2">observations files in GLOD format.</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;It won&#39;t work unless given only one of the options (-h|-e|-l|-s|-c).&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Options:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -h, --help</span><span class="se">\t\t</span><span class="s2"> Displays the help message.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -v, --version</span><span class="se">\t\t</span><span class="s2"> Displays the version name.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -u, --update</span><span class="se">\t\t</span><span class="s2"> Updates the coefficients.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -e, --earth</span><span class="se">\t\t</span><span class="s2"> Performs simulations from a geographic point.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> -e lat_deg,lon_deg,height_km,datetime_isoformat&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -l, --lunar</span><span class="se">\t\t</span><span class="s2"> Performs a simulation from a selenographic point.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,</span><span class="se">\</span>
+<span class="s2">selen_sun_lon,moon_phase_angle&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -s, --satellite</span><span class="se">\t</span><span class="s2"> Performs simulations from a satellite point.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> -s sat_name,datetime_isoformat&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  -c, --comparison</span><span class="se">\t</span><span class="s2"> Performs comparisons from observations files in GLOD format.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t\t</span><span class="s1"> -c &quot;input_glod1.nc input_glod2.nc ...&quot;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -o, --output</span><span class="se">\t\t</span><span class="s2"> Select the output path and format.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> If it&#39;s a simulation:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   GRAPH: -o graph,</span><span class="si">{</span><span class="n">imsel</span><span class="si">}</span><span class="s2">,refl,irr,polar&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   LGLOD (netcdf): -o nc,output_lglod.nc&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> If it&#39;s a comparison:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   GRAPH: -o graph,</span><span class="si">{</span><span class="n">imsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compdiffsel</span><span class="si">}</span><span class="s2">,output&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t\t</span><span class="s2"> output:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t\t\t</span><span class="s2"> Compare not by channel: comparison_channel1,comparison_channel2,...&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t\t\t</span><span class="s2"> Compare by channel: comparison&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   CSV: -o csv,</span><span class="si">{</span><span class="n">compsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compdiffsel</span><span class="si">}</span><span class="s2">,output&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t\t</span><span class="s2"> output:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t\t\t</span><span class="s2"> Compare not by channel: comparison_channel1.csv,comparison_channel2.csv,...&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t\t\t</span><span class="s2"> Compare by channel: comparison.csv&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   GRAPH directory: -o graphd,</span><span class="si">{</span><span class="n">imsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compdiffsel</span><span class="si">}</span><span class="s2">,comparison_folder&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   CSV directory: -o csvd,</span><span class="si">{</span><span class="n">compsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compdiffsel</span><span class="si">}</span><span class="s2">,comparison_folder&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   LGLOD (netcdf): -o nc,output_lglod.nc&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  -f, --srf</span><span class="se">\t\t</span><span class="s2"> Select the file that contains the Spectral Response Function </span><span class="se">\</span>
+<span class="s2">in GLOD format.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  -t, --timeseries</span><span class="se">\t</span><span class="s2"> Select a file with multiple datetimes instead of </span><span class="se">\</span>
+<span class="s2">inputing directly only one datetime. Valid only if the main option is -e or -s.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  -C, --coefficients</span><span class="se">\t</span><span class="s2"> Change the coefficients version used by the TBX, </span><span class="se">\</span>
+<span class="s2">for this execution and the next ones until it&#39;s changed again.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;  -i, --interpolation-settings</span><span class="se">\t</span><span class="s2"> Change the interpolation settings. The </span><span class="se">\</span>
+<span class="s2">input data shall be a json string containing at least one of the following parameters:&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   interp_spectrum: Sets the interpolation spectrum. The valid </span><span class="se">\</span>
+<span class="s2">values are &#39;ASD&#39; and &#39;Apollo 16 + Breccia&#39;.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   interp_srf: Sets the output SRF. The valid values are &#39;asd&#39;, </span><span class="se">\</span>
+<span class="s2">&#39;interpolated_gaussian&#39; and &#39;interpolated_triangle&#39;.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   show_interp_spectrum: Sets if the graphs should show the spectrum </span><span class="se">\</span>
+<span class="s2">used for interpolation. The valid values are &#39;True&#39; and &#39;False&#39;.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   skip_uncertainties: Sets if the ToolBox should skip the </span><span class="se">\</span>
+<span class="s2">uncertainties calculations. The valid values are &#39;True&#39; and &#39;False&#39;.&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   show_cimel_points: Sets if the graphs should show the CIMEL </span><span class="se">\</span>
+<span class="s2">anchor points used for interpolation. The valid values are &#39;True&#39; and &#39;False&#39;.&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="print_version">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.print_version">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_version</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prints the package version name to the standard output.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">VERSION_NAME</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CLIError">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLIError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CLIError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception raised for all errors encountered during command-line argument processing.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ParsingError">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.ParsingError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParsingError</span><span class="p">(</span><span class="n">CLIError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception raised for errors encountered during command-line argument parsing.</span>
+
+<span class="sd">    This exception is used to indicate issues such as:</span>
+<span class="sd">    - Invalid or unrecognized argument values.</span>
+<span class="sd">    - Missing required parameters.</span>
+<span class="sd">    - Incorrect formatting of input arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_chosen_diff</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompFields</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses the difference metric parameter for comparisons.</span>
+
+<span class="sd">    Validates if the input parameter is one of the allowed difference keys, present</span>
+<span class="sd">    in `COMP_DIFF_KEYS`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : str</span>
+<span class="sd">        The input string representing the difference type.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    CompFields</span>
+<span class="sd">        The corresponding `CompFields` enumeration.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ParsingError</span>
+<span class="sd">        If the parameter is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COMP_DIFF_KEYS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid difference metric </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">. Expected one of </span><span class="si">{</span><span class="n">COMP_DIFF_KEYS</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">CompFields</span><span class="o">.</span><span class="n">DIFF_NONE</span>
+    <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="n">COMP_DIFF_KEYS</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">CompFields</span><span class="o">.</span><span class="n">DIFF_REL</span>
+    <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="n">COMP_DIFF_KEYS</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">CompFields</span><span class="o">.</span><span class="n">DIFF_PERC</span>
+    <span class="k">return</span> <span class="n">chosen_diff</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_comp_key</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses the comparison key from the CLI argument.</span>
+
+<span class="sd">    Ensures that the comparison key is a valid mode, which are</span>
+<span class="sd">    persent in `COMP_KEY`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : str</span>
+<span class="sd">        The input string representing the comparison key.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    export.ComparisonKey</span>
+<span class="sd">        The corresponding `ComparisonKey` enumeration.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ParsingError</span>
+<span class="sd">        If the parameter is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">COMP_KEYS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid comparison key </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">. Expected one of </span><span class="si">{</span><span class="n">COMP_KEYS</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">comp_key</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">comp_key</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_check_img_extension</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validates and returns a supported image format.</span>
+
+<span class="sd">    Ensures that the provided file extension is one of the supported image formats,</span>
+<span class="sd">    which are the ones in `IMAGE_EXTENSIONS`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : str</span>
+<span class="sd">        The input string representing the image format.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The validated image format.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ParsingError</span>
+<span class="sd">        If the format is not supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">IMAGE_EXTENSIONS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Error: Graph format not detected. It must be one of the following: </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_EXTENSIONS</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">param</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_filepaths_from_img_extension</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filenames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates file paths with the given image format extension.</span>
+
+<span class="sd">    Appends the validated image extension to each filename in the list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : str</span>
+<span class="sd">        The desired image format (e.g., &quot;png&quot;, &quot;jpg&quot;).</span>
+<span class="sd">    filenames : List[str]</span>
+<span class="sd">        List of base filenames (without extensions).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        List of filenames with the correct extension.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ParsingError</span>
+<span class="sd">        If the provided format is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">_parse_check_img_extension</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+    <span class="n">filepaths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filenames</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">filepaths</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_output_params</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_comparison</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses and validates the output parameters for simulation or comparison.</span>
+
+<span class="sd">    Determines the export type based on the user input and returns the appropriate</span>
+<span class="sd">    `ExportData` subclass. Supports:</span>
+<span class="sd">    - CSV (`ExportCSV`, `ExportComparisonCSV`)</span>
+<span class="sd">    - Graph (`ExportGraph`, `ExportComparisonGraph`)</span>
+<span class="sd">    - NetCDF (`ExportNetCDF`)</span>
+<span class="sd">    - Directory-based export (`ExportComparisonCSVDir`, `ExportComparisonGraphDir`)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arg : str</span>
+<span class="sd">        The full CLI argument string containing output specifications.</span>
+<span class="sd">    is_comparison : bool</span>
+<span class="sd">        Whether the current operation is a comparison.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    export.ExportData</span>
+<span class="sd">        The corresponding export configuration object.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ParsingError</span>
+<span class="sd">        If the output parameters are invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">splitted</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="n">o_type</span> <span class="o">=</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_comparison</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o csv,...&quot;</span><span class="p">)</span>
+            <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportCSV</span><span class="p">(</span>
+                <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o csv,...&quot;</span><span class="p">)</span>
+            <span class="n">comp_key</span> <span class="o">=</span> <span class="n">_parse_comp_key</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">_parse_chosen_diff</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">(</span>
+                <span class="n">comp_key</span><span class="p">,</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">:],</span> <span class="n">chosen_diff</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;graph&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_comparison</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o graph,...&quot;</span><span class="p">)</span>
+            <span class="n">filepaths</span> <span class="o">=</span> <span class="n">_parse_filepaths_from_img_extension</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportGraph</span><span class="p">(</span><span class="o">*</span><span class="n">filepaths</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o graph,...&quot;</span><span class="p">)</span>
+            <span class="n">comp_key</span> <span class="o">=</span> <span class="n">_parse_comp_key</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">filepaths</span> <span class="o">=</span> <span class="n">_parse_filepaths_from_img_extension</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+            <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">_parse_chosen_diff</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraph</span><span class="p">(</span>
+                <span class="n">comp_key</span><span class="p">,</span>
+                <span class="n">filepaths</span><span class="p">,</span>
+                <span class="n">chosen_diff</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;nc&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o nc,...&quot;</span><span class="p">)</span>
+        <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportNetCDF</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;csvd&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_comparison</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: csvd output is only available for comparisons.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o csvd,...&quot;</span><span class="p">)</span>
+        <span class="n">comp_key</span> <span class="o">=</span> <span class="n">_parse_comp_key</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">_parse_chosen_diff</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span><span class="p">(</span><span class="n">comp_key</span><span class="p">,</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">chosen_diff</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;graphd&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_comparison</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                <span class="s2">&quot;Error: graphd output is only available for comparisons.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o graphd,...&quot;</span><span class="p">)</span>
+        <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">_parse_check_img_extension</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">comp_key</span> <span class="o">=</span> <span class="n">_parse_comp_key</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">chosen_diff</span> <span class="o">=</span> <span class="n">_parse_chosen_diff</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraphDir</span><span class="p">(</span>
+            <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">comp_key</span><span class="p">,</span>
+            <span class="n">splitted</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+            <span class="n">chosen_diff</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">export_data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_load_timeseries</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
+    <span class="n">timeseries_file</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">timeseries</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="s2">&quot;--earth&quot;</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--satellite&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">timeseries</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">read_datetimes</span><span class="p">(</span><span class="n">timeseries_file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CLIError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading timeseries file: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CLIError</span><span class="p">(</span><span class="s2">&quot;Error: Timeseries file does not exist.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">timeseries</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_datetime</span><span class="p">(</span><span class="n">dtstr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">dtstr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dt</span>
+
+
+<div class="viewcode-block" id="CLI">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CLI</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Command Line Interface handler for LIME TBX.</span>
+
+<span class="sd">    This class processes command-line arguments, performs simulations, and manages</span>
+<span class="sd">    comparisons. It serves as the main interface for users executing the toolbox</span>
+<span class="sd">    from the command line.</span>
+
+<span class="sd">    It contains a LimeSimulation instance that handles and stores the asked calculations</span>
+<span class="sd">    that then will be retrieved for export.</span>
+
+<span class="sd">    Responsibilities:</span>
+<span class="sd">    - Simulations of lunar irradiance, reflectance, and polarization.</span>
+<span class="sd">    - Comparisons with observational data.</span>
+<span class="sd">    - Output in various formats (CSV, Graph, NetCDF).</span>
+<span class="sd">    - Updating coefficient datasets.</span>
+<span class="sd">    - Managing interpolation and spectral response function settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">eocfi_path</span><span class="p">:</span> <span class="n">EocfiPath</span><span class="p">,</span>
+        <span class="n">selected_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the CLI instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kernels_path : KernelsPath</span>
+<span class="sd">            Path to the SPICE kernels required for calculations.</span>
+<span class="sd">        eocfi_path : EocfiPath</span>
+<span class="sd">            Path to the EO-CFI data directories used for orbit calculations.</span>
+<span class="sd">        selected_version : str, optional</span>
+<span class="sd">            Selected coefficients version (default: None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span> <span class="o">=</span> <span class="n">kernels_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span> <span class="o">=</span> <span class="n">eocfi_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">SettingsManager</span><span class="p">(</span><span class="n">selected_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="p">:</span> <span class="n">ILimeSimulation</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="p">(</span>
+            <span class="n">eocfi_path</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_default_srf</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updater</span> <span class="o">=</span> <span class="n">Update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">CLIExporter</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CLI.load_srf">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.load_srf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_srf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srf_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads the Spectral Response Function (SRF) from a specified file.</span>
+
+<span class="sd">        If no file is provided, it loads the default SRF.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        srf_file : str</span>
+<span class="sd">            Path to the SRF file. If an empty string is given, it loads the default SRF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">srf_file</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_default_srf</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srf</span> <span class="o">=</span> <span class="n">srflib</span><span class="o">.</span><span class="n">read_srf</span><span class="p">(</span><span class="n">srf_file</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_irradiance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates lunar irradiance at a given point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The geographic, lunar, or satellite location for the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">def_srf</span> <span class="o">=</span> <span class="n">get_default_srf</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">update_irradiance</span><span class="p">(</span>
+            <span class="n">def_srf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_cimel_coef</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_reflectance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates lunar reflectance at a given point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The geographic, lunar, or satellite location for the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">def_srf</span> <span class="o">=</span> <span class="n">get_default_srf</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">update_reflectance</span><span class="p">(</span>
+            <span class="n">def_srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_cimel_coef</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_polarisation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates lunar polarization at a given point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The geographic, lunar, or satellite location for the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">def_srf</span> <span class="o">=</span> <span class="n">get_default_srf</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">update_polarisation</span><span class="p">(</span>
+            <span class="n">def_srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_polar_coef</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs all calculations (irradiance, reflectance, and polarization)</span>
+<span class="sd">        for a given location.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The location where calculations should be performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_reflectance</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_irradiance</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_polarisation</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CLI.calculate_geographic">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.calculate_geographic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_geographic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
+        <span class="n">export_data</span><span class="p">:</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportData</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a simulation from a geographic location, ahnd</span>
+<span class="sd">        export the results as specified.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lat : float</span>
+<span class="sd">            Latitude in degrees.</span>
+<span class="sd">        lon : float</span>
+<span class="sd">            Longitude in degrees.</span>
+<span class="sd">        height : float</span>
+<span class="sd">            Height above sea level in meters.</span>
+<span class="sd">        dt : datetime or List[datetime]</span>
+<span class="sd">            The timestamp(s) for the simulation.</span>
+<span class="sd">        export_data : export.ExportData</span>
+<span class="sd">            The export configuration.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If something wrong happens during export.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">SurfacePoint</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_all</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">export_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CLI.calculate_satellital">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.calculate_satellital">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_satellital</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sat_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
+        <span class="n">export_data</span><span class="p">:</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportData</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a simulation from a satellite&#39;s perspective.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sat_name : str</span>
+<span class="sd">            Name of the satellite.</span>
+<span class="sd">        dt : datetime or List[datetime]</span>
+<span class="sd">            The timestamp(s) for the simulation.</span>
+<span class="sd">        export_data : export.ExportData</span>
+<span class="sd">            The export configuration.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If something wrong happens during export.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">SatellitePoint</span><span class="p">(</span><span class="n">sat_name</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_all</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">export_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CLI.calculate_selenographic">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.calculate_selenographic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_selenographic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">distance_sun_moon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">distance_observer_moon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">selen_obs_lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">selen_obs_lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">selen_sun_lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">moon_phase_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">export_data</span><span class="p">:</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportData</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a simulation from a selenographic (Moon-based) perspective.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        distance_sun_moon : float</span>
+<span class="sd">            Distance between the Sun and the Moon (meters).</span>
+<span class="sd">        distance_observer_moon : float</span>
+<span class="sd">            Distance between the observer and the Moon (meters).</span>
+<span class="sd">        selen_obs_lat : float</span>
+<span class="sd">            Observer&#39;s latitude on the Moon (degrees).</span>
+<span class="sd">        selen_obs_lon : float</span>
+<span class="sd">            Observer&#39;s longitude on the Moon (degrees).</span>
+<span class="sd">        selen_sun_lon : float</span>
+<span class="sd">            Sub-solar longitude on the Moon (degrees).</span>
+<span class="sd">        moon_phase_angle : float</span>
+<span class="sd">            Moon phase angle (degrees).</span>
+<span class="sd">        export_data : export.ExportData</span>
+<span class="sd">            The export configuration.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ExportError</span>
+<span class="sd">            If something wrong happens during export.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">CustomPoint</span><span class="p">(</span>
+            <span class="n">distance_sun_moon</span><span class="p">,</span>
+            <span class="n">distance_observer_moon</span><span class="p">,</span>
+            <span class="n">selen_obs_lat</span><span class="p">,</span>
+            <span class="n">selen_obs_lon</span><span class="p">,</span>
+            <span class="n">selen_sun_lon</span><span class="p">,</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">moon_phase_angle</span><span class="p">),</span>
+            <span class="n">moon_phase_angle</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_all</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">export_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_observation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">:</span> <span class="n">LunarObservation</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pob</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaded_moons</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">obs</span><span class="o">.</span><span class="n">dt</span> <span class="o">&lt;</span> <span class="n">pob</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loaded_moons</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loaded_moons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CLI.calculate_comparisons">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.calculate_comparisons">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_comparisons</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">ed</span><span class="p">:</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparison</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs comparisons between simulation results and observational data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_files : List[str]</span>
+<span class="sd">            List of file paths containing observational data.</span>
+<span class="sd">        ed : export.ExportComparison</span>
+<span class="sd">            The comparison export configuration.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        LimeException</span>
+<span class="sd">            If the observation data is not valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loaded_moons</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LunarObservation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">input_files</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_observation</span><span class="p">(</span>
+                <span class="n">moon</span><span class="o">.</span><span class="n">read_moon_obs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaded_moons</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="s2">&quot;No observations given. Aborting.&quot;</span><span class="p">)</span>
+        <span class="n">mos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded_moons</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraph</span>
+        <span class="p">):</span>
+            <span class="n">ch_names_obs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">ch_name</span> <span class="k">for</span> <span class="n">mo</span> <span class="ow">in</span> <span class="n">mos</span> <span class="k">for</span> <span class="n">ch_name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">mo</span><span class="o">.</span><span class="n">ch_irrs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">comparison_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">CHANNEL_MEAN</span><span class="p">,</span>
+            <span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ch_names_obs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_files</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span>
+                    <span class="s2">&quot;The amount of export files given is not enough. There are more channels.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">mo</span> <span class="ow">in</span> <span class="n">mos</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mo</span><span class="o">.</span><span class="n">check_valid_srf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">):</span>
+                <span class="n">srf_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="o">.</span><span class="n">get_channels_names</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mo</span><span class="o">.</span><span class="n">ch_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">srf_names</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mo</span><span class="o">.</span><span class="n">ch_names</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="n">mo</span><span class="o">.</span><span class="n">ch_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">mo</span><span class="o">.</span><span class="n">ch_irrs</span><span class="p">:</span>
+                            <span class="n">mo</span><span class="o">.</span><span class="n">ch_irrs</span><span class="p">[</span><span class="n">srf_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mo</span><span class="o">.</span><span class="n">ch_irrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">mo</span><span class="o">.</span><span class="n">ch_names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">mo</span><span class="o">.</span><span class="n">ch_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">srf_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span>
+                        <span class="s2">&quot;SRF file not valid for the chosen Moon observations file.&quot;</span>
+                    <span class="p">)</span>
+        <span class="n">co</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">Comparison</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">)</span>
+        <span class="n">cimel_coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_cimel_coef</span><span class="p">()</span>
+        <span class="n">comps</span> <span class="o">=</span> <span class="n">co</span><span class="o">.</span><span class="n">get_simulations</span><span class="p">(</span><span class="n">mos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">,</span> <span class="n">cimel_coef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="p">)</span>
+        <span class="c1"># EXPORT</span>
+        <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_skip_uncertainties</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportNetCDF</span><span class="p">):</span>
+            <span class="n">vers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">lglod</span> <span class="o">=</span> <span class="n">LGLODComparisonData</span><span class="p">(</span>
+                <span class="n">comps</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="o">.</span><span class="n">get_channels_names</span><span class="p">(),</span>
+                <span class="n">mos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data_source</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">(),</span>
+                <span class="n">skip_uncs</span><span class="p">,</span>
+                <span class="n">vers</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">lglodlib</span><span class="o">.</span><span class="n">write_comparison</span><span class="p">(</span>
+                <span class="n">lglod</span><span class="p">,</span>
+                <span class="n">ed</span><span class="o">.</span><span class="n">output_file</span><span class="p">,</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraphDir</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">ch_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="o">.</span><span class="n">get_channels_names</span><span class="p">()</span>
+            <span class="n">file_index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">is_both</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">comparison_key</span> <span class="o">==</span> <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">BOTH</span>
+            <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">comparison_key</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">DT</span><span class="p">,</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ch_names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Irradiance (Wm⁻²nm⁻¹)&quot;</span>
+                        <span class="n">ylabels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Observed </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Simulated </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraph</span>
+                        <span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">output_files</span><span class="p">[</span><span class="n">file_index</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span><span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">ch</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraphDir</span><span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">ch</span><span class="p">),</span> <span class="n">ed</span><span class="o">.</span><span class="n">extension</span>
+                            <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">is_both</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="n">_ERROR_RINDEX_BOTH_DOT</span> <span class="o">+</span> <span class="n">output</span><span class="p">)</span>
+                            <span class="n">idx</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">rindex</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.dt&quot;</span> <span class="o">+</span> <span class="n">output</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span>
+                        <span class="p">):</span>
+                            <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;UTC Date&quot;</span>
+                            <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_comparison</span><span class="p">(</span>
+                                <span class="n">comps</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabels</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">sp_name</span><span class="p">,</span>
+                                <span class="n">skip_uncs</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;UTC Date&quot;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export_comparison_graph</span><span class="p">(</span>
+                                <span class="n">comps</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabels</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">ch</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="n">file_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">file_index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">comparison_key</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">MPA</span><span class="p">,</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">mpa_comps</span> <span class="o">=</span> <span class="n">sort_by_mpa</span><span class="p">(</span><span class="n">comps</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ch_names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mpa_comps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Irradiance (Wm⁻²nm⁻¹)&quot;</span>
+                        <span class="n">ylabels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Observed </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Simulated </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraph</span>
+                        <span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">output_files</span><span class="p">[</span><span class="n">file_index</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span><span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">ch</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraphDir</span><span class="p">):</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">ch</span><span class="p">),</span> <span class="n">ed</span><span class="o">.</span><span class="n">extension</span>
+                            <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">is_both</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="n">_ERROR_RINDEX_BOTH_DOT</span> <span class="o">+</span> <span class="n">output</span><span class="p">)</span>
+                            <span class="n">idx</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">rindex</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.mpa&quot;</span> <span class="o">+</span> <span class="n">output</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span>
+                        <span class="p">):</span>
+                            <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Moon Phase Angle (degrees)&quot;</span>
+                            <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_comparison</span><span class="p">(</span>
+                                <span class="n">mpa_comps</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabels</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">sp_name</span><span class="p">,</span>
+                                <span class="n">skip_uncs</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Moon phase angle (degrees)&quot;</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export_comparison_graph</span><span class="p">(</span>
+                                <span class="n">mpa_comps</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabel</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">ch</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="n">file_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">comparison_key</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">,</span>
+                <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">CHANNEL_MEAN</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">wlcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="o">.</span><span class="n">get_channels_centers</span><span class="p">()</span>
+                <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">observed_signal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
+                <span class="n">wlcs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">wlcs</span><span class="p">,</span> <span class="n">comps</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+                <span class="n">comps</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Wavelength (nm)&quot;</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Irradiance (Wm⁻²nm⁻¹)&quot;</span>
+                <span class="n">ylabels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Observed </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Simulated </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                    <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraph</span>
+                <span class="p">):</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">output_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span><span class="p">):</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;allchannels&quot;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonGraphDir</span><span class="p">):</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;allchannels&quot;</span><span class="p">),</span> <span class="n">ed</span><span class="o">.</span><span class="n">extension</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">comparison_key</span> <span class="o">==</span> <span class="n">export</span><span class="o">.</span><span class="n">ComparisonKey</span><span class="o">.</span><span class="n">CHANNEL</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span>
+                        <span class="p">):</span>
+                            <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_comparison_bywlen</span><span class="p">(</span>
+                                <span class="n">comps</span><span class="p">,</span>
+                                <span class="n">wlcs</span><span class="p">,</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabels</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">sp_name</span><span class="p">,</span>
+                                <span class="n">skip_uncs</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export_comparison_bywlen_graph</span><span class="p">(</span>
+                                <span class="n">comps</span><span class="p">,</span>
+                                <span class="n">wlcs</span><span class="p">,</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabel</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">comp</span> <span class="o">=</span> <span class="n">average_comparisons</span><span class="p">(</span><span class="n">wlcs</span><span class="p">,</span> <span class="n">comps</span><span class="p">)</span>
+                        <span class="n">data_start</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])</span>
+                        <span class="n">data_end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">dts</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSV</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ed</span><span class="p">,</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportComparisonCSVDir</span>
+                        <span class="p">):</span>
+                            <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_comparison</span><span class="p">(</span>
+                                <span class="n">comp</span><span class="p">,</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabels</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="n">sp_name</span><span class="p">,</span>
+                                <span class="n">skip_uncs</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export_comparison_graph</span><span class="p">(</span>
+                                <span class="n">comp</span><span class="p">,</span>
+                                <span class="n">xlabel</span><span class="p">,</span>
+                                <span class="n">ylabel</span><span class="p">,</span>
+                                <span class="n">output</span><span class="p">,</span>
+                                <span class="n">version</span><span class="p">,</span>
+                                <span class="s2">&quot;All channels&quot;</span><span class="p">,</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">chosen_diff</span><span class="p">,</span>
+                                <span class="n">date_range</span><span class="o">=</span><span class="p">(</span><span class="n">data_start</span><span class="p">,</span> <span class="n">data_end</span><span class="p">),</span>
+                            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CLI.update_coefficients">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.update_coefficients">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks for and downloads coefficient dataset updates.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            - `0` if the update is successful or no updates are available.</span>
+<span class="sd">            - `1` if an error occurs during the update process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">updater</span><span class="p">:</span> <span class="n">Update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updater</span>
+        <span class="n">stopper_checker_true</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="n">updates</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">updater</span><span class="o">.</span><span class="n">check_for_updates</span><span class="p">():</span>
+                <span class="n">news</span><span class="p">,</span> <span class="n">fails</span> <span class="o">=</span> <span class="n">updater</span><span class="o">.</span><span class="n">download_coefficients</span><span class="p">(</span><span class="n">stopper_checker_true</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">updates</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error connecting to the server.</span><span class="se">\n</span><span class="s2">Check log for details.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Download finished.</span><span class="se">\n</span><span class="s2">There were no updates.&quot;</span>
+        <span class="k">if</span> <span class="n">updates</span><span class="p">:</span>
+            <span class="n">newsstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;There was 1 update&quot;</span>
+            <span class="n">failsstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;it failed&quot;</span>
+            <span class="k">if</span> <span class="n">news</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">newsstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;There were </span><span class="si">{</span><span class="n">news</span><span class="si">}</span><span class="s2"> updates&quot;</span>
+                <span class="n">failsstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fails</span><span class="si">}</span><span class="s2"> of them failed&quot;</span>
+            <span class="k">if</span> <span class="n">fails</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Download finished.</span><span class="se">\n</span><span class="si">{</span><span class="n">newsstring</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Download finished with errors.</span><span class="se">\n</span><span class="si">{</span><span class="n">newsstring</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">failsstring</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">updates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">reload_coeffs</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_interp_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># example: -i &#39;{&quot;interp_spectrum&quot;: &quot;ASD&quot;, &quot;skip_uncertainties&quot;: &quot;False&quot;, &quot;show_interp_spectrum&quot;: &quot;False&quot;, &quot;interp_srf&quot;: &quot;interpolated_gaussian&quot;}&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">interp_settings</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error parsing the interpolation settings </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">if</span> <span class="s2">&quot;interp_spectrum&quot;</span> <span class="ow">in</span> <span class="n">interp_settings</span><span class="p">:</span>
+            <span class="n">interp_spectrum</span> <span class="o">=</span> <span class="n">interp_settings</span><span class="p">[</span><span class="s2">&quot;interp_spectrum&quot;</span><span class="p">]</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_available_spectra_names</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">interp_spectrum</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Interpolation spectrum not recognized. Selected: </span><span class="si">{</span><span class="n">interp_spectrum</span><span class="si">}</span><span class="s2">. Available: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">select_interp_spectrum</span><span class="p">(</span><span class="n">interp_spectrum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;interp_srf&quot;</span> <span class="ow">in</span> <span class="n">interp_settings</span><span class="p">:</span>
+            <span class="n">interp_srf</span> <span class="o">=</span> <span class="n">interp_settings</span><span class="p">[</span><span class="s2">&quot;interp_srf&quot;</span><span class="p">]</span>
+            <span class="n">srf_translator</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">interp_data</span><span class="o">.</span><span class="n">SRF_DICT_SOLAR_DIALOG_SRF_TYPE</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">srf_translator</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">interp_srf</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Interpolation settings output SRF not recognized. Selected: </span><span class="si">{</span><span class="n">interp_srf</span><span class="si">}</span><span class="s2">. Available: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">select_interp_SRF</span><span class="p">(</span><span class="n">srf_translator</span><span class="p">[</span><span class="n">interp_srf</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;show_interp_spectrum&quot;</span> <span class="ow">in</span> <span class="n">interp_settings</span><span class="p">:</span>
+            <span class="n">show_interp_spectrum</span> <span class="o">=</span> <span class="n">interp_settings</span><span class="p">[</span><span class="s2">&quot;show_interp_spectrum&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">show_interp_spectrum</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Interpolation settings show_interp_spectrum value </span><span class="si">{</span><span class="n">show_interp_spectrum</span><span class="si">}</span><span class="s1"> not valid. Must be &quot;True&quot; or &quot;False&quot;&#39;</span>
+                <span class="p">)</span>
+            <span class="n">show_interp_spectrum</span> <span class="o">=</span> <span class="n">show_interp_spectrum</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">set_show_interp_spectrum</span><span class="p">(</span><span class="n">show_interp_spectrum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;skip_uncertainties&quot;</span> <span class="ow">in</span> <span class="n">interp_settings</span><span class="p">:</span>
+            <span class="n">skip_uncertainties</span> <span class="o">=</span> <span class="n">interp_settings</span><span class="p">[</span><span class="s2">&quot;skip_uncertainties&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">skip_uncertainties</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Interpolation settings skip_uncertainties value </span><span class="si">{</span><span class="n">skip_uncertainties</span><span class="si">}</span><span class="s1"> not valid. Must be &quot;True&quot; or &quot;False&quot;&#39;</span>
+                <span class="p">)</span>
+            <span class="n">skip_uncertainties</span> <span class="o">=</span> <span class="n">skip_uncertainties</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">set_skip_uncertainties</span><span class="p">(</span><span class="n">skip_uncertainties</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;show_cimel_points&quot;</span> <span class="ow">in</span> <span class="n">interp_settings</span><span class="p">:</span>
+            <span class="n">show_cimel_points</span> <span class="o">=</span> <span class="n">interp_settings</span><span class="p">[</span><span class="s2">&quot;show_cimel_points&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">show_cimel_points</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Interpolation settings show_cimel_points value </span><span class="si">{</span><span class="n">show_cimel_points</span><span class="si">}</span><span class="s1"> not valid. Must be &quot;True&quot; or &quot;False&quot;&#39;</span>
+                <span class="p">)</span>
+            <span class="n">show_cimel_points</span> <span class="o">=</span> <span class="n">show_cimel_points</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">set_show_cimel_points</span><span class="p">(</span><span class="n">show_cimel_points</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CLI.check_sys_args">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.check_sys_args">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_sys_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sysargs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates system arguments to prevent syntax errors.</span>
+
+<span class="sd">        Ensures flags are correctly formatted and separated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sysargs : List[str]</span>
+<span class="sd">            The raw command-line arguments.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            - `0` if validation passes.</span>
+<span class="sd">            - `1` if errors are found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the user has forgotten one dash, or has set one dash but all together</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sysargs</span>
+        <span class="p">):</span>
+            <span class="n">problem_flags</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">item</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sysargs</span>
+                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
+            <span class="p">]</span>
+            <span class="n">eprint</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The flags must be separated from their argument/s by at least one blank space, </span><span class="se">\</span>
+<span class="s2">and the flags set with only one dash &#39;-&#39; only have one letter. Problematic flags: </span><span class="si">{</span><span class="n">problem_flags</span><span class="si">}</span><span class="s2">.</span><span class="se">\n\</span>
+<span class="s2">Run &#39;lime -h&#39; for help.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_load_srf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="n">srf_file</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">if</span> <span class="n">srf_file</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">srf_file</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_srf</span><span class="p">(</span><span class="n">srf_file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CLIError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error: Error loading Spectral Response Function. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CLIError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: The given srf path &#39;</span><span class="si">{</span><span class="n">srf_file</span><span class="si">}</span><span class="s2">&#39; does not exist.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CLI.handle_input">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.handle_input">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Processes command-line options and executes the corresponding actions.</span>
+
+<span class="sd">        This function parses command-line arguments, validates inputs, and</span>
+<span class="sd">        dispatches execution to the appropriate simulation, comparison,</span>
+<span class="sd">        or configuration functions.</span>
+
+<span class="sd">        It supports:</span>
+<span class="sd">        - Simulations of lunar irradiance, reflectance, and polarization</span>
+<span class="sd">        from different perspectives (Earth, Lunar, Satellite).</span>
+<span class="sd">        - Comparisons with observational data in GLOD format.</span>
+<span class="sd">        - Output in multiple formats (CSV, Graph, NetCDF).</span>
+<span class="sd">        - Updating coefficient datasets.</span>
+<span class="sd">        - Managing interpolation and spectral response function settings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        opts : List[Tuple[str, str]]</span>
+<span class="sd">            A list of command-line options and their corresponding arguments.</span>
+<span class="sd">            Example: `[(&#39;-e&#39;, &#39;10.5,20.3,100,2023-02-18T12:00:00&#39;)]`</span>
+<span class="sd">        args : List[str]</span>
+<span class="sd">            Additional arguments passed after the options, primarily used for</span>
+<span class="sd">            input file paths in comparisons.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Exit status code:</span>
+<span class="sd">            - `0` for success.</span>
+<span class="sd">            - `1` for errors (invalid input, missing parameters, execution failures).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">export_data</span><span class="p">:</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportData</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">timeseries</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Check if it&#39;s comparison</span>
+        <span class="n">is_comparison</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--comparison&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">)</span>
+        <span class="n">mod_interp_settings</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># find settings data</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">):</span>
+                    <span class="n">print_help</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--version&quot;</span><span class="p">):</span>
+                    <span class="n">print_version</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="s2">&quot;--update&quot;</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_coefficients</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--output&quot;</span><span class="p">):</span>  <span class="c1"># Output</span>
+                    <span class="n">export_data</span> <span class="o">=</span> <span class="n">_parse_output_params</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">is_comparison</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--srf&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_load_srf</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--timeseries&quot;</span><span class="p">):</span>
+                    <span class="n">timeseries</span> <span class="o">=</span> <span class="n">_parse_load_timeseries</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span> <span class="s2">&quot;--coefficients&quot;</span><span class="p">):</span>
+                    <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="n">coef</span><span class="o">.</span><span class="n">version</span>
+                            <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_available_coeffs</span><span class="p">()</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Coefficients version not recognized. Selected: </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">. Available: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">.&quot;</span>
+                        <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">select_lime_coeff</span><span class="p">(</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--interpolation-settings&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_interp_settings</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                    <span class="n">mod_interp_settings</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">CLIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">eprint</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="c1"># Simulation input</span>
+        <span class="n">sim_opts</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--earth&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--satellite&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--lunar&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--comparison&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">num_sim_ops</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sim_opts</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mod_interp_settings</span> <span class="ow">and</span> <span class="n">num_sim_ops</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">export_data</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eprint</span><span class="p">(</span><span class="s2">&quot;Error: The output flag (-o | --output) must be included.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">num_sim_ops</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">eprint</span><span class="p">(</span><span class="s2">&quot;Error: There must be one of the following flags: (-e|-s|-l|-c|-i).&quot;</span><span class="p">)</span>
+            <span class="n">print_help</span><span class="p">()</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">num_sim_ops</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">eprint</span><span class="p">(</span>
+                <span class="s2">&quot;Error: There can only be one of the following flags: (-e|-s|-l|-c).&quot;</span>
+            <span class="p">)</span>
+            <span class="n">print_help</span><span class="p">()</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="s2">&quot;--earth&quot;</span><span class="p">):</span>  <span class="c1"># Earth</span>
+                    <span class="n">params_str</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    <span class="n">lenpar</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_str</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">lenpar</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="p">(</span><span class="n">timeseries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lenpar</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">):</span>
+                        <span class="n">eprint</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -e&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="mi">1</span>
+                    <span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">params_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
+                    <span class="n">lat</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">lon</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">height</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span>
+                    <span class="k">if</span> <span class="n">timeseries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">timeseries</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">_parse_datetime</span><span class="p">(</span><span class="n">params_str</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calculate_geographic</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">export_data</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--satellite&quot;</span><span class="p">):</span>  <span class="c1"># Satellite</span>
+                    <span class="n">params_str</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    <span class="n">lenpar</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_str</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">lenpar</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">timeseries</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lenpar</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
+                        <span class="n">eprint</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -s&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="mi">1</span>
+                    <span class="n">sat_name</span> <span class="o">=</span> <span class="n">params_str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">timeseries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">timeseries</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">_parse_datetime</span><span class="p">(</span><span class="n">params_str</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calculate_satellital</span><span class="p">(</span><span class="n">sat_name</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">export_data</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;--lunar&quot;</span><span class="p">):</span>  <span class="c1"># Lunar</span>
+                    <span class="n">params_str</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_str</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+                        <span class="n">eprint</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -l&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="mi">1</span>
+                    <span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">params_str</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calculate_selenographic</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">,</span> <span class="n">export_data</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--comparison&quot;</span><span class="p">):</span>  <span class="c1"># Comparison</span>
+                    <span class="n">params</span> <span class="o">=</span> <span class="n">args</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">input_files</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                        <span class="n">input_files</span> <span class="o">+=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calculate_comparisons</span><span class="p">(</span><span class="n">input_files</span><span class="p">,</span> <span class="n">export_data</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="k">except</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">eprint</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="n">LimeException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">eprint</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+            <span class="n">eprint</span><span class="p">(</span><span class="s2">&quot;Error when performing operations: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error trace: </span><span class="si">{</span><span class="n">trace</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+lime\_tbx.presentation.gui package
+==================================
+
+.. automodule:: lime_tbx.presentation.gui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.presentation.gui.canvas
+   lime_tbx.presentation.gui.coefficients
+   lime_tbx.presentation.gui.constants
+   lime_tbx.presentation.gui.gui
+   lime_tbx.presentation.gui.help
+   lime_tbx.presentation.gui.ifaces
+   lime_tbx.presentation.gui.input
+   lime_tbx.presentation.gui.interpoptions
+   lime_tbx.presentation.gui.maingui
+   lime_tbx.presentation.gui.output
+   lime_tbx.presentation.gui.settings
+   lime_tbx.presentation.gui.spinner
+   lime_tbx.presentation.gui.srf
+   lime_tbx.presentation.gui.util

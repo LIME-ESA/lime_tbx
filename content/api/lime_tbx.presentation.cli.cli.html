@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.presentation.cli.cli module &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lime_tbx.presentation.cli.export module" href="lime_tbx.presentation.cli.export.html" />
+    <link rel="prev" title="lime_tbx.presentation.cli package" href="lime_tbx.presentation.cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lime_tbx.html">lime_tbx package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="lime_tbx.presentation.html">lime_tbx.presentation package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="lime_tbx.presentation.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.presentation.html">lime_tbx.presentation package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.presentation.cli.html">lime_tbx.presentation.cli package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.presentation.cli.cli module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/api/lime_tbx.presentation.cli.cli.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lime_tbx.presentation.cli.cli">
+<span id="lime-tbx-presentation-cli-cli-module"></span><h1>lime_tbx.presentation.cli.cli module<a class="headerlink" href="#module-lime_tbx.presentation.cli.cli" title="Link to this heading"></a></h1>
+<p>Command Line Interface (CLI) module for the LIME Toolbox.</p>
+<p>This module handles the interpretation of command-line options and executes
+the appropriate actions, including simulations, comparisons, and data exports.</p>
+<p>It supports:
+- Simulations of lunar irradiance, reflectance, and polarization.
+- Comparisons with observational data.
+- Output in various formats (CSV, Graph, NetCDF).
+- Updating coefficient datasets.
+- Managing interpolation and spectral response function settings.</p>
+<p>This module serves as the entry point for the command-line execution of LIME TBX.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.cli.</span></span><span class="sig-name descname"><span class="pre">CLI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">eocfi_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath" title="lime_tbx.common.datatypes.EocfiPath"><span class="pre">EocfiPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Command Line Interface handler for LIME TBX.</p>
+<p>This class processes command-line arguments, performs simulations, and manages
+comparisons. It serves as the main interface for users executing the toolbox
+from the command line.</p>
+<p>It contains a LimeSimulation instance that handles and stores the asked calculations
+that then will be retrieved for export.</p>
+<p>Responsibilities:
+- Simulations of lunar irradiance, reflectance, and polarization.
+- Comparisons with observational data.
+- Output in various formats (CSV, Graph, NetCDF).
+- Updating coefficient datasets.
+- Managing interpolation and spectral response function settings.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.calculate_comparisons">
+<span class="sig-name descname"><span class="pre">calculate_comparisons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><span class="pre">ExportComparison</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.calculate_comparisons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.calculate_comparisons" title="Link to this definition"></a></dt>
+<dd><p>Performs comparisons between simulation results and observational data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_files</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of file paths containing observational data.</p></li>
+<li><p><strong>ed</strong> (<a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportComparison" title="lime_tbx.presentation.cli.export.ExportComparison"><em>export.ExportComparison</em></a>) – The comparison export configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeException" title="lime_tbx.common.datatypes.LimeException"><strong>LimeException</strong></a> – If the observation data is not valid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.calculate_geographic">
+<span class="sig-name descname"><span class="pre">calculate_geographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><span class="pre">ExportData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.calculate_geographic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.calculate_geographic" title="Link to this definition"></a></dt>
+<dd><p>Runs a simulation from a geographic location, ahnd
+export the results as specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>float</em>) – Latitude in degrees.</p></li>
+<li><p><strong>lon</strong> (<em>float</em>) – Longitude in degrees.</p></li>
+<li><p><strong>height</strong> (<em>float</em>) – Height above sea level in meters.</p></li>
+<li><p><strong>dt</strong> (<em>datetime</em><em> or </em><em>List</em><em>[</em><em>datetime</em><em>]</em>) – The timestamp(s) for the simulation.</p></li>
+<li><p><strong>export_data</strong> (<a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><em>export.ExportData</em></a>) – The export configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportError" title="lime_tbx.presentation.cli.export.ExportError"><strong>ExportError</strong></a> – If something wrong happens during export.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.calculate_satellital">
+<span class="sig-name descname"><span class="pre">calculate_satellital</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sat_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><span class="pre">ExportData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.calculate_satellital"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.calculate_satellital" title="Link to this definition"></a></dt>
+<dd><p>Runs a simulation from a satellite’s perspective.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sat_name</strong> (<em>str</em>) – Name of the satellite.</p></li>
+<li><p><strong>dt</strong> (<em>datetime</em><em> or </em><em>List</em><em>[</em><em>datetime</em><em>]</em>) – The timestamp(s) for the simulation.</p></li>
+<li><p><strong>export_data</strong> (<a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><em>export.ExportData</em></a>) – The export configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportError" title="lime_tbx.presentation.cli.export.ExportError"><strong>ExportError</strong></a> – If something wrong happens during export.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.calculate_selenographic">
+<span class="sig-name descname"><span class="pre">calculate_selenographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_sun_moon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_observer_moon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selen_obs_lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selen_obs_lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selen_sun_lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moon_phase_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><span class="pre">ExportData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.calculate_selenographic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.calculate_selenographic" title="Link to this definition"></a></dt>
+<dd><p>Runs a simulation from a selenographic (Moon-based) perspective.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_sun_moon</strong> (<em>float</em>) – Distance between the Sun and the Moon (meters).</p></li>
+<li><p><strong>distance_observer_moon</strong> (<em>float</em>) – Distance between the observer and the Moon (meters).</p></li>
+<li><p><strong>selen_obs_lat</strong> (<em>float</em>) – Observer’s latitude on the Moon (degrees).</p></li>
+<li><p><strong>selen_obs_lon</strong> (<em>float</em>) – Observer’s longitude on the Moon (degrees).</p></li>
+<li><p><strong>selen_sun_lon</strong> (<em>float</em>) – Sub-solar longitude on the Moon (degrees).</p></li>
+<li><p><strong>moon_phase_angle</strong> (<em>float</em>) – Moon phase angle (degrees).</p></li>
+<li><p><strong>export_data</strong> (<a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><em>export.ExportData</em></a>) – The export configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.presentation.cli.export.html#lime_tbx.presentation.cli.export.ExportError" title="lime_tbx.presentation.cli.export.ExportError"><strong>ExportError</strong></a> – If something wrong happens during export.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.check_sys_args">
+<span class="sig-name descname"><span class="pre">check_sys_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sysargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.check_sys_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.check_sys_args" title="Link to this definition"></a></dt>
+<dd><p>Validates system arguments to prevent syntax errors.</p>
+<p>Ensures flags are correctly formatted and separated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sysargs</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The raw command-line arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">0</span></code> if validation passes.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">1</span></code> if errors are found.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.handle_input">
+<span class="sig-name descname"><span class="pre">handle_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.handle_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.handle_input" title="Link to this definition"></a></dt>
+<dd><p>Processes command-line options and executes the corresponding actions.</p>
+<p>This function parses command-line arguments, validates inputs, and
+dispatches execution to the appropriate simulation, comparison,
+or configuration functions.</p>
+<p>It supports:
+- Simulations of lunar irradiance, reflectance, and polarization
+from different perspectives (Earth, Lunar, Satellite).
+- Comparisons with observational data in GLOD format.
+- Output in multiple formats (CSV, Graph, NetCDF).
+- Updating coefficient datasets.
+- Managing interpolation and spectral response function settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opts</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – A list of command-line options and their corresponding arguments.
+Example: <code class="code docutils literal notranslate"><span class="pre">[('-e',</span> <span class="pre">'10.5,20.3,100,2023-02-18T12:00:00')]</span></code></p></li>
+<li><p><strong>args</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Additional arguments passed after the options, primarily used for
+input file paths in comparisons.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exit status code:
+- <code class="code docutils literal notranslate"><span class="pre">0</span></code> for success.
+- <code class="code docutils literal notranslate"><span class="pre">1</span></code> for errors (invalid input, missing parameters, execution failures).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.load_srf">
+<span class="sig-name descname"><span class="pre">load_srf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.load_srf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.load_srf" title="Link to this definition"></a></dt>
+<dd><p>Loads the Spectral Response Function (SRF) from a specified file.</p>
+<p>If no file is provided, it loads the default SRF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>srf_file</strong> (<em>str</em>) – Path to the SRF file. If an empty string is given, it loads the default SRF.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLI.update_coefficients">
+<span class="sig-name descname"><span class="pre">update_coefficients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLI.update_coefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLI.update_coefficients" title="Link to this definition"></a></dt>
+<dd><p>Checks for and downloads coefficient dataset updates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">0</span></code> if the update is successful or no updates are available.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">1</span></code> if an error occurs during the update process.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.CLIError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.cli.</span></span><span class="sig-name descname"><span class="pre">CLIError</span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#CLIError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.CLIError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised for all errors encountered during command-line argument processing.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.ParsingError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.cli.</span></span><span class="sig-name descname"><span class="pre">ParsingError</span></span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#ParsingError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.ParsingError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.cli.CLIError" title="lime_tbx.presentation.cli.cli.CLIError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CLIError</span></code></a></p>
+<p>Exception raised for errors encountered during command-line argument parsing.</p>
+<p>This exception is used to indicate issues such as:
+- Invalid or unrecognized argument values.
+- Missing required parameters.
+- Incorrect formatting of input arguments.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.eprint">
+<span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.cli.</span></span><span class="sig-name descname"><span class="pre">eprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#eprint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.eprint" title="Link to this definition"></a></dt>
+<dd><p>Prints messages to the standard error (stderr).</p>
+<p>This function behaves like the built-in <code class="code docutils literal notranslate"><span class="pre">print</span></code>, but directs output
+to <code class="code docutils literal notranslate"><span class="pre">sys.stderr</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">sys.stdout</span></code>. It supports the same arguments
+as <code class="code docutils literal notranslate"><span class="pre">print</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>Any</em>) – Positional arguments passed to <code class="code docutils literal notranslate"><span class="pre">print</span></code>, representing the values to be printed.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Keyword arguments passed to <code class="code docutils literal notranslate"><span class="pre">print</span></code> (e.g., <code class="code docutils literal notranslate"><span class="pre">sep</span></code>, <code class="code docutils literal notranslate"><span class="pre">end</span></code>, <code class="code docutils literal notranslate"><span class="pre">flush</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.print_help">
+<span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.cli.</span></span><span class="sig-name descname"><span class="pre">print_help</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#print_help"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.print_help" title="Link to this definition"></a></dt>
+<dd><p>Displays the command-line help message.</p>
+<p>This function prints usage instructions and a description of available options
+for the LIME Toolbox CLI. It explains how to run simulations, comparisons,
+and specify output formats.</p>
+<p>The available options include:
+- <code class="code docutils literal notranslate"><span class="pre">-h,</span> <span class="pre">--help</span></code>: Show this help message.
+- <code class="code docutils literal notranslate"><span class="pre">-v,</span> <span class="pre">--version</span></code>: Display the version number.
+- <code class="code docutils literal notranslate"><span class="pre">-u,</span> <span class="pre">--update</span></code>: Update the coefficients.
+- <code class="code docutils literal notranslate"><span class="pre">-e,</span> <span class="pre">--earth</span></code>: Perform simulations from a geographic point.
+- <code class="code docutils literal notranslate"><span class="pre">-l,</span> <span class="pre">--lunar</span></code>: Perform simulations from a selenographic point.
+- <code class="code docutils literal notranslate"><span class="pre">-s,</span> <span class="pre">--satellite</span></code>: Perform simulations from a satellite.
+- <code class="code docutils literal notranslate"><span class="pre">-c,</span> <span class="pre">--comparison</span></code>: Perform comparisons using GLOD observation files.
+- <code class="code docutils literal notranslate"><span class="pre">-o,</span> <span class="pre">--output</span></code>: Define output format and file paths.
+- <code class="code docutils literal notranslate"><span class="pre">-f,</span> <span class="pre">--srf</span></code>: Select a Spectral Response Function (SRF) file.
+- <code class="code docutils literal notranslate"><span class="pre">-t,</span> <span class="pre">--timeseries</span></code>: Use a CSV file with multiple datetimes.
+- <code class="code docutils literal notranslate"><span class="pre">-C,</span> <span class="pre">--coefficients</span></code>: Change the coefficients version used by the toolbox.
+- <code class="code docutils literal notranslate"><span class="pre">-i,</span> <span class="pre">--interpolation-settings</span></code>: Modify interpolation settings via JSON input.</p>
+<p>The function also provides examples of valid input formats and highlights
+any constraints or dependencies for specific options.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.cli.print_version">
+<span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.cli.</span></span><span class="sig-name descname"><span class="pre">print_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/cli.html#print_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.cli.print_version" title="Link to this definition"></a></dt>
+<dd><p>Prints the package version name to the standard output.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lime_tbx.presentation.cli.html" class="btn btn-neutral float-left" title="lime_tbx.presentation.cli package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.presentation.cli.export.html" class="btn btn-neutral float-right" title="lime_tbx.presentation.cli.export module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

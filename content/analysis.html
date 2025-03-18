@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Design" href="design.html" />
+    <link rel="prev" title="File Formats" href="user_guide/formats.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-features">Main Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements-elicitation">Requirements Elicitation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simulations">1. Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#functional-requirements-fr">Functional Requirements (FR)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#non-functional-requirements-nfr">Non Functional Requirements (NFR)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#comparisons">2. Comparisons</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Functional Requirements (FR)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Non Functional Requirements (NFR)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#output">3. Output</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Functional Requirements (FR)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Non Functional Requirements (NFR)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#system">4. System</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Functional Requirements (FR)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Non Functional Requirements (NFR)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/content/analysis.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="analysis">
+<h1>Analysis<a class="headerlink" href="#analysis" title="Link to this heading"></a></h1>
+<p>The LIME Toolbox is being developed as part of ESA’s project: “Improving the Lunar Irradiance Model of ESA”.
+Throughout its planning, development, and implementation, ESA and the LIME Team have collaboratively proposed
+and refined various objectives, features and constraints. This analysis breaks down these elements to ensure
+a clear, structured approach, aligning design and implementation with the project’s objectives.</p>
+<section id="main-features">
+<h2>Main Features<a class="headerlink" href="#main-features" title="Link to this heading"></a></h2>
+<p>The main objectives and expected features are described in a similar fashion to user stories, which are short
+descriptions written from a user point of view that focus on what the user needs.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>#</p></th>
+<th class="head text-left"><p>User Story</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>1.1</p></td>
+<td class="text-left"><p>Simulate Single Observation from Earth</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>1.2</p></td>
+<td class="text-left"><p>Simulate Time Series of Observations from Earth</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>2</p></td>
+<td class="text-left"><p>Simulate Single Observation with Custom Selenographic Coordinates</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>3.1</p></td>
+<td class="text-left"><p>Simulate Single Observation for a Satellite</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>3.2</p></td>
+<td class="text-left"><p>Simulate Time Series of Observations for a Satellite</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>3.3</p></td>
+<td class="text-left"><p>Simulate Satellite Observation for a User-Defined Satellite</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>4.1</p></td>
+<td class="text-left"><p>Input a User-Defined Spectral Response Function</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>4.2</p></td>
+<td class="text-left"><p>Visualise User-Defined Spectral Response Function</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>5</p></td>
+<td class="text-left"><p>Compare LIME Against Data from a Remote-Sensing Instrument</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>6</p></td>
+<td class="text-left"><p>Export Simulation/Comparison Data to a File</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>7.1</p></td>
+<td class="text-left"><p>Download Updated Coefficients</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>7.2</p></td>
+<td class="text-left"><p>Change Coefficients Version in Use</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="requirements-elicitation">
+<h2>Requirements Elicitation<a class="headerlink" href="#requirements-elicitation" title="Link to this heading"></a></h2>
+<p>A set of requirements has been obtained from the accepted LIME functionalities and restrictions. This
+set is organised into four categories based on the user story they appeal to. These categories are:</p>
+<ol class="arabic simple">
+<li><p><strong>Simulations</strong>: Requirements related to User Stories 1, 2, 3 and 4.</p></li>
+<li><p><strong>Comparisons</strong>: Requirements related to mainly User Story 5, but also 4.</p></li>
+<li><p><strong>Output</strong>: Requirements related to User Story 6.</p></li>
+<li><p><strong>System</strong>: Requirements related to User Story 7 and also the requirements related to the general
+functioning of the toolbox, not related to any User Story in particular.</p></li>
+</ol>
+<p>Each set is subsequently split into two subsets: functional requirements (FR) and non-functional requirements (NFR).
+Functional requirements specify the essential tasks a system must perform to fulfill user and business
+objectives, akin to a feature checklist. In contrast, non-functional requirements outline the system’s operational standards,
+addressing elements such as performance, security, and user experience. Essentially, functional requirements
+answer “what must be done” whereas non-functional requirements define “how it should be done”.</p>
+<p>Take into account that the requirements listed in this documentation may not fully align with
+those in any previous official LIME documentation, as they are subject to changes and additions.</p>
+<section id="simulations">
+<h3>1. Simulations<a class="headerlink" href="#simulations" title="Link to this heading"></a></h3>
+<section id="functional-requirements-fr">
+<h4>Functional Requirements (FR)<a class="headerlink" href="#functional-requirements-fr" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>FR101</strong>: Allow users to simulate lunar observations for any observer’s position around the Earth and at any time.</p></li>
+<li><p><strong>FR102</strong>: Allow users to simulate lunar observation for any observer/solar selenographic latitude and longitude
+(thus bypassing the need for their computation from the position/time of the observer).</p></li>
+<li><p><strong>FR103</strong>: Allow users to load user-defined spectral response functions (SRF).</p></li>
+<li><p><strong>FR104</strong>: Allow users to simulate lunar observation for a single observation or for a time series of observations,
+for <strong>FR101</strong> and <strong>FR105</strong>.</p></li>
+<li><p><strong>FR105</strong>: The user must be able to simulate lunar observations for an ESA satellite.</p></li>
+<li><p><strong>FR106</strong>: Allow users to choose which SRF are simulations running with (<strong>FR103</strong>).</p></li>
+<li><p><strong>FR107</strong>: Allow users to simulate series of lunar observations, where not only the time varies.</p></li>
+<li><p><strong>FR108</strong>: Allow users to simulate lunar observation using a user-defined satellite.</p></li>
+</ul>
+</section>
+<section id="non-functional-requirements-nfr">
+<h4>Non Functional Requirements (NFR)<a class="headerlink" href="#non-functional-requirements-nfr" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>NFR101</strong>: The simulation input of a single lunar observation (<strong>FR104</strong>) must be introduced via the GUI.</p></li>
+<li><p><strong>NFR102</strong>: The simulation input for a time series of lunar observations (<strong>FR104</strong>) must be done via an input file.</p></li>
+<li><p><strong>NFR103</strong>: In order to simulate lunar observations from a satellite position (<strong>FR105</strong>) the user must provide an
+orbital scenario file in EO-CFI compatible format.</p></li>
+<li><p><strong>NFR104</strong>: The ESA satellites available for selection must include ENVISAT, Proba-V, S2, S3, FLEX.</p></li>
+<li><p><strong>NFR105</strong>: The user defined SRF (<strong>FR103</strong>) must be defined via a user generated SRF file.</p></li>
+<li><p><strong>NFR106</strong>: The user should be able to perform the simulation via command line using parameters or input files.</p></li>
+<li><p><strong>NFR107</strong>: Simulations must run with a SRF, either a default one or a user-defined SRF.</p></li>
+<li><p><strong>NFR108</strong>: The TBX must be flexible in terms of wavelengths. It should accept different amounts of coefficients and process them differently.</p>
+<ul>
+<li><p><strong>NFR108-A</strong> : The TBX must accept coefficients that also include data for the 1088 CIMEL photometer’s 2130 nanometer band.</p></li>
+<li><p><strong>NFR108-B</strong> : The TBX must accept coefficients made for a different response function, for the wavelengths specified in the coefficients.</p></li>
+</ul>
+</li>
+<li><p><strong>NFR109</strong>: The ESA satellites available for selection must include METOP first generation: METOP-A, METOP-B and METOP-C.</p></li>
+<li><p><strong>NFR110</strong>: The simulation input for series of lunar observations (FR107) must be done via an input file.</p></li>
+<li><p><strong>NFR111</strong>: The satellites for <strong>FR108</strong> must be defined using Orbit Scenario Files (OSF) or Three-Line
+Element Set (TLE/3LE) files.</p></li>
+</ul>
+</section>
+</section>
+<section id="comparisons">
+<h3>2. Comparisons<a class="headerlink" href="#comparisons" title="Link to this heading"></a></h3>
+<section id="id1">
+<h4>Functional Requirements (FR)<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>FR201</strong>: Allow performing comparisons of lunar observations from a remote sensing instrument to the LIME model output.</p></li>
+<li><p><strong>FR202</strong>: Allow exporting plots.</p></li>
+<li><p><strong>FR203</strong>: The TBX must allow the user to visualize the comparison for all spectral channels simultaneously.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h4>Non Functional Requirements (NFR)<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>NFR201</strong>: The remote sensing instrument observations (<strong>FR201</strong>) must be pre-stored in a GLOD format file.</p></li>
+<li><p><strong>NFR202</strong>: The comparison plots shall provide: relative differences between measured and modeled lunar
+irradiance/reflectance vs. time and vs. lunar phase angle.</p></li>
+<li><p><strong>NFR203</strong>: The comparison plots shall display statistical indicators: mean relative difference, standard
+deviation of the mean relative difference, temporal trend if applicable, number of comparison samples, etc.</p></li>
+<li><p><strong>NFR204</strong>: The exported plots must be in .jpg or .pdf format.</p></li>
+<li><p><strong>NFR205</strong>: The user should be able to perform the simulations via command line using parameters or input files.</p></li>
+<li><p><strong>NFR206</strong>: Users must be informed that they have to load a user-defined SRF to run the comparison’s simulations with.</p></li>
+<li><p><strong>NFR207</strong>: The comparison of <strong>FR203</strong> must be plotted in the same graph, with x-axis being the wavelength, and y-axis being comparisons &amp; irradiance.
+The plots should show the temporal average of the relative difference between the model and the observation.</p></li>
+<li><p><strong>NFR208</strong>: Switching between comparison graphs should be fast, there shouldn’t be a loading time of longer than 2
+seconds when switching and drawing them after the comparison shouldn’t take more than 20 seconds.</p></li>
+</ul>
+</section>
+</section>
+<section id="output">
+<h3>3. Output<a class="headerlink" href="#output" title="Link to this heading"></a></h3>
+<section id="id3">
+<h4>Functional Requirements (FR)<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>FR301</strong>: The LIME TBX shall output simulated lunar disk irradiance or reflectance.</p></li>
+<li><p><strong>FR302</strong>: The LIME TBX shall output the simulated lunar disk degree of polarization.</p></li>
+<li><p><strong>FR303</strong>: The LIME TBX shall output simulated lunar irradiance or reflectance associated uncertainty.</p></li>
+<li><p><strong>FR304</strong>: The LIME TBX shall output the simulated lunar degree of polarization’s associated uncertainty.</p></li>
+<li><p><strong>FR305</strong>: Allow the visualization of the user defined spectral response used for the spectral integration
+of the LIME output into a sensor spectral band.</p></li>
+</ul>
+</section>
+<section id="id4">
+<h4>Non Functional Requirements (NFR)<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>NFR301</strong>: The simulated lunar disk irradiance or reflectance (<strong>FR301</strong>) must be in the spectral range of 400 nm to 2500 nm.</p></li>
+<li><p><strong>NFR302</strong>: The simulated lunar disk degree of polarization (<strong>FR302</strong>) must be in the spectral range of 400 nm to 2500 nm.</p></li>
+<li><p><strong>NFR303</strong>: The LIME simulated output shall be available to be exported to GLOD format files.</p></li>
+<li><p><strong>NFR304</strong>: The LIME version number shall be visible on all outputs (plots/files) of the TBX.</p></li>
+<li><p><strong>NFR305</strong>: Geometry information (coordinates, angles, etc.) and timestamps must be included in NetCDF and CSV output files.</p></li>
+<li><p><strong>NFR306</strong>: Calculation of uncertainties (<strong>FR303</strong>, <strong>FR304</strong>) must be performed as fast as possible.</p></li>
+</ul>
+</section>
+</section>
+<section id="system">
+<h3>4. System<a class="headerlink" href="#system" title="Link to this heading"></a></h3>
+<section id="id5">
+<h4>Functional Requirements (FR)<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>FR401</strong>: The LIME TBX must be able to perform automatic updates of the LIME coefficients.</p></li>
+<li><p><strong>FR402</strong>: The user shall be able to select past LIME coefficients with whom perform the calculations.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h4>Non Functional Requirements (NFR)<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>NFR401</strong>: The LIME coefficients of the automatic updates (<strong>FR401</strong>) must be stored on a dedicated repository.</p></li>
+<li><p><strong>NFR402</strong>: The LIME TBX shall read the database of lunar observations formatted in GLOD format.</p></li>
+<li><p><strong>NFR403</strong>: The LIME TBX shall use the EO-CFI as orbit propagator and to derive satellite orbital positions.</p></li>
+<li><p><strong>NFR404</strong>: Be to the largest extent platform/operating system independent.</p></li>
+<li><p><strong>NFR405</strong>: Run at least under Windows / mac OS / Linux operating systems.</p></li>
+<li><p><strong>NFR406</strong>: Be to the largest extent a self-installing SW package.</p></li>
+<li><p><strong>NFR407</strong>: The LIME TBX shall be to the largest extent developed in Python.</p></li>
+<li><p><strong>NFR408</strong>: The LIME TBX code shall be available on a password protected web repository allowing versioning of
+the software (e.g., GitHub).</p></li>
+<li><p><strong>NFR409</strong>: The TBX must be compiled and packaged through Docker or similar.</p>
+<ul>
+<li><p><strong>NFR409-A</strong>: Automated compilation and packaging for Windows.</p></li>
+<li><p><strong>NFR409-B</strong>: Automated compilation and packaging for Linux.</p></li>
+<li><p><strong>NFR409-C</strong>: Automated compilation and packaging for Mac.</p></li>
+</ul>
+</li>
+<li><p><strong>NFR410</strong>: The TBX compilation must be automated as much as possible, ideally using GitLab CI.</p></li>
+<li><p><strong>NFR411</strong>: Migrate the project to GitHub</p>
+<ul>
+<li><p><strong>NFR411-A</strong>: During development mirror the repository to GitHub.</p></li>
+<li><p><strong>NFR411-B</strong>: Migrate the issues to GitHub. GitLab issues must be used during development by the LIME team to
+add issues, and GitHub issues when finished.</p></li>
+<li><p><strong>NFR411-C</strong>: Migrate the CI pipeline to GitHub.</p></li>
+<li><p><strong>NFR411-D</strong>: Migrate the code documentation to GitHub.</p></li>
+</ul>
+</li>
+<li><p><strong>NFR412</strong>: Code modules should be as independent as possible so it could be possible to add a “choose model” option
+in the future without requiring too much development.</p></li>
+<li><p><strong>NFR413</strong>: Keep EO-CFI version updated to the latest release.</p></li>
+<li><p><strong>NFR414</strong>: The TBX should be able to simulate the satellite positions for all satellites with OSF files in the EOP-CFI server.</p></li>
+<li><p><strong>NFR415</strong>: The TBX code will be under LGPL license, in a repository with public access.</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_guide/formats.html" class="btn btn-neutral float-left" title="File Formats" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="design.html" class="btn btn-neutral float-right" title="Design" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

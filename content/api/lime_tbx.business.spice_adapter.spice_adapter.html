@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.business.spice_adapter.spice_adapter module &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lime_tbx.common package" href="lime_tbx.common.html" />
+    <link rel="prev" title="lime_tbx.business.spice_adapter package" href="lime_tbx.business.spice_adapter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lime_tbx.html">lime_tbx package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="lime_tbx.business.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.html">lime_tbx.presentation package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.business.html">lime_tbx.business package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.business.spice_adapter.html">lime_tbx.business.spice_adapter package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.spice_adapter.spice_adapter module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/api/lime_tbx.business.spice_adapter.spice_adapter.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lime_tbx.business.spice_adapter.spice_adapter">
+<span id="lime-tbx-business-spice-adapter-spice-adapter-module"></span><h1>lime_tbx.business.spice_adapter.spice_adapter module<a class="headerlink" href="#module-lime_tbx.business.spice_adapter.spice_adapter" title="Link to this heading"></a></h1>
+<p>This module acts as an interface/adapter with NASA’s SPICE software.</p>
+<dl class="simple">
+<dt>It exports the following classes:</dt><dd><ul class="simple">
+<li><p>ISPICEAdapter - Interface that contains the methods of this module.</p></li>
+<li><p>SPICEAdapter - Class that implements the methods exported by this module.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.business.spice_adapter.spice_adapter.</span></span><span class="sig-name descname"><span class="pre">ISPICEAdapter</span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Interface that contains the methods of this module.</p>
+<dl class="simple">
+<dt>It exports the following functions:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>get_moon_data_from_earth() - Calculate lunar data for a position on earth</dt><dd><p>surface at a concrete datetime.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>get_moon_datas_from_rectangular_multiple() - Calculate lunar data for some</dt><dd><p>rectangular coordinates from Earth or Moon.</p>
+</dd>
+</dl>
+</li>
+<li><p>to_rectangular_multiple() - Transforms planetographic coordinates to rectangular coordinates.</p></li>
+<li><dl class="simple">
+<dt>to_planetographic_multiple() - Transforms multiple rectangular coordinates</dt><dd><p>to planetographic coordinates.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_moon_data_from_earth">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_moon_data_from_earth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.get_moon_data_from_earth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_moon_data_from_earth" title="Link to this definition"></a></dt>
+<dd><p>Calculate lunar data for a position on earth surface at a concrete datetime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> (<em>float</em>) – Geographic latitude in decimal degrees.</p></li>
+<li><p><strong>longitude</strong> (<em>float</em>) – Geographic longitude in decimal degrees.</p></li>
+<li><p><strong>altitude</strong> (<em>float</em>) – Altitude over the sea level in meters.</p></li>
+<li><p><strong>dt</strong> (<em>datetime</em><em> | </em><em>list</em><em> of </em><em>datetimes</em>) – Time or time series at which the lunar data will be calculated.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path where the needed SPICE kernels are located.
+The user must have write access to that directory.</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Source frame from which to transform the xyz coordinates.
+By default J2000, but it can be others like MOON_ME or ITRF93.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>md</strong> – Lunar data for the given parameters. If the parameter dt was a list,
+this will be a list. Otherwise not.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_moon_datas_from_rectangular_multiple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_moon_datas_from_rectangular_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyzs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.get_moon_datas_from_rectangular_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_moon_datas_from_rectangular_multiple" title="Link to this definition"></a></dt>
+<dd><p>Calculate lunar data for the given rectangular coordinates.
+Faster execution for some cases</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyzs</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>three floats</em>) – Rectangular coordinates in meters</p></li>
+<li><p><strong>dts</strong> (<em>List</em><em> of </em><em>datetime</em>) – Datetimes of each position of those xyzs</p></li>
+<li><p><strong>kernels_path</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><em>KernelsPath</em></a>) – Information about the SPICE kernels location</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Source frame from which to transform the xyz coordinates.
+By default J2000, but it can be something like ‘MOON_ME’ if the coordinates are lunar.</p></li>
+<li><p><strong>Returns</strong></p></li>
+<li><p><strong>--------</strong></p></li>
+<li><p><strong>MoonData</strong> (<em>list of</em>) – Lunar data for the given parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_solar_moon_datas">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_solar_moon_datas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.get_solar_moon_datas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.get_solar_moon_datas" title="Link to this definition"></a></dt>
+<dd><p>Obtain solar selenographic coordinates of at multiple times.</p>
+<dl class="simple">
+<dt>times<span class="classifier">list of str | list of datetime</span></dt><dd><p>Times at which the lunar data will be calculated.
+If they are str, they must be in a valid UTC format allowed by SPICE, such as
+%Y-%m-%d %H:%M:%S.
+If they are datetimes they must be timezone aware, or they will be understood
+as computer local time.</p>
+</dd>
+<dt>kernels_path<span class="classifier">str</span></dt><dd><p>Path where the SPICE kernels are stored</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_planetographic_multiple">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_planetographic_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetimes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'IAU_EARTH'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.to_planetographic_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_planetographic_multiple" title="Link to this definition"></a></dt>
+<dd><p>Transforms multiple rectangular coordinates to planetographic coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz_list</strong> (<em>list</em><em> of </em><em>tuples</em><em> of </em><em>3 floats</em>) – List of xyz coordinates in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+<li><p><strong>datetimes</strong> (<em>list</em><em> of </em><em>datetime</em>) – Datetimes of the positions</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Reference frame of the rectangular coordinates</p></li>
+<li><p><strong>target_frame</strong> (<em>str</em>) – Reference frame of the planetographic coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>llhs</strong> – List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_planetographic_same_frame">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_planetographic_same_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.to_planetographic_same_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_planetographic_same_frame" title="Link to this definition"></a></dt>
+<dd><p>Transforms multiple rectangular coordinates to planetographic coordinates in the same ref frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz_list</strong> (<em>list</em><em> of </em><em>tuples</em><em> of </em><em>3 floats</em>) – List of xyz coordinates in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>llhs</strong> – List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_rectangular_multiple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_rectangular_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latlonheights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetimes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'IAU_EARTH'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.to_rectangular_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_rectangular_multiple" title="Link to this definition"></a></dt>
+<dd><p>Transforms planetographic coordinates to rectangular coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latlonheights</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>floats</em>) – Latitude and longitude in degrees, height in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+<li><p><strong>datetimes</strong> (<em>list</em><em> of </em><em>datetime</em>) – Datetimes of the positions</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Reference frame of the planetographic coordinates</p></li>
+<li><p><strong>target_frame</strong> (<em>str</em>) – Reference frame of the rectangular coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xyzs</strong> – Rectangular coordinates in meters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_rectangular_same_frame">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_rectangular_same_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latlonheights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#ISPICEAdapter.to_rectangular_same_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter.to_rectangular_same_frame" title="Link to this definition"></a></dt>
+<dd><p>Transforms planetographic coordinates to rectangular coordinates in the same frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latlonheights</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>floats</em>) – Latitude and longitude in degrees, height in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xyzs</strong> – Rectangular coordinates in meters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.business.spice_adapter.spice_adapter.</span></span><span class="sig-name descname"><span class="pre">SPICEAdapter</span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter" title="lime_tbx.business.spice_adapter.spice_adapter.ISPICEAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISPICEAdapter</span></code></a></p>
+<p>Class that implements the methods of this module.</p>
+<dl class="simple">
+<dt>It exports the following functions:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>get_moon_data_from_earth() - Calculate lunar data for a position on earth</dt><dd><p>surface at a concrete datetime.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>get_moon_data_from_moon() - Calculate lunar data for a position on moon’s</dt><dd><p>surface at a concrete datetime.</p>
+</dd>
+</dl>
+</li>
+<li><p>to_rectangular_multiple() - Transforms planetographic coordinates to rectangular coordinates.</p></li>
+<li><dl class="simple">
+<dt>to_planetographic_multiple() - Transforms multiple rectangular coordinates</dt><dd><p>to planetographic coordinates.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_moon_data_from_earth">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_moon_data_from_earth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.get_moon_data_from_earth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_moon_data_from_earth" title="Link to this definition"></a></dt>
+<dd><p>Calculate lunar data for a position on earth surface at a concrete datetime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitude</strong> (<em>float</em>) – Geographic latitude in decimal degrees.</p></li>
+<li><p><strong>longitude</strong> (<em>float</em>) – Geographic longitude in decimal degrees.</p></li>
+<li><p><strong>altitude</strong> (<em>float</em>) – Altitude over the sea level in meters.</p></li>
+<li><p><strong>dt</strong> (<em>datetime</em><em> | </em><em>list</em><em> of </em><em>datetimes</em>) – Time or time series at which the lunar data will be calculated.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path where the needed SPICE kernels are located.
+The user must have write access to that directory.</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Source frame from which to transform the xyz coordinates.
+By default J2000, but it can be others like MOON_ME or ITRF93.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>md</strong> – Lunar data for the given parameters. If the parameter dt was a list,
+this will be a list. Otherwise not.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_moon_datas_from_rectangular_multiple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_moon_datas_from_rectangular_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyzs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.get_moon_datas_from_rectangular_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_moon_datas_from_rectangular_multiple" title="Link to this definition"></a></dt>
+<dd><p>Calculate lunar data for the given rectangular coordinates.
+Faster execution for some cases</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyzs</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>three floats</em>) – Rectangular coordinates in meters</p></li>
+<li><p><strong>dts</strong> (<em>List</em><em> of </em><em>datetime</em>) – Datetimes of each position of those xyzs</p></li>
+<li><p><strong>kernels_path</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><em>KernelsPath</em></a>) – Information about the SPICE kernels location</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Source frame from which to transform the xyz coordinates.
+By default J2000, but it can be something like ‘MOON_ME’ if the coordinates are lunar.</p></li>
+<li><p><strong>Returns</strong></p></li>
+<li><p><strong>--------</strong></p></li>
+<li><p><strong>MoonData</strong> (<em>list of</em>) – Lunar data for the given parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_solar_moon_datas">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_solar_moon_datas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.get_solar_moon_datas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.get_solar_moon_datas" title="Link to this definition"></a></dt>
+<dd><p>Obtain solar selenographic coordinates of at multiple times.</p>
+<dl class="simple">
+<dt>times<span class="classifier">list of str | list of datetime</span></dt><dd><p>Times at which the lunar data will be calculated.
+If they are str, they must be in a valid UTC format allowed by SPICE, such as
+%Y-%m-%d %H:%M:%S.
+If they are datetimes they must be timezone aware, or they will be understood
+as computer local time.</p>
+</dd>
+<dt>kernels_path<span class="classifier">str</span></dt><dd><p>Path where the SPICE kernels are stored</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_planetographic_multiple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_planetographic_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetimes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'IAU_EARTH'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.to_planetographic_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_planetographic_multiple" title="Link to this definition"></a></dt>
+<dd><p>Transforms multiple rectangular coordinates to planetographic coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz_list</strong> (<em>list</em><em> of </em><em>tuples</em><em> of </em><em>3 floats</em>) – List of xyz coordinates in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+<li><p><strong>datetimes</strong> (<em>list</em><em> of </em><em>datetime</em>) – Datetimes of the positions</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Reference frame of the rectangular coordinates</p></li>
+<li><p><strong>target_frame</strong> (<em>str</em>) – Reference frame of the planetographic coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>llhs</strong> – List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_planetographic_same_frame">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_planetographic_same_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.to_planetographic_same_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_planetographic_same_frame" title="Link to this definition"></a></dt>
+<dd><p>Transforms multiple rectangular coordinates to planetographic coordinates in the same ref frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xyz_list</strong> (<em>list</em><em> of </em><em>tuples</em><em> of </em><em>3 floats</em>) – List of xyz coordinates in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>llhs</strong> – List of planetographic coordinates, in lat (deg), lon (deg), alt (meters) form.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_rectangular_multiple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_rectangular_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latlonheights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetimes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'IAU_EARTH'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'J2000'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.to_rectangular_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_rectangular_multiple" title="Link to this definition"></a></dt>
+<dd><p>Transforms planetographic coordinates to rectangular coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latlonheights</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>floats</em>) – Latitude and longitude in degrees, height in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+<li><p><strong>datetimes</strong> (<em>list</em><em> of </em><em>datetime</em>) – Datetimes of the positions</p></li>
+<li><p><strong>source_frame</strong> (<em>str</em>) – Reference frame of the planetographic coordinates</p></li>
+<li><p><strong>target_frame</strong> (<em>str</em>) – Reference frame of the rectangular coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xyzs</strong> – Rectangular coordinates in meters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_rectangular_same_frame">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_rectangular_same_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latlonheights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/business/spice_adapter/spice_adapter.html#SPICEAdapter.to_rectangular_same_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.spice_adapter.spice_adapter.SPICEAdapter.to_rectangular_same_frame" title="Link to this definition"></a></dt>
+<dd><p>Transforms planetographic coordinates to rectangular coordinates in the same frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latlonheights</strong> (<em>list</em><em> of </em><em>tuple</em><em> of </em><em>floats</em>) – Latitude and longitude in degrees, height in meters.</p></li>
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body. For example ‘MOON’ or ‘EARTH’.</p></li>
+<li><p><strong>kernels_path</strong> (<em>str</em>) – Path to the directory of the main kernels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xyzs</strong> – Rectangular coordinates in meters</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuples of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lime_tbx.business.spice_adapter.html" class="btn btn-neutral float-left" title="lime_tbx.business.spice_adapter package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.common.html" class="btn btn-neutral float-right" title="lime_tbx.common package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+lime\_tbx.application.filedata.coefficients module
+==================================================
+
+.. automodule:: lime_tbx.application.filedata.coefficients
+   :members:
+   :undoc-members:
+   :show-inheritance:

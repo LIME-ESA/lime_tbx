@@ -1,0 +1,16 @@
+lime\_tbx.presentation package
+==============================
+
+.. automodule:: lime_tbx.presentation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.presentation.cli
+   lime_tbx.presentation.gui

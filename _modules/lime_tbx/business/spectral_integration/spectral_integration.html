@@ -1,0 +1,612 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.business.spectral_integration.spectral_integration &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.spectral_integration.spectral_integration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.business.spectral_integration.spectral_integration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module performs spectral integrations over spectral response functions and</span>
+<span class="sd">more data.</span>
+
+<span class="sd">It exports the following classes:</span>
+<span class="sd">    * ISpectralIntegration - Interface that contains the methods of this module.</span>
+<span class="sd">    * SpectralIntegration - Class that implements the methods exported by this module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">punpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matheo.band_integration</span><span class="w"> </span><span class="kn">import</span> <span class="n">band_integration</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.interpolation.interp_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+    <span class="n">SpectralData</span><span class="p">,</span>
+    <span class="n">SRF_fwhm</span><span class="p">,</span>
+    <span class="n">SRFChannel</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">logger</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;01/02/2022&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;pieter.de.vis@npl.co.uk&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<span class="n">_ASD_FILE</span> <span class="o">=</span> <span class="s2">&quot;assets/asd_fwhm.csv&quot;</span>
+<span class="n">_CIMEL_FILE</span> <span class="o">=</span> <span class="s2">&quot;assets/responses_1088.csv&quot;</span>
+<span class="n">_INTERPOLATED_GAUSSIAN_FILE</span> <span class="o">=</span> <span class="s2">&quot;assets/interpolated_model_fwhm_3_1_gaussian.csv&quot;</span>
+<span class="n">_INTERPOLATED_TRIANGULAR_FILE</span> <span class="o">=</span> <span class="s2">&quot;assets/interpolated_model_fwhm_1_1_triangle.csv&quot;</span>
+
+
+<div class="viewcode-block" id="get_default_srf">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.get_default_srf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_srf</span><span class="p">():</span>
+    <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
+    <span class="p">)</span>
+    <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s2">&quot;business&quot;</span><span class="p">,</span> <span class="s2">&quot;spectral_integration&quot;</span><span class="p">,</span> <span class="s2">&quot;assets&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s2">&quot;interpolated_model_fwhm_3_1_gaussian.csv&quot;</span><span class="p">),</span>
+        <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">wavs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">spectral_response</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">wavs</span><span class="p">}</span>
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">SRFChannel</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MAX_WLEN</span> <span class="o">-</span> <span class="n">constants</span><span class="o">.</span><span class="n">MIN_WLEN</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_SRF_NAME</span><span class="p">,</span>
+        <span class="n">spectral_response</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">srf</span> <span class="o">=</span> <span class="n">SpectralResponseFunction</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_SRF_NAME</span><span class="p">,</span> <span class="p">[</span><span class="n">ch</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">srf</span></div>
+
+
+
+<div class="viewcode-block" id="ISpectralIntegration">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.ISpectralIntegration">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ISpectralIntegration</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface that contains the methods of this module.</span>
+
+<span class="sd">    It exports the following functions:</span>
+<span class="sd">        * integrate_elis() - Integrate the irradiances and obtain the signal.</span>
+<span class="sd">        * u_integrate_elis() - Calculate the uncertainties of the irradiances integration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ISpectralIntegration.integrate_elis">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.ISpectralIntegration.integrate_elis">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_elis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span> <span class="n">elis_lime</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrate the irradiances and obtain the signal.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            Spectral response function to integrate to</span>
+<span class="sd">        elis_lime: SpectralData</span>
+<span class="sd">            Data to integrate to the srf</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        integr_data: list of float or list of list of float</span>
+<span class="sd">            Integrated signals. List of float if elis_lime.data values are floats,</span>
+<span class="sd">            list of list of float if they are lists or ndarrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISpectralIntegration.u_integrate_elis">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.ISpectralIntegration.u_integrate_elis">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_integrate_elis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span> <span class="n">elis_lime</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the uncertainties of the irradiances integration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            Spectral response function to integrate to</span>
+<span class="sd">        elis_lime: SpectralData</span>
+<span class="sd">            Data to integrate to the srf</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        u_integr_data: list of float or list of list of float</span>
+<span class="sd">            Uncertainties of the integrated signals. List of float if elis_lime.data</span>
+<span class="sd">            values are floats, list of list of float if they are lists or ndarrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISpectralIntegration.integrate_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.ISpectralIntegration.integrate_cimel">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_cimel</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cimel_wavs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Integrate the spectrum of x = wlens and y = data over the CIMEL wavelengths specified in cimel_wavs.</span>
+<span class="sd">        Internally it obtains the CIMEL spectral response function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: np.array of float</span>
+<span class="sd">            Data that is going to be integrated over the CIMEL bands.</span>
+<span class="sd">        wlens: np.array of float</span>
+<span class="sd">            Wavelengths in nm related to the data.</span>
+<span class="sd">        cimel_wavs: np.array of float</span>
+<span class="sd">            Nominal wavelengths of the chosen CIMEL bands.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cimel_integ_data: np.array of float</span>
+<span class="sd">            Data integrated over the CIMEL bands</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SpectralIntegration">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpectralIntegration</span><span class="p">(</span><span class="n">ISpectralIntegration</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class that implements the methods exported by this module&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MCsteps</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop</span> <span class="o">=</span> <span class="n">punpy</span><span class="o">.</span><span class="n">MCPropagation</span><span class="p">(</span><span class="n">MCsteps</span><span class="p">,</span> <span class="n">parallel_cores</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asd_srf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_srf_asd</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cimel_srf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_srf_cimel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_srf_interpolated</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_srf_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralResponseFunction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        read asd fwhm and make SRF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">_ASD_FILE</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="n">srf</span> <span class="o">=</span> <span class="n">SRF_fwhm</span><span class="p">(</span><span class="s2">&quot;asd&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">srf</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_srf_interpolated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralResponseFunction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        read asd fwhm and make SRF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">srf_type</span> <span class="o">=</span> <span class="n">interp_data</span><span class="o">.</span><span class="n">get_interpolation_srf_as_srf_type</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">srf_type</span> <span class="o">==</span> <span class="s2">&quot;interpolated_gaussian&quot;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">_INTERPOLATED_GAUSSIAN_FILE</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span>
+            <span class="p">)</span>
+            <span class="n">srf</span> <span class="o">=</span> <span class="n">SRF_fwhm</span><span class="p">(</span><span class="s2">&quot;interpolated&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">srf_type</span> <span class="o">==</span> <span class="s2">&quot;interpolated_triangle&quot;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">_INTERPOLATED_TRIANGULAR_FILE</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span>
+            <span class="p">)</span>
+            <span class="n">srf</span> <span class="o">=</span> <span class="n">SRF_fwhm</span><span class="p">(</span><span class="s2">&quot;interpolated&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;triangle&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">srf_type</span> <span class="o">==</span> <span class="s2">&quot;asd&quot;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">_ASD_FILE</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="n">srf</span> <span class="o">=</span> <span class="n">SRF_fwhm</span><span class="p">(</span><span class="s2">&quot;interpolated&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;asd&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;The selected interpolated SRF file for spectral integration wasn&#39;t valid.&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;Selecting the default gaussian one.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">_INTERPOLATED_GAUSSIAN_FILE</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span>
+            <span class="p">)</span>
+            <span class="n">srf</span> <span class="o">=</span> <span class="n">SRF_fwhm</span><span class="p">(</span><span class="s2">&quot;interpolated&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">srf</span>
+
+<div class="viewcode-block" id="SpectralIntegration.set_srf_interpolated">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.set_srf_interpolated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_srf_interpolated</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">fwhm</span><span class="p">,</span> <span class="n">sampling</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralResponseFunction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        read asd fwhm and make SRF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">wavs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MIN_WLEN</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_WLEN</span> <span class="o">+</span> <span class="n">sampling</span><span class="p">,</span> <span class="n">sampling</span><span class="p">)</span>
+        <span class="n">fwhms</span> <span class="o">=</span> <span class="n">fwhm</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">wavs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write</span><span class="p">:</span>
+            <span class="n">id_str</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fwhm</span><span class="p">,</span> <span class="n">sampling</span><span class="p">,</span> <span class="n">shape</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">dir_path</span><span class="p">,</span> <span class="s2">&quot;assets/interpolated_model_fwhm_&quot;</span> <span class="o">+</span> <span class="n">id_str</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wavs</span><span class="p">)):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">wavs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fwhms</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span> <span class="o">=</span> <span class="n">SRF_fwhm</span><span class="p">(</span><span class="s2">&quot;interpolated&quot;</span><span class="p">,</span> <span class="n">wavs</span><span class="p">,</span> <span class="n">fwhms</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_srf_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralResponseFunction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        read asd fwhm and make SRF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">srflist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">_CIMEL_FILE</span><span class="p">))</span>
+        <span class="n">cimel_wavs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">cw</span> <span class="ow">in</span> <span class="n">cimel_wavs</span><span class="p">:</span>
+            <span class="n">wlens</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;w.</span><span class="si">{</span><span class="n">cw</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;r.</span><span class="si">{</span><span class="n">cw</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">srf</span> <span class="o">=</span> <span class="p">{</span><span class="n">w</span><span class="p">:</span> <span class="n">r</span> <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">resp</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">}</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">SRFChannel</span><span class="p">(</span><span class="n">cw</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cw</span><span class="p">),</span> <span class="n">srf</span><span class="p">)</span>
+            <span class="n">srflist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SpectralResponseFunction</span><span class="p">(</span><span class="s2">&quot;cimel&quot;</span><span class="p">,</span> <span class="n">srflist</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_cimel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_cimel</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cimel_wavs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cimel_srf</span><span class="o">.</span><span class="n">get_channel_from_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">wl</span> <span class="ow">in</span> <span class="n">cimel_wavs</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Coefficients channels are not present in default CIMEL SRF.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate_elis_xy</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">wlens</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_solar_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_solar_asd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_solar_asd</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">band_integration</span><span class="o">.</span><span class="n">pixel_int</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asd_srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">(),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asd_srf</span><span class="o">.</span><span class="n">get_values</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">band_shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">asd_srf</span><span class="o">.</span><span class="n">get_shape</span><span class="p">(),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_solar_interpolated_default">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_solar_interpolated_default">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_solar_interpolated_default</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">band_integration</span><span class="o">.</span><span class="n">pixel_int</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">(),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_values</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">band_shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_shape</span><span class="p">(),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_solar_interpolated_gaussian">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_solar_interpolated_gaussian">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_solar_interpolated_gaussian</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="c1"># subtracting a fwhm of 0.1 in quadrature to account for fwhm of TSIS solar irradiance</span>
+        <span class="k">return</span> <span class="n">band_integration</span><span class="o">.</span><span class="n">pixel_int</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">(),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_values</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">band_shape</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_solar_interpolated_triangle">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_solar_interpolated_triangle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_solar_interpolated_triangle</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">band_integration</span><span class="o">.</span><span class="n">pixel_int</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">(),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolated_srf</span><span class="o">.</span><span class="n">get_values</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">band_shape</span><span class="o">=</span><span class="s2">&quot;triangle&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_elis_xy">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_elis_xy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_elis_xy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SRFChannel</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param srf:</span>
+<span class="sd">        :type srf:</span>
+<span class="sd">        :param data:</span>
+<span class="sd">        :type data:</span>
+<span class="sd">        :param wlens:</span>
+<span class="sd">        :type wlens:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ich</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
+            <span class="n">ch_wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">ch</span><span class="o">.</span><span class="n">spectral_response</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+            <span class="n">ch_srf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ch_wlens</span><span class="p">])</span>
+            <span class="c1"># TODO shouldnt uncerts be added?</span>
+            <span class="n">band_int</span> <span class="o">=</span> <span class="n">band_integration</span><span class="o">.</span><span class="n">band_int</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">wlens</span><span class="p">,</span> <span class="n">ch_srf</span><span class="p">,</span> <span class="n">ch_wlens</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">band_int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">band_int</span> <span class="o">=</span> <span class="n">band_int</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">signals</span><span class="p">[</span><span class="n">ich</span><span class="p">]</span> <span class="o">=</span> <span class="n">band_int</span>
+        <span class="k">return</span> <span class="n">signals</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convolve_srf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">ch_wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ch_srf</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ch_elis</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convolve ch_srf and ch_elis over ch_wlens, generating the signal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">ch_srf</span><span class="p">,</span> <span class="n">ch_wlens</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">divider</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">divider</span><span class="p">[</span><span class="n">divider</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">divider</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">divider</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">ch_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">ch_srf</span> <span class="o">*</span> <span class="n">ch_elis</span><span class="p">,</span> <span class="n">ch_wlens</span><span class="p">)</span> <span class="o">/</span> <span class="n">divider</span>
+        <span class="k">return</span> <span class="n">ch_signal</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_integrate_elis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elis</span><span class="p">,</span> <span class="n">wlens</span><span class="p">,</span> <span class="n">all_wlens</span><span class="p">,</span> <span class="o">*</span><span class="n">ch_wlenssrf</span><span class="p">):</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elis</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">ch_wlenss</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ch_srfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ch_wlenssrf</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">ch_wlenss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch_wlenssrf</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ch_srfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch_wlenssrf</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">all_interp_elis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">all_wlens</span><span class="p">,</span> <span class="n">wlens</span><span class="p">,</span> <span class="n">elis</span><span class="p">)</span>
+        <span class="n">interm_res_path</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEBUG_INTERMEDIATE_RESULTS_PATH</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+            <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">constants</span><span class="o">.</span><span class="n">DEBUG_INTERMEDIATE_RESULTS_PATH</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">interm_res_path</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">interm_res_path</span><span class="si">}</span><span class="s2">/tests_stefan/irrs_srf_interp_from_irrs_spectrum.csv&quot;</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">all_wlens</span><span class="p">,</span> <span class="n">all_interp_elis</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+                <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                <span class="n">fmt</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">ch_wlens</span><span class="p">,</span> <span class="n">ch_srf</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ch_wlenss</span><span class="p">,</span> <span class="n">ch_srfs</span><span class="p">):</span>
+            <span class="n">elis_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">all_wlens</span><span class="p">,</span> <span class="n">ch_wlens</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ch_elis</span> <span class="o">=</span> <span class="n">all_interp_elis</span><span class="p">[</span><span class="n">elis_ids</span><span class="p">]</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_convolve_srf</span><span class="p">(</span><span class="n">ch_wlens</span><span class="p">,</span> <span class="n">ch_srf</span><span class="p">,</span> <span class="n">ch_elis</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">signals</span>
+
+<div class="viewcode-block" id="SpectralIntegration.integrate_elis">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.integrate_elis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrate_elis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span> <span class="n">elis_lime</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]:</span>
+        <span class="n">wlens</span> <span class="o">=</span> <span class="n">elis_lime</span><span class="o">.</span><span class="n">wlens</span>
+        <span class="n">elis</span> <span class="o">=</span> <span class="n">elis_lime</span><span class="o">.</span><span class="n">data</span>
+        <span class="c1"># ch_wlenss = []</span>
+        <span class="c1"># ch_srfs = []</span>
+        <span class="n">ch_wlensrfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">()))</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="n">ch_wlensrfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response_inrange</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+            <span class="n">ch_wlensrfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response_inrange</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+            <span class="c1"># ch_wlenss.append(np.array(list(ch.spectral_response_inrange.keys())))</span>
+            <span class="c1"># ch_srfs.append(np.array(list(ch.spectral_response_inrange.values())))</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_integrate_elis</span><span class="p">(</span><span class="n">elis</span><span class="p">,</span> <span class="n">wlens</span><span class="p">,</span> <span class="n">all_wlens</span><span class="p">,</span> <span class="o">*</span><span class="n">ch_wlensrfs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">signals</span></div>
+
+
+<div class="viewcode-block" id="SpectralIntegration.u_integrate_elis">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.SpectralIntegration.u_integrate_elis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">u_integrate_elis</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span> <span class="n">elis_lime</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]:</span>
+        <span class="n">u_signals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">elis_lime</span><span class="o">.</span><span class="n">wlens</span><span class="p">)</span>
+        <span class="n">elis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">elis_lime</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">u_elis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">elis_lime</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">)</span>
+        <span class="n">corr_elis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">elis_lime</span><span class="o">.</span><span class="n">err_corr</span><span class="p">)</span>
+        <span class="n">ch_wlensrfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">()))</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="n">ch_wlensrfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response_inrange</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+            <span class="n">ch_wlensrfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response_inrange</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+        <span class="c1"># check for empty arrays as they crash the unc. propagation, but they have to be readded at the end</span>
+        <span class="c1"># (only adding one of each two arrays)</span>
+        <span class="n">empties</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ch_wlensrfs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ch_wlensrfs</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="n">empties_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">empties</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+        <span class="n">ch_wlensrfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">chwls</span> <span class="k">for</span> <span class="n">chwls</span> <span class="ow">in</span> <span class="n">ch_wlensrfs</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chwls</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="n">u_signals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop</span><span class="o">.</span><span class="n">propagate_random</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_integrate_elis</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">elis</span><span class="p">,</span> <span class="n">wlens</span><span class="p">,</span> <span class="n">all_wlens</span><span class="p">,</span> <span class="o">*</span><span class="n">ch_wlensrfs</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">u_elis</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ch_wlensrfs</span><span class="p">]],</span>
+            <span class="n">corr_x</span><span class="o">=</span><span class="p">[</span><span class="n">corr_elis</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">ch_wlensrfs</span><span class="p">]],</span>
+        <span class="p">)</span>
+        <span class="c1"># fill with 0s the removed positions</span>
+        <span class="k">for</span> <span class="n">emp_index</span> <span class="ow">in</span> <span class="n">empties_index</span><span class="p">:</span>
+            <span class="n">u_signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">u_signals</span><span class="p">,</span> <span class="n">emp_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u_signals</span></div>
+</div>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @staticmethod</span>
+<span class="sd">    def integrate_elis_old(</span>
+<span class="sd">        srf: SpectralResponseFunction, elis: Union[List[float], List[List[float]]]</span>
+<span class="sd">    ) -&gt; Union[List[float], List[List[float]]]:</span>
+<span class="sd">        signals = []</span>
+<span class="sd">        wlens = srf.get_wavelengths()</span>
+<span class="sd">        if len(elis) == 0:</span>
+<span class="sd">            return []</span>
+<span class="sd">        wasnt_lists = False</span>
+<span class="sd">        if not isinstance(elis[0], list) or not isinstance(elis[0], np.ndarray):</span>
+<span class="sd">            wasnt_lists = True</span>
+<span class="sd">            elis = [elis]</span>
+<span class="sd">        for ch in srf.channels:</span>
+<span class="sd">            tots_eli = [0 for _ in range(len(elis))]</span>
+<span class="sd">            ch_wlens = list(ch.spectral_response.keys())</span>
+<span class="sd">            dividends = [0 for _ in range(len(elis))]</span>
+<span class="sd">            for i, wl in enumerate(ch_wlens):</span>
+<span class="sd">                interval = 0</span>
+<span class="sd">                if i &gt; 0:</span>
+<span class="sd">                    interval += (wl - ch_wlens[i - 1]) / 2</span>
+<span class="sd">                if i &lt; len(ch_wlens) - 1:</span>
+<span class="sd">                    interval += (ch_wlens[i + 1] - wl) / 2</span>
+<span class="sd">                extra_dividend = ch.spectral_response[wl] * interval</span>
+<span class="sd">                for i, sub_elis in enumerate(elis):</span>
+<span class="sd">                    eli = sub_elis[wlens.index(wl)]</span>
+<span class="sd">                    tots_eli[i] += extra_dividend * eli</span>
+<span class="sd">                    dividends[i] += extra_dividend</span>
+<span class="sd">            ch_signals = []</span>
+<span class="sd">            for i in range(len(tots_eli)):</span>
+<span class="sd">                signal = tots_eli[i] / dividends[i]</span>
+<span class="sd">                ch_signals.append(signal)</span>
+<span class="sd">            signals.append(ch_signals)</span>
+<span class="sd">        if wasnt_lists:</span>
+<span class="sd">            signals = [s[0] for s in signals]</span>
+<span class="sd">        return signals&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

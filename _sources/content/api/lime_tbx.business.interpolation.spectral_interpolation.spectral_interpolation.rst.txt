@@ -1,0 +1,7 @@
+lime\_tbx.business.interpolation.spectral\_interpolation.spectral\_interpolation module
+=======================================================================================
+
+.. automodule:: lime_tbx.business.interpolation.spectral_interpolation.spectral_interpolation
+   :members:
+   :undoc-members:
+   :show-inheritance:

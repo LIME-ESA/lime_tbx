@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.business.lime_algorithms.lime.elref &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.lime_algorithms.lime.elref</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.business.lime_algorithms.lime.elref</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module calculates the extra-terrestrial lunar reflectance.</span>
+
+<span class="sd">It exports the following functions:</span>
+<span class="sd">    * calculate_elref - Calculates the expected extra-terrestrial lunar reflectance</span>
+<span class="sd">    for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020 for the</span>
+<span class="sd">    irradiance, then divided by the solar irradiance.</span>
+<span class="sd">    * calculate_elref_unc - Calculates the uncertainty for the reflectance</span>
+<span class="sd">    calculations of empirical data points.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="sd">&quot;&quot;&quot;___NPL Modules&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">punpy</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+    <span class="n">MoonData</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;2022/03/02&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_measurement_func_elref</span><span class="p">(</span>
+    <span class="n">coeffs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">phi</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">l_phi</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">l_theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">gd_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Final computation of the calculation of the ln of the reflectance of the Moon&#39;s disk, following Eq.2 in</span>
+<span class="sd">    Roman et al., 2020</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    coeffs: list of float | np.ndarray of np.ndarray of float</span>
+<span class="sd">        Coefficients for a wavelength, or all coefficients for all wavelengths (matrix)</span>
+<span class="sd">    phi: float</span>
+<span class="sd">        Selenographic longitude of the sun (radians)</span>
+<span class="sd">    l_phi: float</span>
+<span class="sd">        Selenographic longitude of the observer (degrees)</span>
+<span class="sd">    l_theta: float</span>
+<span class="sd">        Selenographic latitude of the observer (degrees)</span>
+<span class="sd">    gd_value: float</span>
+<span class="sd">        Absolute moon phase angle (degrees)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    elrefs: float | np.ndarray of float</span>
+<span class="sd">        Calculated reflectances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># a_coeffs: list of float | np.ndarray of np.ndarray of float</span>
+    <span class="c1"># A Coefficients for a wavelength, or all the A coefficients for all wavelengths (matrix)</span>
+    <span class="c1"># b_coeffs: list of float | np.ndarray of np.ndarray of float</span>
+    <span class="c1"># B Coefficients for a wavelength, or all the B coefficients for all wavelengths (matrix)</span>
+    <span class="c1"># c_coeffs: list of float | np.ndarray of np.ndarray of float</span>
+    <span class="c1"># C Coefficients for a wavelength, or all the C coefficients for all wavelengths (matrix)</span>
+    <span class="c1"># d_coeffs: list of float | np.ndarray of np.ndarray of float</span>
+    <span class="c1"># D Coefficients for a wavelength, or all the D coefficients for all wavelengths (matrix)</span>
+    <span class="c1"># p_coeffs: list of float | np.ndarray of np.ndarray of float</span>
+    <span class="c1"># P Coefficients for a wavelength, or all the P coefficients for all wavelengths (matrix)</span>
+
+    <span class="n">a_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">b_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">c_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">d_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">14</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">p_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">14</span><span class="p">::,</span> <span class="p">:]</span>
+
+    <span class="n">gr_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">gd_value</span><span class="p">)</span>
+    <span class="n">d1_value</span> <span class="o">=</span> <span class="n">d_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gd_value</span> <span class="o">/</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">d2_value</span> <span class="o">=</span> <span class="n">d_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gd_value</span> <span class="o">/</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">d3_value</span> <span class="o">=</span> <span class="n">d_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="n">gd_value</span> <span class="o">-</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">sum_a</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">a_coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">gr_value</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a_coeffs</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
+    <span class="n">sum_b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">b_coeffs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b_coeffs</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">sum_a</span>
+        <span class="o">+</span> <span class="n">sum_b</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_phi</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_theta</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">l_phi</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">l_theta</span>
+        <span class="o">+</span> <span class="n">d1_value</span>
+        <span class="o">+</span> <span class="n">d2_value</span>
+        <span class="o">+</span> <span class="n">d3_value</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="calculate_elref">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.lime.elref.html#lime_tbx.business.lime_algorithms.lime.elref.calculate_elref">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_elref</span><span class="p">(</span>
+    <span class="n">refl_coeffs</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+    <span class="n">moon_data</span><span class="p">:</span> <span class="n">MoonData</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The calculation of the reflectance of the Moon&#39;s disk, following Eq.2 in Roman et al., 2020,</span>
+<span class="sd">    without multiplying the value by its apollo coefficient.</span>
+
+<span class="sd">    Simulates a lunar observation for a wavelength for any observer/solar selenographic</span>
+<span class="sd">    latitude and longitude. The reflectance is calculated in fractions of unity.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    refl_coeffs: ReflectanceCoefficients</span>
+<span class="sd">        ReflectanceCoefficients with the reflectances coefficients and uncertainties.</span>
+<span class="sd">    moon_data : MoonData</span>
+<span class="sd">        Moon data needed to calculate Moon&#39;s irradiance</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray of np.ndarray of float</span>
+<span class="sd">        The extraterrestrial lunar irradiance calculated using the points&#39; coefficients present in the</span>
+<span class="sd">        reflectance coefficient matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cfs</span> <span class="o">=</span> <span class="n">refl_coeffs</span><span class="o">.</span><span class="n">coeffs</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">long_sun_radians</span>
+    <span class="n">l_theta</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">lat_obs</span>
+    <span class="n">l_phi</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">long_obs</span>
+    <span class="n">gd_value</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">absolute_mpa_degrees</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">_measurement_func_elref</span><span class="p">(</span>
+        <span class="n">cfs</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">,</span>
+        <span class="n">phi</span><span class="p">,</span>
+        <span class="n">l_phi</span><span class="p">,</span>
+        <span class="n">l_theta</span><span class="p">,</span>
+        <span class="n">gd_value</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_elref_unc">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.lime.elref.html#lime_tbx.business.lime_algorithms.lime.elref.calculate_elref_unc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_elref_unc</span><span class="p">(</span>
+    <span class="n">cimel_coef</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+    <span class="n">moon_data</span><span class="p">:</span> <span class="n">MoonData</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the uncertainty for the reflectance calculations of empirical data points.</span>
+
+<span class="sd">    This uncertainties is for the empirical CIMEL data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cimel_coef: ReflectanceCoefficients</span>
+<span class="sd">        ReflectanceCoefficients with the CIMEL coefficients and uncertainties.</span>
+<span class="sd">    moon_data : MoonData</span>
+<span class="sd">        Moon data needed to calculate Moon&#39;s irradiance</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    uncs: np.ndarray of float</span>
+<span class="sd">        The uncertainties calculated</span>
+<span class="sd">    corr: np.ndarray of float</span>
+<span class="sd">        The error correlation matrix calculated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cfs</span> <span class="o">=</span> <span class="n">cimel_coef</span><span class="o">.</span><span class="n">coeffs</span>
+    <span class="n">ucfs</span> <span class="o">=</span> <span class="n">cimel_coef</span><span class="o">.</span><span class="n">unc_coeffs</span>
+    <span class="n">corrcfs</span> <span class="o">=</span> <span class="n">cimel_coef</span><span class="o">.</span><span class="n">err_corr_coeff</span>
+
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">long_sun_radians</span>
+    <span class="n">l_theta</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">lat_obs</span>
+    <span class="n">l_phi</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">long_obs</span>
+    <span class="n">gd_value</span> <span class="o">=</span> <span class="n">moon_data</span><span class="o">.</span><span class="n">absolute_mpa_degrees</span>
+
+    <span class="n">prop</span> <span class="o">=</span> <span class="n">punpy</span><span class="o">.</span><span class="n">MCPropagation</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MCdimlast</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">unc</span><span class="p">,</span> <span class="n">corr</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">propagate_random</span><span class="p">(</span>
+        <span class="n">_measurement_func_elref</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="n">cfs</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">,</span>
+            <span class="n">phi</span><span class="p">,</span>
+            <span class="n">l_phi</span><span class="p">,</span>
+            <span class="n">l_theta</span><span class="p">,</span>
+            <span class="n">gd_value</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="p">[</span>
+            <span class="n">ucfs</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">corr_x</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">corrcfs</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">return_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_some_nans</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">corr</span><span class="p">]])</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">corr</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">corr</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">unc</span><span class="p">,</span> <span class="n">corr</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

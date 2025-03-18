@@ -1,0 +1,869 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.application.simulation.lime_simulation module &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lime_tbx.application.simulation.moon_data_factory module" href="lime_tbx.application.simulation.moon_data_factory.html" />
+    <link rel="prev" title="lime_tbx.application.simulation.comparison.utils module" href="lime_tbx.application.simulation.comparison.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lime_tbx.html">lime_tbx package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="lime_tbx.application.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.html">lime_tbx.presentation package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.application.html">lime_tbx.application package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.application.simulation.html">lime_tbx.application.simulation package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.application.simulation.lime_simulation module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/api/lime_tbx.application.simulation.lime_simulation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lime_tbx.application.simulation.lime_simulation">
+<span id="lime-tbx-application-simulation-lime-simulation-module"></span><h1>lime_tbx.application.simulation.lime_simulation module<a class="headerlink" href="#module-lime_tbx.application.simulation.lime_simulation" title="Link to this heading"></a></h1>
+<p>Module containing the class that contains the state of the simulation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.application.simulation.lime_simulation.</span></span><span class="sig-name descname"><span class="pre">ILimeSimulation</span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Interface for running the main lime-tbx functionality</p>
+<p>Should contain the state of the simulation, so it can be implemented efficiently.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.are_mpas_inside_mpa_range">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">are_mpas_inside_mpa_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.are_mpas_inside_mpa_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.are_mpas_inside_mpa_range" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of values indicating if the moon datas contain a valid mpa range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>are_valid</strong> – True/s if the MoonData/s contains mpa values in the valid range.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool | list of bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.clear_srf">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_srf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.clear_srf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.clear_srf" title="Link to this definition"></a></dt>
+<dd><p>Dereference the SRF object from the LimeSimulation, allowing the garbage collector to remove it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_elis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_elis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar irradiance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated irradiance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis_asd">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_elis_asd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_elis_asd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis_asd" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar irradiance for the asd spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated irradiance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis_cimel">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_elis_cimel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_elis_cimel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis_cimel" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar irradiance for the cimel wavelengths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated irradiance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_elrefs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_elrefs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar reflectance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated reflectance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs_asd">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_elrefs_asd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_elrefs_asd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs_asd" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar reflectance for the asd spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated reflectance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs_cimel">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_elrefs_cimel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_elrefs_cimel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs_cimel" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar reflectance for the cimel wavelengths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated reflectance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_moon_datas">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_moon_datas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_moon_datas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_moon_datas" title="Link to this definition"></a></dt>
+<dd><p>Returns the moon datas for the current point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mds</strong> – MoonData/s of the current point.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_point">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_point" title="Link to this definition"></a></dt>
+<dd><p>Returns the point that is being used in the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point</strong> – The point used in the simulation.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point">Point</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_polars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_polars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for lunar polarisation degree</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polars</strong> – Previously calculated polarisation/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars_asd">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_polars_asd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_polars_asd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars_asd" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for lunar polarisation degree for the asd spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polars_asd</strong> – Previously calculated polarisation/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars_cimel">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_polars_cimel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_polars_cimel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars_cimel" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for lunar polarisation degree for the cimel wavelengths</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polars_cimel</strong> – Previously calculated polarisation/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_signals">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_signals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_signals" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for integrated signals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>signals</strong> – Previously calculated integrated signal/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_surfacepoints">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_surfacepoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint"><span class="pre">SurfacePoint</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint"><span class="pre">SurfacePoint</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.get_surfacepoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_surfacepoints" title="Link to this definition"></a></dt>
+<dd><p>Returns the Satellites points converted to the equivalent of surface points.
+In case they weren’t Satellite Points, the behaviour is not defined.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>surface_points</strong> – Equivalent surface points</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint">SurfacePoint</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint">SurfacePoint</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.is_polarisation_updated">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_polarisation_updated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.is_polarisation_updated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.is_polarisation_updated" title="Link to this definition"></a></dt>
+<dd><p>Returns if the polarisation has been updated. If not, or nothing has been executed,
+or the spectrum doesn’t contain polarisation values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pol_uptodate</strong> – True if the polarisation is updated</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.is_skipping_uncs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_skipping_uncs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.is_skipping_uncs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.is_skipping_uncs" title="Link to this definition"></a></dt>
+<dd><p>Checks if the current simulation instance is skipping the uncertainties calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>skip</strong> – True if the uncertainties are being skipped.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.set_observations">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_observations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lglod</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData" title="lime_tbx.common.datatypes.LGLODData"><span class="pre">LGLODData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.set_observations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.set_observations" title="Link to this definition"></a></dt>
+<dd><p>Loads a set of observations and the relative SRF into the lime simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lglod</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData" title="lime_tbx.common.datatypes.LGLODData"><em>LGLODData</em></a>) – Observations to be loaded</p></li>
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF related to those observations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.set_simulation_changed">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_simulation_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.set_simulation_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.set_simulation_changed" title="Link to this definition"></a></dt>
+<dd><p>Marks the current data as not valid. It should be updated.
+If it is marked as valid, it might not be updated even when instructed to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_irradiance">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_irradiance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals_srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cimel_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_observation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mda_precalculated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.update_irradiance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_irradiance" title="Link to this definition"></a></dt>
+<dd><p>Updates the irradiance values if the stored value are not valid, using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF for which the reflectance and irradiance will be calculated.</p></li>
+<li><p><strong>srf</strong> – SRF for which the integrated signal will be calculated.</p></li>
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point (location) for which the irradiance will be calculated.</p></li>
+<li><p><strong>cimel_coeff</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><em>ReflectanceCoefficients</em></a>) – Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance (needed for irradiance).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_polarisation">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_polarisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">polar_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><span class="pre">PolarisationCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_observation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.update_polarisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_polarisation" title="Link to this definition"></a></dt>
+<dd><p>Updates the polarisation values if the stored values are not valid, using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF for which the polarisation will be calculated.</p></li>
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point (location) for which the polarisation will be calculated.</p></li>
+<li><p><strong>polar_coeff</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><em>PolarisationCoefficients</em></a>) – Coefficients used for the calculation of polarisation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_reflectance">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_reflectance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cimel_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_observation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.update_reflectance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_reflectance" title="Link to this definition"></a></dt>
+<dd><p>Updates the reflectance values if the stored values are not valid, using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF for which the reflectance will be calculated.</p></li>
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point (location) for which the reflectance will be calculated.</p></li>
+<li><p><strong>cimel_coeff</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><em>ReflectanceCoefficients</em></a>) – Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance.</p></li>
+<li><p><strong>callback_observation</strong> (<em>Callable</em>) – Callback that will emit a signal when a simulation is done</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.will_irradiance_calculate_reflectance_previously">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">will_irradiance_calculate_reflectance_previously</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.will_irradiance_calculate_reflectance_previously"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.will_irradiance_calculate_reflectance_previously" title="Link to this definition"></a></dt>
+<dd><p>Returns if the irradiance calculation function would perform the reflectance
+calculation monolitically as a previous step or not given the current state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pt</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point for which the information wants to be known.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>will_calculate</strong> – True if the reflectance would be calculated previously.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.ILimeSimulation.will_irradiance_calculate_reflectance_simultaneously">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">will_irradiance_calculate_reflectance_simultaneously</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#ILimeSimulation.will_irradiance_calculate_reflectance_simultaneously"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.will_irradiance_calculate_reflectance_simultaneously" title="Link to this definition"></a></dt>
+<dd><p>Returns if the irradiance calculation function would perform the reflectance
+calculation simultaneously avoiding storing the error correlation matrices,
+given the current state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pt</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point for which the information wants to be known.
+If not specified the currently loaded one will be used.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>will_calculate</strong> – True if the reflectance would be calculated simultaneously.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.application.simulation.lime_simulation.</span></span><span class="sig-name descname"><span class="pre">LimeSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eocfi_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath" title="lime_tbx.common.datatypes.EocfiPath"><span class="pre">EocfiPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath" title="lime_tbx.common.datatypes.KernelsPath"><span class="pre">KernelsPath</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.ISettingsManager" title="lime_tbx.presentation.gui.settings.ISettingsManager"><span class="pre">ISettingsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">MCsteps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lime_tbx.application.simulation.lime_simulation.ILimeSimulation" title="lime_tbx.application.simulation.lime_simulation.ILimeSimulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ILimeSimulation</span></code></a></p>
+<p>Class for running the main lime-tbx functionality</p>
+<p>Contains the state of the simulation, so it can be implemented efficiently.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.are_mpas_inside_mpa_range">
+<span class="sig-name descname"><span class="pre">are_mpas_inside_mpa_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.are_mpas_inside_mpa_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.are_mpas_inside_mpa_range" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of values indicating if the moon datas contain a valid mpa range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>are_valid</strong> – True/s if the MoonData/s contains mpa values in the valid range.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool | list of bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.clear_srf">
+<span class="sig-name descname"><span class="pre">clear_srf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.clear_srf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.clear_srf" title="Link to this definition"></a></dt>
+<dd><p>Dereference the SRF object from the LimeSimulation, allowing the garbage collector to remove it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis">
+<span class="sig-name descname"><span class="pre">get_elis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_elis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar irradiance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated irradiance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis_asd">
+<span class="sig-name descname"><span class="pre">get_elis_asd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_elis_asd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis_asd" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar irradiance for the asd spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated irradiance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis_cimel">
+<span class="sig-name descname"><span class="pre">get_elis_cimel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_elis_cimel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis_cimel" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar irradiance for the cimel wavelengths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated irradiance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs">
+<span class="sig-name descname"><span class="pre">get_elrefs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_elrefs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar reflectance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated reflectance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs_asd">
+<span class="sig-name descname"><span class="pre">get_elrefs_asd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_elrefs_asd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs_asd" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar reflectance for the asd spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated reflectance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs_cimel">
+<span class="sig-name descname"><span class="pre">get_elrefs_cimel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_elrefs_cimel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs_cimel" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for extraterrestrial lunar reflectance for the cimel wavelengths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elrefs</strong> – Previously calculated reflectance/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_interp_srf_name">
+<span class="sig-name descname"><span class="pre">get_interp_srf_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_interp_srf_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_interp_srf_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_moon_datas">
+<span class="sig-name descname"><span class="pre">get_moon_datas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_moon_datas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_moon_datas" title="Link to this definition"></a></dt>
+<dd><p>Returns the moon datas for the current point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mds</strong> – MoonData/s of the current point.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData">MoonData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_point">
+<span class="sig-name descname"><span class="pre">get_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_point" title="Link to this definition"></a></dt>
+<dd><p>Returns the point that is being used in the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point</strong> – The point used in the simulation.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point">Point</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars">
+<span class="sig-name descname"><span class="pre">get_polars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_polars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for lunar polarisation degree</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polars</strong> – Previously calculated polarisation/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars_asd">
+<span class="sig-name descname"><span class="pre">get_polars_asd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_polars_asd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars_asd" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for lunar polarisation degree for the asd spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polars_asd</strong> – Previously calculated polarisation/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars_cimel">
+<span class="sig-name descname"><span class="pre">get_polars_cimel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_polars_cimel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars_cimel" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for lunar polarisation degree for the cimel wavelengths</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>polars_cimel</strong> – Previously calculated polarisation/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_signals">
+<span class="sig-name descname"><span class="pre">get_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_signals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_signals" title="Link to this definition"></a></dt>
+<dd><p>Returns the stored value for integrated signals</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>signals</strong> – Previously calculated integrated signal/s</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_surfacepoints">
+<span class="sig-name descname"><span class="pre">get_surfacepoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint"><span class="pre">SurfacePoint</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint"><span class="pre">SurfacePoint</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.get_surfacepoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_surfacepoints" title="Link to this definition"></a></dt>
+<dd><p>Returns the Satellites points converted to the equivalent of surface points.
+In case they weren’t Satellite Points, the behaviour is not defined.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>surface_points</strong> – Equivalent surface points</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint">SurfacePoint</a> | list of <a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint">SurfacePoint</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.is_polarisation_updated">
+<span class="sig-name descname"><span class="pre">is_polarisation_updated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.is_polarisation_updated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.is_polarisation_updated" title="Link to this definition"></a></dt>
+<dd><p>Returns if the polarisation has been updated. If not, or nothing has been executed,
+or the spectrum doesn’t contain polarisation values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pol_uptodate</strong> – True if the polarisation is updated</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.is_skipping_uncs">
+<span class="sig-name descname"><span class="pre">is_skipping_uncs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.is_skipping_uncs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.is_skipping_uncs" title="Link to this definition"></a></dt>
+<dd><p>Checks if the current simulation instance is skipping the uncertainties calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>skip</strong> – True if the uncertainties are being skipped.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.set_observations">
+<span class="sig-name descname"><span class="pre">set_observations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lglod</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData" title="lime_tbx.common.datatypes.LGLODData"><span class="pre">LGLODData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.set_observations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.set_observations" title="Link to this definition"></a></dt>
+<dd><p>Loads a set of observations and the relative SRF into the lime simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lglod</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData" title="lime_tbx.common.datatypes.LGLODData"><em>LGLODData</em></a>) – Observations to be loaded</p></li>
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF related to those observations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.set_simulation_changed">
+<span class="sig-name descname"><span class="pre">set_simulation_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.set_simulation_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.set_simulation_changed" title="Link to this definition"></a></dt>
+<dd><p>Marks the current data as not valid. It should be updated.
+If it is marked as valid, it might not be updated even when instructed to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_irradiance">
+<span class="sig-name descname"><span class="pre">update_irradiance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals_srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cimel_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_observation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mda_precalculated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.update_irradiance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_irradiance" title="Link to this definition"></a></dt>
+<dd><p>Updates the irradiance values if the stored value are not valid, using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF for which the reflectance and irradiance will be calculated.</p></li>
+<li><p><strong>srf</strong> – SRF for which the integrated signal will be calculated.</p></li>
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point (location) for which the irradiance will be calculated.</p></li>
+<li><p><strong>cimel_coeff</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><em>ReflectanceCoefficients</em></a>) – Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance (needed for irradiance).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_polarisation">
+<span class="sig-name descname"><span class="pre">update_polarisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">polar_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><span class="pre">PolarisationCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_observation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.update_polarisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_polarisation" title="Link to this definition"></a></dt>
+<dd><p>Updates the polarisation values if the stored values are not valid, using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF for which the polarisation will be calculated.</p></li>
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point (location) for which the polarisation will be calculated.</p></li>
+<li><p><strong>polar_coeff</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><em>PolarisationCoefficients</em></a>) – Coefficients used for the calculation of polarisation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_reflectance">
+<span class="sig-name descname"><span class="pre">update_reflectance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><span class="pre">SpectralResponseFunction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cimel_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_observation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.update_reflectance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_reflectance" title="Link to this definition"></a></dt>
+<dd><p>Updates the reflectance values if the stored values are not valid, using the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srf</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction" title="lime_tbx.common.datatypes.SpectralResponseFunction"><em>SpectralResponseFunction</em></a>) – SRF for which the reflectance will be calculated.</p></li>
+<li><p><strong>point</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point (location) for which the reflectance will be calculated.</p></li>
+<li><p><strong>cimel_coeff</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><em>ReflectanceCoefficients</em></a>) – Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance.</p></li>
+<li><p><strong>callback_observation</strong> (<em>Callable</em>) – Callback that will emit a signal when a simulation is done</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.will_irradiance_calculate_reflectance_previously">
+<span class="sig-name descname"><span class="pre">will_irradiance_calculate_reflectance_previously</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.will_irradiance_calculate_reflectance_previously"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.will_irradiance_calculate_reflectance_previously" title="Link to this definition"></a></dt>
+<dd><p>Returns if the irradiance calculation function would perform the reflectance
+calculation monolitically as a previous step or not given the current state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pt</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point for which the information wants to be known.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>will_calculate</strong> – True if the reflectance would be calculated previously.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.LimeSimulation.will_irradiance_calculate_reflectance_simultaneously">
+<span class="sig-name descname"><span class="pre">will_irradiance_calculate_reflectance_simultaneously</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><span class="pre">Point</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#LimeSimulation.will_irradiance_calculate_reflectance_simultaneously"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.LimeSimulation.will_irradiance_calculate_reflectance_simultaneously" title="Link to this definition"></a></dt>
+<dd><p>Returns if the irradiance calculation function would perform the reflectance
+calculation simultaneously avoiding storing the error correlation matrices,
+given the current state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pt</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point" title="lime_tbx.common.datatypes.Point"><em>Point</em></a>) – Point for which the information wants to be known.
+If not specified the currently loaded one will be used.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>will_calculate</strong> – True if the reflectance would be calculated simultaneously.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lime_tbx.application.simulation.lime_simulation.is_ampa_valid_range">
+<span class="sig-prename descclassname"><span class="pre">lime_tbx.application.simulation.lime_simulation.</span></span><span class="sig-name descname"><span class="pre">is_ampa_valid_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ampa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/application/simulation/lime_simulation.html#is_ampa_valid_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.application.simulation.lime_simulation.is_ampa_valid_range" title="Link to this definition"></a></dt>
+<dd><p>Checks if the value of the absolute moon phase angle is inside the valid range for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ampa</strong> (<em>float</em>) – Absolute moon phase angle in degrees</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>valid_range</strong> – True if the angle is inside the valid range for the simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lime_tbx.application.simulation.comparison.utils.html" class="btn btn-neutral float-left" title="lime_tbx.application.simulation.comparison.utils module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.application.simulation.moon_data_factory.html" class="btn btn-neutral float-right" title="lime_tbx.application.simulation.moon_data_factory module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

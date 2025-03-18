@@ -1,0 +1,7 @@
+lime\_tbx.business.eocfi\_adapter.eocfi\_adapter module
+=======================================================
+
+.. automodule:: lime_tbx.business.eocfi_adapter.eocfi_adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:

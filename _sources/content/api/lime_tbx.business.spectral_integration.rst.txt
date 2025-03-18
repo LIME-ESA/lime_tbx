@@ -1,0 +1,15 @@
+lime\_tbx.business.spectral\_integration package
+================================================
+
+.. automodule:: lime_tbx.business.spectral_integration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.business.spectral_integration.spectral_integration

@@ -1,0 +1,501 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.common package &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="lime_tbx.common.constants module" href="lime_tbx.common.constants.html" />
+    <link rel="prev" title="lime_tbx.business.spice_adapter.spice_adapter module" href="lime_tbx.business.spice_adapter.spice_adapter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="lime_tbx.html">lime_tbx package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">lime_tbx.common package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.html">lime_tbx.presentation package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.common package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/api/lime_tbx.common.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-lime_tbx.common">
+<span id="lime-tbx-common-package"></span><h1>lime_tbx.common package<a class="headerlink" href="#module-lime_tbx.common" title="Link to this heading"></a></h1>
+<p>LIME Toolbox - Common Layer</p>
+<p>This package contains shared utilities, constants, and helper functions
+that are used across different layers of the LIME Toolbox. It ensures code
+reusability and maintainability by centralizing common functionality.</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lime_tbx.common.constants.html">lime_tbx.common.constants module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields"><code class="docutils literal notranslate"><span class="pre">CompFields</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.COMP_DATE"><code class="docutils literal notranslate"><span class="pre">CompFields.COMP_DATE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.COMP_MPA"><code class="docutils literal notranslate"><span class="pre">CompFields.COMP_MPA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.COMP_WLEN"><code class="docutils literal notranslate"><span class="pre">CompFields.COMP_WLEN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.COMP_WLEN_MEAN"><code class="docutils literal notranslate"><span class="pre">CompFields.COMP_WLEN_MEAN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.DIFF_NONE"><code class="docutils literal notranslate"><span class="pre">CompFields.DIFF_NONE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.DIFF_PERC"><code class="docutils literal notranslate"><span class="pre">CompFields.DIFF_PERC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields.DIFF_REL"><code class="docutils literal notranslate"><span class="pre">CompFields.DIFF_REL</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lime_tbx.common.datatypes.html">lime_tbx.common.datatypes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData"><code class="docutils literal notranslate"><span class="pre">ComparisonData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.observed_signal"><code class="docutils literal notranslate"><span class="pre">ComparisonData.observed_signal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.simulated_signal"><code class="docutils literal notranslate"><span class="pre">ComparisonData.simulated_signal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.diffs_signal"><code class="docutils literal notranslate"><span class="pre">ComparisonData.diffs_signal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.mean_relative_difference"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mean_relative_difference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.mean_absolute_relative_difference"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mean_absolute_relative_difference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.standard_deviation_mrd"><code class="docutils literal notranslate"><span class="pre">ComparisonData.standard_deviation_mrd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.number_samples"><code class="docutils literal notranslate"><span class="pre">ComparisonData.number_samples</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.dts"><code class="docutils literal notranslate"><span class="pre">ComparisonData.dts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.points"><code class="docutils literal notranslate"><span class="pre">ComparisonData.points</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.ampa_valid_range"><code class="docutils literal notranslate"><span class="pre">ComparisonData.ampa_valid_range</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.perc_diffs"><code class="docutils literal notranslate"><span class="pre">ComparisonData.perc_diffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.mean_perc_difference"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mean_perc_difference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.mdas"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mdas</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id0"><code class="docutils literal notranslate"><span class="pre">ComparisonData.ampa_valid_range</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id1"><code class="docutils literal notranslate"><span class="pre">ComparisonData.diffs_signal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id2"><code class="docutils literal notranslate"><span class="pre">ComparisonData.dts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.get_diffs_and_label"><code class="docutils literal notranslate"><span class="pre">ComparisonData.get_diffs_and_label()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id3"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mdas</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id4"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mean_absolute_relative_difference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id5"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mean_perc_difference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id6"><code class="docutils literal notranslate"><span class="pre">ComparisonData.mean_relative_difference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id7"><code class="docutils literal notranslate"><span class="pre">ComparisonData.number_samples</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id8"><code class="docutils literal notranslate"><span class="pre">ComparisonData.observed_signal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id9"><code class="docutils literal notranslate"><span class="pre">ComparisonData.perc_diffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id10"><code class="docutils literal notranslate"><span class="pre">ComparisonData.points</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id11"><code class="docutils literal notranslate"><span class="pre">ComparisonData.simulated_signal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id12"><code class="docutils literal notranslate"><span class="pre">ComparisonData.standard_deviation_mrd</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint"><code class="docutils literal notranslate"><span class="pre">CustomPoint</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.distance_sun_moon"><code class="docutils literal notranslate"><span class="pre">CustomPoint.distance_sun_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.distance_observer_moon"><code class="docutils literal notranslate"><span class="pre">CustomPoint.distance_observer_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.selen_obs_lat"><code class="docutils literal notranslate"><span class="pre">CustomPoint.selen_obs_lat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.selen_obs_lon"><code class="docutils literal notranslate"><span class="pre">CustomPoint.selen_obs_lon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.selen_sun_lon"><code class="docutils literal notranslate"><span class="pre">CustomPoint.selen_sun_lon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.abs_moon_phase_angle"><code class="docutils literal notranslate"><span class="pre">CustomPoint.abs_moon_phase_angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint.moon_phase_angle"><code class="docutils literal notranslate"><span class="pre">CustomPoint.moon_phase_angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id13"><code class="docutils literal notranslate"><span class="pre">CustomPoint.abs_moon_phase_angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id14"><code class="docutils literal notranslate"><span class="pre">CustomPoint.distance_observer_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id15"><code class="docutils literal notranslate"><span class="pre">CustomPoint.distance_sun_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id16"><code class="docutils literal notranslate"><span class="pre">CustomPoint.moon_phase_angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id17"><code class="docutils literal notranslate"><span class="pre">CustomPoint.selen_obs_lat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id18"><code class="docutils literal notranslate"><span class="pre">CustomPoint.selen_obs_lon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id19"><code class="docutils literal notranslate"><span class="pre">CustomPoint.selen_sun_lon</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath"><code class="docutils literal notranslate"><span class="pre">EocfiPath</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath.main_eocfi_path"><code class="docutils literal notranslate"><span class="pre">EocfiPath.main_eocfi_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath.custom_eocfi_path"><code class="docutils literal notranslate"><span class="pre">EocfiPath.custom_eocfi_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id20"><code class="docutils literal notranslate"><span class="pre">EocfiPath.custom_eocfi_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id21"><code class="docutils literal notranslate"><span class="pre">EocfiPath.main_eocfi_path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.interpolation_spectrum"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.interpolation_spectrum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.interpolation_spectrum_polarisation"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.interpolation_spectrum_polarisation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.interpolation_SRF"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.interpolation_SRF</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.show_interp_spectrum"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.show_interp_spectrum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.skip_uncertainties"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.skip_uncertainties</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.use_wehrli"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.use_wehrli</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id22"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.interpolation_SRF</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id23"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.interpolation_spectrum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id24"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.interpolation_spectrum_polarisation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings.show_cimel_points"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.show_cimel_points</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id25"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.show_interp_spectrum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id26"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.skip_uncertainties</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id27"><code class="docutils literal notranslate"><span class="pre">InterpolationSettings.use_wehrli</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath"><code class="docutils literal notranslate"><span class="pre">KernelsPath</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath.main_kernels_path"><code class="docutils literal notranslate"><span class="pre">KernelsPath.main_kernels_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath.custom_kernel_path"><code class="docutils literal notranslate"><span class="pre">KernelsPath.custom_kernel_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id28"><code class="docutils literal notranslate"><span class="pre">KernelsPath.custom_kernel_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id29"><code class="docutils literal notranslate"><span class="pre">KernelsPath.main_kernels_path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData.comparisons"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.comparisons</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData.ch_names"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.ch_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData.sat_name"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.sat_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData.spectrum_name"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.spectrum_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData.skipped_uncs"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.skipped_uncs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id30"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.ch_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id31"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.comparisons</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id32"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.sat_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id33"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.skipped_uncs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id34"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.spectrum_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData.version"><code class="docutils literal notranslate"><span class="pre">LGLODComparisonData.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData"><code class="docutils literal notranslate"><span class="pre">LGLODData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.observations"><code class="docutils literal notranslate"><span class="pre">LGLODData.observations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.signals"><code class="docutils literal notranslate"><span class="pre">LGLODData.signals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.not_default_srf"><code class="docutils literal notranslate"><span class="pre">LGLODData.not_default_srf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.elis_cimel"><code class="docutils literal notranslate"><span class="pre">LGLODData.elis_cimel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.elrefs_cimel"><code class="docutils literal notranslate"><span class="pre">LGLODData.elrefs_cimel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.polars_cimel"><code class="docutils literal notranslate"><span class="pre">LGLODData.polars_cimel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.spectrum_name"><code class="docutils literal notranslate"><span class="pre">LGLODData.spectrum_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.skipped_uncs"><code class="docutils literal notranslate"><span class="pre">LGLODData.skipped_uncs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.dolp_spectrum_name"><code class="docutils literal notranslate"><span class="pre">LGLODData.dolp_spectrum_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id35"><code class="docutils literal notranslate"><span class="pre">LGLODData.dolp_spectrum_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id36"><code class="docutils literal notranslate"><span class="pre">LGLODData.elis_cimel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id37"><code class="docutils literal notranslate"><span class="pre">LGLODData.elrefs_cimel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id38"><code class="docutils literal notranslate"><span class="pre">LGLODData.not_default_srf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id39"><code class="docutils literal notranslate"><span class="pre">LGLODData.observations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id40"><code class="docutils literal notranslate"><span class="pre">LGLODData.polars_cimel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id41"><code class="docutils literal notranslate"><span class="pre">LGLODData.signals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id42"><code class="docutils literal notranslate"><span class="pre">LGLODData.skipped_uncs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id43"><code class="docutils literal notranslate"><span class="pre">LGLODData.spectrum_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData.version"><code class="docutils literal notranslate"><span class="pre">LGLODData.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeCoefficients"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeCoefficients.reflectance"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients.reflectance</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeCoefficients.polarisation"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients.polarisation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeCoefficients.version"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id44"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients.polarisation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id45"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients.reflectance</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id46"><code class="docutils literal notranslate"><span class="pre">LimeCoefficients.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeException"><code class="docutils literal notranslate"><span class="pre">LimeException</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation"><code class="docutils literal notranslate"><span class="pre">LunarObservation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.ch_names"><code class="docutils literal notranslate"><span class="pre">LunarObservation.ch_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.sat_pos_ref"><code class="docutils literal notranslate"><span class="pre">LunarObservation.sat_pos_ref</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.ch_irrs"><code class="docutils literal notranslate"><span class="pre">LunarObservation.ch_irrs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.dt"><code class="docutils literal notranslate"><span class="pre">LunarObservation.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.sat_pos"><code class="docutils literal notranslate"><span class="pre">LunarObservation.sat_pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.data_source"><code class="docutils literal notranslate"><span class="pre">LunarObservation.data_source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.md"><code class="docutils literal notranslate"><span class="pre">LunarObservation.md</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id47"><code class="docutils literal notranslate"><span class="pre">LunarObservation.ch_irrs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id48"><code class="docutils literal notranslate"><span class="pre">LunarObservation.ch_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.check_valid_srf"><code class="docutils literal notranslate"><span class="pre">LunarObservation.check_valid_srf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id49"><code class="docutils literal notranslate"><span class="pre">LunarObservation.data_source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id50"><code class="docutils literal notranslate"><span class="pre">LunarObservation.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.get_ch_irradiance"><code class="docutils literal notranslate"><span class="pre">LunarObservation.get_ch_irradiance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.has_ch_value"><code class="docutils literal notranslate"><span class="pre">LunarObservation.has_ch_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id51"><code class="docutils literal notranslate"><span class="pre">LunarObservation.md</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id52"><code class="docutils literal notranslate"><span class="pre">LunarObservation.sat_pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id53"><code class="docutils literal notranslate"><span class="pre">LunarObservation.sat_pos_ref</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.ch_names"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.ch_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.sat_pos_ref"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.sat_pos_ref</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.dt"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.sat_pos"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.sat_pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.irrs"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.irrs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.refls"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.refls</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.polars"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.polars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.sat_name"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.sat_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.selenographic_data"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.selenographic_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.data_source"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.data_source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id54"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.ch_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.check_valid_srf"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.check_valid_srf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id55"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.data_source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id56"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.has_ch_value"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.has_ch_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id57"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.irrs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id58"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.polars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id59"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.refls</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id60"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.sat_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id61"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.sat_pos</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id62"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.sat_pos_ref</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id63"><code class="docutils literal notranslate"><span class="pre">LunarObservationWrite.selenographic_data</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData"><code class="docutils literal notranslate"><span class="pre">MoonData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.distance_sun_moon"><code class="docutils literal notranslate"><span class="pre">MoonData.distance_sun_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.distance_observer_moon"><code class="docutils literal notranslate"><span class="pre">MoonData.distance_observer_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.selen_sun_lon_rad"><code class="docutils literal notranslate"><span class="pre">MoonData.selen_sun_lon_rad</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.selen_obs_lat"><code class="docutils literal notranslate"><span class="pre">MoonData.selen_obs_lat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.selen_obs_lon"><code class="docutils literal notranslate"><span class="pre">MoonData.selen_obs_lon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.abs_moon_phase_angle"><code class="docutils literal notranslate"><span class="pre">MoonData.abs_moon_phase_angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.mpa_degrees"><code class="docutils literal notranslate"><span class="pre">MoonData.mpa_degrees</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData.geom_factor"><code class="docutils literal notranslate"><span class="pre">MoonData.geom_factor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.OrbitFile"><code class="docutils literal notranslate"><span class="pre">OrbitFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.OrbitFile.name"><code class="docutils literal notranslate"><span class="pre">OrbitFile.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.OrbitFile.dt0"><code class="docutils literal notranslate"><span class="pre">OrbitFile.dt0</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.OrbitFile.dtf"><code class="docutils literal notranslate"><span class="pre">OrbitFile.dtf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id64"><code class="docutils literal notranslate"><span class="pre">OrbitFile.dt0</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id65"><code class="docutils literal notranslate"><span class="pre">OrbitFile.dtf</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id66"><code class="docutils literal notranslate"><span class="pre">OrbitFile.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point"><code class="docutils literal notranslate"><span class="pre">Point</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_coefficients_negative"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients.get_coefficients_negative()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_coefficients_positive"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients.get_coefficients_positive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_uncertainties_negative"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients.get_uncertainties_negative()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_uncertainties_positive"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients.get_uncertainties_positive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_wavelengths"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients.get_wavelengths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.is_calculable"><code class="docutils literal notranslate"><span class="pre">PolarisationCoefficients.is_calculable()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients._ds"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients._ds</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients.wlens"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.wlens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients.coeffs"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.coeffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients.unc_coeffs"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.unc_coeffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id67"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.coeffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients.err_corr_coeff"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.err_corr_coeff</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id68"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.unc_coeffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id69"><code class="docutils literal notranslate"><span class="pre">ReflectanceCoefficients.wlens</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRFChannel"><code class="docutils literal notranslate"><span class="pre">SRFChannel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRFChannel.center"><code class="docutils literal notranslate"><span class="pre">SRFChannel.center</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRFChannel.id"><code class="docutils literal notranslate"><span class="pre">SRFChannel.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRFChannel.spectral_response"><code class="docutils literal notranslate"><span class="pre">SRFChannel.spectral_response</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRFChannel.valid_spectre"><code class="docutils literal notranslate"><span class="pre">SRFChannel.valid_spectre</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.name"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.channels"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.channels</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.fwhm"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.fwhm</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.get_shape"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.get_shape()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.get_values"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.get_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.get_wavelengths"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.get_wavelengths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id70"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.shape"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.shape</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.wav_centre"><code class="docutils literal notranslate"><span class="pre">SRF_fwhm.wav_centre</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite"><code class="docutils literal notranslate"><span class="pre">Satellite</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.name"><code class="docutils literal notranslate"><span class="pre">Satellite.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.id"><code class="docutils literal notranslate"><span class="pre">Satellite.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.orbit_files"><code class="docutils literal notranslate"><span class="pre">Satellite.orbit_files</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.norad_sat_number"><code class="docutils literal notranslate"><span class="pre">Satellite.norad_sat_number</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.intdes"><code class="docutils literal notranslate"><span class="pre">Satellite.intdes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.time_file"><code class="docutils literal notranslate"><span class="pre">Satellite.time_file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.get_best_orbit_file"><code class="docutils literal notranslate"><span class="pre">Satellite.get_best_orbit_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.get_datetime_range"><code class="docutils literal notranslate"><span class="pre">Satellite.get_datetime_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id71"><code class="docutils literal notranslate"><span class="pre">Satellite.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id72"><code class="docutils literal notranslate"><span class="pre">Satellite.intdes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id73"><code class="docutils literal notranslate"><span class="pre">Satellite.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id74"><code class="docutils literal notranslate"><span class="pre">Satellite.norad_sat_number</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id75"><code class="docutils literal notranslate"><span class="pre">Satellite.orbit_files</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id76"><code class="docutils literal notranslate"><span class="pre">Satellite.time_file</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePoint"><code class="docutils literal notranslate"><span class="pre">SatellitePoint</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePoint.name"><code class="docutils literal notranslate"><span class="pre">SatellitePoint.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePoint.dt"><code class="docutils literal notranslate"><span class="pre">SatellitePoint.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id77"><code class="docutils literal notranslate"><span class="pre">SatellitePoint.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id78"><code class="docutils literal notranslate"><span class="pre">SatellitePoint.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePosition"><code class="docutils literal notranslate"><span class="pre">SatellitePosition</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePosition.x"><code class="docutils literal notranslate"><span class="pre">SatellitePosition.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePosition.y"><code class="docutils literal notranslate"><span class="pre">SatellitePosition.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePosition.z"><code class="docutils literal notranslate"><span class="pre">SatellitePosition.z</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id79"><code class="docutils literal notranslate"><span class="pre">SatellitePosition.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id80"><code class="docutils literal notranslate"><span class="pre">SatellitePosition.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id81"><code class="docutils literal notranslate"><span class="pre">SatellitePosition.z</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite.distance_sun_moon"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.distance_sun_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite.selen_sun_lon_rad"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.selen_sun_lon_rad</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite.mpa_degrees"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.mpa_degrees</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite.selen_obs_lat_deg"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.selen_obs_lat_deg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite.selen_obs_lon_deg"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.selen_obs_lon_deg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite.distance_obs_moon_km"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.distance_obs_moon_km</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id82"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.distance_obs_moon_km</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id83"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.distance_sun_moon</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id84"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.mpa_degrees</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id85"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.selen_obs_lat_deg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id86"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.selen_obs_lon_deg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id87"><code class="docutils literal notranslate"><span class="pre">SelenographicDataWrite.selen_sun_lon_rad</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData"><code class="docutils literal notranslate"><span class="pre">SpectralData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.wlens"><code class="docutils literal notranslate"><span class="pre">SpectralData.wlens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.data"><code class="docutils literal notranslate"><span class="pre">SpectralData.data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.uncertainties"><code class="docutils literal notranslate"><span class="pre">SpectralData.uncertainties</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.err_corr"><code class="docutils literal notranslate"><span class="pre">SpectralData.err_corr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.clear_err_corr"><code class="docutils literal notranslate"><span class="pre">SpectralData.clear_err_corr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_irradiance_ds"><code class="docutils literal notranslate"><span class="pre">SpectralData.make_irradiance_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_polarisation_ds"><code class="docutils literal notranslate"><span class="pre">SpectralData.make_polarisation_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_reflectance_ds"><code class="docutils literal notranslate"><span class="pre">SpectralData.make_reflectance_ds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_signals_ds"><code class="docutils literal notranslate"><span class="pre">SpectralData.make_signals_ds()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.name"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.channels"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.channels</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id88"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.channels</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_channel_from_name"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.get_channel_from_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_channels_centers"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.get_channels_centers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_channels_names"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.get_channels_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_values"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.get_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_wavelengths"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.get_wavelengths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id89"><code class="docutils literal notranslate"><span class="pre">SpectralResponseFunction.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralValidity"><code class="docutils literal notranslate"><span class="pre">SpectralValidity</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralValidity.OUT"><code class="docutils literal notranslate"><span class="pre">SpectralValidity.OUT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralValidity.PARTLY_OUT"><code class="docutils literal notranslate"><span class="pre">SpectralValidity.PARTLY_OUT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralValidity.VALID"><code class="docutils literal notranslate"><span class="pre">SpectralValidity.VALID</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint"><code class="docutils literal notranslate"><span class="pre">SurfacePoint</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint.latitude"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.latitude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint.longitude"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.longitude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint.altitude"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.altitude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint.dt"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id90"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.altitude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id91"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.dt</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id92"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.latitude</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.datatypes.html#id93"><code class="docutils literal notranslate"><span class="pre">SurfacePoint.longitude</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lime_tbx.common.logger.html">lime_tbx.common.logger module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lime_tbx.common.logger.html#lime_tbx.common.logger.get_logger"><code class="docutils literal notranslate"><span class="pre">get_logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lime_tbx.common.templates.html">lime_tbx.common.templates module</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lime_tbx.business.spice_adapter.spice_adapter.html" class="btn btn-neutral float-left" title="lime_tbx.business.spice_adapter.spice_adapter module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.common.constants.html" class="btn btn-neutral float-right" title="lime_tbx.common.constants module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

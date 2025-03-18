@@ -1,0 +1,16 @@
+lime\_tbx.application.simulation.comparison package
+===================================================
+
+.. automodule:: lime_tbx.application.simulation.comparison
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.application.simulation.comparison.comparison
+   lime_tbx.application.simulation.comparison.utils

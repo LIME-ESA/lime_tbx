@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.application.simulation.comparison.utils &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.application.simulation.comparison.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.application.simulation.comparison.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module abstracts and encapsulates utilities related to performing</span>
+<span class="sd">and showing comparisons between user measurements and the model output.</span>
+
+<span class="sd">It exports the following methods:</span>
+<span class="sd">    * average_comparisons - Returns a ComparisonData based on the average</span>
+<span class="sd">        of a list of ComparisonData, now classified by channel.</span>
+<span class="sd">    * sort_by_mpa - Returns a copy of the given list of ComparisonData</span>
+<span class="sd">        but sorted by moon phase angle.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="sd">&quot;&quot;&quot;___NPL Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.lime_simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_ampa_valid_range</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ComparisonData</span><span class="p">,</span>
+    <span class="n">SpectralData</span><span class="p">,</span>
+    <span class="n">MoonData</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;29/10/2024&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Production&quot;</span>
+
+
+<div class="viewcode-block" id="sort_by_mpa">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.application.simulation.comparison.utils.html#lime_tbx.application.simulation.comparison.utils.sort_by_mpa">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_by_mpa</span><span class="p">(</span><span class="n">comparisons</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComparisonData</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ComparisonData</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a copy of the given list of ComparisonData but sorted by moon phase angle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparisons: list of ComparisonData</span>
+<span class="sd">        List of ComparisonData that will be sorted by mpa.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sorted_comparisons: list of ComparisonData</span>
+<span class="sd">        List with the same ComparisonData instances but sorted by the moon phase angle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_comparisons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comparisons</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">observed_signal</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_comparisons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">spectrals</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">observed_signal</span><span class="p">,</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">simulated_signal</span><span class="p">,</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">diffs_signal</span><span class="p">,</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">perc_diffs</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">sp_vals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">spectr</span> <span class="ow">in</span> <span class="n">spectrals</span><span class="p">:</span>
+            <span class="n">sp_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectr</span><span class="o">.</span><span class="n">wlens</span><span class="p">)</span>
+            <span class="n">sp_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectr</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">sp_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectr</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">)</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">sp_vals</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">dts</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">mdas</span><span class="p">))</span>
+        <span class="n">vals</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mpa_degrees</span><span class="p">)</span>
+        <span class="n">mdas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">]</span>
+        <span class="n">mpas</span> <span class="o">=</span> <span class="p">[</span><span class="n">mda</span><span class="o">.</span><span class="n">mpa_degrees</span> <span class="k">for</span> <span class="n">mda</span> <span class="ow">in</span> <span class="n">mdas</span><span class="p">]</span>
+        <span class="n">ampa_valid_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">is_ampa_valid_range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">mpa</span><span class="p">))</span> <span class="k">for</span> <span class="n">mpa</span> <span class="ow">in</span> <span class="n">mpas</span><span class="p">]</span>
+        <span class="n">new_spectrals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spectr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spectrals</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span>
+            <span class="n">wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mpas</span><span class="p">)</span>  <span class="c1"># [v[index].mpa_degrees for v in vals]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">])</span>
+            <span class="n">uncertainties</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">])</span>
+            <span class="n">new_spectrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpectralData</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">uncertainties</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">mrd</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">mean_relative_difference</span>
+        <span class="n">mard</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">mean_absolute_relative_difference</span>
+        <span class="n">mpd</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">mean_perc_difference</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">standard_deviation_mrd</span>
+        <span class="n">nsamp</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">number_samples</span>
+        <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">]</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">]</span>
+        <span class="n">nc</span> <span class="o">=</span> <span class="n">ComparisonData</span><span class="p">(</span>
+            <span class="n">new_spectrals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">new_spectrals</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">new_spectrals</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">mrd</span><span class="p">,</span>
+            <span class="n">mard</span><span class="p">,</span>
+            <span class="n">std</span><span class="p">,</span>
+            <span class="n">nsamp</span><span class="p">,</span>
+            <span class="n">dts</span><span class="p">,</span>
+            <span class="n">points</span><span class="p">,</span>
+            <span class="n">ampa_valid_range</span><span class="p">,</span>
+            <span class="n">new_spectrals</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="n">mpd</span><span class="p">,</span>
+            <span class="n">mdas</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">new_comparisons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_comparisons</span></div>
+
+
+
+<div class="viewcode-block" id="average_comparisons">
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.application.simulation.comparison.utils.html#lime_tbx.application.simulation.comparison.utils.average_comparisons">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_comparisons</span><span class="p">(</span>
+    <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">comps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComparisonData</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComparisonData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a ComparisonData based on the average of a list of ComparisonData,</span>
+<span class="sd">    now classified by channel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparisons: list of ComparisonData</span>
+<span class="sd">        List of ComparisonData that will be merged and averaged.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    avg_comparison: ComparisonData</span>
+<span class="sd">        ComparisonData based on the average data of the given comparisons.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span>
+        <span class="n">wlens</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">observed_signal</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">observed_signal</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sim</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span>
+        <span class="n">wlens</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">simulated_signal</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">simulated_signal</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">diffs</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span>
+        <span class="n">wlens</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">diffs_signal</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">diffs_signal</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mrd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span><span class="n">diffs</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mard</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">mean_absolute_relative_difference</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">stdrd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">standard_deviation_mrd</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">number_samples</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])</span>
+    <span class="n">ampavr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">ampa_valid_range</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">])</span>
+    <span class="n">perc_diffs</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span>
+        <span class="n">wlens</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">perc_diffs</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">perc_diffs</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">]),</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mpd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span><span class="n">perc_diffs</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ComparisonData</span><span class="p">(</span>
+        <span class="n">obs</span><span class="p">,</span>
+        <span class="n">sim</span><span class="p">,</span>
+        <span class="n">diffs</span><span class="p">,</span>
+        <span class="n">mrd</span><span class="p">,</span>
+        <span class="n">mard</span><span class="p">,</span>
+        <span class="n">stdrd</span><span class="p">,</span>
+        <span class="n">ns</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ampavr</span><span class="p">,</span>
+        <span class="n">perc_diffs</span><span class="p">,</span>
+        <span class="n">mpd</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">c</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

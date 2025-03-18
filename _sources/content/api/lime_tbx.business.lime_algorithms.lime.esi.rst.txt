@@ -1,0 +1,7 @@
+lime\_tbx.business.lime\_algorithms.lime.esi module
+===================================================
+
+.. automodule:: lime_tbx.business.lime_algorithms.lime.esi
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,16 @@
+lime\_tbx.persistence.local\_storage package
+============================================
+
+.. automodule:: lime_tbx.persistence.local_storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.persistence.local_storage.appdata
+   lime_tbx.persistence.local_storage.programdata

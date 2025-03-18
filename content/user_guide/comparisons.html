@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparisons &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Coefficients" href="coefficients.html" />
+    <link rel="prev" title="Simulations" href="simulations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulations.html">Simulations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Comparisons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-input">Comparison Input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-output">Comparison Output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#default-view">Default View</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-options">User Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exporting-data">Exporting Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#comparing-throught-the-command-line-interface-cli">Comparing throught the Command-Line Interface (CLI)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cli-comparison-input">CLI Comparison Input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cli-comparison-output">CLI Comparison Output</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#graphical-export-image-pdf">Graphical Export (Image/PDF)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-export-csv-file">Data Export (CSV File)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#netcdf-export">NetCDF Export</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Comparisons</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/content/user_guide/comparisons.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="comparisons">
+<h1>Comparisons<a class="headerlink" href="#comparisons" title="Link to this heading"></a></h1>
+<p>Users must switch to the comparison page. Go to the action menu bar and navigate
+to “File → Perform comparisons from a remote sensing instrument” as seen in <a class="reference internal" href="#fig-15">Figure 15</a>.</p>
+<figure class="align-center" id="fig-15">
+<img alt="Action menu option to switch to the comparisons page" src="../../_images/action_to_comparisons.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 15:</i> </span><span class="caption-text">Action menu option to switch to the comparisons page.</span><a class="headerlink" href="#fig-15" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="comparison-input">
+<h2>Comparison Input<a class="headerlink" href="#comparison-input" title="Link to this heading"></a></h2>
+<figure class="align-center" id="fig-16">
+<img alt="Initial view of the comparison page" src="../../_images/initial_comparison_page.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 16:</i> </span><span class="caption-text">Initial view of the comparison page.</span><a class="headerlink" href="#fig-16" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The comparison page (<a class="reference internal" href="#fig-16">Figure 16</a>) contains the user input fields at the top:</p>
+<ul class="simple">
+<li><p><strong>Lunar Observation Files</strong>:</p>
+<ul>
+<li><p>Instrument observation netCDF files in GLOD format to be compared.</p>
+<ul>
+<li><p>GLOD formats are explained in the <a class="reference internal" href="formats.html"><span class="std std-doc">File Formats</span></a> section.</p></li>
+</ul>
+</li>
+<li><p>“LOAD FILES”: Opens a file selection dialog for loading observation files.</p></li>
+<li><p>“UNLOAD FILES”: Clears all loaded observation files.</p></li>
+</ul>
+</li>
+<li><p><strong>SRF File</strong>:</p>
+<ul>
+<li><p>SRF netCDF file in GLOD format.</p>
+<ul>
+<li><p>Must contain channels matching those in the observation files.</p></li>
+</ul>
+</li>
+<li><p>“LOAD FILE”: Opens a file selection dialog for selecting the SRF file.</p></li>
+</ul>
+</li>
+<li><p><strong>Compare Button</strong>:</p>
+<ul>
+<li><p>Initiates the comparison processing, displaying a progress indicator (as shown in <a class="reference internal" href="#fig-17">Figure 17</a>).</p></li>
+<li><p>This button is enabled once valid observations and an SRF file are loaded.</p></li>
+</ul>
+</li>
+</ul>
+<figure class="align-center" id="fig-17">
+<img alt="Comparison page processing comparisons" src="../../_images/processing_comparison_page.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 17:</i> </span><span class="caption-text">Comparison page processing comparisons.</span><a class="headerlink" href="#fig-17" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="comparison-output">
+<h2>Comparison Output<a class="headerlink" href="#comparison-output" title="Link to this heading"></a></h2>
+<p>Once comparisons are computed, the comparison page presents the results and
+provides tools for exploring the data, as shown in <a class="reference internal" href="#fig-18">Figure 18</a>.</p>
+<figure class="align-center" id="fig-18">
+<img alt="Comparison page after comparisons are computed" src="../../_images/comparison_finished.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 18:</i> </span><span class="caption-text">Comparison page after comparisons are computed.</span><a class="headerlink" href="#fig-18" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="default-view">
+<h3>Default View<a class="headerlink" href="#default-view" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The <strong>instrument’s first-channel irradiance observations</strong> (blue) are plotted alongside<br />
+<strong>LIME simulations</strong> (orange) for the same channel.</p></li>
+<li><p>The <strong>x-axis</strong> represents the <strong>comparison variable</strong> (default: <strong>Date</strong>).</p></li>
+<li><p>The <strong>primary y-axis</strong> represents <strong>irradiance values</strong>.</p></li>
+<li><p>The <strong>secondary y-axis</strong> (right) represents the <strong>relative difference (%)</strong> (gray).</p></li>
+</ul>
+</section>
+<section id="user-options">
+<h3>User Options<a class="headerlink" href="#user-options" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Channel Selection</strong>: Switch between instrument channels via the “Channels” tab (above the graphs).</p></li>
+<li><p><strong>Difference Metric</strong>: Adjust the displayed difference via the “Difference” dropdown (top-right), selecting:</p>
+<ul>
+<li><p><strong>Relative difference</strong></p></li>
+<li><p><strong>Percentage difference</strong></p></li>
+<li><p><strong>No difference</strong></p></li>
+</ul>
+</li>
+<li><p><strong>Comparison Method</strong>: Change the comparison basis via the “Comparison by” dropdown (top-center) from <strong>Date</strong> to:</p>
+<ul>
+<li><p><strong>Moon phase angle</strong></p></li>
+<li><p><strong>Wavelength</strong>, with two visualization options:</p>
+<ul>
+<li><p><strong>Mean-based Comparison</strong>: Computes the mean of all observations and simulations for each channel.</p></li>
+<li><p><strong>Boxplot Visualization</strong>: Displays the distribution of values per channel, as explained in <a class="reference internal" href="#fig-19">Figure 19</a>.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>New Comparison</strong>: Click “NEW” (top-left) to clear results and start a new comparison.</p>
+<ul>
+<li><p>A <strong>confirmation dialog</strong> appears, as shown in <a class="reference internal" href="#fig-20">Figure 20</a>.</p></li>
+</ul>
+</li>
+</ul>
+<figure class="align-center" id="fig-19">
+<img alt="LIME comparisons boxplots dissected" src="../../_images/boxplot_meaning.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 19:</i> </span><span class="caption-text">Breakdown of LIME comparison boxplots.</span><a class="headerlink" href="#fig-19" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="fig-20">
+<img alt="Dialog asking for confirmation after clicking \&quot;NEW\&quot;" src="../../_images/clear_comparison.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 20:</i> </span><span class="caption-text">Dialog asking for confirmation after clicking “NEW”</span><a class="headerlink" href="#fig-20" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="exporting-data">
+<h3>Exporting Data<a class="headerlink" href="#exporting-data" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Graphs can be exported as images (JPG, PNG, PDF, etc.) or CSV files.</p></li>
+<li><p>The full comparison dataset can be saved as a netCDF file, allowing it to be reloaded in LIME Toolbox for future analysis.</p></li>
+</ul>
+</section>
+</section>
+<section id="comparing-throught-the-command-line-interface-cli">
+<h2>Comparing throught the Command-Line Interface (CLI)<a class="headerlink" href="#comparing-throught-the-command-line-interface-cli" title="Link to this heading"></a></h2>
+<section id="cli-comparison-input">
+<h3>CLI Comparison Input<a class="headerlink" href="#cli-comparison-input" title="Link to this heading"></a></h3>
+<p>To perform comparisons via CLI, use the <code class="docutils literal notranslate"><span class="pre">-c</span></code> or <code class="docutils literal notranslate"><span class="pre">--comparison</span></code> option along with <code class="docutils literal notranslate"><span class="pre">-f</span></code> or <code class="docutils literal notranslate"><span class="pre">--srf</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;path_observation_1 path_observation_2 ... path_observation_n&quot;</span><span class="w"> </span>-f<span class="w"> </span>path_srf
+</pre></div>
+</div>
+<p><strong>Example:</strong>
+To compare <code class="docutils literal notranslate"><span class="pre">input_1.nc</span></code>, <code class="docutils literal notranslate"><span class="pre">input_2.nc</span></code> and <code class="docutils literal notranslate"><span class="pre">input_3.nc</span></code>, using the spectral response function
+defined in <code class="docutils literal notranslate"><span class="pre">srf.nc</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;input_1.nc input_2.nc input_3.nc&quot;</span><span class="w"> </span>-f<span class="w"> </span>srf.nc
+</pre></div>
+</div>
+<p>Users can also use glob patterns to load multiple files.
+For example to compare all <code class="docutils literal notranslate"><span class="pre">.nc</span></code> files in the <code class="docutils literal notranslate"><span class="pre">files</span></code> directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;files/*.nc&quot;</span><span class="w"> </span>
+</pre></div>
+</div>
+</section>
+<section id="cli-comparison-output">
+<h3>CLI Comparison Output<a class="headerlink" href="#cli-comparison-output" title="Link to this heading"></a></h3>
+<p>As with simulations, comparison results must be be exported in order to be able to interact
+with them. Append the <code class="docutils literal notranslate"><span class="pre">-o</span></code> or <code class="docutils literal notranslate"><span class="pre">--output</span></code> option for this.</p>
+<section id="graphical-export-image-pdf">
+<h4>Graphical Export (Image/PDF)<a class="headerlink" href="#graphical-export-image-pdf" title="Link to this heading"></a></h4>
+<p>Specify the image type, comparison variable, difference metric, and file paths for each channel:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,<span class="o">(</span>pdf<span class="p">|</span>jpg<span class="p">|</span>png<span class="p">|</span>svg<span class="o">)</span>,<span class="o">(</span>DT<span class="p">|</span>MPA<span class="p">|</span>BOTH<span class="p">|</span>CHANNEL<span class="p">|</span>CHANNEL_MEAN<span class="o">)</span>,<span class="o">(</span>rel<span class="p">|</span>perc<span class="p">|</span>none<span class="o">)</span>,comparison_channel_1,comparison_channel_2,...,comparison_channel_n
+</pre></div>
+</div>
+<p>To simplify, export all channels to a directory using <code class="docutils literal notranslate"><span class="pre">graphd</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graphd,<span class="o">(</span>pdf<span class="p">|</span>jpg<span class="p">|</span>png<span class="p">|</span>svg<span class="o">)</span>,<span class="o">(</span>DT<span class="p">|</span>MPA<span class="p">|</span>BOTH<span class="p">|</span>CHANNEL<span class="p">|</span>CHANNEL_MEAN<span class="o">)</span>,<span class="o">(</span>rel<span class="p">|</span>perc<span class="p">|</span>none<span class="o">)</span>,output_directory
+</pre></div>
+</div>
+<p><strong>Examples:</strong></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,jpg,DT,rel,comparison1.jpg,comparison2.jpg
+</pre></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">graphd</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graphd,jpg,DT,rel,comparison_dir
+</pre></div>
+</div>
+</section>
+<section id="data-export-csv-file">
+<h4>Data Export (CSV File)<a class="headerlink" href="#data-export-csv-file" title="Link to this heading"></a></h4>
+<p>Specify the comparison variable, difference metric, and file paths for each channel:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,<span class="o">(</span>DT<span class="p">|</span>MPA<span class="p">|</span>BOTH<span class="p">|</span>CHANNEL<span class="p">|</span>CHANNEL_MEAN<span class="o">)</span>,<span class="o">(</span>rel<span class="p">|</span>perc<span class="p">|</span>none<span class="o">)</span>,comparison_channel_1,comparison_channel_2,...,comparison_channel_n
+</pre></div>
+</div>
+<p>To export all channels to a directory, use <code class="docutils literal notranslate"><span class="pre">csvd</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csvd,<span class="o">(</span>DT<span class="p">|</span>MPA<span class="p">|</span>BOTH<span class="p">|</span>CHANNEL<span class="p">|</span>CHANNEL_MEAN<span class="o">)</span>,<span class="o">(</span>rel<span class="p">|</span>perc<span class="p">|</span>none<span class="o">)</span>,output_directory
+</pre></div>
+</div>
+<p><strong>Examples:</strong></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,DT,rel,comparison1.csv,comparison2.csv
+</pre></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">csvd</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csvd,DT,rel,comparison_dir
+</pre></div>
+</div>
+</section>
+<section id="netcdf-export">
+<h4>NetCDF Export<a class="headerlink" href="#netcdf-export" title="Link to this heading"></a></h4>
+<p>Specify the netCDF file path:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>nc,output_path
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>nc,output.nc
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simulations.html" class="btn btn-neutral float-left" title="Simulations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="coefficients.html" class="btn btn-neutral float-right" title="Coefficients" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

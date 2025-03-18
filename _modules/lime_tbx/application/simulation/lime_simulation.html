@@ -1,0 +1,1585 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.application.simulation.lime_simulation &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.application.simulation.lime_simulation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.application.simulation.lime_simulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module containing the class that contains the state of the simulation.&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CustomPoint</span><span class="p">,</span>
+    <span class="n">LGLODData</span><span class="p">,</span>
+    <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+    <span class="n">SatellitePoint</span><span class="p">,</span>
+    <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+    <span class="n">SpectralData</span><span class="p">,</span>
+    <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+    <span class="n">KernelsPath</span><span class="p">,</span>
+    <span class="n">SurfacePoint</span><span class="p">,</span>
+    <span class="n">EocfiPath</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.lime_algorithms.lime</span><span class="w"> </span><span class="kn">import</span> <span class="n">lime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.lime_algorithms.dolp</span><span class="w"> </span><span class="kn">import</span> <span class="n">dolp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.interpolation.spectral_interpolation.spectral_interpolation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpectralInterpolation</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.interpolation.interp_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.moon_data_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoonDataFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.spectral_integration.spectral_integration</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpectralIntegration</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.spice_adapter.spice_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">SPICEAdapter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.presentation.gui.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">ISettingsManager</span>
+
+<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano&quot;</span>
+<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;01/06/2022&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis, Javier Gatón Herguedas&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;pieter.de.vis@npl.co.uk, gaton@goa.uva.es&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="is_ampa_valid_range">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.is_ampa_valid_range">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_ampa_valid_range</span><span class="p">(</span><span class="n">ampa</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the value of the absolute moon phase angle is inside the valid range for the simulation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ampa: float</span>
+<span class="sd">        Absolute moon phase angle in degrees</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    valid_range: bool</span>
+<span class="sd">        True if the angle is inside the valid range for the simulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">ampa</span> <span class="o">&lt;=</span> <span class="mi">90</span></div>
+
+
+
+<div class="viewcode-block" id="ILimeSimulation">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ILimeSimulation</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface for running the main lime-tbx functionality</span>
+
+<span class="sd">    Should contain the state of the simulation, so it can be implemented efficiently.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ILimeSimulation.set_simulation_changed">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.set_simulation_changed">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_simulation_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Marks the current data as not valid. It should be updated.</span>
+<span class="sd">        If it is marked as valid, it might not be updated even when instructed to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.clear_srf">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.clear_srf">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_srf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dereference the SRF object from the LimeSimulation, allowing the garbage collector to remove it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.is_skipping_uncs">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.is_skipping_uncs">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_skipping_uncs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the current simulation instance is skipping the uncertainties calculation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        skip: bool</span>
+<span class="sd">            True if the uncertainties are being skipped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.update_reflectance">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_reflectance">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_reflectance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the reflectance values if the stored values are not valid, using the given parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            SRF for which the reflectance will be calculated.</span>
+<span class="sd">        point: Point</span>
+<span class="sd">            Point (location) for which the reflectance will be calculated.</span>
+<span class="sd">        cimel_coeff: ReflectanceCoefficients</span>
+<span class="sd">            Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance.</span>
+<span class="sd">        callback_observation: Callable</span>
+<span class="sd">            Callback that will emit a signal when a simulation is done</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.update_irradiance">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_irradiance">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_irradiance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">signals_srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mda_precalculated</span><span class="p">:</span> <span class="n">MoonData</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the irradiance values if the stored value are not valid, using the given parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            SRF for which the reflectance and irradiance will be calculated.</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            SRF for which the integrated signal will be calculated.</span>
+<span class="sd">        point: Point</span>
+<span class="sd">            Point (location) for which the irradiance will be calculated.</span>
+<span class="sd">        cimel_coeff: ReflectanceCoefficients</span>
+<span class="sd">            Cimel Coefficients (and maybe more coeffs) used for the calculation of reflectance (needed for irradiance).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.update_polarisation">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.update_polarisation">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_polarisation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">polar_coeff</span><span class="p">:</span> <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the polarisation values if the stored values are not valid, using the given parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            SRF for which the polarisation will be calculated.</span>
+<span class="sd">        point: Point</span>
+<span class="sd">            Point (location) for which the polarisation will be calculated.</span>
+<span class="sd">        polar_coeff: PolarisationCoefficients</span>
+<span class="sd">            Coefficients used for the calculation of polarisation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_elrefs">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for extraterrestrial lunar reflectance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated reflectance/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_elis">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for extraterrestrial lunar irradiance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated irradiance/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_signals">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_signals">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for integrated signals</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        signals: SpectralData</span>
+<span class="sd">            Previously calculated integrated signal/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_elrefs_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs_cimel">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elrefs_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for extraterrestrial lunar reflectance for the cimel wavelengths.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated reflectance/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_elis_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis_cimel">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elis_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for extraterrestrial lunar irradiance for the cimel wavelengths.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated irradiance/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_elrefs_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elrefs_asd">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elrefs_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for extraterrestrial lunar reflectance for the asd spectrum.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated reflectance/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_elis_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_elis_asd">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elis_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for extraterrestrial lunar irradiance for the asd spectrum.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated irradiance/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_polars">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_polars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for lunar polarisation degree</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        polars: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated polarisation/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_polars_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars_cimel">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_polars_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for lunar polarisation degree for the cimel wavelengths</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        polars_cimel: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated polarisation/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_polars_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_polars_asd">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_polars_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stored value for lunar polarisation degree for the asd spectrum.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        polars_asd: SpectralData | list of SpectralData</span>
+<span class="sd">            Previously calculated polarisation/s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_surfacepoints">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_surfacepoints">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_surfacepoints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Satellites points converted to the equivalent of surface points.</span>
+<span class="sd">        In case they weren&#39;t Satellite Points, the behaviour is not defined.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        surface_points: SurfacePoint | list of SurfacePoint | None</span>
+<span class="sd">            Equivalent surface points</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_point">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_point">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_point</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the point that is being used in the simulation</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        point: Point</span>
+<span class="sd">            The point used in the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.get_moon_datas">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.get_moon_datas">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_moon_datas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the moon datas for the current point</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mds: MoonData | list of MoonData</span>
+<span class="sd">            MoonData/s of the current point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.are_mpas_inside_mpa_range">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.are_mpas_inside_mpa_range">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">are_mpas_inside_mpa_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of values indicating if the moon datas contain a valid mpa range.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        are_valid: bool | list of bool</span>
+<span class="sd">            True/s if the MoonData/s contains mpa values in the valid range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.set_observations">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.set_observations">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lglod</span><span class="p">:</span> <span class="n">LGLODData</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a set of observations and the relative SRF into the lime simulation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lglod: LGLODData</span>
+<span class="sd">            Observations to be loaded</span>
+<span class="sd">        srf: SpectralResponseFunction</span>
+<span class="sd">            SRF related to those observations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.will_irradiance_calculate_reflectance_previously">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.will_irradiance_calculate_reflectance_previously">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">will_irradiance_calculate_reflectance_previously</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns if the irradiance calculation function would perform the reflectance</span>
+<span class="sd">        calculation monolitically as a previous step or not given the current state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pt: Point</span>
+<span class="sd">            Point for which the information wants to be known.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        will_calculate: bool</span>
+<span class="sd">            True if the reflectance would be calculated previously.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.will_irradiance_calculate_reflectance_simultaneously">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.will_irradiance_calculate_reflectance_simultaneously">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">will_irradiance_calculate_reflectance_simultaneously</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">:</span> <span class="n">Point</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns if the irradiance calculation function would perform the reflectance</span>
+<span class="sd">        calculation simultaneously avoiding storing the error correlation matrices,</span>
+<span class="sd">        given the current state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pt: Point</span>
+<span class="sd">            Point for which the information wants to be known.</span>
+<span class="sd">            If not specified the currently loaded one will be used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        will_calculate: bool</span>
+<span class="sd">            True if the reflectance would be calculated simultaneously.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ILimeSimulation.is_polarisation_updated">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.ILimeSimulation.is_polarisation_updated">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_polarisation_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns if the polarisation has been updated. If not, or nothing has been executed,</span>
+<span class="sd">        or the spectrum doesn&#39;t contain polarisation values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pol_uptodate: bool</span>
+<span class="sd">            True if the polarisation is updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LimeSimulation">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LimeSimulation</span><span class="p">(</span><span class="n">ILimeSimulation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for running the main lime-tbx functionality</span>
+
+<span class="sd">    Contains the state of the simulation, so it can be implemented efficiently.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">eocfi_path</span><span class="p">:</span> <span class="n">EocfiPath</span><span class="p">,</span>
+        <span class="n">kernels_path</span><span class="p">:</span> <span class="n">KernelsPath</span><span class="p">,</span>
+        <span class="n">settings_manager</span><span class="p">:</span> <span class="n">ISettingsManager</span><span class="p">,</span>
+        <span class="n">MCsteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        eocfi_path: EocfiPath</span>
+<span class="sd">            Path where the folder with the needed EOCFI data files is located.</span>
+<span class="sd">        kernels_path: KernelsPath</span>
+<span class="sd">            Path where the folder with the needed SPICE kernel files is located.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span> <span class="o">=</span> <span class="n">kernels_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span> <span class="o">=</span> <span class="n">eocfi_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span> <span class="o">=</span> <span class="n">settings_manager</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elref</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elis</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polars</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="p">:</span> <span class="n">SpectralData</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elis_cimel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elis_asd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polars_cimel</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polars_asd</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surfaces_of_sat</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">point</span><span class="p">:</span> <span class="n">Point</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pol_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srf_updtodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mds_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intp</span> <span class="o">=</span> <span class="n">SpectralInterpolation</span><span class="p">(</span><span class="n">MCsteps</span><span class="o">=</span><span class="n">MCsteps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">int</span> <span class="o">=</span> <span class="n">SpectralIntegration</span><span class="p">(</span><span class="n">MCsteps</span><span class="o">=</span><span class="n">MCsteps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skip_uncs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_srf_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LimeSimulation.set_simulation_changed">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.set_simulation_changed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_simulation_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pol_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srf_updtodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mds_uptodate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skip_uncs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interp_srf_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">set_coef_version_name</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.clear_srf">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.clear_srf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_srf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_simulation_changed</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_parameters</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">mda_precalculated</span><span class="p">:</span> <span class="n">MoonData</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mds_uptodate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">SatellitePoint</span><span class="p">):</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">surfaces_of_sat</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_and_surfaces_from_satellite</span><span class="p">(</span>
+                    <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mda_precalculated</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mds</span> <span class="o">=</span> <span class="n">mda_precalculated</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mds</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md</span><span class="p">(</span>
+                        <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span>
+                    <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">point</span> <span class="o">=</span> <span class="n">point</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mds_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">srf_updtodate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srf</span> <span class="o">=</span> <span class="n">srf</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="nb">set</span><span class="p">(</span><span class="n">srf</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">())]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">constants</span><span class="o">.</span><span class="n">MIN_WLEN</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_WLEN</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srf_updtodate</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LimeSimulation.is_skipping_uncs">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.is_skipping_uncs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_skipping_uncs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip_uncs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_skip_uncs</span> <span class="o">=</span> <span class="n">interp_data</span><span class="o">.</span><span class="n">is_skip_uncertainties</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip_uncs</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_interp_srf_name">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_interp_srf_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_interp_srf_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interp_srf_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interp_srf_name</span> <span class="o">=</span> <span class="n">interp_data</span><span class="o">.</span><span class="n">get_interpolation_srf_as_srf_type</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interp_srf_name</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.update_reflectance">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_reflectance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_reflectance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_parameters</span><span class="p">(</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
+        <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_skipping_uncs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;starting reflectance update&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">keep_err_corr_mats</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">will_irradiance_calculate_reflectance_simultaneously</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elref</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_reflectances_values</span><span class="p">(</span>
+                <span class="n">cimel_coeff</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">intp</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                <span class="n">skip_uncs</span><span class="p">,</span>
+                <span class="n">callback_observation</span><span class="p">,</span>
+                <span class="n">keep_err_corr_mats</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">interm_res_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_intermediate_results_path</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">interm_res_path</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">interm_res_path</span><span class="si">}</span><span class="s2">/refl_cimel.csv&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">interm_res_path</span><span class="si">}</span><span class="s2">/refl_interp_spectrum.csv&quot;</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">elref</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref</span><span class="o">.</span><span class="n">data</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+                    <span class="n">fmt</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">&quot;</span><span class="p">],</span>
+                    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;reflectance update done&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_elref_eli_and_integrate</span><span class="p">(</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">interp_srf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">intp</span><span class="p">:</span> <span class="n">SpectralInterpolation</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">:</span> <span class="n">SpectralIntegration</span><span class="p">,</span>
+        <span class="n">signals_srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">show_interp_spectrum</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">use_wehrli</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">SpectralData</span><span class="p">,</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">SpectralData</span><span class="p">,</span>
+    <span class="p">]:</span>
+        <span class="n">elref_cimel</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_elref</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="n">cimel_coeff</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">elref_asd</span> <span class="o">=</span> <span class="p">(</span><span class="n">intp</span><span class="o">.</span><span class="n">get_best_interp_reference</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">)</span>
+            <span class="n">ret_asd</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_best_interp_reference</span><span class="p">(</span><span class="n">mds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elref_asd</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_best_interp_reference</span><span class="p">(</span><span class="n">mds</span><span class="p">)</span>
+            <span class="n">ret_asd</span> <span class="o">=</span> <span class="n">elref_asd</span>
+        <span class="n">elis_cimel</span><span class="p">,</span> <span class="n">elis_asd</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_irradiances_values</span><span class="p">(</span>
+            <span class="n">mds</span><span class="p">,</span>
+            <span class="n">elref_cimel</span><span class="p">,</span>
+            <span class="n">ret_asd</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="n">show_interp_spectrum</span><span class="p">,</span>
+            <span class="n">use_wehrli</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_wehrli</span><span class="p">:</span>
+            <span class="n">interp_srf_name</span> <span class="o">=</span> <span class="s2">&quot;asd_wehrli&quot;</span>
+        <span class="n">elref</span><span class="p">,</span> <span class="n">elis</span><span class="p">,</span> <span class="n">signals</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_interpolate_refl_calc_irr_signal</span><span class="p">(</span>
+            <span class="n">elref_asd</span><span class="p">,</span>
+            <span class="n">elref_cimel</span><span class="p">,</span>
+            <span class="n">intp</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="n">mds</span><span class="p">,</span>
+            <span class="n">interp_srf_name</span><span class="p">,</span>
+            <span class="n">signals_srf</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="n">callback_observation</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">elref_cimel</span><span class="p">,</span> <span class="n">ret_asd</span><span class="p">,</span> <span class="n">elref</span><span class="p">,</span> <span class="n">elis_cimel</span><span class="p">,</span> <span class="n">elis_asd</span><span class="p">,</span> <span class="n">elis</span><span class="p">,</span> <span class="n">signals</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_reflectances_values</span><span class="p">(</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">intp</span><span class="p">:</span> <span class="n">SpectralInterpolation</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">keep_err_corr_mats</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">SpectralData</span><span class="p">,</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+    <span class="p">]:</span>
+        <span class="n">elref_cimel</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_elref</span><span class="p">(</span>
+            <span class="n">mds</span><span class="p">,</span> <span class="n">cimel_coeff</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">,</span> <span class="n">keep_err_corr_mats</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">elref_asd</span> <span class="o">=</span> <span class="p">(</span><span class="n">intp</span><span class="o">.</span><span class="n">get_best_interp_reference</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">)</span>
+            <span class="n">ret_asd</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_best_interp_reference</span><span class="p">(</span><span class="n">mds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elref_asd</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_best_interp_reference</span><span class="p">(</span><span class="n">mds</span><span class="p">)</span>
+            <span class="n">ret_asd</span> <span class="o">=</span> <span class="n">elref_asd</span>
+        <span class="n">elref</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_interpolate_refl</span><span class="p">(</span>
+            <span class="n">elref_asd</span><span class="p">,</span>
+            <span class="n">elref_cimel</span><span class="p">,</span>
+            <span class="n">intp</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="n">callback_observation</span><span class="p">,</span>
+            <span class="n">keep_err_corr_mats</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">elref_cimel</span><span class="p">,</span> <span class="n">ret_asd</span><span class="p">,</span> <span class="n">elref</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_irradiances_values</span><span class="p">(</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">elref_cimel</span><span class="p">,</span>
+        <span class="n">elref_asd</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">show_interp_spectrum</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">use_wehrli</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span> <span class="n">SpectralData</span><span class="p">,]:</span>
+        <span class="n">_cimel_srf</span> <span class="o">=</span> <span class="s2">&quot;cimel&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">use_wehrli</span> <span class="k">else</span> <span class="s2">&quot;cimel_wehrli&quot;</span>
+        <span class="n">elis_cimel</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_eli_from_elref</span><span class="p">(</span>
+            <span class="n">mds</span><span class="p">,</span> <span class="n">elref_cimel</span><span class="p">,</span> <span class="n">_cimel_srf</span><span class="p">,</span> <span class="n">skip_uncs</span>
+        <span class="p">)</span>
+        <span class="n">elis_asd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">show_interp_spectrum</span><span class="p">:</span>
+            <span class="n">md</span> <span class="o">=</span> <span class="n">mds</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">md</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">md</span> <span class="o">=</span> <span class="n">md</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">elis_asd</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_eli_from_elref</span><span class="p">(</span>
+                <span class="n">md</span><span class="p">,</span> <span class="n">elref_asd</span><span class="p">,</span> <span class="s2">&quot;asd&quot;</span><span class="p">,</span> <span class="n">skip_uncs</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">elis_cimel</span><span class="p">,</span> <span class="n">elis_asd</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_polarisation_values</span><span class="p">(</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">polar_coeff</span><span class="p">:</span> <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+        <span class="n">intp</span><span class="p">:</span> <span class="n">SpectralInterpolation</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">SpectralData</span><span class="p">,</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+    <span class="p">]:</span>
+        <span class="n">polar_cimel</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_polar</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="n">polar_coeff</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">polar_asd</span> <span class="o">=</span> <span class="p">(</span><span class="n">intp</span><span class="o">.</span><span class="n">get_best_polar_interp_reference</span><span class="p">(</span><span class="n">md</span><span class="p">)</span> <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">)</span>
+            <span class="n">ret_polar_asd</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_best_polar_interp_reference</span><span class="p">(</span><span class="n">mds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">polar_asd</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_best_polar_interp_reference</span><span class="p">(</span><span class="n">mds</span><span class="p">)</span>
+            <span class="n">ret_polar_asd</span> <span class="o">=</span> <span class="n">polar_asd</span>
+        <span class="n">polar</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_interpolate_polar</span><span class="p">(</span>
+            <span class="n">polar_asd</span><span class="p">,</span>
+            <span class="n">polar_cimel</span><span class="p">,</span>
+            <span class="n">intp</span><span class="p">,</span>
+            <span class="n">wlens</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="n">callback_observation</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">polar_cimel</span><span class="p">,</span> <span class="n">ret_polar_asd</span><span class="p">,</span> <span class="n">polar</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_irradiance_and_reflectance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">signals_srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_parameters</span><span class="p">(</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
+        <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_skipping_uncs</span><span class="p">()</span>
+        <span class="n">interp_srf_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_interp_srf_name</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting irradiance &amp; reflectance update&quot;</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elref</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elis_cimel</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elis_asd</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elis</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_elref_eli_and_integrate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span>
+            <span class="n">cimel_coeff</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+            <span class="n">interp_srf_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intp</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">int</span><span class="p">,</span>
+            <span class="n">signals_srf</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="n">callback_observation</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_show_interp_spectrum</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_use_wehrli_for_esi</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Irradiance, reflectance and signal update done&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LimeSimulation.update_irradiance">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_irradiance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_irradiance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">signals_srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mda_precalculated</span><span class="p">:</span> <span class="n">MoonData</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_parameters</span><span class="p">(</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">mda_precalculated</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">will_irradiance_calculate_reflectance_simultaneously</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_irradiance_and_reflectance</span><span class="p">(</span>
+                    <span class="n">srf</span><span class="p">,</span> <span class="n">signals_srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">cimel_coeff</span><span class="p">,</span> <span class="n">callback_observation</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_skipping_uncs</span><span class="p">()</span>
+            <span class="n">interp_srf_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_interp_srf_name</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">elis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_reflectance</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">cimel_coeff</span><span class="p">,</span> <span class="n">callback_observation</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;starting irradiance update&quot;</span><span class="p">)</span>
+                <span class="n">use_wehrli</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_use_wehrli_for_esi</span><span class="p">()</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elis_cimel</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elis_asd</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_irradiances_values</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span><span class="p">,</span>
+                    <span class="n">skip_uncs</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_show_interp_spectrum</span><span class="p">(),</span>
+                    <span class="n">use_wehrli</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">use_wehrli</span><span class="p">:</span>
+                    <span class="n">interp_srf_name</span> <span class="o">=</span> <span class="s2">&quot;asd_wehrli&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;auxiliar irradiance update done&quot;</span><span class="p">)</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elis</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_eli_from_elref_and_integrate</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">elref</span><span class="p">,</span>
+                    <span class="n">interp_srf_name</span><span class="p">,</span>
+                    <span class="n">signals_srf</span><span class="p">,</span>
+                    <span class="n">skip_uncs</span><span class="p">,</span>
+                    <span class="n">callback_observation</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">interm_res_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_intermediate_results_path</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">interm_res_path</span><span class="p">:</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">interm_res_path</span><span class="si">}</span><span class="s2">/irr_from_refl_cimel.csv&quot;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">elis_cimel</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">interm_res_path</span><span class="si">}</span><span class="s2">/irr_from_interp_spectrum.csv&quot;</span><span class="p">,</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">elis</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elis</span><span class="o">.</span><span class="n">data</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+                        <span class="n">fmt</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">&quot;</span><span class="p">],</span>
+                        <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">interm_res_path</span><span class="si">}</span><span class="s2">/signals_from_irr_interp_srf_integrated.csv&quot;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="c1"># Free up space</span>
+                <span class="n">elrefclearer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elrefclearer</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">elrefclearer</span> <span class="o">=</span> <span class="p">[</span><span class="n">elrefclearer</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">elr</span> <span class="ow">in</span> <span class="n">elrefclearer</span><span class="p">:</span>
+                    <span class="n">elr</span><span class="o">.</span><span class="n">clear_err_corr</span><span class="p">()</span>
+                <span class="c1">#</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;irradiance &amp; signals update done&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.will_irradiance_calculate_reflectance_previously">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.will_irradiance_calculate_reflectance_previously">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">will_irradiance_calculate_reflectance_previously</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">will_irradiance_calculate_reflectance_simultaneously</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.will_irradiance_calculate_reflectance_simultaneously">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.will_irradiance_calculate_reflectance_simultaneously">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">will_irradiance_calculate_reflectance_simultaneously</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">:</span> <span class="n">Point</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">point</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_skipping_uncs</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_LIMIT_REFL_ERR_CORR_ARE_STORED</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.is_polarisation_updated">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.is_polarisation_updated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_polarisation_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pol_uptodate</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.update_polarisation">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.update_polarisation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_polarisation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span>
+        <span class="n">polar_coeff</span><span class="p">:</span> <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_skipping_uncs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_parameters</span><span class="p">(</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pol_uptodate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;starting polarisation update&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">polars_asd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">polars_cimel</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">polars_cimel</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">polars_asd</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">polars</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">LimeSimulation</span><span class="o">.</span><span class="n">_calculate_polarisation_values</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span>
+                <span class="n">polar_coeff</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">intp</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                <span class="n">skip_uncs</span><span class="p">,</span>
+                <span class="n">callback_observation</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pol_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;polarisation update done&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_refl_calc_irr_signal</span><span class="p">(</span>
+        <span class="n">asd_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">cimel_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">intp</span><span class="p">:</span> <span class="n">SpectralInterpolation</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">srf_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">:</span> <span class="n">SpectralIntegration</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="n">wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wlens</span><span class="p">)</span>
+        <span class="n">is_list</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cimel_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+            <span class="n">cimel_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">cimel_data</span><span class="p">]</span>
+            <span class="n">asd_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">asd_data</span><span class="p">]</span>  <span class="c1"># both same length</span>
+            <span class="n">mds</span> <span class="o">=</span> <span class="p">[</span><span class="n">mds</span><span class="p">]</span>
+        <span class="n">elref_specs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">rl</span> <span class="o">=</span> <span class="n">lime</span><span class="o">.</span><span class="n">LIME</span><span class="p">()</span>
+        <span class="n">channel_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">))]</span>
+
+        <span class="n">elis_specs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">uncs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cf</span><span class="p">,</span> <span class="n">asdd</span><span class="p">,</span> <span class="n">md</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cimel_data</span><span class="p">,</span> <span class="n">asd_data</span><span class="p">,</span> <span class="n">mds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+                <span class="n">callback_observation</span><span class="p">()</span>
+            <span class="n">ds_intp</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_uncs</span><span class="p">:</span>
+                <span class="p">(</span>
+                    <span class="n">elrefs_intp</span><span class="p">,</span>
+                    <span class="n">u_elrefs_intp</span><span class="p">,</span>
+                    <span class="n">corr_elrefs_intp</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_interpolated_refl_unc</span><span class="p">(</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">ds_intp</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_reflectance_ds</span><span class="p">(</span>
+                    <span class="n">wlens</span><span class="p">,</span> <span class="n">elrefs_intp</span><span class="p">,</span> <span class="n">u_elrefs_intp</span><span class="p">,</span> <span class="n">corr_elrefs_intp</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">elrefs_intp</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_interpolated_refl</span><span class="p">(</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">wlens</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">u_elrefs_intp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">elrefs_intp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">elref_spec</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">elrefs_intp</span><span class="p">,</span> <span class="n">u_elrefs_intp</span><span class="p">,</span> <span class="n">ds_intp</span><span class="p">)</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">sigunc</span> <span class="o">=</span> <span class="n">rl</span><span class="o">.</span><span class="n">get_elis_from_elrefs_and_integrate</span><span class="p">(</span>
+                <span class="n">elref_spec</span><span class="p">,</span> <span class="n">md</span><span class="p">,</span> <span class="n">srf_type</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">srf</span><span class="p">,</span> <span class="n">skip_uncs</span>
+            <span class="p">)</span>
+            <span class="n">elis_specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+            <span class="n">uncs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigunc</span><span class="p">)</span>
+            <span class="n">elref_specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpectralData</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">elrefs_intp</span><span class="p">,</span> <span class="n">u_elrefs_intp</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+            <span class="n">callback_observation</span><span class="p">()</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">signals</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">uncs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">uncs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">sp_d</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">channel_ids</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">uncs</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+            <span class="n">elref_specs</span> <span class="o">=</span> <span class="n">elref_specs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">elis_specs</span> <span class="o">=</span> <span class="n">elis_specs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">elref_specs</span><span class="p">,</span> <span class="n">elis_specs</span><span class="p">,</span> <span class="n">sp_d</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_refl</span><span class="p">(</span>
+        <span class="n">asd_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">cimel_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">intp</span><span class="p">:</span> <span class="n">SpectralInterpolation</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">keep_err_corr_mats</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="n">wlens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wlens</span><span class="p">)</span>
+        <span class="n">is_list</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cimel_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+            <span class="n">cimel_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">cimel_data</span><span class="p">]</span>
+            <span class="n">asd_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">asd_data</span><span class="p">]</span>  <span class="c1"># both same length</span>
+        <span class="n">specs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cf</span><span class="p">,</span> <span class="n">asdd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cimel_data</span><span class="p">,</span> <span class="n">asd_data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+                <span class="n">callback_observation</span><span class="p">()</span>
+            <span class="n">ds_intp</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_uncs</span><span class="p">:</span>
+                <span class="p">(</span>
+                    <span class="n">elrefs_intp</span><span class="p">,</span>
+                    <span class="n">u_elrefs_intp</span><span class="p">,</span>
+                    <span class="n">corr_elrefs_intp</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_interpolated_refl_unc</span><span class="p">(</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">keep_err_corr_mats</span><span class="p">:</span>
+                    <span class="n">ds_intp</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_reflectance_ds</span><span class="p">(</span>
+                        <span class="n">wlens</span><span class="p">,</span> <span class="n">elrefs_intp</span><span class="p">,</span> <span class="n">u_elrefs_intp</span><span class="p">,</span> <span class="n">corr_elrefs_intp</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">elrefs_intp</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_interpolated_refl</span><span class="p">(</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">wlens</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">u_elrefs_intp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">elrefs_intp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpectralData</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">elrefs_intp</span><span class="p">,</span> <span class="n">u_elrefs_intp</span><span class="p">,</span> <span class="n">ds_intp</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+            <span class="n">callback_observation</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+            <span class="n">specs</span> <span class="o">=</span> <span class="n">specs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">specs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_polar</span><span class="p">(</span>
+        <span class="n">asd_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">cimel_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">intp</span><span class="p">:</span> <span class="n">SpectralInterpolation</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="n">is_list</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cimel_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+            <span class="n">cimel_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">cimel_data</span><span class="p">]</span>
+            <span class="n">asd_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">asd_data</span><span class="p">]</span>  <span class="c1"># both same length</span>
+        <span class="n">specs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cf</span><span class="p">,</span> <span class="n">asdd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cimel_data</span><span class="p">,</span> <span class="n">asd_data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+                <span class="n">callback_observation</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_uncs</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">polars_intp</span><span class="p">,</span> <span class="n">u_polars_intp</span><span class="p">,</span> <span class="n">_</span><span class="p">,)</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_interpolated_refl_unc</span><span class="p">(</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wlens</span><span class="p">),</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">uncertainties</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">err_corr</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">polars_intp</span> <span class="o">=</span> <span class="n">intp</span><span class="o">.</span><span class="n">get_interpolated_refl</span><span class="p">(</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">cf</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+                    <span class="n">asdd</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">wlens</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="n">u_polars_intp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">polars_intp</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="c1"># The Dataset is not needed later, and the corr_matrix is very big so we ignore it to save up space</span>
+            <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpectralData</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">polars_intp</span><span class="p">,</span> <span class="n">u_polars_intp</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+            <span class="n">callback_observation</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+            <span class="n">specs</span> <span class="o">=</span> <span class="n">specs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">specs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_elref</span><span class="p">(</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">cimel_coeff</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">keep_err_corr_mats</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">rl</span> <span class="o">=</span> <span class="n">lime</span><span class="o">.</span><span class="n">LIME</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rl</span><span class="o">.</span><span class="n">get_elrefs</span><span class="p">(</span><span class="n">cimel_coeff</span><span class="p">,</span> <span class="n">mds</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">,</span> <span class="n">keep_err_corr_mats</span><span class="p">)</span>
+        <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">:</span>
+            <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rl</span><span class="o">.</span><span class="n">get_elrefs</span><span class="p">(</span><span class="n">cimel_coeff</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">,</span> <span class="n">keep_err_corr_mats</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">specs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_eli_from_elref</span><span class="p">(</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">elrefs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">srf_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculation of Extraterrestrial Lunar Irradiance following Eq 3 in Roman et al., 2020</span>
+
+<span class="sd">        Simulates a lunar observation for a wavelength for any observer/solar selenographic</span>
+<span class="sd">        latitude and longitude. The irradiance is calculated in Wm⁻²/nm.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mds: MoonData | list of MoonData</span>
+<span class="sd">            moon datas</span>
+<span class="sd">        elrefs: SpectralData | list of SpectralData</span>
+<span class="sd">            elrefs previously calculated</span>
+<span class="sd">        srf_type: str</span>
+<span class="sd">            SRF type that is going to be used. Can be &#39;cimel&#39;, &#39;asd&#39;, &#39;interpolated_gaussian&#39; or &#39;interpolated_triangle&#39;</span>
+<span class="sd">        skip_uncs: bool</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        elis: SpectralData | list of SpectralData</span>
+<span class="sd">            The extraterrestrial lunar irradiance calculated, a list if self.mds is a list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rl</span> <span class="o">=</span> <span class="n">lime</span><span class="o">.</span><span class="n">LIME</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rl</span><span class="o">.</span><span class="n">get_elis_from_elrefs</span><span class="p">(</span><span class="n">elrefs</span><span class="p">,</span> <span class="n">mds</span><span class="p">,</span> <span class="n">srf_type</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">)</span>
+        <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mds</span><span class="p">):</span>
+            <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rl</span><span class="o">.</span><span class="n">get_elis_from_elrefs</span><span class="p">(</span><span class="n">elrefs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">m</span><span class="p">,</span> <span class="n">srf_type</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">specs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_polar</span><span class="p">(</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">polar_coeff</span><span class="p">:</span> <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="n">dl</span> <span class="o">=</span> <span class="n">dolp</span><span class="o">.</span><span class="n">DOLP</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">dl</span><span class="o">.</span><span class="n">get_polarized</span><span class="p">(</span><span class="n">mds</span><span class="o">.</span><span class="n">mpa_degrees</span><span class="p">,</span> <span class="n">polar_coeff</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mds</span><span class="p">:</span>
+                <span class="n">spectral_data</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">get_polarized</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">mpa_degrees</span><span class="p">,</span> <span class="n">polar_coeff</span><span class="p">,</span> <span class="n">skip_uncs</span><span class="p">)</span>
+                <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spectral_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">specs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_eli_from_elref_and_integrate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]],</span>
+        <span class="n">elrefs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]],</span>
+        <span class="n">srf_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">,</span>
+        <span class="n">skip_uncs</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">callback_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">rl</span> <span class="o">=</span> <span class="n">lime</span><span class="o">.</span><span class="n">LIME</span><span class="p">()</span>
+        <span class="n">channel_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">sigunc</span> <span class="o">=</span> <span class="n">rl</span><span class="o">.</span><span class="n">get_elis_from_elrefs_and_integrate</span><span class="p">(</span>
+                <span class="n">elrefs</span><span class="p">,</span> <span class="n">mds</span><span class="p">,</span> <span class="n">srf_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="n">srf</span><span class="p">,</span> <span class="n">skip_uncs</span>
+            <span class="p">)</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sig</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">uncs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sigunc</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">sp_d</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">channel_ids</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">uncs</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">spec</span><span class="p">,</span> <span class="n">sp_d</span>
+        <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">uncs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+                <span class="n">callback_observation</span><span class="p">()</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">sigunc</span> <span class="o">=</span> <span class="n">rl</span><span class="o">.</span><span class="n">get_elis_from_elrefs_and_integrate</span><span class="p">(</span>
+                <span class="n">elrefs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">m</span><span class="p">,</span> <span class="n">srf_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="n">srf</span><span class="p">,</span> <span class="n">skip_uncs</span>
+            <span class="p">)</span>
+            <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+            <span class="n">uncs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigunc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callback_observation</span><span class="p">:</span>
+            <span class="n">callback_observation</span><span class="p">()</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">signals</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">uncs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">uncs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">sp_d</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span><span class="n">channel_ids</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">uncs</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">specs</span><span class="p">,</span> <span class="n">sp_d</span>
+
+<div class="viewcode-block" id="LimeSimulation.set_observations">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.set_observations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lglod</span><span class="p">:</span> <span class="n">LGLODData</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">):</span>
+        <span class="n">obss</span> <span class="o">=</span> <span class="n">lglod</span><span class="o">.</span><span class="n">observations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">set_coef_version_name</span><span class="p">(</span><span class="n">lglod</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elref</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span><span class="o">.</span><span class="n">refls</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">obss</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span> <span class="o">=</span> <span class="n">lglod</span><span class="o">.</span><span class="n">elrefs_cimel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elis</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span><span class="o">.</span><span class="n">irrs</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">obss</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elis_cimel</span> <span class="o">=</span> <span class="n">lglod</span><span class="o">.</span><span class="n">elis_cimel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elis_asd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polars</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span><span class="o">.</span><span class="n">polars</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">obss</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polars_cimel</span> <span class="o">=</span> <span class="n">lglod</span><span class="o">.</span><span class="n">polars_cimel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polars_asd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skip_uncs</span> <span class="o">=</span> <span class="n">lglod</span><span class="o">.</span><span class="n">skipped_uncs</span>
+        <span class="k">if</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span><span class="o">.</span><span class="n">dt</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">obss</span><span class="p">]</span>
+        <span class="n">signals</span> <span class="o">=</span> <span class="n">lglod</span><span class="o">.</span><span class="n">signals</span>
+        <span class="n">ds_sign</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="o">.</span><span class="n">make_signals_ds</span><span class="p">(</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">uncertainties</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">SpectralData</span><span class="p">(</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">wlens</span><span class="p">,</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">signals</span><span class="o">.</span><span class="n">uncertainties</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">ds_sign</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dts</span><span class="p">:</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">selenographic_data</span>
+            <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_planetographic_same_frame</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">z</span><span class="p">)],</span>
+                <span class="s2">&quot;MOON&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">CustomPoint</span><span class="p">(</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">,</span>
+                <span class="n">alt</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
+                <span class="n">lat</span><span class="p">,</span>
+                <span class="n">lon</span><span class="p">,</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">selen_sun_lon_rad</span><span class="p">,</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">mpa_degrees</span><span class="p">),</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">mpa_degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_name</span> <span class="ow">or</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">SurfacePoint</span><span class="p">(</span>
+                <span class="o">*</span><span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_planetographic_multiple</span><span class="p">(</span>
+                    <span class="p">[(</span><span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">z</span><span class="p">)],</span>
+                    <span class="s2">&quot;EARTH&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+                    <span class="p">[</span><span class="n">dts</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos_ref</span><span class="p">,</span>
+                <span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">dts</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">SatellitePoint</span><span class="p">(</span><span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_name</span><span class="p">,</span> <span class="n">dts</span><span class="p">)</span>
+            <span class="n">surfaces_of_sat</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">mds</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">planetographics</span> <span class="o">=</span> <span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_planetographic_multiple</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">obs</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">sat_pos</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">obss</span><span class="p">],</span>
+                <span class="s2">&quot;EARTH&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+                <span class="n">dts</span><span class="p">,</span>
+                <span class="n">obss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sat_pos_ref</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dts</span><span class="p">):</span>
+                <span class="n">sp</span> <span class="o">=</span> <span class="n">SurfacePoint</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">planetographics</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">dt</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">md</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">)</span>
+                <span class="n">surfaces_of_sat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="p">)</span>
+                <span class="n">mds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">md</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">surfaces_of_sat</span> <span class="o">=</span> <span class="n">surfaces_of_sat</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mds</span> <span class="o">=</span> <span class="n">mds</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">point</span> <span class="o">=</span> <span class="n">point</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mds_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_parameters</span><span class="p">(</span><span class="n">srf</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refl_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irr_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pol_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals_uptodate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;observations loaded&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_elrefs">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_elis">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elis</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_signals">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_signals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpectralData</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_elrefs_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs_cimel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elrefs_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref_cimel</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_elis_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis_cimel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elis_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elis_cimel</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_elrefs_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elrefs_asd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elrefs_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_show_interp_spectrum</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elref_asd</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_elis_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_elis_asd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_elis_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_show_interp_spectrum</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">elis_asd</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_polars">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_polars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">polars</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_polars_cimel">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars_cimel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_polars_cimel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">polars_cimel</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_polars_asd">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_polars_asd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_polars_asd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_show_interp_spectrum</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">polars_asd</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_surfacepoints">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_surfacepoints">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_surfacepoints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surfaces_of_sat</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_point">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_point</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.get_moon_datas">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.get_moon_datas">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_moon_datas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mds</span></div>
+
+
+<div class="viewcode-block" id="LimeSimulation.are_mpas_inside_mpa_range">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.simulation.lime_simulation.html#lime_tbx.application.simulation.lime_simulation.LimeSimulation.are_mpas_inside_mpa_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">are_mpas_inside_mpa_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">is_ampa_valid_range</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">absolute_mpa_degrees</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">l</span>
+        <span class="k">return</span> <span class="n">is_ampa_valid_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mds</span><span class="o">.</span><span class="n">absolute_mpa_degrees</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+lime\_tbx.presentation.gui.ifaces module
+========================================
+
+.. automodule:: lime_tbx.presentation.gui.ifaces
+   :members:
+   :undoc-members:
+   :show-inheritance:

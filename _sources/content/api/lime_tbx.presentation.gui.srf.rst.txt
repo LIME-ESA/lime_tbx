@@ -1,0 +1,7 @@
+lime\_tbx.presentation.gui.srf module
+=====================================
+
+.. automodule:: lime_tbx.presentation.gui.srf
+   :members:
+   :undoc-members:
+   :show-inheritance:

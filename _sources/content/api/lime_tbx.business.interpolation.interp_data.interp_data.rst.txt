@@ -1,0 +1,7 @@
+lime\_tbx.business.interpolation.interp\_data.interp\_data module
+=================================================================
+
+.. automodule:: lime_tbx.business.interpolation.interp_data.interp_data
+   :members:
+   :undoc-members:
+   :show-inheritance:

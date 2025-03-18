@@ -1,0 +1,7 @@
+lime\_tbx.persistence.local\_storage.appdata module
+===================================================
+
+.. automodule:: lime_tbx.persistence.local_storage.appdata
+   :members:
+   :undoc-members:
+   :show-inheritance:

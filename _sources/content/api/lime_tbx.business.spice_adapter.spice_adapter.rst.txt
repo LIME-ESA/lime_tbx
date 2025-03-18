@@ -1,0 +1,7 @@
+lime\_tbx.business.spice\_adapter.spice\_adapter module
+=======================================================
+
+.. automodule:: lime_tbx.business.spice_adapter.spice_adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:

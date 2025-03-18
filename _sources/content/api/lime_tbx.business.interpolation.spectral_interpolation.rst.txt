@@ -1,0 +1,15 @@
+lime\_tbx.business.interpolation.spectral\_interpolation package
+================================================================
+
+.. automodule:: lime_tbx.business.interpolation.spectral_interpolation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.business.interpolation.spectral_interpolation.spectral_interpolation

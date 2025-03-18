@@ -1,0 +1,1392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lime_tbx.common.datatypes &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=f2acf8a4" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Lime Tbx
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/readme.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/CHANGELOG.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/glossary.html">Glossary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/simulations.html">Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/comparisons.html">Comparisons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/coefficients.html">Coefficients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/user_guide/formats.html">File Formats</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/implementation.html">Implementation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/api/lime_tbx.html">lime_tbx package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../content/CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Lime Tbx</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lime_tbx.common.datatypes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lime_tbx.common.datatypes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains different dataclasses and classes used for the exchange</span>
+<span class="sd">of data between modules of the package lime-tbx.</span>
+
+<span class="sd">It exports the following classes:</span>
+<span class="sd">    * MoonData - Moon data used in the calculations of the Moon&#39;s irradiance.</span>
+<span class="sd">    * SRFChannel - Spectral responses and metadata for a SRF Channel</span>
+<span class="sd">    * SpectralResponseFunction - The spectral response function, a set of channels with their data.</span>
+<span class="sd">    * SRF_fwhm - Dataclass containing the spectral response function, a set of channels with their data.</span>
+<span class="sd">    * Point - Superclass for all point classes.</span>
+<span class="sd">    * SurfacePoint - Point on Earth&#39;s surface</span>
+<span class="sd">    * CustomPoint - Point with custom Moon data.</span>
+<span class="sd">    * SatellitePoint - Point of a Satellite in a concrete datetime</span>
+<span class="sd">    * OrbitFile - Satellite orbit file.</span>
+<span class="sd">    * Satellite - ESA Satellite</span>
+<span class="sd">    * SatellitePosition - A satellite&#39;s position</span>
+<span class="sd">    * LunarObservation - GLOD lunar observation</span>
+<span class="sd">    * PolarisationCoefficients - Coefficients used in the DoLP algorithm.</span>
+<span class="sd">    * ReflectanceCoefficients - Dataclass containing the cimel coefficients that will be used in the</span>
+<span class="sd">        reflectance simulation algorithm.</span>
+<span class="sd">    * LimeCoefficients - Dataclass containing a PolarisationCoefficients and a ReflectanceCoefficients.</span>
+<span class="sd">    * SpectralData - Data for a spectrum of wavelengths, with an associated uncertainty each.</span>
+<span class="sd">    * ComparisonData - Dataclass containing the data outputed from a comparison.</span>
+<span class="sd">    * KernelsPath - Dataclass containing the needed information in order to find all SPICE kernels.</span>
+<span class="sd">    * EocfiPath - Dataclass containing the needed information in order to find all satellite data for EOCFI.</span>
+<span class="sd">    * SelenographicDataWrite - Extra data that allowes to define CustomPoints in the GLOD data file.</span>
+<span class="sd">    * LunarObservationWrite - Dataclass containing the needed information to create a Lunar observation</span>
+<span class="sd">        in a LGLOD file.</span>
+<span class="sd">    * LGLODData - Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format</span>
+<span class="sd">        used by the toolbox.</span>
+<span class="sd">    * LGLODComparisonData - Dataclass with the data of a LGLOD comparison file. LGLOD is the</span>
+<span class="sd">        GLOD-based format used by the toolbox.</span>
+<span class="sd">    * LimeException - Exception that is raised by the toolbox that is intended to be shown to the user.</span>
+<span class="sd">    * InterpolationSettings - Representation of the YAML file that contains the interpolation settings data.</span>
+
+<span class="sd">It exports the following Enums:</span>
+<span class="sd">    * SpectralValidity - Enum that represents if a channel is inside LIME&#39;s spectral range.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;___Built-In Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">asdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
+
+<span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+<span class="sd">&quot;&quot;&quot;___NPL Modules___&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">obsarray</span>
+
+<span class="sd">&quot;&quot;&quot;___LIME_TBX Modules___&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.templates</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TEMPLATE_IRR</span><span class="p">,</span>
+    <span class="n">TEMPLATE_POL</span><span class="p">,</span>
+    <span class="n">TEMPLATE_REFL</span><span class="p">,</span>
+    <span class="n">TEMPLATE_SIGNALS</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="MoonData">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MoonData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Moon data needed to calculate Moon&#39;s irradiance, probably obtained from NASA&#39;s SPICE Toolbox</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    distance_sun_moon : float</span>
+<span class="sd">        Distance between the Sun and the Moon (in astronomical units)</span>
+<span class="sd">    distance_observer_moon : float</span>
+<span class="sd">        Distance between the Observer and the Moon (in kilometers)</span>
+<span class="sd">    selen_sun_lon_rad : float</span>
+<span class="sd">        Selenographic longitude of the Sun (in radians)</span>
+<span class="sd">    selen_obs_lat : float</span>
+<span class="sd">        Selenographic latitude of the observer (in degrees)</span>
+<span class="sd">    selen_obs_lon : float</span>
+<span class="sd">        Selenographic longitude of the observer (in degrees)</span>
+<span class="sd">    abs_moon_phase_angle : float</span>
+<span class="sd">        Absolute Moon phase angle (in degrees)</span>
+<span class="sd">    mpa_degrees : float</span>
+<span class="sd">        Moon phase angle (in degrees)</span>
+<span class="sd">    geom_factor : float</span>
+<span class="sd">        Geometric factor by which the TBX calculated irradiance will be divided.</span>
+<span class="sd">        Used in comparisons when the normalization parameters (distances) are not available with precision.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">distance_sun_moon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">distance_observer_moon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">long_sun_radians</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">lat_obs</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">long_obs</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">absolute_mpa_degrees</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">mpa_degrees</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">geom_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_sun_moon</span> <span class="o">=</span> <span class="n">distance_sun_moon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_observer_moon</span> <span class="o">=</span> <span class="n">distance_observer_moon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">long_sun_radians</span> <span class="o">=</span> <span class="n">long_sun_radians</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lat_obs</span> <span class="o">=</span> <span class="n">lat_obs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">long_obs</span> <span class="o">=</span> <span class="n">long_obs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absolute_mpa_degrees</span> <span class="o">=</span> <span class="n">absolute_mpa_degrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpa_degrees</span> <span class="o">=</span> <span class="n">mpa_degrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">geom_factor</span> <span class="o">=</span> <span class="n">geom_factor</span></div>
+
+
+
+<div class="viewcode-block" id="SpectralValidity">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralValidity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpectralValidity</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum that represents if a channel is inside LIME&#39;s spectral range.</span>
+<span class="sd">    VALID: Fully in the range.</span>
+<span class="sd">    PARTLY_OUT: Some wavelengths out of range.</span>
+<span class="sd">    OUT: All wavelengths out of range.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">VALID</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">PARTLY_OUT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">OUT</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="SRFChannel">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRFChannel">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SRFChannel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass containing the spectral responses and metadata for a SRF Channel</span>
+
+<span class="sd">    center: float</span>
+<span class="sd">        Center wavelength</span>
+<span class="sd">    id: str</span>
+<span class="sd">        Identifier of the channel</span>
+<span class="sd">    spectral_response : dict of float, float</span>
+<span class="sd">        Set of pairs wavelength, percentage. 100% = 1.0.</span>
+<span class="sd">    spectral_validity: SpectralValidity</span>
+<span class="sd">        Information about if the channel is inside LIME&#39;s spectral calculation range or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">center</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">spectral_response</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="n">valid_spectre</span><span class="p">:</span> <span class="n">SpectralValidity</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">center</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">spectral_response</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">min_wlen</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">MIN_WLEN</span><span class="p">,</span>
+        <span class="n">max_wlen</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_WLEN</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectral_response</span> <span class="o">=</span> <span class="n">spectral_response</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectral_response_inrange</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spectral_response</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">min_wlen</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="n">max_wlen</span>
+        <span class="p">}</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectral_response</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">spec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_wlen</span> <span class="ow">or</span> <span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_wlen</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_spectre</span> <span class="o">=</span> <span class="n">SpectralValidity</span><span class="o">.</span><span class="n">OUT</span>
+        <span class="k">elif</span> <span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_wlen</span> <span class="ow">or</span> <span class="n">spec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_wlen</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_spectre</span> <span class="o">=</span> <span class="n">SpectralValidity</span><span class="o">.</span><span class="n">PARTLY_OUT</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_spectre</span> <span class="o">=</span> <span class="n">SpectralValidity</span><span class="o">.</span><span class="n">VALID</span></div>
+
+
+
+<div class="viewcode-block" id="SpectralResponseFunction">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpectralResponseFunction</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass containing the spectral response function, a set of channels with their data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the SRF, the identifier.</span>
+<span class="sd">    channels: list of SRFChannel</span>
+<span class="sd">        List of the SRF channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">channels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SRFChannel</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SpectralResponseFunction.get_wavelengths">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_wavelengths">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavelengths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">wlens</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="n">wlens</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">wlens</span></div>
+
+
+<div class="viewcode-block" id="SpectralResponseFunction.get_values">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">spectral_response</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">vals</span></div>
+
+
+<div class="viewcode-block" id="SpectralResponseFunction.get_channels_names">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_channels_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_channels_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ch</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SpectralResponseFunction.get_channels_centers">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_channels_centers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_channels_centers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">wlcs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="n">wlcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">center</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wlcs</span></div>
+
+
+<div class="viewcode-block" id="SpectralResponseFunction.get_channel_from_name">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralResponseFunction.get_channel_from_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_channel_from_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SRFChannel</span><span class="p">:</span>
+        <span class="n">chs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">chs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SRF_fwhm">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SRF_fwhm</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass containing the spectral response function, a set of channels with their data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the SRF, the identifier.</span>
+<span class="sd">    channels: list of SRFChannel</span>
+<span class="sd">        List of the SRF channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">wav_centre</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">fwhm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">shape</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="SRF_fwhm.get_wavelengths">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.get_wavelengths">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavelengths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wav_centre</span></div>
+
+
+<div class="viewcode-block" id="SRF_fwhm.get_values">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.get_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fwhm</span></div>
+
+
+<div class="viewcode-block" id="SRF_fwhm.get_shape">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SRF_fwhm.get_shape">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Point">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Point">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Point</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class representing a point which can be used to generate a MoonData&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="SurfacePoint">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SurfacePoint">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SurfacePoint</span><span class="p">(</span><span class="n">Point</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass representing a point on Earth&#39;s surface.</span>
+
+<span class="sd">    The needed parameters for the calculation from a surface point.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    latitude: float</span>
+<span class="sd">        Geographic latitude in decimal degrees.</span>
+<span class="sd">    longitude: float</span>
+<span class="sd">        Geographic longitude in decimal degrees.</span>
+<span class="sd">    altitude: float</span>
+<span class="sd">        Altitude over the sea level in meters.</span>
+<span class="sd">    dt: datetime | list of datetime</span>
+<span class="sd">        Time or time series at which the lunar data will be calculated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">altitude</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]</span></div>
+
+
+
+<div class="viewcode-block" id="CustomPoint">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.CustomPoint">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomPoint</span><span class="p">(</span><span class="n">Point</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass representing a point with custom Moon data.</span>
+
+<span class="sd">    The needed parameters for the calculation from a custom point.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    distance_sun_moon : float</span>
+<span class="sd">        Distance between the Sun and the Moon (in astronomical units)</span>
+<span class="sd">    distance_observer_moon : float</span>
+<span class="sd">        Distance between the Observer and the Moon (in kilometers)</span>
+<span class="sd">    selen_obs_lat : float</span>
+<span class="sd">        Selenographic latitude of the observer (in degrees)</span>
+<span class="sd">    selen_obs_lon : float</span>
+<span class="sd">        Selenographic longitude of the observer (in degrees)</span>
+<span class="sd">    selen_sun_lon : float</span>
+<span class="sd">        Selenographic longitude of the Sun (in radians)</span>
+<span class="sd">    abs_moon_phase_angle : float</span>
+<span class="sd">        Absolute Moon phase angle (in degrees)</span>
+<span class="sd">    moon_phase_angle : float</span>
+<span class="sd">        Moon phase angle (in degrees)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">distance_sun_moon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">distance_observer_moon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">selen_obs_lat</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">selen_obs_lon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">selen_sun_lon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">abs_moon_phase_angle</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">moon_phase_angle</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="SatellitePoint">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePoint">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SatellitePoint</span><span class="p">(</span><span class="n">Point</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass representing a Satellite in a concrete datetime</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name of the satellite</span>
+<span class="sd">    dt : datetime | list of datetime</span>
+<span class="sd">        Datetime/s that will be computed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]</span></div>
+
+
+
+<div class="viewcode-block" id="OrbitFile">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.OrbitFile">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrbitFile</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass that represents a Satellite orbit file.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Name of the orbit file in the file system.</span>
+<span class="sd">    dt0: datetime</span>
+<span class="sd">        First datetime for which the orbit file works.</span>
+<span class="sd">    dtf: datetime</span>
+<span class="sd">        Last datetime for which the orbit file works</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dt0</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">dtf</span><span class="p">:</span> <span class="n">datetime</span></div>
+
+
+
+<div class="viewcode-block" id="Satellite">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Satellite</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass that represents an ESA Satellite.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        Satellite name</span>
+<span class="sd">    id: int</span>
+<span class="sd">        Satellite id</span>
+<span class="sd">    orbit_files: list of OrbitFile</span>
+<span class="sd">        Orbit files of the Satellite</span>
+<span class="sd">    norad_sat_number: int | None</span>
+<span class="sd">        Number of the satellite in the NORAD Catalog number (Celestrak)</span>
+<span class="sd">        Only present if the satellite has TLE files.</span>
+<span class="sd">    intdes: str | None</span>
+<span class="sd">        International Designator of the object.</span>
+<span class="sd">        Only present if the satellite has TLE files.</span>
+<span class="sd">    time_file: str | None</span>
+<span class="sd">        File used for time initialization.</span>
+<span class="sd">        Only present if the satellite has TLE files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">orbit_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OrbitFile</span><span class="p">]</span>
+    <span class="n">norad_sat_number</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">intdes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">time_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Satellite.get_datetime_range">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.get_datetime_range">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_datetime_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate all the datetime range between its orbit files.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dt0: datetime</span>
+<span class="sd">            First datetime for which the Satellite can be simulated.</span>
+<span class="sd">        dtf: datetime</span>
+<span class="sd">            Last datetime for which the Satellite can be simulated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dt0</span> <span class="o">=</span> <span class="n">dtf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">orf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbit_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dt0</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dt0</span> <span class="o">=</span> <span class="n">orf</span><span class="o">.</span><span class="n">dt0</span>
+                <span class="n">dtf</span> <span class="o">=</span> <span class="n">orf</span><span class="o">.</span><span class="n">dtf</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dt0</span> <span class="o">&gt;</span> <span class="n">orf</span><span class="o">.</span><span class="n">dt0</span><span class="p">:</span>
+                    <span class="n">dt0</span> <span class="o">=</span> <span class="n">orf</span><span class="o">.</span><span class="n">dt0</span>
+                <span class="k">if</span> <span class="n">dtf</span> <span class="o">&lt;</span> <span class="n">orf</span><span class="o">.</span><span class="n">dtf</span><span class="p">:</span>
+                    <span class="n">dtf</span> <span class="o">=</span> <span class="n">orf</span><span class="o">.</span><span class="n">dtf</span>
+        <span class="k">return</span> <span class="n">dt0</span><span class="p">,</span> <span class="n">dtf</span></div>
+
+
+<div class="viewcode-block" id="Satellite.get_best_orbit_file">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.Satellite.get_best_orbit_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_orbit_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrbitFile</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain the best orbit file for the given datetime.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt: datetime</span>
+<span class="sd">            Datetime that is queried.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        orbit_file: OrbitFile</span>
+<span class="sd">            Selected orbit file for the fiven datetime.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sel_td</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">sel_orf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">orf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbit_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="o">&gt;=</span> <span class="n">orf</span><span class="o">.</span><span class="n">dt0</span> <span class="ow">and</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="n">orf</span><span class="o">.</span><span class="n">dtf</span><span class="p">:</span>
+                <span class="n">td</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dt</span> <span class="o">-</span> <span class="n">orf</span><span class="o">.</span><span class="n">dt0</span><span class="p">,</span> <span class="n">orf</span><span class="o">.</span><span class="n">dtf</span> <span class="o">-</span> <span class="n">dt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sel_td</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">td</span> <span class="o">&lt;</span> <span class="n">sel_td</span><span class="p">:</span>
+                    <span class="n">sel_td</span> <span class="o">=</span> <span class="n">td</span>
+                    <span class="n">sel_orf</span> <span class="o">=</span> <span class="n">orf</span>
+        <span class="k">return</span> <span class="n">sel_orf</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SatellitePosition">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SatellitePosition">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SatellitePosition</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass containing the information of the position of a SatellitePoint,</span>
+<span class="sd">    for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it&#39;s ITRF93.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: float</span>
+<span class="sd">        The x coordinate</span>
+<span class="sd">    y: float</span>
+<span class="sd">        The y coordinate</span>
+<span class="sd">    z: float</span>
+<span class="sd">        The z coordinate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">x</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">z</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="LunarObservation">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LunarObservation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass containing the information for one GLOD-like lunar observation instant.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ch_names: list of str</span>
+<span class="sd">        Names of the channels present</span>
+<span class="sd">    sat_pos_ref: str</span>
+<span class="sd">        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it&#39;s ITRF93.</span>
+<span class="sd">    ch_irrs: dict of str and float</span>
+<span class="sd">        Irradiances relative to each channel. The key is the channel name, and the irradiance</span>
+<span class="sd">        is given in Wm⁻²nm⁻¹.</span>
+<span class="sd">    dt: datetime</span>
+<span class="sd">        Datetime of the observation.</span>
+<span class="sd">    sat_pos: SatellitePosition</span>
+<span class="sd">        Satellite position at that moment.</span>
+<span class="sd">    data_source: str</span>
+<span class="sd">        Data source of the lunar observation.</span>
+<span class="sd">    md: MoonData or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ch_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">sat_pos_ref</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">ch_irrs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">sat_pos</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SatellitePosition</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">md</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">MoonData</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LunarObservation.get_ch_irradiance">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.get_ch_irradiance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ch_irradiance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_irrs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel name not in data structure&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_irrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="LunarObservation.has_ch_value">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.has_ch_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_ch_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_irrs</span></div>
+
+
+<div class="viewcode-block" id="LunarObservation.check_valid_srf">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservation.check_valid_srf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_valid_srf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_names</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">ch_srf</span> <span class="ow">in</span> <span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ch_srf</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">ch</span><span class="p">:</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ReflectanceCoefficients">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReflectanceCoefficients</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set of coefficients from the same version. Used in order to calculate the reflectance</span>
+<span class="sd">    from mainly CIMEL data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _ds: xarray.DataSet</span>
+<span class="sd">        Original source dataset</span>
+<span class="sd">    wlens: np.ndarray</span>
+<span class="sd">        Wavelengths present in this coefficient version. Each one of them</span>
+<span class="sd">    coeffs: _WlenReflCoeffs</span>
+<span class="sd">        Reflectance Coefficients, with an attribute for every coefficient group, a matrix each.</span>
+<span class="sd">    unc_coeffs: _WlenReflCoeffs</span>
+<span class="sd">        Reflectance Coefficients uncertainties, with an attribute for every coefficient group, a matrix each.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_ds&quot;</span><span class="p">,</span> <span class="s2">&quot;wlens&quot;</span><span class="p">,</span> <span class="s2">&quot;coeffs&quot;</span><span class="p">,</span> <span class="s2">&quot;unc_coeffs&quot;</span><span class="p">,</span> <span class="s2">&quot;err_corr_coeff&quot;</span><span class="p">]</span>
+
+    <span class="nd">@dataclass</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_WlenReflCoeffs</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Subdataclass where coefficients are stored</span>
+
+<span class="sd">        x_coeffs structure: [[x0_w0, x0_w1, x0_w2, ...], [x1_w0, x1_w2, x1_w2, ...], ...]</span>
+<span class="sd">        It&#39;s that way so &quot;vector-wise&quot; operations can be performed over every xn parameter without</span>
+<span class="sd">        having to perform them over every wavelength too.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;_coeffs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;a_coeffs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;b_coeffs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;c_coeffs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;d_coeffs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;p_coeffs&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">a_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">14</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">14</span><span class="p">::,</span> <span class="p">:]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_ds</span><span class="p">:</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ds</span> <span class="o">=</span> <span class="n">_ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">_ds</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">coeffs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">_ds</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">ReflectanceCoefficients</span><span class="o">.</span><span class="n">_WlenReflCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+        <span class="n">u_coeff_cimel</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">_ds</span><span class="o">.</span><span class="n">u_coeff</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">coeffs</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unc_coeffs</span> <span class="o">=</span> <span class="n">ReflectanceCoefficients</span><span class="o">.</span><span class="n">_WlenReflCoeffs</span><span class="p">(</span><span class="n">u_coeff_cimel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">err_corr_coeff</span> <span class="o">=</span> <span class="n">_ds</span><span class="o">.</span><span class="n">err_corr_coeff</span><span class="o">.</span><span class="n">values</span></div>
+
+
+
+<div class="viewcode-block" id="PolarisationCoefficients">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PolarisationCoefficients</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coefficients used in the DoLP algorithm.</span>
+
+<span class="sd">    If created with numpy arrays, it will return those numpy arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">wavelengths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">pos_coeffs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">pos_unc</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">p_pos_err_corr_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">neg_coeffs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">neg_unc</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">p_neg_err_corr_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wavelengths: list of float</span>
+<span class="sd">            Wavelengths present in the model, in nanometers</span>
+<span class="sd">        pos_coeffs: list of tuples of N floats</span>
+<span class="sd">            Positive phase angles related to the given wavelengths</span>
+<span class="sd">        neg_coeffs: list of tuples of N floats</span>
+<span class="sd">            Negative phase angles related to the given wavelengths</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span> <span class="o">=</span> <span class="n">wavelengths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_coeffs</span> <span class="o">=</span> <span class="n">pos_coeffs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_unc</span> <span class="o">=</span> <span class="n">pos_unc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_pos_err_corr_data</span> <span class="o">=</span> <span class="n">p_pos_err_corr_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neg_coeffs</span> <span class="o">=</span> <span class="n">neg_coeffs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neg_unc</span> <span class="o">=</span> <span class="n">neg_unc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_neg_err_corr_data</span> <span class="o">=</span> <span class="n">p_neg_err_corr_data</span>
+
+<div class="viewcode-block" id="PolarisationCoefficients.get_wavelengths">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_wavelengths">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavelengths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets all wavelengths present in the model, in nanometers</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of float</span>
+<span class="sd">            A list of floats that are the wavelengths in nanometers, in order</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span></div>
+
+
+<div class="viewcode-block" id="PolarisationCoefficients.get_coefficients_positive">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_coefficients_positive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_coefficients_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength_nm</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets all positive phase angle coefficients for a concrete wavelength</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wavelength_nm : float</span>
+<span class="sd">            Wavelength in nanometers from which one wants to obtain the coefficients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of float</span>
+<span class="sd">            A list containing the &#39;a&#39; coefficients for the wavelength</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">wavelength_nm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PolarisationCoefficients.get_uncertainties_positive">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_uncertainties_positive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_uncertainties_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength_nm</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">wavelength_nm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_unc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PolarisationCoefficients.get_coefficients_negative">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_coefficients_negative">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_coefficients_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength_nm</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets all negative phase angle coefficients for a concrete wavelength</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wavelength_nm : float</span>
+<span class="sd">            Wavelength in nanometers from which one wants to obtain the coefficients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of float</span>
+<span class="sd">            A list containing the &#39;a&#39; coefficients for the wavelength</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">wavelength_nm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">neg_coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PolarisationCoefficients.get_uncertainties_negative">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.get_uncertainties_negative">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_uncertainties_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength_nm</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_wavelengths</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">wavelength_nm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">neg_unc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PolarisationCoefficients.is_calculable">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients.is_calculable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_calculable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neg_coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LimeCoefficients">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeCoefficients">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LimeCoefficients</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coefficients used in the LIME algorithms.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reflectance: ReflectanceCoefficients</span>
+<span class="sd">        Reflectance coefficients for the LIME model.</span>
+<span class="sd">    polarisation: PolatizationCoefficients</span>
+<span class="sd">        Polarisation coefficients for the DoLP/LIME model.</span>
+<span class="sd">    version: str</span>
+<span class="sd">        Name of the version that will be shown to the user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">reflectance</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span>
+    <span class="n">polarisation</span><span class="p">:</span> <span class="n">PolarisationCoefficients</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="SpectralData">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpectralData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data for a spectrum of wavelengths, with an associated uncertainty each.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wlens: np.ndarray</span>
+<span class="sd">        Spectrum of wavelengths.</span>
+<span class="sd">    data: np.ndarray</span>
+<span class="sd">        Data associated to the wavelengths (irradiance, reflectance, etc).</span>
+<span class="sd">    uncertainties: np.ndarray</span>
+<span class="sd">        Uncertainties associated to the data.</span>
+<span class="sd">    err_corr: None | np.ndarray</span>
+<span class="sd">        Error correlation matrix, if included.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">wlens</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">uncertainties</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">ds</span><span class="p">:</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wlens: np.ndarray</span>
+<span class="sd">            Spectrum of wavelengths</span>
+<span class="sd">        data: np.ndarray</span>
+<span class="sd">            Data associated to the wavelengths (irradiance, reflectance, etc)</span>
+<span class="sd">        uncertainties: np.ndarray</span>
+<span class="sd">            Uncertainties associated to the data</span>
+<span class="sd">        ds: xarray.Dataset</span>
+<span class="sd">            Dataset used in data generation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span> <span class="o">=</span> <span class="n">wlens</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainties</span> <span class="o">=</span> <span class="n">uncertainties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">err_corr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="s2">&quot;err_corr_reflectance_wavelength&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">err_corr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">err_corr_reflectance_wavelength</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="s2">&quot;err_corr_polarisation&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">err_corr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">err_corr_polarisation</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="s2">&quot;err_corr_irradiance&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">err_corr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">err_corr_irradiance</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SpectralData.clear_err_corr">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.clear_err_corr">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_err_corr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dereference the error correlation matrix from the object.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">err_corr</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SpectralData.make_reflectance_ds">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_reflectance_ds">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_reflectance_ds</span><span class="p">(</span>
+        <span class="n">wavs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">refl</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">unc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">corr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="n">dim_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wavelength&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavs</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">corr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">corr</span><span class="p">]])</span>
+        <span class="c1"># create dataset</span>
+        <span class="n">ds_refl</span> <span class="o">=</span> <span class="n">obsarray</span><span class="o">.</span><span class="n">create_ds</span><span class="p">(</span><span class="n">TEMPLATE_REFL</span><span class="p">,</span> <span class="n">dim_sizes</span><span class="p">)</span>
+        <span class="n">ds_refl</span> <span class="o">=</span> <span class="n">ds_refl</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavs</span><span class="p">)</span>
+
+        <span class="n">ds_refl</span><span class="o">.</span><span class="n">reflectance</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">refl</span>
+        <span class="k">if</span> <span class="n">unc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_refl</span><span class="o">.</span><span class="n">u_reflectance</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">unc</span>
+        <span class="k">if</span> <span class="n">corr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_refl</span><span class="o">.</span><span class="n">err_corr_reflectance_wavelength</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">corr</span>
+
+        <span class="k">return</span> <span class="n">ds_refl</span></div>
+
+
+<div class="viewcode-block" id="SpectralData.make_irradiance_ds">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_irradiance_ds">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_irradiance_ds</span><span class="p">(</span>
+        <span class="n">wavs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">irr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">unc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">corr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="n">dim_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wavelength&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavs</span><span class="p">)}</span>
+        <span class="c1"># create dataset</span>
+        <span class="n">ds_irr</span> <span class="o">=</span> <span class="n">obsarray</span><span class="o">.</span><span class="n">create_ds</span><span class="p">(</span><span class="n">TEMPLATE_IRR</span><span class="p">,</span> <span class="n">dim_sizes</span><span class="p">)</span>
+
+        <span class="n">ds_irr</span> <span class="o">=</span> <span class="n">ds_irr</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavs</span><span class="p">)</span>
+
+        <span class="n">ds_irr</span><span class="o">.</span><span class="n">irradiance</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">irr</span>
+
+        <span class="k">if</span> <span class="n">unc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_irr</span><span class="o">.</span><span class="n">u_irradiance</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">unc</span>
+        <span class="k">if</span> <span class="n">corr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_irr</span><span class="o">.</span><span class="n">err_corr_irradiance</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">corr</span>
+
+        <span class="k">return</span> <span class="n">ds_irr</span></div>
+
+
+<div class="viewcode-block" id="SpectralData.make_polarisation_ds">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_polarisation_ds">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_polarisation_ds</span><span class="p">(</span>
+        <span class="n">wavs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">polarisation</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">unc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">corr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="n">dim_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wavelength&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavs</span><span class="p">)}</span>
+        <span class="c1"># create dataset</span>
+        <span class="n">ds_pol</span> <span class="o">=</span> <span class="n">obsarray</span><span class="o">.</span><span class="n">create_ds</span><span class="p">(</span><span class="n">TEMPLATE_POL</span><span class="p">,</span> <span class="n">dim_sizes</span><span class="p">)</span>
+
+        <span class="n">ds_pol</span> <span class="o">=</span> <span class="n">ds_pol</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">wavs</span><span class="p">)</span>
+
+        <span class="n">ds_pol</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">polarisation</span>
+
+        <span class="k">if</span> <span class="n">unc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_pol</span><span class="o">.</span><span class="n">u_polarisation</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">unc</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds_pol</span><span class="o">.</span><span class="n">u_polarisation</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">polarisation</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span>
+
+        <span class="k">if</span> <span class="n">corr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_pol</span><span class="o">.</span><span class="n">err_corr_polarisation</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">corr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds_pol</span><span class="o">.</span><span class="n">err_corr_polarisation</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">polarisation</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">polarisation</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ds_pol</span></div>
+
+
+<div class="viewcode-block" id="SpectralData.make_signals_ds">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData.make_signals_ds">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_signals_ds</span><span class="p">(</span>
+        <span class="n">channel_ids</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">signals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">unc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">corr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="n">dim_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel_ids</span><span class="p">),</span> <span class="s2">&quot;dts&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">])}</span>
+        <span class="c1"># create dataset</span>
+        <span class="n">ds_refl</span> <span class="o">=</span> <span class="n">obsarray</span><span class="o">.</span><span class="n">create_ds</span><span class="p">(</span><span class="n">TEMPLATE_SIGNALS</span><span class="p">,</span> <span class="n">dim_sizes</span><span class="p">)</span>
+
+        <span class="n">ds_refl</span> <span class="o">=</span> <span class="n">ds_refl</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">wavelength</span><span class="o">=</span><span class="n">channel_ids</span><span class="p">)</span>
+
+        <span class="n">ds_refl</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">signals</span>
+
+        <span class="k">if</span> <span class="n">unc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds_refl</span><span class="o">.</span><span class="n">u_signals</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">unc</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds_refl</span><span class="o">.</span><span class="n">u_signals</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">signals</span> <span class="o">*</span> <span class="mf">0.05</span>
+
+        <span class="k">return</span> <span class="n">ds_refl</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ComparisonData">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ComparisonData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass containing the data outputed from a comparison.</span>
+
+<span class="sd">    The SpectralDatas &quot;wlens&quot; attribute is not a list of float, instead a list</span>
+<span class="sd">    of datetimes, corresponding to the measurements datetimes.</span>
+
+<span class="sd">    The comparison data corresponds to the compared data for multiple datetimes</span>
+<span class="sd">    for a single channel.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    observed_signal: SpectralData</span>
+<span class="sd">        Real data obtained from the GLOD files.</span>
+<span class="sd">    simulated_signal: SpectralData</span>
+<span class="sd">        Simulated data obtained from the model for the same conditions.</span>
+<span class="sd">    diffs_signal: SpectralData</span>
+<span class="sd">        Relative differences between the simulated and real data. 100*(experimental - simulated) / simulated.</span>
+<span class="sd">    mean_relative_difference: float</span>
+<span class="sd">        The mean of the relative differences (diffs_signals mean).</span>
+<span class="sd">    mean_absolute_relative_difference: float</span>
+<span class="sd">        The mean of the absolutes of the relative differences (abs(diffs_signals) mean).</span>
+<span class="sd">    standard_deviation_mrd: float</span>
+<span class="sd">        Standard deviation of relative differences.</span>
+<span class="sd">    number_samples: int</span>
+<span class="sd">        Number of compared instances presnet in the object</span>
+<span class="sd">    dts: list of datetime</span>
+<span class="sd">        Datetimes of the different samples. They are also used as the &quot;wlens&quot; attribute</span>
+<span class="sd">        for the SpectraDatas.</span>
+<span class="sd">    points: list of SurfacePoint</span>
+<span class="sd">        Point for every datetime.</span>
+<span class="sd">    ampa_valid_range: list of bool</span>
+<span class="sd">        Flag that indicates if the moon phase angle is in the valid LIME range.</span>
+<span class="sd">    perc_diffs: SpectralData</span>
+<span class="sd">        Percentage differences between the simulated and real data.</span>
+<span class="sd">    mean_perc_difference: float</span>
+<span class="sd">        The mean of the percentage differences (perc_diffs mean).</span>
+<span class="sd">    mdas: list of MoonData</span>
+<span class="sd">        List of lunar geometry and angles for the comparison measurements</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">observed_signal</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="n">simulated_signal</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="n">diffs_signal</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="n">mean_relative_difference</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">mean_absolute_relative_difference</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">standard_deviation_mrd</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">number_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">dts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="n">points</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SurfacePoint</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">CustomPoint</span><span class="p">]]</span>
+    <span class="n">ampa_valid_range</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+    <span class="n">perc_diffs</span><span class="p">:</span> <span class="n">SpectralData</span>
+    <span class="n">mean_perc_difference</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">mdas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MoonData</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ComparisonData.get_diffs_and_label">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ComparisonData.get_diffs_and_label">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_diffs_and_label</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">chosen_diffs</span><span class="p">:</span> <span class="n">constants</span><span class="o">.</span><span class="n">CompFields</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">SpectralData</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="n">chosen_diffs</span> <span class="o">==</span> <span class="n">constants</span><span class="o">.</span><span class="n">CompFields</span><span class="o">.</span><span class="n">DIFF_PERC</span><span class="p">:</span>
+            <span class="n">datadiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perc_diffs</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Percentage difference (%)&quot;</span>
+        <span class="k">elif</span> <span class="n">chosen_diffs</span> <span class="o">==</span> <span class="n">constants</span><span class="o">.</span><span class="n">CompFields</span><span class="o">.</span><span class="n">DIFF_REL</span><span class="p">:</span>
+            <span class="n">datadiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffs_signal</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Relative difference (%)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">datadiff</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">datadiff</span><span class="p">,</span> <span class="n">label</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="KernelsPath">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.KernelsPath">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">KernelsPath</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass containing the needed information in order to find all SPICE kernels.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_kernels_path: str</span>
+<span class="sd">        Path where the main SPICE kernels are located (can be read-only).</span>
+<span class="sd">    custom_kernel_path: str</span>
+<span class="sd">        Path where the custom SPICE kernel will be stored (must be writeable).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">main_kernels_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">custom_kernel_path</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="EocfiPath">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.EocfiPath">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EocfiPath</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass containing the needed information in order to find all EOCFI data in the system.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_eocfi_path: str</span>
+<span class="sd">        Path where the main TBX satellite data is located (can be read-only).</span>
+<span class="sd">    custom_eocfi_path: str</span>
+<span class="sd">        Path where the custom TBX satellite data is located (can be read-only).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">main_eocfi_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">custom_eocfi_path</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="SelenographicDataWrite">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SelenographicDataWrite">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SelenographicDataWrite</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extra data that allowes to define CustomPoints in the GLOD data file.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    distance_sun_moon : float</span>
+<span class="sd">        Distance between the Sun and the Moon (in astronomical units)</span>
+<span class="sd">    selen_sun_lon_rad : float</span>
+<span class="sd">        Selenographic longitude of the Sun (in radians)</span>
+<span class="sd">    mpa_degrees : float</span>
+<span class="sd">        Moon phase angle (in degrees)</span>
+<span class="sd">    selen_obs_lat_deg: float</span>
+<span class="sd">        Selenographic latitude of the observer (in degrees)</span>
+<span class="sd">    selen_obs_lon_deg: float</span>
+<span class="sd">        Selenographic longitude of the observer (in degrees)</span>
+<span class="sd">    distance_obs_moon_km: float</span>
+<span class="sd">        Distance between the observer and the Moon (in kilometers)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">distance_sun_moon</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">selen_sun_lon_rad</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">mpa_degrees</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">selen_obs_lat_deg</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">selen_obs_lon_deg</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">distance_obs_moon_km</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="LunarObservationWrite">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LunarObservationWrite</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass containing the needed information to create a Lunar observation in a LGLOD file.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ch_names: list of str</span>
+<span class="sd">        Names of the channels present</span>
+<span class="sd">    sat_pos_ref: str</span>
+<span class="sd">        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it&#39;s ITRF93.</span>
+<span class="sd">    dt: datetime</span>
+<span class="sd">        Datetime of the observation.</span>
+<span class="sd">    sat_pos: SatellitePosition</span>
+<span class="sd">        Satellite position at that moment.</span>
+<span class="sd">    irrs: SpectralData</span>
+<span class="sd">        Irradiance data</span>
+<span class="sd">    refls: SpectralData</span>
+<span class="sd">        Reflectance data</span>
+<span class="sd">    polars: SpectralData</span>
+<span class="sd">        Polarisation data</span>
+<span class="sd">    sat_name: str | None</span>
+<span class="sd">        Name of the satellite. If None or empty, then it&#39;s a SurfacePoint</span>
+<span class="sd">    selenographic_data: SelenographicDataWrite | None</span>
+<span class="sd">        If a CustomPoint, data that allowes to define the point. If None then it&#39;s not selenographic</span>
+<span class="sd">        (not a CustomPoint).</span>
+<span class="sd">    data_source: str</span>
+<span class="sd">        Data source of the lunar observation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ch_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">sat_pos_ref</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">sat_pos</span><span class="p">:</span> <span class="n">SatellitePosition</span>
+    <span class="n">irrs</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
+    <span class="n">refls</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
+    <span class="n">polars</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
+    <span class="n">sat_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">selenographic_data</span><span class="p">:</span> <span class="n">SelenographicDataWrite</span>
+    <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="LunarObservationWrite.has_ch_value">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.has_ch_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_ch_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_names</span></div>
+
+
+<div class="viewcode-block" id="LunarObservationWrite.check_valid_srf">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LunarObservationWrite.check_valid_srf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_valid_srf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srf</span><span class="p">:</span> <span class="n">SpectralResponseFunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_names</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">ch_srf</span> <span class="ow">in</span> <span class="n">srf</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ch_srf</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">ch</span><span class="p">:</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LGLODData">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODData">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LGLODData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format used by the toolbox.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    observations: list of LunarObservationWrite</span>
+<span class="sd">        Spectral irradiance, reflectance and polarisation for all the datetimes.</span>
+<span class="sd">    signals: SpectralData</span>
+<span class="sd">        SRF-Integrated irradiance data.</span>
+<span class="sd">    not_default_srf: bool</span>
+<span class="sd">        Flag that indicates if the spectral response function used is the default one or not (a custom user-selected one).</span>
+<span class="sd">    elis_cimel: list of SpectralData</span>
+<span class="sd">        Irradiance for the cimel.</span>
+<span class="sd">    elrefs_cimel: list of SpectralData</span>
+<span class="sd">        Reflectance for the cimel.</span>
+<span class="sd">    polars_cimel: list of SpectralData</span>
+<span class="sd">        Polarisation for the cimel.</span>
+<span class="sd">    spectrum_name: str</span>
+<span class="sd">        Name of the spectrum used for interpolation.</span>
+<span class="sd">    skipped_uncs: bool</span>
+<span class="sd">        Flag that indicates if the uncertainties calculation was skipped or not.</span>
+<span class="sd">    dolp_spectrum_name: str</span>
+<span class="sd">        Name of the spectrum used for polarisation interpolation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LunarObservationWrite</span><span class="p">]</span>
+    <span class="n">signals</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
+    <span class="n">not_default_srf</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">elis_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
+    <span class="n">elrefs_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
+    <span class="n">polars_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
+    <span class="n">spectrum_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">skipped_uncs</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dolp_spectrum_name</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="LGLODComparisonData">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LGLODComparisonData">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LGLODComparisonData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataclass with the data of a LGLOD comparison file. LGLOD is the GLOD-based format used by the toolbox.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparisons: list of ComparisonData</span>
+<span class="sd">        List of the comparison values.</span>
+<span class="sd">    ch_names: list of str</span>
+<span class="sd">        List with the names of the channels.</span>
+<span class="sd">    sat_name: str</span>
+<span class="sd">        Name of the satellite used for comparison.</span>
+<span class="sd">    spectrum_name: str</span>
+<span class="sd">        Name of the spectrum used for interpolation.</span>
+<span class="sd">    skipped_uncs: bool</span>
+<span class="sd">        Flag that indicates if the uncertainties calculation was skipped or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">comparisons</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ComparisonData</span><span class="p">]</span>
+    <span class="n">ch_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">sat_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">spectrum_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">skipped_uncs</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="LimeException">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.LimeException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LimeException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception that is raised by the toolbox that is intended to be shown to the user.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="InterpolationSettings">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.InterpolationSettings">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InterpolationSettings</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Representation of the YAML file that contains the interpolation settings data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    interpolation_spectrum: str</span>
+<span class="sd">        Name (and id) of the spectrum used for interpolation.</span>
+<span class="sd">    interpolation_spectrum_polarisation: str</span>
+<span class="sd">        Name (and id) of the spectrum used for interpolation for polarisation.</span>
+<span class="sd">    interpolation_SRF: str</span>
+<span class="sd">        Name (and id) of the spectrum used for SRF interpolation.</span>
+<span class="sd">    show_interp_spectrum: bool</span>
+<span class="sd">        Flag that indicates if the interpolation spectrum used is going to be shown in graphs.</span>
+<span class="sd">    skip_uncertainties: bool</span>
+<span class="sd">        Flag that indicates if the uncertainties calculation should be skipped.</span>
+<span class="sd">    use_wehrli: bool</span>
+<span class="sd">        Boolean indicating if the Wehrli spectrum will be used for calculating ESI or not.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">interpolation_spectrum</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">interpolation_spectrum_polarisation</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">interpolation_SRF</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">show_cimel_points</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">show_interp_spectrum</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">skip_uncertainties</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">use_wehrli</span><span class="p">:</span> <span class="nb">bool</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">file</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_yaml</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;InterpolationSettings&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="n">yaml_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">])</span>
+        <span class="n">setts_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">yaml_str</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+        <span class="n">setts</span><span class="p">:</span> <span class="s2">&quot;InterpolationSettings&quot;</span> <span class="o">=</span> <span class="n">InterpolationSettings</span><span class="p">(</span><span class="o">**</span><span class="n">setts_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">setts</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, European Space Agency (ESA). Code and documentation licensed under the GNU Lesser General Public License (LGPL), Version 3.0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

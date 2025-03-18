@@ -1,0 +1,17 @@
+lime\_tbx.application package
+=============================
+
+.. automodule:: lime_tbx.application
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.application.coefficients
+   lime_tbx.application.filedata
+   lime_tbx.application.simulation
