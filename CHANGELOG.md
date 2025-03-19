@@ -43,6 +43,10 @@ are `float64`, now they are kept as `float64`, which ensures they are positive-d
 slightly modifying the values making them not be positive-definite. This eliminates the
 overhead of computing the closest positive-definite matrix, achieving a 2.5× speedup in uncertainty
 calculations compared to v1.0.3. (**NFR306**)
+- Optimized the ASD wavelengths error correlation matrix by converting it from `float64` to `float32` while preserving
+  its positive semi-definite (PSD) property. This enhancement achieves a mean relative difference of less than 0.001%,
+  ensuring numerical stability. Additionally, this change provides a 2.5× speedup, contributing to an overall 6.25× improvement
+  in uncertainty calculations compared to v1.0.3. (**NFR306**)
 - Fixed minor bugs
 
 ## [1.0.3] - 2024-01-25
