@@ -79,7 +79,7 @@ def get_best_polar_asd_data(
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD.nc"))
+    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD_32.nc"))
 
     wavs = ds_asd.wavelength.values
     phase_angles = ds_asd.phase_angle.values
@@ -103,7 +103,7 @@ def get_linear_polar_data() -> SpectralData:
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD.nc"))
+    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD_32.nc"))
 
     wavs = ds_asd.wavelength.values
     pol = np.ones(wavs.shape)
@@ -131,11 +131,8 @@ def get_best_asd_data(moon_phase_angle: float) -> SpectralData:
         Reflectance spectrum.
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    # data = np.genfromtxt(
-    #     os.path.join(current_dir, "assets/SomeMoonReflectances.txt"), delimiter=","
-    # )
 
-    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD.nc"))
+    ds_asd = xr.open_dataset(os.path.join(current_dir, "assets/ds_ASD_32.nc"))
 
     wavs = ds_asd.wavelength.values
     phase_angles = ds_asd.phase_angle.values

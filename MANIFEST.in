@@ -34,7 +34,7 @@ include lime_tbx/business/interpolation/interp_data/assets/SomeMoonReflectances.
 include lime_tbx/business/interpolation/interp_data/assets/Apollo16.txt
 include lime_tbx/business/interpolation/interp_data/assets/Breccia.txt
 include lime_tbx/business/interpolation/interp_data/assets/Composite.txt
-include lime_tbx/business/interpolation/interp_data/assets/ds_ASD.nc
+include lime_tbx/business/interpolation/interp_data/assets/ds_ASD_32.nc
 
 prune lime_tbx/business/eocfi_adapter/eocfi_c
 include lime_tbx/business/eocfi_adapter/eocfi_c/bin/get_positions_linux
