@@ -1745,6 +1745,17 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.interpolation_action = QAction(self)
         self.interpolation_action.setText("&Interpolation options")
         self.interpolation_action.triggered.connect(self.interpol_options)
+        ##
+        # Shortcut action
+        toggle_fullscreen = QAction("Toggle Fullscreen", self)
+        toggle_fullscreen.setShortcuts(
+            [
+                QtGui.QKeySequence.FullScreen,
+                QtGui.QKeySequence(QtCore.Qt.Key_F11),
+            ]
+        )
+        toggle_fullscreen.triggered.connect(self.toggle_fullscreen)
+        self.addAction(toggle_fullscreen)
 
     def _create_menu_bar(self):
         self._create_actions()
@@ -1767,6 +1778,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self.menu_bar.addMenu(coeffs_menu)
         self.menu_bar.addMenu(help_menu)
         self.menu_bar.addMenu(settings_menu)
+
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
