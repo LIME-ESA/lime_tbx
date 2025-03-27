@@ -61,18 +61,6 @@ def _measurement_func_elref(
     elrefs: float | np.ndarray of float
         Calculated reflectances.
     """
-
-    # a_coeffs: list of float | np.ndarray of np.ndarray of float
-    # A Coefficients for a wavelength, or all the A coefficients for all wavelengths (matrix)
-    # b_coeffs: list of float | np.ndarray of np.ndarray of float
-    # B Coefficients for a wavelength, or all the B coefficients for all wavelengths (matrix)
-    # c_coeffs: list of float | np.ndarray of np.ndarray of float
-    # C Coefficients for a wavelength, or all the C coefficients for all wavelengths (matrix)
-    # d_coeffs: list of float | np.ndarray of np.ndarray of float
-    # D Coefficients for a wavelength, or all the D coefficients for all wavelengths (matrix)
-    # p_coeffs: list of float | np.ndarray of np.ndarray of float
-    # P Coefficients for a wavelength, or all the P coefficients for all wavelengths (matrix)
-
     a_coeffs = coeffs[0:4, :]
     b_coeffs = coeffs[4:7, :]
     c_coeffs = coeffs[7:11, :]
@@ -82,6 +70,8 @@ def _measurement_func_elref(
     gr_value = np.radians(gd_value)
     d1_value = d_coeffs[0] * np.exp(-gd_value / p_coeffs[0])
     d2_value = d_coeffs[1] * np.exp(-gd_value / p_coeffs[1])
+    # Cosine in radians is correct even though gd_value is in degrees
+    # It's being divided by p3 and p4 are in degrees too degrees/degrees = radians/radians (units are gone)
     d3_value = d_coeffs[2] * np.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
 
     sum_a: float = np.sum(
@@ -93,10 +83,10 @@ def _measurement_func_elref(
     result = (
         sum_a
         + sum_b
-        + c_coeffs[0] * l_phi
-        + c_coeffs[1] * l_theta
-        + c_coeffs[2] * phi * l_phi
-        + c_coeffs[3] * phi * l_theta
+        + c_coeffs[0] * l_theta
+        + c_coeffs[1] * l_phi
+        + c_coeffs[2] * phi * l_theta
+        + c_coeffs[3] * phi * l_phi
         + d1_value
         + d2_value
         + d3_value

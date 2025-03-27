@@ -47,6 +47,7 @@ calculations compared to v1.0.3. (**NFR306**)
   its positive semi-definite (PSD) property. This enhancement achieves a mean relative difference of less than 0.001%,
   ensuring numerical stability. Additionally, this change provides a 2.5× speedup, contributing to an overall 6.25× improvement
   in uncertainty calculations compared to v1.0.3. (**NFR306**)
+- Fixed LIME reflectance equation implementation. Observer's selenographic longitude and latitude were swapped.
 - Fixed minor bugs
 
 ## [1.0.3] - 2024-01-25
