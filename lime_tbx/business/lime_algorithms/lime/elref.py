@@ -3,8 +3,7 @@ This module calculates the extra-terrestrial lunar reflectance.
 
 It exports the following functions:
     * calculate_elref - Calculates the expected extra-terrestrial lunar reflectance
-    for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020 for the
-    irradiance, then divided by the solar irradiance.
+    for a given wavelength in nanometers. 
     * calculate_elref_unc - Calculates the uncertainty for the reflectance
     calculations of empirical data points.
 """
@@ -40,8 +39,7 @@ def _measurement_func_elref(
     gd_value: float,
 ) -> Union[float, np.ndarray]:
     """
-    Final computation of the calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
-    Roman et al., 2020
+    Final computation of the calculation of the ln of the reflectance of the Moon's disk
 
     Parameters
     ----------
@@ -99,8 +97,7 @@ def calculate_elref(
     moon_data: MoonData,
 ) -> np.ndarray:
     """
-    The calculation of the reflectance of the Moon's disk, following Eq.2 in Roman et al., 2020,
-    without multiplying the value by its apollo coefficient.
+    The calculation of the reflectance of the Moon's disk
 
     Simulates a lunar observation for a wavelength for any observer/solar selenographic
     latitude and longitude. The reflectance is calculated in fractions of unity.
