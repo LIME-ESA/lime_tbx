@@ -23,6 +23,7 @@ from lime_tbx.application.filedata.netcdfcommon import (
     validate_schema,
     xr_open_dataset,
     get_length_conversion_factor,
+    DTypeSchema,
 )
 from lime_tbx.common import logger
 
@@ -58,7 +59,7 @@ def _validate_schema_srf(ds: xr.Dataset):
         "wavelength": DataArraySchema(np.floating, dims=[sample_dim, "channel"]),
     }
     coords = {"channel": DataArraySchema(np.floating)}
-    channel_id = {"channel_id": DataArraySchema(np.str_)}
+    channel_id = {"channel_id": DataArraySchema(DTypeSchema(np.character))}
     # channel_id can actually be either a variable or a coordinate, preferably a variable.
     dss = DatasetSchema(
         data_vars=data_vars | channel_id,
@@ -115,7 +116,7 @@ def read_srf(filepath: str) -> SpectralResponseFunction:
         for i in range(n_channels):
             channel_spec_resp = dict(zip(wvlens[i], factors[i]))
             center = float(ds["channel"][i].data) * ch_f_to_nm
-            c_id = str(ds["channel_id"][i].values)
+            c_id = str(ds["channel_id"][i].values.astype(str))
             channel = SRFChannel(center, c_id, channel_spec_resp)
             channels.append(channel)
         name = os.path.basename(filepath)
