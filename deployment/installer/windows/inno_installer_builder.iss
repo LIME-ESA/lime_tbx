@@ -21,9 +21,9 @@ DefaultDirName={autopf64}\{#MyAppName}
 DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64compatible
 PrivilegesRequired=admin
-OutputDir={#MyAppDevPath}\installer\windows
+OutputDir={#MyAppDevPath}\deployment\installer\windows
 OutputBaseFilename=LimeTBX installer
-SetupIconFile={#MyAppDevPath}\lime_tbx\gui\assets\lime_logo.ico
+SetupIconFile={#MyAppDevPath}\lime_tbx\presentation\gui\assets\lime_logo.ico
 UninstallDisplayIcon={app}\LimeTBX\{#MyAppExeName}
 Compression=lzma
 SolidCompression=yes
@@ -42,7 +42,7 @@ Name: "{app}\coeff_data"; Permissions: everyone-full
 ;Source: "{#MyAppDevPath}\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppDevPath}\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "{#MyAppDevPath}\dist\LimeTBX\scipy\.libs\*"; DestDir: "{app}\LimeTBX\scipy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MyAppDevPath}\dist\LimeTBX\numpy\.libs\*"; DestDir: "{app}\LimeTBX\numpy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "{#MyAppDevPath}\dist\LimeTBX\numpy\.libs\*"; DestDir: "{app}\LimeTBX\numpy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\dist\LimeTBX\sklearn\.libs\*"; DestDir: "{app}\LimeTBX\sklearn\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full

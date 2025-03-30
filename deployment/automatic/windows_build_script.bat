@@ -9,6 +9,7 @@ rd /s /q .venv
 python -m venv .venv
 .venv\scripts\pip install wheel
 .venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\pip install PySide2~=5.15
 rd /s /q dist build
 python -m PyInstaller lime_tbx.spec
 del "deployment\installer\windows\LimeTBX installer.exe"
