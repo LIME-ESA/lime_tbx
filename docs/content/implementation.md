@@ -228,9 +228,8 @@ to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.
 
 2. Run the container and deploy the app:
     ```sh
-    for %F in ("%cd%") do set dirname=%~dpF
-    for %F in ("%dirname%") do set grandparent=%~dpF
-    docker run -v %grandparent%:C:\repo lime_compiler
+    for %F in ("%cd%\..") do set dirname=%~dpF
+    docker run -v %dirname%:C:\repo lime_compiler
     ```
 
 #### Mac Automated Deployment (Unavailable)

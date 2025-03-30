@@ -31,6 +31,5 @@ RUN python -m pip install pyinstaller
 WORKDIR "C:\\"
 ENTRYPOINT .\repo\deployment\automatic\windows_build_script.bat
 #docker build .. -t lime_compiler -f Windows.Dockerfile
-#for %F in ("%cd%") do set dirname=%~dpF
-#for %F in ("%dirname%") do set grandparent=%~dpF
-#docker run -v %grandparent%:C:\repo lime_compiler
+#for %F in ("%cd%\..") do set dirname=%~dpF
+#docker run -v %dirname%:C:\repo lime_compiler
