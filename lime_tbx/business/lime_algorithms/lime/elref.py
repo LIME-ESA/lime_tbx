@@ -81,10 +81,10 @@ def _measurement_func_elref(
     result = (
         sum_a
         + sum_b
-        + c_coeffs[0] * l_theta
-        + c_coeffs[1] * l_phi
-        + c_coeffs[2] * phi * l_theta
-        + c_coeffs[3] * phi * l_phi
+        + c_coeffs[1] * l_theta
+        + c_coeffs[0] * l_phi
+        + c_coeffs[3] * phi * l_theta
+        + c_coeffs[2] * phi * l_phi
         + d1_value
         + d2_value
         + d3_value
