@@ -21,7 +21,7 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20231120_V01.nc"
+COEFF_PATH = "./coeff_data/versions/LIME_MODEL_COEFS_20231120_V02.nc"
 
 
 def _get_20231120_coeff_data() -> (
@@ -86,14 +86,6 @@ def _get_20231120_coeff_data() -> (
                 -4.11777603e-03,
             ],
             [
-                9.93774275e-04,
-                4.30200427e-04,
-                7.40067288e-04,
-                4.89828115e-04,
-                3.86177380e-04,
-                3.15136539e-04,
-            ],
-            [
                 -4.01494766e-04,
                 -1.03429053e-03,
                 -1.23256777e-03,
@@ -102,12 +94,12 @@ def _get_20231120_coeff_data() -> (
                 -9.07939706e-04,
             ],
             [
-                1.57846164e-03,
-                1.20361757e-03,
-                1.56231308e-03,
-                1.67657032e-03,
-                1.50271295e-03,
-                1.34691074e-03,
+                9.93774275e-04,
+                4.30200427e-04,
+                7.40067288e-04,
+                4.89828115e-04,
+                3.86177380e-04,
+                3.15136539e-04,
             ],
             [
                 9.52160725e-04,
@@ -116,6 +108,14 @@ def _get_20231120_coeff_data() -> (
                 6.90399788e-04,
                 5.97112528e-04,
                 1.18135775e-03,
+            ],
+            [
+                1.57846164e-03,
+                1.20361757e-03,
+                1.56231308e-03,
+                1.67657032e-03,
+                1.50271295e-03,
+                1.34691074e-03,
             ],
             [
                 1.49109036e00,
@@ -340,7 +340,7 @@ def _get_20231120_coeff_data() -> (
 class TestCoefficients(unittest.TestCase):
     def test_read_coefficients(self):
         cf = coefficients.read_coeff_nc(COEFF_PATH)
-        version = "20231120_v1"
+        version = "20231120_v2"
         data, u_data, pos, neg = _get_20231120_coeff_data()
         self.assertEqual(cf.version, version)
         rf = cf.reflectance
