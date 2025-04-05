@@ -55,3 +55,4 @@ jobs:
         with:
           name: doc-coverage-badge
           path: doc-cov.svg
+          retention-days: 1

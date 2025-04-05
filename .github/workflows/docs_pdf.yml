@@ -36,4 +36,5 @@ jobs:
         with:
           name: user-manual
           path: user_manual.pdf
+          retention-days: 1
 

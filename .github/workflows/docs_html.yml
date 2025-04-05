@@ -32,6 +32,7 @@ jobs:
         with:
           name: html-docs
           path: public/
+          retention-days: 1
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:

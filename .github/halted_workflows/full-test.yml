@@ -37,3 +37,4 @@ jobs:
         with:
           name: test-report
           path: test_report/
+          retention-days: 1
