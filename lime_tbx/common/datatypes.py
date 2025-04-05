@@ -48,6 +48,7 @@ from abc import ABC
 import numpy as np
 import xarray
 import yaml
+from atomicwrites import atomic_write
 
 """___NPL Modules___"""
 import obsarray
@@ -1090,7 +1091,7 @@ class InterpolationSettings:
     use_wehrli: bool
 
     def _save_disk(self, path: str):
-        with open(path, "w") as file:
+        with atomic_write(path, overwrite=True) as file:
             yaml.dump(asdict(self), file)
 
     @staticmethod

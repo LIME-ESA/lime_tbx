@@ -40,6 +40,7 @@ classifiers=[
     "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
 dependencies = [
+    "atomicwrites~=1.4",
     "comet-maths~=1.0.3",
     "Deprecated~=1.2.18",
     "matheo~=0.1.2",
