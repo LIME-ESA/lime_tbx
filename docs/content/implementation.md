@@ -170,7 +170,7 @@ copy make.mak Makefile
 nmake
 ```
 
-#### 2. Build the Python Package (Mac only)
+#### 2. Build the Python Package
 Building the `.egg-info` directory is needed so PyInstaller is able to read the metadata
 from it when packaging the toolbox. For that, the easiest way is to build the package:
 ```sh
