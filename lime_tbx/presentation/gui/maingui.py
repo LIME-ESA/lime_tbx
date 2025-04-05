@@ -5,6 +5,7 @@ from enum import Enum
 from typing import List, Callable, Union, Tuple, Iterable
 from datetime import datetime, timezone
 import os
+import sys
 
 """___Third-Party Modules___"""
 from qtpy import QtWidgets, QtCore, QtGui
@@ -1748,12 +1749,11 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         ##
         # Shortcut action
         toggle_fullscreen = QAction("Toggle Fullscreen", self)
-        toggle_fullscreen.setShortcuts(
-            [
-                QtGui.QKeySequence.FullScreen,
-                QtGui.QKeySequence(QtCore.Qt.Key_F11),
-            ]
-        )
+        toggle_fullscreen.setShortcutContext(QtCore.Qt.WidgetWithChildrenShortcut)
+        fullscreen_shortcuts = [QtGui.QKeySequence.FullScreen]
+        if sys.platform != "win32":
+            fullscreen_shortcuts.append(QtGui.QKeySequence(QtCore.Qt.Key_F11)) 
+        toggle_fullscreen.setShortcuts(fullscreen_shortcuts)
         toggle_fullscreen.triggered.connect(self.toggle_fullscreen)
         self.addAction(toggle_fullscreen)
 
