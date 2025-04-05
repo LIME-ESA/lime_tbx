@@ -52,6 +52,7 @@ dependencies = [
     "obsarray~=1.0.1",
     "packaging>=24.1",
     "pandas~=2.2.3",
+    "platformdirs~=4.3",
     "punpy~=1.0.2",
     "PyYAML~=6.0",
     "QtPy~=2.4",
