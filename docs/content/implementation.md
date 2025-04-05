@@ -239,12 +239,38 @@ to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.
     docker run -v %dirname%:C:\repo lime_compiler
     ```
 
-#### Mac Automated Deployment (Unavailable)
+#### Mac Automated Deployment
 
-Automatic deployment for macOS is currently unavailable. Docker does not support
-macOS as a guest OS due to the lack of macOS containers.
+Automated deployment on macOS is partially supported, but cannot be containerized like on Linux due
+to macOS container limitations: Docker does not support macOS as a guest OS.
 
-Future plans include exploring automated deployment using GitHub Actions with macOS runners.
+However, deployment can still be automated using native macOS tools or CI platforms
+like GitHub Actions with macOS runners (planned for future improvements).
+
+In the meantime, the recommended manual approach is to use a local macOS environment
+with the official Python 3.9 (via Homebrew), not the system-provided one.
+
+1. Install Python 3.9 via Homebrew (avoid system Python):
+
+  ```sh
+  brew install python@3.9
+  ```
+
+2. Install required Python tools:
+
+  ```sh
+  python3.9 -m pip install pyinstaller build
+  ```
+
+3. Run the macOS build script:
+
+  ```sh
+  ./deployment/automatic/mac_build_script.sh
+  ```
+
+> ⚠️ Make sure you are not using the system Python (e.g., `/usr/bin/python3`), as it lacks proper OpenSSL
+> support and can cause issues with PyInstaller builds.
+
 
 ## Code Quality
 [![GitLab CI](https://img.shields.io/badge/GitLab%20CI-FC6D26?style=for-the-badge&logo=gitlab&logoColor=fff)](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/)
