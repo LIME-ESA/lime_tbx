@@ -95,6 +95,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'business\\lime_algorithms\\lime\\assets\\tsis_fwhm_3_1_gaussian.csv', '.\\lime_tbx\\business\\lime_algorithms\\lime\\assets'),
         (src_path + 'business\\lime_algorithms\\lime\\assets\\tsis_fwhm_1_1_triangle.csv', '.\\lime_tbx\\business\\lime_algorithms\\lime\\assets'),
     ]
+    a_datas += copy_metadata("lime_tbx")
     a_icon = src_path + 'presentation\\gui\\assets\\lime_logo.ico'
     e_console = True
 elif sys.platform == 'darwin':
@@ -139,8 +140,6 @@ elif sys.platform == 'darwin':
     ]
     a_icon = src_path + 'presentation/gui/assets/lime_logo.icns'
 runner_file = src_path + '__main__.py'
-
-a_datas += copy_metadata("lime_tbx")
 
 a = Analysis(
     [runner_file],
