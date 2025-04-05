@@ -66,7 +66,6 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'business\\eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.exe', '.\\lime_tbx\\business\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'business\\eocfi_adapter\\eocfi_c\\bin\\msvcr100.dll', '.\\lime_tbx\\business\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'business\\eocfi_adapter\\eocfi_c\\bin\\pthreadVC2.dll', '.\\lime_tbx\\business\\eocfi_adapter\\eocfi_c\\bin'),
-        (f'{venv_path}\\Lib\\site-packages\\shiboken2\\files.dir', '.\\shiboken2\\files.dir'),
     ]
     a_datas = [
         (src_path + 'presentation\\gui\\assets\\style.qss', '.\\lime_tbx\\presentation\\gui\\assets'),
