@@ -170,7 +170,14 @@ copy make.mak Makefile
 nmake
 ```
 
-#### 2. Create a Virtual Environment
+#### 2. Build the Python Package (Mac only)
+Building the `.egg-info` directory is needed so PyInstaller is able to read the metadata
+from it when packaging the toolbox. For that, the easiest way is to build the package:
+```sh
+python3 -m build
+```
+
+#### 3. Create a Virtual Environment
 To minimize application size it's strongly recommended to use a virtual environment (`venv`) :
 
 ```sh
@@ -181,7 +188,7 @@ pip install -r requirements.txt
 pip install PySide6~=6.8   # Use PySide2 for older OS versions
 ```
 
-#### 3. Build the App Bundle
+#### 4. Build the App Bundle
 Use `pyinstaller` to create an executable bundle for your OS:
 ```sh
 pyinstaller lime_tbx.spec  
@@ -189,7 +196,7 @@ pyinstaller lime_tbx.spec
 
 Once the build is complete, deactivate the virtual environment.
 
-#### 4. Create an Installer
+#### 5. Create an Installer
 Navigate to the `deployment/installer` directory and use the appropriate method for your operating system:
 - **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
 - **Mac**: Run `build_mac_installer.sh`.
