@@ -25,6 +25,7 @@ ENV SSL_CERT_FILE="C:\Program Files\Common Files\SSL\cacert.pem"
 RUN python -m pip install --upgrade pip
 RUN python -m pip install wheel
 RUN python -m pip install pyinstaller
+RUN python -m pip install build
 
 # Not installing it Visual Studio Build Tools, nmake is not found even after installing them
 
