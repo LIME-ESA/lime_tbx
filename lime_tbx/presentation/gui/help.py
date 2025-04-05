@@ -25,24 +25,37 @@ __email__ = "gaton@goa.uva.es"
 __status__ = "Development"
 
 
-_DESCRIPTION: str = (
-    """
-The LIME Toolbox allows users to simulate lunar observations for any observer
-position around the Earth and at any time, from satellite positions of multiple
-ESA satellites like ENVISAT, Proba-V, S2, S3 and FLEX, or any satellite position
-for which an orbital scenario file is provided by the user in EOCFI compatible
-format, and for any observer/solar selenographic latitude and longitude (thus
-bypassing the need for their computation from the position/time of the observer).
-\\n\\nThis simulations can be performed for any user defined instrument spectral
-response pre-stored in a GLOD format file.
-\\n\\nIt also allows performing comparisons of lunar observations from a remote
-sensing instrument (pre-stored in GLOD format files) to the LIME model output.
-""".replace(
-        "\n", " "
-    )
-    .replace("\\n", "\n")
-    .strip()
-)
+_INTRODUCTION: str = """
+<p>
+    Welcome to the LIME ToolBox!
+    <ul>
+        <li>Learn more about LIME at <a style=\"color: #00ae9d\" href=\"https://lime.uva.es\">lime.uva.es</a></li>
+        <li>Browse the documentation at
+            <a style=\"color: #00ae9d\" href=\"https://lime-esa.github.io/lime_tbx/\">lime-esa.github.io/lime_tbx</a></li>
+        <li>Explore the source code on GitHub 
+            <a style=\"color: #00ae9d\" href=\"https://github.com/LIME-ESA/lime_tbx\">github.com/LIME-ESA/lime_tbx</a></li>
+    </ul>
+</p>
+""".replace("\n", " ").strip()
+
+_DESCRIPTION: str ="""
+<p>
+    The LIME Toolbox allows users to simulate lunar observations for any observer
+    position around the Earth and at any time, from satellite positions of multiple
+    ESA satellites like ENVISAT, Proba-V, S2, S3 and FLEX, or any satellite position
+    for which an orbital scenario file is provided by the user in EOCFI compatible
+    format, and for any observer/solar selenographic latitude and longitude (thus
+    bypassing the need for their computation from the position/time of the observer).
+</p>
+<p>
+    This simulations can be performed for any user defined instrument spectral
+    response pre-stored in a GLOD format file.
+</p>
+<p>
+    It also allows performing comparisons of lunar observations from a remote
+    sensing instrument (pre-stored in GLOD format files) to the LIME model output.
+</p>
+""".replace("\n", " ").strip()
 
 
 _CONTACT: str = """
@@ -183,7 +196,7 @@ class AboutDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.setMinimumSize(450, 400)
+        self.setMinimumSize(600, 400)
         self.setWindowTitle(constants.APPLICATION_NAME)
         # Title
         title = "Lunar Irradiance Model of ESA ToolBox"
@@ -192,10 +205,13 @@ class AboutDialog(QtWidgets.QDialog):
         self.version_label = QtWidgets.QLabel(
             f"Version: {dtp_constants.VERSION_NAME}", alignment=QtCore.Qt.AlignCenter
         )
+        # Introduction
+        self.introduction_text = QtWidgets.QLabel(_INTRODUCTION, alignment=QtCore.Qt.AlignLeft)
+        self.introduction_text.setWordWrap(True)
         # LIME Logo
         _current_dir = os.path.dirname(os.path.abspath(__file__))
-        logo_path = os.path.join(_current_dir, constants.LOGO_PATH)
-        lime_pixmap = QtGui.QPixmap(logo_path).scaledToHeight(220)
+        logo_path = os.path.join(_current_dir, constants.CROPPED_LOGO_PATH)
+        lime_pixmap = QtGui.QPixmap(logo_path).scaledToHeight(150, QtCore.Qt.SmoothTransformation)
         self.lime_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.lime_logo.setPixmap(lime_pixmap)
         # Description
@@ -211,7 +227,7 @@ class AboutDialog(QtWidgets.QDialog):
         self.contact_label.setOpenExternalLinks(True)
         # ESA Logo
         esa_logo_path = os.path.join(_current_dir, constants.ESA_LOGO_PATH)
-        esa_pixmap = QtGui.QPixmap(esa_logo_path).scaledToHeight(250)
+        esa_pixmap = QtGui.QPixmap(esa_logo_path).scaledToHeight(150, QtCore.Qt.SmoothTransformation)
         self.esa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.esa_logo.setPixmap(esa_pixmap)
         # Collaborators
@@ -221,7 +237,7 @@ class AboutDialog(QtWidgets.QDialog):
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.uva_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(80)
+        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(80, QtCore.Qt.SmoothTransformation)
         self.uva_logo.setPixmap(uva_pixmap)
         self.uva_logo.mousePressEvent = self._open_web_uva
         self.uva_logo.setOpenExternalLinks(True)
@@ -229,7 +245,7 @@ class AboutDialog(QtWidgets.QDialog):
         goa_logo_path = os.path.join(_current_dir, constants.GOA_UVA_LOGO_PATH)
         self.goa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.goa_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(80)
+        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(80, QtCore.Qt.SmoothTransformation)
         self.goa_logo.setPixmap(goa_pixmap)
         self.goa_logo.mousePressEvent = self._open_web_goa_uva
         self.goa_logo.setOpenExternalLinks(True)
@@ -237,7 +253,7 @@ class AboutDialog(QtWidgets.QDialog):
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.npl_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(80)
+        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(80, QtCore.Qt.SmoothTransformation)
         self.npl_logo.setPixmap(npl_pixmap)
         self.npl_logo.mousePressEvent = self._open_web_npl
         self.npl_logo.setOpenExternalLinks(True)
@@ -245,7 +261,7 @@ class AboutDialog(QtWidgets.QDialog):
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.vito_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(72)
+        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(72, QtCore.Qt.SmoothTransformation)
         self.vito_logo.setPixmap(vito_pixmap)
         self.vito_logo.mousePressEvent = self._open_web_vito
         self.vito_logo.setOpenExternalLinks(True)
@@ -264,6 +280,7 @@ class AboutDialog(QtWidgets.QDialog):
         self.scroll_layout = QtWidgets.QVBoxLayout()
         self.scroll_layout.addWidget(self.title_label)
         self.scroll_layout.addWidget(self.version_label)
+        self.scroll_layout.addWidget(self.introduction_text)
         self.scroll_layout.addWidget(self.lime_logo)
         self.scroll_layout.addWidget(self.description_label)
         self.scroll_layout.addWidget(self.contact_label)
@@ -297,8 +314,14 @@ class AboutDialog(QtWidgets.QDialog):
 _HELP_TEXT = (
     """
 <p>
-    Welcome to the LIME ToolBox! To check the user guide please visit:
-    <a style=\"color: #00ae9d\" href=\"https://calvalportal.ceos.org/lime\">calvalportal.ceos.org/lime</a>
+    Welcome to the LIME ToolBox!
+    <ul>
+        <li>Learn more about LIME at <a style=\"color: #00ae9d\" href=\"https://lime.uva.es\">lime.uva.es</a></li>
+        <li>Browse the documentation at
+            <a style=\"color: #00ae9d\" href=\"https://lime-esa.github.io/lime_tbx/\">lime-esa.github.io/lime_tbx</a></li>
+        <li>Explore the source code on GitHub 
+            <a style=\"color: #00ae9d\" href=\"https://github.com/LIME-ESA/lime_tbx\">github.com/LIME-ESA/lime_tbx</a></li>
+    </ul>
 </p>
 """
     + _CONTACT
@@ -354,7 +377,7 @@ class HelpDialog(QtWidgets.QDialog):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.setMinimumSize(400, 450)
+        self.setMinimumSize(450, 450)
         self.setWindowTitle(constants.APPLICATION_NAME)
         self.content = QtWidgets.QLabel(_HELP_TEXT)
         self.content.setWordWrap(True)

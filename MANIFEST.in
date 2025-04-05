@@ -8,6 +8,7 @@ include lime_tbx/presentation/gui/assets/style.qss
 include lime_tbx/presentation/gui/assets/style_constants.txt
 include lime_tbx/presentation/gui/assets/style_constants_darwin.txt
 include lime_tbx/presentation/gui/assets/lime_logo.png
+include lime_tbx/presentation/gui/assets/cropped_lime_logo.png
 include lime_tbx/presentation/gui/assets/esa_logo.png
 include lime_tbx/presentation/gui/assets/uva_logo.png
 include lime_tbx/presentation/gui/assets/goa_uva_logo.png
