@@ -7,7 +7,7 @@ name = "lime_tbx"
 dynamic = ["version"]
 description = "Toolbox for running the LIME (Lunar Irradiance Model of ESA) to simulate lunar observations and compare them with remote sensing data of the Moon."
 readme = "README.md"
-license = {text = "LGPL-3.0-only"}
+license = "LGPL-3.0-only"
 authors = [
     { name = "Javier Gatón Herguedas", email = "gaton@goa.uva.es" },
     { name = "Pieter De Vis", email = "pieter.de.vis@npl.co.uk"},

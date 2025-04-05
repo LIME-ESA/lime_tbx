@@ -2,6 +2,8 @@
 
 import sys
 
+from PyInstaller.utils.hooks import copy_metadata
+
 block_cipher = None
 
 
@@ -135,6 +137,8 @@ elif sys.platform == 'darwin':
     ]
     a_icon = src_path + 'presentation/gui/assets/lime_logo.icns'
 runner_file = src_path + '__main__.py'
+
+a_datas += copy_metadata("lime_tbx")
 
 a = Analysis(
     [runner_file],

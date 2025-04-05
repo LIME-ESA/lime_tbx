@@ -1,5 +1,6 @@
 prune *
 recursive-include lime_tbx *.py
+include PKG-INFO
 
 include lime_tbx/_version.py
 
