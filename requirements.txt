@@ -1,5 +1,7 @@
+atomicwrites~=1.4
 comet-maths~=1.0.3
 Deprecated~=1.2.18
+jaraco.text~=4.0
 matheo~=0.1.2
 matplotlib~=3.9.4
 mplcursors~=0.6
@@ -8,6 +10,7 @@ numpy~=1.26.4
 obsarray~=1.0.1
 packaging>=24.1
 pandas~=2.2.3
+platformdirs~=4.3
 punpy~=1.0.2
 PyYAML~=6.0
 QtPy~=2.4

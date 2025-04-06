@@ -7,7 +7,8 @@ name = "lime_tbx"
 dynamic = ["version"]
 description = "Toolbox for running the LIME (Lunar Irradiance Model of ESA) to simulate lunar observations and compare them with remote sensing data of the Moon."
 readme = "README.md"
-license = {text = "LGPL-3.0-only"}
+license = "LGPL-3.0-only"
+license-files = ["LICENSE"]
 authors = [
     { name = "Javier Gatón Herguedas", email = "gaton@goa.uva.es" },
     { name = "Pieter De Vis", email = "pieter.de.vis@npl.co.uk"},
@@ -26,7 +27,6 @@ requires-python = ">=3.9"
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Natural Language :: English",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
@@ -40,8 +40,10 @@ classifiers=[
     "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
 dependencies = [
+    "atomicwrites~=1.4",
     "comet-maths~=1.0.3",
     "Deprecated~=1.2.18",
+    "jaraco.text~=4.0",
     "matheo~=0.1.2",
     "matplotlib~=3.9.4",
     "mplcursors~=0.6",
@@ -50,6 +52,7 @@ dependencies = [
     "obsarray~=1.0.1",
     "packaging>=24.1",
     "pandas~=2.2.3",
+    "platformdirs~=4.3",
     "punpy~=1.0.2",
     "PyYAML~=6.0",
     "QtPy~=2.4",
@@ -65,7 +68,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pre-commit", "tox", "interrogate"]
 docs = ["sphinx", "sphinx_rtd_theme", "myst_parser", "sphinxcontrib-openapi", "linkify-it-py"]
-pyside6 = ["PySide6~=6.8"]
+pyside6 = ["PySide6~=6.9"]
 pyside2 = ["PySide2~=5.15"]
 
 [project.urls]

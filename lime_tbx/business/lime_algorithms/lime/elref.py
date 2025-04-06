@@ -3,8 +3,7 @@ This module calculates the extra-terrestrial lunar reflectance.
 
 It exports the following functions:
     * calculate_elref - Calculates the expected extra-terrestrial lunar reflectance
-    for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020 for the
-    irradiance, then divided by the solar irradiance.
+    for a given wavelength in nanometers. 
     * calculate_elref_unc - Calculates the uncertainty for the reflectance
     calculations of empirical data points.
 """
@@ -40,8 +39,7 @@ def _measurement_func_elref(
     gd_value: float,
 ) -> Union[float, np.ndarray]:
     """
-    Final computation of the calculation of the ln of the reflectance of the Moon's disk, following Eq.2 in
-    Roman et al., 2020
+    Final computation of the calculation of the ln of the reflectance of the Moon's disk
 
     Parameters
     ----------
@@ -61,18 +59,6 @@ def _measurement_func_elref(
     elrefs: float | np.ndarray of float
         Calculated reflectances.
     """
-
-    # a_coeffs: list of float | np.ndarray of np.ndarray of float
-    # A Coefficients for a wavelength, or all the A coefficients for all wavelengths (matrix)
-    # b_coeffs: list of float | np.ndarray of np.ndarray of float
-    # B Coefficients for a wavelength, or all the B coefficients for all wavelengths (matrix)
-    # c_coeffs: list of float | np.ndarray of np.ndarray of float
-    # C Coefficients for a wavelength, or all the C coefficients for all wavelengths (matrix)
-    # d_coeffs: list of float | np.ndarray of np.ndarray of float
-    # D Coefficients for a wavelength, or all the D coefficients for all wavelengths (matrix)
-    # p_coeffs: list of float | np.ndarray of np.ndarray of float
-    # P Coefficients for a wavelength, or all the P coefficients for all wavelengths (matrix)
-
     a_coeffs = coeffs[0:4, :]
     b_coeffs = coeffs[4:7, :]
     c_coeffs = coeffs[7:11, :]
@@ -82,6 +68,8 @@ def _measurement_func_elref(
     gr_value = np.radians(gd_value)
     d1_value = d_coeffs[0] * np.exp(-gd_value / p_coeffs[0])
     d2_value = d_coeffs[1] * np.exp(-gd_value / p_coeffs[1])
+    # Cosine in radians is correct even though gd_value is in degrees
+    # It's being divided by p3 and p4 are in degrees too degrees/degrees = radians/radians (units are gone)
     d3_value = d_coeffs[2] * np.cos((gd_value - p_coeffs[2]) / p_coeffs[3])
 
     sum_a: float = np.sum(
@@ -93,10 +81,10 @@ def _measurement_func_elref(
     result = (
         sum_a
         + sum_b
-        + c_coeffs[0] * l_phi
-        + c_coeffs[1] * l_theta
-        + c_coeffs[2] * phi * l_phi
-        + c_coeffs[3] * phi * l_theta
+        + c_coeffs[0] * l_theta
+        + c_coeffs[1] * l_phi
+        + c_coeffs[2] * phi * l_theta
+        + c_coeffs[3] * phi * l_phi
         + d1_value
         + d2_value
         + d3_value
@@ -109,8 +97,7 @@ def calculate_elref(
     moon_data: MoonData,
 ) -> np.ndarray:
     """
-    The calculation of the reflectance of the Moon's disk, following Eq.2 in Roman et al., 2020,
-    without multiplying the value by its apollo coefficient.
+    The calculation of the reflectance of the Moon's disk
 
     Simulates a lunar observation for a wavelength for any observer/solar selenographic
     latitude and longitude. The reflectance is calculated in fractions of unity.

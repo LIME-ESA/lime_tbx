@@ -170,7 +170,14 @@ copy make.mak Makefile
 nmake
 ```
 
-#### 2. Create a Virtual Environment
+#### 2. Build the Python Package
+Building the `.egg-info` directory is needed so PyInstaller is able to read the metadata
+from it when packaging the toolbox. For that, the easiest way is to build the package:
+```sh
+python3 -m build
+```
+
+#### 3. Create a Virtual Environment
 To minimize application size it's strongly recommended to use a virtual environment (`venv`) :
 
 ```sh
@@ -181,7 +188,7 @@ pip install -r requirements.txt
 pip install PySide6~=6.8   # Use PySide2 for older OS versions
 ```
 
-#### 3. Build the App Bundle
+#### 4. Build the App Bundle
 Use `pyinstaller` to create an executable bundle for your OS:
 ```sh
 pyinstaller lime_tbx.spec  
@@ -189,7 +196,7 @@ pyinstaller lime_tbx.spec
 
 Once the build is complete, deactivate the virtual environment.
 
-#### 4. Create an Installer
+#### 5. Create an Installer
 Navigate to the `deployment/installer` directory and use the appropriate method for your operating system:
 - **Windows**: Use "InnoSetup" and run `inno_installer_builder.iss`.
 - **Mac**: Run `build_mac_installer.sh`.
@@ -228,17 +235,42 @@ to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.
 
 2. Run the container and deploy the app:
     ```sh
-    for %F in ("%cd%") do set dirname=%~dpF
-    for %F in ("%dirname%") do set grandparent=%~dpF
-    docker run -v %grandparent%:C:\repo lime_compiler
+    for %F in ("%cd%\..") do set dirname=%~dpF
+    docker run -v %dirname%:C:\repo lime_compiler
     ```
 
-#### Mac Automated Deployment (Unavailable)
+#### Mac Automated Deployment
 
-Automatic deployment for macOS is currently unavailable. Docker does not support
-macOS as a guest OS due to the lack of macOS containers.
+Automated deployment on macOS is partially supported, but cannot be containerized like on Linux due
+to macOS container limitations: Docker does not support macOS as a guest OS.
 
-Future plans include exploring automated deployment using GitHub Actions with macOS runners.
+However, deployment can still be automated using native macOS tools or CI platforms
+like GitHub Actions with macOS runners (planned for future improvements).
+
+In the meantime, the recommended manual approach is to use a local macOS environment
+with the official Python 3.9 (via Homebrew), not the system-provided one.
+
+1. Install Python 3.9 via Homebrew (avoid system Python):
+
+  ```sh
+  brew install python@3.9
+  ```
+
+2. Install required Python tools:
+
+  ```sh
+  python3.9 -m pip install pyinstaller build
+  ```
+
+3. Run the macOS build script:
+
+  ```sh
+  ./deployment/automatic/mac_build_script.sh
+  ```
+
+> ⚠️ Make sure you are not using the system Python (e.g., `/usr/bin/python3`), as it lacks proper OpenSSL
+> support and can cause issues with PyInstaller builds.
+
 
 ## Code Quality
 [![GitLab CI](https://img.shields.io/badge/GitLab%20CI-FC6D26?style=for-the-badge&logo=gitlab&logoColor=fff)](https://about.gitlab.com/stages-devops-lifecycle/continuous-integration/)

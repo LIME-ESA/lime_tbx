@@ -76,6 +76,8 @@ lime -i '{"interp_spectrum": "ASD", "skip_uncertainties": "False", "show_interp_
 ```
 - Running this alone changes settings for subsequent runs.
 - Running it with a simulation/comparison option updates settings for the current run and future runs.
+- **Note**: When running multiple instances concurrently, they must share the same settings.
+  Otherwise, behavior is undefined and may lead to crashes or wrong results.
 
 
 ## Logging

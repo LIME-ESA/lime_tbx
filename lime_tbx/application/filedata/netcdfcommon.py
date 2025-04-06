@@ -7,7 +7,11 @@ from typing import Iterable, Mapping, Any, Union
 import numpy as np
 import xarray as xr
 from xarray_schema import DatasetSchema, SchemaError
-from xarray_schema.components import AttrSchema as BrAttrSchema
+from xarray_schema.components import (
+    AttrSchema as BrAttrSchema,
+    DTypeSchema as BrDTypeSchema,
+    DTypeLike,
+)
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -97,6 +101,21 @@ class AttrSchema(BrAttrSchema):
         if self.value is not None:
             if self.value is not None and self.value != attr:
                 raise SchemaError(f"name {attr} != {self.value}")
+
+
+class DTypeSchema(BrDTypeSchema):
+    def __init__(self, dtype: DTypeLike) -> None:
+        if dtype in [
+            np.floating,
+            np.integer,
+            np.signedinteger,
+            np.unsignedinteger,
+            np.generic,
+            np.character,
+        ]:
+            self.dtype = dtype
+        else:
+            self.dtype = np.dtype(dtype)
 
 
 def xr_open_dataset(

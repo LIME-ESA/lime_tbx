@@ -91,7 +91,7 @@ This updates the coefficient version for all subsequent simulations and applies 
 current simulation if used alongside any simulation or comparison option.
 
 **Example:**
-To select the coefficient version `20231120_v1`:
+To select the coefficient version `20231120_v2`:
 ```sh
-lime -C 20231120_v1
+lime -C 20231120_v2
 ```

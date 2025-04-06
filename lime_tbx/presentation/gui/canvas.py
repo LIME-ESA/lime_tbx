@@ -126,6 +126,7 @@ class MplCanvas(FigureCanvas):
     def clear_twinx(self):
         if self.axes_x2 is not None:
             self.axes_x2.cla()
+            self.axes_x2.yaxis.set_label_position("right")
             self.boxplot_lines_ax2 = []
 
     def clear(self):

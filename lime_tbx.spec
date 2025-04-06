@@ -2,6 +2,8 @@
 
 import sys
 
+from PyInstaller.utils.hooks import copy_metadata
+
 block_cipher = None
 
 
@@ -24,6 +26,7 @@ if sys.platform == 'linux':
         (src_path + 'presentation/gui/assets/style.qss', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/style_constants.txt', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/lime_logo.png', './lime_tbx/presentation/gui/assets'),
+        (src_path + 'presentation/gui/assets/cropped_lime_logo.png', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/esa_logo.png', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/uva_logo.png', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/goa_uva_logo.png', './lime_tbx/presentation/gui/assets'),
@@ -36,7 +39,7 @@ if sys.platform == 'linux':
         (src_path + 'business/interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/business/interpolation/interp_data/assets'),
         (src_path + 'business/interpolation/interp_data/assets/Breccia.txt', './lime_tbx/business/interpolation/interp_data/assets'),
         (src_path + 'business/interpolation/interp_data/assets/Composite.txt', './lime_tbx/business/interpolation/interp_data/assets'),
-        (src_path + 'business/interpolation/interp_data/assets/ds_ASD.nc', './lime_tbx/business/interpolation/interp_data/assets'),
+        (src_path + 'business/interpolation/interp_data/assets/ds_ASD_32.nc', './lime_tbx/business/interpolation/interp_data/assets'),
         (src_path + 'business/spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv', './lime_tbx/business/spectral_integration/assets'),
         (src_path + 'business/spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv', './lime_tbx/business/spectral_integration/assets'),
         (src_path + 'business/spectral_integration/assets/asd_fwhm.csv', './lime_tbx/business/spectral_integration/assets'),
@@ -63,12 +66,12 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'business\\eocfi_adapter\\eocfi_c\\bin\\get_positions_win64.exe', '.\\lime_tbx\\business\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'business\\eocfi_adapter\\eocfi_c\\bin\\msvcr100.dll', '.\\lime_tbx\\business\\eocfi_adapter\\eocfi_c\\bin'),
         (src_path + 'business\\eocfi_adapter\\eocfi_c\\bin\\pthreadVC2.dll', '.\\lime_tbx\\business\\eocfi_adapter\\eocfi_c\\bin'),
-        (f'{venv_path}\\Lib\\site-packages\\shiboken2\\files.dir', '.\\shiboken2\\files.dir'),
     ]
     a_datas = [
         (src_path + 'presentation\\gui\\assets\\style.qss', '.\\lime_tbx\\presentation\\gui\\assets'),
         (src_path + 'presentation\\gui\\assets\\style_constants.txt', '.\\lime_tbx\\presentation\\gui\\assets'),
         (src_path + 'presentation\\gui\\assets\\lime_logo.png', '.\\lime_tbx\\presentation\\gui\\assets'),
+        (src_path + 'presentation\\gui\\assets\\cropped_lime_logo.png', '.\\lime_tbx\\presentation\\gui\\assets'),
         (src_path + 'presentation\\gui\\assets\\esa_logo.png', '.\\lime_tbx\\presentation\\gui\\assets'),
         (src_path + 'presentation\\gui\\assets\\uva_logo.png', '.\\lime_tbx\\presentation\\gui\\assets'),
         (src_path + 'presentation\\gui\\assets\\goa_uva_logo.png', '.\\lime_tbx\\presentation\\gui\\assets'),
@@ -81,7 +84,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'business\\interpolation\\interp_data\\assets\\Apollo16.txt', '.\\lime_tbx\\business\\interpolation\\interp_data\\assets'),
         (src_path + 'business\\interpolation\\interp_data\\assets\\Breccia.txt', '.\\lime_tbx\\business\\interpolation\\interp_data\\assets'),
         (src_path + 'business\\interpolation\\interp_data\\assets\\Composite.txt', '.\\lime_tbx\\business\\interpolation\\interp_data\\assets'),
-        (src_path + 'business\\interpolation\\interp_data\\assets\\ds_ASD.nc', '.\\lime_tbx\\business\\interpolation\\interp_data\\assets'),
+        (src_path + 'business\\interpolation\\interp_data\\assets\\ds_ASD_32.nc', '.\\lime_tbx\\business\\interpolation\\interp_data\\assets'),
         (src_path + 'business\\spectral_integration\\assets\\interpolated_model_fwhm_1_1_triangle.csv', '.\\lime_tbx\\business\\spectral_integration\\assets'),
         (src_path + 'business\\spectral_integration\\assets\\interpolated_model_fwhm_3_1_gaussian.csv', '.\\lime_tbx\\business\\spectral_integration\\assets'),
         (src_path + 'business\\spectral_integration\\assets\\asd_fwhm.csv', '.\\lime_tbx\\business\\spectral_integration\\assets'),
@@ -91,7 +94,7 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'business\\lime_algorithms\\lime\\assets\\tsis_asd.csv', '.\\lime_tbx\\business\\lime_algorithms\\lime\\assets'),
         (src_path + 'business\\lime_algorithms\\lime\\assets\\tsis_fwhm_3_1_gaussian.csv', '.\\lime_tbx\\business\\lime_algorithms\\lime\\assets'),
         (src_path + 'business\\lime_algorithms\\lime\\assets\\tsis_fwhm_1_1_triangle.csv', '.\\lime_tbx\\business\\lime_algorithms\\lime\\assets'),
-    ]
+    ] + copy_metadata("lime_tbx")
     a_icon = src_path + 'presentation\\gui\\assets\\lime_logo.ico'
     e_console = True
 elif sys.platform == 'darwin':
@@ -110,6 +113,7 @@ elif sys.platform == 'darwin':
         (src_path + 'presentation/gui/assets/style_constants.txt', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/style_constants_darwin.txt', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/lime_logo.png', './lime_tbx/presentation/gui/assets'),
+        (src_path + 'presentation/gui/assets/cropped_lime_logo.png', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/esa_logo.png', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/uva_logo.png', './lime_tbx/presentation/gui/assets'),
         (src_path + 'presentation/gui/assets/goa_uva_logo.png', './lime_tbx/presentation/gui/assets'),
@@ -122,7 +126,7 @@ elif sys.platform == 'darwin':
         (src_path + 'business/interpolation/interp_data/assets/Apollo16.txt', './lime_tbx/business/interpolation/interp_data/assets'),
         (src_path + 'business/interpolation/interp_data/assets/Breccia.txt', './lime_tbx/business/interpolation/interp_data/assets'),
         (src_path + 'business/interpolation/interp_data/assets/Composite.txt', './lime_tbx/business/interpolation/interp_data/assets'),
-        (src_path + 'business/interpolation/interp_data/assets/ds_ASD.nc', './lime_tbx/business/interpolation/interp_data/assets'),
+        (src_path + 'business/interpolation/interp_data/assets/ds_ASD_32.nc', './lime_tbx/business/interpolation/interp_data/assets'),
         (src_path + 'business/spectral_integration/assets/interpolated_model_fwhm_1_1_triangle.csv', './lime_tbx/business/spectral_integration/assets'),
         (src_path + 'business/spectral_integration/assets/interpolated_model_fwhm_3_1_gaussian.csv', './lime_tbx/business/spectral_integration/assets'),
         (src_path + 'business/spectral_integration/assets/asd_fwhm.csv', './lime_tbx/business/spectral_integration/assets'),
@@ -132,6 +136,7 @@ elif sys.platform == 'darwin':
         (src_path + 'business/lime_algorithms/lime/assets/tsis_asd.csv', './lime_tbx/business/lime_algorithms/lime/assets'),
         (src_path + 'business/lime_algorithms/lime/assets/tsis_fwhm_3_1_gaussian.csv', './lime_tbx/business/lime_algorithms/lime/assets'),
         (src_path + 'business/lime_algorithms/lime/assets/tsis_fwhm_1_1_triangle.csv', './lime_tbx/business/lime_algorithms/lime/assets'),
+        ('lime_tbx.egg-info', 'lime_tbx.egg-info'),
     ]
     a_icon = src_path + 'presentation/gui/assets/lime_logo.icns'
 runner_file = src_path + '__main__.py'
@@ -141,7 +146,7 @@ a = Analysis(
     pathex=a_pathex,
     binaries=a_binaries,
     datas=a_datas,
-    hiddenimports=["sklearn.utils._typedefs", "sklearn.utils._heap", "sklearn.utils._sorting", "sklearn.utils._vector_sentinel"],
+    hiddenimports=["sklearn.utils._typedefs", "sklearn.utils._heap", "sklearn.utils._sorting", "sklearn.utils._vector_sentinel", "jaraco"],
     hookspath=[],
     hooksconfig=a_hooksconfig,
     runtime_hooks=[],

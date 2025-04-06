@@ -43,6 +43,15 @@ are `float64`, now they are kept as `float64`, which ensures they are positive-d
 slightly modifying the values making them not be positive-definite. This eliminates the
 overhead of computing the closest positive-definite matrix, achieving a 2.5× speedup in uncertainty
 calculations compared to v1.0.3. (**NFR306**)
+- Optimized the ASD wavelengths error correlation matrix by converting it from `float64` to `float32` while preserving
+  its positive semi-definite (PSD) property. This enhancement achieves a mean relative difference of less than 0.001%,
+  ensuring numerical stability. Additionally, this change provides a 2.5× speedup, contributing to an overall 6.25× improvement
+  in uncertainty calculations compared to v1.0.3. (**NFR306**)
+- Updated LIME reflectance equation to align with the LIME ATBD. Observer's selenographic longitude and latitude were
+  previously swapped in the implementation. Corresponding coefficients were also swapped, resulting in correct outputs
+  despite the mismatch. Both the equation and the coefficients are now fully consistent with the ATBD.
+  - Replaced old coefficients file `20231120_v01` with corrected version `20231120_v02`. Outputs of the current toolbox version
+    using the new coefficients remain unchanged compared to the previous toolbox version (1.0.3) using the old coefficients.
 - Fixed minor bugs
 
 ## [1.0.3] - 2024-01-25

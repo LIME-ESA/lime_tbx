@@ -48,6 +48,7 @@ from abc import ABC
 import numpy as np
 import xarray
 import yaml
+from atomicwrites import atomic_write
 
 """___NPL Modules___"""
 import obsarray
@@ -694,11 +695,11 @@ class SpectralData:
         self.uncertainties = uncertainties
         self.err_corr = None
         if hasattr(ds, "err_corr_reflectance_wavelength"):
-            self.err_corr = ds.err_corr_reflectance_wavelength.values.astype(np.float64)
+            self.err_corr = ds.err_corr_reflectance_wavelength.values
         elif hasattr(ds, "err_corr_polarisation"):
-            self.err_corr = ds.err_corr_polarisation.values.astype(np.float64)
+            self.err_corr = ds.err_corr_polarisation.values
         elif hasattr(ds, "err_corr_irradiance"):
-            self.err_corr = ds.err_corr_irradiance.values.astype(np.float64)
+            self.err_corr = ds.err_corr_irradiance.values
 
     def clear_err_corr(self):
         """Dereference the error correlation matrix from the object."""
@@ -1090,7 +1091,7 @@ class InterpolationSettings:
     use_wehrli: bool
 
     def _save_disk(self, path: str):
-        with open(path, "w") as file:
+        with atomic_write(path, overwrite=True) as file:
             yaml.dump(asdict(self), file)
 
     @staticmethod

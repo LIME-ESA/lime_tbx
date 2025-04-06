@@ -18,6 +18,8 @@ RUN apt install build-essential zlib1g-dev libncurses5-dev \
     libreadline-dev libffi-dev -y
 RUN apt install libbz2-dev libgl1 libsm6 libxext6 \
     libglib2.0-0 libxrender1 rsyslog-gssapi -y
+# Libs for getting scm version
+RUN apt install git -y
 # Libs for pyinstaller & lime
 RUN apt install libsqlite3-dev libdbus-1-3 libxkbcommon-x11-0 \
     libfontconfig1 libwayland-cursor0 libwayland-client0 libwayland-egl1  -y
@@ -63,6 +65,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3.9 get-pip.py
 RUN python3.9 -m pip install --upgrade pip
 RUN python3.9 -m pip install pyinstaller
+RUN python3.9 -m pip install build
 
 # Suppress fontconfig warnings keeping an updated version
 RUN apt-get install libpng16-16
