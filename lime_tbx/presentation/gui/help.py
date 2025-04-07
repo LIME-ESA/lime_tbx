@@ -358,7 +358,7 @@ _HELP_TEXT = (
     Use the tabs at the top of the interface to select between simulation modes.
 </p>
 <p>
-    Choose 'Irradiance,' 'Reflectance,' or 'Polarisation' to generate outputs
+    Choose 'Irradiance', 'Reflectance', or 'Polarisation' to generate outputs
     based on the input parameters. Results will appear in the Result tab.
     If you select irradiance, the integrated signals (based on your SRF),
     will be shown in the Signal tab.
