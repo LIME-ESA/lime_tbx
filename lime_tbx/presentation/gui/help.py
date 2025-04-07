@@ -36,26 +36,35 @@ _INTRODUCTION: str = """
             <a style=\"color: #00ae9d\" href=\"https://github.com/LIME-ESA/lime_tbx\">github.com/LIME-ESA/lime_tbx</a></li>
     </ul>
 </p>
-""".replace("\n", " ").strip()
+""".replace(
+    "\n", " "
+).strip()
 
-_DESCRIPTION: str ="""
+_DESCRIPTION: str = """
 <p>
-    The LIME Toolbox allows users to simulate lunar observations for any observer
-    position around the Earth and at any time, from satellite positions of multiple
-    ESA satellites like ENVISAT, Proba-V, S2, S3 and FLEX, or any satellite position
-    for which an orbital scenario file is provided by the user in EOCFI compatible
-    format, and for any observer/solar selenographic latitude and longitude (thus
-    bypassing the need for their computation from the position/time of the observer).
+    The LIME Toolbox allows users to simulate lunar observations from any observer
+    position on Earth, at any time. It supports satellite positions from multiple
+    ESA missions, including ENVISAT, Proba-V, Sentinel-2, Sentinel-3 and FLEX, or
+    any custom orbital scenario provided in an EOCFI-compatible format. Observations can
+    also be simulated for specific observer/solar selenographic latitude and longitude coordinates,
+    bypassing the need to compute them from the observation time and location.
 </p>
 <p>
-    This simulations can be performed for any user defined instrument spectral
-    response pre-stored in a GLOD format file.
+    Simulations can be performed using any user-defined instrument spectral response function (SRF),
+    provided in GLOD format.
 </p>
 <p>
-    It also allows performing comparisons of lunar observations from a remote
-    sensing instrument (pre-stored in GLOD format files) to the LIME model output.
+    The Toolbox also enables comparison of remote sensing instrument observations (in GLOD format)
+    with simulated LIME outputs for validation and calibration purposes.
 </p>
-""".replace("\n", " ").strip()
+<p>
+    The GLOD format implementation is explained in the user guide, under the formats section:
+    <a style=\"color: #00ae9d\" href=\"https://lime-esa.github.io/lime_tbx/content/user_guide/formats.html\">
+    lime-esa.github.io/lime_tbx/content/user_guide/formats.html</a>
+</p>
+""".replace(
+    "\n", " "
+).strip()
 
 
 _CONTACT: str = """
@@ -206,12 +215,16 @@ class AboutDialog(QtWidgets.QDialog):
             f"Version: {dtp_constants.VERSION_NAME}", alignment=QtCore.Qt.AlignCenter
         )
         # Introduction
-        self.introduction_text = QtWidgets.QLabel(_INTRODUCTION, alignment=QtCore.Qt.AlignLeft)
+        self.introduction_text = QtWidgets.QLabel(
+            _INTRODUCTION, alignment=QtCore.Qt.AlignLeft
+        )
         self.introduction_text.setWordWrap(True)
         # LIME Logo
         _current_dir = os.path.dirname(os.path.abspath(__file__))
         logo_path = os.path.join(_current_dir, constants.CROPPED_LOGO_PATH)
-        lime_pixmap = QtGui.QPixmap(logo_path).scaledToHeight(150, QtCore.Qt.SmoothTransformation)
+        lime_pixmap = QtGui.QPixmap(logo_path).scaledToHeight(
+            150, QtCore.Qt.SmoothTransformation
+        )
         self.lime_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.lime_logo.setPixmap(lime_pixmap)
         # Description
@@ -219,6 +232,9 @@ class AboutDialog(QtWidgets.QDialog):
             _DESCRIPTION, alignment=QtCore.Qt.AlignLeft
         )
         self.description_label.setWordWrap(True)
+        self.description_label.setTextFormat(QtCore.Qt.RichText)
+        self.description_label.setTextInteractionFlags(QtCore.Qt.TextBrowserInteraction)
+        self.description_label.setOpenExternalLinks(True)
         # Contact
         self.contact_label = QtWidgets.QLabel(_CONTACT, alignment=QtCore.Qt.AlignLeft)
         self.contact_label.setWordWrap(True)
@@ -227,7 +243,9 @@ class AboutDialog(QtWidgets.QDialog):
         self.contact_label.setOpenExternalLinks(True)
         # ESA Logo
         esa_logo_path = os.path.join(_current_dir, constants.ESA_LOGO_PATH)
-        esa_pixmap = QtGui.QPixmap(esa_logo_path).scaledToHeight(150, QtCore.Qt.SmoothTransformation)
+        esa_pixmap = QtGui.QPixmap(esa_logo_path).scaledToHeight(
+            150, QtCore.Qt.SmoothTransformation
+        )
         self.esa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.esa_logo.setPixmap(esa_pixmap)
         # Collaborators
@@ -237,7 +255,9 @@ class AboutDialog(QtWidgets.QDialog):
         uva_logo_path = os.path.join(_current_dir, constants.UVA_LOGO_PATH)
         self.uva_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.uva_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(80, QtCore.Qt.SmoothTransformation)
+        uva_pixmap = QtGui.QPixmap(uva_logo_path).scaledToHeight(
+            80, QtCore.Qt.SmoothTransformation
+        )
         self.uva_logo.setPixmap(uva_pixmap)
         self.uva_logo.mousePressEvent = self._open_web_uva
         self.uva_logo.setOpenExternalLinks(True)
@@ -245,7 +265,9 @@ class AboutDialog(QtWidgets.QDialog):
         goa_logo_path = os.path.join(_current_dir, constants.GOA_UVA_LOGO_PATH)
         self.goa_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.goa_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(80, QtCore.Qt.SmoothTransformation)
+        goa_pixmap = QtGui.QPixmap(goa_logo_path).scaledToHeight(
+            80, QtCore.Qt.SmoothTransformation
+        )
         self.goa_logo.setPixmap(goa_pixmap)
         self.goa_logo.mousePressEvent = self._open_web_goa_uva
         self.goa_logo.setOpenExternalLinks(True)
@@ -253,7 +275,9 @@ class AboutDialog(QtWidgets.QDialog):
         npl_logo_path = os.path.join(_current_dir, constants.NPL_LOGO_PATH)
         self.npl_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.npl_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(80, QtCore.Qt.SmoothTransformation)
+        npl_pixmap = QtGui.QPixmap(npl_logo_path).scaledToHeight(
+            80, QtCore.Qt.SmoothTransformation
+        )
         self.npl_logo.setPixmap(npl_pixmap)
         self.npl_logo.mousePressEvent = self._open_web_npl
         self.npl_logo.setOpenExternalLinks(True)
@@ -261,7 +285,9 @@ class AboutDialog(QtWidgets.QDialog):
         vito_logo_path = os.path.join(_current_dir, constants.VITO_LOGO_PATH)
         self.vito_logo = QtWidgets.QLabel("", alignment=QtCore.Qt.AlignCenter)
         self.vito_logo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(72, QtCore.Qt.SmoothTransformation)
+        vito_pixmap = QtGui.QPixmap(vito_logo_path).scaledToHeight(
+            72, QtCore.Qt.SmoothTransformation
+        )
         self.vito_logo.setPixmap(vito_pixmap)
         self.vito_logo.mousePressEvent = self._open_web_vito
         self.vito_logo.setOpenExternalLinks(True)
