@@ -70,7 +70,7 @@ _DESCRIPTION: str = """
 _CONTACT: str = """
 To communicate any problem or error please visit the forum at
 <a style=\"color: #00ae9d\" href=\"https://lime.uva.es/forums/\">lime.uva.es/forums</a>
-or contact:
+or contact
 <a style=\"color: #00ae9d\" href=\"mailto:lime_tbx@goa.uva.es\">lime_tbx@goa.uva.es</a>
 """.replace(
     "\n", " "
@@ -219,6 +219,9 @@ class AboutDialog(QtWidgets.QDialog):
             _INTRODUCTION, alignment=QtCore.Qt.AlignLeft
         )
         self.introduction_text.setWordWrap(True)
+        self.introduction_text.setTextFormat(QtCore.Qt.RichText)
+        self.introduction_text.setTextInteractionFlags(QtCore.Qt.TextBrowserInteraction)
+        self.introduction_text.setOpenExternalLinks(True)
         # LIME Logo
         _current_dir = os.path.dirname(os.path.abspath(__file__))
         logo_path = os.path.join(_current_dir, constants.CROPPED_LOGO_PATH)
@@ -338,59 +341,55 @@ class AboutDialog(QtWidgets.QDialog):
 
 
 _HELP_TEXT = (
-    """
-<p>
-    Welcome to the LIME ToolBox!
-    <ul>
-        <li>Learn more about LIME at <a style=\"color: #00ae9d\" href=\"https://lime.uva.es\">lime.uva.es</a></li>
-        <li>Browse the documentation at
-            <a style=\"color: #00ae9d\" href=\"https://lime-esa.github.io/lime_tbx/\">lime-esa.github.io/lime_tbx</a></li>
-        <li>Explore the source code on GitHub 
-            <a style=\"color: #00ae9d\" href=\"https://github.com/LIME-ESA/lime_tbx\">github.com/LIME-ESA/lime_tbx</a></li>
-    </ul>
-</p>
-"""
+    _INTRODUCTION
     + _CONTACT
     + """
 <h2>How does it work?</h2>
 <p>
-    The LIME model computes lunar reflectance for CIMEL wavelengths with
-    the specified coefficients. Subsequently, these values undergo interpolation
-    across the entire spectrum using the 'ASD' spectrum or 'Apollo 16 + Breccia'.
-    Following this, irradiance is determined based on the calculated reflectance,
-    and ultimately, the irradiance is integrated for each band in the selected
-    Spectral Response Function (SRF).
+    The LIME model computes lunar reflectance at Cimel wavelengths using
+    the selected coefficients. These values are then interpolated
+    across the full spectral range using either the <i>ASD</i> spectrum or <i>Apollo 16 + Breccia</i> composite.
+    From this, lunar irradiance is derived by combining the interpolated reflectance with solar input,
+    and then integrated over each band's of the Spectral Response Function (SRF) to produce
+    the final output.
 </p>
 <h2>Simulation</h2>
 <p>
-    Explore the various input types by switching between the top tabs.
+    Use the tabs at the top of the interface to select between simulation modes.
 </p>
 <p>
-    Select the 'Irradiance,' 'Reflectance,' or 'Polarisation' buttons to
-    display the simulation output corresponding to the provided input.
-    The spectrum will be displayed in the Result tab, and if irradiance is selected,
-    the integrated irradiances will be presented in the Signal tab.
+    Choose 'Irradiance,' 'Reflectance,' or 'Polarisation' to generate outputs
+    based on the input parameters. Results will appear in the Result tab.
+    If you select irradiance, the integrated signals (based on your SRF),
+    will be shown in the Signal tab.
 </p>
 <h2>Comparison</h2>
 <p>
-    To transition from Simulation to Comparison, go to File > Perform Comparisons.
-    Here, you can load observation files in GLOD format along with their corresponding
-    SRF file and proceed to conduct the desired comparisons.
+    To compare simulated results with real observations:
+    <ol>
+        <li>Go to File > Perform Comparisons</li>
+        <li>Load your GLOD-format observation files and corresponding SRF files</li>
+        <li>Click Compare and wait</li>
+        <li>Choose to compare by datetime, moon phase angle, or channel</li>
+    </ol>
 </p>
 <p>
-    The comparison can be presented either with respect to datetime or moon phase angle.
-    The difference can be expressed as either a percentage difference or a relative
-    difference, calculated using the formula '100 * (Observation - Simulation) / Simulation'.
+    The difference between observed and simulated irradiance can be shown as:
+    <ul>
+        <li>An absolute percentage difference</li>
+        <li>A relative difference, using the formula:<br/>
+        '100 * (Observation - Simulation) / Simulation'</li>
+    </ul>
 </p>
 <h2>Too slow?</h2>
 <p>
-    Calculating uncertainties for large datasets can be time-consuming,
-    and users may not always require this information.
-    If this process is causing issues, it can be disabled.
-</p>
-<p>
-    To do so, navigate to Settings > Interpolation Options > Skip Uncertainty Calculations,
-    and toggle the switch to activate.
+    Calculating uncertainties for large datasets can be time-consuming.
+    If this affects performance or is not needed, you can disable uncertainty propagation.
+    To do so:
+    <ol>
+        <li>Go to Settings > Interpolation Options</li>
+        <li>Toggle Skip Uncertainty Calculations</li>
+    </ol>
 </p>
 """
 )
