@@ -4,3 +4,4 @@ lime_tbx/business/eocfi_adapter/eocfi_c/lib/* linguist-vendored
 lime_tbx/business/eocfi_adapter/eocfi_c/lib/*/* linguist-vendored
 lime_tbx/business/eocfi_adapter/eocfi_c/bin/* linguist-vendored
 kernels/* linguist-vendored
+eocfi_data/data/missions/EARTHCARE/SDF/* -linguist-detectable
