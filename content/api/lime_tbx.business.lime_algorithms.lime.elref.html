@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.lime_algorithms.lime.elref module &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+  <title>lime_tbx.business.lime_algorithms.lime.elref module &mdash; Lime Tbx 1.0.4.dev259+g520d255 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../_static/documentation_options.js?v=5643a52f"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -124,8 +124,7 @@
 <dt>It exports the following functions:</dt><dd><ul class="simple">
 <li><p>calculate_elref - Calculates the expected extra-terrestrial lunar reflectance</p></li>
 </ul>
-<p>for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020 for the
-irradiance, then divided by the solar irradiance.
+<p>for a given wavelength in nanometers.
 * calculate_elref_unc - Calculates the uncertainty for the reflectance
 calculations of empirical data points.</p>
 </dd>
@@ -133,8 +132,7 @@ calculations of empirical data points.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="lime_tbx.business.lime_algorithms.lime.elref.calculate_elref">
 <span class="sig-prename descclassname"><span class="pre">lime_tbx.business.lime_algorithms.lime.elref.</span></span><span class="sig-name descname"><span class="pre">calculate_elref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refl_coeffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">moon_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/lime_algorithms/lime/elref.html#calculate_elref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.lime_algorithms.lime.elref.calculate_elref" title="Link to this definition"></a></dt>
-<dd><p>The calculation of the reflectance of the Moon’s disk, following Eq.2 in Roman et al., 2020,
-without multiplying the value by its apollo coefficient.</p>
+<dd><p>The calculation of the reflectance of the Moon’s disk</p>
 <p>Simulates a lunar observation for a wavelength for any observer/solar selenographic
 latitude and longitude. The reflectance is calculated in fractions of unity.</p>
 <dl class="field-list simple">

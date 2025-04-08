@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.application.filedata.srf &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+  <title>lime_tbx.application.filedata.srf &mdash; Lime Tbx 1.0.4.dev259+g520d255 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../_static/documentation_options.js?v=5643a52f"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -123,6 +123,7 @@
     <span class="n">validate_schema</span><span class="p">,</span>
     <span class="n">xr_open_dataset</span><span class="p">,</span>
     <span class="n">get_length_conversion_factor</span><span class="p">,</span>
+    <span class="n">DTypeSchema</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
@@ -152,23 +153,31 @@
 <span class="sd">    ds: xr.Dataset</span>
 <span class="sd">        Dataset to validate</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sample_dim</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;srf&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">sample_dim</span><span class="p">,</span> <span class="s2">&quot;channel&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;wavelength&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">sample_dim</span><span class="p">,</span> <span class="s2">&quot;channel&quot;</span><span class="p">]),</span>
-    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_vars</span><span class="p">(</span><span class="n">channel_dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;channel&quot;</span><span class="p">):</span>
+        <span class="n">sample_dim</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;srf&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">sample_dim</span><span class="p">,</span> <span class="n">channel_dim</span><span class="p">]),</span>
+            <span class="s2">&quot;wavelength&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">sample_dim</span><span class="p">,</span> <span class="n">channel_dim</span><span class="p">]),</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">data_vars</span>
+
     <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)}</span>
-    <span class="n">channel_id</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;channel_id&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">)}</span>
+    <span class="n">channel_id</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;channel_id&quot;</span><span class="p">:</span> <span class="n">DataArraySchema</span><span class="p">(</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">character</span><span class="p">))}</span>
     <span class="c1"># channel_id can actually be either a variable or a coordinate, preferably a variable.</span>
     <span class="n">dss</span> <span class="o">=</span> <span class="n">DatasetSchema</span><span class="p">(</span>
-        <span class="n">data_vars</span><span class="o">=</span><span class="n">data_vars</span> <span class="o">|</span> <span class="n">channel_id</span><span class="p">,</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="n">get_data_vars</span><span class="p">()</span> <span class="o">|</span> <span class="n">channel_id</span><span class="p">,</span>
         <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">odss</span> <span class="o">=</span> <span class="n">DatasetSchema</span><span class="p">(</span>
-        <span class="n">data_vars</span><span class="o">=</span><span class="n">data_vars</span><span class="p">,</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="n">get_data_vars</span><span class="p">(),</span>
         <span class="n">coords</span><span class="o">=</span><span class="n">coords</span> <span class="o">|</span> <span class="n">channel_id</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">validate_schema</span><span class="p">(</span><span class="n">dss</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="n">odss</span><span class="p">])</span>
+    <span class="c1"># channel can be a variable, then there are no coordinates</span>
+    <span class="n">flex_dss</span> <span class="o">=</span> <span class="n">DatasetSchema</span><span class="p">(</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="n">get_data_vars</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="o">|</span> <span class="n">channel_id</span> <span class="o">|</span> <span class="n">coords</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">validate_schema</span><span class="p">(</span><span class="n">dss</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="n">odss</span><span class="p">,</span> <span class="n">flex_dss</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="read_srf">
@@ -217,7 +226,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_channels</span><span class="p">):</span>
             <span class="n">channel_spec_resp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">wvlens</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">factors</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">center</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">*</span> <span class="n">ch_f_to_nm</span>
-            <span class="n">c_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;channel_id&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">c_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;channel_id&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
             <span class="n">channel</span> <span class="o">=</span> <span class="n">SRFChannel</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">c_id</span><span class="p">,</span> <span class="n">channel_spec_resp</span><span class="p">)</span>
             <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>

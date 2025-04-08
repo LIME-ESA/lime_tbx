@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.lime_algorithms.lime.elref &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+  <title>lime_tbx.business.lime_algorithms.lime.elref &mdash; Lime Tbx 1.0.4.dev259+g520d255 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../../../../../_static/documentation_options.js?v=5643a52f"></script>
       <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -103,8 +103,7 @@
 
 <span class="sd">It exports the following functions:</span>
 <span class="sd">    * calculate_elref - Calculates the expected extra-terrestrial lunar reflectance</span>
-<span class="sd">    for a given wavelength in nanometers. Based on Eq 3 in Roman et al., 2020 for the</span>
-<span class="sd">    irradiance, then divided by the solar irradiance.</span>
+<span class="sd">    for a given wavelength in nanometers. </span>
 <span class="sd">    * calculate_elref_unc - Calculates the uncertainty for the reflectance</span>
 <span class="sd">    calculations of empirical data points.</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -140,8 +139,7 @@
     <span class="n">gd_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Final computation of the calculation of the ln of the reflectance of the Moon&#39;s disk, following Eq.2 in</span>
-<span class="sd">    Roman et al., 2020</span>
+<span class="sd">    Final computation of the calculation of the ln of the reflectance of the Moon&#39;s disk</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -161,18 +159,6 @@
 <span class="sd">    elrefs: float | np.ndarray of float</span>
 <span class="sd">        Calculated reflectances.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># a_coeffs: list of float | np.ndarray of np.ndarray of float</span>
-    <span class="c1"># A Coefficients for a wavelength, or all the A coefficients for all wavelengths (matrix)</span>
-    <span class="c1"># b_coeffs: list of float | np.ndarray of np.ndarray of float</span>
-    <span class="c1"># B Coefficients for a wavelength, or all the B coefficients for all wavelengths (matrix)</span>
-    <span class="c1"># c_coeffs: list of float | np.ndarray of np.ndarray of float</span>
-    <span class="c1"># C Coefficients for a wavelength, or all the C coefficients for all wavelengths (matrix)</span>
-    <span class="c1"># d_coeffs: list of float | np.ndarray of np.ndarray of float</span>
-    <span class="c1"># D Coefficients for a wavelength, or all the D coefficients for all wavelengths (matrix)</span>
-    <span class="c1"># p_coeffs: list of float | np.ndarray of np.ndarray of float</span>
-    <span class="c1"># P Coefficients for a wavelength, or all the P coefficients for all wavelengths (matrix)</span>
-
     <span class="n">a_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">b_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">c_coeffs</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span> <span class="p">:]</span>
@@ -182,6 +168,8 @@
     <span class="n">gr_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">gd_value</span><span class="p">)</span>
     <span class="n">d1_value</span> <span class="o">=</span> <span class="n">d_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gd_value</span> <span class="o">/</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">d2_value</span> <span class="o">=</span> <span class="n">d_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gd_value</span> <span class="o">/</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># Cosine in radians is correct even though gd_value is in degrees</span>
+    <span class="c1"># It&#39;s being divided by p3 and p4 are in degrees too degrees/degrees = radians/radians (units are gone)</span>
     <span class="n">d3_value</span> <span class="o">=</span> <span class="n">d_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="n">gd_value</span> <span class="o">-</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">p_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 
     <span class="n">sum_a</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
@@ -193,10 +181,10 @@
     <span class="n">result</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">sum_a</span>
         <span class="o">+</span> <span class="n">sum_b</span>
-        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_phi</span>
-        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_theta</span>
-        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">l_phi</span>
-        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">l_theta</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_theta</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">l_phi</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">l_theta</span>
+        <span class="o">+</span> <span class="n">c_coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">l_phi</span>
         <span class="o">+</span> <span class="n">d1_value</span>
         <span class="o">+</span> <span class="n">d2_value</span>
         <span class="o">+</span> <span class="n">d3_value</span>
@@ -211,8 +199,7 @@
     <span class="n">moon_data</span><span class="p">:</span> <span class="n">MoonData</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The calculation of the reflectance of the Moon&#39;s disk, following Eq.2 in Roman et al., 2020,</span>
-<span class="sd">    without multiplying the value by its apollo coefficient.</span>
+<span class="sd">    The calculation of the reflectance of the Moon&#39;s disk</span>
 
 <span class="sd">    Simulates a lunar observation for a wavelength for any observer/solar selenographic</span>
 <span class="sd">    latitude and longitude. The reflectance is calculated in fractions of unity.</span>

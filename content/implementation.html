@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Implementation &mdash; Lime Tbx 0.1.dev1+gab245d1 documentation</title>
+  <title>Implementation &mdash; Lime Tbx 1.0.4.dev259+g520d255 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=25c3d3cf"></script>
+      <script src="../_static/documentation_options.js?v=5643a52f"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -80,15 +80,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#manual-deployment">Manual Deployment</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#requirements">Requirements:</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#compile-c-code-for-eo-cfi">1. Compile C code for EO-CFI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#create-a-virtual-environment">2. Create a Virtual Environment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#build-the-app-bundle">3. Build the App Bundle</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#create-an-installer">4. Create an Installer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#build-the-python-package">2. Build the Python Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-virtual-environment">3. Create a Virtual Environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#build-the-app-bundle">4. Build the App Bundle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-an-installer">5. Create an Installer</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#automated-deployment">Automated Deployment</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#linux-automated-deployment">Linux Automated Deployment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#windows-automated-deployment">Windows Automated Deployment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#mac-automated-deployment-unavailable">Mac Automated Deployment (Unavailable)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mac-automated-deployment">Mac Automated Deployment</a></li>
 </ul>
 </li>
 </ul>
@@ -365,8 +366,16 @@ nmake
 </pre></div>
 </div>
 </section>
+<section id="build-the-python-package">
+<h4>2. Build the Python Package<a class="headerlink" href="#build-the-python-package" title="Link to this heading"></a></h4>
+<p>Building the <code class="docutils literal notranslate"><span class="pre">.egg-info</span></code> directory is needed so PyInstaller is able to read the metadata
+from it when packaging the toolbox. For that, the easiest way is to build the package:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>build
+</pre></div>
+</div>
+</section>
 <section id="create-a-virtual-environment">
-<h4>2. Create a Virtual Environment<a class="headerlink" href="#create-a-virtual-environment" title="Link to this heading"></a></h4>
+<h4>3. Create a Virtual Environment<a class="headerlink" href="#create-a-virtual-environment" title="Link to this heading"></a></h4>
 <p>To minimize application size it’s strongly recommended to use a virtual environment (<code class="docutils literal notranslate"><span class="pre">venv</span></code>) :</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
 <span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">  </span><span class="c1"># For Linux/Mac</span>
@@ -377,7 +386,7 @@ pip<span class="w"> </span>install<span class="w"> </span>PySide6~<span class="o
 </div>
 </section>
 <section id="build-the-app-bundle">
-<h4>3. Build the App Bundle<a class="headerlink" href="#build-the-app-bundle" title="Link to this heading"></a></h4>
+<h4>4. Build the App Bundle<a class="headerlink" href="#build-the-app-bundle" title="Link to this heading"></a></h4>
 <p>Use <code class="docutils literal notranslate"><span class="pre">pyinstaller</span></code> to create an executable bundle for your OS:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pyinstaller<span class="w"> </span>lime_tbx.spec<span class="w">  </span>
 </pre></div>
@@ -385,7 +394,7 @@ pip<span class="w"> </span>install<span class="w"> </span>PySide6~<span class="o
 <p>Once the build is complete, deactivate the virtual environment.</p>
 </section>
 <section id="create-an-installer">
-<h4>4. Create an Installer<a class="headerlink" href="#create-an-installer" title="Link to this heading"></a></h4>
+<h4>5. Create an Installer<a class="headerlink" href="#create-an-installer" title="Link to this heading"></a></h4>
 <p>Navigate to the <code class="docutils literal notranslate"><span class="pre">deployment/installer</span></code> directory and use the appropriate method for your operating system:</p>
 <ul class="simple">
 <li><p><strong>Windows</strong>: Use “InnoSetup” and run <code class="docutils literal notranslate"><span class="pre">inno_installer_builder.iss</span></code>.</p></li>
@@ -428,19 +437,43 @@ to <a href="#1-compile-c-code-for-eocfi">Manual Deployment - Step 1</a>.</p>
 </div>
 </li>
 <li><p>Run the container and deploy the app:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span>%F<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">(</span><span class="s2">&quot;%cd%&quot;</span><span class="o">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">dirname</span><span class="o">=</span>%~dpF
-<span class="k">for</span><span class="w"> </span>%F<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">(</span><span class="s2">&quot;%dirname%&quot;</span><span class="o">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">grandparent</span><span class="o">=</span>%~dpF
-docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>%grandparent%:C:<span class="se">\r</span>epo<span class="w"> </span>lime_compiler
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span>%F<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">(</span><span class="s2">&quot;%cd%\..&quot;</span><span class="o">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="nv">dirname</span><span class="o">=</span>%~dpF
+docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>%dirname%:C:<span class="se">\r</span>epo<span class="w"> </span>lime_compiler
 </pre></div>
 </div>
 </li>
 </ol>
 </section>
-<section id="mac-automated-deployment-unavailable">
-<h4>Mac Automated Deployment (Unavailable)<a class="headerlink" href="#mac-automated-deployment-unavailable" title="Link to this heading"></a></h4>
-<p>Automatic deployment for macOS is currently unavailable. Docker does not support
-macOS as a guest OS due to the lack of macOS containers.</p>
-<p>Future plans include exploring automated deployment using GitHub Actions with macOS runners.</p>
+<section id="mac-automated-deployment">
+<h4>Mac Automated Deployment<a class="headerlink" href="#mac-automated-deployment" title="Link to this heading"></a></h4>
+<p>Automated deployment on macOS is partially supported, but cannot be containerized like on Linux due
+to macOS container limitations: Docker does not support macOS as a guest OS.</p>
+<p>However, deployment can still be automated using native macOS tools or CI platforms
+like GitHub Actions with macOS runners (planned for future improvements).</p>
+<p>In the meantime, the recommended manual approach is to use a local macOS environment
+with the official Python 3.9 (via Homebrew), not the system-provided one.</p>
+<ol class="arabic simple">
+<li><p>Install Python 3.9 via Homebrew (avoid system Python):</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>python@3.9
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Install required Python tools:</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python3.9<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pyinstaller<span class="w"> </span>build
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Run the macOS build script:</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./deployment/automatic/mac_build_script.sh
+</pre></div>
+</div>
+<blockquote>
+<div><p>⚠️ Make sure you are not using the system Python (e.g., <code class="docutils literal notranslate"><span class="pre">/usr/bin/python3</span></code>), as it lacks proper OpenSSL
+support and can cause issues with PyInstaller builds.</p>
+</div></blockquote>
 </section>
 </section>
 </section>
