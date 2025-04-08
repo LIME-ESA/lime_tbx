@@ -83,7 +83,7 @@ include = ["lime_tbx*"]
 
 [tool.setuptools_scm]
 root = "."
-fallback_version = "1"
+fallback_version = "1.0.3.1"
 
 [tool.versioneer]
 VCS = "git"
