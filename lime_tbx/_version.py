@@ -8,4 +8,4 @@ from importlib.metadata import version, PackageNotFoundError
 try:
     __version__ = version("lime_tbx")
 except PackageNotFoundError:
-    __version__ = "0.0.0"
+    __version__ = "1.0.3.1"
