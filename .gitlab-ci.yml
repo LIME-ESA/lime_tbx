@@ -18,6 +18,7 @@ stages:
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
 variables:
+  GIT_DEPTH: 0 # disable shallow copy
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 # Pip's cache doesn't store the python packages
@@ -45,6 +46,8 @@ cache:
     # Set up git for test commits
     - git config --global user.name "Gitlabs CI Testing"
     - git config --global user.email "test@example.com"
+    # Get git tags properly
+    - git fetch --tags
     # Make a virtual environment to install deps into (this will be cached for each step)
     - python --version
     - pip install virtualenv
