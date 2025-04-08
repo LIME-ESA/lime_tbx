@@ -108,6 +108,9 @@ doc-coverage:
     - python -c "import sys;print(sys.path)"
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
+    - git fetch --tags
+    - git tag
+    - git describe --tags
     - tox
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
