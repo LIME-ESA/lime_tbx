@@ -45,6 +45,12 @@ cache:
     # Set up git for test commits
     - git config --global user.name "Gitlabs CI Testing"
     - git config --global user.email "test@example.com"
+    # Git tags
+    - git fetch --unshallow
+    - git fetch --tags
+    - git tag
+    - git log --oneline --decorate --graph --all --simplify-by-decoration | head -n 30
+    - git describe --tags
     # Make a virtual environment to install deps into (this will be cached for each step)
     - python --version
     - pip install virtualenv
