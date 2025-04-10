@@ -44,6 +44,8 @@ import os
 import getopt
 import sys
 import warnings
+from traceback import format_exc, format_exception
+import faulthandler
 
 from lime_tbx.presentation.cli.cli import (
     CLI,
@@ -58,6 +60,12 @@ from lime_tbx.persistence.local_storage.programdata import (
 from lime_tbx.common.datatypes import KernelsPath, EocfiPath
 from lime_tbx.common import logger
 from lime_tbx.application.coefficients import access_data
+
+
+def excepthook(exc_type, exc_value, exc_traceback):
+    error_msg = "".join(format_exception(exc_type, exc_value, exc_traceback))
+    logger.get_logger().error("Uncaught exception:\n%s", error_msg)
+    print(f"Uncaught exception logged: {str(error_msg)}")
 
 
 def main():
@@ -84,6 +92,7 @@ def main():
         and exits with a status code.
     """
     logger.get_logger().info("ToolBox started")
+    sys.excepthook = excepthook
     warnings.filterwarnings("ignore", ".*Gtk-WARNING.*")
     warnings.filterwarnings("ignore", ".*Fontconfig warning.*")
     warnings.filterwarnings(
@@ -94,6 +103,7 @@ def main():
     )
     programfiles = get_programfiles_folder()
     appdata = get_appdata_folder()
+    faulthandler.enable(open(os.path.join(appdata, "crash.log"), "a"))
     logger.get_logger().info(
         f"Appdata folder: {appdata}. Programfiles folder: {programfiles}."
     )
@@ -113,22 +123,28 @@ def main():
         print("Error parsing input parameters: " + str(e))
         print_help()
         sys.exit(2)
-    if len(opts) == 0:
-        from lime_tbx.presentation.gui.gui import GUI
+    try:
+        if len(opts) == 0:
+            from lime_tbx.presentation.gui.gui import GUI
 
-        if sys.platform.lower().startswith("win"):
-            import ctypes
+            if sys.platform.lower().startswith("win"):
+                import ctypes
 
-            whnd = ctypes.windll.kernel32.GetConsoleWindow()
-            if whnd != 0:
-                ctypes.windll.user32.ShowWindow(whnd, 0)
-        gui = GUI(kernels_path, eocfi_path, selected_version)
-    else:
-        cli = CLI(kernels_path, eocfi_path, selected_version)
-        status = cli.check_sys_args(sysargs)
-        if status == 0:
-            status = cli.handle_input(opts, args)
-        sys.exit(status)
+                whnd = ctypes.windll.kernel32.GetConsoleWindow()
+                if whnd != 0:
+                    ctypes.windll.user32.ShowWindow(whnd, 0)
+            gui = GUI(kernels_path, eocfi_path, selected_version)
+        else:
+            cli = CLI(kernels_path, eocfi_path, selected_version)
+            status = cli.check_sys_args(sysargs)
+            if status == 0:
+                status = cli.handle_input(opts, args)
+            sys.exit(status)
+    except Exception as e:
+        trace = format_exc()
+        logger.get_logger().critical(e)
+        logger.get_logger().critical(trace)
+        print(e, trace)
 
 
 if __name__ == "__main__":
