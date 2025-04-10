@@ -43,7 +43,9 @@ _INTERPOLATED_TRIANGULAR_FILE = "assets/interpolated_model_fwhm_1_1_triangle.csv
 
 
 def get_default_srf():
-    spectral_response = {i: 1.0 for i in range(constants.MIN_WLEN, constants.MAX_WLEN+1)}
+    spectral_response = {
+        float(i): 1.0 for i in range(constants.MIN_WLEN, constants.MAX_WLEN + 1)
+    }
     ch = SRFChannel(
         (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
         constants.DEFAULT_SRF_NAME,
