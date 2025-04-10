@@ -43,16 +43,9 @@ _INTERPOLATED_TRIANGULAR_FILE = "assets/interpolated_model_fwhm_1_1_triangle.csv
 
 
 def get_default_srf():
-    dir_path = os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    )
-    dir_path = os.path.join(dir_path, "business", "spectral_integration", "assets")
-    data = np.genfromtxt(
-        os.path.join(dir_path, "interpolated_model_fwhm_3_1_gaussian.csv"),
-        delimiter=",",
-    )
-    wavs = data[:, 0]
-    spectral_response = {i: 1.0 for i in wavs}
+    spectral_response = {
+        float(i): 1.0 for i in range(constants.MIN_WLEN, constants.MAX_WLEN + 1)
+    }
     ch = SRFChannel(
         (constants.MAX_WLEN - constants.MIN_WLEN) / 2,
         constants.DEFAULT_SRF_NAME,

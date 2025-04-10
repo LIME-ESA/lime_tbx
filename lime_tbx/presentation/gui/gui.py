@@ -4,6 +4,7 @@
 import sys
 import pkgutil
 import os
+import traceback
 
 """___Third-Party Modules___"""
 from qtpy import QtWidgets, QtGui
@@ -11,6 +12,7 @@ from qtpy import QtWidgets, QtGui
 """___LIME_TBX Modules___"""
 from lime_tbx.presentation.gui import constants, maingui
 from lime_tbx.common.datatypes import KernelsPath, EocfiPath
+from lime_tbx.common import logger
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -30,6 +32,15 @@ def _preprocess_qss(qss: str, qss_constants: str):
     return qss
 
 
+class LimeApp(QtWidgets.QApplication):
+    def notify(self, receiver, event):
+        try:
+            return super().notify(receiver, event)
+        except Exception:
+            logger.get_logger().error("Exception in event loop:\n%s", traceback.format_exc())
+            return False
+
+
 class GUI:
     def __init__(
         self,
@@ -39,7 +50,7 @@ class GUI:
     ):
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
-        app = QtWidgets.QApplication([constants.APPLICATION_NAME])
+        app = LimeApp([constants.APPLICATION_NAME])
         self._init_fonts()
         window = maingui.LimeTBXWindow(kernels_path)
         main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path, selected_version)

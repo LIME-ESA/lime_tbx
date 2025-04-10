@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 # Set the working directory
 WORKDIR /temp
 
@@ -6,6 +6,7 @@ WORKDIR /temp
 RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
     "Set-ExecutionPolicy Bypass -Scope Process; \
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; \
+    $env:chocolateyVersion = '1.4.3'; \
     iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex"
 
 # Install git (python dep)
