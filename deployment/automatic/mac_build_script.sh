@@ -12,5 +12,6 @@ rm -rf .venv
 python3.9 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/pip install PySide2~=5.15
+export MACOSX_DEPLOYMENT_TARGET=10.15
 pyinstaller lime_tbx.spec
 cd deployment/installer && ./build_mac_installer.sh
