@@ -961,6 +961,7 @@ for wavelengths between 350 and 2500 nm"
 
     def set_current_channel_index(self, index: int):
         cui = self.channel_tabs.setCurrentIndex(index)
+        self.channels[index].tight_layout()
         return cui
 
     def get_channel_names(self) -> List[str]:

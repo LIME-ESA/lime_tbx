@@ -7,7 +7,7 @@ import os
 import traceback
 
 """___Third-Party Modules___"""
-from qtpy import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui, QtCore
 
 """___LIME_TBX Modules___"""
 from lime_tbx.presentation.gui import constants, maingui
@@ -37,7 +37,9 @@ class LimeApp(QtWidgets.QApplication):
         try:
             return super().notify(receiver, event)
         except Exception:
-            logger.get_logger().error("Exception in event loop:\n%s", traceback.format_exc())
+            logger.get_logger().error(
+                "Exception in event loop:\n%s", traceback.format_exc()
+            )
             return False
 
 
@@ -51,10 +53,15 @@ class GUI:
         self.kernels_path = kernels_path
         self.eocfi_path = eocfi_path
         app = LimeApp([constants.APPLICATION_NAME])
+        if sys.platform == "linux":
+            QtGui.QGuiApplication.setDesktopFileName("limetbx")
+            QtGui.QGuiApplication.setApplicationName("LimeTBX")
+            QtGui.QGuiApplication.setApplicationDisplayName("LimeTBX")
+            QtCore.QCoreApplication.setApplicationName("LimeTBX")
         self._init_fonts()
         window = maingui.LimeTBXWindow(kernels_path)
         main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path, selected_version)
-        window.resize(850, 850)
+        window.resize(800, 750)
         window.setCentralWidget(main_widget)
         window.show()
         window.setWindowTitle(constants.APPLICATION_NAME)
