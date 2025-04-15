@@ -61,7 +61,7 @@ class GUI:
         self._init_fonts()
         window = maingui.LimeTBXWindow(kernels_path)
         main_widget = maingui.LimeTBXWidget(kernels_path, eocfi_path, selected_version)
-        window.resize(850, 850)
+        window.resize(800, 750)
         window.setCentralWidget(main_widget)
         window.show()
         window.setWindowTitle(constants.APPLICATION_NAME)
