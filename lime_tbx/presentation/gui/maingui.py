@@ -919,6 +919,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp.remove_channels(data[1])
         outp.check_if_range_visible()
         self._unblock_gui()
+        outp.set_current_channel_index(0)
         self.export_lglod_button.setEnabled(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
@@ -1752,7 +1753,7 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         toggle_fullscreen.setShortcutContext(QtCore.Qt.WidgetWithChildrenShortcut)
         fullscreen_shortcuts = [QtGui.QKeySequence.FullScreen]
         if sys.platform != "win32":
-            fullscreen_shortcuts.append(QtGui.QKeySequence(QtCore.Qt.Key_F11)) 
+            fullscreen_shortcuts.append(QtGui.QKeySequence(QtCore.Qt.Key_F11))
         toggle_fullscreen.setShortcuts(fullscreen_shortcuts)
         toggle_fullscreen.triggered.connect(self.toggle_fullscreen)
         self.addAction(toggle_fullscreen)
