@@ -1135,6 +1135,7 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
 
     def _redraw_new_diffs(self):
         self._get_current_graph().change_diff_canvas(self.chosen_diffs)
+        self.refresh_canvas()
 
     def show_relative(self, redraw=True):
         self.chosen_diffs = CompFields.DIFF_REL
@@ -1161,5 +1162,8 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
         else:
             self.stackl.setCurrentIndex(1)
 
-    def tight_layout(self):
-        self._get_current_graph().tight_layout()
+    def refresh_canvas(self):
+        canvas = self._get_current_graph().canvas
+        canvas.draw()
+        canvas.repaint()
+        canvas.update()
