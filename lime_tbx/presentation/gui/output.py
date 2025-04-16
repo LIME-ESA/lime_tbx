@@ -30,6 +30,7 @@ from lime_tbx.common.datatypes import (
     SpectralData,
     MoonData,
 )
+from lime_tbx.common import logger
 from lime_tbx.presentation.gui.settings import ISettingsManager
 from lime_tbx.application.filedata import csv
 from lime_tbx.presentation.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
@@ -548,8 +549,8 @@ class CompGraphWidget(GraphWidget):
             try:
                 self.canvas.fig.tight_layout()
                 self.canvas.draw()
-            except:
-                pass
+            except Exception as e:
+                logger.get_logger().error(e)
         else:
             self._to_update_plot = True
 
@@ -1159,3 +1160,6 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
             self.stackl.setCurrentIndex(0)
         else:
             self.stackl.setCurrentIndex(1)
+
+    def tight_layout(self):
+        self._get_current_graph().tight_layout()
