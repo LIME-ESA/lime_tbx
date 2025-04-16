@@ -1168,12 +1168,13 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
         self.refresh_canvas()
 
     def _refresh_canvas(self):
-        self.hide()
-        self.show()
-        self.raise_()
-        self.activateWindow()
-        self._get_current_graph()._redraw()
-        canvas = self._get_current_graph().canvas
+        cg = self._get_current_graph()
+        cg.hide()
+        cg.show()
+        cg.raise_()
+        cg.activateWindow()
+        cg._redraw()
+        canvas = cg.canvas
         canvas.draw()
         canvas.flush_events()
         canvas.repaint()
@@ -1186,4 +1187,4 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
         # _refresh_canvas is also part of the workaround
         # TODO: Explore a more elegant solution.
         self._refresh_canvas()
-        QtCore.QTimer.singleShot(2500, self._refresh_canvas)
+        QtCore.QTimer.singleShot(1000, self._refresh_canvas)
