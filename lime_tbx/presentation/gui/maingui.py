@@ -555,6 +555,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.output.setVisible(not focuswlen)
         if focuswlen:
             self.output_stacklay.setCurrentIndex(1)
+            self.output_wlen.refresh_canvas()
         else:
             self.output_stacklay.setCurrentIndex(0)
 

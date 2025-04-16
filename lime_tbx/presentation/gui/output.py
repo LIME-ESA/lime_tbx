@@ -30,6 +30,7 @@ from lime_tbx.common.datatypes import (
     SpectralData,
     MoonData,
 )
+from lime_tbx.common import logger
 from lime_tbx.presentation.gui.settings import ISettingsManager
 from lime_tbx.application.filedata import csv
 from lime_tbx.presentation.gui.ifaces import IMainSimulationsWidget, noconflict_makecls
@@ -548,8 +549,8 @@ class CompGraphWidget(GraphWidget):
             try:
                 self.canvas.fig.tight_layout()
                 self.canvas.draw()
-            except:
-                pass
+            except Exception as e:
+                logger.get_logger().error(e)
         else:
             self._to_update_plot = True
 
@@ -1134,6 +1135,7 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
 
     def _redraw_new_diffs(self):
         self._get_current_graph().change_diff_canvas(self.chosen_diffs)
+        self.refresh_canvas()
 
     def show_relative(self, redraw=True):
         self.chosen_diffs = CompFields.DIFF_REL
@@ -1159,3 +1161,9 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
             self.stackl.setCurrentIndex(0)
         else:
             self.stackl.setCurrentIndex(1)
+
+    def refresh_canvas(self):
+        canvas = self._get_current_graph().canvas
+        canvas.draw()
+        canvas.repaint()
+        canvas.update()
