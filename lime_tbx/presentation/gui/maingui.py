@@ -1982,13 +1982,21 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         )
         select_coefficients_dialog.exec()
 
+    def _restore_main_focus(self):
+        QtWidgets.QApplication.processEvents()
+        self.raise_()
+        self.activateWindow()
+        self.repaint()
+
     def about(self):
         about_dialog = help.AboutDialog(self)
         about_dialog.exec()
+        self._restore_main_focus()
 
     def help(self):
         help_dialog = help.HelpDialog(self)
         help_dialog.exec()
+        self._restore_main_focus()
 
     def update_calculability(self):
         lime_tbx_w = self._get_lime_widget()

@@ -87,6 +87,10 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         # finish main
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.canvas, 1)
+        self.canvas.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+        self.canvas.updateGeometry()
         self.main_layout.addLayout(self.buttons_layout)
         if self._to_update_plot:
             self._update_plot()
@@ -1161,9 +1165,25 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
             self.stackl.setCurrentIndex(0)
         else:
             self.stackl.setCurrentIndex(1)
+        self.refresh_canvas()
 
-    def refresh_canvas(self):
+    def _refresh_canvas(self):
+        self.hide()
+        self.show()
+        self.raise_()
+        self.activateWindow()
+        self._get_current_graph()._redraw()
         canvas = self._get_current_graph().canvas
         canvas.draw()
+        canvas.flush_events()
         canvas.repaint()
         canvas.update()
+
+    def refresh_canvas(self):
+        # Workaround for occasional rendering issues where the canvas does not appear correctly
+        # when first shown in a QStackedLayout. Calling draw/update once may not be sufficient,
+        # so we schedule a delayed second call to ensure proper display.
+        # _refresh_canvas is also part of the workaround
+        # TODO: Explore a more elegant solution.
+        self._refresh_canvas()
+        QtCore.QTimer.singleShot(2500, self._refresh_canvas)
