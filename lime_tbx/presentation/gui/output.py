@@ -1168,13 +1168,8 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
         self.refresh_canvas()
 
     def _refresh_canvas(self):
-        cg = self._get_current_graph()
-        cg.hide()
-        cg.show()
-        cg.raise_()
-        cg.activateWindow()
-        cg._redraw()
-        canvas = cg.canvas
+        canvas = self._get_current_graph().canvas
+        canvas.updateGeometry()
         canvas.draw()
         canvas.flush_events()
         canvas.repaint()
@@ -1182,9 +1177,5 @@ class ComparisonByWlenOutput(QtWidgets.QWidget):
 
     def refresh_canvas(self):
         # Workaround for occasional rendering issues where the canvas does not appear correctly
-        # when first shown in a QStackedLayout. Calling draw/update once may not be sufficient,
-        # so we schedule a delayed second call to ensure proper display.
-        # _refresh_canvas is also part of the workaround
-        # TODO: Explore a more elegant solution.
+        # when first shown in a QStackedLayout.
         self._refresh_canvas()
-        QtCore.QTimer.singleShot(1000, self._refresh_canvas)
