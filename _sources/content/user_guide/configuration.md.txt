@@ -97,3 +97,7 @@ export LIME_DEBUG=DEBUG  # Linux/Mac
 set LIME_DEBUG=DEBUG     # Windows (cmd)
 $env:LIME_DEBUG="DEBUG"  # Windows (PowerShell)
 ```
+
+If the LIME Toolbox suddenly crashes without generating any information in the standard logs,
+a detailed crash report is automatically saved to a file named `crash.log` located in the appdata directory.
+This file can be useful for troubleshooting and should be included when reporting issues.

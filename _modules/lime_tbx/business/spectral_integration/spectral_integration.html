@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.spectral_integration.spectral_integration &mdash; Lime Tbx 1.0.4.dev259+g520d255 documentation</title>
+  <title>lime_tbx.business.spectral_integration.spectral_integration &mdash; Lime Tbx 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=5643a52f"></script>
+      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -145,16 +145,9 @@
 <div class="viewcode-block" id="get_default_srf">
 <a class="viewcode-back" href="../../../../content/api/lime_tbx.business.spectral_integration.spectral_integration.html#lime_tbx.business.spectral_integration.spectral_integration.get_default_srf">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_default_srf</span><span class="p">():</span>
-    <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
-    <span class="p">)</span>
-    <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s2">&quot;business&quot;</span><span class="p">,</span> <span class="s2">&quot;spectral_integration&quot;</span><span class="p">,</span> <span class="s2">&quot;assets&quot;</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s2">&quot;interpolated_model_fwhm_3_1_gaussian.csv&quot;</span><span class="p">),</span>
-        <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wavs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="n">spectral_response</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">wavs</span><span class="p">}</span>
+    <span class="n">spectral_response</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MIN_WLEN</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_WLEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
     <span class="n">ch</span> <span class="o">=</span> <span class="n">SRFChannel</span><span class="p">(</span>
         <span class="p">(</span><span class="n">constants</span><span class="o">.</span><span class="n">MAX_WLEN</span> <span class="o">-</span> <span class="n">constants</span><span class="o">.</span><span class="n">MIN_WLEN</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
         <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_SRF_NAME</span><span class="p">,</span>
