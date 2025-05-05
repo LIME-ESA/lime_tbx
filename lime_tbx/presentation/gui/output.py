@@ -73,17 +73,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
         self._prepare_toolbar()
         self._redraw()
-        # save buttons
-        self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.export_button = QtWidgets.QPushButton("Export graph (.png, .jpg, .pdf...)")
-        self.export_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.export_button.clicked.connect(self.export_graph)
-        self.csv_button = QtWidgets.QPushButton("Export CSV")
-        self.csv_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.csv_button.clicked.connect(self.export_csv)
         self.disable_buttons(True)
-        self.buttons_layout.addWidget(self.export_button)
-        self.buttons_layout.addWidget(self.csv_button)
         # finish main
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.canvas, 1)
@@ -91,7 +81,6 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
         self.canvas.updateGeometry()
-        self.main_layout.addLayout(self.buttons_layout)
         if self._to_update_plot:
             self._update_plot()
         if self._to_update_labels:
@@ -102,8 +91,8 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         pass
 
     def disable_buttons(self, disable: bool):
-        self.export_button.setDisabled(disable)
-        self.csv_button.setDisabled(disable)
+        self.graph_action.setDisabled(disable)
+        self.csv_action.setDisabled(disable)
 
     def _update_plot(self, redraw=True):
         if self.data is not None:
@@ -121,7 +110,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
 
     def _prepare_toolbar(self):
         self.toolbar = NavigationToolbar(self.canvas, self)
-        unwanted_buttons = ["Back", "Forward"]
+        unwanted_buttons = ["Back", "Forward", "Save"]
         for ta in self.toolbar.actions():
             ta: QAction = ta
             if ta.text() in unwanted_buttons:
@@ -142,6 +131,30 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
                     tmp.setPixelColor(w, h, color)
             pixmap = QtGui.QPixmap.fromImage(tmp)
             ta.setIcon(QtGui.QIcon(pixmap))
+        # Add Export graph and export csv actions
+        self.graph_action = QAction(
+            "Export\nGraph",
+            parent=self.toolbar,
+            enabled=False,
+            toolTip="Save Figure as a graph (.png, .jpg, .pdf...)",
+        )
+        self.graph_action.triggered.connect(self.export_graph)
+        self.toolbar.insertAction(self.toolbar.actions()[-1], self.graph_action)
+        self.csv_action = QAction(
+            "Export\nCSV",
+            parent=self.toolbar,
+            enabled=False,
+            toolTip="Export as a CSV file",
+        )
+        self.csv_action.triggered.connect(self.export_csv)
+        self.toolbar.insertAction(self.toolbar.actions()[-1], self.csv_action)
+        # Set all toolbar actions with Pointing Hand cursor when hover
+        for widg in self.toolbar.findChildren(QtWidgets.QWidget):
+            if (
+                hasattr(widg, "defaultAction")
+                and widg.defaultAction() in self.toolbar.actions()
+            ):
+                widg.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
     def set_vertical_lines(self, xs: List[float]):
         self.vertical_lines = xs
@@ -208,6 +221,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         pass
 
     @abstractmethod
+    @QtCore.Slot()
     def export_csv(self):
         pass
 
