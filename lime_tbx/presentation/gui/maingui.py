@@ -451,6 +451,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.worker_ths = []
         self._listening_changes_combobox = True
         self.chosen_diffs = CompFields.DIFF_REL
+        self._can_export_netcdf = False
         self._build_layout()
 
     def _build_layout(self):
@@ -541,14 +542,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.stack_layout.addWidget(self.spinner)
         self.stack_layout.addWidget(self.output_stacklayw)
         self.stack_layout.setCurrentIndex(1)
-        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
-        self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.export_lglod_button.clicked.connect(self.export_to_lglod)
-        self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.top_precomp)
         self.main_layout.addWidget(self.top_postcomp)
         self.main_layout.addLayout(self.stack_layout)
-        self.main_layout.addWidget(self.export_lglod_button)
 
     def _focus_on_comp_wlen(self, focuswlen: bool):
         self.output_wlen.setVisible(focuswlen)
@@ -631,7 +627,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.spinner.set_text("Drawing graphs...")
 
     def can_save_simulation(self) -> bool:
-        return self.export_lglod_button.isEnabled()
+        return self._can_export_netcdf
+
+    def set_can_export_to_nc(self, can: bool):
+        self._can_export_netcdf = can
 
     @QtCore.Slot()
     def export_to_lglod(self) -> None:
@@ -746,7 +745,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
-        self.export_lglod_button.setEnabled(False)
+        self.set_can_export_to_nc(False)
         self.top_postcomp.setVisible(False)
         self._listening_changes_combobox = True
         self._unblock_gui()
@@ -754,7 +753,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _clear_comparison_error(self, error: Exception):
         self._unblock_gui()
         self.handle_operation_error(error)
-        self.export_lglod_button.setEnabled(False)
+        self.set_can_export_to_nc(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
 
@@ -921,7 +920,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp.check_if_range_visible()
         self._unblock_gui()
         outp.set_current_channel_index(0)
-        self.export_lglod_button.setEnabled(True)
+        self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.top_postcomp.setVisible(True)
@@ -931,7 +930,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp: output.ComparisonOutput = data[0]
         outp.check_if_range_visible()
         self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
+        self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.top_postcomp.setVisible(True)
@@ -939,7 +938,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _show_comparisons_wlen_finished(self, data):
         self._focus_on_comp_wlen(True)
         self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
+        self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.top_postcomp.setVisible(True)
@@ -954,7 +953,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def compare_error(self, error: Exception):
         self._unblock_gui()
         self.handle_operation_error(error)
-        self.export_lglod_button.setEnabled(False)
+        self.set_can_export_to_nc(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
 
@@ -986,6 +985,7 @@ class MainSimulationsWidget(
         )
         self.workers = []
         self.worker_ths = []
+        self._can_export_to_nc = False
         self._build_layout()
         self._finished_building = True
 
@@ -1049,11 +1049,6 @@ class MainSimulationsWidget(
         self.lower_tabs.addTab(self.srf_widget, "SRF")
         self.lower_tabs.addTab(self.signal_widget, "Signal")
         self.lower_tabs.currentChanged.connect(self.lower_tabs_changed)
-        # Export to LGLOD
-        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
-        self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
-        self.export_lglod_button.clicked.connect(self.export_glod)
-        self.export_lglod_button.setDisabled(True)
         self._export_lglod_button_was_disabled = True
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
@@ -1066,7 +1061,6 @@ class MainSimulationsWidget(
         self.lower_stack.addWidget(self.lower_tabs)
         self.lower_stack.setCurrentIndex(1)
         self.main_layout.addLayout(self.lower_stack, 1)
-        self.main_layout.addWidget(self.export_lglod_button)
         self.update_calculability()
 
     def _callback_set_enabled(self, enabled: bool):
@@ -1098,7 +1092,7 @@ class MainSimulationsWidget(
         self._export_lglod_button_was_disabled = True
 
     def _disable_lglod_export(self, disable: bool):
-        self.export_lglod_button.setDisabled(disable)
+        self._can_export_to_nc = not disable
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(disable)
 
@@ -1146,7 +1140,7 @@ class MainSimulationsWidget(
             self.srf_widget.update_size()
 
     def can_save_simulation(self) -> bool:
-        return self.export_lglod_button.isEnabled()
+        return self._can_export_to_nc
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):
@@ -1711,14 +1705,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def _create_actions(self):
         # File actions
         self.save_simulation_action = QAction(self)
-        self.save_simulation_action.setText(
-            "&Save simulation to LIME GLOD format file."
-        )
+        self.save_simulation_action.setText("&Save as a netCDF file.")
         self.save_simulation_action.triggered.connect(self.save_simulation)
         self.save_simulation_action.setDisabled(True)
         self.load_simulation_action = QAction(self)
         self.load_simulation_action.setText(
-            "&Load simulation file stored in a LIME GLOD format file."
+            "&Load simulation/comparison from a netCDF file."
         )
         self.load_simulation_action.triggered.connect(self.load_simulation)
         self.comparison_action = QAction(self)
@@ -1932,9 +1924,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def comparison(self):
         if not self._is_comparing:
-            self.save_simulation_action.setText(
-                "&Save comparison to LIME GLOD format file."
-            )
             self.comparison_action.setText("&Perform simulations")
             self.comparison_action.triggered.connect(self.simulations)
             lime_tbx_w = self._get_lime_widget()
@@ -1947,9 +1936,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def simulations(self):
         if self._is_comparing:
-            self.save_simulation_action.setText(
-                "&Save simulation to LIME GLOD format file."
-            )
             self.comparison_action.setText(
                 "Perform &comparisons from a remote sensing instrument"
             )

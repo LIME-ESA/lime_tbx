@@ -211,16 +211,16 @@ Results are plotted with:
 Users can export the results in multiple formats:
 
 #### Graphical Export (Image/PDF)
-- Click "EXPORT GRAPH" (bottom-left) to save the graph as an image or PDF.
+- Click "Export Graph" (top-center) to save the graph as an image or PDF.
 - A file system dialog will prompt the user to select the location, filename, and format.
 - Supported formats include JPG, PNG, PDF, and other common image formats.
 
 #### Data Export (CSV File)
-- Click "EXPORT CSV" (bottom-right) to save the simulation data as a comma-separated values (CSV) file.
+- Click "Export CSV" (top-center) to save the simulation data as a comma-separated values (CSV) file.
 - The user will be prompted to choose the location and filename.
 
 #### NetCDF Export
-- Click "EXPORT TO NETCDF" (bottom of the page) to save results as a netCDF file.
+- Go to the action menu bar and navigat to "File → Save as a netCDF file" to save results as a netCDF file.
 > **Why use netCDF?**
 > - Unlike CSV, netCDF allows LIME Toolbox to reload previous simulations for visualization.
 > - This format enables efficient data storage and retrieval.
