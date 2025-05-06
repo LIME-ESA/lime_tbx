@@ -102,6 +102,26 @@ def create_lglod_data(
             )
             for e in elrefs_cimel
         ]
+    if lime_simulation.is_aolp_updated():
+        aolp = lime_simulation.get_aolp()
+        aolp_cimel = lime_simulation.get_aolp_cimel()
+        if not isinstance(aolp_cimel, list):
+            aolp_cimel = [aolp_cimel]
+        if not isinstance(aolp, list):
+            aolp = [aolp]
+    else:
+        aolp = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs
+        ]
+        aolp_cimel = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs_cimel
+        ]
     signals = lime_simulation.get_signals()
     if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
         dts = point.dt
@@ -140,6 +160,7 @@ def create_lglod_data(
                 elis[i],
                 elrefs[i],
                 polars[i],
+                aolp[i],
                 sat_name,
                 SelenographicDataWrite(
                     md.distance_sun_moon,
@@ -203,6 +224,7 @@ def create_lglod_data(
         elis_cimel,
         elrefs_cimel,
         polars_cimel,
+        aolp_cimel,
         spectrum_name,
         skipped_uncs,
         coeff_version,

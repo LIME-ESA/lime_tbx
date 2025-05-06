@@ -254,6 +254,10 @@ _VALID_DOLP_INTERP_SPECTRA = [
     SPECTRUM_NAME_LINEAR,
 ]
 
+_VALID_AOLP_INTERP_SPECTRA = [
+    SPECTRUM_NAME_LINEAR,
+]
+
 _VALID_INTERP_SRFS = [
     SRF_NAME_GAUSSIAN_1NM_3NM,
     SRF_NAME_TRIANGULAR_1NM_1NM,
@@ -353,6 +357,23 @@ def get_dolp_interpolation_spectrum_name() -> str:
         f"Unknown interpolation spectrum found: {setts.interpolation_spectrum_polarisation}"
     )
     return _VALID_DOLP_INTERP_SPECTRA[0]
+
+
+def get_aolp_interpolation_spectrum_name() -> str:
+    """Obtains the currently chosen aolp (angle of polarisation) interpolation spectrum name.
+
+    Returns
+    -------
+    name: str
+        Currently chosen aolp interpolation spectrum name.
+    """
+    setts = _load_interp_settings()
+    if setts.interpolation_spectrum_aolp in _VALID_AOLP_INTERP_SPECTRA:
+        return setts.interpolation_spectrum_aolp
+    logger.get_logger().error(
+        f"Unknown interpolation spectrum found: {setts.interpolation_spectrum_aolp}"
+    )
+    return _VALID_AOLP_INTERP_SPECTRA[0]
 
 
 def get_available_interp_SRFs() -> List[str]:

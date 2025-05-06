@@ -9,6 +9,7 @@ from lime_tbx.common.datatypes import (
     LimeCoefficients,
     ReflectanceCoefficients,
     PolarisationCoefficients,
+    AOLPCoefficients,
 )
 from lime_tbx.common.templates import TEMPLATE_CIMEL
 from lime_tbx.common import constants
@@ -166,5 +167,14 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
         p_neg_u_data,
         p_neg_err_corr_data,
     )
+    aolp_coeff = np.array([[np.nan for _ in wlens] for _ in range(6)])
+    if "aolp_coeff" in ds.variables:
+        aolp_coeff = np.array(ds.aolp_coeff.T).astype(float)
+    unc_aolp = np.ones(aolp_coeff.shape) * 1e-6
+    _numcoefs_aolp = len(aolp_coeff)
+    err_corr_aolp = np.zeros((_numcoefs_aolp, _numcoefs_aolp))
+    np.fill_diagonal(err_corr_aolp, 1)
+    # TODO get real uncs for AOLP
+    aolp = AOLPCoefficients(wlens, aolp_coeff, unc_aolp, err_corr_aolp)
     ds.close()
-    return LimeCoefficients(rf, pol, version_name)
+    return LimeCoefficients(rf, pol, aolp, version_name)

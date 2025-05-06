@@ -442,6 +442,39 @@ def write_obs(
                 for o in obs
             ]
         )
+        aolp_spectrum = ds.createVariable(
+            "aolp_spectrum", "f8", ("number_obs", "wlens")
+        )
+        aolp_spectrum.units = "Decimal degrees"
+        aolp_spectrum.long_name = (
+            "simulated angle of linear polarisation per wavelength"
+        )
+        aolp_spectrum.valid_min = -1.0
+        aolp_spectrum.valid_max = 1.0
+        aolp_vals = np.array(
+            [
+                np.array([o.aolp.data[i] for i in range(len(obs[0].aolp.wlens))])
+                for o in obs
+            ]
+        )
+        aolp_spectrum[:] = aolp_vals
+        aolp_spectrum_unc = ds.createVariable(
+            "aolp_spectrum_unc", "f8", ("number_obs", "wlens")
+        )
+        aolp_spectrum_unc.units = "Decimal degrees"
+        aolp_spectrum_unc.long_name = (
+            "uncertainties of the simulated angle of linear polarisation per wavelength"
+        )
+        aolp_spectrum_unc.valid_min = -1.0
+        aolp_spectrum_unc.valid_max = 1.0
+        aolp_spectrum_unc[:] = np.array(
+            [
+                np.array(
+                    [o.aolp.uncertainties[i] for i in range(len(obs[0].aolp.wlens))]
+                )
+                for o in obs
+            ]
+        )
         cimel_wlens = ds.createVariable("cimel_wlens", "f8", ("wlens_cimel",))
         cimel_wlens.units = "nm"
         cimel_wlens.long_name = "CIMEL wavelengths"
@@ -485,6 +518,22 @@ def write_obs(
         polar_cimel_unc.long_name = "Uncertainties for the simulated lunar degree of polarisation for the CIMEL wavelengths."
         polar_cimel_unc[:] = np.array(
             [cimel.uncertainties for cimel in lglod.polars_cimel]
+        )
+        aolp_cimel = ds.createVariable(
+            "aolp_cimel", "f8", ("number_obs", "wlens_cimel")
+        )
+        aolp_cimel.units = "Decimal degrees"
+        aolp_cimel.long_name = (
+            "Simulated lunar angle of polarisation for the CIMEL wavelengths."
+        )
+        aolp_cimel[:] = np.array([cimel.data for cimel in lglod.aolp_cimel])
+        aolp_cimel_unc = ds.createVariable(
+            "aolp_cimel_unc", "f8", ("number_obs", "wlens_cimel")
+        )
+        aolp_cimel_unc.units = "Decimal degrees"
+        aolp_cimel_unc.long_name = "Uncertainties for the simulated lunar angle of polarisation for the CIMEL wavelengths."
+        aolp_cimel_unc[:] = np.array(
+            [cimel.uncertainties for cimel in lglod.aolp_cimel]
         )
         ds.data_source = obs[0].data_source
         ds.close()
@@ -538,6 +587,14 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     polar_spectrum_unc = [
         list(map(float, data)) for data in ds.variables["polar_spectrum_unc"][:].data
     ]
+    aolp_spectrum = aolp_spectrum_unc = [None for _ in polar_spectrum]
+    if "aolp_spectrum" in ds.variables:
+        aolp_spectrum = [
+            list(map(float, data)) for data in ds.variables["aolp_spectrum"][:].data
+        ]
+        aolp_spectrum_unc = [
+            list(map(float, data)) for data in ds.variables["aolp_spectrum_unc"][:].data
+        ]
     cimel_wlens = np.array(ds.variables["cimel_wlens"][:].data)
     irr_cimel = [list(map(float, data)) for data in ds.variables["irr_cimel"][:].data]
     irr_cimel_unc = [
@@ -552,6 +609,10 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     ]
     polar_cimel_unc = [
         list(map(float, data)) for data in ds.variables["polar_cimel_unc"][:].data
+    ]
+    aolp_cimel = [list(map(float, data)) for data in ds.variables["aolp_cimel"][:].data]
+    aolp_cimel_unc = [
+        list(map(float, data)) for data in ds.variables["aolp_cimel_unc"][:].data
     ]
     seldata = _read_selenographic_data(ds)
     obss = []
@@ -580,6 +641,12 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
             np.array(polar_spectrum_unc[i]),
             None,
         )
+        aolp = SpectralData(
+            np.array(wlens),
+            np.array(aolp_spectrum[i]),
+            np.array(aolp_spectrum_unc[i]),
+            None,
+        )
         dt = None
         if len(datetimes) > 0:
             dt = datetimes[i]
@@ -592,6 +659,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
             irrs,
             refls,
             polars,
+            aolp,
             sat_name_0,
             selenographic_data,
             data_source,
@@ -615,6 +683,12 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         )
         for i in range(len(polar_cimel))
     ]
+    aolps_cimel = [
+        SpectralData(
+            cimel_wlens, np.array(aolp_cimel[i]), np.array(aolp_cimel_unc[i]), None
+        )
+        for i in range(len(aolp_cimel))
+    ]
     return LGLODData(
         obss,
         signals,
@@ -622,6 +696,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         elis_cimel,
         elrefs_cimel,
         polars_cimel,
+        aolps_cimel,
         sp_name,
         skipped_uncs,
         vers,

@@ -59,6 +59,7 @@ from lime_tbx.common.datatypes import (
     SpectralData,
     MoonData,
     EocfiPath,
+    AOLPCoefficients,
 )
 from lime_tbx.common import logger, constants as logic_constants
 from lime_tbx.common.constants import CompFields
@@ -241,6 +242,34 @@ def polar_callback(
     )
 
 
+def aolp_callback(
+    srf: SpectralResponseFunction,
+    point: Point,
+    coeffs: PolarisationCoefficients,
+    lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
+) -> Tuple[
+    Point,
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+    Union[bool, List[bool]],
+    Union[List[MoonData], MoonData, None],
+]:
+    def_srf = get_default_srf()
+    callback_obs = lambda: signal_info.emit("another_aolp_simulated")
+    lime_simulation.update_aolp(def_srf, point, coeffs, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    return (
+        point,
+        lime_simulation.get_aolp(),
+        lime_simulation.get_aolp_cimel(),
+        lime_simulation.get_aolp_asd(),
+        lime_simulation.are_mpas_inside_mpa_range(),
+        mdas,
+    )
+
+
 def compare_callback(
     mos: List[LunarObservation],
     srf: SpectralResponseFunction,
@@ -280,12 +309,14 @@ def calculate_all_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     p_coeffs: PolarisationCoefficients,
+    aolp_coeff: AOLPCoefficients,
     lime_simulation: ILimeSimulation,
 ):
     def_srf = get_default_srf()
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     lime_simulation.update_polarisation(def_srf, point, p_coeffs)
+    lime_simulation.update_aolp(def_srf, point, aolp_coeff)
     return (point, srf)
 
 
@@ -1009,12 +1040,18 @@ class MainSimulationsWidget(
         self.elref_button = QtWidgets.QPushButton("Reflectance")
         self.elref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.elref_button.clicked.connect(self.show_elref)
-        self.polar_button = QtWidgets.QPushButton("Polarisation")
+        self.polar_button = QtWidgets.QPushButton("DoLP")
         self.polar_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.polar_button.clicked.connect(self.show_polar)
+        self.polar_button.setToolTip("Degree of Linear Polarisation")
+        self.aolp_button = QtWidgets.QPushButton("AoLP")
+        self.aolp_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.aolp_button.clicked.connect(self.show_aolp)
+        self.aolp_button.setToolTip("Angle of Linear Polarisation")
         self.buttons_layout.addWidget(self.eli_button)
         self.buttons_layout.addWidget(self.elref_button)
         self.buttons_layout.addWidget(self.polar_button)
+        self.buttons_layout.addWidget(self.aolp_button)
         # Lower tab
         self.lower_tabs = QtWidgets.QTabWidget()
         self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
@@ -1108,7 +1145,9 @@ class MainSimulationsWidget(
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
         polar_calculable = self.settings_manager.get_polar_coef().is_calculable()
+        aolp_calculable = self.settings_manager.get_aolp_coef().is_calculable()
         self.polar_button.setEnabled(calculable and polar_calculable)
+        self.aolp_button.setEnabled(calculable and aolp_calculable)
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
@@ -1408,6 +1447,78 @@ class MainSimulationsWidget(
         self.handle_operation_error(error)
         self._unblock_gui()
 
+    @QtCore.Slot()
+    def show_aolp(self):
+        """
+        Calculate and show angle of extraterrestrial lunar polarisation (AOLP) for the given input.
+        """
+        self._block_gui_loading()
+        point = self.input_widget.get_point()
+        srf = self.settings_manager.get_srf()
+        coeffs = self.settings_manager.get_aolp_coef()
+        self.quant_aolp = 1
+        self.quant_aolp_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_aolp = len(point.dt)
+        worker = CallbackWorker(
+            aolp_callback,
+            [srf, point, coeffs, self.lime_simulation],
+            True,
+        )
+        self._start_thread(worker, self.aolp_finished, self.aolp_error, self.aolp_info)
+
+    def aolp_info(self, data: str):
+        if self.quant_aolp_sim < self.quant_aolp:
+            self.loading_spinner.set_text(f"{self.quant_aolp_sim}/{self.quant_aolp}")
+            self.quant_aolp_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
+
+    def aolp_finished(
+        self,
+        data: Tuple[
+            Point,
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[bool, List[bool]],
+            Union[List[MoonData], MoonData, None],
+        ],
+    ):
+        self._unblock_gui()
+        self._set_graph_dts(data[0])
+        mpa_text = ""
+        mdas = data[5]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
+        sp_name = interp_data.get_aolp_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
+        self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mda(mdas)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
+        self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        version = self.settings_manager.get_coef_version_name()
+        is_out_mpa_range = (
+            not data[4] if not isinstance(data[4], list) else False in data[4]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        self.graph.update_labels(
+            "Lunar Angle of Linear Polarisation",
+            "Wavelengths (nm)",
+            "Angle of Linear Polarisation (°)",
+            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+        )
+        self.graph.set_inside_mpa_range(data[4])
+        self.clear_signals()
+        self.lower_tabs.setCurrentIndex(0)
+
+    def aolp_error(self, error: Exception):
+        self.handle_operation_error(error)
+        self._unblock_gui()
+
     def load_observations_finished(
         self,
         point: Point,
@@ -1423,9 +1534,10 @@ class MainSimulationsWidget(
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coef()
+        aolp_coef = self.settings_manager.get_aolp_coef()
         worker = CallbackWorker(
             calculate_all_callback,
-            [srf, point, cimel_coef, p_coeffs, self.lime_simulation],
+            [srf, point, cimel_coef, p_coeffs, aolp_coef, self.lime_simulation],
         )
         self._start_thread(
             worker, self.calculate_all_finished, self.calculate_all_error

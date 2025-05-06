@@ -22,6 +22,7 @@ from lime_tbx.common.datatypes import (
     KernelsPath,
     SurfacePoint,
     EocfiPath,
+    AOLPCoefficients,
 )
 from lime_tbx.common import constants
 from lime_tbx.business.lime_algorithms.lime import lime
@@ -169,6 +170,28 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
+    def update_aolp(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        aolp_coeff: AOLPCoefficients,
+        callback_observation: Callable = None,
+    ):
+        """
+        Updates the aolp values if the stored values are not valid, using the given parameters.
+
+        Parameters
+        ----------
+        srf: SpectralResponseFunction
+            SRF for which the aolp will be calculated.
+        point: Point
+            Point (location) for which the aolp will be calculated.
+        aolp_coeff: AOLPCoefficients
+            Coefficients used for the calculation of aolp.
+        """
+        pass
+
+    @abstractmethod
     def get_elrefs(self) -> Union[SpectralData, List[SpectralData]]:
         """
         Returns the stored value for extraterrestrial lunar reflectance
@@ -289,6 +312,42 @@ class ILimeSimulation(ABC):
         pass
 
     @abstractmethod
+    def get_aolp(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for lunar angle of linear polarisation
+
+        Returns
+        -------
+        aolp: SpectralData | list of SpectralData
+            Previously calculated polarisation angle/s
+        """
+        pass
+
+    @abstractmethod
+    def get_aolp_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for lunar angle of linear polarisation for the cimel wavelengths
+
+        Returns
+        -------
+        aolp_cimel: SpectralData | list of SpectralData
+            Previously calculated polarisation angle/s
+        """
+        pass
+
+    @abstractmethod
+    def get_aolp_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        """
+        Returns the stored value for lunar angle of linear polarisation for the asd spectrum.
+
+        Returns
+        -------
+        polars_asd: SpectralData | list of SpectralData
+            Previously calculated polarisation angle/s
+        """
+        pass
+
+    @abstractmethod
     def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
         """
         Returns the Satellites points converted to the equivalent of surface points.
@@ -401,6 +460,18 @@ class ILimeSimulation(ABC):
         """
         pass
 
+    @abstractmethod
+    def is_aolp_updated(self) -> bool:
+        """Returns if the AoLP has been updated. If not, or nothing has been executed,
+        or the spectrum doesn't contain AoLP values.
+
+        Returns
+        -------
+        aolp_uptodate: bool
+            True if the v is updated
+        """
+        pass
+
 
 class LimeSimulation(ILimeSimulation):
     """
@@ -434,6 +505,7 @@ class LimeSimulation(ILimeSimulation):
         self.elref: Union[SpectralData, List[SpectralData]] = None
         self.elis: Union[SpectralData, List[SpectralData]] = None
         self.polars: Union[SpectralData, List[SpectralData]] = None
+        self.aolp: Union[SpectralData, List[SpectralData]] = None
         self.signals: SpectralData = None
         self.elref_cimel: Union[SpectralData, List[SpectralData]] = None
         self.elref_asd: Union[SpectralData, List[SpectralData]] = None
@@ -441,12 +513,15 @@ class LimeSimulation(ILimeSimulation):
         self.elis_asd: Union[SpectralData, List[SpectralData]] = None
         self.polars_cimel: Union[SpectralData, List[SpectralData]] = None
         self.polars_asd: Union[SpectralData, List[SpectralData]] = None
+        self.aolp_cimel: Union[SpectralData, List[SpectralData]] = None
+        self.aolp_asd: Union[SpectralData, List[SpectralData]] = None
         self.srf: SpectralResponseFunction = None
         self.surfaces_of_sat: Tuple[SurfacePoint, List[SurfacePoint], None] = None
         self.point: Point = None
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
+        self.aolp_uptodate = False
         self.signals_uptodate = False
         self.srf_updtodate = False
         self.mds_uptodate = False
@@ -460,6 +535,7 @@ class LimeSimulation(ILimeSimulation):
         self.refl_uptodate = False
         self.irr_uptodate = False
         self.pol_uptodate = False
+        self.aolp_uptodate = False
         self.signals_uptodate = False
         self.srf_updtodate = False
         self.mds_uptodate = False
@@ -699,6 +775,36 @@ class LimeSimulation(ILimeSimulation):
         )
         return polar_cimel, ret_polar_asd, polar
 
+    @staticmethod
+    def _calculate_aolp_values(
+        mds: Union[MoonData, List[MoonData]],
+        aolp_coeff: AOLPCoefficients,
+        intp: SpectralInterpolation,
+        wlens: List[float],
+        skip_uncs: bool,
+        callback_observation: Callable,
+    ) -> Tuple[
+        Union[SpectralData, List[SpectralData]],
+        SpectralData,
+        Union[SpectralData, List[SpectralData]],
+    ]:
+        aolp_cimel = LimeSimulation._calculate_aolp(mds, aolp_coeff, skip_uncs)
+        if isinstance(mds, list):
+            aolp_asd = (intp.get_best_aolp_interp_reference(md) for md in mds)
+            ret_aolp_asd = intp.get_best_aolp_interp_reference(mds[0])
+        else:
+            aolp_asd = intp.get_best_aolp_interp_reference(mds)
+            ret_aolp_asd = aolp_asd
+        aolp = LimeSimulation._interpolate_aolp(
+            aolp_asd,
+            aolp_cimel,
+            intp,
+            wlens,
+            True,
+            callback_observation,
+        )
+        return aolp_cimel, ret_aolp_asd, aolp
+
     def _update_irradiance_and_reflectance(
         self,
         srf: SpectralResponseFunction,
@@ -845,6 +951,9 @@ class LimeSimulation(ILimeSimulation):
     def is_polarisation_updated(self) -> bool:
         return self.pol_uptodate
 
+    def is_aolp_updated(self) -> bool:
+        return self.aolp_uptodate
+
     def update_polarisation(
         self,
         srf: SpectralResponseFunction,
@@ -873,6 +982,35 @@ class LimeSimulation(ILimeSimulation):
             self.pol_uptodate = True
             if self.verbose:
                 print("polarisation update done")
+
+    def update_aolp(
+        self,
+        srf: SpectralResponseFunction,
+        point: Point,
+        aolp_coeff: AOLPCoefficients,
+        callback_observation: Callable = None,
+    ):
+        skip_uncs = self.is_skipping_uncs()
+        self._save_parameters(srf, point)
+        if not self.aolp_uptodate:
+            if self.verbose:
+                print("starting aolp_asd update")
+            self.aolp = self.aolp_asd = self.aolp_cimel = None
+            (
+                self.aolp_cimel,
+                self.aolp_asd,
+                self.aolp,
+            ) = LimeSimulation._calculate_aolp_values(
+                self.mds,
+                aolp_coeff,
+                self.intp,
+                self.wlens,
+                skip_uncs,
+                callback_observation,
+            )
+            self.aolp_uptodate = True
+            if self.verbose:
+                print("aolp update done")
 
     @staticmethod
     def _interpolate_refl_calc_irr_signal(
@@ -1054,6 +1192,52 @@ class LimeSimulation(ILimeSimulation):
         return specs
 
     @staticmethod
+    def _interpolate_aolp(
+        asd_data: Union[SpectralData, Iterable[SpectralData]],
+        cimel_data: Union[SpectralData, List[SpectralData]],
+        intp: SpectralInterpolation,
+        wlens: List[float],
+        skip_uncs: bool,
+        callback_observation: Callable,
+    ) -> Union[SpectralData, List[SpectralData]]:
+        is_list = isinstance(cimel_data, list)
+        if not is_list:
+            cimel_data = [cimel_data]
+            asd_data = [asd_data]  # both same length
+        specs: Union[SpectralData, List[SpectralData]] = []
+        for cf, asdd in zip(cimel_data, asd_data):
+            if callback_observation:
+                callback_observation()
+            if not skip_uncs:
+                (aolp_intp, u_aolp_intp, _,) = intp.get_interpolated_refl_unc(
+                    cf.wlens,
+                    cf.data,
+                    asdd.wlens,
+                    asdd.data,
+                    np.array(wlens),
+                    cf.uncertainties,
+                    asdd.uncertainties,
+                    cf.err_corr,
+                    asdd.err_corr,
+                )
+            else:
+                aolp_intp = intp.get_interpolated_refl(
+                    cf.wlens,
+                    cf.data,
+                    asdd.wlens,
+                    asdd.data,
+                    np.array(wlens),
+                )
+                u_aolp_intp = np.zeros(aolp_intp.shape)
+            # The Dataset is not needed later, and the corr_matrix is very big so we ignore it to save up space
+            specs.append(SpectralData(wlens, aolp_intp, u_aolp_intp, None))
+        if callback_observation:
+            callback_observation()
+        if not is_list:
+            specs = specs[0]
+        return specs
+
+    @staticmethod
     def _calculate_elref(
         mds: Union[MoonData, List[MoonData]],
         cimel_coeff: ReflectanceCoefficients,
@@ -1120,6 +1304,22 @@ class LimeSimulation(ILimeSimulation):
                 specs.append(spectral_data)
         return specs
 
+    @staticmethod
+    def _calculate_aolp(
+        mds: Union[MoonData, List[MoonData]],
+        aolp_coeff: AOLPCoefficients,
+        skip_uncs: bool,
+    ) -> Union[SpectralData, List[SpectralData]]:
+        al = dolp.AOLP()
+        if not isinstance(mds, list):
+            return al.get_aolp(mds.mpa_degrees, aolp_coeff, skip_uncs)
+        else:
+            specs = []
+            for m in mds:
+                spectral_data = al.get_aolp(m.mpa_degrees, aolp_coeff, skip_uncs)
+                specs.append(spectral_data)
+        return specs
+
     def _calculate_eli_from_elref_and_integrate(
         self,
         mds: Union[MoonData, List[MoonData]],
@@ -1170,6 +1370,9 @@ class LimeSimulation(ILimeSimulation):
         self.polars = [obs.polars for obs in obss]
         self.polars_cimel = lglod.polars_cimel
         self.polars_asd = None
+        self.aolp = [obs.aolp for obs in obss]
+        self.aolp_cimel = lglod.aolp_cimel
+        self.aolp_asd = None
         self._skip_uncs = lglod.skipped_uncs
         if obss[0].dt == None:
             dts = []
@@ -1241,6 +1444,7 @@ class LimeSimulation(ILimeSimulation):
         self.refl_uptodate = True
         self.irr_uptodate = True
         self.pol_uptodate = True
+        self.aolp_uptodate = True
         self.signals_uptodate = True
         if self.verbose:
             print("observations loaded")
@@ -1280,6 +1484,17 @@ class LimeSimulation(ILimeSimulation):
         if not self.settings_manager.is_show_interp_spectrum():
             return None
         return self.polars_asd
+
+    def get_aolp(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.aolp
+
+    def get_aolp_cimel(self) -> Union[SpectralData, List[SpectralData]]:
+        return self.aolp_cimel
+
+    def get_aolp_asd(self) -> Union[SpectralData, List[SpectralData]]:
+        if not self.settings_manager.is_show_interp_spectrum():
+            return None
+        return self.aolp_asd
 
     def get_surfacepoints(self) -> Union[SurfacePoint, List[SurfacePoint], None]:
         return self.surfaces_of_sat
