@@ -548,12 +548,13 @@ class TestCLI(unittest.TestCase):
         path_refl = "./test_files/cli/proba_refl.test.csv"
         path_irr = "./test_files/cli/proba_irr.test.csv"
         path_polar = "./test_files/cli/proba_polar.test.csv"
+        path_aolp = "./test_files/cli/proba_aolp.test.csv"
         path_integrated = "./test_files/cli/proba_integrated.test.csv"
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o csv,{},{},{},{}".format(
-                    path_refl, path_irr, path_polar, path_integrated
+                "-s PROBA-V,2020-01-20T02:00:00 -o csv,{},{},{},{},{}".format(
+                    path_refl, path_irr, path_polar, path_aolp, path_integrated
                 )
             )
         )
