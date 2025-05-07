@@ -131,9 +131,9 @@ def print_help():
     imsel = "(" + "|".join(IMAGE_EXTENSIONS) + ")"
     compdiffsel = "(" + "|".join(COMP_DIFF_KEYS) + ")"
     print(
-        "The lime toolbox performs simulations of lunar irradiance, reflectance and \
-polarisation for a given point and datetime. It also performs comparisons for some given \
-observations files in GLOD format.\n"
+        "The lime toolbox performs simulations of lunar irradiance, reflectance and both \
+degree and angle of linear polarisation for a given point and datetime. It also performs \
+comparisons for some given observations files in GLOD format.\n"
     )
     print("It won't work unless given only one of the options (-h|-e|-l|-s|-c).")
     print("")
@@ -156,8 +156,8 @@ selen_sun_lon,moon_phase_angle"
     print('\t\t\t -c "input_glod1.nc input_glod2.nc ..."')
     print("  -o, --output\t\t Select the output path and format.")
     print("\t\t\t If it's a simulation:")
-    print(f"\t\t\t   GRAPH: -o graph,{imsel},refl,irr,polar")
-    print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv")
+    print(f"\t\t\t   GRAPH: -o graph,{imsel},refl,irr,dolp,aolp")
+    print("\t\t\t   CSV: -o csv,refl.csv,irr.csv,dolp.csv,aolp.csv,integrated_irr.csv")
     print("\t\t\t   LGLOD (netcdf): -o nc,output_lglod.nc")
     print("\t\t\t If it's a comparison:")
     print(f"\t\t\t   GRAPH: -o graph,{imsel},{compsel},{compdiffsel},output")
@@ -383,10 +383,14 @@ def _parse_output_params(arg: str, is_comparison: bool) -> export.ExportData:
     o_type = splitted[0]
     if o_type == "csv":
         if not is_comparison:
-            if len(splitted) != 5:
+            if len(splitted) != 6:
                 raise ParsingError("Error: Wrong number of arguments for -o csv,...")
             export_data = export.ExportCSV(
-                splitted[1], splitted[2], splitted[3], splitted[4]
+                splitted[1],
+                splitted[2],
+                splitted[3],
+                splitted[4],
+                splitted[5],
             )
         else:
             if len(splitted) < 4:
@@ -398,7 +402,7 @@ def _parse_output_params(arg: str, is_comparison: bool) -> export.ExportData:
             )
     elif o_type == "graph":
         if not is_comparison:
-            if len(splitted) != 5:
+            if len(splitted) != 6:
                 raise ParsingError("Error: Wrong number of arguments for -o graph,...")
             filepaths = _parse_filepaths_from_img_extension(splitted[1], splitted[2:])
             export_data = export.ExportGraph(*filepaths)
@@ -558,8 +562,8 @@ class CLI:
             def_srf, point, self.settings_manager.get_cimel_coef()
         )
 
-    def _calculate_polarisation(self, point: Point):
-        """Calculates lunar polarization at a given point.
+    def _calculate_dolp(self, point: Point):
+        """Calculates degree of lunar linear polarisation at a given point.
 
         Parameters
         ----------
@@ -569,6 +573,19 @@ class CLI:
         def_srf = get_default_srf()
         self.lime_simulation.update_polarisation(
             def_srf, point, self.settings_manager.get_polar_coef()
+        )
+
+    def _calculate_aolp(self, point: Point):
+        """Calculates angle of lunar linear polarisation at a given point.
+
+        Parameters
+        ----------
+        point : Point
+            The geographic, lunar, or satellite location for the simulation.
+        """
+        def_srf = get_default_srf()
+        self.lime_simulation.update_aolp(
+            def_srf, point, self.settings_manager.get_aolp_coef()
         )
 
     def _calculate_all(self, point: Point):
@@ -582,7 +599,8 @@ class CLI:
         """
         self._calculate_reflectance(point)
         self._calculate_irradiance(point)
-        self._calculate_polarisation(point)
+        self._calculate_dolp(point)
+        self._calculate_aolp(point)
 
     def calculate_geographic(
         self,

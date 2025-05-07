@@ -341,6 +341,9 @@ class SettingsManager(ISettingsManager):
     def get_selected_polar_spectrum_name(self) -> str:
         return interp_data.get_dolp_interpolation_spectrum_name()
 
+    def get_selected_aolp_spectrum_name(self) -> str:
+        return interp_data.get_aolp_interpolation_spectrum_name()
+
     def select_interp_spectrum(self, name: str):
         interp_data.set_interpolation_spectrum_name(name)
 
