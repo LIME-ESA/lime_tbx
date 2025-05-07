@@ -198,6 +198,7 @@ def create_lglod_data(
                 elis[0],
                 elrefs[0],
                 polars[0],
+                aolp[0],
                 sat_name,
                 SelenographicDataWrite(
                     point.distance_sun_moon,
