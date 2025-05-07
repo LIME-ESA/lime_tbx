@@ -588,14 +588,6 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     polar_spectrum_unc = [
         list(map(float, data)) for data in ds.variables["polar_spectrum_unc"][:].data
     ]
-    aolp_spectrum = aolp_spectrum_unc = [None for _ in polar_spectrum]
-    if "aolp_spectrum" in ds.variables:
-        aolp_spectrum = [
-            list(map(float, data)) for data in ds.variables["aolp_spectrum"][:].data
-        ]
-        aolp_spectrum_unc = [
-            list(map(float, data)) for data in ds.variables["aolp_spectrum_unc"][:].data
-        ]
     cimel_wlens = np.array(ds.variables["cimel_wlens"][:].data)
     irr_cimel = [list(map(float, data)) for data in ds.variables["irr_cimel"][:].data]
     irr_cimel_unc = [
@@ -611,15 +603,28 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     polar_cimel_unc = [
         list(map(float, data)) for data in ds.variables["polar_cimel_unc"][:].data
     ]
-    aolp_cimel = [list(map(float, data)) for data in ds.variables["aolp_cimel"][:].data]
-    aolp_cimel_unc = [
-        list(map(float, data)) for data in ds.variables["aolp_cimel_unc"][:].data
-    ]
+    aolp_spectrum = aolp_spectrum_unc = [[None for _ in p] for p in polar_spectrum]
+    aolp_cimel = aolp_cimel_unc = [[None for _ in p] for p in polar_cimel]
+    if "aolp_spectrum" in ds.variables:
+        aolp_spectrum = [
+            list(map(float, data)) for data in ds.variables["aolp_spectrum"][:].data
+        ]
+        aolp_spectrum_unc = [
+            list(map(float, data)) for data in ds.variables["aolp_spectrum_unc"][:].data
+        ]
+        aolp_cimel = [
+            list(map(float, data)) for data in ds.variables["aolp_cimel"][:].data
+        ]
+        aolp_cimel_unc = [
+            list(map(float, data)) for data in ds.variables["aolp_cimel_unc"][:].data
+        ]
     seldata = _read_selenographic_data(ds)
     obss = []
     sp_name = ds.spectrum_name
     dolp_sp_name = ds.polarisation_spectrum_name
-    aolp_sp_name = ds.aolp_spectrum_name
+    aolp_sp_name = ""
+    if "aolp_spectrum_name" in ds.ncattrs():
+        aolp_sp_name = ds.aolp_spectrum_name
     data_source = ds.data_source
     skipped_uncs = bool(ds.skipped_uncertainties)
     vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
