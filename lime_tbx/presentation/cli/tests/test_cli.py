@@ -408,7 +408,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,ascii,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,ascii,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test,test_files/cli/proba_aolp.test"
             )
         )
         self.assertEqual(errcode, 1)
