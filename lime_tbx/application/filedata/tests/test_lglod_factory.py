@@ -47,11 +47,13 @@ class TestLGLODFactory(unittest.TestCase):
             KERNELS_PATH,
             "test",
             "testp",
+            "testa",
             "test",
             mdas,
         )
         self.assertEqual(lglod.spectrum_name, "test")
         self.assertEqual(lglod.dolp_spectrum_name, "testp")
+        self.assertEqual(lglod.aolp_spectrum_name, "testa")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data
         )
@@ -72,11 +74,13 @@ class TestLGLODFactory(unittest.TestCase):
             KERNELS_PATH,
             "test",
             "testp",
+            "testa",
             "test",
             mdas,
         )
         self.assertEqual(lglod.spectrum_name, "test")
         self.assertEqual(lglod.dolp_spectrum_name, "testp")
+        self.assertEqual(lglod.aolp_spectrum_name, "testa")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data
         )
@@ -95,11 +99,13 @@ class TestLGLODFactory(unittest.TestCase):
             KERNELS_PATH,
             "test",
             "testp",
+            "testa",
             "test",
             mdas,
         )
         self.assertEqual(lglod.spectrum_name, "test")
         self.assertEqual(lglod.dolp_spectrum_name, "testp")
+        self.assertEqual(lglod.aolp_spectrum_name, "testa")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data
         )

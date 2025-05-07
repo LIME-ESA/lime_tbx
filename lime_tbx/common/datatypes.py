@@ -1040,7 +1040,9 @@ class LGLODData:
     skipped_uncs: bool
         Flag that indicates if the uncertainties calculation was skipped or not.
     dolp_spectrum_name: str
-        Name of the spectrum used for polarisation interpolation.
+        Name of the spectrum used for degree of linear polarisation interpolation.
+    aolp_spectrum_name: str
+        Name of the spectrum used for angle of linear polarisation interpolation.
     """
 
     observations: List[LunarObservationWrite]
@@ -1054,6 +1056,7 @@ class LGLODData:
     skipped_uncs: bool
     version: str
     dolp_spectrum_name: str
+    aolp_spectrum_name: str
 
 
 @dataclass

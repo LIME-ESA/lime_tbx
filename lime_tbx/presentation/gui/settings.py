@@ -112,7 +112,12 @@ class ISettingsManager(ABC):
 
     @abstractmethod
     def get_selected_polar_spectrum_name(self) -> str:
-        """Obtain the currently selected polarisation interpolation spectrum name"""
+        """Obtain the currently selected degree of polarisation interpolation spectrum name"""
+        pass
+
+    @abstractmethod
+    def get_selected_aolp_spectrum_name(self) -> str:
+        """Obtain the currently selected angle of polarisation interpolation spectrum name"""
         pass
 
     @abstractmethod

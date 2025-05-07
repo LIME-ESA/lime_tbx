@@ -324,6 +324,7 @@ def write_obs(
             lglod, path, dt, sim_data, inside_mpa_range, seldata
         )
         ds.polarisation_spectrum_name = lglod.dolp_spectrum_name
+        ds.aolp_spectrum_name = lglod.aolp_spectrum_name
         ds.is_comparison = 0
         # dims
         wlens_dim = ds.createDimension("wlens", len(obs[0].irrs.wlens))
@@ -618,6 +619,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     obss = []
     sp_name = ds.spectrum_name
     dolp_sp_name = ds.polarisation_spectrum_name
+    aolp_sp_name = ds.aolp_spectrum_name
     data_source = ds.data_source
     skipped_uncs = bool(ds.skipped_uncertainties)
     vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
@@ -701,6 +703,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
         skipped_uncs,
         vers,
         dolp_sp_name,
+        aolp_sp_name,
     )
 
 

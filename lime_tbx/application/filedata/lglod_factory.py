@@ -40,6 +40,7 @@ def create_lglod_data(
     kernels_path: KernelsPath,
     spectrum_name: str,
     dolp_spectrum_name: str,
+    aolp_spectrum_name: str,
     coeff_version: str,
     mdas: Union[MoonData, List[MoonData]],
 ) -> LGLODData:
@@ -56,6 +57,8 @@ def create_lglod_data(
         Name of the spectrum used to interpolate Reflectance & Irradiance ('ASD', 'linear')
     dolp_spectrum_name: str
         Name of the spectrum used to interpolate DoLP (usually 'linear')
+    aolp_spectrum_name: str
+        Name of the spectrum used to interpolate AoLP (usually 'linear')
     coeff_version: str
         Coefficients version name
 
@@ -230,4 +233,5 @@ def create_lglod_data(
         skipped_uncs,
         coeff_version,
         dolp_spectrum_name,
+        aolp_spectrum_name,
     )

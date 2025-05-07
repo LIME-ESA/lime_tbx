@@ -374,6 +374,7 @@ class CLIExporter:
         """
         sp_name = self.settings_manager.get_selected_spectrum_name()
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
+        aolp_sp_name = self.settings_manager.get_selected_aolp_spectrum_name()
         version = self.settings_manager.get_lime_coef().version
         mds = self.lime_simulation.get_moon_datas()
         if not isinstance(mds, list):
@@ -385,6 +386,7 @@ class CLIExporter:
             self.kernels_path,
             sp_name,
             dolp_sp_name,
+            aolp_sp_name,
             version,
             mds,
         )
