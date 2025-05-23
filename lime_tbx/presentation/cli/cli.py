@@ -1204,7 +1204,7 @@ Run 'lime -h' for help."
                     params = list(map(float, params_str[:3]))
                     lat = params[0]
                     lon = params[1]
-                    height = params[2] / 1000
+                    height = params[2] * 1000
                     if timeseries is not None:
                         dt = timeseries
                     else:
