@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Added
+
+- Improved export buttons placement: Export buttons have been repositioned to enhance user experience
+by reducing screen clutter and allowing more space for the output graph and data display.
+  - `Export Graph` and `Export CSV` are now available directly on the plot toolbar.
+  - `Export netCDF` button has been removed, but the functionality remains accessible via
+  "File → Save as a netCDF file" in the context menu.
+- Responsive Layout for Selenographic Input: When the window is wide enough, the Selenographic input fields
+are automatically rearranged in 3 columns × 2 rows instead of the previous fixed 2 rows × 3 columns. This improves space
+efficiency, leaving more room for the output graph and data display.
+
+### Fixed
+
+- Closing the `LOAD FILE` dialog without selecting a new file, after having previously loaded one,
+cause the GUI to incorrectly show the previous file as still loaded. The file now does remain loaded
+correctly in such cases.
+
 ## [1.1.0] - 2025-04-21
 
 ### Added
