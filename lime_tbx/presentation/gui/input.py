@@ -819,8 +819,8 @@ class AddSatDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def load_datafile(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        self.loaded_path = path
-        if path != "":
+        if path:
+            self.loaded_path = path
             if len(path) > 3:
                 if path[-4:].upper() in (".OSF", ".EOF", ".EEF"):
                     self._load_osf(path)
