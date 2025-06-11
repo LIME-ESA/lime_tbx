@@ -168,15 +168,12 @@ def read_coeff_nc(path: str) -> LimeCoefficients:
         p_neg_err_corr_data,
     )
     aolp_coeff = np.array([[np.nan for _ in wlens] for _ in range(6)])
+    unc_aolp = np.array([[np.nan for _ in wlens] for _ in range(6)])
+    err_corr_aolp = np.ones((len(unc_aolp), len(unc_aolp)))
     if "aolp_coeff" in ds.variables:
         aolp_coeff = np.array(ds.aolp_coeff.T).astype(float)
-    # TODO actually read unc_aolp
-    unc_aolp = np.ones(aolp_coeff.shape) * 1e-9
-    unc_aolp[:, 0] = 1
-    _numcoefs_aolp = len(aolp_coeff)
-    err_corr_aolp = np.ones((_numcoefs_aolp, _numcoefs_aolp)) * 1e-8
-    np.fill_diagonal(err_corr_aolp, 1)
-    # TODO get real uncs for AOLP
+        unc_aolp = np.array(ds.u_aolp_coeff.T).astype(float)
+        err_corr_aolp = np.array(ds.err_corr_aolp_coeff).astype(float)
     aolp = AOLPCoefficients(wlens, aolp_coeff, unc_aolp, err_corr_aolp)
     ds.close()
     return LimeCoefficients(rf, pol, aolp, version_name)
