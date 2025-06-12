@@ -26,7 +26,7 @@ from lime_tbx.common.datatypes import (
 )
 from lime_tbx.common import constants
 from lime_tbx.business.lime_algorithms.lime import lime
-from lime_tbx.business.lime_algorithms.dolp import dolp
+from lime_tbx.business.lime_algorithms import polar
 from lime_tbx.business.interpolation.spectral_interpolation.spectral_interpolation import (
     SpectralInterpolation,
 )
@@ -1294,7 +1294,7 @@ class LimeSimulation(ILimeSimulation):
         polar_coeff: PolarisationCoefficients,
         skip_uncs: bool,
     ) -> Union[SpectralData, List[SpectralData]]:
-        dl = dolp.DOLP()
+        dl = polar.dolp.DOLP()
         if not isinstance(mds, list):
             return dl.get_polarized(mds.mpa_degrees, polar_coeff, skip_uncs)
         else:
@@ -1310,7 +1310,7 @@ class LimeSimulation(ILimeSimulation):
         aolp_coeff: AOLPCoefficients,
         skip_uncs: bool,
     ) -> Union[SpectralData, List[SpectralData]]:
-        al = dolp.AOLP()
+        al = polar.aolp.AOLP()
         if not isinstance(mds, list):
             return al.get_aolp(mds.mpa_degrees, aolp_coeff, skip_uncs)
         else:
