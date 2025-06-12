@@ -189,7 +189,8 @@ The simulation results are displayed below the input section.
 Users can select one of the following button to run simulations and view results:
 - **"IRRADIANCE"** – Displays irradiance results.
 - **"REFLECTANCE"** – Shows reflectance results.
-- **"POLARIZATION"** – Visualizes Degree of Lunar Polarisation (DoLP).
+- **"DOLP"** – Visualises the Degree of Linear Polarisation (DoLP).
+- **"AOLP"** – Visualises the Angle of Linear Polarisation (AoLP).
 
 These buttons are positioned between the input and the output, as shown on top of [Figure 12](#fig-12).
 
