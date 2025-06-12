@@ -1,6 +1,7 @@
 # Simulations
 
-LIME Toolbox allows users to simulate lunar reflectance, irradiance, and the degree of linear polarisation (DoLP).
+LIME Toolbox allows users to simulate lunar reflectance, irradiance, the degree of linear polarisation (DoLP),
+and the angle of linear polarisation (AoLP).
 Simulations are performed using the Simulation page ([Figure 6](#fig-6)), which is the default view when
 launching LIME Toolbox.
 
@@ -236,21 +237,21 @@ based on the desired output type.
 #### Graphical Export (Image/PDF)
 Specify the image type, paths and filenames of each graph:
 ```sh
--o graph,(pdf|jpg|png|svg),reflectance_path,irradiance_path,polarisation_path
+-o graph,(pdf|jpg|png|svg),reflectance_path,irradiance_path,dolp_path,aolp_path
 ```
 For example:
 ```sh
--o graph,jpg,reflectance.jpg,irradiance.jpg,polarisation.jpg
+-o graph,jpg,reflectance.jpg,irradiance.jpg,dolp.jpg,aolp.jpg
 ```
 
 #### Data Export (CSV File)
 Specify paths and names of each file:
 ```sh
--o csv,reflectance_path,irradiance_path,polarization_path,integrated_irradiance_path
+-o csv,reflectance_path,irradiance_path,dolp_path,aolp_path,integrated_irradiance_path
 ```
 For example:
 ```sh
--o csv,reflectance.csv,irradiance.csv,polarization.csv,integrated_irradiance.csv
+-o csv,reflectance.csv,irradiance.csv,dolp.csv,aolp.csv,integrated_irradiance.csv
 ```
 
 #### NetCDF Export
