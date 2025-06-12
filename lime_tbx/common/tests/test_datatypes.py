@@ -307,6 +307,7 @@ class TestLunarObservationWrite(unittest.TestCase):
             irrs,
             refls,
             polars,
+            polars,
             None,
             None,
             "Test",

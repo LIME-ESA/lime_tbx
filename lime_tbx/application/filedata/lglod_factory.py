@@ -40,6 +40,7 @@ def create_lglod_data(
     kernels_path: KernelsPath,
     spectrum_name: str,
     dolp_spectrum_name: str,
+    aolp_spectrum_name: str,
     coeff_version: str,
     mdas: Union[MoonData, List[MoonData]],
 ) -> LGLODData:
@@ -56,6 +57,8 @@ def create_lglod_data(
         Name of the spectrum used to interpolate Reflectance & Irradiance ('ASD', 'linear')
     dolp_spectrum_name: str
         Name of the spectrum used to interpolate DoLP (usually 'linear')
+    aolp_spectrum_name: str
+        Name of the spectrum used to interpolate AoLP (usually 'linear')
     coeff_version: str
         Coefficients version name
 
@@ -102,6 +105,26 @@ def create_lglod_data(
             )
             for e in elrefs_cimel
         ]
+    if lime_simulation.is_aolp_updated():
+        aolp = lime_simulation.get_aolp()
+        aolp_cimel = lime_simulation.get_aolp_cimel()
+        if not isinstance(aolp_cimel, list):
+            aolp_cimel = [aolp_cimel]
+        if not isinstance(aolp, list):
+            aolp = [aolp]
+    else:
+        aolp = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs
+        ]
+        aolp_cimel = [
+            SpectralData(
+                e.wlens, np.zeros(e.data.shape), np.zeros(e.uncertainties.shape), None
+            )
+            for e in elrefs_cimel
+        ]
     signals = lime_simulation.get_signals()
     if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
         dts = point.dt
@@ -140,6 +163,7 @@ def create_lglod_data(
                 elis[i],
                 elrefs[i],
                 polars[i],
+                aolp[i],
                 sat_name,
                 SelenographicDataWrite(
                     md.distance_sun_moon,
@@ -177,6 +201,7 @@ def create_lglod_data(
                 elis[0],
                 elrefs[0],
                 polars[0],
+                aolp[0],
                 sat_name,
                 SelenographicDataWrite(
                     point.distance_sun_moon,
@@ -203,8 +228,10 @@ def create_lglod_data(
         elis_cimel,
         elrefs_cimel,
         polars_cimel,
+        aolp_cimel,
         spectrum_name,
         skipped_uncs,
         coeff_version,
         dolp_spectrum_name,
+        aolp_spectrum_name,
     )

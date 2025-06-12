@@ -12,6 +12,7 @@ import numpy as np
 from lime_tbx.common.datatypes import (
     LimeCoefficients,
     PolarisationCoefficients,
+    AOLPCoefficients,
     SRFChannel,
     SpectralResponseFunction,
     ReflectanceCoefficients,
@@ -47,6 +48,11 @@ class ISettingsManager(ABC):
     @abstractmethod
     def get_polar_coef(self) -> PolarisationCoefficients:
         """Obtain the current PolarisationCoefficients chosen by the user."""
+        pass
+
+    @abstractmethod
+    def get_aolp_coef(self) -> AOLPCoefficients:
+        """Obtain the current AOLPCoefficients chosen by the user."""
         pass
 
     @abstractmethod
@@ -106,7 +112,12 @@ class ISettingsManager(ABC):
 
     @abstractmethod
     def get_selected_polar_spectrum_name(self) -> str:
-        """Obtain the currently selected polarisation interpolation spectrum name"""
+        """Obtain the currently selected degree of polarisation interpolation spectrum name"""
+        pass
+
+    @abstractmethod
+    def get_selected_aolp_spectrum_name(self) -> str:
+        """Obtain the currently selected angle of polarisation interpolation spectrum name"""
         pass
 
     @abstractmethod
@@ -267,6 +278,7 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
         self.polar_coeff = self.coeffs[index].polarisation
+        self.aolp_coeff = self.coeffs[index].aolp
         self.coef_version_name = None
 
     def get_default_srf(self) -> SpectralResponseFunction:
@@ -277,6 +289,9 @@ class SettingsManager(ISettingsManager):
 
     def get_polar_coef(self) -> PolarisationCoefficients:
         return self.polar_coeff
+
+    def get_aolp_coef(self) -> AOLPCoefficients:
+        return self.aolp_coeff
 
     def load_srf(self, srf: SpectralResponseFunction):
         self.srfs.append(srf)
@@ -300,6 +315,7 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[index]
         self.cimel_coeff = self.coeffs[index].reflectance
         self.polar_coeff = self.coeffs[index].polarisation
+        self.aolp_coeff = self.coeffs[index].aolp
         access_data.set_previously_selected_version(self.coeff.version)
 
     def reload_coeffs(self) -> None:
@@ -307,6 +323,7 @@ class SettingsManager(ISettingsManager):
         self.coeff = self.coeffs[-1]
         self.cimel_coeff = self.coeffs[-1].reflectance
         self.polar_coeff = self.coeffs[-1].polarisation
+        self.aolp_coeff = self.coeffs[-1].aolp
 
     def get_available_interp_SRFs(self) -> List[str]:
         return interp_data.get_available_interp_SRFs()
@@ -328,6 +345,9 @@ class SettingsManager(ISettingsManager):
 
     def get_selected_polar_spectrum_name(self) -> str:
         return interp_data.get_dolp_interpolation_spectrum_name()
+
+    def get_selected_aolp_spectrum_name(self) -> str:
+        return interp_data.get_aolp_interpolation_spectrum_name()
 
     def select_interp_spectrum(self, name: str):
         interp_data.set_interpolation_spectrum_name(name)

@@ -546,6 +546,26 @@ class ReflectanceCoefficients:
         self.err_corr_coeff = _ds.err_corr_coeff.values
 
 
+class AOLPCoefficients:
+    def __init__(
+        self,
+        wavelengths: List[float],
+        aolp_coeff: List[List[float]],
+        unc_coeff: List[List[float]],
+        err_corr_data: List[List[float]],
+    ):
+        self.wlens = wavelengths
+        self.aolp_coeff = aolp_coeff
+        self.unc_coeff = unc_coeff
+        self.err_corr_data = err_corr_data
+
+    def get_wavelengths(self) -> List[float]:
+        return self.wlens
+
+    def is_calculable(self):
+        return not np.isnan(self.aolp_coeff).any()
+
+
 class PolarisationCoefficients:
     """
     Coefficients used in the DoLP algorithm.
@@ -652,6 +672,7 @@ class LimeCoefficients:
 
     reflectance: ReflectanceCoefficients
     polarisation: PolarisationCoefficients
+    aolp: AOLPCoefficients
     version: str
 
 
@@ -956,6 +977,8 @@ class LunarObservationWrite:
         Reflectance data
     polars: SpectralData
         Polarisation data
+    aolp: SpectralData
+        AoLP data
     sat_name: str | None
         Name of the satellite. If None or empty, then it's a SurfacePoint
     selenographic_data: SelenographicDataWrite | None
@@ -972,6 +995,7 @@ class LunarObservationWrite:
     irrs: "SpectralData"
     refls: "SpectralData"
     polars: "SpectralData"
+    aolp: "SpectralData"
     sat_name: str
     selenographic_data: SelenographicDataWrite
     data_source: str
@@ -1009,12 +1033,16 @@ class LGLODData:
         Reflectance for the cimel.
     polars_cimel: list of SpectralData
         Polarisation for the cimel.
+    aolp_cimel: list of SpectralData
+        AoLP for the cimel.
     spectrum_name: str
         Name of the spectrum used for interpolation.
     skipped_uncs: bool
         Flag that indicates if the uncertainties calculation was skipped or not.
     dolp_spectrum_name: str
-        Name of the spectrum used for polarisation interpolation.
+        Name of the spectrum used for degree of linear polarisation interpolation.
+    aolp_spectrum_name: str
+        Name of the spectrum used for angle of linear polarisation interpolation.
     """
 
     observations: List[LunarObservationWrite]
@@ -1023,10 +1051,12 @@ class LGLODData:
     elis_cimel: List["SpectralData"]
     elrefs_cimel: List["SpectralData"]
     polars_cimel: List["SpectralData"]
+    aolp_cimel: List["SpectralData"]
     spectrum_name: str
     skipped_uncs: bool
     version: str
     dolp_spectrum_name: str
+    aolp_spectrum_name: str
 
 
 @dataclass
@@ -1072,6 +1102,8 @@ class InterpolationSettings:
         Name (and id) of the spectrum used for interpolation.
     interpolation_spectrum_polarisation: str
         Name (and id) of the spectrum used for interpolation for polarisation.
+    interpolation_spectrum_aolp: str
+        Name (and id) of the spectrum used for interpolation for angle of polarisation.
     interpolation_SRF: str
         Name (and id) of the spectrum used for SRF interpolation.
     show_interp_spectrum: bool
@@ -1084,6 +1116,7 @@ class InterpolationSettings:
 
     interpolation_spectrum: str
     interpolation_spectrum_polarisation: str
+    interpolation_spectrum_aolp: str
     interpolation_SRF: str
     show_cimel_points: bool
     show_interp_spectrum: bool

@@ -21,16 +21,12 @@ import numpy as np
 import punpy
 
 """___LIME TBX Modules___"""
-from lime_tbx.common.datatypes import PolarisationCoefficients, SpectralData
+from lime_tbx.common.datatypes import (
+    PolarisationCoefficients,
+    SpectralData,
+    AOLPCoefficients,
+)
 from lime_tbx.common import constants
-
-
-"""___Authorship___"""
-__author__ = "Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano"
-__created__ = "01/02/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
 
 
 class IDOLP(ABC):
