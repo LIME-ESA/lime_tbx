@@ -19,7 +19,7 @@ from lime_tbx.common.datatypes import (
 )
 from lime_tbx.business.spectral_integration.spectral_integration import get_default_srf
 from lime_tbx.business.lime_algorithms.lime.tests.test_elref import get_coeffs
-from lime_tbx.business.lime_algorithms.dolp.tests.test_dolp import POL_COEFFS
+from lime_tbx.business.lime_algorithms.polar.tests.test_dolp import POL_COEFFS
 from lime_tbx.presentation.gui.settings import SettingsManager
 
 EOCFI_PATH = EocfiPath("eocfi_data", "eocfi_data2")

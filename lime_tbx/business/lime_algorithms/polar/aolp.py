@@ -1,12 +1,11 @@
 """
 This module calculates the extra-terrestrial lunar disk angle of polarisation.
 
-It exports the following classes:
-    * IDOLP - Interface that contains the methods of this module.
-    * DOLP - Class that implements the methods exported by this module.
+It exports the following class:
+    * AOLP - Class that implements the methods exported by this module.
 
 It follows equations described in the following documents:
-- Lunar irradiance model algorithm and theoretical basis document D7.
+- Lunar irradiance model algorithm and theoretical basis document D5.
 """
 
 """___Built-In Modules___"""
