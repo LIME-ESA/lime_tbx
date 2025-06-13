@@ -989,12 +989,6 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         window.set_save_simulation_action_disabled(True)
 
 
-_WARN_POLAR_PRELIMINARY = (
-    "Disclaimer",
-    "Polarisation values are preliminary and may be updated.",
-)
-
-
 class MainSimulationsWidget(
     QtWidgets.QWidget, IMainSimulationsWidget, metaclass=noconflict_makecls()
 ):
@@ -1445,7 +1439,7 @@ class MainSimulationsWidget(
             "Wavelengths (nm)",
             "Degree of Linear Polarisation (%)",
             subtitle=subtitle,
-            extra_attrs=[_WARN_POLAR_PRELIMINARY],
+            extra_attrs=[constants._WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
@@ -1519,7 +1513,7 @@ class MainSimulationsWidget(
             "Wavelengths (nm)",
             "Angle of Linear Polarisation (°)",
             subtitle=subtitle,
-            extra_attrs=[_WARN_POLAR_PRELIMINARY],
+            extra_attrs=[constants._WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()

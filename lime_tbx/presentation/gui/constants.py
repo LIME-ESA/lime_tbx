@@ -16,3 +16,7 @@ LIME_SPECTRUM_LIMIT_LABEL = "LIME Spectrum limit"
 INTERPOLATED_DATA_LABEL = "Interpolated spectrum"
 ERRORBARS_LABEL = "Uncertainty (k=2)"
 CIMEL_POINT_LABEL = "Model output at CIMEL channels"
+_WARN_POLAR_PRELIMINARY = (
+    "Disclaimer",
+    "Polarisation values are preliminary and may be updated.",
+)
