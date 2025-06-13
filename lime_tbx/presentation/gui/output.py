@@ -186,8 +186,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         self.ylabel = ylabel
         if subtitle != None:
             self.subtitle = subtitle
-        if extra_attrs is not None:
-            self.extra_attrs = extra_attrs
+        self.extra_attrs = extra_attrs
         if self.is_built:
             self._update_labels(redraw)
         else:
