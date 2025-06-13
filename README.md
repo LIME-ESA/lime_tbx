@@ -151,7 +151,7 @@ to fully explore the capabilities of the toolbox.
 
 ## Roadmap
 
-- [ ] New feature: Simulate Angle of Lunar Polarisation (AoLP)
+- [x] New feature: Simulate Angle of Lunar Polarisation (AoLP)
 - [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR108**)
     - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR108-A**)
     - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR108-B**)
