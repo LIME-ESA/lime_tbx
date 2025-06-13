@@ -7,10 +7,12 @@ This glossary provides definitions for key terms and concepts used throughout th
 ```
 | **Abbreviation** | **Stands for** | **Notes** |
 |------------------|----------------|-----------|
+| **AOLP** | Angle of Linear Polarisation | |
 | **ASD** | Analytical Spectral Devices - Instrument manufacturer | Also refers to the instrument itself |
 | **Cimel** | (Not an abbreviation) Instrument manufacturer | Also refers to the instrument itself |
 | **CSV** | Comma-Separated Values | |
 | **CLI** | Command Line Interface | |
+| **DOLP** | Degree of Linear Polarisation | |
 | **EO** | Earth Observation | |
 | **EO-CFI** | Earth Observation CFI Software | |
 | **ESA** | European Space Agency | Project client |

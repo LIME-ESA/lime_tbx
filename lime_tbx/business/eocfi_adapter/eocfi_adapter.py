@@ -421,9 +421,13 @@ class EOCFIConverter:
         )
         so, serr = cmd_exec.communicate()
         out_lines = so.splitlines()
-        if len(serr) > 0:
-            err_msg = "Executing EO CFI: {}".format(serr.rstrip())
-            log = logger.get_logger()
+        log = logger.get_logger()
+        if serr is None:
+            log.warning(
+                f"EOCFI stderr message is None. It should be a string. Command run: {cmd}"
+            )
+        elif len(serr) > 0:
+            err_msg = f"Executing EO CFI: {serr.rstrip()}"
             if len(out_lines) == 3 * n_dates:
                 log.warning(err_msg)
             else:
@@ -439,15 +443,11 @@ class EOCFIConverter:
         else:
             if len(out_lines) == 0:
                 raise Exception(
-                    "No lines outputed after executing the EOCFI binary. Command executed: {}".format(
-                        cmd
-                    )
+                    f"No lines outputed after executing the EOCFI binary. Command executed: {cmd}"
                 )
             else:
                 raise Exception(
-                    "Number of lines unexpected. {}/{}.\n{}".format(
-                        str(len(out_lines)), str(3 * n_dates), out_lines
-                    )
+                    f"Number of lines unexpected. {len(out_lines)}/{3 * n_dates}.\n{out_lines}"
                 )
 
         positions = [(satpos[0], satpos[1], satpos[2]) for satpos in sat_positions]

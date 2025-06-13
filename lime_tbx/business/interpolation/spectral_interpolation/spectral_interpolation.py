@@ -189,6 +189,9 @@ class SpectralInterpolation(ISpectralInterpolation):
     def get_best_polar_interp_reference(self, moon_data: MoonData):
         return idata.get_linear_polar_data()
 
+    def get_best_aolp_interp_reference(self, moon_data: MoonData):
+        return idata.get_linear_polar_data()
+
     def get_interpolated_refl(
         self,
         cimel_wav: NDArray[np.float_],

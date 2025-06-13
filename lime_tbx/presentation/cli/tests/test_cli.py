@@ -92,7 +92,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2250-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
+                "-s PROBA-V,2250-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -104,7 +104,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
+                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -118,7 +118,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -132,7 +132,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -158,7 +158,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graphd,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graphd,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -179,7 +179,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
     def test_sat_probav_csv_extra_arg(self):
         cli = get_cli()
         errcode = cli.handle_input(
-            *get_opts("-s PROBA-V,2020-01-20T02:00:00 -o csv,p1,p2,p3,p4,p5")
+            *get_opts("-s PROBA-V,2020-01-20T02:00:00 -o csv,p1,p2,p3,p4,p5,p6")
         )
         self.assertEqual(errcode, 1)
         f = open("./test_files/cli/err_num_args_o_csv.txt")
@@ -188,7 +188,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
 
     def test_sat_probav_missing_datetime(self):
         cli = get_cli()
-        errcode = cli.handle_input(*get_opts("-s PROBA-V -o csv,p1,p2,p3,p4"))
+        errcode = cli.handle_input(*get_opts("-s PROBA-V -o csv,p1,p2,p3,p4,p5"))
         self.assertEqual(errcode, 1)
         f = open("./test_files/cli/err_miss_datetime_sat.txt")
         self.assertEqual(self.capturedErr.getvalue(), f.read())
@@ -408,7 +408,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,ascii,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,ascii,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test,test_files/cli/proba_aolp.test"
             )
         )
         self.assertEqual(errcode, 1)
@@ -548,12 +548,13 @@ class TestCLI(unittest.TestCase):
         path_refl = "./test_files/cli/proba_refl.test.csv"
         path_irr = "./test_files/cli/proba_irr.test.csv"
         path_polar = "./test_files/cli/proba_polar.test.csv"
+        path_aolp = "./test_files/cli/proba_aolp.test.csv"
         path_integrated = "./test_files/cli/proba_integrated.test.csv"
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o csv,{},{},{},{}".format(
-                    path_refl, path_irr, path_polar, path_integrated
+                "-s PROBA-V,2020-01-20T02:00:00 -o csv,{},{},{},{},{}".format(
+                    path_refl, path_irr, path_polar, path_aolp, path_integrated
                 )
             )
         )
@@ -575,7 +576,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test,test_files/cli/proba_aolp.test"
             )
         )
         self.assertEqual(errcode, 0)

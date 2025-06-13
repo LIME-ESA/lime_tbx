@@ -109,6 +109,8 @@ those in any previous official LIME documentation, as they are subject to change
 - **FR304**: The LIME TBX shall output the simulated lunar degree of polarization’s associated uncertainty.
 - **FR305**: Allow the visualization of the user defined spectral response used for the spectral integration
   of the LIME output into a sensor spectral band.
+- **FR306**: The LIME TBX shall output the simulated lunar disk angle of linear polarization (AoLP).
+- **FR307**: The LIME TBX shall output the simulated lunar angle of linear polarization’s associated uncertainty.
 
 #### Non Functional Requirements (NFR)
 - **NFR301**: The simulated lunar disk irradiance or reflectance (**FR301**) must be in the spectral range of 400 nm to 2500 nm.
@@ -116,7 +118,8 @@ those in any previous official LIME documentation, as they are subject to change
 - **NFR303**: The LIME simulated output shall be available to be exported to GLOD format files.
 - **NFR304**: The LIME version number shall be visible on all outputs (plots/files) of the TBX.
 - **NFR305**: Geometry information (coordinates, angles, etc.) and timestamps must be included in NetCDF and CSV output files.
-- **NFR306**: Calculation of uncertainties (**FR303**, **FR304**) must be performed as fast as possible. 
+- **NFR306**: Calculation of uncertainties (**FR303**, **FR304**, **FR307**) must be performed as fast as possible.
+- **NFR307**: The simulated lunar disk angle of linear polarization (**FR306**) must be in the spectral range of 400 nm to 2500 nm.
 
 ### 4. System
 

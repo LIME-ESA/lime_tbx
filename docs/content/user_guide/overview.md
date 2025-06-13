@@ -108,8 +108,8 @@ Once simulations and comparisons are computed, users can:
 ## Polarisation Computation
 While LIME Toolbox primarily computes reflectance and irradiance, it can also estimate **polarisation** using precomputed polarisation coefficients.
 
-- **Degree of Lunar Polarisation (DoLP)** is derived from reflectance using **LIME polarisation coefficients**.
-- **Polarisation calculations follow the same interpolation and SRF integration process** but do not influence irradiance computation.
+- **Degree of Lunar Polarisation (DoLP)** and **Angle of Linear Polarisation (AoLP)** are derived using **LIME polarisation coefficients**.
+- **Polarisation calculations follow the same interpolation process** but do not influence irradiance computation.
 - The **polarisation interpolation spectrum is fixed** (users cannot select it).
 
 **Polarisation results are computed separately** and are available in **dedicated output files**.

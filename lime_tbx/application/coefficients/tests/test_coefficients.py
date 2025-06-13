@@ -10,7 +10,7 @@ import numpy as np
 """___LIME_TBX Modules___"""
 from lime_tbx.application.filedata import coefficients
 from lime_tbx.business.lime_algorithms.lime import lime
-from lime_tbx.business.lime_algorithms.dolp import dolp
+from lime_tbx.business.lime_algorithms.polar import dolp
 from lime_tbx.common.datatypes import MoonData
 
 """___Authorship___"""

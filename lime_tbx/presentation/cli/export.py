@@ -54,15 +54,18 @@ class ExportCSV(ExportData):
         Path to the output CSV file for reflectance.
     o_file_irr : str
         Path to the output CSV file for irradiance.
-    o_file_polar : str
-        Path to the output CSV file for polarization.
+    o_file_dolp : str
+        Path to the output CSV file for degree of linear polarisation.
+    o_file_aolp : str
+        Path to the output CSV file for angle of linear polarisation.
     o_file_integrated_irr : str
         Path to the output CSV file for integrated irradiance.
     """
 
     o_file_refl: str
     o_file_irr: str
-    o_file_polar: str
+    o_file_dolp: str
+    o_file_aolp: str
     o_file_integrated_irr: str
 
 
@@ -76,13 +79,16 @@ class ExportGraph(ExportData):
         Path to the output graph file for reflectance.
     o_file_irr : str
         Path to the output graph file for irradiance.
-    o_file_polar : str
-        Path to the output graph file for polarization.
+    o_file_dolp : str
+        Path to the output graph file for degree of linear polarisation.
+    o_file_aolp : str
+        Path to the output graph file for angle of linear polarisation.
     """
 
     o_file_refl: str
     o_file_irr: str
-    o_file_polar: str
+    o_file_dolp: str
+    o_file_aolp: str
 
 
 class ComparisonKey(Enum):
@@ -283,6 +289,7 @@ class CLIExporter:
             mda = mdas
             mpa = mdas.mpa_degrees
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
+        aolp_sp_name = self.settings_manager.get_selected_aolp_spectrum_name()
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         csv.export_csv_simulation(
             self.lime_simulation.get_elrefs(),
@@ -310,18 +317,34 @@ class CLIExporter:
             self.lime_simulation.get_elis_cimel(),
             mda,
         )
+        polar_extra_attrs = [gui_constants._WARN_POLAR_PRELIMINARY]
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
             "Degree of Linear Polarisation (%)",
             point,
-            ed.o_file_polar,
+            ed.o_file_dolp,
             version,
             are_mpas_oinside_mpa_range,
             dolp_sp_name,
             skip_uncs,
             self.lime_simulation.get_polars_cimel(),
             mda,
+            polar_extra_attrs,
+        )
+        csv.export_csv_simulation(
+            self.lime_simulation.get_aolp(),
+            "Wavelengths (nm)",
+            "Angle of Linear Polarisation (°)",
+            point,
+            ed.o_file_aolp,
+            version,
+            are_mpas_oinside_mpa_range,
+            aolp_sp_name,
+            skip_uncs,
+            self.lime_simulation.get_aolp_cimel(),
+            mda,
+            polar_extra_attrs,
         )
         csv.export_csv_integrated_irradiance(
             srf,
@@ -354,6 +377,7 @@ class CLIExporter:
         """
         sp_name = self.settings_manager.get_selected_spectrum_name()
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
+        aolp_sp_name = self.settings_manager.get_selected_aolp_spectrum_name()
         version = self.settings_manager.get_lime_coef().version
         mds = self.lime_simulation.get_moon_datas()
         if not isinstance(mds, list):
@@ -365,6 +389,7 @@ class CLIExporter:
             self.kernels_path,
             sp_name,
             dolp_sp_name,
+            aolp_sp_name,
             version,
             mds,
         )
@@ -418,6 +443,7 @@ class CLIExporter:
         canv.axes.cla()  # Clear the canvas.
         sp_name = self.settings_manager.get_selected_spectrum_name()
         dolp_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
+        aolp_sp_name = self.settings_manager.get_selected_aolp_spectrum_name()
         canvas.redraw_canvas(
             canv,
             self.lime_simulation.get_elrefs(),
@@ -428,7 +454,6 @@ class CLIExporter:
             ],
             self.lime_simulation.get_elrefs_cimel(),
             self.lime_simulation.get_elrefs_asd(),
-            None,
             "Extraterrestrial Lunar Reflectances",
             "Wavelengths (nm)",
             "Reflectances (Fraction of unity)",
@@ -452,7 +477,6 @@ class CLIExporter:
             ],
             self.lime_simulation.get_elis_cimel(),
             self.lime_simulation.get_elis_asd(),
-            None,
             "Extraterrestrial Lunar Irradiances",
             "Wavelengths (nm)",
             "Irradiances (Wm⁻²nm⁻¹)",
@@ -467,7 +491,7 @@ class CLIExporter:
             ) from e
         canv.axes.cla()  # Clear the canvas.
         spectrum_info = f" | Interp. spectrum: {dolp_sp_name}{mpa_text}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}\n{': '.join(gui_constants._WARN_POLAR_PRELIMINARY)}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.cla()  # Clear the canvas.
         canvas.redraw_canvas(
@@ -480,7 +504,6 @@ class CLIExporter:
             ],
             self.lime_simulation.get_polars_cimel(),
             self.lime_simulation.get_polars_asd(),
-            None,
             "Extraterrestrial Lunar Polarisation",
             "Wavelengths (nm)",
             "Degree of Linear Polarisation (%)",
@@ -488,10 +511,37 @@ class CLIExporter:
             dolp_sp_name,
         )
         try:
-            canv.print_figure(ed.o_file_polar)
+            canv.print_figure(ed.o_file_dolp)
         except Exception as e:
             raise ExportError(
                 f"Something went wrong while exporting polarisation graph. {str(e)}"
+            ) from e
+        canv.axes.cla()  # Clear the canvas.
+        spectrum_info = f" | Interp. spectrum: {aolp_sp_name}{mpa_text}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}\n{': '.join(gui_constants._WARN_POLAR_PRELIMINARY)}"
+        canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
+        canv.axes.cla()  # Clear the canvas.
+        canvas.redraw_canvas(
+            canv,
+            self.lime_simulation.get_aolp(),
+            [
+                [gui_constants.INTERPOLATED_DATA_LABEL],
+                [gui_constants.CIMEL_POINT_LABEL],
+                [gui_constants.ERRORBARS_LABEL],
+            ],
+            self.lime_simulation.get_aolp_cimel(),
+            self.lime_simulation.get_aolp_asd(),
+            "Extraterrestrial Lunar Angle of Polarisation",
+            "Wavelengths (nm)",
+            "Angle of Linear Polarisation (°)",
+            None,
+            aolp_sp_name,
+        )
+        try:
+            canv.print_figure(ed.o_file_aolp)
+        except Exception as e:
+            raise ExportError(
+                f"Something went wrong while exporting angle of polarisation graph. {str(e)}"
             ) from e
         canv.clear()  # Clear the canvas.
 

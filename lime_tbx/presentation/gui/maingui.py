@@ -59,6 +59,7 @@ from lime_tbx.common.datatypes import (
     SpectralData,
     MoonData,
     EocfiPath,
+    AOLPCoefficients,
 )
 from lime_tbx.common import logger, constants as logic_constants
 from lime_tbx.common.constants import CompFields
@@ -241,6 +242,34 @@ def polar_callback(
     )
 
 
+def aolp_callback(
+    srf: SpectralResponseFunction,
+    point: Point,
+    coeffs: PolarisationCoefficients,
+    lime_simulation: ILimeSimulation,
+    signal_info: QtCore.Signal,
+) -> Tuple[
+    Point,
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+    Union[SpectralData, List[SpectralData]],
+    Union[bool, List[bool]],
+    Union[List[MoonData], MoonData, None],
+]:
+    def_srf = get_default_srf()
+    callback_obs = lambda: signal_info.emit("another_aolp_simulated")
+    lime_simulation.update_aolp(def_srf, point, coeffs, callback_obs)
+    mdas = lime_simulation.get_moon_datas()
+    return (
+        point,
+        lime_simulation.get_aolp(),
+        lime_simulation.get_aolp_cimel(),
+        lime_simulation.get_aolp_asd(),
+        lime_simulation.are_mpas_inside_mpa_range(),
+        mdas,
+    )
+
+
 def compare_callback(
     mos: List[LunarObservation],
     srf: SpectralResponseFunction,
@@ -280,12 +309,14 @@ def calculate_all_callback(
     point: Point,
     cimel_coef: ReflectanceCoefficients,
     p_coeffs: PolarisationCoefficients,
+    aolp_coeff: AOLPCoefficients,
     lime_simulation: ILimeSimulation,
 ):
     def_srf = get_default_srf()
     lime_simulation.update_irradiance(def_srf, srf, point, cimel_coef)
     lime_simulation.update_reflectance(def_srf, point, cimel_coef)
     lime_simulation.update_polarisation(def_srf, point, p_coeffs)
+    lime_simulation.update_aolp(def_srf, point, aolp_coeff)
     return (point, srf)
 
 
@@ -451,6 +482,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.worker_ths = []
         self._listening_changes_combobox = True
         self.chosen_diffs = CompFields.DIFF_REL
+        self._can_export_netcdf = False
         self._build_layout()
 
     def _build_layout(self):
@@ -541,14 +573,9 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.stack_layout.addWidget(self.spinner)
         self.stack_layout.addWidget(self.output_stacklayw)
         self.stack_layout.setCurrentIndex(1)
-        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
-        self.export_lglod_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.export_lglod_button.clicked.connect(self.export_to_lglod)
-        self.export_lglod_button.setDisabled(True)
         self.main_layout.addWidget(self.top_precomp)
         self.main_layout.addWidget(self.top_postcomp)
         self.main_layout.addLayout(self.stack_layout)
-        self.main_layout.addWidget(self.export_lglod_button)
 
     def _focus_on_comp_wlen(self, focuswlen: bool):
         self.output_wlen.setVisible(focuswlen)
@@ -631,7 +658,10 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.spinner.set_text("Drawing graphs...")
 
     def can_save_simulation(self) -> bool:
-        return self.export_lglod_button.isEnabled()
+        return self._can_export_netcdf
+
+    def set_can_export_to_nc(self, can: bool):
+        self._can_export_netcdf = can
 
     @QtCore.Slot()
     def export_to_lglod(self) -> None:
@@ -746,7 +776,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.input.clear_input()
         self.lime_simulation.clear_srf()
         self.clear_comp_dialog.close()
-        self.export_lglod_button.setEnabled(False)
+        self.set_can_export_to_nc(False)
         self.top_postcomp.setVisible(False)
         self._listening_changes_combobox = True
         self._unblock_gui()
@@ -754,7 +784,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _clear_comparison_error(self, error: Exception):
         self._unblock_gui()
         self.handle_operation_error(error)
-        self.export_lglod_button.setEnabled(False)
+        self.set_can_export_to_nc(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
 
@@ -921,7 +951,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp.check_if_range_visible()
         self._unblock_gui()
         outp.set_current_channel_index(0)
-        self.export_lglod_button.setEnabled(True)
+        self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.top_postcomp.setVisible(True)
@@ -931,7 +961,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp: output.ComparisonOutput = data[0]
         outp.check_if_range_visible()
         self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
+        self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.top_postcomp.setVisible(True)
@@ -939,7 +969,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def _show_comparisons_wlen_finished(self, data):
         self._focus_on_comp_wlen(True)
         self._unblock_gui()
-        self.export_lglod_button.setEnabled(True)
+        self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
         self.top_postcomp.setVisible(True)
@@ -954,7 +984,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     def compare_error(self, error: Exception):
         self._unblock_gui()
         self.handle_operation_error(error)
-        self.export_lglod_button.setEnabled(False)
+        self.set_can_export_to_nc(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
 
@@ -986,6 +1016,7 @@ class MainSimulationsWidget(
         )
         self.workers = []
         self.worker_ths = []
+        self._can_export_to_nc = False
         self._build_layout()
         self._finished_building = True
 
@@ -1009,12 +1040,18 @@ class MainSimulationsWidget(
         self.elref_button = QtWidgets.QPushButton("Reflectance")
         self.elref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.elref_button.clicked.connect(self.show_elref)
-        self.polar_button = QtWidgets.QPushButton("Polarisation")
+        self.polar_button = QtWidgets.QPushButton("DoLP")
         self.polar_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.polar_button.clicked.connect(self.show_polar)
+        self.polar_button.setToolTip("Degree of Linear Polarisation")
+        self.aolp_button = QtWidgets.QPushButton("AoLP")
+        self.aolp_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.aolp_button.clicked.connect(self.show_aolp)
+        self.aolp_button.setToolTip("Angle of Linear Polarisation")
         self.buttons_layout.addWidget(self.eli_button)
         self.buttons_layout.addWidget(self.elref_button)
         self.buttons_layout.addWidget(self.polar_button)
+        self.buttons_layout.addWidget(self.aolp_button)
         # Lower tab
         self.lower_tabs = QtWidgets.QTabWidget()
         self.lower_tabs.tabBar().setCursor(QtCore.Qt.PointingHandCursor)
@@ -1049,11 +1086,6 @@ class MainSimulationsWidget(
         self.lower_tabs.addTab(self.srf_widget, "SRF")
         self.lower_tabs.addTab(self.signal_widget, "Signal")
         self.lower_tabs.currentChanged.connect(self.lower_tabs_changed)
-        # Export to LGLOD
-        self.export_lglod_button = QtWidgets.QPushButton("Export to NetCDF")
-        self.export_lglod_button.setCursor(QtCore.Qt.PointingHandCursor)
-        self.export_lglod_button.clicked.connect(self.export_glod)
-        self.export_lglod_button.setDisabled(True)
         self._export_lglod_button_was_disabled = True
         # finish main layout
         self.main_layout.addWidget(self.input_widget)
@@ -1066,7 +1098,6 @@ class MainSimulationsWidget(
         self.lower_stack.addWidget(self.lower_tabs)
         self.lower_stack.setCurrentIndex(1)
         self.main_layout.addLayout(self.lower_stack, 1)
-        self.main_layout.addWidget(self.export_lglod_button)
         self.update_calculability()
 
     def _callback_set_enabled(self, enabled: bool):
@@ -1098,7 +1129,7 @@ class MainSimulationsWidget(
         self._export_lglod_button_was_disabled = True
 
     def _disable_lglod_export(self, disable: bool):
-        self.export_lglod_button.setDisabled(disable)
+        self._can_export_to_nc = not disable
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(disable)
 
@@ -1114,7 +1145,9 @@ class MainSimulationsWidget(
         self.eli_button.setEnabled(calculable)
         self.elref_button.setEnabled(calculable)
         polar_calculable = self.settings_manager.get_polar_coef().is_calculable()
+        aolp_calculable = self.settings_manager.get_aolp_coef().is_calculable()
         self.polar_button.setEnabled(calculable and polar_calculable)
+        self.aolp_button.setEnabled(calculable and aolp_calculable)
         if not (self._export_lglod_button_was_disabled):
             self._disable_lglod_export(not calculable)
 
@@ -1146,7 +1179,7 @@ class MainSimulationsWidget(
             self.srf_widget.update_size()
 
     def can_save_simulation(self) -> bool:
-        return self.export_lglod_button.isEnabled()
+        return self._can_export_to_nc
 
     def handle_operation_error(self, error: Exception):
         if isinstance(error, LimeException):
@@ -1400,17 +1433,93 @@ class MainSimulationsWidget(
         warning_out_mpa_range = ""
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         self.graph.update_labels(
             "Lunar polarisation",
             "Wavelengths (nm)",
             "Degree of Linear Polarisation (%)",
-            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+            subtitle=subtitle,
+            extra_attrs=[constants._WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
         self.lower_tabs.setCurrentIndex(0)
 
     def polar_error(self, error: Exception):
+        self.handle_operation_error(error)
+        self._unblock_gui()
+
+    @QtCore.Slot()
+    def show_aolp(self):
+        """
+        Calculate and show angle of extraterrestrial lunar polarisation (AOLP) for the given input.
+        """
+        self._block_gui_loading()
+        point = self.input_widget.get_point()
+        srf = self.settings_manager.get_srf()
+        coeffs = self.settings_manager.get_aolp_coef()
+        self.quant_aolp = 1
+        self.quant_aolp_sim = 0
+        if hasattr(point, "dt") and isinstance(point.dt, list):
+            self.quant_aolp = len(point.dt)
+        worker = CallbackWorker(
+            aolp_callback,
+            [srf, point, coeffs, self.lime_simulation],
+            True,
+        )
+        self._start_thread(worker, self.aolp_finished, self.aolp_error, self.aolp_info)
+
+    def aolp_info(self, data: str):
+        if self.quant_aolp_sim < self.quant_aolp:
+            self.loading_spinner.set_text(f"{self.quant_aolp_sim}/{self.quant_aolp}")
+            self.quant_aolp_sim += 1
+        else:
+            self.loading_spinner.set_text(f"Finishing simulations...")
+
+    def aolp_finished(
+        self,
+        data: Tuple[
+            Point,
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[SpectralData, List[SpectralData]],
+            Union[bool, List[bool]],
+            Union[List[MoonData], MoonData, None],
+        ],
+    ):
+        self._unblock_gui()
+        self._set_graph_dts(data[0])
+        mpa_text = ""
+        mdas = data[5]
+        mda = _simplify_mdas_mda(mdas)
+        if mda:
+            mpa_text = f" | MPA: {mda.mpa_degrees:.3f}°"
+        sp_name = interp_data.get_aolp_interpolation_spectrum_name()
+        spectrum_info = f" | Interp. spectrum: {sp_name}{mpa_text}"
+        self.graph.set_interp_spectrum_name(sp_name)
+        self.graph.set_mda(mdas)
+        self.graph.set_skipped_uncertainties(self.lime_simulation.is_skipping_uncs())
+        self.graph.update_plot(data[1], data[2], data[3], data[0], redraw=False)
+        version = self.settings_manager.get_coef_version_name()
+        is_out_mpa_range = (
+            not data[4] if not isinstance(data[4], list) else False in data[4]
+        )
+        warning_out_mpa_range = ""
+        if is_out_mpa_range:
+            warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
+        self.graph.update_labels(
+            "Lunar Angle of Linear Polarisation",
+            "Wavelengths (nm)",
+            "Angle of Linear Polarisation (°)",
+            subtitle=subtitle,
+            extra_attrs=[constants._WARN_POLAR_PRELIMINARY],
+        )
+        self.graph.set_inside_mpa_range(data[4])
+        self.clear_signals()
+        self.lower_tabs.setCurrentIndex(0)
+
+    def aolp_error(self, error: Exception):
         self.handle_operation_error(error)
         self._unblock_gui()
 
@@ -1429,9 +1538,10 @@ class MainSimulationsWidget(
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
         p_coeffs = self.settings_manager.get_polar_coef()
+        aolp_coef = self.settings_manager.get_aolp_coef()
         worker = CallbackWorker(
             calculate_all_callback,
-            [srf, point, cimel_coef, p_coeffs, self.lime_simulation],
+            [srf, point, cimel_coef, p_coeffs, aolp_coef, self.lime_simulation],
         )
         self._start_thread(
             worker, self.calculate_all_finished, self.calculate_all_error
@@ -1442,6 +1552,7 @@ class MainSimulationsWidget(
         srf: SpectralResponseFunction = data[1]
         sp_name = self.settings_manager.get_selected_spectrum_name()
         polar_sp_name = self.settings_manager.get_selected_polar_spectrum_name()
+        aolp_sp_name = self.settings_manager.get_selected_aolp_spectrum_name()
         version = self.settings_manager.get_coef_version_name()
         mds = self.lime_simulation.get_moon_datas()
         if not isinstance(mds, list):
@@ -1453,6 +1564,7 @@ class MainSimulationsWidget(
             self.kernels_path,
             sp_name,
             polar_sp_name,
+            aolp_sp_name,
             version,
             mds,
         )
@@ -1711,14 +1823,12 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
     def _create_actions(self):
         # File actions
         self.save_simulation_action = QAction(self)
-        self.save_simulation_action.setText(
-            "&Save simulation to LIME GLOD format file."
-        )
+        self.save_simulation_action.setText("&Save as a netCDF file.")
         self.save_simulation_action.triggered.connect(self.save_simulation)
         self.save_simulation_action.setDisabled(True)
         self.load_simulation_action = QAction(self)
         self.load_simulation_action.setText(
-            "&Load simulation file stored in a LIME GLOD format file."
+            "&Load simulation/comparison from a netCDF file."
         )
         self.load_simulation_action.triggered.connect(self.load_simulation)
         self.comparison_action = QAction(self)
@@ -1932,9 +2042,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def comparison(self):
         if not self._is_comparing:
-            self.save_simulation_action.setText(
-                "&Save comparison to LIME GLOD format file."
-            )
             self.comparison_action.setText("&Perform simulations")
             self.comparison_action.triggered.connect(self.simulations)
             lime_tbx_w = self._get_lime_widget()
@@ -1947,9 +2054,6 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
     def simulations(self):
         if self._is_comparing:
-            self.save_simulation_action.setText(
-                "&Save simulation to LIME GLOD format file."
-            )
             self.comparison_action.setText(
                 "Perform &comparisons from a remote sensing instrument"
             )

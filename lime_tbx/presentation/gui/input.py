@@ -98,11 +98,86 @@ def _callback_save_satellite(
 
 
 class _LimeDoubleInput(QtWidgets.QDoubleSpinBox):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        decimals=None,
+        minimum=None,
+        maximum=None,
+        singleStep=None,
+        value=None,
+        suffix=None,
+    ) -> None:
+        kwargs = {}
+        if decimals is not None:
+            kwargs["decimals"] = decimals
+        if minimum is not None:
+            kwargs["minimum"] = minimum
+        if maximum is not None:
+            kwargs["maximum"] = maximum
+        if singleStep is not None:
+            kwargs["singleStep"] = singleStep
+        if value is not None:
+            kwargs["value"] = value
+        if suffix is not None:
+            kwargs["suffix"] = " " + suffix.strip()
+        super().__init__(**kwargs)
 
     def textFromValue(self, val: float) -> str:
-        return f"{val}"
+        return f"{val:.{self.decimals()}f}".rstrip("0").rstrip(".")
+
+
+class ResponsiveForm(QtWidgets.QWidget):
+    """Responsive Form input that varies between 2 and 3 columns, useful in selenographic input."""
+
+    def __init__(self):
+        super().__init__()
+        self.rows = []
+        self.columns = 2
+        self.lay = QtWidgets.QHBoxLayout(self)
+        self.lay.setContentsMargins(0, 0, 0, 0)
+
+    def addRow(self, label: QtWidgets.QWidget, item: QtWidgets.QWidget):
+        self.rows.append((label, item))
+        self.build_layout()
+
+    def build_layout(self):
+        columns = self.columns
+        # Clear current layout
+        while self.lay.count():
+            child = self.lay.takeAt(0)
+            child.deleteLater()
+        for col in range(columns):
+            form = QtWidgets.QFormLayout()
+            nrows = int(np.ceil(len(self.rows) / columns))
+            for i in range(nrows):
+                index = col * nrows + i
+                if index < len(self.rows):
+                    row = self.rows[index]
+                    form.addRow(row[0], row[1])
+            self.lay.addLayout(form)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        width = self.width()
+        self._internal_resize(width)
+
+    def _internal_resize(self, width: int):
+        ncols = self.columns
+        if width > 950:
+            ncols = 3
+        elif width < 850:
+            ncols = 2
+        if self.columns != ncols:
+            self.columns = ncols
+            self.build_layout()
+
+    def external_resize(self, width):
+        """When a parent widget changes size but its not focused in this widget,
+        we want the parent's widget sizehint to change taking this widget potential resize into account."""
+        precols = self.columns
+        self._internal_resize(width)
+        if precols != self.columns:
+            self.updateGeometry()
 
 
 class CustomInputWidget(QtWidgets.QWidget):
@@ -117,12 +192,12 @@ class CustomInputWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QHBoxLayout(self)
-        self.dist_sun_moon_label = QtWidgets.QLabel("Dist. Sun-Moon (AU):")
-        self.dist_obs_moon_label = QtWidgets.QLabel("Dist. Observer-Moon (km):")
-        self.moon_phase_angle_label = QtWidgets.QLabel("Moon phase angle (°):")
-        self.selen_obs_lat_label = QtWidgets.QLabel("Observer sel. latitude (°):")
-        self.selen_obs_lon_label = QtWidgets.QLabel("Observer sel. longitude (°):")
-        self.selen_sun_lon_label = QtWidgets.QLabel("Sun sel. longitude (RAD):")
+        self.dist_sun_moon_label = QtWidgets.QLabel("Dist. Sun-Moon:")
+        self.dist_obs_moon_label = QtWidgets.QLabel("Dist. Observer-Moon:")
+        self.moon_phase_angle_label = QtWidgets.QLabel("Moon phase angle:")
+        self.selen_obs_lat_label = QtWidgets.QLabel("Observer sel. latitude:")
+        self.selen_obs_lon_label = QtWidgets.QLabel("Observer sel. longitude:")
+        self.selen_sun_lon_label = QtWidgets.QLabel("Sun sel. longitude:")
         self.dist_sun_moon_label.setToolTip(
             "Distance between the Sun and the Moon in Astronomical Units"
         )
@@ -139,53 +214,26 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.selen_sun_lon_label.setToolTip(
             "Selenographic longitude of the Sun in radians"
         )
-        self.dist_sun_moon_spinbox = _LimeDoubleInput()
-        self.dist_obs_moon_spinbox = _LimeDoubleInput()
-        self.selen_obs_lat_spinbox = _LimeDoubleInput()
-        self.selen_obs_lon_spinbox = _LimeDoubleInput()
-        self.selen_sun_lon_spinbox = _LimeDoubleInput()
-        self.moon_phase_angle_spinbox = _LimeDoubleInput()
-        self.dist_sun_moon_spinbox.setMinimum(0.00001)
-        self.dist_sun_moon_spinbox.setMaximum(1.5)
-        self.dist_sun_moon_spinbox.setDecimals(20)
-        self.dist_sun_moon_spinbox.setSingleStep(0.001)
-        self.dist_sun_moon_spinbox.setValue(1)
-        self.dist_obs_moon_spinbox.setMinimum(1)
-        self.dist_obs_moon_spinbox.setMaximum(1000000)
-        self.dist_obs_moon_spinbox.setDecimals(20)
-        self.dist_obs_moon_spinbox.setValue(400000)
-        self.selen_obs_lat_spinbox.setMinimum(-90)
-        self.selen_obs_lat_spinbox.setMaximum(90)
-        self.selen_obs_lat_spinbox.setDecimals(20)
-        self.selen_obs_lon_spinbox.setMinimum(-180)
-        self.selen_obs_lon_spinbox.setMaximum(180)
-        self.selen_obs_lon_spinbox.setDecimals(20)
-        self.selen_sun_lon_spinbox.setMinimum(-3.141592653589793)
-        self.selen_sun_lon_spinbox.setMaximum(3.141592653589793)
-        self.selen_sun_lon_spinbox.setDecimals(20)
-        self.selen_sun_lon_spinbox.setSingleStep(0.1)
-        self.moon_phase_angle_spinbox.setMinimum(-180)
-        self.moon_phase_angle_spinbox.setMaximum(180)
-        self.moon_phase_angle_spinbox.setDecimals(20)
-        self.moon_phase_angle_spinbox.setValue(30)
-        self.dists_layout = QtWidgets.QFormLayout()
-        self.sel_coords_layout = QtWidgets.QFormLayout()
-        self.dists_layout.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
-        self.dists_layout.addRow(self.dist_obs_moon_label, self.dist_obs_moon_spinbox)
-        self.dists_layout.addRow(
+        self.dist_sun_moon_spinbox = _LimeDoubleInput(14, 0.5, 1.5, 0.0001, 1, "AU")
+        self.dist_obs_moon_spinbox = _LimeDoubleInput(
+            10, 1, 1000000, None, 400000, "km"
+        )
+        self.selen_obs_lat_spinbox = _LimeDoubleInput(13, -90, 90, None, None, "°")
+        self.selen_obs_lon_spinbox = _LimeDoubleInput(12, -180, 180, None, None, "°")
+        self.selen_sun_lon_spinbox = _LimeDoubleInput(
+            14, -np.pi, np.pi, 0.1, None, "rad"
+        )
+        self.moon_phase_angle_spinbox = _LimeDoubleInput(12, -180, 180, None, 30, "°")
+        self.customform = ResponsiveForm()
+        self.customform.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
+        self.customform.addRow(self.dist_obs_moon_label, self.dist_obs_moon_spinbox)
+        self.customform.addRow(
             self.moon_phase_angle_label, self.moon_phase_angle_spinbox
         )
-        self.main_layout.addLayout(self.dists_layout)
-        self.sel_coords_layout.addRow(
-            self.selen_obs_lat_label, self.selen_obs_lat_spinbox
-        )
-        self.sel_coords_layout.addRow(
-            self.selen_obs_lon_label, self.selen_obs_lon_spinbox
-        )
-        self.sel_coords_layout.addRow(
-            self.selen_sun_lon_label, self.selen_sun_lon_spinbox
-        )
-        self.main_layout.addLayout(self.sel_coords_layout)
+        self.customform.addRow(self.selen_obs_lat_label, self.selen_obs_lat_spinbox)
+        self.customform.addRow(self.selen_obs_lon_label, self.selen_obs_lon_spinbox)
+        self.customform.addRow(self.selen_sun_lon_label, self.selen_sun_lon_spinbox)
+        self.main_layout.addWidget(self.customform)
 
     def get_dist_sun_moon(self) -> float:
         return self.dist_sun_moon_spinbox.value()
@@ -222,6 +270,9 @@ class CustomInputWidget(QtWidgets.QWidget):
 
     def set_selen_sun_lon(self, selen_sun_lon: float) -> float:
         return self.selen_sun_lon_spinbox.setValue(selen_sun_lon)
+
+    def external_resize(self, width):
+        self.customform.external_resize(width)
 
 
 class ShowDatetimeWidget(QtWidgets.QWidget):
@@ -540,21 +591,12 @@ class SurfaceInputWidget(QtWidgets.QWidget):
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.latitude_label = QtWidgets.QLabel("Latitude (°):")
-        self.longitude_label = QtWidgets.QLabel("Longitude (°):")
-        self.altitude_label = QtWidgets.QLabel("Altitude (km):")
-        self.latitude_spinbox = _LimeDoubleInput()
-        self.longitude_spinbox = _LimeDoubleInput()
-        self.altitude_spinbox = _LimeDoubleInput()
-        self.latitude_spinbox.setMinimum(-90)
-        self.latitude_spinbox.setMaximum(90)
-        self.latitude_spinbox.setDecimals(20)
-        self.longitude_spinbox.setMinimum(-180)
-        self.longitude_spinbox.setMaximum(180)
-        self.longitude_spinbox.setDecimals(20)
-        self.altitude_spinbox.setMinimum(-1)
-        self.altitude_spinbox.setMaximum(1000000)
-        self.altitude_spinbox.setDecimals(20)
+        self.latitude_label = QtWidgets.QLabel("Latitude:")
+        self.longitude_label = QtWidgets.QLabel("Longitude:")
+        self.altitude_label = QtWidgets.QLabel("Altitude:")
+        self.latitude_spinbox = _LimeDoubleInput(13, -90, 90, None, None, "°")
+        self.longitude_spinbox = _LimeDoubleInput(12, -180, 180, None, None, "°")
+        self.altitude_spinbox = _LimeDoubleInput(10, -1, 1000000, None, None, "km")
         self.coordinates_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.coordinates_layout)
         self.coord_forms_layouts = [QtWidgets.QFormLayout() for _ in range(3)]
@@ -777,8 +819,8 @@ class AddSatDialog(QtWidgets.QDialog):
     @QtCore.Slot()
     def load_datafile(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
-        self.loaded_path = path
-        if path != "":
+        if path:
+            self.loaded_path = path
             if len(path) > 3:
                 if path[-4:].upper() in (".OSF", ".EOF", ".EEF"):
                     self._load_osf(path)
@@ -947,6 +989,8 @@ class InputWidget(QtWidgets.QWidget):
         self.callback_check_calculable = callback_check_calculable
         self.skip_uncs = skip_uncs
         self._build_layout()
+        self.installEventFilter(self)
+        self._can_resize_children = False
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -1048,6 +1092,20 @@ class InputWidget(QtWidgets.QWidget):
         self.skip_uncs = skip_uncs
         self.surface.set_is_skipping_uncs(skip_uncs)
         self.satellite.set_is_skipping_uncs(skip_uncs)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not self._can_resize_children:
+            QtCore.QTimer.singleShot(250, self._set_resizeable)
+
+    def _set_resizeable(self):
+        self._can_resize_children = True
+
+    def eventFilter(self, watched, event: QtCore.QEvent):
+        if event.type() == QtCore.QEvent.Type.Resize:
+            if self._can_resize_children:
+                self.custom.external_resize(self.width())
+        return super().eventFilter(watched, event)
 
 
 class ComparisonInput(QtWidgets.QWidget):

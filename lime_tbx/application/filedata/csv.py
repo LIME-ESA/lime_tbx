@@ -9,7 +9,7 @@ It exports the following functions:
 """
 
 """___Built-In Modules___"""
-from typing import Union, List
+from typing import Union, List, Tuple
 from datetime import datetime, timezone
 import csv
 import dateutil.parser
@@ -159,6 +159,7 @@ def export_csv_simulation(
     skip_uncs: bool,
     cimel_data: Union[SpectralData, List[SpectralData]],
     mda: Union[List[MoonData], MoonData, None],
+    extra_attrs: List[Tuple[str, str]] = None,
 ):
     """
     Export the given data to a csv file
@@ -187,6 +188,9 @@ def export_csv_simulation(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
+            if extra_attrs:
+                for ea in extra_attrs:
+                    writer.writerow([ea[0], ea[1]])
             some_out_mpa_range = (
                 not inside_mpa_range
                 if not isinstance(inside_mpa_range, list)
