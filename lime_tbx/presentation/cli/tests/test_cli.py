@@ -118,7 +118,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,/root,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -132,7 +132,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,/root,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -158,7 +158,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graphd,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graphd,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -576,7 +576,7 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,test_files/cli/proba_refl.test,test_files/cli/proba_irr.test,test_files/cli/proba_polar.test,test_files/cli/proba_aolp.test"
             )
         )
         self.assertEqual(errcode, 0)
