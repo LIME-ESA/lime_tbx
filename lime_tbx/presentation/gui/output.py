@@ -1,7 +1,7 @@
 """describe class"""
 
 """___Built-In Modules___"""
-from typing import Union, List
+from typing import Union, List, Tuple
 from datetime import datetime
 from abc import ABC, abstractmethod
 
@@ -68,6 +68,7 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         version = self.settings_manager.get_coef_version_name()
         subtitle = "LIME coefficients version: {}".format(version)
         self.subtitle = subtitle
+        self.extra_attrs = None
         self.canvas.set_subtitle(subtitle, fontproperties=font_prop)
         self.canvas.axes.set_xlabel(self.xlabel, fontproperties=label_font_prop)
         self.canvas.axes.set_ylabel(self.ylabel, fontproperties=label_font_prop)
@@ -178,12 +179,15 @@ class GraphWidget(QtWidgets.QWidget, ABC, metaclass=noconflict_makecls()):
         ylabel: str,
         redraw: bool = True,
         subtitle: str = None,
+        extra_attrs: List[Tuple[str, str]] = None,
     ):
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
         if subtitle != None:
             self.subtitle = subtitle
+        if extra_attrs is not None:
+            self.extra_attrs = extra_attrs
         if self.is_built:
             self._update_labels(redraw)
         else:
@@ -320,6 +324,13 @@ class SimGraphWidget(GraphWidget):
         if not self.is_built:
             return
         self.canvas.axes.cla()  # Clear the canvas.
+        subtitle = self.subtitle
+        if self.extra_attrs:
+            subtitle = (
+                subtitle
+                + "\n"
+                + "\n".join(f"{ea[0]}: {ea[1]}" for ea in self.extra_attrs)
+            )
         lines = redraw_canvas(
             self.canvas,
             self.data,
@@ -331,7 +342,7 @@ class SimGraphWidget(GraphWidget):
             self.ylabel,
             self.vertical_lines,
             self.interp_spectrum_name,
-            self.subtitle,
+            subtitle,
             self.settings_manager.is_show_cimel_points(),
         )
         try:
@@ -424,6 +435,7 @@ class SimGraphWidget(GraphWidget):
                         self.skip_uncs,
                         self.cimel_data,
                         self.mda,
+                        self.extra_attrs,
                     )
                 else:
                     csv.export_csv_srf(

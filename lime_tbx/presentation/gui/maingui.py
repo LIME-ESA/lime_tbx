@@ -989,6 +989,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         window.set_save_simulation_action_disabled(True)
 
 
+_WARN_POLAR_PRELIMINARY = (
+    "Disclaimer",
+    "Polarisation values are preliminary and may be updated.",
+)
+
+
 class MainSimulationsWidget(
     QtWidgets.QWidget, IMainSimulationsWidget, metaclass=noconflict_makecls()
 ):
@@ -1433,11 +1439,13 @@ class MainSimulationsWidget(
         warning_out_mpa_range = ""
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         self.graph.update_labels(
             "Lunar polarisation",
             "Wavelengths (nm)",
             "Degree of Linear Polarisation (%)",
-            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+            subtitle=subtitle,
+            extra_attrs=[_WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
@@ -1505,11 +1513,13 @@ class MainSimulationsWidget(
         warning_out_mpa_range = ""
         if is_out_mpa_range:
             warning_out_mpa_range = f"\n{_WARN_OUTSIDE_MPA_RANGE}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
         self.graph.update_labels(
             "Lunar Angle of Linear Polarisation",
             "Wavelengths (nm)",
             "Angle of Linear Polarisation (°)",
-            subtitle=f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}",
+            subtitle=subtitle,
+            extra_attrs=[_WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()

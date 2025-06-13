@@ -1,7 +1,7 @@
 """This module creates LGLOD datatypes"""
 
 """___Built-In Modules___"""
-from typing import List, Union
+from typing import List, Union, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np

@@ -19,6 +19,13 @@ by reducing screen clutter and allowing more space for the output graph and data
 - Responsive Layout for Selenographic Input: When the window is wide enough, the Selenographic input fields
 are automatically rearranged in 3 columns × 2 rows instead of the previous fixed 2 rows × 3 columns. This improves space
 efficiency, leaving more room for the output graph and data display.
+- Introduced Angle of Linear Polarisation (AoLP) feature set.
+- Coefficient versions available by default now include `20250608_V01` version.
+
+### Changed
+
+- Polarisation (DoLP and AoLP) graphs and csv exports contain a disclaimer stating that the calculated
+values are preliminary and subject to changes.
 
 ### Fixed
 
