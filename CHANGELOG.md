@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
-## [unreleased] - yyyy-mm-dd
+## [1.2.0] - 2025-06-19
 
 ### Added
 
@@ -85,6 +85,7 @@ calculations compared to v1.0.3. (**NFR306**)
 Initial version that serves as the baseline for tracking changes in the change log.
 
 
-[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/LIME-ESA/lime_tbx/releases/tag/v1.0.3
