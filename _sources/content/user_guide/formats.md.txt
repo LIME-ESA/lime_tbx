@@ -221,15 +221,19 @@ Simulation files contain additional variables that store spectral data, describe
 | `irr_spectrum_unc` | `number_obs`, `wlens` | float64 | Uncertainties for the simulated lunar irradiance per wavelength. |
 | `refl_spectrum` | `number_obs`, `wlens` | float64 | Simulated lunar reflectance per wavelength. |
 | `refl_spectrum_unc` | `number_obs`, `wlens` | float64 | Uncertainties for the simulated lunar reflectance per wavelength. |
-| `polar_spectrum` | `number_obs`, `wlens` | float64 | Simulated lunar degree of polarization per wavelength. |
-| `polar_spectrum_unc` | `number_obs`, `wlens` | float64 | Uncertainties for the simulated lunar degree of polarization per wavelength. |
+| `polar_spectrum` | `number_obs`, `wlens` | float64 | Simulated lunar degree of linear polarization per wavelength. |
+| `polar_spectrum_unc` | `number_obs`, `wlens` | float64 | Uncertainties for the simulated lunar degree of linear polarization per wavelength. |
+| `aolp_spectrum` | `number_obs`, `wlens` | float64 | Simulated lunar angle of linear polarization per wavelength. |
+| `aolp_spectrum_unc` | `number_obs`, `wlens` | float64 | Uncertainties for the simulated lunar angle of linear polarization per wavelength. |
 | `cimel_wlens` | `wlens_cimel` | float64 | CIMEL wavelengths. |
 | `irr_cimel` | `number_obs`, `wlens_cimel` | float64 | Simulated lunar irradiance for the CIMEL wavelengths. |
 | `irr_cimel_unc` | `number_obs`, `wlens_cimel` | float64 | Uncertainties for the simulated lunar irradiance for the CIMEL wavelengths. |
 | `refl_cimel` | `number_obs`, `wlens_cimel` | float64 | Simulated lunar reflectance for the CIMEL wavelengths. |
 | `refl_cimel_unc` | `number_obs`, `wlens_cimel` | float64 | Uncertainties for the simulated lunar reflectance for the CIMEL wavelengths. |
-| `polar_cimel` | `number_obs`, `wlens_cimel` | float64 | Simulated lunar degree of polarization for the CIMEL wavelengths. |
-| `polar_cimel_unc` | `number_obs`, `wlens_cimel` | float64 | Uncertainties for the simulated lunar degree of polarization for the CIMEL wavelengths. |
+| `polar_cimel` | `number_obs`, `wlens_cimel` | float64 | Simulated lunar degree of linear polarization for the CIMEL wavelengths. |
+| `polar_cimel_unc` | `number_obs`, `wlens_cimel` | float64 | Uncertainties for the simulated lunar degree of linear polarization for the CIMEL wavelengths. |
+| `aolp_cimel` | `number_obs`, `wlens_cimel` | float64 | Simulated lunar angle of linear polarization for the CIMEL wavelengths. |
+| `aolp_cimel_unc` | `number_obs`, `wlens_cimel` | float64 | Uncertainties for the simulated lunar angle of linear polarization for the CIMEL wavelengths. |
 
 
 <i>Table 7</i>: Data variables in LIME Toolbox Simulation netCDF files.

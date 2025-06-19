@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.presentation.cli.export &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.presentation.cli.export &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -162,15 +162,18 @@
 <span class="sd">        Path to the output CSV file for reflectance.</span>
 <span class="sd">    o_file_irr : str</span>
 <span class="sd">        Path to the output CSV file for irradiance.</span>
-<span class="sd">    o_file_polar : str</span>
-<span class="sd">        Path to the output CSV file for polarization.</span>
+<span class="sd">    o_file_dolp : str</span>
+<span class="sd">        Path to the output CSV file for degree of linear polarisation.</span>
+<span class="sd">    o_file_aolp : str</span>
+<span class="sd">        Path to the output CSV file for angle of linear polarisation.</span>
 <span class="sd">    o_file_integrated_irr : str</span>
 <span class="sd">        Path to the output CSV file for integrated irradiance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">o_file_refl</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">o_file_irr</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">o_file_polar</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_dolp</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_aolp</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">o_file_integrated_irr</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
@@ -187,13 +190,16 @@
 <span class="sd">        Path to the output graph file for reflectance.</span>
 <span class="sd">    o_file_irr : str</span>
 <span class="sd">        Path to the output graph file for irradiance.</span>
-<span class="sd">    o_file_polar : str</span>
-<span class="sd">        Path to the output graph file for polarization.</span>
+<span class="sd">    o_file_dolp : str</span>
+<span class="sd">        Path to the output graph file for degree of linear polarisation.</span>
+<span class="sd">    o_file_aolp : str</span>
+<span class="sd">        Path to the output graph file for angle of linear polarisation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">o_file_refl</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">o_file_irr</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">o_file_polar</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">o_file_dolp</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">o_file_aolp</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 
@@ -418,6 +424,7 @@
             <span class="n">mda</span> <span class="o">=</span> <span class="n">mdas</span>
             <span class="n">mpa</span> <span class="o">=</span> <span class="n">mdas</span><span class="o">.</span><span class="n">mpa_degrees</span>
         <span class="n">dolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_polar_spectrum_name</span><span class="p">()</span>
+        <span class="n">aolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_aolp_spectrum_name</span><span class="p">()</span>
         <span class="n">skip_uncs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">is_skip_uncertainties</span><span class="p">()</span>
         <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs</span><span class="p">(),</span>
@@ -445,18 +452,34 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_cimel</span><span class="p">(),</span>
             <span class="n">mda</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">polar_extra_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">_WARN_POLAR_PRELIMINARY</span><span class="p">]</span>
         <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars</span><span class="p">(),</span>
             <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Degree of Linear Polarisation (%)&quot;</span><span class="p">,</span>
             <span class="n">point</span><span class="p">,</span>
-            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_polar</span><span class="p">,</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_dolp</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
             <span class="n">are_mpas_oinside_mpa_range</span><span class="p">,</span>
             <span class="n">dolp_sp_name</span><span class="p">,</span>
             <span class="n">skip_uncs</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars_cimel</span><span class="p">(),</span>
             <span class="n">mda</span><span class="p">,</span>
+            <span class="n">polar_extra_attrs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_aolp</span><span class="p">(),</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Angle of Linear Polarisation (°)&quot;</span><span class="p">,</span>
+            <span class="n">point</span><span class="p">,</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">o_file_aolp</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">,</span>
+            <span class="n">are_mpas_oinside_mpa_range</span><span class="p">,</span>
+            <span class="n">aolp_sp_name</span><span class="p">,</span>
+            <span class="n">skip_uncs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_aolp_cimel</span><span class="p">(),</span>
+            <span class="n">mda</span><span class="p">,</span>
+            <span class="n">polar_extra_attrs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_integrated_irradiance</span><span class="p">(</span>
             <span class="n">srf</span><span class="p">,</span>
@@ -489,6 +512,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
         <span class="n">dolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_polar_spectrum_name</span><span class="p">()</span>
+        <span class="n">aolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_aolp_spectrum_name</span><span class="p">()</span>
         <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_lime_coef</span><span class="p">()</span><span class="o">.</span><span class="n">version</span>
         <span class="n">mds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_moon_datas</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mds</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -500,6 +524,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">kernels_path</span><span class="p">,</span>
             <span class="n">sp_name</span><span class="p">,</span>
             <span class="n">dolp_sp_name</span><span class="p">,</span>
+            <span class="n">aolp_sp_name</span><span class="p">,</span>
             <span class="n">version</span><span class="p">,</span>
             <span class="n">mds</span><span class="p">,</span>
         <span class="p">)</span>
@@ -553,6 +578,7 @@
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_spectrum_name</span><span class="p">()</span>
         <span class="n">dolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_polar_spectrum_name</span><span class="p">()</span>
+        <span class="n">aolp_sp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_selected_aolp_spectrum_name</span><span class="p">()</span>
         <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
             <span class="n">canv</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs</span><span class="p">(),</span>
@@ -563,7 +589,6 @@
             <span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs_cimel</span><span class="p">(),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elrefs_asd</span><span class="p">(),</span>
-            <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;Extraterrestrial Lunar Reflectances&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Reflectances (Fraction of unity)&quot;</span><span class="p">,</span>
@@ -587,7 +612,6 @@
             <span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_cimel</span><span class="p">(),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_asd</span><span class="p">(),</span>
-            <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;Extraterrestrial Lunar Irradiances&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Irradiances (Wm⁻²nm⁻¹)&quot;</span><span class="p">,</span>
@@ -602,7 +626,7 @@
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">dolp_sp_name</span><span class="si">}{</span><span class="n">mpa_text</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">_WARN_POLAR_PRELIMINARY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
@@ -615,7 +639,6 @@
             <span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars_cimel</span><span class="p">(),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars_asd</span><span class="p">(),</span>
-            <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;Extraterrestrial Lunar Polarisation&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
             <span class="s2">&quot;Degree of Linear Polarisation (%)&quot;</span><span class="p">,</span>
@@ -623,10 +646,37 @@
             <span class="n">dolp_sp_name</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">o_file_polar</span><span class="p">)</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">o_file_dolp</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting polarisation graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">aolp_sp_name</span><span class="si">}{</span><span class="n">mpa_text</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">_WARN_POLAR_PRELIMINARY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
+        <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
+        <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
+            <span class="n">canv</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_aolp</span><span class="p">(),</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">INTERPOLATED_DATA_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">CIMEL_POINT_LABEL</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">ERRORBARS_LABEL</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_aolp_cimel</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_aolp_asd</span><span class="p">(),</span>
+            <span class="s2">&quot;Extraterrestrial Lunar Angle of Polarisation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Angle of Linear Polarisation (°)&quot;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">aolp_sp_name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">canv</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">o_file_aolp</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExportError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong while exporting angle of polarisation graph. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
 

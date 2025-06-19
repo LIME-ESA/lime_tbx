@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.presentation.gui.settings &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.presentation.gui.settings &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -112,6 +112,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LimeCoefficients</span><span class="p">,</span>
     <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+    <span class="n">AOLPCoefficients</span><span class="p">,</span>
     <span class="n">SRFChannel</span><span class="p">,</span>
     <span class="n">SpectralResponseFunction</span><span class="p">,</span>
     <span class="n">ReflectanceCoefficients</span><span class="p">,</span>
@@ -157,6 +158,14 @@
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_polar_coef</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolarisationCoefficients</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the current PolarisationCoefficients chosen by the user.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISettingsManager.get_aolp_coef">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.ISettingsManager.get_aolp_coef">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_aolp_coef</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AOLPCoefficients</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the current AOLPCoefficients chosen by the user.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
@@ -252,7 +261,15 @@
 <a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.ISettingsManager.get_selected_polar_spectrum_name">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_selected_polar_spectrum_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the currently selected polarisation interpolation spectrum name&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the currently selected degree of polarisation interpolation spectrum name&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ISettingsManager.get_selected_aolp_spectrum_name">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.ISettingsManager.get_selected_aolp_spectrum_name">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_selected_aolp_spectrum_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the currently selected angle of polarisation interpolation spectrum name&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
@@ -462,6 +479,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cimel_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">reflectance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polar_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">polarisation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aolp_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">aolp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coef_version_name</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SettingsManager.get_default_srf">
@@ -480,6 +498,12 @@
 <a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.SettingsManager.get_polar_coef">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_polar_coef</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PolarisationCoefficients</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">polar_coeff</span></div>
+
+
+<div class="viewcode-block" id="SettingsManager.get_aolp_coef">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.SettingsManager.get_aolp_coef">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_aolp_coef</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AOLPCoefficients</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aolp_coeff</span></div>
 
 
 <div class="viewcode-block" id="SettingsManager.load_srf">
@@ -524,6 +548,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cimel_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">reflectance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polar_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">polarisation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aolp_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">aolp</span>
         <span class="n">access_data</span><span class="o">.</span><span class="n">set_previously_selected_version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">.</span><span class="n">version</span><span class="p">)</span></div>
 
 
@@ -533,7 +558,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">access_data</span><span class="o">.</span><span class="n">get_all_coefficients</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cimel_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reflectance</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">polar_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">polarisation</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">polar_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">polarisation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aolp_coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">aolp</span></div>
 
 
 <div class="viewcode-block" id="SettingsManager.get_available_interp_SRFs">
@@ -576,6 +602,12 @@
 <a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.SettingsManager.get_selected_polar_spectrum_name">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_selected_polar_spectrum_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">interp_data</span><span class="o">.</span><span class="n">get_dolp_interpolation_spectrum_name</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SettingsManager.get_selected_aolp_spectrum_name">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.gui.settings.html#lime_tbx.presentation.gui.settings.SettingsManager.get_selected_aolp_spectrum_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_selected_aolp_spectrum_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">interp_data</span><span class="o">.</span><span class="n">get_aolp_interpolation_spectrum_name</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SettingsManager.select_interp_spectrum">

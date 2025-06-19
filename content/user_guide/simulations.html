@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulations &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>Simulations &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -154,7 +154,8 @@
              
   <section id="simulations">
 <h1>Simulations<a class="headerlink" href="#simulations" title="Link to this heading"></a></h1>
-<p>LIME Toolbox allows users to simulate lunar reflectance, irradiance, and the degree of linear polarisation (DoLP).
+<p>LIME Toolbox allows users to simulate lunar reflectance, irradiance, the degree of linear polarisation (DoLP),
+and the angle of linear polarisation (AoLP).
 Simulations are performed using the Simulation page (<a class="reference internal" href="#fig-6">Figure 6</a>), which is the default view when
 launching LIME Toolbox.</p>
 <p>Users can select one of three simulation methods:</p>
@@ -358,7 +359,8 @@ Users can select one of the following button to run simulations and view results
 <ul class="simple">
 <li><p><strong>“IRRADIANCE”</strong> – Displays irradiance results.</p></li>
 <li><p><strong>“REFLECTANCE”</strong> – Shows reflectance results.</p></li>
-<li><p><strong>“POLARIZATION”</strong> – Visualizes Degree of Lunar Polarisation (DoLP).</p></li>
+<li><p><strong>“DOLP”</strong> – Visualises the Degree of Linear Polarisation (DoLP).</p></li>
+<li><p><strong>“AOLP”</strong> – Visualises the Angle of Linear Polarisation (AoLP).</p></li>
 </ul>
 <p>These buttons are positioned between the input and the output, as shown on top of <a class="reference internal" href="#fig-12">Figure 12</a>.</p>
 <figure class="align-center" id="fig-12">
@@ -378,7 +380,7 @@ Users can select one of the following button to run simulations and view results
 <section id="graphical-export-image-pdf">
 <h4>Graphical Export (Image/PDF)<a class="headerlink" href="#graphical-export-image-pdf" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Click “EXPORT GRAPH” (bottom-left) to save the graph as an image or PDF.</p></li>
+<li><p>Click “Export Graph” (top-center) to save the graph as an image or PDF.</p></li>
 <li><p>A file system dialog will prompt the user to select the location, filename, and format.</p></li>
 <li><p>Supported formats include JPG, PNG, PDF, and other common image formats.</p></li>
 </ul>
@@ -386,14 +388,14 @@ Users can select one of the following button to run simulations and view results
 <section id="data-export-csv-file">
 <h4>Data Export (CSV File)<a class="headerlink" href="#data-export-csv-file" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Click “EXPORT CSV” (bottom-right) to save the simulation data as a comma-separated values (CSV) file.</p></li>
+<li><p>Click “Export CSV” (top-center) to save the simulation data as a comma-separated values (CSV) file.</p></li>
 <li><p>The user will be prompted to choose the location and filename.</p></li>
 </ul>
 </section>
 <section id="netcdf-export">
 <h4>NetCDF Export<a class="headerlink" href="#netcdf-export" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Click “EXPORT TO NETCDF” (bottom of the page) to save results as a netCDF file.</p></li>
+<li><p>Go to the action menu bar and navigat to “File → Save as a netCDF file” to save results as a netCDF file.</p></li>
 </ul>
 <blockquote>
 <div><p><strong>Why use netCDF?</strong></p>
@@ -413,22 +415,22 @@ based on the desired output type.</p>
 <section id="id5">
 <h4>Graphical Export (Image/PDF)<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <p>Specify the image type, paths and filenames of each graph:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,<span class="o">(</span>pdf<span class="p">|</span>jpg<span class="p">|</span>png<span class="p">|</span>svg<span class="o">)</span>,reflectance_path,irradiance_path,polarisation_path
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,<span class="o">(</span>pdf<span class="p">|</span>jpg<span class="p">|</span>png<span class="p">|</span>svg<span class="o">)</span>,reflectance_path,irradiance_path,dolp_path,aolp_path
 </pre></div>
 </div>
 <p>For example:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,jpg,reflectance.jpg,irradiance.jpg,polarisation.jpg
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>graph,jpg,reflectance.jpg,irradiance.jpg,dolp.jpg,aolp.jpg
 </pre></div>
 </div>
 </section>
 <section id="id6">
 <h4>Data Export (CSV File)<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
 <p>Specify paths and names of each file:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,reflectance_path,irradiance_path,polarization_path,integrated_irradiance_path
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,reflectance_path,irradiance_path,dolp_path,aolp_path,integrated_irradiance_path
 </pre></div>
 </div>
 <p>For example:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,reflectance.csv,irradiance.csv,polarization.csv,integrated_irradiance.csv
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-o<span class="w"> </span>csv,reflectance.csv,irradiance.csv,dolp.csv,aolp.csv,integrated_irradiance.csv
 </pre></div>
 </div>
 </section>

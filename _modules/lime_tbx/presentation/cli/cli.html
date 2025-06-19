@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.presentation.cli.cli &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.presentation.cli.cli &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -236,9 +236,9 @@
     <span class="n">imsel</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_EXTENSIONS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="n">compdiffsel</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">COMP_DIFF_KEYS</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;The lime toolbox performs simulations of lunar irradiance, reflectance and </span><span class="se">\</span>
-<span class="s2">polarisation for a given point and datetime. It also performs comparisons for some given </span><span class="se">\</span>
-<span class="s2">observations files in GLOD format.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;The lime toolbox performs simulations of lunar irradiance, reflectance and both </span><span class="se">\</span>
+<span class="s2">degree and angle of linear polarisation for a given point and datetime. It also performs </span><span class="se">\</span>
+<span class="s2">comparisons for some given observations files in GLOD format.</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;It won&#39;t work unless given only one of the options (-h|-e|-l|-s|-c).&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -261,8 +261,8 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t\t</span><span class="s1"> -c &quot;input_glod1.nc input_glod2.nc ...&quot;&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  -o, --output</span><span class="se">\t\t</span><span class="s2"> Select the output path and format.&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> If it&#39;s a simulation:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   GRAPH: -o graph,</span><span class="si">{</span><span class="n">imsel</span><span class="si">}</span><span class="s2">,refl,irr,polar&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   CSV: -o csv,refl.csv,irr.csv,polar.csv,integrated_irr.csv&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   GRAPH: -o graph,</span><span class="si">{</span><span class="n">imsel</span><span class="si">}</span><span class="s2">,refl,irr,dolp,aolp&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   CSV: -o csv,refl.csv,irr.csv,dolp.csv,aolp.csv,integrated_irr.csv&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   LGLOD (netcdf): -o nc,output_lglod.nc&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2"> If it&#39;s a comparison:&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t\t\t</span><span class="s2">   GRAPH: -o graph,</span><span class="si">{</span><span class="n">imsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compsel</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">compdiffsel</span><span class="si">}</span><span class="s2">,output&quot;</span><span class="p">)</span>
@@ -498,10 +498,14 @@
     <span class="n">o_type</span> <span class="o">=</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_comparison</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o csv,...&quot;</span><span class="p">)</span>
             <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportCSV</span><span class="p">(</span>
-                <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">splitted</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="n">splitted</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                <span class="n">splitted</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
@@ -513,7 +517,7 @@
             <span class="p">)</span>
     <span class="k">elif</span> <span class="n">o_type</span> <span class="o">==</span> <span class="s2">&quot;graph&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_comparison</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ParsingError</span><span class="p">(</span><span class="s2">&quot;Error: Wrong number of arguments for -o graph,...&quot;</span><span class="p">)</span>
             <span class="n">filepaths</span> <span class="o">=</span> <span class="n">_parse_filepaths_from_img_extension</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
             <span class="n">export_data</span> <span class="o">=</span> <span class="n">export</span><span class="o">.</span><span class="n">ExportGraph</span><span class="p">(</span><span class="o">*</span><span class="n">filepaths</span><span class="p">)</span>
@@ -678,8 +682,8 @@
             <span class="n">def_srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_cimel_coef</span><span class="p">()</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_polarisation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates lunar polarization at a given point.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_dolp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates degree of lunar linear polarisation at a given point.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -689,6 +693,19 @@
         <span class="n">def_srf</span> <span class="o">=</span> <span class="n">get_default_srf</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">update_polarisation</span><span class="p">(</span>
             <span class="n">def_srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_polar_coef</span><span class="p">()</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_aolp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates angle of lunar linear polarisation at a given point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point : Point</span>
+<span class="sd">            The geographic, lunar, or satellite location for the simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">def_srf</span> <span class="o">=</span> <span class="n">get_default_srf</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">update_aolp</span><span class="p">(</span>
+            <span class="n">def_srf</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_manager</span><span class="o">.</span><span class="n">get_aolp_coef</span><span class="p">()</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">Point</span><span class="p">):</span>
@@ -702,7 +719,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_reflectance</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_irradiance</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_polarisation</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dolp</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_aolp</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CLI.calculate_geographic">
 <a class="viewcode-back" href="../../../../content/api/lime_tbx.presentation.cli.cli.html#lime_tbx.presentation.cli.cli.CLI.calculate_geographic">[docs]</a>
@@ -1344,7 +1362,7 @@
                     <span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">params_str</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
                     <span class="n">lat</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">lon</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">height</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span>
+                    <span class="n">height</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span>
                     <span class="k">if</span> <span class="n">timeseries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">dt</span> <span class="o">=</span> <span class="n">timeseries</span>
                     <span class="k">else</span><span class="p">:</span>

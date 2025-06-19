@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Analysis &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>Analysis &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -280,6 +280,8 @@ seconds when switching and drawing them after the comparison shouldn’t take mo
 <li><p><strong>FR304</strong>: The LIME TBX shall output the simulated lunar degree of polarization’s associated uncertainty.</p></li>
 <li><p><strong>FR305</strong>: Allow the visualization of the user defined spectral response used for the spectral integration
 of the LIME output into a sensor spectral band.</p></li>
+<li><p><strong>FR306</strong>: The LIME TBX shall output the simulated lunar disk angle of linear polarization (AoLP).</p></li>
+<li><p><strong>FR307</strong>: The LIME TBX shall output the simulated lunar angle of linear polarization’s associated uncertainty.</p></li>
 </ul>
 </section>
 <section id="id4">
@@ -290,7 +292,8 @@ of the LIME output into a sensor spectral band.</p></li>
 <li><p><strong>NFR303</strong>: The LIME simulated output shall be available to be exported to GLOD format files.</p></li>
 <li><p><strong>NFR304</strong>: The LIME version number shall be visible on all outputs (plots/files) of the TBX.</p></li>
 <li><p><strong>NFR305</strong>: Geometry information (coordinates, angles, etc.) and timestamps must be included in NetCDF and CSV output files.</p></li>
-<li><p><strong>NFR306</strong>: Calculation of uncertainties (<strong>FR303</strong>, <strong>FR304</strong>) must be performed as fast as possible.</p></li>
+<li><p><strong>NFR306</strong>: Calculation of uncertainties (<strong>FR303</strong>, <strong>FR304</strong>, <strong>FR307</strong>) must be performed as fast as possible.</p></li>
+<li><p><strong>NFR307</strong>: The simulated lunar disk angle of linear polarization (<strong>FR306</strong>) must be in the spectral range of 400 nm to 2500 nm.</p></li>
 </ul>
 </section>
 </section>

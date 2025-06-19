@@ -1,6 +1,7 @@
 # Simulations
 
-LIME Toolbox allows users to simulate lunar reflectance, irradiance, and the degree of linear polarisation (DoLP).
+LIME Toolbox allows users to simulate lunar reflectance, irradiance, the degree of linear polarisation (DoLP),
+and the angle of linear polarisation (AoLP).
 Simulations are performed using the Simulation page ([Figure 6](#fig-6)), which is the default view when
 launching LIME Toolbox.
 
@@ -189,7 +190,8 @@ The simulation results are displayed below the input section.
 Users can select one of the following button to run simulations and view results:
 - **"IRRADIANCE"** – Displays irradiance results.
 - **"REFLECTANCE"** – Shows reflectance results.
-- **"POLARIZATION"** – Visualizes Degree of Lunar Polarisation (DoLP).
+- **"DOLP"** – Visualises the Degree of Linear Polarisation (DoLP).
+- **"AOLP"** – Visualises the Angle of Linear Polarisation (AoLP).
 
 These buttons are positioned between the input and the output, as shown on top of [Figure 12](#fig-12).
 
@@ -211,16 +213,16 @@ Results are plotted with:
 Users can export the results in multiple formats:
 
 #### Graphical Export (Image/PDF)
-- Click "EXPORT GRAPH" (bottom-left) to save the graph as an image or PDF.
+- Click "Export Graph" (top-center) to save the graph as an image or PDF.
 - A file system dialog will prompt the user to select the location, filename, and format.
 - Supported formats include JPG, PNG, PDF, and other common image formats.
 
 #### Data Export (CSV File)
-- Click "EXPORT CSV" (bottom-right) to save the simulation data as a comma-separated values (CSV) file.
+- Click "Export CSV" (top-center) to save the simulation data as a comma-separated values (CSV) file.
 - The user will be prompted to choose the location and filename.
 
 #### NetCDF Export
-- Click "EXPORT TO NETCDF" (bottom of the page) to save results as a netCDF file.
+- Go to the action menu bar and navigat to "File → Save as a netCDF file" to save results as a netCDF file.
 > **Why use netCDF?**
 > - Unlike CSV, netCDF allows LIME Toolbox to reload previous simulations for visualization.
 > - This format enables efficient data storage and retrieval.
@@ -235,21 +237,21 @@ based on the desired output type.
 #### Graphical Export (Image/PDF)
 Specify the image type, paths and filenames of each graph:
 ```sh
--o graph,(pdf|jpg|png|svg),reflectance_path,irradiance_path,polarisation_path
+-o graph,(pdf|jpg|png|svg),reflectance_path,irradiance_path,dolp_path,aolp_path
 ```
 For example:
 ```sh
--o graph,jpg,reflectance.jpg,irradiance.jpg,polarisation.jpg
+-o graph,jpg,reflectance.jpg,irradiance.jpg,dolp.jpg,aolp.jpg
 ```
 
 #### Data Export (CSV File)
 Specify paths and names of each file:
 ```sh
--o csv,reflectance_path,irradiance_path,polarization_path,integrated_irradiance_path
+-o csv,reflectance_path,irradiance_path,dolp_path,aolp_path,integrated_irradiance_path
 ```
 For example:
 ```sh
--o csv,reflectance.csv,irradiance.csv,polarization.csv,integrated_irradiance.csv
+-o csv,reflectance.csv,irradiance.csv,dolp.csv,aolp.csv,integrated_irradiance.csv
 ```
 
 #### NetCDF Export

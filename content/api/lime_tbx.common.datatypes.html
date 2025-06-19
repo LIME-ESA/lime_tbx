@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.common.datatypes module &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.common.datatypes module &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -169,6 +169,22 @@ of data between modules of the package lime-tbx.</p>
 </ul>
 </dd>
 </dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.AOLPCoefficients">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">AOLPCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavelengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aolp_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unc_coeff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_corr_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#AOLPCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.AOLPCoefficients" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.AOLPCoefficients.get_wavelengths">
+<span class="sig-name descname"><span class="pre">get_wavelengths</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#AOLPCoefficients.get_wavelengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.AOLPCoefficients.get_wavelengths" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.AOLPCoefficients.is_calculable">
+<span class="sig-name descname"><span class="pre">is_calculable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#AOLPCoefficients.is_calculable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.AOLPCoefficients.is_calculable" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.ComparisonData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">ComparisonData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observed_signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulated_signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffs_signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_relative_difference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_absolute_relative_difference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard_deviation_mrd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SurfacePoint" title="lime_tbx.common.datatypes.SurfacePoint"><span class="pre">SurfacePoint</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.CustomPoint" title="lime_tbx.common.datatypes.CustomPoint"><span class="pre">CustomPoint</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ampa_valid_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_diffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_perc_difference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mdas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#ComparisonData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.ComparisonData" title="Link to this definition"></a></dt>
@@ -555,7 +571,7 @@ for the SpectraDatas.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.InterpolationSettings">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">InterpolationSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interpolation_spectrum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_spectrum_polarisation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_SRF</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cimel_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_interp_spectrum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_uncertainties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_wehrli</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#InterpolationSettings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.InterpolationSettings" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">InterpolationSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interpolation_spectrum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_spectrum_polarisation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_spectrum_aolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_SRF</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cimel_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_interp_spectrum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_uncertainties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_wehrli</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#InterpolationSettings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.InterpolationSettings" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Representation of the YAML file that contains the interpolation settings data.</p>
 <dl class="py attribute">
@@ -573,6 +589,17 @@ for the SpectraDatas.</p>
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.InterpolationSettings.interpolation_spectrum_polarisation">
 <span class="sig-name descname"><span class="pre">interpolation_spectrum_polarisation</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.InterpolationSettings.interpolation_spectrum_polarisation" title="Link to this definition"></a></dt>
 <dd><p>Name (and id) of the spectrum used for interpolation for polarisation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.InterpolationSettings.interpolation_spectrum_aolp">
+<span class="sig-name descname"><span class="pre">interpolation_spectrum_aolp</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.InterpolationSettings.interpolation_spectrum_aolp" title="Link to this definition"></a></dt>
+<dd><p>Name (and id) of the spectrum used for interpolation for angle of polarisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -636,7 +663,12 @@ for the SpectraDatas.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id24">
-<span class="sig-name descname"><span class="pre">interpolation_spectrum_polarisation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">interpolation_spectrum_aolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id25">
+<span class="sig-name descname"><span class="pre">interpolation_spectrum_polarisation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -645,18 +677,18 @@ for the SpectraDatas.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id25">
-<span class="sig-name descname"><span class="pre">show_interp_spectrum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id26">
-<span class="sig-name descname"><span class="pre">skip_uncertainties</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">show_interp_spectrum</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id27">
-<span class="sig-name descname"><span class="pre">use_wehrli</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">skip_uncertainties</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id28">
+<span class="sig-name descname"><span class="pre">use_wehrli</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id28" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -689,13 +721,13 @@ for the SpectraDatas.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id28">
-<span class="sig-name descname"><span class="pre">custom_kernel_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id28" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id29">
+<span class="sig-name descname"><span class="pre">custom_kernel_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id29" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id29">
-<span class="sig-name descname"><span class="pre">main_kernels_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id29" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id30">
+<span class="sig-name descname"><span class="pre">main_kernels_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id30" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -761,28 +793,28 @@ for the SpectraDatas.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id30">
-<span class="sig-name descname"><span class="pre">ch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id30" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id31">
-<span class="sig-name descname"><span class="pre">comparisons</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.ComparisonData" title="lime_tbx.common.datatypes.ComparisonData"><span class="pre">ComparisonData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id31" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id31" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id32">
-<span class="sig-name descname"><span class="pre">sat_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id32" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">comparisons</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.ComparisonData" title="lime_tbx.common.datatypes.ComparisonData"><span class="pre">ComparisonData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id32" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id33">
-<span class="sig-name descname"><span class="pre">skipped_uncs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id33" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">sat_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id33" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id34">
-<span class="sig-name descname"><span class="pre">spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id34" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">skipped_uncs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id34" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id35">
+<span class="sig-name descname"><span class="pre">spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id35" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -794,7 +826,7 @@ for the SpectraDatas.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.LGLODData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">LGLODData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.LunarObservationWrite" title="lime_tbx.common.datatypes.LunarObservationWrite"><span class="pre">LunarObservationWrite</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">not_default_srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elis_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elrefs_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polars_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipped_uncs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dolp_spectrum_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#LGLODData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.LGLODData" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">LGLODData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.LunarObservationWrite" title="lime_tbx.common.datatypes.LunarObservationWrite"><span class="pre">LunarObservationWrite</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">not_default_srf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elis_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elrefs_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polars_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aolp_cimel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipped_uncs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dolp_spectrum_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aolp_spectrum_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#LGLODData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.LGLODData" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Dataclass with the data of a LGLOD simulation file. LGLOD is the GLOD-based format used by the toolbox.</p>
 <dl class="py attribute">
@@ -864,6 +896,17 @@ for the SpectraDatas.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.LGLODData.aolp_cimel">
+<span class="sig-name descname"><span class="pre">aolp_cimel</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.LGLODData.aolp_cimel" title="Link to this definition"></a></dt>
+<dd><p>AoLP for the cimel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.LGLODData.spectrum_name">
 <span class="sig-name descname"><span class="pre">spectrum_name</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.LGLODData.spectrum_name" title="Link to this definition"></a></dt>
 <dd><p>Name of the spectrum used for interpolation.</p>
@@ -888,7 +931,7 @@ for the SpectraDatas.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.LGLODData.dolp_spectrum_name">
 <span class="sig-name descname"><span class="pre">dolp_spectrum_name</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.LGLODData.dolp_spectrum_name" title="Link to this definition"></a></dt>
-<dd><p>Name of the spectrum used for polarisation interpolation.</p>
+<dd><p>Name of the spectrum used for degree of linear polarisation interpolation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -897,48 +940,69 @@ for the SpectraDatas.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id35">
-<span class="sig-name descname"><span class="pre">dolp_spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id35" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.LGLODData.aolp_spectrum_name">
+<span class="sig-name descname"><span class="pre">aolp_spectrum_name</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.LGLODData.aolp_spectrum_name" title="Link to this definition"></a></dt>
+<dd><p>Name of the spectrum used for angle of linear polarisation interpolation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id36">
-<span class="sig-name descname"><span class="pre">elis_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id36" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">aolp_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id36" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id37">
-<span class="sig-name descname"><span class="pre">elrefs_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id37" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">aolp_spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id37" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id38">
-<span class="sig-name descname"><span class="pre">not_default_srf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id38" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dolp_spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id38" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id39">
-<span class="sig-name descname"><span class="pre">observations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.LunarObservationWrite" title="lime_tbx.common.datatypes.LunarObservationWrite"><span class="pre">LunarObservationWrite</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id39" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">elis_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id39" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id40">
-<span class="sig-name descname"><span class="pre">polars_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id40" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">elrefs_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id40" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id41">
-<span class="sig-name descname"><span class="pre">signals</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id41" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">not_default_srf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id41" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id42">
-<span class="sig-name descname"><span class="pre">skipped_uncs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id42" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">observations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.LunarObservationWrite" title="lime_tbx.common.datatypes.LunarObservationWrite"><span class="pre">LunarObservationWrite</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id42" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id43">
-<span class="sig-name descname"><span class="pre">spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id43" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">polars_cimel</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id43" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id44">
+<span class="sig-name descname"><span class="pre">signals</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id44" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id45">
+<span class="sig-name descname"><span class="pre">skipped_uncs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id45" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id46">
+<span class="sig-name descname"><span class="pre">spectrum_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id46" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -950,7 +1014,7 @@ for the SpectraDatas.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.LimeCoefficients">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">LimeCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reflectance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarisation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><span class="pre">PolarisationCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#LimeCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.LimeCoefficients" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">LimeCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reflectance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarisation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><span class="pre">PolarisationCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.AOLPCoefficients" title="lime_tbx.common.datatypes.AOLPCoefficients"><span class="pre">AOLPCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#LimeCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.LimeCoefficients" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Coefficients used in the LIME algorithms.</p>
 <dl class="py attribute">
@@ -987,18 +1051,23 @@ for the SpectraDatas.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id44">
-<span class="sig-name descname"><span class="pre">polarisation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><span class="pre">PolarisationCoefficients</span></a></em><a class="headerlink" href="#id44" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.LimeCoefficients.aolp">
+<span class="sig-name descname"><span class="pre">aolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.AOLPCoefficients" title="lime_tbx.common.datatypes.AOLPCoefficients"><span class="pre">AOLPCoefficients</span></a></em><a class="headerlink" href="#lime_tbx.common.datatypes.LimeCoefficients.aolp" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id45">
-<span class="sig-name descname"><span class="pre">reflectance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></em><a class="headerlink" href="#id45" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id47">
+<span class="sig-name descname"><span class="pre">polarisation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.PolarisationCoefficients" title="lime_tbx.common.datatypes.PolarisationCoefficients"><span class="pre">PolarisationCoefficients</span></a></em><a class="headerlink" href="#id47" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id46">
-<span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id46" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id48">
+<span class="sig-name descname"><span class="pre">reflectance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.ReflectanceCoefficients" title="lime_tbx.common.datatypes.ReflectanceCoefficients"><span class="pre">ReflectanceCoefficients</span></a></em><a class="headerlink" href="#id48" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id49">
+<span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id49" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1093,13 +1162,13 @@ is given in Wm⁻²nm⁻¹.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id47">
-<span class="sig-name descname"><span class="pre">ch_irrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id47" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id50">
+<span class="sig-name descname"><span class="pre">ch_irrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id50" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id48">
-<span class="sig-name descname"><span class="pre">ch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id48" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id51">
+<span class="sig-name descname"><span class="pre">ch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id51" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1108,13 +1177,13 @@ is given in Wm⁻²nm⁻¹.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id49">
-<span class="sig-name descname"><span class="pre">data_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id49" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id52">
+<span class="sig-name descname"><span class="pre">data_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id52" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id50">
-<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id50" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id53">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id53" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1128,25 +1197,25 @@ is given in Wm⁻²nm⁻¹.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id51">
-<span class="sig-name descname"><span class="pre">md</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id51" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id54">
+<span class="sig-name descname"><span class="pre">md</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.MoonData" title="lime_tbx.common.datatypes.MoonData"><span class="pre">MoonData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id54" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id52">
-<span class="sig-name descname"><span class="pre">sat_pos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SatellitePosition" title="lime_tbx.common.datatypes.SatellitePosition"><span class="pre">SatellitePosition</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id52" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id55">
+<span class="sig-name descname"><span class="pre">sat_pos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SatellitePosition" title="lime_tbx.common.datatypes.SatellitePosition"><span class="pre">SatellitePosition</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id55" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id53">
-<span class="sig-name descname"><span class="pre">sat_pos_ref</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id53" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id56">
+<span class="sig-name descname"><span class="pre">sat_pos_ref</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id56" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.LunarObservationWrite">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">LunarObservationWrite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sat_pos_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sat_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SatellitePosition" title="lime_tbx.common.datatypes.SatellitePosition"><span class="pre">SatellitePosition</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">irrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">refls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">polars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sat_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selenographic_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SelenographicDataWrite" title="lime_tbx.common.datatypes.SelenographicDataWrite"><span class="pre">SelenographicDataWrite</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#LunarObservationWrite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.LunarObservationWrite" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.common.datatypes.</span></span><span class="sig-name descname"><span class="pre">LunarObservationWrite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sat_pos_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sat_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SatellitePosition" title="lime_tbx.common.datatypes.SatellitePosition"><span class="pre">SatellitePosition</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">irrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">refls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">polars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">aolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sat_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selenographic_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lime_tbx.common.datatypes.SelenographicDataWrite" title="lime_tbx.common.datatypes.SelenographicDataWrite"><span class="pre">SelenographicDataWrite</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/common/datatypes.html#LunarObservationWrite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.common.datatypes.LunarObservationWrite" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Dataclass containing the needed information to create a Lunar observation in a LGLOD file.</p>
 <dl class="py attribute">
@@ -1227,6 +1296,17 @@ is given in Wm⁻²nm⁻¹.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.common.datatypes.LunarObservationWrite.aolp">
+<span class="sig-name descname"><span class="pre">aolp</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.LunarObservationWrite.aolp" title="Link to this definition"></a></dt>
+<dd><p>AoLP data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="lime_tbx.common.datatypes.LunarObservationWrite.sat_name">
 <span class="sig-name descname"><span class="pre">sat_name</span></span><a class="headerlink" href="#lime_tbx.common.datatypes.LunarObservationWrite.sat_name" title="Link to this definition"></a></dt>
 <dd><p>Name of the satellite. If None or empty, then it’s a SurfacePoint</p>
@@ -1261,8 +1341,13 @@ is given in Wm⁻²nm⁻¹.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id54">
-<span class="sig-name descname"><span class="pre">ch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id54" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id57">
+<span class="sig-name descname"><span class="pre">aolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id57" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id58">
+<span class="sig-name descname"><span class="pre">ch_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id58" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1271,13 +1356,13 @@ is given in Wm⁻²nm⁻¹.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id55">
-<span class="sig-name descname"><span class="pre">data_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id55" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id59">
+<span class="sig-name descname"><span class="pre">data_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id59" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id56">
-<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id56" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id60">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id60" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1286,38 +1371,38 @@ is given in Wm⁻²nm⁻¹.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id57">
-<span class="sig-name descname"><span class="pre">irrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id57" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id58">
-<span class="sig-name descname"><span class="pre">polars</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id58" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id59">
-<span class="sig-name descname"><span class="pre">refls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id59" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id60">
-<span class="sig-name descname"><span class="pre">sat_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id60" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id61">
-<span class="sig-name descname"><span class="pre">sat_pos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SatellitePosition" title="lime_tbx.common.datatypes.SatellitePosition"><span class="pre">SatellitePosition</span></a></em><a class="headerlink" href="#id61" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">irrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id61" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id62">
-<span class="sig-name descname"><span class="pre">sat_pos_ref</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id62" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">polars</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id62" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id63">
-<span class="sig-name descname"><span class="pre">selenographic_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SelenographicDataWrite" title="lime_tbx.common.datatypes.SelenographicDataWrite"><span class="pre">SelenographicDataWrite</span></a></em><a class="headerlink" href="#id63" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">refls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></em><a class="headerlink" href="#id63" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id64">
+<span class="sig-name descname"><span class="pre">sat_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id64" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id65">
+<span class="sig-name descname"><span class="pre">sat_pos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SatellitePosition" title="lime_tbx.common.datatypes.SatellitePosition"><span class="pre">SatellitePosition</span></a></em><a class="headerlink" href="#id65" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id66">
+<span class="sig-name descname"><span class="pre">sat_pos_ref</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id66" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id67">
+<span class="sig-name descname"><span class="pre">selenographic_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.common.datatypes.SelenographicDataWrite" title="lime_tbx.common.datatypes.SelenographicDataWrite"><span class="pre">SelenographicDataWrite</span></a></em><a class="headerlink" href="#id67" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1457,18 +1542,18 @@ Used in comparisons when the normalization parameters (distances) are not availa
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id64">
-<span class="sig-name descname"><span class="pre">dt0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id64" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id68">
+<span class="sig-name descname"><span class="pre">dt0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id68" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id65">
-<span class="sig-name descname"><span class="pre">dtf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id65" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id69">
+<span class="sig-name descname"><span class="pre">dtf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#id69" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id66">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id66" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id70">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id70" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1602,8 +1687,8 @@ from mainly CIMEL data.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id67">
-<span class="sig-name descname"><span class="pre">coeffs</span></span><a class="headerlink" href="#id67" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id71">
+<span class="sig-name descname"><span class="pre">coeffs</span></span><a class="headerlink" href="#id71" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1612,13 +1697,13 @@ from mainly CIMEL data.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id68">
-<span class="sig-name descname"><span class="pre">unc_coeffs</span></span><a class="headerlink" href="#id68" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id72">
+<span class="sig-name descname"><span class="pre">unc_coeffs</span></span><a class="headerlink" href="#id72" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id69">
-<span class="sig-name descname"><span class="pre">wlens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id69" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id73">
+<span class="sig-name descname"><span class="pre">wlens</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id73" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1708,8 +1793,8 @@ from mainly CIMEL data.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id70">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id70" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id74">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id74" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1831,33 +1916,33 @@ Only present if the satellite has TLE files.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id71">
-<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id71" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id72">
-<span class="sig-name descname"><span class="pre">intdes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id72" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id73">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id73" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id74">
-<span class="sig-name descname"><span class="pre">norad_sat_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id74" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id75">
-<span class="sig-name descname"><span class="pre">orbit_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.OrbitFile" title="lime_tbx.common.datatypes.OrbitFile"><span class="pre">OrbitFile</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id75" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id75" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id76">
-<span class="sig-name descname"><span class="pre">time_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id76" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">intdes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id76" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id77">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id77" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id78">
+<span class="sig-name descname"><span class="pre">norad_sat_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id78" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id79">
+<span class="sig-name descname"><span class="pre">orbit_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.OrbitFile" title="lime_tbx.common.datatypes.OrbitFile"><span class="pre">OrbitFile</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id79" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id80">
+<span class="sig-name descname"><span class="pre">time_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id80" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1890,13 +1975,13 @@ Only present if the satellite has TLE files.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id77">
-<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id77" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id81">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id81" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id78">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id78" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id82">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id82" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1941,18 +2026,18 @@ for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For E
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id79">
-<span class="sig-name descname"><span class="pre">x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id79" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id83">
+<span class="sig-name descname"><span class="pre">x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id83" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id80">
-<span class="sig-name descname"><span class="pre">y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id80" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id84">
+<span class="sig-name descname"><span class="pre">y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id84" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id81">
-<span class="sig-name descname"><span class="pre">z</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id81" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id85">
+<span class="sig-name descname"><span class="pre">z</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id85" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2029,33 +2114,33 @@ for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For E
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id82">
-<span class="sig-name descname"><span class="pre">distance_obs_moon_km</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id82" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id83">
-<span class="sig-name descname"><span class="pre">distance_sun_moon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id83" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id84">
-<span class="sig-name descname"><span class="pre">mpa_degrees</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id84" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id85">
-<span class="sig-name descname"><span class="pre">selen_obs_lat_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id85" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id86">
-<span class="sig-name descname"><span class="pre">selen_obs_lon_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id86" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">distance_obs_moon_km</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id86" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id87">
-<span class="sig-name descname"><span class="pre">selen_sun_lon_rad</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id87" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">distance_sun_moon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id87" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id88">
+<span class="sig-name descname"><span class="pre">mpa_degrees</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id88" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id89">
+<span class="sig-name descname"><span class="pre">selen_obs_lat_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id89" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id90">
+<span class="sig-name descname"><span class="pre">selen_obs_lon_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id90" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id91">
+<span class="sig-name descname"><span class="pre">selen_sun_lon_rad</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id91" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2165,8 +2250,8 @@ for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For E
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id88">
-<span class="sig-name descname"><span class="pre">channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SRFChannel" title="lime_tbx.common.datatypes.SRFChannel"><span class="pre">SRFChannel</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id88" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id92">
+<span class="sig-name descname"><span class="pre">channels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lime_tbx.common.datatypes.SRFChannel" title="lime_tbx.common.datatypes.SRFChannel"><span class="pre">SRFChannel</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id92" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2195,8 +2280,8 @@ for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For E
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id89">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id89" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id93">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id93" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2277,23 +2362,23 @@ OUT: All wavelengths out of range.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id90">
-<span class="sig-name descname"><span class="pre">altitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id90" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id94">
+<span class="sig-name descname"><span class="pre">altitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id94" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id91">
-<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id91" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id95">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id95" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id92">
-<span class="sig-name descname"><span class="pre">latitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id92" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id96">
+<span class="sig-name descname"><span class="pre">latitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id96" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id93">
-<span class="sig-name descname"><span class="pre">longitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id93" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id97">
+<span class="sig-name descname"><span class="pre">longitude</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id97" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

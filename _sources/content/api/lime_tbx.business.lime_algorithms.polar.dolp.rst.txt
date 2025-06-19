@@ -1,0 +1,7 @@
+lime\_tbx.business.lime\_algorithms.polar.dolp module
+=====================================================
+
+.. automodule:: lime_tbx.business.lime_algorithms.polar.dolp
+   :members:
+   :undoc-members:
+   :show-inheritance:

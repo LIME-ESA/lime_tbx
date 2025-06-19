@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.lime_algorithms.dolp package &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.business.lime_algorithms.polar.aolp module &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,14 +15,14 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="lime_tbx.business.lime_algorithms.dolp.dolp module" href="lime_tbx.business.lime_algorithms.dolp.dolp.html" />
-    <link rel="prev" title="lime_tbx.business.lime_algorithms package" href="lime_tbx.business.lime_algorithms.html" /> 
+    <link rel="next" title="lime_tbx.business.lime_algorithms.polar.dolp module" href="lime_tbx.business.lime_algorithms.polar.dolp.html" />
+    <link rel="prev" title="lime_tbx.business.lime_algorithms.polar package" href="lime_tbx.business.lime_algorithms.polar.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -106,9 +106,10 @@
           <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
           <li class="breadcrumb-item"><a href="lime_tbx.business.html">lime_tbx.business package</a></li>
           <li class="breadcrumb-item"><a href="lime_tbx.business.lime_algorithms.html">lime_tbx.business.lime_algorithms package</a></li>
-      <li class="breadcrumb-item active">lime_tbx.business.lime_algorithms.dolp package</li>
+          <li class="breadcrumb-item"><a href="lime_tbx.business.lime_algorithms.polar.html">lime_tbx.business.lime_algorithms.polar package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.business.lime_algorithms.polar.aolp module</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/content/api/lime_tbx.business.lime_algorithms.dolp.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/content/api/lime_tbx.business.lime_algorithms.polar.aolp.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -116,34 +117,52 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-lime_tbx.business.lime_algorithms.dolp">
-<span id="lime-tbx-business-lime-algorithms-dolp-package"></span><h1>lime_tbx.business.lime_algorithms.dolp package<a class="headerlink" href="#module-lime_tbx.business.lime_algorithms.dolp" title="Link to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="lime_tbx.business.lime_algorithms.dolp.dolp.html">lime_tbx.business.lime_algorithms.dolp.dolp module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.DOLP"><code class="docutils literal notranslate"><span class="pre">DOLP</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.DOLP.get_polarized"><code class="docutils literal notranslate"><span class="pre">DOLP.get_polarized()</span></code></a></li>
+  <section id="module-lime_tbx.business.lime_algorithms.polar.aolp">
+<span id="lime-tbx-business-lime-algorithms-polar-aolp-module"></span><h1>lime_tbx.business.lime_algorithms.polar.aolp module<a class="headerlink" href="#module-lime_tbx.business.lime_algorithms.polar.aolp" title="Link to this heading"></a></h1>
+<p>This module calculates the extra-terrestrial lunar disk angle of polarisation.</p>
+<dl class="simple">
+<dt>It exports the following class:</dt><dd><ul class="simple">
+<li><p>AOLP - Class that implements the methods exported by this module.</p></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.IDOLP"><code class="docutils literal notranslate"><span class="pre">IDOLP</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.IDOLP.get_polarized"><code class="docutils literal notranslate"><span class="pre">IDOLP.get_polarized()</span></code></a></li>
+</dd>
+</dl>
+<p>It follows equations described in the following documents:
+- Lunar irradiance model algorithm and theoretical basis document D5.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lime_tbx.business.lime_algorithms.polar.aolp.AOLP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.business.lime_algorithms.polar.aolp.</span></span><span class="sig-name descname"><span class="pre">AOLP</span></span><a class="reference internal" href="../../_modules/lime_tbx/business/lime_algorithms/polar/aolp.html#AOLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.lime_algorithms.polar.aolp.AOLP" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lime_tbx.business.lime_algorithms.polar.aolp.AOLP.get_aolp">
+<span class="sig-name descname"><span class="pre">get_aolp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mpa_degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefficients</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.AOLPCoefficients" title="lime_tbx.common.datatypes.AOLPCoefficients"><span class="pre">AOLPCoefficients</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_uncs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData"><span class="pre">SpectralData</span></a></span></span><a class="reference internal" href="../../_modules/lime_tbx/business/lime_algorithms/polar/aolp.html#AOLP.get_aolp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.business.lime_algorithms.polar.aolp.AOLP.get_aolp" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the angle of linear polarisation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mpa_degrees</strong> (<em>float</em>) – Moon phase angle in degrees.</p></li>
+<li><p><strong>coefficients</strong> (<a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.AOLPCoefficients" title="lime_tbx.common.datatypes.AOLPCoefficients"><em>AOLPCoefficients</em></a>) – Coefficients needed in the aolp algorithm</p></li>
+<li><p><strong>skip_uncs</strong> (<em>bool</em>) – Flag for skipping the calculation of uncertainties.</p></li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>aolps</strong> – List with the angle of polarisation for each given wavelength.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.SpectralData" title="lime_tbx.common.datatypes.SpectralData">SpectralData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="lime_tbx.business.lime_algorithms.html" class="btn btn-neutral float-left" title="lime_tbx.business.lime_algorithms package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="lime_tbx.business.lime_algorithms.dolp.dolp.html" class="btn btn-neutral float-right" title="lime_tbx.business.lime_algorithms.dolp.dolp module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="lime_tbx.business.lime_algorithms.polar.html" class="btn btn-neutral float-left" title="lime_tbx.business.lime_algorithms.polar package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.business.lime_algorithms.polar.dolp.html" class="btn btn-neutral float-right" title="lime_tbx.business.lime_algorithms.polar.dolp module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

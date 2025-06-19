@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.presentation.cli.export module &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.presentation.cli.export module &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -290,7 +290,7 @@ and its dts attribute is None.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_file_refl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_polar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_integrated_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_file_refl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_dolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_aolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_integrated_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportCSV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportData</span></code></a></p>
 <p>Represents CSV file export settings for simulation results.</p>
 <dl class="py attribute">
@@ -316,9 +316,20 @@ and its dts attribute is None.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_polar">
-<span class="sig-name descname"><span class="pre">o_file_polar</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_polar" title="Link to this definition"></a></dt>
-<dd><p>Path to the output CSV file for polarization.</p>
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_dolp">
+<span class="sig-name descname"><span class="pre">o_file_dolp</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_dolp" title="Link to this definition"></a></dt>
+<dd><p>Path to the output CSV file for degree of linear polarisation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportCSV.o_file_aolp">
+<span class="sig-name descname"><span class="pre">o_file_aolp</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportCSV.o_file_aolp" title="Link to this definition"></a></dt>
+<dd><p>Path to the output CSV file for angle of linear polarisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -339,22 +350,27 @@ and its dts attribute is None.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">o_file_integrated_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">o_file_aolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">o_file_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">o_file_dolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">o_file_polar</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">o_file_integrated_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">o_file_refl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">o_file_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">o_file_refl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -408,18 +424,18 @@ Each comparison type has a different amount of files.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">output_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">output_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -466,18 +482,18 @@ the file names.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -522,18 +538,18 @@ Each comparison type has a different amount of files.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id16">
-<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id17">
-<span class="sig-name descname"><span class="pre">output_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">output_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -590,23 +606,23 @@ chosen file extension, and automatically generating the file names.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id18">
-<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id19">
-<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id19" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">chosen_diff</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lime_tbx.common.constants.html#lime_tbx.common.constants.CompFields" title="lime_tbx.common.constants.CompFields"><span class="pre">CompFields</span></a></em><a class="headerlink" href="#id19" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id20">
-<span class="sig-name descname"><span class="pre">extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">comparison_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lime_tbx.presentation.cli.export.ComparisonKey" title="lime_tbx.presentation.cli.export.ComparisonKey"><span class="pre">ComparisonKey</span></a></em><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id21">
-<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -628,7 +644,7 @@ chosen file extension, and automatically generating the file names.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_file_refl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_polar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lime_tbx.presentation.cli.export.</span></span><span class="sig-name descname"><span class="pre">ExportGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o_file_refl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_irr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_dolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o_file_aolp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lime_tbx/presentation/cli/export.html#ExportGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lime_tbx.presentation.cli.export.ExportData" title="lime_tbx.presentation.cli.export.ExportData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportData</span></code></a></p>
 <p>Represents graphical export settings for simulation results.</p>
 <dl class="py attribute">
@@ -654,9 +670,9 @@ chosen file extension, and automatically generating the file names.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph.o_file_polar">
-<span class="sig-name descname"><span class="pre">o_file_polar</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph.o_file_polar" title="Link to this definition"></a></dt>
-<dd><p>Path to the output graph file for polarization.</p>
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph.o_file_dolp">
+<span class="sig-name descname"><span class="pre">o_file_dolp</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph.o_file_dolp" title="Link to this definition"></a></dt>
+<dd><p>Path to the output graph file for degree of linear polarisation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -665,18 +681,34 @@ chosen file extension, and automatically generating the file names.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id22">
-<span class="sig-name descname"><span class="pre">o_file_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="lime_tbx.presentation.cli.export.ExportGraph.o_file_aolp">
+<span class="sig-name descname"><span class="pre">o_file_aolp</span></span><a class="headerlink" href="#lime_tbx.presentation.cli.export.ExportGraph.o_file_aolp" title="Link to this definition"></a></dt>
+<dd><p>Path to the output graph file for angle of linear polarisation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id23">
-<span class="sig-name descname"><span class="pre">o_file_polar</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id23" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">o_file_aolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id23" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id24">
-<span class="sig-name descname"><span class="pre">o_file_refl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">o_file_dolp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id25">
+<span class="sig-name descname"><span class="pre">o_file_irr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id26">
+<span class="sig-name descname"><span class="pre">o_file_refl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -699,8 +731,8 @@ chosen file extension, and automatically generating the file names.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id25">
-<span class="sig-name descname"><span class="pre">output_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id27">
+<span class="sig-name descname"><span class="pre">output_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

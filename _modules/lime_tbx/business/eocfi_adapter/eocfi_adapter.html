@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.eocfi_adapter.eocfi_adapter &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.business.eocfi_adapter.eocfi_adapter &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -538,9 +538,13 @@
         <span class="p">)</span>
         <span class="n">so</span><span class="p">,</span> <span class="n">serr</span> <span class="o">=</span> <span class="n">cmd_exec</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
         <span class="n">out_lines</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">serr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;Executing EO CFI: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">serr</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
-            <span class="n">log</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">serr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;EOCFI stderr message is None. It should be a string. Command run: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">serr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Executing EO CFI: </span><span class="si">{</span><span class="n">serr</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">n_dates</span><span class="p">:</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -556,15 +560,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                    <span class="s2">&quot;No lines outputed after executing the EOCFI binary. Command executed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">cmd</span>
-                    <span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;No lines outputed after executing the EOCFI binary. Command executed: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                    <span class="s2">&quot;Number of lines unexpected. </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out_lines</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">n_dates</span><span class="p">),</span> <span class="n">out_lines</span>
-                    <span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;Number of lines unexpected. </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">out_lines</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_dates</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="si">{</span><span class="n">out_lines</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
         <span class="n">positions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">satpos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">satpos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">satpos</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">satpos</span> <span class="ow">in</span> <span class="n">sat_positions</span><span class="p">]</span>

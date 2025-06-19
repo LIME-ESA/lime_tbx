@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.lime_algorithms.dolp.dolp &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.business.lime_algorithms.polar.dolp &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/js/theme.js"></script>
@@ -88,7 +88,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">lime_tbx.business.lime_algorithms.dolp.dolp</li>
+      <li class="breadcrumb-item active">lime_tbx.business.lime_algorithms.polar.dolp</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -97,7 +97,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for lime_tbx.business.lime_algorithms.dolp.dolp</h1><div class="highlight"><pre>
+  <h1>Source code for lime_tbx.business.lime_algorithms.polar.dolp</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module calculates the extra-terrestrial lunar disk degree of polarisation.</span>
 
@@ -121,20 +121,16 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">punpy</span>
 
 <span class="sd">&quot;&quot;&quot;___LIME TBX Modules___&quot;&quot;&quot;</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolarisationCoefficients</span><span class="p">,</span> <span class="n">SpectralData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PolarisationCoefficients</span><span class="p">,</span>
+    <span class="n">SpectralData</span><span class="p">,</span>
+    <span class="n">AOLPCoefficients</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span>
 
 
-<span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
-<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Pieter De Vis, Jacob Fahy, Javier Gatón Herguedas, Ramiro González Catón, Carlos Toledano&quot;</span>
-<span class="n">__created__</span> <span class="o">=</span> <span class="s2">&quot;01/02/2022&quot;</span>
-<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
-<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gaton@goa.uva.es&quot;</span>
-<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
-
-
 <div class="viewcode-block" id="IDOLP">
-<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.IDOLP">[docs]</a>
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.polar.dolp.html#lime_tbx.business.lime_algorithms.polar.dolp.IDOLP">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IDOLP</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interface that contains the methods of this module.</span>
@@ -145,7 +141,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="IDOLP.get_polarized">
-<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.IDOLP.get_polarized">[docs]</a>
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.polar.dolp.html#lime_tbx.business.lime_algorithms.polar.dolp.IDOLP.get_polarized">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_polarized</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -185,7 +181,7 @@
 
 
 <div class="viewcode-block" id="DOLP">
-<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.DOLP">[docs]</a>
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.polar.dolp.html#lime_tbx.business.lime_algorithms.polar.dolp.DOLP">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DOLP</span><span class="p">(</span><span class="n">IDOLP</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_direct_polarized</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -248,7 +244,7 @@
         <span class="k">return</span> <span class="n">unc</span><span class="p">,</span> <span class="n">corr</span>
 
 <div class="viewcode-block" id="DOLP.get_polarized">
-<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.dolp.dolp.html#lime_tbx.business.lime_algorithms.dolp.dolp.DOLP.get_polarized">[docs]</a>
+<a class="viewcode-back" href="../../../../../content/api/lime_tbx.business.lime_algorithms.polar.dolp.html#lime_tbx.business.lime_algorithms.polar.dolp.DOLP.get_polarized">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_polarized</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mpa_degrees</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

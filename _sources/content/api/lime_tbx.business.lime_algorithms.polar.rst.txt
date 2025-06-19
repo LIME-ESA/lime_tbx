@@ -1,0 +1,16 @@
+lime\_tbx.business.lime\_algorithms.polar package
+=================================================
+
+.. automodule:: lime_tbx.business.lime_algorithms.polar
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lime_tbx.business.lime_algorithms.polar.aolp
+   lime_tbx.business.lime_algorithms.polar.dolp

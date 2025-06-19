@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.common.datatypes &mdash; Lime Tbx 1.1.0 documentation</title>
+  <title>lime_tbx.common.datatypes &mdash; Lime Tbx 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -727,6 +727,35 @@
 
 
 
+<div class="viewcode-block" id="AOLPCoefficients">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.AOLPCoefficients">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AOLPCoefficients</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">wavelengths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">aolp_coeff</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">unc_coeff</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">err_corr_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span> <span class="o">=</span> <span class="n">wavelengths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aolp_coeff</span> <span class="o">=</span> <span class="n">aolp_coeff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unc_coeff</span> <span class="o">=</span> <span class="n">unc_coeff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">err_corr_data</span> <span class="o">=</span> <span class="n">err_corr_data</span>
+
+<div class="viewcode-block" id="AOLPCoefficients.get_wavelengths">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.AOLPCoefficients.get_wavelengths">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_wavelengths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wlens</span></div>
+
+
+<div class="viewcode-block" id="AOLPCoefficients.is_calculable">
+<a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.AOLPCoefficients.is_calculable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_calculable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aolp_coeff</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="PolarisationCoefficients">
 <a class="viewcode-back" href="../../../content/api/lime_tbx.common.datatypes.html#lime_tbx.common.datatypes.PolarisationCoefficients">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PolarisationCoefficients</span><span class="p">:</span>
@@ -856,6 +885,7 @@
 
     <span class="n">reflectance</span><span class="p">:</span> <span class="n">ReflectanceCoefficients</span>
     <span class="n">polarisation</span><span class="p">:</span> <span class="n">PolarisationCoefficients</span>
+    <span class="n">aolp</span><span class="p">:</span> <span class="n">AOLPCoefficients</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
@@ -1196,6 +1226,8 @@
 <span class="sd">        Reflectance data</span>
 <span class="sd">    polars: SpectralData</span>
 <span class="sd">        Polarisation data</span>
+<span class="sd">    aolp: SpectralData</span>
+<span class="sd">        AoLP data</span>
 <span class="sd">    sat_name: str | None</span>
 <span class="sd">        Name of the satellite. If None or empty, then it&#39;s a SurfacePoint</span>
 <span class="sd">    selenographic_data: SelenographicDataWrite | None</span>
@@ -1212,6 +1244,7 @@
     <span class="n">irrs</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
     <span class="n">refls</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
     <span class="n">polars</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
+    <span class="n">aolp</span><span class="p">:</span> <span class="s2">&quot;SpectralData&quot;</span>
     <span class="n">sat_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">selenographic_data</span><span class="p">:</span> <span class="n">SelenographicDataWrite</span>
     <span class="n">data_source</span><span class="p">:</span> <span class="nb">str</span>
@@ -1258,12 +1291,16 @@
 <span class="sd">        Reflectance for the cimel.</span>
 <span class="sd">    polars_cimel: list of SpectralData</span>
 <span class="sd">        Polarisation for the cimel.</span>
+<span class="sd">    aolp_cimel: list of SpectralData</span>
+<span class="sd">        AoLP for the cimel.</span>
 <span class="sd">    spectrum_name: str</span>
 <span class="sd">        Name of the spectrum used for interpolation.</span>
 <span class="sd">    skipped_uncs: bool</span>
 <span class="sd">        Flag that indicates if the uncertainties calculation was skipped or not.</span>
 <span class="sd">    dolp_spectrum_name: str</span>
-<span class="sd">        Name of the spectrum used for polarisation interpolation.</span>
+<span class="sd">        Name of the spectrum used for degree of linear polarisation interpolation.</span>
+<span class="sd">    aolp_spectrum_name: str</span>
+<span class="sd">        Name of the spectrum used for angle of linear polarisation interpolation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LunarObservationWrite</span><span class="p">]</span>
@@ -1272,10 +1309,12 @@
     <span class="n">elis_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
     <span class="n">elrefs_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
     <span class="n">polars_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
+    <span class="n">aolp_cimel</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SpectralData&quot;</span><span class="p">]</span>
     <span class="n">spectrum_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">skipped_uncs</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">version</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">dolp_spectrum_name</span><span class="p">:</span> <span class="nb">str</span></div>
+    <span class="n">dolp_spectrum_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">aolp_spectrum_name</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 
@@ -1330,6 +1369,8 @@
 <span class="sd">        Name (and id) of the spectrum used for interpolation.</span>
 <span class="sd">    interpolation_spectrum_polarisation: str</span>
 <span class="sd">        Name (and id) of the spectrum used for interpolation for polarisation.</span>
+<span class="sd">    interpolation_spectrum_aolp: str</span>
+<span class="sd">        Name (and id) of the spectrum used for interpolation for angle of polarisation.</span>
 <span class="sd">    interpolation_SRF: str</span>
 <span class="sd">        Name (and id) of the spectrum used for SRF interpolation.</span>
 <span class="sd">    show_interp_spectrum: bool</span>
@@ -1342,6 +1383,7 @@
 
     <span class="n">interpolation_spectrum</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">interpolation_spectrum_polarisation</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">interpolation_spectrum_aolp</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">interpolation_SRF</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">show_cimel_points</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">show_interp_spectrum</span><span class="p">:</span> <span class="nb">bool</span>
