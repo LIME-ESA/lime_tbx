@@ -32,6 +32,7 @@ values are preliminary and subject to changes.
 - Closing the `LOAD FILE` dialog without selecting a new file, after having previously loaded one,
 cause the GUI to incorrectly show the previous file as still loaded. The file now does remain loaded
 correctly in such cases.
+- CLI for simulations from geographic coordinates was wrongly interpreting the height parameter
 
 ## [1.1.0] - 2025-04-21
 
