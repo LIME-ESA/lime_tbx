@@ -214,53 +214,51 @@ def read_moon_obs(
         Generated MoonObservation from the given datafile
     """
     try:
-        ds = xr_open_dataset(path, mask_limits={"sat_pos": False})
+        ds = xr_open_dataset(path, mask_limits=False)  # {"sat_pos": False})
         _validate_schema_regular_moonobs(ds)
-        n_channels = len(ds["channel_name"])
-        ch_names = []
-        ch_irrs = {}
-        for i in range(n_channels):
-            ch_name = str(ds["channel_name"][i].values, "utf-8").rstrip("\x00")
-            ch_names.append(ch_name)
-        dt = ds["date"].values[0]
-        if np.issubdtype(dt.dtype, np.datetime64):
-            dt = dt.astype("datetime64[us]").astype(datetime)
-            dt = dt.replace(tzinfo=timezone.utc)
+        ch_names = np.char.rstrip(
+            np.char.decode(ds["channel_name"].to_numpy(), "utf-8"), "\x00"
+        )
+        dt = ds["date"].to_numpy().item()
+        if isinstance(dt, np.datetime64):
+            dt = (
+                dt.astype("datetime64[us]")
+                .astype(datetime)
+                .replace(tzinfo=timezone.utc)
+            )
         else:
             dt = datetime.fromtimestamp(dt, tz=timezone.utc)
-        sat_pos_ref = ds["sat_pos_ref"].values
-        if str(sat_pos_ref.dtype.str).startswith("|S"):
-            sat_pos_ref = str(sat_pos_ref, "utf-8")
+        sat_pos_ref = ds["sat_pos_ref"].to_numpy()
+        if isinstance(sat_pos_ref, np.ndarray):
+            sat_pos_ref = sat_pos_ref.item()
+        if isinstance(sat_pos_ref, (bytes, bytearray)):
+            sat_pos_ref = sat_pos_ref.decode("utf-8", errors="replace")
         else:
-            sat_pos_ref = sat_pos_ref[0]
-        sat_pos_units: str = ds["sat_pos"].units
-        d_to_m = get_length_conversion_factor(sat_pos_units, "m")
-        to_correct_distance = False
-        if not np.isnan(ds["sat_pos"].values).any():
-            sat_pos = SatellitePosition(*list(ds["sat_pos"].values * d_to_m))
+            sat_pos_ref = str(sat_pos_ref)
+        sat_pos_vals = ds["sat_pos"].to_numpy()
+        has_sat_pos = ~np.isnan(sat_pos_vals).any()
+        if has_sat_pos:
+            d_to_m = get_length_conversion_factor(ds["sat_pos"].units, "m")
+            sat_pos = SatellitePosition(*sat_pos_vals * d_to_m)
             md = None
+            corr_dist = False
         else:
             sat_pos = None
             md = _get_moondata_from_moon_obs(ds, dt, kernels_path, eocfi_path)
-            if "to_correct_distance" in ds.attrs and int(ds.to_correct_distance) == 1:
-                to_correct_distance = True
-        irr_obs = ds["irr_obs"].values
-        irr_obs_units: str = ds["irr_obs"].units
-        d_to_nm = _calc_divisor_to_nm(irr_obs_units)
-        if to_correct_distance:
-            irr_obs = (
-                irr_obs
-                * ((1 / md.distance_sun_moon) ** 2)
-                * (DIST_EARTH_MOON_KM / md.distance_observer_moon) ** 2
-            )
-        irr_obs = irr_obs / d_to_nm
-        for i, ch_irr in enumerate(irr_obs):
-            if not np.isnan(ch_irr):
-                ch_irrs[ch_names[i]] = float(ch_irr)
-        data_source = ds.data_source
+            corr_dist = bool(int(ds.attrs.get("to_correct_distance", 0)))
+        irr_obs = ds["irr_obs"].to_numpy()
+        d_to_nm = _calc_divisor_to_nm(ds["irr_obs"].units)
+        data_source = ds.attrs.get("data_source")
         ds.close()
+        if corr_dist:
+            irr_obs *= (1 / md.distance_sun_moon) ** 2 * (
+                DIST_EARTH_MOON_KM / md.distance_observer_moon
+            ) ** 2
+        irr_obs /= d_to_nm
+        valid = ~np.isnan(irr_obs)
+        ch_irrs = dict(zip(ch_names[valid], irr_obs[valid].astype(float)))
         return LunarObservation(
-            ch_names, sat_pos_ref, ch_irrs, dt, sat_pos, data_source, md
+            list(ch_names), sat_pos_ref, ch_irrs, dt, sat_pos, data_source, md
         )
     except SchemaError as e:
         raise e
