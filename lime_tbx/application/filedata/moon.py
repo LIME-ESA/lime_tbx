@@ -214,7 +214,7 @@ def read_moon_obs(
         Generated MoonObservation from the given datafile
     """
     try:
-        ds = xr_open_dataset(path, mask_limits=False)  # {"sat_pos": False})
+        ds = xr_open_dataset(path, mask_limits={"irr_obs": True, "__default__": False})
         _validate_schema_regular_moonobs(ds)
         ch_names = np.char.rstrip(
             np.char.decode(ds["channel_name"].to_numpy(), "utf-8"), "\x00"

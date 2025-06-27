@@ -139,7 +139,8 @@ def xr_open_dataset(
     mask_limits: bool | Mapping[str, bool]
         If True, replace array values lower than `valid_min` or higher than `valid_max` with `NA`, if present.
         Pass a mapping, e.g. {"my_variable": False}, to toggle this feature per-variable individually.
-        If a mapping is passed and a variable is missing, it's understood that the variable is mapped to True by default.
+        If a mapping is passed and a variable is missing, it's understood that the variable is mapped to the default value.
+        The default value is the one defined for the "__default__" mapping, or True if not specified.
 
     Returns
     -------
@@ -148,12 +149,15 @@ def xr_open_dataset(
     """
     ds = xr.open_dataset(filepath, engine="netcdf4", mask_and_scale=mask_fillvalue)
     if mask_limits is not False:
+        default = True
+        if not isinstance(mask_limits, bool):
+            default = mask_limits.get("__default__", True)
         for vname, var in ds.data_vars.items():
             mask_limits_var = False
             if isinstance(mask_limits, bool):
                 mask_limits_var = mask_limits
             else:
-                mask_limits_var = vname not in mask_limits or mask_limits[vname]
+                mask_limits_var = mask_limits.get(vname, default)
             if mask_limits_var:
                 values = var.values
                 mask = np.ones(values.shape, dtype=bool)
