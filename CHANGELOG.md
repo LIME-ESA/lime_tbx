@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Added
+
+- Added a disclaimer during comparison processing to inform users that,
+  if the operation is taking too long, they can improve performance by
+  disabling uncertainty computation.
+
+
 ## [1.2.0] - 2025-06-20
 
 ### Added

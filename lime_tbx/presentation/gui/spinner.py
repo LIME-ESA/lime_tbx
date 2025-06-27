@@ -25,6 +25,7 @@ class SpinnerPage(QtWidgets.QWidget):
         self.label_spinner = QtWidgets.QLabel()
         self.label_spinner.setMovie(self.movie)
         self.label_text = QtWidgets.QLabel()
+        self.label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(QtWidgets.QLabel())
         self.main_layout.addWidget(self.label_spinner)
         self.main_layout.addWidget(self.label_text)
