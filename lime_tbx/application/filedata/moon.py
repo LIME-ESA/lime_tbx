@@ -219,8 +219,8 @@ def read_moon_obs(
         ch_names = np.char.rstrip(
             np.char.decode(ds["channel_name"].to_numpy(), "utf-8"), "\x00"
         )
-        dt = ds["date"].to_numpy().item()
-        if isinstance(dt, np.datetime64):
+        dt = ds["date"].values[0]
+        if np.issubdtype(dt.dtype, np.datetime64):
             dt = (
                 dt.astype("datetime64[us]")
                 .astype(datetime)
