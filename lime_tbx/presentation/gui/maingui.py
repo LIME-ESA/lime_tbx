@@ -773,6 +773,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _clear_comparison_finished(self, data):
         self.srf = None
+        self.comps = None
+        self.data_source = None
+        self.skipped_uncs = None
+        self.mpa_comps = None
+        self.version = None
         self.set_show_comparison_input(True)
         if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
             self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
