@@ -1,4 +1,4 @@
-[![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-informational?style=for-the-badge)](https://github.com/LIME-ESA/lime_tbx/tags)
+[![Version 1.2.1](https://img.shields.io/badge/version-1.2.1-informational?style=for-the-badge)](https://github.com/LIME-ESA/lime_tbx/tags)
 [![License: LGPL 3.0][license-shield]][license-url]
 [![Issues][issues-shield]][issues-url]
 [![Stargazers][stars-shield]][stars-url]

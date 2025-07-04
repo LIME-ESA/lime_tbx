@@ -721,14 +721,19 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         )
 
     def compare_info(self, data: str):
+        is_skip = self.settings_manager.is_skip_uncertainties()
         if (
             self.quant_mos_simulated < self.quant_mos - 1
         ):  # -1 So it gives time to the last message to be shown
-            self.spinner.set_text(f"{self.quant_mos_simulated}/{self.quant_mos}")
-            self.quant_mos_simulated += 1
+            text = f"{self.quant_mos_simulated}/{self.quant_mos}"
+            if not is_skip:
+                text += (
+                    "\nIf this is too slow, try deactivating uncertainty computation"
+                )
         else:
-            self.spinner.set_text(f"Finishing comparisons\nand drawing graphs...")
-            self.quant_mos_simulated += 1
+            text = f"Finishing comparisons\nand drawing graphs..."
+        self.spinner.set_text(text)
+        self.quant_mos_simulated += 1
 
     def set_show_comparison_input(self, show: bool):
         self.top_precomp.setVisible(show)
@@ -768,6 +773,11 @@ class ComparisonPageWidget(QtWidgets.QWidget):
 
     def _clear_comparison_finished(self, data):
         self.srf = None
+        self.comps = None
+        self.data_source = None
+        self.skipped_uncs = None
+        self.mpa_comps = None
+        self.version = None
         self.set_show_comparison_input(True)
         if not self.compare_by_field.currentText() == CompFields.COMP_DATE:
             self.compare_by_field.setCurrentText(CompFields.COMP_DATE)
