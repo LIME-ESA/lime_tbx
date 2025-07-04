@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.application.filedata.moon &mdash; Lime Tbx 1.2.0 documentation</title>
+  <title>lime_tbx.application.filedata.moon &mdash; Lime Tbx 1.2.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../../../_static/documentation_options.js?v=ca842793"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -316,53 +316,51 @@
 <span class="sd">        Generated MoonObservation from the given datafile</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr_open_dataset</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mask_limits</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sat_pos&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr_open_dataset</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mask_limits</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;irr_obs&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;__default__&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
         <span class="n">_validate_schema_regular_moonobs</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-        <span class="n">n_channels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;channel_name&quot;</span><span class="p">])</span>
-        <span class="n">ch_names</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">ch_irrs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_channels</span><span class="p">):</span>
-            <span class="n">ch_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;channel_name&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">ch_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch_name</span><span class="p">)</span>
+        <span class="n">ch_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;channel_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">):</span>
-            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;datetime64[us]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span>
-            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">dt</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;datetime64[us]&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
-        <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos_ref&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">sat_pos_ref</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">str</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;|S&quot;</span><span class="p">):</span>
-            <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sat_pos_ref</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos_ref&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sat_pos_ref</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="n">sat_pos_ref</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sat_pos_ref</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">)):</span>
+            <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="n">sat_pos_ref</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="n">sat_pos_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">sat_pos_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span>
-        <span class="n">d_to_m</span> <span class="o">=</span> <span class="n">get_length_conversion_factor</span><span class="p">(</span><span class="n">sat_pos_units</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
-        <span class="n">to_correct_distance</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="n">sat_pos</span> <span class="o">=</span> <span class="n">SatellitePosition</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">d_to_m</span><span class="p">))</span>
+            <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sat_pos_ref</span><span class="p">)</span>
+        <span class="n">sat_pos_vals</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">has_sat_pos</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">sat_pos_vals</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">has_sat_pos</span><span class="p">:</span>
+            <span class="n">d_to_m</span> <span class="o">=</span> <span class="n">get_length_conversion_factor</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sat_pos&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
+            <span class="n">sat_pos</span> <span class="o">=</span> <span class="n">SatellitePosition</span><span class="p">(</span><span class="o">*</span><span class="n">sat_pos_vals</span> <span class="o">*</span> <span class="n">d_to_m</span><span class="p">)</span>
             <span class="n">md</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">corr_dist</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sat_pos</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">md</span> <span class="o">=</span> <span class="n">_get_moondata_from_moon_obs</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">kernels_path</span><span class="p">,</span> <span class="n">eocfi_path</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s2">&quot;to_correct_distance&quot;</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">to_correct_distance</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">to_correct_distance</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">irr_obs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;irr_obs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">irr_obs_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;irr_obs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span>
-        <span class="n">d_to_nm</span> <span class="o">=</span> <span class="n">_calc_divisor_to_nm</span><span class="p">(</span><span class="n">irr_obs_units</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">to_correct_distance</span><span class="p">:</span>
-            <span class="n">irr_obs</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">irr_obs</span>
-                <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">md</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-                <span class="o">*</span> <span class="p">(</span><span class="n">DIST_EARTH_MOON_KM</span> <span class="o">/</span> <span class="n">md</span><span class="o">.</span><span class="n">distance_observer_moon</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-            <span class="p">)</span>
-        <span class="n">irr_obs</span> <span class="o">=</span> <span class="n">irr_obs</span> <span class="o">/</span> <span class="n">d_to_nm</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch_irr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">irr_obs</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ch_irr</span><span class="p">):</span>
-                <span class="n">ch_irrs</span><span class="p">[</span><span class="n">ch_names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ch_irr</span><span class="p">)</span>
-        <span class="n">data_source</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_source</span>
+            <span class="n">corr_dist</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;to_correct_distance&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="n">irr_obs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;irr_obs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">d_to_nm</span> <span class="o">=</span> <span class="n">_calc_divisor_to_nm</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;irr_obs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">data_source</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_source&quot;</span><span class="p">)</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">corr_dist</span><span class="p">:</span>
+            <span class="n">irr_obs</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">md</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">DIST_EARTH_MOON_KM</span> <span class="o">/</span> <span class="n">md</span><span class="o">.</span><span class="n">distance_observer_moon</span>
+            <span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">irr_obs</span> <span class="o">/=</span> <span class="n">d_to_nm</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">irr_obs</span><span class="p">)</span>
+        <span class="n">ch_irrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ch_names</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span> <span class="n">irr_obs</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">LunarObservation</span><span class="p">(</span>
-            <span class="n">ch_names</span><span class="p">,</span> <span class="n">sat_pos_ref</span><span class="p">,</span> <span class="n">ch_irrs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">sat_pos</span><span class="p">,</span> <span class="n">data_source</span><span class="p">,</span> <span class="n">md</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">ch_names</span><span class="p">),</span> <span class="n">sat_pos_ref</span><span class="p">,</span> <span class="n">ch_irrs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">sat_pos</span><span class="p">,</span> <span class="n">data_source</span><span class="p">,</span> <span class="n">md</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="n">SchemaError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">e</span>
