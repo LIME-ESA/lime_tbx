@@ -11,8 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Relaxed SRF NetCDF file schema validation: `wavelength` can now be a coordinate instead of a variable.
-- Relaxed GLOD NetCDF schema validation: the `date` field can now be a variable instead of a coordinate, and is also accepted as a scalar array.
+- Relaxed SRF NetCDF file schema validation rules:
+  - The `wavelength` field can now be defined a coordinate instead of only as a variable.
+- Relaxed GLOD NetCDF schema validation rules:
+  - The `date` field is now accepted as a variable, not only as a coordinate.
+
+### Added
+
+- GLOD file parsing now supports `date` values provided as a scalar array.
 
 ## [1.2.1] - 2025-07-04
 
