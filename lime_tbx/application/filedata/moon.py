@@ -112,13 +112,22 @@ def _validate_schema_regular_moonobs(ds: xr.Dataset):
         checks=checks,
     )
     date_datetime = {"date": DataArraySchema(np.datetime64)}
-    odss = DatasetSchema(
-        data_vars=data_vars,
-        coords=date_datetime,
-        attrs=attrs,
-        checks=checks,
-    )
-    validate_schema(dss, ds, [odss])
+    odss = [
+        DatasetSchema(
+            data_vars=data_vars,
+            coords=date_datetime,
+            attrs=attrs,
+            checks=checks,
+        )
+    ]
+    odss += [
+        DatasetSchema(
+            data_vars=data_vars | datevar,
+            attrs=attrs,
+        )
+        for datevar in [coords, date_datetime]
+    ]
+    validate_schema(dss, ds, odss)
 
 
 def _get_moondata_from_moon_obs(
@@ -219,7 +228,7 @@ def read_moon_obs(
         ch_names = np.char.rstrip(
             np.char.decode(ds["channel_name"].to_numpy(), "utf-8"), "\x00"
         )
-        dt = ds["date"].values[0]
+        dt = np.asarray(ds["date"].values).reshape(-1)[0]
         if np.issubdtype(dt.dtype, np.datetime64):
             dt = (
                 dt.astype("datetime64[us]")

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Changed
+
+- Relaxed SRF NetCDF file schema validation: `wavelength` can now be a coordinate instead of a variable.
+- Relaxed GLOD NetCDF schema validation: the `date` field can now be a variable instead of a coordinate, and is also accepted as a scalar array.
+
 ## [1.2.1] - 2025-07-04
 
 ### Added

@@ -54,8 +54,7 @@ def _validate_schema_srf(ds: xr.Dataset):
         Dataset to validate
     """
 
-    def get_data_vars(channel_dim: str = "channel"):
-        sample_dim = None
+    def get_data_vars(channel_dim: str = "channel", sample_dim=None):
         data_vars = {
             "srf": DataArraySchema(np.floating, dims=[sample_dim, channel_dim]),
             "wavelength": DataArraySchema(np.floating, dims=[sample_dim, channel_dim]),
@@ -77,7 +76,15 @@ def _validate_schema_srf(ds: xr.Dataset):
     flex_dss = DatasetSchema(
         data_vars=get_data_vars(None) | channel_id | coords,
     )
-    validate_schema(dss, ds, [odss, flex_dss])
+    # wavelength can be a coordinate instead of sample_dim
+    wlen_coord = {"wavelength": DataArraySchema(np.floating)}
+    data_vars = get_data_vars(sample_dim="wavelength") | channel_id
+    data_vars.pop("wavelength")
+    wcoorddss = DatasetSchema(
+        data_vars=data_vars,
+        coords=coords | wlen_coord,
+    )
+    validate_schema(dss, ds, [odss, flex_dss, wcoorddss])
 
 
 def read_srf(filepath: str) -> SpectralResponseFunction:
