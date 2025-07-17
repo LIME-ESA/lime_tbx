@@ -700,7 +700,7 @@ class CLI:
             distance_observer_moon,
             selen_obs_lat,
             selen_obs_lon,
-            selen_sun_lon,
+            np.radians(selen_sun_lon),
             abs(moon_phase_angle),
             moon_phase_angle,
         )
