@@ -91,7 +91,7 @@ Users must provide:
 - **Sun-Moon Distance** (AU)
 - **Observer-Moon Distance** (km)
 - **Selenographic Latitude & Longitude of Observer** (decimal degrees)
-- **Selenographic Longitude of the Sun** (radians)
+- **Selenographic Longitude of the Sun** (decimal degrees)
 - **Moon Phase Angle** (decimal degrees)
 
 ```{eval-rst}
@@ -111,9 +111,9 @@ lime -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,sel
 #### Example
 For a simulation for 0.98 AU of Sun-Moon Distance, 420000 km of Observer-Moon Distance, 20.5° and -30.2° as the
 selenographic latitude and longitude of the observer,
-0.69 radians as the selenographic longitude of the Sun, and 15º as the moon phase angle:
+69° as the selenographic longitude of the Sun, and 15° as the moon phase angle:
 ```sh
-lime -l 0.98,420000,20.5,-30.2,0.69,15 
+lime -l 0.98,420000,20.5,-30.2,69,15
 ```
 
 ## Simulation Using Satellite Positions
