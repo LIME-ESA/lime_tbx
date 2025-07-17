@@ -1449,7 +1449,7 @@ class MainSimulationsWidget(
             "Wavelengths (nm)",
             "Degree of Linear Polarisation (%)",
             subtitle=subtitle,
-            extra_attrs=[constants._WARN_POLAR_PRELIMINARY],
+            extra_attrs=[constants.WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()
@@ -1523,7 +1523,7 @@ class MainSimulationsWidget(
             "Wavelengths (nm)",
             "Angle of Linear Polarisation (°)",
             subtitle=subtitle,
-            extra_attrs=[constants._WARN_POLAR_PRELIMINARY],
+            extra_attrs=[constants.WARN_POLAR_PRELIMINARY],
         )
         self.graph.set_inside_mpa_range(data[4])
         self.clear_signals()

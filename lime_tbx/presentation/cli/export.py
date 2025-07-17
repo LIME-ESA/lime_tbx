@@ -317,7 +317,7 @@ class CLIExporter:
             self.lime_simulation.get_elis_cimel(),
             mda,
         )
-        polar_extra_attrs = [gui_constants._WARN_POLAR_PRELIMINARY]
+        polar_extra_attrs = [gui_constants.WARN_POLAR_PRELIMINARY]
         csv.export_csv_simulation(
             self.lime_simulation.get_polars(),
             "Wavelengths (nm)",
@@ -491,7 +491,7 @@ class CLIExporter:
             ) from e
         canv.axes.cla()  # Clear the canvas.
         spectrum_info = f" | Interp. spectrum: {dolp_sp_name}{mpa_text}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}\n{': '.join(gui_constants._WARN_POLAR_PRELIMINARY)}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}\n{': '.join(gui_constants.WARN_POLAR_PRELIMINARY)}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.cla()  # Clear the canvas.
         canvas.redraw_canvas(
@@ -518,7 +518,7 @@ class CLIExporter:
             ) from e
         canv.axes.cla()  # Clear the canvas.
         spectrum_info = f" | Interp. spectrum: {aolp_sp_name}{mpa_text}"
-        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}\n{': '.join(gui_constants._WARN_POLAR_PRELIMINARY)}"
+        subtitle = f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}\n{': '.join(gui_constants.WARN_POLAR_PRELIMINARY)}"
         canv.set_subtitle(subtitle, fontproperties=canvas.font_prop)
         canv.axes.cla()  # Clear the canvas.
         canvas.redraw_canvas(
