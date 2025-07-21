@@ -216,13 +216,11 @@ class CustomInputWidget(QtWidgets.QWidget):
         )
         self.dist_sun_moon_spinbox = _LimeDoubleInput(14, 0.5, 1.5, 0.0001, 1, "AU")
         self.dist_obs_moon_spinbox = _LimeDoubleInput(
-            10, 1, 1000000, None, 400000, "km"
+            10, 1, 1000000, None, 384400, "km"
         )
         self.selen_obs_lat_spinbox = _LimeDoubleInput(13, -90, 90, None, None, "°")
         self.selen_obs_lon_spinbox = _LimeDoubleInput(12, -180, 180, None, None, "°")
-        self.selen_sun_lon_spinbox = _LimeDoubleInput(
-            14, -np.pi, np.pi, 0.1, None, "rad"
-        )
+        self.selen_sun_lon_spinbox = _LimeDoubleInput(12, -180, 180, None, None, "°")
         self.moon_phase_angle_spinbox = _LimeDoubleInput(12, -180, 180, None, 30, "°")
         self.customform = ResponsiveForm()
         self.customform.addRow(self.dist_sun_moon_label, self.dist_sun_moon_spinbox)
@@ -248,7 +246,7 @@ class CustomInputWidget(QtWidgets.QWidget):
         return self.selen_obs_lon_spinbox.value()
 
     def get_selen_sun_lon(self) -> float:
-        return self.selen_sun_lon_spinbox.value()
+        return np.radians(self.selen_sun_lon_spinbox.value())
 
     def get_moon_phase_angle(self) -> float:
         return self.moon_phase_angle_spinbox.value()
@@ -269,7 +267,7 @@ class CustomInputWidget(QtWidgets.QWidget):
         return self.selen_obs_lon_spinbox.setValue(selen_obs_lon)
 
     def set_selen_sun_lon(self, selen_sun_lon: float) -> float:
-        return self.selen_sun_lon_spinbox.setValue(selen_sun_lon)
+        return self.selen_sun_lon_spinbox.setValue(np.degrees(selen_sun_lon))
 
     def external_resize(self, width):
         self.customform.external_resize(width)

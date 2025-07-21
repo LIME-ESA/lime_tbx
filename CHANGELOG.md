@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [1.2.2] - 2025-07-21
+
+### Changed
+
+- Relaxed SRF NetCDF file schema validation rules:
+  - The `wavelength` field can now be defined a coordinate instead of only as a variable.
+- Relaxed GLOD NetCDF schema validation rules:
+  - The `date` field is now accepted as a variable, not only as a coordinate.
+- Solar selenographic longitude must now be specified in decimal degrees (instead of radians) in both CLI and GUI.
+- Minor UI adjustments, including updated disclaimers and new default input values.
+
+### Added
+
+- GLOD file parsing now supports `date` values provided as a scalar array.
+
 ## [1.2.1] - 2025-07-04
 
 ### Added
