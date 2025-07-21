@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulations &mdash; Lime Tbx 1.2.1 documentation</title>
+  <title>Simulations &mdash; Lime Tbx 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -253,7 +253,7 @@ Users must provide:</p>
 <li><p><strong>Sun-Moon Distance</strong> (AU)</p></li>
 <li><p><strong>Observer-Moon Distance</strong> (km)</p></li>
 <li><p><strong>Selenographic Latitude &amp; Longitude of Observer</strong> (decimal degrees)</p></li>
-<li><p><strong>Selenographic Longitude of the Sun</strong> (radians)</p></li>
+<li><p><strong>Selenographic Longitude of the Sun</strong> (decimal degrees)</p></li>
 <li><p><strong>Moon Phase Angle</strong> (decimal degrees)</p></li>
 </ul>
 <figure class="align-center" id="fig-9">
@@ -272,8 +272,8 @@ Users must provide:</p>
 <h4>Example<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
 <p>For a simulation for 0.98 AU of Sun-Moon Distance, 420000 km of Observer-Moon Distance, 20.5° and -30.2° as the
 selenographic latitude and longitude of the observer,
-0.69 radians as the selenographic longitude of the Sun, and 15º as the moon phase angle:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span><span class="m">0</span>.98,420000,20.5,-30.2,0.69,15<span class="w"> </span>
+69° as the selenographic longitude of the Sun, and 15° as the moon phase angle:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span><span class="m">0</span>.98,420000,20.5,-30.2,69,15
 </pre></div>
 </div>
 </section>

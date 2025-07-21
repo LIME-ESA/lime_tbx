@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.presentation.cli.export &mdash; Lime Tbx 1.2.1 documentation</title>
+  <title>lime_tbx.presentation.cli.export &mdash; Lime Tbx 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -452,7 +452,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_elis_cimel</span><span class="p">(),</span>
             <span class="n">mda</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">polar_extra_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">_WARN_POLAR_PRELIMINARY</span><span class="p">]</span>
+        <span class="n">polar_extra_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">WARN_POLAR_PRELIMINARY</span><span class="p">]</span>
         <span class="n">csv</span><span class="o">.</span><span class="n">export_csv_simulation</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_polars</span><span class="p">(),</span>
             <span class="s2">&quot;Wavelengths (nm)&quot;</span><span class="p">,</span>
@@ -626,7 +626,7 @@
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">dolp_sp_name</span><span class="si">}{</span><span class="n">mpa_text</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">_WARN_POLAR_PRELIMINARY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">WARN_POLAR_PRELIMINARY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
@@ -653,7 +653,7 @@
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">spectrum_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; | Interp. spectrum: </span><span class="si">{</span><span class="n">aolp_sp_name</span><span class="si">}{</span><span class="n">mpa_text</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">_WARN_POLAR_PRELIMINARY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LIME coefficients version: </span><span class="si">{</span><span class="n">version</span><span class="si">}{</span><span class="n">spectrum_info</span><span class="si">}{</span><span class="n">warning_out_mpa_range</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gui_constants</span><span class="o">.</span><span class="n">WARN_POLAR_PRELIMINARY</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">set_subtitle</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">fontproperties</span><span class="o">=</span><span class="n">canvas</span><span class="o">.</span><span class="n">font_prop</span><span class="p">)</span>
         <span class="n">canv</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># Clear the canvas.</span>
         <span class="n">canvas</span><span class="o">.</span><span class="n">redraw_canvas</span><span class="p">(</span>
