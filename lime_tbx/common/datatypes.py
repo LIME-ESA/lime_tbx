@@ -46,6 +46,7 @@ from abc import ABC
 
 """___Third-Party Modules___"""
 import numpy as np
+import pandas as pd
 import xarray
 import yaml
 from atomicwrites import atomic_write
@@ -711,9 +712,19 @@ class SpectralData:
         ds: xarray.Dataset
             Dataset used in data generation
         """
-        self.wlens = wlens
-        self.data = data
-        self.uncertainties = uncertainties
+        if np.ndim(data) == 1:
+            self._is_multichannel = False
+            self._df = pd.DataFrame({"wlens": wlens, "data": data})
+            if uncertainties is not None:
+                self._df["uncertainties"] = uncertainties
+        else:
+            self._is_multichannel = True
+            df_dict = {}
+            for i, wl in enumerate(wlens):
+                df_dict[f"{wl}_data"] = data[i]
+                if uncertainties is not None:
+                    df_dict[f"{wl}_unc"] = uncertainties[i]
+            self._df = pd.DataFrame(df_dict)
         self.err_corr = None
         if hasattr(ds, "err_corr_reflectance_wavelength"):
             self.err_corr = ds.err_corr_reflectance_wavelength.values
@@ -721,6 +732,39 @@ class SpectralData:
             self.err_corr = ds.err_corr_polarisation.values
         elif hasattr(ds, "err_corr_irradiance"):
             self.err_corr = ds.err_corr_irradiance.values
+
+    @property
+    def wlens(self):
+        if self._is_multichannel:
+            return sorted(
+                set(
+                    col.rsplit("_", 1)[0]
+                    for col in self._df.columns
+                    if col.endswith("_data")
+                )
+            )
+        return self._df["wlens"].values
+
+    @property
+    def data(self):
+        if self._is_multichannel:
+            return [self._df[f"{wl}_data"].values for wl in self.wlens]
+        return self._df["data"].values
+
+    @property
+    def uncertainties(self):
+        if self._is_multichannel:
+            for wl in self.wlens:
+                if f"{wl}_unc" not in self._df:
+                    return None
+            return [self._df[f"{wl}_unc"].values for wl in self.wlens]
+        if "uncertainties" in self._df:
+            return self._df["uncertainties"].values
+        return None
+
+    def filter_indices(self, indices_keep):
+        """Mantain the given indices, filter out the ones not included"""
+        self._df = self._df[indices_keep].reset_index(drop=True)
 
     def clear_err_corr(self):
         """Dereference the error correlation matrix from the object."""
