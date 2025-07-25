@@ -544,7 +544,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
         self.comp_options_box.addWidget(self.clear_comparison_button)
         self.comp_options_box.addWidget(QtWidgets.QLabel(), 2)
-        self.filter_button = QtWidgets.QPushButton("Filter")
+        self.filter_button = QtWidgets.QPushButton("Filter 3σ")
         self.filter_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.filter_button.clicked.connect(self.filter_out_3sigmas)
         self.comp_options_box.addWidget(self.filter_button)

@@ -679,18 +679,18 @@ class LimeCoefficients:
 
 class SpectralData:
     """
-    Data for a spectrum of wavelengths, with an associated uncertainty each.
+    Represents spectral data with associated uncertainties and optional error correlation.
 
     Attributes
     ----------
     wlens: np.ndarray
-        Spectrum of wavelengths.
+        Array of wavelengths.
     data: np.ndarray
-        Data associated to the wavelengths (irradiance, reflectance, etc).
+        Measured data associated to the wavelengths (irradiance, reflectance, etc).
     uncertainties: np.ndarray
-        Uncertainties associated to the data.
-    err_corr: None | np.ndarray
-        Error correlation matrix, if included.
+        Uncertainties associated with the measurements.
+    err_corr: np.ndarray or None
+        Error correlation matrix, if available in the dataset.
     """
 
     def __init__(
@@ -735,6 +735,7 @@ class SpectralData:
 
     @property
     def wlens(self):
+        """Return the array of wavelengths."""
         if self._is_multichannel:
             return np.array(
                 sorted(
@@ -749,12 +750,14 @@ class SpectralData:
 
     @property
     def data(self):
+        """Return the measurement data."""
         if self._is_multichannel:
             return np.array([self._df[f"{wl}_data"].values for wl in self.wlens])
         return self._df["data"].values
 
     @property
     def uncertainties(self):
+        """Return the uncertainty data if available, otherwise None."""
         if self._is_multichannel:
             for wl in self.wlens:
                 if f"{wl}_unc" not in self._df:
@@ -765,7 +768,13 @@ class SpectralData:
         return None
 
     def filter_indices(self, indices_keep):
-        """Mantain the given indices, filter out the ones not included"""
+        """Retain only the rows corresponding to the given indices.
+
+        Parameters
+        ----------
+        indices_keep : array-like
+            Indices of the rows to keep.
+        """
         self._df = self._df[indices_keep].reset_index(drop=True)
 
     def clear_err_corr(self):
