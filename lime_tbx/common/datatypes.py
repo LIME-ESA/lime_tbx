@@ -736,11 +736,13 @@ class SpectralData:
     @property
     def wlens(self):
         if self._is_multichannel:
-            return sorted(
-                set(
-                    col.rsplit("_", 1)[0]
-                    for col in self._df.columns
-                    if col.endswith("_data")
+            return np.array(
+                sorted(
+                    set(
+                        col.rsplit("_", 1)[0]
+                        for col in self._df.columns
+                        if col.endswith("_data")
+                    )
                 )
             )
         return self._df["wlens"].values
@@ -748,7 +750,7 @@ class SpectralData:
     @property
     def data(self):
         if self._is_multichannel:
-            return [self._df[f"{wl}_data"].values for wl in self.wlens]
+            return np.array([self._df[f"{wl}_data"].values for wl in self.wlens])
         return self._df["data"].values
 
     @property
@@ -757,7 +759,7 @@ class SpectralData:
             for wl in self.wlens:
                 if f"{wl}_unc" not in self._df:
                     return None
-            return [self._df[f"{wl}_unc"].values for wl in self.wlens]
+            return np.array([self._df[f"{wl}_unc"].values for wl in self.wlens])
         if "uncertainties" in self._df:
             return self._df["uncertainties"].values
         return None

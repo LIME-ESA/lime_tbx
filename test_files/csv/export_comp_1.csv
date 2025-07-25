@@ -6,5 +6,5 @@ MARD (Mean of the Absolutes of the Relative Differences %),0.1
 MPD (Mean Percentage Difference %),0.1
 **,The LIME can only give a reliable simulation for absolute moon phase angles between 2° and 90°
 MPA,moon phase angle (deg),selenographic latitude (deg),selenographic longitude (deg),solar selenographic longitude (rad),distance sun moon (AU),distance observer moon (km),latitude,longitude,altitude(m),Observed Signal,Simulated Signal,Relative difference (%),Observed Signal uncertainties,Simulated Signal uncertainties,Relative difference (%) uncertainties
--15.2,-15.2,45.1,44.1,1.1,1,400000,43,45,4500,0.02,0.03,0.03,0,0,0
+-15.2,-15.2,45.1,44.1,1.1,1,400000,43,45,4500,0.02,0.03,0.03,0.0,0,0
 -12.2 **,-12.2,45.6,42.1,1.15,1.000001,400100,43,45,4500,0.03,0.03,0.03,0.005,0,0
