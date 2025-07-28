@@ -544,10 +544,15 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
         self.comp_options_box.addWidget(self.clear_comparison_button)
         self.comp_options_box.addWidget(QtWidgets.QLabel(), 2)
-        self.filter_button = QtWidgets.QPushButton("Filter 3σ")
+        self.filter_button = QtWidgets.QPushButton("FILTER 3σ")
+        self.filter_button.setStyleSheet("text-transform: none")
         self.filter_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.filter_button.setToolTip(
+            "Filter out measurements that are 3σ away from the mean relative difference, channel-wise."
+        )
         self.filter_button.clicked.connect(self.filter_out_3sigmas)
         self.comp_options_box.addWidget(self.filter_button)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 1)
         self.compare_by_label = QtWidgets.QLabel("Compare by:")
         self.compare_by_field = QtWidgets.QComboBox()
         self.compare_by_field.view().setVerticalScrollBarPolicy(
