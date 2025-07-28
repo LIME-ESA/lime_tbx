@@ -513,6 +513,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._listening_changes_combobox = True
         self.chosen_diffs = CompFields.DIFF_REL
         self._can_export_netcdf = False
+        self._channel_index = 0
         self._build_layout()
 
     def _build_layout(self):
@@ -874,6 +875,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
+        self._channel_index = 0
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
@@ -989,6 +991,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
+        self._channel_index = 0
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
@@ -998,8 +1001,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp: output.ComparisonOutput = data[0]
         outp.remove_channels(data[1])
         outp.check_if_range_visible()
+        outp.set_current_channel_index(self._channel_index)
         self._unblock_gui()
-        outp.set_current_channel_index(0)
         self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
@@ -1040,6 +1043,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def filter_out_3sigmas(self):
         self._block_gui_loading()
+        self._channel_index = self.output.get_current_channel_index()
         worker = CallbackWorker(
             filter_out_3sigmas,
             [self.comps],
@@ -1073,13 +1077,12 @@ class ComparisonPageWidget(QtWidgets.QWidget):
             self.settings_manager,
             self.chosen_diffs,
         ]
-        # Channels are set to the output here, as that needs to be done in the main qt thread.
-        ch_names = self.srf.get_channels_names()
-        self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
-        self._start_thread(
-            worker, self._load_lglod_comparisons_finished, self.compare_error
-        )
+        self._start_thread(worker, self._show_after_filter_finished, self.compare_error)
+
+    def _show_after_filter_finished(self, data):
+        self._load_lglod_comparisons_finished(data)
+        self._update_from_compare_combo(self.compare_by_field.currentText())
 
 
 class MainSimulationsWidget(
