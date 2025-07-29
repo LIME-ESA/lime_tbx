@@ -34,7 +34,7 @@ jobs:
           mkdir test_report
           source .venv/bin/activate
           export GITLAB_CI="GITLAB_CI"
-          tox -- --runslow
+          tox -- --runslow -m slow
       - name: Upload test report
         uses: actions/upload-artifact@v4
         with:
