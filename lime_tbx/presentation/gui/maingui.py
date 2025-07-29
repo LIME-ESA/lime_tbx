@@ -304,6 +304,36 @@ def compare_callback(
     return comparisons, mpa_comp, mos, srf
 
 
+def filter_out_3sigmas(
+    comps: List[ComparisonData],
+) -> Tuple[List[ComparisonData], List[ComparisonData],]:
+    for co in comps:
+        if co.mean_relative_difference is None:
+            continue
+        lower_limit = co.mean_relative_difference - 3 * co.standard_deviation_mrd
+        upper_limit = co.mean_relative_difference + 3 * co.standard_deviation_mrd
+        indices_keep = [lower_limit <= rd <= upper_limit for rd in co.diffs_signal.data]
+        co.observed_signal.filter_indices(indices_keep)
+        co.simulated_signal.filter_indices(indices_keep)
+        co.diffs_signal.filter_indices(indices_keep)
+        co.perc_diffs.filter_indices(indices_keep)
+        co.dts = [d for d, keep in zip(co.dts, indices_keep) if keep]
+        co.points = [p for p, keep in zip(co.points, indices_keep) if keep]
+        co.ampa_valid_range = [
+            v for v, keep in zip(co.ampa_valid_range, indices_keep) if keep
+        ]
+        co.mdas = [m for m, keep in zip(co.mdas, indices_keep) if keep]
+        co.number_samples = len(co.observed_signal.wlens)
+        co.mean_relative_difference = np.mean(co.diffs_signal.data)
+        co.mean_absolute_relative_difference = (
+            np.sum(np.abs(co.diffs_signal.data)) / co.number_samples
+        )
+        co.standard_deviation_mrd = np.std(co.diffs_signal.data)
+        co.mean_perc_difference = np.mean(co.perc_diffs.data)
+    mpa_comp = sort_by_mpa(comps)
+    return comps, mpa_comp
+
+
 def calculate_all_callback(
     srf: SpectralResponseFunction,
     point: Point,
@@ -483,6 +513,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._listening_changes_combobox = True
         self.chosen_diffs = CompFields.DIFF_REL
         self._can_export_netcdf = False
+        self._channel_index = 0
         self._build_layout()
 
     def _build_layout(self):
@@ -514,6 +545,15 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
         self.comp_options_box.addWidget(self.clear_comparison_button)
         self.comp_options_box.addWidget(QtWidgets.QLabel(), 2)
+        self.filter_button = QtWidgets.QPushButton("FILTER 3σ")
+        self.filter_button.setStyleSheet("text-transform: none")
+        self.filter_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.filter_button.setToolTip(
+            "Filter out measurements that are 3σ away from the mean relative difference, channel-wise."
+        )
+        self.filter_button.clicked.connect(self.filter_out_3sigmas)
+        self.comp_options_box.addWidget(self.filter_button)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 1)
         self.compare_by_label = QtWidgets.QLabel("Compare by:")
         self.compare_by_field = QtWidgets.QComboBox()
         self.compare_by_field.view().setVerticalScrollBarPolicy(
@@ -835,6 +875,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
+        self._channel_index = 0
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
@@ -950,6 +991,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
+        self._channel_index = 0
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
@@ -959,8 +1001,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp: output.ComparisonOutput = data[0]
         outp.remove_channels(data[1])
         outp.check_if_range_visible()
+        outp.set_current_channel_index(self._channel_index)
         self._unblock_gui()
-        outp.set_current_channel_index(0)
         self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
@@ -997,6 +1039,50 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.set_can_export_to_nc(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
+
+    @QtCore.Slot()
+    def filter_out_3sigmas(self):
+        self._block_gui_loading()
+        self._channel_index = self.output.get_current_channel_index()
+        worker = CallbackWorker(
+            filter_out_3sigmas,
+            [self.comps],
+        )
+        self._start_thread(
+            worker,
+            self.filter_finished,
+            self.compare_error,
+        )
+
+    def filter_finished(
+        self,
+        data: Tuple[
+            List[ComparisonData],
+            List[ComparisonData],
+        ],
+    ):
+        self.set_show_comparison_input(False)
+        comps = data[0]
+        mpa_comps = data[1]
+        self.comps = comps
+        self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
+        self.mpa_comps = mpa_comps
+        self.version = self.settings_manager.get_coef_version_name()
+        params = [
+            self.output,
+            self.comps,
+            CompFields.COMP_DATE,
+            self.srf,
+            self.version,
+            self.settings_manager,
+            self.chosen_diffs,
+        ]
+        worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(worker, self._show_after_filter_finished, self.compare_error)
+
+    def _show_after_filter_finished(self, data):
+        self._load_lglod_comparisons_finished(data)
+        self._update_from_compare_combo(self.compare_by_field.currentText())
 
 
 class MainSimulationsWidget(

@@ -280,7 +280,7 @@ class TestCSV(unittest.TestCase):
         uncs = np.array(
             [np.array(UNCS)[0:2] * (i + 1) for i in range(len(srf.channels))]
         )
-        data = SpectralData(WLENS, signals, uncs, None)
+        data = SpectralData(WLENS[:3], signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
         export_csv_integrated_irradiance(
             srf,

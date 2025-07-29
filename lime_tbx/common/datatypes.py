@@ -46,6 +46,7 @@ from abc import ABC
 
 """___Third-Party Modules___"""
 import numpy as np
+import pandas as pd
 import xarray
 import yaml
 from atomicwrites import atomic_write
@@ -678,18 +679,18 @@ class LimeCoefficients:
 
 class SpectralData:
     """
-    Data for a spectrum of wavelengths, with an associated uncertainty each.
+    Represents spectral data with associated uncertainties and optional error correlation.
 
     Attributes
     ----------
     wlens: np.ndarray
-        Spectrum of wavelengths.
+        Array of wavelengths.
     data: np.ndarray
-        Data associated to the wavelengths (irradiance, reflectance, etc).
+        Measured data associated to the wavelengths (irradiance, reflectance, etc).
     uncertainties: np.ndarray
-        Uncertainties associated to the data.
-    err_corr: None | np.ndarray
-        Error correlation matrix, if included.
+        Uncertainties associated with the measurements.
+    err_corr: np.ndarray or None
+        Error correlation matrix, if available in the dataset.
     """
 
     def __init__(
@@ -711,9 +712,19 @@ class SpectralData:
         ds: xarray.Dataset
             Dataset used in data generation
         """
-        self.wlens = wlens
-        self.data = data
-        self.uncertainties = uncertainties
+        if np.ndim(data) == 1:
+            self._is_multichannel = False
+            self._df = pd.DataFrame({"wlens": wlens, "data": data})
+            if uncertainties is not None:
+                self._df["uncertainties"] = uncertainties
+        else:
+            self._is_multichannel = True
+            df_dict = {}
+            for i, wl in enumerate(wlens):
+                df_dict[f"{wl}_data"] = data[i]
+                if uncertainties is not None:
+                    df_dict[f"{wl}_unc"] = uncertainties[i]
+            self._df = pd.DataFrame(df_dict)
         self.err_corr = None
         if hasattr(ds, "err_corr_reflectance_wavelength"):
             self.err_corr = ds.err_corr_reflectance_wavelength.values
@@ -721,6 +732,50 @@ class SpectralData:
             self.err_corr = ds.err_corr_polarisation.values
         elif hasattr(ds, "err_corr_irradiance"):
             self.err_corr = ds.err_corr_irradiance.values
+
+    @property
+    def wlens(self):
+        """Return the array of wavelengths."""
+        if self._is_multichannel:
+            return np.array(
+                sorted(
+                    set(
+                        col.rsplit("_", 1)[0]
+                        for col in self._df.columns
+                        if col.endswith("_data")
+                    )
+                )
+            )
+        return self._df["wlens"].values
+
+    @property
+    def data(self):
+        """Return the measurement data."""
+        if self._is_multichannel:
+            return np.array([self._df[f"{wl}_data"].values for wl in self.wlens])
+        return self._df["data"].values
+
+    @property
+    def uncertainties(self):
+        """Return the uncertainty data if available, otherwise None."""
+        if self._is_multichannel:
+            for wl in self.wlens:
+                if f"{wl}_unc" not in self._df:
+                    return None
+            return np.array([self._df[f"{wl}_unc"].values for wl in self.wlens])
+        if "uncertainties" in self._df:
+            return self._df["uncertainties"].values
+        return None
+
+    def filter_indices(self, indices_keep):
+        """Retain only the rows corresponding to the given indices.
+
+        Parameters
+        ----------
+        indices_keep : array-like
+            Indices of the rows to keep.
+        """
+        self._df = self._df[indices_keep].reset_index(drop=True)
 
     def clear_err_corr(self):
         """Dereference the error correlation matrix from the object."""
