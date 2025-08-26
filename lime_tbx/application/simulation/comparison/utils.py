@@ -10,7 +10,7 @@ It exports the following methods:
 """
 
 """___Built-In Modules___"""
-from typing import List
+from typing import List, Tuple
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -163,3 +163,39 @@ def average_comparisons(
         None,
     )
     return c
+
+
+def _filter_out_3sigmas_comp(co: ComparisonData):
+    lower_limit = co.mean_relative_difference - 3 * co.standard_deviation_mrd
+    upper_limit = co.mean_relative_difference + 3 * co.standard_deviation_mrd
+    indices_keep = [lower_limit <= rd <= upper_limit for rd in co.diffs_signal.data]
+    co.observed_signal.filter_indices(indices_keep)
+    co.simulated_signal.filter_indices(indices_keep)
+    co.diffs_signal.filter_indices(indices_keep)
+    co.perc_diffs.filter_indices(indices_keep)
+    co.dts = [d for d, keep in zip(co.dts, indices_keep) if keep]
+    co.points = [p for p, keep in zip(co.points, indices_keep) if keep]
+    co.ampa_valid_range = [
+        v for v, keep in zip(co.ampa_valid_range, indices_keep) if keep
+    ]
+    co.mdas = [m for m, keep in zip(co.mdas, indices_keep) if keep]
+    co.number_samples = len(co.observed_signal.wlens)
+    co.mean_relative_difference = np.mean(co.diffs_signal.data)
+    co.mean_absolute_relative_difference = (
+        np.sum(np.abs(co.diffs_signal.data)) / co.number_samples
+    )
+    co.standard_deviation_mrd = np.std(co.diffs_signal.data)
+    co.mean_perc_difference = np.mean(co.perc_diffs.data)
+
+
+def filter_out_3sigmas_iter(comps: List[ComparisonData]) -> List[ComparisonData]:
+    for co in comps:
+        if co.mean_relative_difference is None:
+            continue
+        preshape = None
+        shape = co.observed_signal.data.shape
+        while preshape is None or preshape != shape:
+            _filter_out_3sigmas_comp(co)
+            preshape = shape
+            shape = co.observed_signal.data.shape
+    return comps

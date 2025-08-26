@@ -14,6 +14,7 @@ Options:
 			 -s sat_name,datetime_isoformat
   -c, --comparison	 Performs comparisons from observations files in GLOD format.
 			 -c "input_glod1.nc input_glod2.nc ..."
+			 Accepts the flag --filter3sigma: Iteratively filters out data with a channel-wise relative difference of 3 or more times the standard deviation from the mean.
   -o, --output		 Select the output path and format.
 			 If it's a simulation:
 			   GRAPH: -o graph,(pdf|jpg|png|svg),refl,irr,dolp,aolp

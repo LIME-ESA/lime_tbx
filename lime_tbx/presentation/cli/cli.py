@@ -49,6 +49,7 @@ from lime_tbx.application.simulation.comparison import comparison
 from lime_tbx.application.simulation.comparison.utils import (
     sort_by_mpa,
     average_comparisons,
+    filter_out_3sigmas_iter,
 )
 from lime_tbx.application.filedata import moon, srf as srflib, csv, lglod as lglodlib
 from lime_tbx.application.coefficients.update import Update
@@ -123,6 +124,8 @@ def print_help():
     - `-t, --timeseries`: Use a CSV file with multiple datetimes.
     - `-C, --coefficients`: Change the coefficients version used by the toolbox.
     - `-i, --interpolation-settings`: Modify interpolation settings via JSON input.
+    - `--filter3sigma`: Only applies for comparisons: Iteratively filters out data with a channel-wise
+        relative difference of 3 or more times the standard deviation from the mean.
 
     The function also provides examples of valid input formats and highlights
     any constraints or dependencies for specific options.
@@ -154,6 +157,10 @@ selen_sun_lon,moon_phase_angle"
         "  -c, --comparison\t Performs comparisons from observations files in GLOD format."
     )
     print('\t\t\t -c "input_glod1.nc input_glod2.nc ..."')
+    print(
+        "\t\t\t Accepts the flag --filter3sigma: Iteratively filters out data with a channel-wise"
+        " relative difference of 3 or more times the standard deviation from the mean."
+    )
     print("  -o, --output\t\t Select the output path and format.")
     print("\t\t\t If it's a simulation:")
     print(f"\t\t\t   GRAPH: -o graph,{imsel},refl,irr,dolp,aolp")
@@ -182,8 +189,8 @@ selen_sun_lon,moon_phase_angle"
 in GLOD format."
     )
     print(
-        "  -t, --timeseries\t Select a file with multiple datetimes instead of \
-inputing directly only one datetime. Valid only if the main option is -e or -s."
+        "  -t, --timeseries\t Select a file with multiple datetimes instead of"
+        " inputing directly only one datetime. Valid only if the main option is -e or -s."
     )
     print(
         "  -C, --coefficients\t Change the coefficients version used by the TBX, \
@@ -718,6 +725,7 @@ class CLI:
         self,
         input_files: List[str],
         ed: export.ExportComparison,
+        filter3sigma: bool,
     ):
         """Performs comparisons between simulation results and observational data.
 
@@ -727,6 +735,8 @@ class CLI:
             List of file paths containing observational data.
         ed : export.ExportComparison
             The comparison export configuration.
+        filter3sigma: bool
+            Flag indicating if the a 3 sigma filter should be iteratively applied.
 
         Raises
         ------
@@ -769,6 +779,8 @@ class CLI:
         co = comparison.Comparison(self.kernels_path)
         cimel_coef = self.settings_manager.get_cimel_coef()
         comps = co.get_simulations(mos, self.srf, cimel_coef, self.lime_simulation)
+        if filter3sigma:
+            comps = filter_out_3sigmas_iter(comps)
         # EXPORT
         skip_uncs = self.settings_manager.is_skip_uncertainties()
         if isinstance(ed, export.ExportNetCDF):
@@ -1145,6 +1157,7 @@ Run 'lime -h' for help."
         """
         export_data: export.ExportData = None
         timeseries = None
+        filter3sigma = False
         # Check if it's comparison
         is_comparison = any(item[0] in ("-c", "--comparison") for item in opts)
         mod_interp_settings = False
@@ -1180,6 +1193,8 @@ Run 'lime -h' for help."
                 elif opt in ("-i", "--interpolation-settings"):
                     self._parse_interp_settings(arg)
                     mod_interp_settings = True
+                elif opt in ("--filter3sigma"):
+                    filter3sigma = True
         except CLIError as e:
             eprint(str(e))
             return 1
@@ -1257,7 +1272,7 @@ Run 'lime -h' for help."
                     input_files = []
                     for param in params:
                         input_files += glob.glob(param)
-                    self.calculate_comparisons(input_files, export_data)
+                    self.calculate_comparisons(input_files, export_data, filter3sigma)
                     break
         except export.ExportError as e:
             eprint(str(e))
