@@ -78,6 +78,9 @@ provides tools for exploring the data, as shown in [Figure 18](#fig-18).
   - **Wavelength**, with two visualization options:
     - **Mean-based Comparison**: Computes the mean of all observations and simulations for each channel.
     - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 19](#fig-19).
+- **Filter outliers**: Iteratively remove data points that deviate by three or more standard deviations from
+  the mean. The process continues automatically until all remaining points fall within the range.
+  To apply it, press the "FILTER 3σ" button. 
 - **New Comparison**: Click "NEW" (top-left) to clear results and start a new comparison.  
   - A **confirmation dialog** appears, as shown in [Figure 20](#fig-20).
 
@@ -178,4 +181,11 @@ Specify the netCDF file path:
 **Example:**
 ```sh
 -o nc,output.nc
+```
+
+### CLI Comparison Filters
+
+Users can also apply the 3σ outlier filter by adding the `--filter3sigma` flag:
+```sh
+lime -c "files/*.nc" --filter3sigma
 ```
