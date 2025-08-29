@@ -335,6 +335,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.max_date = max_date
         self.all_loaded_datetimes = []
         self._build_layout()
+        self._apply_limits_singledatetime(self.min_date, self.max_date)
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QHBoxLayout(self)
@@ -434,6 +435,18 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
     def _clear_layout(self):
         self.single_dt_frame.setHidden(True)
         self.multiple_dt_frame.setHidden(True)
+
+    def _apply_limits_singledatetime(self, d0: datetime, df: datetime):
+        if d0 is not None:
+            dt0 = QtCore.QDateTime(
+                d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
+            )
+            self.datetime_edit.setMinimumDateTime(dt0)
+        if df is not None:
+            dtf = QtCore.QDateTime(
+                df.year, df.month, df.day, df.hour, df.minute, df.second
+            )
+            self.datetime_edit.setMaximumDateTime(dtf)
 
     def change_single_datetime(self):
         self._clear_layout()
@@ -559,10 +572,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
     def set_limits(self, d0: datetime, df: datetime):
         self.min_date = d0
         self.max_date = df
-        dt0 = QtCore.QDateTime(d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second)
-        self.datetime_edit.setMinimumDateTime(dt0)
-        dtf = QtCore.QDateTime(df.year, df.month, df.day, df.hour, df.minute, df.second)
-        self.datetime_edit.setMaximumDateTime(dtf)
+        self._apply_limits_singledatetime(d0, df)
         if not self.single_datetime:
             self.update_dates_with_limits()
             self.callback_check_calculable()
@@ -604,7 +614,10 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         for lay in self.coord_forms_layouts:
             self.coordinates_layout.addLayout(lay)
         self.flexdt_wg = FlexibleDateTimeInput(
-            self.callback_check_calculable, self._skip_uncs
+            self.callback_check_calculable,
+            self._skip_uncs,
+            _SPICE_MIN_DATE,
+            _SPICE_MAX_DATE,
         )
         self.main_layout.addWidget(self.flexdt_wg)
         self.main_layout.addStretch()
@@ -872,6 +885,8 @@ class AddSatDialog(QtWidgets.QDialog):
 
 
 _DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
+_SPICE_MIN_DATE = datetime(1900, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+_SPICE_MAX_DATE = datetime(2050, 12, 31, 23, 58, 50, tzinfo=timezone.utc)
 
 
 class SatelliteInputWidget(QtWidgets.QWidget):
@@ -999,7 +1014,26 @@ class InputWidget(QtWidgets.QWidget):
         )
         self.tabs.addTab(self.surface, "Geographic")
         self.custom = CustomInputWidget()
-        self.tabs.addTab(self.custom, "Selenographic")
+        self.custom_multi = QtWidgets.QWidget()  # CustomMultipleInputWidget()
+        self.seleno_stack = QtWidgets.QStackedWidget()
+        self.seleno_stack.addWidget(self.custom)
+        self.seleno_stack.addWidget(self.custom_multi)
+        self.tabs.addTab(self.seleno_stack, "Selenographic")
+        self.seleno_btn = QtWidgets.QToolButton()
+        self.seleno_btn.setAutoRaise(True)
+        self.seleno_btn.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.seleno_btn.setStyleSheet(
+            "QToolButton::menu-indicator {image: none;width: 0px;}"
+        )
+        self.seleno_btn.setArrowType(QtCore.Qt.DownArrow)
+        self.seleno_menu = QtWidgets.QMenu(self.seleno_btn)
+        act_single = self.seleno_menu.addAction(
+            "Single Point", lambda: self._switch_seleno_mode(0)
+        )
+        act_multi = self.seleno_menu.addAction(
+            "Multiple Points", lambda: self._switch_seleno_mode(1)
+        )
+        self.seleno_btn.setMenu(self.seleno_menu)
         self.satellite = SatelliteInputWidget(
             self.callback_check_calculable,
             self.skip_uncs,
@@ -1007,8 +1041,22 @@ class InputWidget(QtWidgets.QWidget):
             self.kernels_path,
         )
         self.tabs.addTab(self.satellite, "Satellite")
+        self.tabs.tabBar().setTabButton(1, QtWidgets.QTabBar.RightSide, self.seleno_btn)
         self.tabs.currentChanged.connect(self.callback_check_calculable)
+        act_single.setCheckable(True)
+        act_multi.setCheckable(True)
+        self._set_seleno_mode(0)
         self.main_layout.addWidget(self.tabs)
+
+    def _set_seleno_mode(self, idx: int):
+        self.seleno_stack.setCurrentIndex(idx)
+        for i, act in enumerate(self.seleno_menu.actions()):
+            act.setChecked(i == idx)
+
+    def _switch_seleno_mode(self, idx: int):
+        self._set_seleno_mode(idx)
+        self.tabs.setCurrentIndex(1)
+        self.callback_check_calculable()
 
     @staticmethod
     def _are_different_points(point_a: Point, point_b: Point) -> bool:
