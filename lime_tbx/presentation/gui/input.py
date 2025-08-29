@@ -42,9 +42,9 @@ __status__ = "Production"
 
 MAX_PATH_LEN = 35
 
-_A_LOT_DATETIMES_MSG = f"Usually, calculated reflectance values are used to obtain irradiances. \
+_A_LOT_PTS_MSG = f"Usually, calculated reflectance values are used to obtain irradiances. \
 However, due to the large size of the error correlation matrices, these matrices are not \
-stored in memory for more than {constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED} datetimes. \
+stored in memory for more than {constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED} points. \
 This requires recalculating reflectances whenever irradiances are computed. Therefore, \
 if you want both values in this case, it is advisable to choose to calculate irradiances first."
 
@@ -271,6 +271,82 @@ class CustomInputWidget(QtWidgets.QWidget):
 
     def external_resize(self, width):
         self.customform.external_resize(width)
+
+
+class CustomMultipleInputWidget(QtWidgets.QWidget):
+    def __init__(self, skip_uncs: bool):
+        super().__init__()
+        self._skip_uncs = skip_uncs
+        self.loaded_points = []
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.points_label = QtWidgets.QLabel("Points file:")
+        self.load_points_button = QtWidgets.QPushButton("Load file")
+        self.load_points_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.load_points_button.clicked.connect(self.load_points)
+        self.loaded_points_label = QtWidgets.QLabel("")
+        self.points_input_layout = QtWidgets.QHBoxLayout()
+        self.points_input_layout.addWidget(self.load_points_button)
+        self.points_input_layout.addWidget(self.loaded_points_label, 1)
+        self.main_layout.addWidget(self.points_label)
+        self.main_layout.addLayout(self.points_input_layout)
+        ## Aux buttons
+        self.points_buttons = QtWidgets.QHBoxLayout()
+        ### Show Points
+        self.show_points_button = QtWidgets.QPushButton(" See Points ")
+        self.show_points_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.show_points_button.clicked.connect(self.show_points)
+        self.points_buttons.addWidget(self.show_points_button)
+        self.points_buttons.addWidget(QtWidgets.QLabel(), 1)
+        ### Info 'a lot points'
+        self.info_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxInformation
+        )
+        self.info_pixmap = self.info_icon.pixmap(32)
+        self.info_hidden_points_a_lot = QtWidgets.QLabel(" ")
+        self.info_hidden_points_a_lot.setPixmap(self.info_pixmap)
+        self.info_hidden_points_a_lot.setWordWrap(True)
+        self.info_hidden_points_a_lot.hide()
+        self.points_buttons.addWidget(self.info_hidden_points_a_lot)
+        self.points_buttons.addWidget(QtWidgets.QLabel(), 1)
+        self.points_buttons.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.addLayout(self.points_buttons)
+
+    @QtCore.Slot()
+    def load_points(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        if path != "":
+            try:
+                self.loaded_points = csv.read_selenopoints(path)
+                # TODO check if all values are within its valid range, if not raise exception
+            except Exception as e:
+                self.show_error(e)
+            else:
+                shown_path = path
+                if len(shown_path) > MAX_PATH_LEN:
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) :]
+                self.loaded_points_label.setText(shown_path)
+                self.loaded_points_label.setToolTip(path)
+        self.check_if_a_lot_points_and_update_msg()
+
+    @QtCore.Slot()
+    def show_points(self):
+        print("TODO")
+
+    def get_points(self) -> List[CustomPoint]:
+        return self.loaded_points
+
+    def check_if_a_lot_points_and_update_msg(self):
+        # TODO: The limit must actually exist, currently only checks number of dts, not points
+        max_points = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+        if len(self.loaded_points) > max_points and not self._skip_uncs:
+            self.info_hidden_points_a_lot.show()
+            self.info_hidden_points_a_lot.setToolTip(_A_LOT_PTS_MSG)
+        else:
+            self.info_hidden_points_a_lot.hide()
+            self.info_hidden_points_a_lot.setToolTip("")
 
 
 class ShowDatetimeWidget(QtWidgets.QWidget):
@@ -530,7 +606,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
         if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
             self.info_hidden_datetimes_a_lot.show()
-            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
+            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_PTS_MSG)
         else:
             self.info_hidden_datetimes_a_lot.hide()
             self.info_hidden_datetimes_a_lot.setToolTip("")
@@ -1014,7 +1090,7 @@ class InputWidget(QtWidgets.QWidget):
         )
         self.tabs.addTab(self.surface, "Geographic")
         self.custom = CustomInputWidget()
-        self.custom_multi = QtWidgets.QWidget()  # CustomMultipleInputWidget()
+        self.custom_multi = CustomMultipleInputWidget(self.skip_uncs)
         self.seleno_stack = QtWidgets.QStackedWidget()
         self.seleno_stack.addWidget(self.custom)
         self.seleno_stack.addWidget(self.custom_multi)

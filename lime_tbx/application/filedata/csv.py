@@ -42,6 +42,9 @@ __status__ = "Development"
 _EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
 _READ_FILE_DTS_ERROR_STR = "There was a problem while loading datetimes csv file.\n\
 Check that every row has the correct format and see log for details."
+_READ_FILE_SELENOPTS_ERROR_STR = "There was a problem while loading selnographic\
+points csv file.\n\
+Check that every row has the correct format and see log for details."
 _WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
 
@@ -573,7 +576,7 @@ def read_datetimes(path: str) -> List[datetime]:
     Returns
     -------
     dts: list of datetime
-        Datetimes that where stored in that file.
+        Datetimes that were stored in that file.
     """
     try:
         with open(path, "r") as file:
@@ -596,3 +599,36 @@ def read_datetimes(path: str) -> List[datetime]:
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_DTS_ERROR_STR)
+
+
+def read_selenopoints(path: str) -> List[CustomPoint]:
+    """
+    Read a custompoint data-series CSV file.
+
+    Parameters
+    ----------
+    path: str
+        Path where the file is stored.
+
+    Returns
+    -------
+    pts: list of CustomPoint
+        Selenographic CustomPoint that were stored in that file.
+    """
+    try:
+        with open(path, "r") as file:
+            reader = csv.reader(file)
+            points = []
+            for row in reader:
+                if not row:
+                    continue
+                irow = map(float, row)
+                dsm, dom, solat, solon, sslon, mpa = list(irow)
+                pt = CustomPoint(
+                    dsm, dom, solat, solon, np.radians(sslon), abs(mpa), mpa
+                )
+                points.append(pt)
+            return points
+    except Exception as e:
+        logger.get_logger().exception(e)
+        raise Exception(_READ_FILE_SELENOPTS_ERROR_STR)
