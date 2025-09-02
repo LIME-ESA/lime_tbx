@@ -314,6 +314,10 @@ class CustomMultipleInputWidget(QtWidgets.QWidget):
         self.points_buttons.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(self.points_buttons)
 
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
     @QtCore.Slot()
     def load_points(self):
         path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
@@ -333,7 +337,11 @@ class CustomMultipleInputWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def show_points(self):
-        print("TODO")
+        self.points_window = QtWidgets.QMainWindow(self)
+        self.points_widget = ShowPointsWidget(self.loaded_points)
+        self.points_window.setCentralWidget(self.points_widget)
+        self.points_window.show()
+        self.points_window.resize(660, 230)
 
     def get_points(self) -> List[CustomPoint]:
         return self.loaded_points
@@ -347,6 +355,59 @@ class CustomMultipleInputWidget(QtWidgets.QWidget):
         else:
             self.info_hidden_points_a_lot.hide()
             self.info_hidden_points_a_lot.setToolTip("")
+
+
+class ShowPointsWidget(QtWidgets.QWidget):
+    def __init__(self, points: List[CustomPoint]):
+        super().__init__()
+        self.pts = points
+        self._build_layout()
+        self._fill_table()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.groupbox = QtWidgets.QGroupBox()
+        self.container_layout = QtWidgets.QVBoxLayout()
+        self.data_layout = QtWidgets.QFormLayout()
+        self.groupbox.setLayout(self.container_layout)
+        # table
+        self.table = QtWidgets.QTableWidget()
+        self.container_layout.addLayout(self.data_layout, 1)
+        self.data_layout.addWidget(self.table)
+        self.container_layout.addStretch()
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.groupbox)
+        self.main_layout.addWidget(self.scroll_area)
+
+    def _fill_table(self):
+        self.table.setRowCount(1 + len(self.pts))
+        self.table.setColumnCount(6)
+        self.table.setItem(0, 0, QtWidgets.QTableWidgetItem("Dist. Sun-Moon (AU)"))
+        self.table.setItem(0, 1, QtWidgets.QTableWidgetItem("Dist. Obs-Moon (km)"))
+        self.table.setItem(0, 2, QtWidgets.QTableWidgetItem("Obs. sel. lat. (°)"))
+        self.table.setItem(0, 3, QtWidgets.QTableWidgetItem("Obs. sel. lon. (°)"))
+        self.table.setItem(0, 4, QtWidgets.QTableWidgetItem("Sun. sel. lon. (°)"))
+        self.table.setItem(0, 5, QtWidgets.QTableWidgetItem("Moon phase angle (°)"))
+        for i, pt in enumerate(self.pts):
+            self.table.setItem(
+                1 + i, 0, QtWidgets.QTableWidgetItem(str(pt.distance_sun_moon))
+            )
+            self.table.setItem(
+                1 + i, 1, QtWidgets.QTableWidgetItem(str(pt.distance_observer_moon))
+            )
+            self.table.setItem(
+                1 + i, 2, QtWidgets.QTableWidgetItem(str(pt.selen_obs_lat))
+            )
+            self.table.setItem(
+                1 + i, 3, QtWidgets.QTableWidgetItem(str(pt.selen_obs_lon))
+            )
+            self.table.setItem(
+                1 + i, 4, QtWidgets.QTableWidgetItem(str(np.degrees(pt.selen_sun_lon)))
+            )
+            self.table.setItem(
+                1 + i, 5, QtWidgets.QTableWidgetItem(str(pt.moon_phase_angle))
+            )
 
 
 class ShowDatetimeWidget(QtWidgets.QWidget):
