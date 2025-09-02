@@ -15,6 +15,7 @@ from lime_tbx.common.datatypes import (
     SatellitePoint,
     KernelsPath,
     EocfiPath,
+    MultipleCustomPoint,
 )
 from lime_tbx.business.spice_adapter.spice_adapter import SPICEAdapter
 from lime_tbx.business.eocfi_adapter.eocfi_adapter import EOCFIConverter
@@ -62,6 +63,8 @@ class MoonDataFactory:
 
         elif isinstance(point, CustomPoint):
             md = MoonDataFactory.get_md_from_custom(point)
+        elif isinstance(point, MultipleCustomPoint):
+            md = MoonDataFactory.get_md_from_multi_custom(point)
         else:
             md = MoonDataFactory.get_md_from_satellite(point, eocfi_path, kernels_path)
         return md
@@ -119,6 +122,24 @@ class MoonDataFactory:
             cp.moon_phase_angle,
         )
         return md
+
+    @staticmethod
+    def get_md_from_multi_custom(cps: MultipleCustomPoint) -> List[MoonData]:
+        """
+        Create moondatas from a MultipleCustomPoint
+
+        Parameters
+        ----------
+        cps: MultipleCustomPoint
+            MultipleCustomPoint from which to create the MoonDatas.
+
+        Returns
+        -------
+        mds: list of MoonData
+            MoonDatas generated from the given data.
+        """
+        mds = [MoonDataFactory.get_md_from_custom(cp) for cp in cps.pts]
+        return mds
 
     @staticmethod
     def get_md_from_satellite(

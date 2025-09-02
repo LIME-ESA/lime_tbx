@@ -39,10 +39,10 @@ It exports the following Enums:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass, asdict
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union, Tuple, Iterable, Callable
 from datetime import datetime
 from enum import Enum
-from abc import ABC
+from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -243,6 +243,14 @@ class Point(ABC):
 
     pass
 
+    @abstractmethod
+    def equals(self, o) -> bool:
+        pass
+
+    @abstractmethod
+    def get_len(self) -> int:
+        pass
+
 
 @dataclass
 class SurfacePoint(Point):
@@ -267,6 +275,36 @@ class SurfacePoint(Point):
     longitude: float
     altitude: float
     dt: Union[datetime, List[datetime]]
+
+    def equals(self, o: "SurfacePoint") -> bool:
+        if not isinstance(o, SurfacePoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) != type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        sdt = self.dt
+        odt = o.dt
+        if not isinstance(sdt, list):
+            sdt = [sdt]
+        if not isinstance(odt, list):
+            odt = [odt]
+        if len(sdt) != len(odt):
+            return False
+        for sdti, odti in zip(sdt, odt):
+            if sdti != odti:
+                return False
+        return True
+
+    def get_len(self) -> int:
+        if isinstance(self.dt, list):
+            return len(self.dt)
+        return 1
 
 
 @dataclass
@@ -302,6 +340,54 @@ class CustomPoint(Point):
     abs_moon_phase_angle: float
     moon_phase_angle: float
 
+    def equals(self, o: "CustomPoint") -> bool:
+        if not isinstance(o, CustomPoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) != type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        return True
+
+    def get_len(self) -> int:
+        return 1
+
+
+@dataclass
+class MultipleCustomPoint(Point):
+    """
+    Dataclass representing a set of custom points
+    """
+
+    pts: List[CustomPoint]
+
+    def equals(self, o: "MultipleCustomPoint") -> bool:
+        if not isinstance(o, MultipleCustomPoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) != type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        if len(self.pts) != len(o.pts):
+            return False
+        for sdt, odt in zip(self.pts, o.pts):
+            if not sdt.equals(odt):
+                return False
+        return True
+
+    def get_len(self) -> int:
+        return len(self.pts)
+
 
 @dataclass
 class SatellitePoint(Point):
@@ -318,6 +404,36 @@ class SatellitePoint(Point):
 
     name: str
     dt: Union[datetime, List[datetime]]
+
+    def equals(self, o: "SatellitePoint") -> bool:
+        if not isinstance(o, SatellitePoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) != type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        sdt = self.dt
+        odt = o.dt
+        if not isinstance(sdt, list):
+            sdt = [sdt]
+        if not isinstance(odt, list):
+            odt = [odt]
+        if len(sdt) != len(odt):
+            return False
+        for sdti, odti in zip(sdt, odt):
+            if sdti != odti:
+                return False
+        return True
+
+    def get_len(self) -> int:
+        if isinstance(self.dt, list):
+            return len(self.dt)
+        return 1
 
 
 @dataclass(eq=True, frozen=True)

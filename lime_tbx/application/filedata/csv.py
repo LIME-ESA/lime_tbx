@@ -28,6 +28,7 @@ from lime_tbx.common.datatypes import (
     CustomPoint,
     ComparisonData,
     MoonData,
+    LimeException,
 )
 from lime_tbx.common import logger
 from lime_tbx.common.constants import CompFields
@@ -615,10 +616,10 @@ def read_selenopoints(path: str) -> List[CustomPoint]:
     pts: list of CustomPoint
         Selenographic CustomPoint that were stored in that file.
     """
+    points: List[CustomPoint] = []
     try:
         with open(path, "r") as file:
             reader = csv.reader(file)
-            points = []
             for row in reader:
                 if not row:
                     continue
@@ -628,7 +629,24 @@ def read_selenopoints(path: str) -> List[CustomPoint]:
                     dsm, dom, solat, solon, np.radians(sslon), abs(mpa), mpa
                 )
                 points.append(pt)
-            return points
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_SELENOPTS_ERROR_STR)
+    for i, pt in enumerate(points):
+        msgs = []
+        if not 0.5 <= pt.distance_sun_moon <= 1.5:
+            msgs.append("Dist. Sun-Moon (AU) must be between 0.5 and 1.5")
+        if not 1 <= pt.distance_observer_moon <= 1000000:
+            msgs.append("Dist. Obs-Moon (km) must be between 1 and 1000000")
+        if not -90 <= pt.selen_obs_lat <= 90:
+            msgs.append("Obs. sel. lat. (°) must be between -90 and 90")
+        if not -180 <= pt.selen_obs_lon <= 180:
+            msgs.append("Obs. sel. lon. (°) must be between -180 and 180")
+        if not -180 <= np.degrees(pt.selen_sun_lon) <= 180:
+            msgs.append("Sun sel. lon. (°) must be between -180 and 180")
+        if not -180 <= pt.moon_phase_angle <= 180:
+            msgs.append("Moon phase angle (°) must be between -180 and 180")
+        if msgs:
+            msg = f"Invalid values in point {i+1}:\n" + "\n".join(msgs)
+            raise LimeException(msg)
+    return points

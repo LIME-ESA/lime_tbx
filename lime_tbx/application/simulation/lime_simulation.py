@@ -23,6 +23,7 @@ from lime_tbx.common.datatypes import (
     SurfacePoint,
     EocfiPath,
     AOLPCoefficients,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import constants
 from lime_tbx.business.lime_algorithms.lime import lime
@@ -940,11 +941,14 @@ class LimeSimulation(ILimeSimulation):
     ) -> bool:
         if pt is None:
             pt = self.point
-        if not self.is_skipping_uncs() and hasattr(pt, "dt"):
-            if (
-                isinstance(pt.dt, list)
-                and len(pt.dt) > constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
-            ):
+        lenvals = 1
+        if not self.is_skipping_uncs():
+            if isinstance(pt, (SurfacePoint, SatellitePoint)):
+                if isinstance(pt.dt, list):
+                    lenvals = len(pt.dt)
+            elif isinstance(pt, MultipleCustomPoint):
+                lenvals = len(pt.pts)
+            if lenvals > constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED:
                 return True
         return False
 
