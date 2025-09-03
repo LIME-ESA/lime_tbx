@@ -8,8 +8,9 @@ Options:
   -u, --update		 Updates the coefficients.
   -e, --earth		 Performs simulations from a geographic point.
 			 -e lat_deg,lon_deg,height_km,datetime_isoformat
-  -l, --lunar		 Performs a simulation from a selenographic point.
+  -l, --lunar		 Performs a simulation from a selenographic point/s.
 			 -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle
+			 -l multiple_points.csv
   -s, --satellite	 Performs simulations from a satellite point.
 			 -s sat_name,datetime_isoformat
   -c, --comparison	 Performs comparisons from observations files in GLOD format.
