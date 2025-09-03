@@ -26,12 +26,15 @@ from lime_tbx.common.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
+    MultipleCustomPoint,
+    SatellitePoint,
     ComparisonData,
     MoonData,
     LimeException,
 )
 from lime_tbx.common import logger
 from lime_tbx.common.constants import CompFields
+from lime_tbx.application.simulation.moon_data_factory import MoonDataFactory
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -65,20 +68,11 @@ def _write_point(writer, point: Union[Point, None]):
             else:
                 writer.writerow(["datetime", str(dt)])
         elif isinstance(point, CustomPoint):
-            writer.writerow(["moon phase angle (deg)", point.moon_phase_angle])
-            writer.writerow(
-                ["distance observer moon (km)", point.distance_observer_moon]
-            )
-            writer.writerow(["distance sun moon (AU)", point.distance_sun_moon])
-            writer.writerow(
-                ["selenographic latitude of observer (deg)", point.selen_obs_lat]
-            )
-            writer.writerow(
-                ["selenographic longitude of observer (deg)", point.selen_obs_lon]
-            )
-            writer.writerow(
-                ["selenographic longitude of sun (rad)", point.selen_sun_lon]
-            )
+            mds = MoonDataFactory.get_md_from_custom(point)
+            _write_moondata(writer, mds)
+        elif isinstance(point, MultipleCustomPoint):
+            mds = MoonDataFactory.get_md_from_multi_custom(point)
+            _write_moondata(writer, mds)
         else:
             writer.writerow(["satellite", point.name])
             dt: Union[datetime, List[datetime]] = point.dt
@@ -202,28 +196,35 @@ def export_csv_simulation(
             )
             if some_out_mpa_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            if not isinstance(point, CustomPoint):
-                # CustomPoint data already written with write_moondata
+            if not isinstance(point, (CustomPoint, MultipleCustomPoint)) or mda is None:
+                # MultiCustomPoint and CustomPoint data already written with write_moondata
                 _write_point(writer, point)
             if mda:
                 _write_moondata(writer, mda)
             ylabels = []
             cimel_ylabels = []
-            if not isinstance(point, CustomPoint) and point != None:
-                dts = point.dt
-                if not isinstance(dts, list):
-                    dts = [dts]
-                    inside_mpa_range = [inside_mpa_range]
-                for dt, inside_mpa in zip(dts, inside_mpa_range):
+            if point is not None and not isinstance(point, CustomPoint):
+                if isinstance(point, (SurfacePoint, SatellitePoint)):
+                    dts = point.dt
+                    if not isinstance(dts, list):
+                        dts = [dts]
+                        inside_mpa_range = [inside_mpa_range]
+                    ids = dts
+                else:
+                    ids = [i + 1 for i in range(len(point.pts))]
+                for idx, inside_mpa in zip(ids, inside_mpa_range):
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    dtprint = dt.isoformat(sep=" ", timespec="milliseconds")
-                    ylab = f"{dtprint} {ylabel}{warn_out_mpa_range}"
+                    if not isinstance(idx, datetime):
+                        idprint = str(idx)
+                    else:
+                        idprint = idx.isoformat(sep=" ", timespec="milliseconds")
+                    ylab = f"{idprint} {ylabel}{warn_out_mpa_range}"
                     ylabels.append(ylab)
                     cimel_ylabels.append(ylab)
                     if not skip_uncs:
-                        halfy2 = f"{dtprint} {ylabel} uncertainties (k=2)"
+                        halfy2 = f"{idprint} {ylabel} uncertainties (k=2)"
                         ylabels.append(f"{halfy2}{warn_out_mpa_range}")
                         cimel_ylabels.append(f"{halfy2}{warn_out_mpa_range}")
             else:
@@ -510,7 +511,9 @@ def export_csv_integrated_irradiance(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-            if mpa is not None and not isinstance(point, CustomPoint):
+            if mpa is not None and not isinstance(
+                point, (MultipleCustomPoint, CustomPoint)
+            ):
                 writer.writerow(["moon phase angle (deg)", mpa])
             some_out_mpa_range = (
                 not inside_mpa_range
@@ -522,25 +525,27 @@ def export_csv_integrated_irradiance(
             _write_point(writer, point)
             writer.writerow(["srf name", srf.name])
             irr_titles = []
-            if not isinstance(point, CustomPoint) and point != None:
-                dts = point.dt
-                if not isinstance(dts, list):
-                    dts = [dts]
-                    inside_mpa_range = [inside_mpa_range]
-                for dt, inside_mpa in zip(dts, inside_mpa_range):
+            if point is not None:
+                if isinstance(point, (SurfacePoint, SatellitePoint)):
+                    ids = point.dt
+                    if not isinstance(ids, list):
+                        ids = [ids]
+                        inside_mpa_range = [inside_mpa_range]
+                else:
+                    ids = point.pts
+                for idx, inside_mpa in zip(ids, inside_mpa_range):
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
+                    if isinstance(idx, datetime):
+                        idstr = idx.isoformat(sep=" ", timespec="milliseconds")
+                    else:
+                        idstr = str(idx)
                     irr_titles.append(
-                        "{} irradiances (Wm⁻²nm⁻¹){}".format(
-                            dt.isoformat(sep=" ", timespec="milliseconds"),
-                            warn_out_mpa_range,
-                        )
+                        f"{idstr} irradiances (Wm⁻²nm⁻¹){warn_out_mpa_range}"
                     )
                     if not skip_uncs:
-                        irr_titles.append(
-                            f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties{warn_out_mpa_range}"
-                        )
+                        irr_titles.append(f"{idstr} uncertainties{warn_out_mpa_range}")
             else:
                 irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
                 if not skip_uncs:
