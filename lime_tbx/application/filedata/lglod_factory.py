@@ -126,7 +126,7 @@ def create_lglod_data(
             for e in elrefs_cimel
         ]
     signals = lime_simulation.get_signals()
-    if isinstance(point, SurfacePoint) or isinstance(point, SatellitePoint):
+    if isinstance(point, (SurfacePoint, SatellitePoint)):
         dts = point.dt
         if not isinstance(dts, list):
             dts = [dts]
@@ -176,44 +176,50 @@ def create_lglod_data(
                 constants.LIME_TBX_DATA_SOURCE,
             )
             obs.append(ob)
-    elif isinstance(point, CustomPoint):
-        sat_pos = SatellitePosition(
-            *SPICEAdapter.to_rectangular_same_frame(
-                [
-                    (
-                        point.selen_obs_lat,
-                        point.selen_obs_lon,
-                        point.distance_observer_moon * 1000,
-                    )
-                ],
-                "MOON",
-                kernels_path.main_kernels_path,
-            )[0]
-        )
-        sat_name = ""
+    else:  # Custom or MultiCustom
+        if isinstance(point, CustomPoint):
+            pts = [point]
+        else:
+            pts = point.pts
+        obs = []
         sat_pos_ref = constants.MOON_FRAME
-        obs = [
-            LunarObservationWrite(
-                ch_names,
-                sat_pos_ref,
-                None,
-                sat_pos,
-                elis[0],
-                elrefs[0],
-                polars[0],
-                aolp[0],
-                sat_name,
-                SelenographicDataWrite(
-                    point.distance_sun_moon,
-                    point.selen_sun_lon,
-                    point.moon_phase_angle,
-                    point.selen_obs_lat,
-                    point.selen_obs_lon,
-                    point.distance_observer_moon,
-                ),
-                constants.LIME_TBX_DATA_SOURCE,
+        sat_name = ""
+        for i, pt in enumerate(pts):
+            sat_pos = SatellitePosition(
+                *SPICEAdapter.to_rectangular_same_frame(
+                    [
+                        (
+                            pt.selen_obs_lat,
+                            pt.selen_obs_lon,
+                            pt.distance_observer_moon * 1000,
+                        )
+                    ],
+                    "MOON",
+                    kernels_path.main_kernels_path,
+                )[0]
             )
-        ]
+            obs += [
+                LunarObservationWrite(
+                    ch_names,
+                    sat_pos_ref,
+                    None,
+                    sat_pos,
+                    elis[i],
+                    elrefs[i],
+                    polars[i],
+                    aolp[i],
+                    sat_name,
+                    SelenographicDataWrite(
+                        pt.distance_sun_moon,
+                        pt.selen_sun_lon,
+                        pt.moon_phase_angle,
+                        pt.selen_obs_lat,
+                        pt.selen_obs_lon,
+                        pt.distance_observer_moon,
+                    ),
+                    constants.LIME_TBX_DATA_SOURCE,
+                )
+            ]
     is_not_default_srf = True
     if (
         srf.name == constants.DEFAULT_SRF_NAME

@@ -45,6 +45,22 @@ class TestMoon(unittest.TestCase):
         for ch_name in cdata.ch_names:
             self.assertIn(ch_name, srf.get_channels_names())
 
+    def test_read_lglod_sim_multiseleno(self):
+        path = "./test_files/moon/sim_multiseleno.nc"
+        data = lglod.read_lglod_file(path, KERNELS_PATH)
+        self.assertFalse(data.not_default_srf)
+        self.assertIsInstance(data, LGLODData)
+        self.assertEqual(len(data.elis_cimel), 2)
+        self.assertEqual(data.signals.data.shape, (1, 2))
+
+    def test_read_lglod_sim_multiseleno_cimelsrf(self):
+        path = "./test_files/moon/sim_multiseleno_cimel.nc"
+        data = lglod.read_lglod_file(path, KERNELS_PATH)
+        self.assertTrue(data.not_default_srf)
+        self.assertIsInstance(data, LGLODData)
+        self.assertEqual(len(data.elis_cimel), 2)
+        self.assertEqual(data.signals.data.shape, (6, 2))
+
 
 if __name__ == "__main__":
     unittest.main()

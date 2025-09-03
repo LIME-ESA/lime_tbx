@@ -15,6 +15,7 @@ from lime_tbx.common.datatypes import (
     SurfacePoint,
     SatellitePoint,
     CustomPoint,
+    MultipleCustomPoint,
     EocfiPath,
 )
 from lime_tbx.business.spectral_integration.spectral_integration import get_default_srf
@@ -108,6 +109,38 @@ class TestLGLODFactory(unittest.TestCase):
         self.assertEqual(lglod.aolp_spectrum_name, "testa")
         np.testing.assert_array_equal(
             lglod.elis_cimel[0].data, ls.get_elis_cimel().data
+        )
+
+    def test_multiple_custom_point_ok(self):
+        ls = get_lime_simulation()
+        srf = get_default_srf()
+        pts = [
+            CustomPoint(1, 400000, 30, 30, 1, 40, -40),
+            CustomPoint(1.00002, 400001, 32, 31, 2, 41, -41),
+        ]
+        pt = MultipleCustomPoint(pts)
+        ls.update_irradiance(srf, srf, pt, get_coeffs())
+        ls.update_polarisation(srf, pt, POL_COEFFS)
+        mdas = ls.get_moon_datas()
+        lglod = lglod_factory.create_lglod_data(
+            pt,
+            srf,
+            ls,
+            KERNELS_PATH,
+            "test",
+            "testp",
+            "testa",
+            "test",
+            mdas,
+        )
+        self.assertEqual(lglod.spectrum_name, "test")
+        self.assertEqual(lglod.dolp_spectrum_name, "testp")
+        self.assertEqual(lglod.aolp_spectrum_name, "testa")
+        np.testing.assert_array_equal(
+            lglod.elis_cimel[0].data, ls.get_elis_cimel()[0].data
+        )
+        np.testing.assert_array_equal(
+            lglod.elis_cimel[1].data, ls.get_elis_cimel()[1].data
         )
 
 

@@ -1794,7 +1794,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def load_observations_finished(
         self, lglod: LGLODData, srf: SpectralResponseFunction
     ):
-        if srf == None:
+        if srf is None:
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_observation_callback, [lglod, srf])
         self._start_thread(

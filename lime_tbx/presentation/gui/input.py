@@ -348,6 +348,15 @@ class CustomMultipleInputWidget(QtWidgets.QWidget):
     def get_points(self) -> List[CustomPoint]:
         return self.loaded_points
 
+    def set_point(self, pt: MultipleCustomPoint):
+        self.loaded_points = pt.pts
+        self.loaded_points_label.setText("Loaded from netCDF")
+        self.loaded_points_label.setToolTip(
+            "Loaded from a netCDF file containing precomputed LIME TBX output"
+        )
+        self.callback_check_calculable()
+        self.check_if_a_lot_points_and_update_msg()
+
     def check_if_a_lot_points_and_update_msg(self):
         max_points = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
         if len(self.loaded_points) > max_points and not self._skip_uncs:
@@ -1237,6 +1246,10 @@ class InputWidget(QtWidgets.QWidget):
             self.custom.set_selen_obs_lon(point.selen_obs_lon)
             self.custom.set_selen_sun_lon(point.selen_sun_lon)
             self.custom.set_moon_phase_angle(point.moon_phase_angle)
+        elif isinstance(point, MultipleCustomPoint):
+            self._set_seleno_mode(1)
+            self.tabs.setCurrentIndex(1)
+            self.custom_multi.set_point(point)
         elif isinstance(point, SatellitePoint):
             self.tabs.setCurrentIndex(2)
             self.satellite.set_satellite(point.name)

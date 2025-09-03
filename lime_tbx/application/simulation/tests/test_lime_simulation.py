@@ -734,6 +734,41 @@ class TestLimeSimulation(unittest.TestCase):
             lglod.observations[0].irrs.data, ls.get_elis()[0].data
         )
 
+    def test_load_glod_multiseleno(self):
+        ls = get_lime_simulation()
+        lglod: LGLODData = lglodlib.read_lglod_file(
+            "test_files/moon/sim_multiseleno.nc", KERNELS_PATH
+        )
+        srf = get_default_srf()
+        ls.set_observations(lglod, srf)
+        ls.get_elis()
+        np.testing.assert_array_equal(
+            lglod.observations[0].irrs.data, ls.get_elis()[0].data
+        )
+        np.testing.assert_array_equal(
+            lglod.observations[1].irrs.data, ls.get_elis()[1].data
+        )
+        self.assertEquals(lglod.signals.data.shape, (1, 2))
+
+    def test_load_glod_multiseleno_cimelsrf(self):
+        ls = get_lime_simulation()
+        lglod: LGLODData = lglodlib.read_lglod_file(
+            "test_files/moon/sim_multiseleno_cimel.nc", KERNELS_PATH
+        )
+        srf = srflib.read_srf(
+            "test_files/srf/W_XX-EUMETSAT-Darmstadt_VIS+IR+SRF_MSG3+SEVIRI_C_EUMG.nc"
+        )
+        ls.set_observations(lglod, srf)
+        ls.get_elis()
+        np.testing.assert_array_equal(
+            lglod.observations[0].irrs.data, ls.get_elis()[0].data
+        )
+        np.testing.assert_array_equal(
+            lglod.observations[1].irrs.data, ls.get_elis()[1].data
+        )
+        np.testing.assert_array_equal(lglod.signals.data, ls.get_signals().data)
+        self.assertEquals(lglod.signals.data.shape, (6, 2))
+
     def test_set_observations_unrelated_lglod_srf(self):
         # loading does not check that they are related (at this level)
         ls = get_lime_simulation()
