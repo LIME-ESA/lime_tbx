@@ -37,6 +37,7 @@ from lime_tbx.common.datatypes import (
     SatellitePoint,
     SurfacePoint,
     EocfiPath,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import constants, logger
 from lime_tbx.common.constants import CompFields
@@ -146,11 +147,12 @@ comparisons for some given observations files in GLOD format.\n"
     print("  -u, --update\t\t Updates the coefficients.")
     print("  -e, --earth\t\t Performs simulations from a geographic point.")
     print(f"\t\t\t -e lat_deg,lon_deg,height_km,datetime_isoformat")
-    print("  -l, --lunar\t\t Performs a simulation from a selenographic point.")
+    print("  -l, --lunar\t\t Performs a simulation from a selenographic point/s.")
     print(
         "\t\t\t -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,\
 selen_sun_lon,moon_phase_angle"
     )
+    print("\t\t\t -l multiple_points.csv")
     print("  -s, --satellite\t Performs simulations from a satellite point.")
     print(f"\t\t\t -s sat_name,datetime_isoformat")
     print(
@@ -714,6 +716,33 @@ class CLI:
         self._calculate_all(point)
         self.exporter.export(point, export_data, self.srf)
 
+    def calculate_multiselenographic(
+        self, input_path: str, export_data: export.ExportData
+    ):
+        """Runs the simulation for multiple selenographic coordinates
+
+        Parameters
+        ----------
+        input_path: str
+            Path of the csv file where the coordinates are specified
+        export_data : export.ExportData
+            The export configuration.
+
+        Raises
+        ------
+        ExportError
+            If something wrong happens during export.
+        """
+        try:
+            cps = csv.read_selenopoints(input_path)
+        except Exception as e:
+            raise ParsingError(
+                f"Error reading multiple selenographic input file: {str(e)}"
+            ) from e
+        point = MultipleCustomPoint(cps)
+        self._calculate_all(point)
+        self.exporter.export(point, export_data, self.srf)
+
     def _add_observation(self, obs: LunarObservation):
         for i, pob in enumerate(self.loaded_moons):
             if obs.dt < pob.dt:
@@ -1259,11 +1288,15 @@ Run 'lime -h' for help."
                     break
                 elif opt in ("-l", "--lunar"):  # Lunar
                     params_str = arg.split(",")
-                    if len(params_str) != 6:
+                    if len(params_str) == 1:
+                        multiseleno_path = params_str[0]
+                        self.calculate_multiselenographic(multiseleno_path, export_data)
+                    elif len(params_str) == 6:
+                        params = list(map(float, params_str))
+                        self.calculate_selenographic(*params, export_data)
+                    else:
                         eprint("Error: Wrong number of arguments for -l")
                         return 1
-                    params = list(map(float, params_str))
-                    self.calculate_selenographic(*params, export_data)
                     break
                 elif opt in ("-c", "--comparison"):  # Comparison
                     params = args
@@ -1277,7 +1310,7 @@ Run 'lime -h' for help."
         except export.ExportError as e:
             eprint(str(e))
             return 1
-        except LimeException as e:
+        except (CLIError, LimeException) as e:
             eprint(f"Error: {str(e)}")
             return 1
         except Exception as e:
