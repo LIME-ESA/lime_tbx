@@ -288,6 +288,13 @@ class CustomMultipleInputWidget(QtWidgets.QWidget):
         self.load_points_button = QtWidgets.QPushButton("Load file")
         self.load_points_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.load_points_button.clicked.connect(self.load_points)
+        self.load_points_button.setToolTip(
+            "Load a CSV file with a series of selenographic coordinates. "
+            "Each line represents a different point, which is comprised by six parameters. "
+            "The six parameters must be in the following order: "
+            "sun_moon_distance_au, observer_moon_distance_km, observer_selenographic_latitude_deg,"
+            " observer_selenographic_longitude_deg, solar_selenographic_longitude_deg, moon_phase_angle_deg"
+        )
         self.loaded_points_label = QtWidgets.QLabel("")
         self.points_input_layout = QtWidgets.QHBoxLayout()
         self.points_input_layout.addWidget(self.load_points_button)
