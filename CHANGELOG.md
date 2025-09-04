@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Filter 3σ: Filter out measurements that are more than 3σ away from the mean relative difference in comparison.
-  This filtering is done channel-wise.
+- Filter 3σ: Option in the Comparison page to filter out measurements that are more than 3σ away
+  from the mean relative difference. Filtering is done channel-wise.
+- Multiple Selenographic Points: Support for loading multiple selenographic coordinates at once
+  via CSV file input in the selenographic input tab.
 
 ## [1.2.2] - 2025-07-21
 
