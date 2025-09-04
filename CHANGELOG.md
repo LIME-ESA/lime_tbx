@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple Selenographic Points: Support for loading multiple selenographic coordinates at once
   via CSV file input in the selenographic input tab.
 
+### Changed
+
+- Updated EO-CFI library dependencies to version 4.29 and recompiled EO-CFI dependent binaries.
+
 ## [1.2.2] - 2025-07-21
 
 ### Changed
@@ -91,7 +95,6 @@ correctly in such cases.
 - Timeseries input file now also accepts regular format timestamps, not only CSV.
 - Added METOP-A, METOP-B and METOP-C data (TLE/3LE). METOP-B and METOP-C will need to be periodically updated.
 - Updated TLE/3LE data for PLEIADES 1A, PLEIADES 1B and PROBA-V, now covering the period from their launch until 2025-04-14.
-- Updated EO-CFI library dependencies to version 4.28.
 
 ### Changed
 
@@ -99,6 +102,7 @@ correctly in such cases.
 - Provide support for Python 3.11 and 3.12.
 - Updated library dependencies and versions.
 - Refactored main Python package grouping subpackages in layer architecture based packages.
+- Updated EO-CFI library dependencies to version 4.28 and recompiled EO-CFI dependent binaries.
 
 ### Fixed
 
