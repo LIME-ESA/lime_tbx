@@ -1,10 +1,11 @@
 """Tests for lglod module"""
 
 """___Built-In Modules___"""
-pass
+import unittest
+from datetime import datetime, timezone
 
 """___Third-Party Modules___"""
-import unittest
+import numpy as np
 
 """___LIME_TBX Modules___"""
 
@@ -44,6 +45,60 @@ class TestMoon(unittest.TestCase):
         self.assertIsInstance(cdata, LGLODComparisonData)
         for ch_name in cdata.ch_names:
             self.assertIn(ch_name, srf.get_channels_names())
+
+    def test_read_lglod_sim_multiseleno(self):
+        path = "./test_files/moon/sim_multiseleno.nc"
+        data = lglod.read_lglod_file(path, KERNELS_PATH)
+        self.assertFalse(data.not_default_srf)
+        self.assertIsInstance(data, LGLODData)
+        self.assertEqual(len(data.elis_cimel), 2)
+        self.assertEqual(data.signals.data.shape, (1, 2))
+
+    def test_read_lglod_sim_multiseleno_cimelsrf(self):
+        path = "./test_files/moon/sim_multiseleno_cimel.nc"
+        data = lglod.read_lglod_file(path, KERNELS_PATH)
+        self.assertTrue(data.not_default_srf)
+        self.assertIsInstance(data, LGLODData)
+        self.assertEqual(len(data.elis_cimel), 2)
+        self.assertEqual(data.signals.data.shape, (6, 2))
+
+    def test_read_write_lglod_multiseleno(self):
+        path = "./test_files/moon/sim_multiseleno.nc"
+        data = lglod.read_lglod_file(path, KERNELS_PATH)
+        tpath = "./test_files/moon/sim_multiseleno.test.nc"
+        now = datetime.now(timezone.utc)
+        inside_mpa_range = [True for _ in range(len(data.elis_cimel))]
+        lglod.write_obs(data, tpath, now, inside_mpa_range)
+        tdata = lglod.read_lglod_file(tpath, KERNELS_PATH)
+        np.testing.assert_array_equal(data.elis_cimel[0].data, tdata.elis_cimel[0].data)
+        np.testing.assert_array_equal(
+            data.elis_cimel[0].wlens, tdata.elis_cimel[0].wlens
+        )
+        np.testing.assert_array_equal(data.elis_cimel[1].data, tdata.elis_cimel[1].data)
+        np.testing.assert_array_equal(
+            data.elis_cimel[1].wlens, tdata.elis_cimel[1].wlens
+        )
+        np.testing.assert_array_equal(data.signals.wlens, tdata.signals.wlens)
+        np.testing.assert_array_equal(data.signals.data, tdata.signals.data)
+
+    def test_read_write_lglod_multiseleno_cimel(self):
+        path = "./test_files/moon/sim_multiseleno_cimel.nc"
+        data = lglod.read_lglod_file(path, KERNELS_PATH)
+        tpath = "./test_files/moon/sim_multiseleno_cimel.test.nc"
+        now = datetime.now(timezone.utc)
+        inside_mpa_range = [True for _ in range(len(data.elis_cimel))]
+        lglod.write_obs(data, tpath, now, inside_mpa_range)
+        tdata = lglod.read_lglod_file(tpath, KERNELS_PATH)
+        np.testing.assert_array_equal(data.elis_cimel[0].data, tdata.elis_cimel[0].data)
+        np.testing.assert_array_equal(
+            data.elis_cimel[0].wlens, tdata.elis_cimel[0].wlens
+        )
+        np.testing.assert_array_equal(data.elis_cimel[1].data, tdata.elis_cimel[1].data)
+        np.testing.assert_array_equal(
+            data.elis_cimel[1].wlens, tdata.elis_cimel[1].wlens
+        )
+        np.testing.assert_array_equal(data.signals.wlens, tdata.signals.wlens)
+        np.testing.assert_array_equal(data.signals.data, tdata.signals.data)
 
 
 if __name__ == "__main__":

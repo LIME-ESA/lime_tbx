@@ -23,6 +23,7 @@ from lime_tbx.common.datatypes import (
     SurfacePoint,
     EocfiPath,
     AOLPCoefficients,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import constants
 from lime_tbx.business.lime_algorithms.lime import lime
@@ -940,11 +941,14 @@ class LimeSimulation(ILimeSimulation):
     ) -> bool:
         if pt is None:
             pt = self.point
-        if not self.is_skipping_uncs() and hasattr(pt, "dt"):
-            if (
-                isinstance(pt.dt, list)
-                and len(pt.dt) > constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
-            ):
+        lenvals = 1
+        if not self.is_skipping_uncs():
+            if isinstance(pt, (SurfacePoint, SatellitePoint)):
+                if isinstance(pt.dt, list):
+                    lenvals = len(pt.dt)
+            elif isinstance(pt, MultipleCustomPoint):
+                lenvals = len(pt.pts)
+            if lenvals > constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED:
                 return True
         return False
 
@@ -1374,38 +1378,45 @@ class LimeSimulation(ILimeSimulation):
         self.aolp_cimel = lglod.aolp_cimel
         self.aolp_asd = None
         self._skip_uncs = lglod.skipped_uncs
-        if obss[0].dt == None:
+        if obss[0].dt is None:
             dts = []
         else:
             dts = [obs.dt for obs in obss]
         signals = lglod.signals
         ds_sign = SpectralData.make_signals_ds(
             signals.wlens,
-            signals.data.T,
-            signals.uncertainties.T,
+            signals.data,
+            signals.uncertainties,
         )
         self.signals = SpectralData(
             signals.wlens,
-            signals.data.T,
-            signals.uncertainties.T,
+            signals.data,
+            signals.uncertainties,
             ds_sign,
         )
         if not dts:
-            sel = obss[0].selenographic_data
-            lat, lon, alt = SPICEAdapter.to_planetographic_same_frame(
-                [(obss[0].sat_pos.x, obss[0].sat_pos.y, obss[0].sat_pos.z)],
-                "MOON",
-                self.kernels_path.main_kernels_path,
-            )[0]
-            point = CustomPoint(
-                sel.distance_sun_moon,
-                alt / 1000,
-                lat,
-                lon,
-                sel.selen_sun_lon_rad,
-                abs(sel.mpa_degrees),
-                sel.mpa_degrees,
-            )
+            pts = []
+            for ob in obss:
+                sel = ob.selenographic_data
+                lat, lon, alt = SPICEAdapter.to_planetographic_same_frame(
+                    [(ob.sat_pos.x, ob.sat_pos.y, ob.sat_pos.z)],
+                    "MOON",
+                    self.kernels_path.main_kernels_path,
+                )[0]
+                point = CustomPoint(
+                    sel.distance_sun_moon,
+                    alt / 1000,
+                    lat,
+                    lon,
+                    sel.selen_sun_lon_rad,
+                    abs(sel.mpa_degrees),
+                    sel.mpa_degrees,
+                )
+                pts.append(point)
+            if len(pts) > 1:
+                point = MultipleCustomPoint(pts)
+            else:
+                point = pts[0]
         elif not obss[0].sat_name or obss[0].sat_name == "":
             point = SurfacePoint(
                 *SPICEAdapter.to_planetographic_multiple(

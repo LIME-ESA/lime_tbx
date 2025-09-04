@@ -103,6 +103,37 @@ Users must provide:
    Selenographic coordinates input.
 ```
 
+### Multiple Points Input  
+You can load several selenographic coordinates at once instead of entering them individually.
+
+```{eval-rst}
+.. figure:: ../../images/user_guide/dropdown_multiseleno.png
+   :name: fig-10
+   :align: center
+   :alt: Selenographic tab's dropdown menu, with Multiple Points option highlighted
+
+   Selenographic tab's dropdown menu, with Multiple Points option highlighted.
+```
+
+1. Open the Selenographic tab's dropdown menu and select Multiple Points ([Figure 10](#fig-10)).
+2. The multiple selenographic input page will appear ([Figure 11](#fig-11)). Click "LOAD FILE" and choose
+   a `.csv` file containing the coordinates.
+
+```{eval-rst}
+.. figure:: ../../images/user_guide/initial_multiseleno_page.png
+   :name: fig-11
+   :align: center
+   :alt: Multiple selenographic points input page
+
+   Multiple selenographic points input page.
+```
+
+The file should have one point per line, with six comma-separated values in the following order:
+
+```csv
+sun_moon_distance_au,observer_moon_distance_km,observer_selenographic_latitude_deg,observer_selenographic_longitude_deg,solar_selenographic_longitude_deg,moon_phase_angle_deg
+```
+
 ### Command-Line Interface (CLI)
 Use the `-l` or `--lunar` option:
 ```sh
@@ -119,7 +150,7 @@ lime -l 0.98,420000,20.5,-30.2,69,15
 ## Simulation Using Satellite Positions
 
 
-Selecting the **"Satellite"** tab enables simulation based on **orbiting satellites** ([Figure 10](#fig-10)).  
+Selecting the **"Satellite"** tab enables simulation based on **orbiting satellites** ([Figure 12](#fig-12)).  
 Users must:
 - **Select a satellite** from the available list.
 - **Provide a UTC Date & Time**.
@@ -127,7 +158,7 @@ Users must:
 > *Note:* Time-series input works the same as in [Geographic Coordinates](#simulation-using-geographic-coordinates).
 
 
-Selecting the "Satellite" tab enables simulations based on orbiting satellite ([Figure 10](#fig-10)).
+Selecting the "Satellite" tab enables simulations based on orbiting satellite ([Figure 12](#fig-12)).
 Users must:
 - **Select a satellite** from the available list.
 - **Provide a UTC Date & Time**.
@@ -135,7 +166,7 @@ Users must:
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/satellite_input.png
-   :name: fig-10
+   :name: fig-12
    :align: center
    :alt: Satellite position input
 
@@ -146,7 +177,7 @@ Users must:
 
 It's possible to add user-defined satellites to the list of available satellites.
 1. Click the button with a plus (+) sign on the right of the dropdown.
-2. The user will be prompted with the *Add Satellite Data* window ([Figure 11](#fig-11)).
+2. The user will be prompted with the *Add Satellite Data* window ([Figure 13](#fig-13)).
 3. Click "LOAD FILE" which opens a file selection dialog where users can load Orbit Scenario Files
    (OSF) or Three-Line Element Set files (TLE/3LE).
 4. The *Add Satellite Data* window will now display information of the loaded file, and the user
@@ -158,7 +189,7 @@ It's possible to add user-defined satellites to the list of available satellites
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/add_satellite_data_window.png
-   :name: fig-11
+   :name: fig-13
    :align: center
    :alt: Add Satellite Data window
 
@@ -193,11 +224,11 @@ Users can select one of the following button to run simulations and view results
 - **"DOLP"** – Visualises the Degree of Linear Polarisation (DoLP).
 - **"AOLP"** – Visualises the Angle of Linear Polarisation (AoLP).
 
-These buttons are positioned between the input and the output, as shown on top of [Figure 12](#fig-12).
+These buttons are positioned between the input and the output, as shown on top of [Figure 14](#fig-14).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/simulation_output.png
-   :name: fig-12
+   :name: fig-14
    :align: center
    :alt: Simulation output
 
@@ -267,12 +298,12 @@ For example:
 ## Integrated Irradiance
 
 LIME Toolbox integrates the calculated irradiance over the selected spectral response function (SRF).
-These values appear in the "Signal" tab ([Figure 13](#fig-13)), showing one value per SRF channel,
+These values appear in the "Signal" tab ([Figure 15](#fig-15)), showing one value per SRF channel,
 and can be exported as CSV.
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/signal_tab.png
-   :name: fig-13
+   :name: fig-15
    :align: center
    :alt: Signal tab showing some results for the CIMEL SRF
 
@@ -282,7 +313,7 @@ and can be exported as CSV.
 ### Spectral Response Functions (SRF)
 
 Users can visualise, load, and switch between different SRFs in the "SRF" tab
-([Figure 14](#fig-14)). This tab presents:
+([Figure 16](#fig-16)). This tab presents:
 - A graph of the currently selected SRF, where:
   - X-axis represents wavelengths.
   - Y-axis represents the spectral response.
@@ -290,7 +321,7 @@ Users can visualise, load, and switch between different SRFs in the "SRF" tab
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/srf_tab.png
-   :name: fig-14
+   :name: fig-16
    :align: center
    :alt: SRF tab showing CIMEL SRF
 
@@ -300,7 +331,7 @@ Users can visualise, load, and switch between different SRFs in the "SRF" tab
 By default, LIME Toolbox includes a default SRF that encompasses the entire LIME spectrum, named "Default".
 
 #### Loading a New SRF
-1. Click "LOAD" (top-right corner in [Figure 14](#fig-14)).  
+1. Click "LOAD" (top-right corner in [Figure 16](#fig-16)).  
 2. Select a netCDF SRF file in GLOD format (explained in the [File Formats](./formats.md) section).
 3. Once loaded, use the dropdown menu next to the "LOAD" button to switch between SRFs.
 

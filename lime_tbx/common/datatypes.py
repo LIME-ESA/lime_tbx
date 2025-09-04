@@ -39,10 +39,10 @@ It exports the following Enums:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass, asdict
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union, Tuple, Iterable, Callable
 from datetime import datetime
 from enum import Enum
-from abc import ABC
+from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 import numpy as np
@@ -239,9 +239,36 @@ class SRF_fwhm:
 
 
 class Point(ABC):
-    """Abstract class representing a point which can be used to generate a MoonData"""
+    """Abstract class representing a user point which can be used to
+    generate one or more MoonDatas"""
 
-    pass
+    @abstractmethod
+    def equals(self, o) -> bool:
+        """Test whether two objects are the same point.
+
+        This function allows two Points to be compared against each other to see if they
+        have the same elements.
+
+        Parameters
+        ----------
+        o: Point
+            The other Point to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+
+    @abstractmethod
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user Point.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the Point
+        """
 
 
 @dataclass
@@ -267,6 +294,58 @@ class SurfacePoint(Point):
     longitude: float
     altitude: float
     dt: Union[datetime, List[datetime]]
+
+    def equals(self, o: "SurfacePoint") -> bool:
+        """Test whether two objects are the same SurfacePoint.
+
+        This function allows two SurfacePoint to be compared against each other to see if they
+        have the same elements.
+
+        Parameters
+        ----------
+        o: SurfacePoint
+            The other SurfacePoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, SurfacePoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        sdt = self.dt
+        odt = o.dt
+        if not isinstance(sdt, list):
+            sdt = [sdt]
+        if not isinstance(odt, list):
+            odt = [odt]
+        if len(sdt) != len(odt):
+            return False
+        for sdti, odti in zip(sdt, odt):
+            if sdti != odti:
+                return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user SurfacePoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the SurfacePoint
+        """
+        if isinstance(self.dt, list):
+            return len(self.dt)
+        return 1
 
 
 @dataclass
@@ -302,11 +381,107 @@ class CustomPoint(Point):
     abs_moon_phase_angle: float
     moon_phase_angle: float
 
+    def equals(self, o: "CustomPoint") -> bool:
+        """Test whether two objects are the same CustomPoint.
+
+        This function allows two CustomPoint to be compared against each other to see if they
+        have the same elements.
+
+        Parameters
+        ----------
+        o: CustomPoint
+            The other CustomPoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, CustomPoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user CustomPoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the CustomPoint
+        """
+        return 1
+
+
+@dataclass
+class MultipleCustomPoint(Point):
+    """
+    Dataclass representing a set of multiple custom points.
+
+    Attributes
+    ----------
+    pts: list of CustomPoint
+    """
+
+    pts: List[CustomPoint]
+
+    def equals(self, o: "MultipleCustomPoint") -> bool:
+        """Test whether two objects are the same MultipleCustomPoint.
+
+        This function allows two MultipleCustomPoint to be compared against each other to
+        see if they have the same elements.
+
+        Parameters
+        ----------
+        o: MultipleCustomPoint
+            The other MultipleCustomPoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, MultipleCustomPoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        if len(self.pts) != len(o.pts):
+            return False
+        for sdt, odt in zip(self.pts, o.pts):
+            if not sdt.equals(odt):
+                return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user MultipleCustomPoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the MultipleCustomPoint
+        """
+        return len(self.pts)
+
 
 @dataclass
 class SatellitePoint(Point):
     """
-    Dataclass representing a Satellite in a concrete datetime
+    Dataclass representing a Satellite position in one or more datetimes.
 
     Attributes
     ----------
@@ -318,6 +493,58 @@ class SatellitePoint(Point):
 
     name: str
     dt: Union[datetime, List[datetime]]
+
+    def equals(self, o: "SatellitePoint") -> bool:
+        """Test whether two objects are the same SatellitePoint.
+
+        This function allows two SatellitePoint to be compared against each other to
+        see if they have the same elements.
+
+        Parameters
+        ----------
+        o: SatellitePoint
+            The other SatellitePoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, SatellitePoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        sdt = self.dt
+        odt = o.dt
+        if not isinstance(sdt, list):
+            sdt = [sdt]
+        if not isinstance(odt, list):
+            odt = [odt]
+        if len(sdt) != len(odt):
+            return False
+        for sdti, odti in zip(sdt, odt):
+            if sdti != odti:
+                return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user SatellitePoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the SatellitePoint
+        """
+        if isinstance(self.dt, list):
+            return len(self.dt)
+        return 1
 
 
 @dataclass(eq=True, frozen=True)
@@ -413,7 +640,7 @@ class Satellite:
         for orf in self.orbit_files:
             if dt >= orf.dt0 and dt <= orf.dtf:
                 td = min(dt - orf.dt0, orf.dtf - dt)
-                if sel_td == None or td < sel_td:
+                if sel_td is None or td < sel_td:
                     sel_td = td
                     sel_orf = orf
         return sel_orf
@@ -423,7 +650,8 @@ class Satellite:
 class SatellitePosition:
     """
     Dataclass containing the information of the position of a SatellitePoint,
-    for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
+    for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon).
+    For EOCFI it's ITRF93.
 
     Attributes
     ----------
@@ -450,7 +678,8 @@ class LunarObservation:
     ch_names: list of str
         Names of the channels present
     sat_pos_ref: str
-        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
+        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon).
+        For EOCFI it's ITRF93.
     ch_irrs: dict of str and float
         Irradiances relative to each channel. The key is the channel name, and the irradiance
         is given in Wm⁻²nm⁻¹.

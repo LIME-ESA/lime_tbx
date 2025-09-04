@@ -23,6 +23,7 @@ from lime_tbx.common.datatypes import (
     KernelsPath,
     LimeException,
     EocfiPath,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import constants
 from lime_tbx.business.eocfi_adapter import eocfi_adapter
@@ -42,9 +43,9 @@ __status__ = "Production"
 
 MAX_PATH_LEN = 35
 
-_A_LOT_DATETIMES_MSG = f"Usually, calculated reflectance values are used to obtain irradiances. \
+_A_LOT_PTS_MSG = f"Usually, calculated reflectance values are used to obtain irradiances. \
 However, due to the large size of the error correlation matrices, these matrices are not \
-stored in memory for more than {constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED} datetimes. \
+stored in memory for more than {constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED} points. \
 This requires recalculating reflectances whenever irradiances are computed. Therefore, \
 if you want both values in this case, it is advisable to choose to calculate irradiances first."
 
@@ -273,6 +274,167 @@ class CustomInputWidget(QtWidgets.QWidget):
         self.customform.external_resize(width)
 
 
+class CustomMultipleInputWidget(QtWidgets.QWidget):
+    def __init__(self, callback_check_calculable: Callable, skip_uncs: bool):
+        super().__init__()
+        self.callback_check_calculable = callback_check_calculable
+        self._skip_uncs = skip_uncs
+        self.loaded_points = []
+        self._build_layout()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.points_label = QtWidgets.QLabel("Points file:")
+        self.load_points_button = QtWidgets.QPushButton("Load file")
+        self.load_points_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.load_points_button.clicked.connect(self.load_points)
+        self.load_points_button.setToolTip(
+            "Load a CSV file with a series of selenographic coordinates. "
+            "Each line represents a different point, which is comprised by six parameters. "
+            "The six parameters must be in the following order: "
+            "sun_moon_distance_au, observer_moon_distance_km, observer_selenographic_latitude_deg,"
+            " observer_selenographic_longitude_deg, solar_selenographic_longitude_deg, moon_phase_angle_deg"
+        )
+        self.loaded_points_label = QtWidgets.QLabel("")
+        self.points_input_layout = QtWidgets.QHBoxLayout()
+        self.points_input_layout.addWidget(self.load_points_button)
+        self.points_input_layout.addWidget(self.loaded_points_label, 1)
+        self.main_layout.addWidget(self.points_label)
+        self.main_layout.addLayout(self.points_input_layout)
+        ## Aux buttons
+        self.points_buttons = QtWidgets.QHBoxLayout()
+        ### Show Points
+        self.show_points_button = QtWidgets.QPushButton(" See Points ")
+        self.show_points_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.show_points_button.clicked.connect(self.show_points)
+        self.points_buttons.addWidget(self.show_points_button)
+        self.points_buttons.addWidget(QtWidgets.QLabel(), 1)
+        ### Info 'a lot points'
+        self.info_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxInformation
+        )
+        self.info_pixmap = self.info_icon.pixmap(32)
+        self.info_hidden_points_a_lot = QtWidgets.QLabel(" ")
+        self.info_hidden_points_a_lot.setPixmap(self.info_pixmap)
+        self.info_hidden_points_a_lot.setWordWrap(True)
+        self.info_hidden_points_a_lot.hide()
+        self.points_buttons.addWidget(self.info_hidden_points_a_lot)
+        self.points_buttons.addWidget(QtWidgets.QLabel(), 1)
+        self.points_buttons.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.addLayout(self.points_buttons)
+
+    def show_error(self, error: Exception):
+        error_dialog = QtWidgets.QMessageBox(self)
+        error_dialog.critical(self, "ERROR", str(error))
+
+    @QtCore.Slot()
+    def load_points(self):
+        path = QtWidgets.QFileDialog().getOpenFileName(self)[0]
+        if path != "":
+            try:
+                self.loaded_points = csv.read_selenopoints(path)
+            except Exception as e:
+                self.show_error(e)
+            else:
+                shown_path = path
+                if len(shown_path) > MAX_PATH_LEN:
+                    shown_path = "..." + shown_path[-(MAX_PATH_LEN - 3) :]
+                self.loaded_points_label.setText(shown_path)
+                self.loaded_points_label.setToolTip(path)
+                self.callback_check_calculable()
+        self.check_if_a_lot_points_and_update_msg()
+
+    @QtCore.Slot()
+    def show_points(self):
+        self.points_window = QtWidgets.QMainWindow(self)
+        self.points_widget = ShowPointsWidget(self.loaded_points)
+        self.points_window.setCentralWidget(self.points_widget)
+        self.points_window.show()
+        self.points_window.resize(675, 230)
+
+    def get_points(self) -> List[CustomPoint]:
+        return self.loaded_points
+
+    def set_point(self, pt: MultipleCustomPoint):
+        self.loaded_points = pt.pts
+        self.loaded_points_label.setText("Loaded from netCDF")
+        self.loaded_points_label.setToolTip(
+            "Loaded from a netCDF file containing precomputed LIME TBX output"
+        )
+        self.callback_check_calculable()
+        self.check_if_a_lot_points_and_update_msg()
+
+    def check_if_a_lot_points_and_update_msg(self):
+        max_points = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
+        if len(self.loaded_points) > max_points and not self._skip_uncs:
+            self.info_hidden_points_a_lot.show()
+            self.info_hidden_points_a_lot.setToolTip(_A_LOT_PTS_MSG)
+        else:
+            self.info_hidden_points_a_lot.hide()
+            self.info_hidden_points_a_lot.setToolTip("")
+
+    def set_is_skipping_uncs(self, skip_uncs: bool):
+        self._skip_uncs = skip_uncs
+        self.check_if_a_lot_points_and_update_msg()
+
+    def is_calculable(self) -> bool:
+        return len(self.loaded_points) > 0
+
+
+class ShowPointsWidget(QtWidgets.QWidget):
+    def __init__(self, points: List[CustomPoint]):
+        super().__init__()
+        self.pts = points
+        self._build_layout()
+        self._fill_table()
+
+    def _build_layout(self):
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.groupbox = QtWidgets.QGroupBox()
+        self.container_layout = QtWidgets.QVBoxLayout()
+        self.data_layout = QtWidgets.QFormLayout()
+        self.groupbox.setLayout(self.container_layout)
+        # table
+        self.table = QtWidgets.QTableWidget()
+        self.container_layout.addLayout(self.data_layout, 1)
+        self.data_layout.addWidget(self.table)
+        self.container_layout.addStretch()
+        self.scroll_area = QtWidgets.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setWidget(self.groupbox)
+        self.main_layout.addWidget(self.scroll_area)
+
+    def _fill_table(self):
+        self.table.setRowCount(len(self.pts))
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(
+            [
+                "Dist. Sun-Moon (AU)",
+                "Dist. Obs-Moon (km)",
+                "Obs. sel. lat. (°)",
+                "Obs. sel. lon. (°)",
+                "Sun sel. lon. (°)",
+                "Moon phase angle (°)",
+            ]
+        )
+        self.table.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)
+        for i, pt in enumerate(self.pts):
+            self.table.setItem(
+                i, 0, QtWidgets.QTableWidgetItem(str(pt.distance_sun_moon))
+            )
+            self.table.setItem(
+                i, 1, QtWidgets.QTableWidgetItem(str(pt.distance_observer_moon))
+            )
+            self.table.setItem(i, 2, QtWidgets.QTableWidgetItem(str(pt.selen_obs_lat)))
+            self.table.setItem(i, 3, QtWidgets.QTableWidgetItem(str(pt.selen_obs_lon)))
+            self.table.setItem(
+                i, 4, QtWidgets.QTableWidgetItem(str(np.degrees(pt.selen_sun_lon)))
+            )
+            self.table.setItem(
+                i, 5, QtWidgets.QTableWidgetItem(str(pt.moon_phase_angle))
+            )
+
+
 class ShowDatetimeWidget(QtWidgets.QWidget):
     def __init__(self, datetimes: List[datetime]):
         super().__init__()
@@ -335,6 +497,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.max_date = max_date
         self.all_loaded_datetimes = []
         self._build_layout()
+        self._apply_limits_singledatetime(self.min_date, self.max_date)
 
     def _build_layout(self):
         self.main_layout = QtWidgets.QHBoxLayout(self)
@@ -435,6 +598,18 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.single_dt_frame.setHidden(True)
         self.multiple_dt_frame.setHidden(True)
 
+    def _apply_limits_singledatetime(self, d0: datetime, df: datetime):
+        if d0 is not None:
+            dt0 = QtCore.QDateTime(
+                d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second
+            )
+            self.datetime_edit.setMinimumDateTime(dt0)
+        if df is not None:
+            dtf = QtCore.QDateTime(
+                df.year, df.month, df.day, df.hour, df.minute, df.second
+            )
+            self.datetime_edit.setMaximumDateTime(dtf)
+
     def change_single_datetime(self):
         self._clear_layout()
         self._build_layout_single_datetime()
@@ -517,7 +692,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         max_dts = constants.MAX_LIMIT_REFL_ERR_CORR_ARE_STORED
         if len(self.loaded_datetimes) > max_dts and not self._skip_uncs:
             self.info_hidden_datetimes_a_lot.show()
-            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_DATETIMES_MSG)
+            self.info_hidden_datetimes_a_lot.setToolTip(_A_LOT_PTS_MSG)
         else:
             self.info_hidden_datetimes_a_lot.hide()
             self.info_hidden_datetimes_a_lot.setToolTip("")
@@ -559,10 +734,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
     def set_limits(self, d0: datetime, df: datetime):
         self.min_date = d0
         self.max_date = df
-        dt0 = QtCore.QDateTime(d0.year, d0.month, d0.day, d0.hour, d0.minute, d0.second)
-        self.datetime_edit.setMinimumDateTime(dt0)
-        dtf = QtCore.QDateTime(df.year, df.month, df.day, df.hour, df.minute, df.second)
-        self.datetime_edit.setMaximumDateTime(dtf)
+        self._apply_limits_singledatetime(d0, df)
         if not self.single_datetime:
             self.update_dates_with_limits()
             self.callback_check_calculable()
@@ -604,7 +776,10 @@ class SurfaceInputWidget(QtWidgets.QWidget):
         for lay in self.coord_forms_layouts:
             self.coordinates_layout.addLayout(lay)
         self.flexdt_wg = FlexibleDateTimeInput(
-            self.callback_check_calculable, self._skip_uncs
+            self.callback_check_calculable,
+            self._skip_uncs,
+            _SPICE_MIN_DATE,
+            _SPICE_MAX_DATE,
         )
         self.main_layout.addWidget(self.flexdt_wg)
         self.main_layout.addStretch()
@@ -872,6 +1047,8 @@ class AddSatDialog(QtWidgets.QDialog):
 
 
 _DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
+_SPICE_MIN_DATE = datetime(1900, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+_SPICE_MAX_DATE = datetime(2050, 12, 31, 23, 58, 50, tzinfo=timezone.utc)
 
 
 class SatelliteInputWidget(QtWidgets.QWidget):
@@ -999,7 +1176,28 @@ class InputWidget(QtWidgets.QWidget):
         )
         self.tabs.addTab(self.surface, "Geographic")
         self.custom = CustomInputWidget()
-        self.tabs.addTab(self.custom, "Selenographic")
+        self.custom_multi = CustomMultipleInputWidget(
+            self.callback_check_calculable, self.skip_uncs
+        )
+        self.seleno_stack = QtWidgets.QStackedWidget()
+        self.seleno_stack.addWidget(self.custom)
+        self.seleno_stack.addWidget(self.custom_multi)
+        self.tabs.addTab(self.seleno_stack, "Selenographic")
+        self.seleno_btn = QtWidgets.QToolButton()
+        self.seleno_btn.setAutoRaise(True)
+        self.seleno_btn.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.seleno_btn.setStyleSheet(
+            "QToolButton::menu-indicator {image: none;width: 0px;}"
+        )
+        self.seleno_btn.setArrowType(QtCore.Qt.DownArrow)
+        self.seleno_menu = QtWidgets.QMenu(self.seleno_btn)
+        act_single = self.seleno_menu.addAction(
+            "Single Point", lambda: self._switch_seleno_mode(0)
+        )
+        act_multi = self.seleno_menu.addAction(
+            "Multiple Points", lambda: self._switch_seleno_mode(1)
+        )
+        self.seleno_btn.setMenu(self.seleno_menu)
         self.satellite = SatelliteInputWidget(
             self.callback_check_calculable,
             self.skip_uncs,
@@ -1007,20 +1205,29 @@ class InputWidget(QtWidgets.QWidget):
             self.kernels_path,
         )
         self.tabs.addTab(self.satellite, "Satellite")
+        self.tabs.tabBar().setTabButton(1, QtWidgets.QTabBar.RightSide, self.seleno_btn)
         self.tabs.currentChanged.connect(self.callback_check_calculable)
+        act_single.setCheckable(True)
+        act_multi.setCheckable(True)
+        self._set_seleno_mode(0)
         self.main_layout.addWidget(self.tabs)
+
+    def _set_seleno_mode(self, idx: int):
+        self.seleno_stack.setCurrentIndex(idx)
+        for i, act in enumerate(self.seleno_menu.actions()):
+            act.setChecked(i == idx)
+
+    def _get_seleno_mode(self) -> int:
+        return self.seleno_stack.currentIndex()
+
+    def _switch_seleno_mode(self, idx: int):
+        self._set_seleno_mode(idx)
+        self.tabs.setCurrentIndex(1)
+        self.callback_check_calculable()
 
     @staticmethod
     def _are_different_points(point_a: Point, point_b: Point) -> bool:
-        if type(point_a) != type(point_b):
-            return True
-        for att in dir(point_a):
-            if len(att) < 2 or att[0:2] != "__":
-                a0 = getattr(point_a, att)
-                a1 = getattr(point_b, att)
-                if a0 != a1:
-                    return True
-        return False
+        return not point_a.equals(point_b)
 
     def _check_last_point(self, point: Point):
         if InputWidget._are_different_points(point, self.last_point):
@@ -1038,6 +1245,7 @@ class InputWidget(QtWidgets.QWidget):
             self.surface.set_altitude(point.altitude)
             self.surface.set_datetimes(point.dt)
         elif isinstance(point, CustomPoint):
+            self._set_seleno_mode(0)
             self.tabs.setCurrentIndex(1)
             self.custom.set_dist_sun_moon(point.distance_sun_moon)
             self.custom.set_dist_obs_moon(point.distance_observer_moon)
@@ -1045,6 +1253,10 @@ class InputWidget(QtWidgets.QWidget):
             self.custom.set_selen_obs_lon(point.selen_obs_lon)
             self.custom.set_selen_sun_lon(point.selen_sun_lon)
             self.custom.set_moon_phase_angle(point.moon_phase_angle)
+        elif isinstance(point, MultipleCustomPoint):
+            self._set_seleno_mode(1)
+            self.tabs.setCurrentIndex(1)
+            self.custom_multi.set_point(point)
         elif isinstance(point, SatellitePoint):
             self.tabs.setCurrentIndex(2)
             self.satellite.set_satellite(point.name)
@@ -1058,19 +1270,23 @@ class InputWidget(QtWidgets.QWidget):
             alt = self.surface.get_altitude()
             dts = self.surface.get_datetimes()
             point = SurfacePoint(lat, lon, alt, dts)
-        elif isinstance(tab, CustomInputWidget):
-            dsm = self.custom.get_dist_sun_moon()
-            dom = self.custom.get_dist_obs_moon()
-            olat = self.custom.get_selen_obs_lat()
-            olon = self.custom.get_selen_obs_lon()
-            slon = self.custom.get_selen_sun_lon()
-            mpa = self.custom.get_moon_phase_angle()
-            ampa = abs(mpa)
-            point = CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
-        else:
+        elif isinstance(tab, SatelliteInputWidget):
             sat = self.satellite.get_satellite()
             dts = self.satellite.get_datetimes()
             point = SatellitePoint(sat, dts)
+        else:
+            if self._get_seleno_mode() == 0:
+                dsm = self.custom.get_dist_sun_moon()
+                dom = self.custom.get_dist_obs_moon()
+                olat = self.custom.get_selen_obs_lat()
+                olon = self.custom.get_selen_obs_lon()
+                slon = self.custom.get_selen_sun_lon()
+                mpa = self.custom.get_moon_phase_angle()
+                ampa = abs(mpa)
+                point = CustomPoint(dsm, dom, olat, olon, slon, ampa, mpa)
+            else:
+                pts = self.custom_multi.get_points()
+                point = MultipleCustomPoint(pts)
         return point
 
     def is_calculable(self) -> bool:
@@ -1079,6 +1295,9 @@ class InputWidget(QtWidgets.QWidget):
             return self.surface.is_calculable()
         elif isinstance(tab, SatelliteInputWidget):
             return self.satellite.is_calculable()
+        else:
+            if self._get_seleno_mode() == 1:
+                return self.custom_multi.is_calculable()
         return True
 
     def get_point(self) -> Point:
@@ -1090,6 +1309,7 @@ class InputWidget(QtWidgets.QWidget):
         self.skip_uncs = skip_uncs
         self.surface.set_is_skipping_uncs(skip_uncs)
         self.satellite.set_is_skipping_uncs(skip_uncs)
+        self.custom_multi.set_is_skipping_uncs(skip_uncs)
 
     def showEvent(self, event):
         super().showEvent(event)

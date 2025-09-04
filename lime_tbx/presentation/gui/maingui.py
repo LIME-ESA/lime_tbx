@@ -63,6 +63,7 @@ from lime_tbx.common.datatypes import (
     MoonData,
     EocfiPath,
     AOLPCoefficients,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import logger, constants as logic_constants
 from lime_tbx.common.constants import CompFields
@@ -1274,10 +1275,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
-        self.quant_elis = 1
+        self.quant_elis = point.get_len()
         self.quant_elis_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_elis = len(point.dt)
         self.will_calc_reflectance_prev = (
             self.lime_simulation.will_irradiance_calculate_reflectance_previously(point)
         )
@@ -1307,10 +1306,12 @@ class MainSimulationsWidget(
             self.loading_spinner.set_text(f"Finishing simulations...")
 
     def _set_graph_dts(self, pt: Point):
-        self.graph.set_dts([])
+        self.graph.set_cursor_names([])
         if isinstance(pt, SurfacePoint) or isinstance(pt, SatellitePoint):
             if isinstance(pt.dt, list) and len(pt.dt) > 1:
-                self.graph.set_dts(pt.dt)
+                self.graph.set_cursor_names(pt.dt)
+        elif isinstance(pt, MultipleCustomPoint):
+            self.graph.set_cursor_names([str(i + 1) for i in range(len(pt.pts))])
 
     def eli_finished(
         self,
@@ -1376,10 +1377,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
-        self.quant_elrefs = 1
+        self.quant_elrefs = point.get_len()
         self.quant_elrefs_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_elrefs = len(point.dt)
         worker = CallbackWorker(
             elref_callback,
             [srf, point, cimel_coef, self.lime_simulation],
@@ -1456,10 +1455,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coef()
-        self.quant_polars = 1
+        self.quant_polars = point.get_len()
         self.quant_polars_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_polars = len(point.dt)
         worker = CallbackWorker(
             polar_callback,
             [srf, point, coeffs, self.lime_simulation],
@@ -1535,10 +1532,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_aolp_coef()
-        self.quant_aolp = 1
+        self.quant_aolp = point.get_len()
         self.quant_aolp_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_aolp = len(point.dt)
         worker = CallbackWorker(
             aolp_callback,
             [srf, point, coeffs, self.lime_simulation],
@@ -1799,7 +1794,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def load_observations_finished(
         self, lglod: LGLODData, srf: SpectralResponseFunction
     ):
-        if srf == None:
+        if srf is None:
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_observation_callback, [lglod, srf])
         self._start_thread(
