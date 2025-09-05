@@ -34,4 +34,4 @@ WORKDIR "C:\\"
 ENTRYPOINT .\repo\deployment\automatic\windows_build_script.bat
 #docker build .. -t lime_compiler -f Windows.Dockerfile
 #for %F in ("%cd%\..") do set dirname=%~dpF
-#docker run -v %dirname%:C:\repo lime_compiler
+#docker run --rm -v %dirname%:C:\repo lime_compiler
