@@ -1,11 +1,13 @@
 #!/usr/bin/env sh
 cd repo
-# C code (EOCFI)
-cd lime_tbx/business/eocfi_adapter/eocfi_c
-cp MakefileLinux.mak Makefile
-make
-cd ../../../..
-# python code
+## C code (EOCFI)
+echo "WARNING: Skipping C extension compilation during packaging to avoid dirty tag version."
+echo "This means C code is NOT compiled in this package build!"
+#cd lime_tbx/business/eocfi_adapter/eocfi_c
+#cp MakefileLinux.mak Makefile
+#make
+#cd ../../../..
+## python code
 rm -rf lime_tbx.egg-info dist build
 python3.9 -m build
 rm -rf .venv
