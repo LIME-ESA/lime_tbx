@@ -26,11 +26,15 @@ from lime_tbx.common.datatypes import (
     SpectralValidity,
     SurfacePoint,
     CustomPoint,
+    MultipleCustomPoint,
+    SatellitePoint,
     ComparisonData,
     MoonData,
+    LimeException,
 )
 from lime_tbx.common import logger
 from lime_tbx.common.constants import CompFields
+from lime_tbx.application.simulation.moon_data_factory import MoonDataFactory
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -41,6 +45,9 @@ __status__ = "Development"
 
 _EXPORT_ERROR_STR = "Error while exporting as CSV. See log for details."
 _READ_FILE_DTS_ERROR_STR = "There was a problem while loading datetimes csv file.\n\
+Check that every row has the correct format and see log for details."
+_READ_FILE_SELENOPTS_ERROR_STR = "There was a problem while loading selnographic\
+points csv file.\n\
 Check that every row has the correct format and see log for details."
 _WARN_OUT_MPA_RANGE = "The LIME can only give a reliable simulation \
 for absolute moon phase angles between 2° and 90°"
@@ -61,20 +68,11 @@ def _write_point(writer, point: Union[Point, None]):
             else:
                 writer.writerow(["datetime", str(dt)])
         elif isinstance(point, CustomPoint):
-            writer.writerow(["moon phase angle (deg)", point.moon_phase_angle])
-            writer.writerow(
-                ["distance observer moon (km)", point.distance_observer_moon]
-            )
-            writer.writerow(["distance sun moon (AU)", point.distance_sun_moon])
-            writer.writerow(
-                ["selenographic latitude of observer (deg)", point.selen_obs_lat]
-            )
-            writer.writerow(
-                ["selenographic longitude of observer (deg)", point.selen_obs_lon]
-            )
-            writer.writerow(
-                ["selenographic longitude of sun (rad)", point.selen_sun_lon]
-            )
+            mds = MoonDataFactory.get_md_from_custom(point)
+            _write_moondata(writer, mds)
+        elif isinstance(point, MultipleCustomPoint):
+            mds = MoonDataFactory.get_md_from_multi_custom(point)
+            _write_moondata(writer, mds)
         else:
             writer.writerow(["satellite", point.name])
             dt: Union[datetime, List[datetime]] = point.dt
@@ -198,28 +196,35 @@ def export_csv_simulation(
             )
             if some_out_mpa_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
-            if not isinstance(point, CustomPoint):
-                # CustomPoint data already written with write_moondata
+            if not isinstance(point, (CustomPoint, MultipleCustomPoint)) or mda is None:
+                # MultiCustomPoint and CustomPoint data already written with write_moondata
                 _write_point(writer, point)
             if mda:
                 _write_moondata(writer, mda)
             ylabels = []
             cimel_ylabels = []
-            if not isinstance(point, CustomPoint) and point != None:
-                dts = point.dt
-                if not isinstance(dts, list):
-                    dts = [dts]
-                    inside_mpa_range = [inside_mpa_range]
-                for dt, inside_mpa in zip(dts, inside_mpa_range):
+            if point is not None and not isinstance(point, CustomPoint):
+                if isinstance(point, (SurfacePoint, SatellitePoint)):
+                    dts = point.dt
+                    if not isinstance(dts, list):
+                        dts = [dts]
+                        inside_mpa_range = [inside_mpa_range]
+                    ids = dts
+                else:
+                    ids = [i + 1 for i in range(len(point.pts))]
+                for idx, inside_mpa in zip(ids, inside_mpa_range):
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
-                    dtprint = dt.isoformat(sep=" ", timespec="milliseconds")
-                    ylab = f"{dtprint} {ylabel}{warn_out_mpa_range}"
+                    if not isinstance(idx, datetime):
+                        idprint = str(idx)
+                    else:
+                        idprint = idx.isoformat(sep=" ", timespec="milliseconds")
+                    ylab = f"{idprint} {ylabel}{warn_out_mpa_range}"
                     ylabels.append(ylab)
                     cimel_ylabels.append(ylab)
                     if not skip_uncs:
-                        halfy2 = f"{dtprint} {ylabel} uncertainties (k=2)"
+                        halfy2 = f"{idprint} {ylabel} uncertainties (k=2)"
                         ylabels.append(f"{halfy2}{warn_out_mpa_range}")
                         cimel_ylabels.append(f"{halfy2}{warn_out_mpa_range}")
             else:
@@ -506,7 +511,9 @@ def export_csv_integrated_irradiance(
             writer = csv.writer(file)
             writer.writerow(["LIME coefficients version", coeff_version])
             writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-            if mpa is not None and not isinstance(point, CustomPoint):
+            if mpa is not None and not isinstance(
+                point, (MultipleCustomPoint, CustomPoint)
+            ):
                 writer.writerow(["moon phase angle (deg)", mpa])
             some_out_mpa_range = (
                 not inside_mpa_range
@@ -518,25 +525,27 @@ def export_csv_integrated_irradiance(
             _write_point(writer, point)
             writer.writerow(["srf name", srf.name])
             irr_titles = []
-            if not isinstance(point, CustomPoint) and point != None:
-                dts = point.dt
-                if not isinstance(dts, list):
-                    dts = [dts]
-                    inside_mpa_range = [inside_mpa_range]
-                for dt, inside_mpa in zip(dts, inside_mpa_range):
+            if point is not None:
+                if isinstance(point, (SurfacePoint, SatellitePoint)):
+                    ids = point.dt
+                    if not isinstance(ids, list):
+                        ids = [ids]
+                        inside_mpa_range = [inside_mpa_range]
+                else:
+                    ids = point.pts
+                for idx, inside_mpa in zip(ids, inside_mpa_range):
                     warn_out_mpa_range = ""
                     if not inside_mpa:
                         warn_out_mpa_range = " **"
+                    if isinstance(idx, datetime):
+                        idstr = idx.isoformat(sep=" ", timespec="milliseconds")
+                    else:
+                        idstr = str(idx)
                     irr_titles.append(
-                        "{} irradiances (Wm⁻²nm⁻¹){}".format(
-                            dt.isoformat(sep=" ", timespec="milliseconds"),
-                            warn_out_mpa_range,
-                        )
+                        f"{idstr} irradiances (Wm⁻²nm⁻¹){warn_out_mpa_range}"
                     )
                     if not skip_uncs:
-                        irr_titles.append(
-                            f"{dt.isoformat(sep=' ', timespec='milliseconds')} uncertainties{warn_out_mpa_range}"
-                        )
+                        irr_titles.append(f"{idstr} uncertainties{warn_out_mpa_range}")
             else:
                 irr_titles.append("irradiances (Wm⁻²nm⁻¹)")
                 if not skip_uncs:
@@ -573,7 +582,7 @@ def read_datetimes(path: str) -> List[datetime]:
     Returns
     -------
     dts: list of datetime
-        Datetimes that where stored in that file.
+        Datetimes that were stored in that file.
     """
     try:
         with open(path, "r") as file:
@@ -596,3 +605,53 @@ def read_datetimes(path: str) -> List[datetime]:
     except Exception as e:
         logger.get_logger().exception(e)
         raise Exception(_READ_FILE_DTS_ERROR_STR)
+
+
+def read_selenopoints(path: str) -> List[CustomPoint]:
+    """
+    Read a custompoint data-series CSV file.
+
+    Parameters
+    ----------
+    path: str
+        Path where the file is stored.
+
+    Returns
+    -------
+    pts: list of CustomPoint
+        Selenographic CustomPoint that were stored in that file.
+    """
+    points: List[CustomPoint] = []
+    try:
+        with open(path, "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if not row:
+                    continue
+                irow = map(float, row)
+                dsm, dom, solat, solon, sslon, mpa = list(irow)
+                pt = CustomPoint(
+                    dsm, dom, solat, solon, np.radians(sslon), abs(mpa), mpa
+                )
+                points.append(pt)
+    except Exception as e:
+        logger.get_logger().exception(e)
+        raise Exception(_READ_FILE_SELENOPTS_ERROR_STR)
+    for i, pt in enumerate(points):
+        msgs = []
+        if not 0.5 <= pt.distance_sun_moon <= 1.5:
+            msgs.append("Dist. Sun-Moon (AU) must be between 0.5 and 1.5")
+        if not 1 <= pt.distance_observer_moon <= 1000000:
+            msgs.append("Dist. Obs-Moon (km) must be between 1 and 1000000")
+        if not -90 <= pt.selen_obs_lat <= 90:
+            msgs.append("Obs. sel. lat. (°) must be between -90 and 90")
+        if not -180 <= pt.selen_obs_lon <= 180:
+            msgs.append("Obs. sel. lon. (°) must be between -180 and 180")
+        if not -180 <= np.degrees(pt.selen_sun_lon) <= 180:
+            msgs.append("Sun sel. lon. (°) must be between -180 and 180")
+        if not -180 <= pt.moon_phase_angle <= 180:
+            msgs.append("Moon phase angle (°) must be between -180 and 180")
+        if msgs:
+            msg = f"Invalid values in point {i+1}:\n" + "\n".join(msgs)
+            raise LimeException(msg)
+    return points

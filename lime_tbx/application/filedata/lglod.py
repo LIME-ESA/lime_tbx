@@ -95,11 +95,11 @@ def _write_start_dataset(
     ds.processing_level = "v1.0.0"
     ds.doc_url = "N/A"
     ds.doc_doi = "N/A"
-    if min_dt != None:
+    if min_dt is not None:
         ds.time_coverage_start = min_dt.strftime(_DT_FORMAT)
     else:
         ds.time_coverage_start = ""
-    if max_dt != None:
+    if max_dt is not None:
         ds.time_coverage_end = max_dt.strftime(_DT_FORMAT)
     else:
         ds.time_coverage_end = ""
@@ -208,7 +208,7 @@ def _write_normal_simulations(
     if isinstance(lglod, LGLODData):
         obs = lglod.observations
         quant_dates = len(obs)
-        if quant_dates == 1 and obs[0].dt == None:
+        if obs[0].dt is None:
             quant_dates = 0
         if quant_dates > 0:
             min_dt = min(obs, key=lambda o: o.dt).dt
@@ -308,7 +308,7 @@ def write_obs(
     try:
         obs = lglod.observations
         quant_dates = len(obs)
-        if quant_dates == 1 and obs[0].dt == None:
+        if obs[0].dt is None:
             quant_dates = 0
         sim_data = _NormalSimulationData(
             quant_dates,
@@ -557,14 +557,18 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     ]
     sat_pos_units: str = ds["sat_pos"].units
     d_to_m = get_length_conversion_factor(sat_pos_units, "m")
-    lambda_to_satpos = lambda xyz: SatellitePosition(
-        *list(map(lambda a: a * d_to_m, xyz))
-    )
+
+    def lambda_to_satpos(xyz):
+        return SatellitePosition(*list(map(lambda a: a * d_to_m, xyz)))
+
     sat_poss = list(map(lambda_to_satpos, ds.variables["sat_pos"][:].data))
-    lambda_to_str = lambda data: data.tobytes().decode("utf-8").replace("\x00", "")
+
+    def lambda_to_str(data):
+        return data.tobytes().decode("utf-8").replace("\x00", "")
+
     sat_pos_ref_0 = list(map(lambda_to_str, ds.variables["sat_pos_ref"][:].data))[0]
-    signals_data = np.array(ds.variables["irr_obs"][:].data)
-    signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data)
+    signals_data = np.array(ds.variables["irr_obs"][:].data.T)
+    signals_uncs = np.array(ds.variables["irr_obs_unc"][:].data.T)
     signals = SpectralData(
         np.array(channel_names_0), signals_data, np.array(signals_uncs), None
     )
@@ -629,7 +633,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
     skipped_uncs = bool(ds.skipped_uncertainties)
     vers = str(ds.reference_model)[len("LIME coefficients version: ") :]
     ds.close()
-    for i in range(len(sat_poss)):
+    for i, sat_pos in enumerate(sat_poss):
         irrs = SpectralData(
             np.array(wlens),
             np.array(irr_spectrum[i]),
@@ -662,7 +666,7 @@ def _read_lime_glod(ds: nc.Dataset) -> LGLODData:
             channel_names_0,
             sat_pos_ref_0,
             dt,
-            sat_poss[i],
+            sat_pos,
             irrs,
             refls,
             polars,

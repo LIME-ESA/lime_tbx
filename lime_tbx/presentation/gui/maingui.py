@@ -35,7 +35,10 @@ from lime_tbx.presentation.gui.settings import ISettingsManager
 from lime_tbx.application.filedata import moon, srf as srf_loader, lglod as lglodlib
 from lime_tbx.application.filedata.lglod_factory import create_lglod_data
 from lime_tbx.application.simulation.comparison import comparison
-from lime_tbx.application.simulation.comparison.utils import sort_by_mpa
+from lime_tbx.application.simulation.comparison.utils import (
+    sort_by_mpa,
+    filter_out_3sigmas_iter,
+)
 from lime_tbx.application.simulation.lime_simulation import (
     ILimeSimulation,
     LimeSimulation,
@@ -60,6 +63,7 @@ from lime_tbx.common.datatypes import (
     MoonData,
     EocfiPath,
     AOLPCoefficients,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import logger, constants as logic_constants
 from lime_tbx.common.constants import CompFields
@@ -304,6 +308,14 @@ def compare_callback(
     return comparisons, mpa_comp, mos, srf
 
 
+def filter_3sigma_callback(
+    comps: List[ComparisonData],
+) -> Tuple[List[ComparisonData], List[ComparisonData]]:
+    comps = filter_out_3sigmas_iter(comps)
+    mpa_comp = sort_by_mpa(comps)
+    return comps, mpa_comp
+
+
 def calculate_all_callback(
     srf: SpectralResponseFunction,
     point: Point,
@@ -483,6 +495,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self._listening_changes_combobox = True
         self.chosen_diffs = CompFields.DIFF_REL
         self._can_export_netcdf = False
+        self._channel_index = 0
         self._build_layout()
 
     def _build_layout(self):
@@ -514,6 +527,15 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.clear_comparison_button.clicked.connect(self.clear_comparison_pressed)
         self.comp_options_box.addWidget(self.clear_comparison_button)
         self.comp_options_box.addWidget(QtWidgets.QLabel(), 2)
+        self.filter_button = QtWidgets.QPushButton("FILTER 3σ")
+        self.filter_button.setStyleSheet("text-transform: none")
+        self.filter_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.filter_button.setToolTip(
+            "Iteratively filter out measurements that are 3σ away from the mean relative difference, channel-wise."
+        )
+        self.filter_button.clicked.connect(self.filter_out_3sigmas)
+        self.comp_options_box.addWidget(self.filter_button)
+        self.comp_options_box.addWidget(QtWidgets.QLabel(), 1)
         self.compare_by_label = QtWidgets.QLabel("Compare by:")
         self.compare_by_field = QtWidgets.QComboBox()
         self.compare_by_field.view().setVerticalScrollBarPolicy(
@@ -835,6 +857,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
+        self._channel_index = 0
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
@@ -950,6 +973,7 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         ch_names = srf.get_channels_names()
         self.output.set_channels(ch_names)
         worker = CallbackWorker(show_comparisons_callback, params)
+        self._channel_index = 0
         self._start_thread(
             worker, self._load_lglod_comparisons_finished, self.compare_error
         )
@@ -959,8 +983,8 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         outp: output.ComparisonOutput = data[0]
         outp.remove_channels(data[1])
         outp.check_if_range_visible()
+        outp.set_current_channel_index(self._channel_index)
         self._unblock_gui()
-        outp.set_current_channel_index(0)
         self.set_can_export_to_nc(True)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(False)
@@ -997,6 +1021,50 @@ class ComparisonPageWidget(QtWidgets.QWidget):
         self.set_can_export_to_nc(False)
         window: LimeTBXWindow = self.parentWidget().parentWidget()
         window.set_save_simulation_action_disabled(True)
+
+    @QtCore.Slot()
+    def filter_out_3sigmas(self):
+        self._block_gui_loading()
+        self._channel_index = self.output.get_current_channel_index()
+        worker = CallbackWorker(
+            filter_3sigma_callback,
+            [self.comps],
+        )
+        self._start_thread(
+            worker,
+            self.filter_finished,
+            self.compare_error,
+        )
+
+    def filter_finished(
+        self,
+        data: Tuple[
+            List[ComparisonData],
+            List[ComparisonData],
+        ],
+    ):
+        self.set_show_comparison_input(False)
+        comps = data[0]
+        mpa_comps = data[1]
+        self.comps = comps
+        self.skipped_uncs = self.settings_manager.is_skip_uncertainties()
+        self.mpa_comps = mpa_comps
+        self.version = self.settings_manager.get_coef_version_name()
+        params = [
+            self.output,
+            self.comps,
+            CompFields.COMP_DATE,
+            self.srf,
+            self.version,
+            self.settings_manager,
+            self.chosen_diffs,
+        ]
+        worker = CallbackWorker(show_comparisons_callback, params)
+        self._start_thread(worker, self._show_after_filter_finished, self.compare_error)
+
+    def _show_after_filter_finished(self, data):
+        self._load_lglod_comparisons_finished(data)
+        self._update_from_compare_combo(self.compare_by_field.currentText())
 
 
 class MainSimulationsWidget(
@@ -1207,10 +1275,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
-        self.quant_elis = 1
+        self.quant_elis = point.get_len()
         self.quant_elis_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_elis = len(point.dt)
         self.will_calc_reflectance_prev = (
             self.lime_simulation.will_irradiance_calculate_reflectance_previously(point)
         )
@@ -1240,10 +1306,12 @@ class MainSimulationsWidget(
             self.loading_spinner.set_text(f"Finishing simulations...")
 
     def _set_graph_dts(self, pt: Point):
-        self.graph.set_dts([])
+        self.graph.set_cursor_names([])
         if isinstance(pt, SurfacePoint) or isinstance(pt, SatellitePoint):
             if isinstance(pt.dt, list) and len(pt.dt) > 1:
-                self.graph.set_dts(pt.dt)
+                self.graph.set_cursor_names(pt.dt)
+        elif isinstance(pt, MultipleCustomPoint):
+            self.graph.set_cursor_names([str(i + 1) for i in range(len(pt.pts))])
 
     def eli_finished(
         self,
@@ -1309,10 +1377,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         cimel_coef = self.settings_manager.get_cimel_coef()
-        self.quant_elrefs = 1
+        self.quant_elrefs = point.get_len()
         self.quant_elrefs_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_elrefs = len(point.dt)
         worker = CallbackWorker(
             elref_callback,
             [srf, point, cimel_coef, self.lime_simulation],
@@ -1389,10 +1455,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_polar_coef()
-        self.quant_polars = 1
+        self.quant_polars = point.get_len()
         self.quant_polars_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_polars = len(point.dt)
         worker = CallbackWorker(
             polar_callback,
             [srf, point, coeffs, self.lime_simulation],
@@ -1468,10 +1532,8 @@ class MainSimulationsWidget(
         point = self.input_widget.get_point()
         srf = self.settings_manager.get_srf()
         coeffs = self.settings_manager.get_aolp_coef()
-        self.quant_aolp = 1
+        self.quant_aolp = point.get_len()
         self.quant_aolp_sim = 0
-        if hasattr(point, "dt") and isinstance(point.dt, list):
-            self.quant_aolp = len(point.dt)
         worker = CallbackWorker(
             aolp_callback,
             [srf, point, coeffs, self.lime_simulation],
@@ -1732,7 +1794,7 @@ class LimeTBXWidget(QtWidgets.QWidget):
     def load_observations_finished(
         self, lglod: LGLODData, srf: SpectralResponseFunction
     ):
-        if srf == None:
+        if srf is None:
             srf = self.settings_manager.get_default_srf()
         worker = CallbackWorker(check_srf_observation_callback, [lglod, srf])
         self._start_thread(

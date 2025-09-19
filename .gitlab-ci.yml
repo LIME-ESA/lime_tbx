@@ -139,7 +139,7 @@ tox_slowtests:
     - pip install tox
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
-    - tox -- --runslow
+    - tox -- --runslow -m slow
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
   only:
@@ -158,7 +158,7 @@ tox_slowtests_manual:
     - pip install tox
     - mkdir test_report
     - export GITLAB_CI="GITLAB_CI"
-    - tox -- --runslow
+    - tox -- --runslow -m slow
   coverage: '/^TOTAL.+?(\d+\%)$/'
   needs: []
   rules:

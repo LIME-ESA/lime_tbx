@@ -39,13 +39,14 @@ It exports the following Enums:
 
 """___Built-In Modules___"""
 from dataclasses import dataclass, asdict
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union, Tuple, Iterable, Callable
 from datetime import datetime
 from enum import Enum
-from abc import ABC
+from abc import ABC, abstractmethod
 
 """___Third-Party Modules___"""
 import numpy as np
+import pandas as pd
 import xarray
 import yaml
 from atomicwrites import atomic_write
@@ -238,9 +239,36 @@ class SRF_fwhm:
 
 
 class Point(ABC):
-    """Abstract class representing a point which can be used to generate a MoonData"""
+    """Abstract class representing a user point which can be used to
+    generate one or more MoonDatas"""
 
-    pass
+    @abstractmethod
+    def equals(self, o) -> bool:
+        """Test whether two objects are the same point.
+
+        This function allows two Points to be compared against each other to see if they
+        have the same elements.
+
+        Parameters
+        ----------
+        o: Point
+            The other Point to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+
+    @abstractmethod
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user Point.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the Point
+        """
 
 
 @dataclass
@@ -266,6 +294,58 @@ class SurfacePoint(Point):
     longitude: float
     altitude: float
     dt: Union[datetime, List[datetime]]
+
+    def equals(self, o: "SurfacePoint") -> bool:
+        """Test whether two objects are the same SurfacePoint.
+
+        This function allows two SurfacePoint to be compared against each other to see if they
+        have the same elements.
+
+        Parameters
+        ----------
+        o: SurfacePoint
+            The other SurfacePoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, SurfacePoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        sdt = self.dt
+        odt = o.dt
+        if not isinstance(sdt, list):
+            sdt = [sdt]
+        if not isinstance(odt, list):
+            odt = [odt]
+        if len(sdt) != len(odt):
+            return False
+        for sdti, odti in zip(sdt, odt):
+            if sdti != odti:
+                return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user SurfacePoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the SurfacePoint
+        """
+        if isinstance(self.dt, list):
+            return len(self.dt)
+        return 1
 
 
 @dataclass
@@ -301,11 +381,107 @@ class CustomPoint(Point):
     abs_moon_phase_angle: float
     moon_phase_angle: float
 
+    def equals(self, o: "CustomPoint") -> bool:
+        """Test whether two objects are the same CustomPoint.
+
+        This function allows two CustomPoint to be compared against each other to see if they
+        have the same elements.
+
+        Parameters
+        ----------
+        o: CustomPoint
+            The other CustomPoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, CustomPoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user CustomPoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the CustomPoint
+        """
+        return 1
+
+
+@dataclass
+class MultipleCustomPoint(Point):
+    """
+    Dataclass representing a set of multiple custom points.
+
+    Attributes
+    ----------
+    pts: list of CustomPoint
+    """
+
+    pts: List[CustomPoint]
+
+    def equals(self, o: "MultipleCustomPoint") -> bool:
+        """Test whether two objects are the same MultipleCustomPoint.
+
+        This function allows two MultipleCustomPoint to be compared against each other to
+        see if they have the same elements.
+
+        Parameters
+        ----------
+        o: MultipleCustomPoint
+            The other MultipleCustomPoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, MultipleCustomPoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        if len(self.pts) != len(o.pts):
+            return False
+        for sdt, odt in zip(self.pts, o.pts):
+            if not sdt.equals(odt):
+                return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user MultipleCustomPoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the MultipleCustomPoint
+        """
+        return len(self.pts)
+
 
 @dataclass
 class SatellitePoint(Point):
     """
-    Dataclass representing a Satellite in a concrete datetime
+    Dataclass representing a Satellite position in one or more datetimes.
 
     Attributes
     ----------
@@ -317,6 +493,58 @@ class SatellitePoint(Point):
 
     name: str
     dt: Union[datetime, List[datetime]]
+
+    def equals(self, o: "SatellitePoint") -> bool:
+        """Test whether two objects are the same SatellitePoint.
+
+        This function allows two SatellitePoint to be compared against each other to
+        see if they have the same elements.
+
+        Parameters
+        ----------
+        o: SatellitePoint
+            The other SatellitePoint to be compared with the first
+
+        Returns
+        -------
+        eq: bool
+            True if all eleements are the same in both objects, False otherwise.
+        """
+        if not isinstance(o, SatellitePoint):
+            return False
+        for att in dir(self):
+            if len(att) < 2 or att[0:2] != "__":
+                a0 = getattr(self, att)
+                a1 = getattr(o, att)
+                if type(a0) is not type(a1):
+                    return False
+                if not isinstance(a0, (Iterable, Callable)):
+                    if a0 != a1:
+                        return False
+        sdt = self.dt
+        odt = o.dt
+        if not isinstance(sdt, list):
+            sdt = [sdt]
+        if not isinstance(odt, list):
+            odt = [odt]
+        if len(sdt) != len(odt):
+            return False
+        for sdti, odti in zip(sdt, odt):
+            if sdti != odti:
+                return False
+        return True
+
+    def get_len(self) -> int:
+        """Obtain the amount of moondatas that are encompassed in the user SatellitePoint.
+
+        Returns
+        -------
+        n: int
+            Amount of moondatas encompassed in the SatellitePoint
+        """
+        if isinstance(self.dt, list):
+            return len(self.dt)
+        return 1
 
 
 @dataclass(eq=True, frozen=True)
@@ -412,7 +640,7 @@ class Satellite:
         for orf in self.orbit_files:
             if dt >= orf.dt0 and dt <= orf.dtf:
                 td = min(dt - orf.dt0, orf.dtf - dt)
-                if sel_td == None or td < sel_td:
+                if sel_td is None or td < sel_td:
                     sel_td = td
                     sel_orf = orf
         return sel_orf
@@ -422,7 +650,8 @@ class Satellite:
 class SatellitePosition:
     """
     Dataclass containing the information of the position of a SatellitePoint,
-    for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
+    for a specific reference system, usually J2000 (Earth), or MOON_ME (Moon).
+    For EOCFI it's ITRF93.
 
     Attributes
     ----------
@@ -449,7 +678,8 @@ class LunarObservation:
     ch_names: list of str
         Names of the channels present
     sat_pos_ref: str
-        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon). For EOCFI it's ITRF93.
+        Name of the reference system, usually J2000 (Earth), or MOON_ME (Moon).
+        For EOCFI it's ITRF93.
     ch_irrs: dict of str and float
         Irradiances relative to each channel. The key is the channel name, and the irradiance
         is given in Wm⁻²nm⁻¹.
@@ -678,18 +908,18 @@ class LimeCoefficients:
 
 class SpectralData:
     """
-    Data for a spectrum of wavelengths, with an associated uncertainty each.
+    Represents spectral data with associated uncertainties and optional error correlation.
 
     Attributes
     ----------
     wlens: np.ndarray
-        Spectrum of wavelengths.
+        Array of wavelengths.
     data: np.ndarray
-        Data associated to the wavelengths (irradiance, reflectance, etc).
+        Measured data associated to the wavelengths (irradiance, reflectance, etc).
     uncertainties: np.ndarray
-        Uncertainties associated to the data.
-    err_corr: None | np.ndarray
-        Error correlation matrix, if included.
+        Uncertainties associated with the measurements.
+    err_corr: np.ndarray or None
+        Error correlation matrix, if available in the dataset.
     """
 
     def __init__(
@@ -711,9 +941,19 @@ class SpectralData:
         ds: xarray.Dataset
             Dataset used in data generation
         """
-        self.wlens = wlens
-        self.data = data
-        self.uncertainties = uncertainties
+        if np.ndim(data) == 1:
+            self._is_multichannel = False
+            self._df = pd.DataFrame({"wlens": wlens, "data": data})
+            if uncertainties is not None:
+                self._df["uncertainties"] = uncertainties
+        else:
+            self._is_multichannel = True
+            df_dict = {}
+            for i, wl in enumerate(wlens):
+                df_dict[f"{wl}_data"] = data[i]
+                if uncertainties is not None:
+                    df_dict[f"{wl}_unc"] = uncertainties[i]
+            self._df = pd.DataFrame(df_dict)
         self.err_corr = None
         if hasattr(ds, "err_corr_reflectance_wavelength"):
             self.err_corr = ds.err_corr_reflectance_wavelength.values
@@ -721,6 +961,50 @@ class SpectralData:
             self.err_corr = ds.err_corr_polarisation.values
         elif hasattr(ds, "err_corr_irradiance"):
             self.err_corr = ds.err_corr_irradiance.values
+
+    @property
+    def wlens(self):
+        """Return the array of wavelengths."""
+        if self._is_multichannel:
+            return np.array(
+                sorted(
+                    set(
+                        col.rsplit("_", 1)[0]
+                        for col in self._df.columns
+                        if col.endswith("_data")
+                    )
+                )
+            )
+        return self._df["wlens"].values
+
+    @property
+    def data(self):
+        """Return the measurement data."""
+        if self._is_multichannel:
+            return np.array([self._df[f"{wl}_data"].values for wl in self.wlens])
+        return self._df["data"].values
+
+    @property
+    def uncertainties(self):
+        """Return the uncertainty data if available, otherwise None."""
+        if self._is_multichannel:
+            for wl in self.wlens:
+                if f"{wl}_unc" not in self._df:
+                    return None
+            return np.array([self._df[f"{wl}_unc"].values for wl in self.wlens])
+        if "uncertainties" in self._df:
+            return self._df["uncertainties"].values
+        return None
+
+    def filter_indices(self, indices_keep):
+        """Retain only the rows corresponding to the given indices.
+
+        Parameters
+        ----------
+        indices_keep : array-like
+            Indices of the rows to keep.
+        """
+        self._df = self._df[indices_keep].reset_index(drop=True)
 
     def clear_err_corr(self):
         """Dereference the error correlation matrix from the object."""

@@ -29,6 +29,7 @@ from lime_tbx.common.datatypes import (
     CustomPoint,
     SpectralData,
     MoonData,
+    MultipleCustomPoint,
 )
 from lime_tbx.common import logger
 from lime_tbx.presentation.gui.settings import ISettingsManager
@@ -310,14 +311,13 @@ class SimGraphWidget(GraphWidget):
         else:
             self._to_update_labels = True
 
-    def set_cursor_names(self, labels: List[str]):
-        self.dts = None
-        self.cursor_names = labels.copy()
-
-    def set_dts(self, dts: List[datetime]):
-        # TODO: Refactor this, change func name and combine with set_cursor_names
-        self.dts = dts
-        self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in dts]
+    def set_cursor_names(self, labels: Union[List[str], List[datetime]]):
+        if len(labels) == 0 or isinstance(labels[0], str):
+            self.dts = None
+            self.cursor_names = labels.copy()
+        else:
+            self.dts = labels
+            self.cursor_names = [dt.strftime("%Y/%m/%d %H:%M:%S") for dt in labels]
 
     def _redraw(self):
         if not self.is_built:
@@ -365,8 +365,12 @@ class SimGraphWidget(GraphWidget):
                 ]
 
             self.mpl_cursor = mplcursors.cursor(cursor_lines, hover=2)
-            func_num_from_label = lambda label: int(int(label[6:]))
-            if self.dts:
+            n_lines = len(
+                [l for l in cursor_lines if l.get_label().startswith("_child")]
+            )
+            if n_lines == len(self.cursor_names):
+                func_num_from_label = lambda label: int(int(label[6:]))
+            else:
                 func_num_from_label = lambda label: int(int(label[6:]) / 2)
 
             for l in cursor_lines:
@@ -708,19 +712,26 @@ class SignalWidget(QtWidgets.QWidget):
                 0, 3, QtWidgets.QTableWidgetItem(f"Uncertainties{asterisk_if_mpa_out}")
             )
         else:
-            dts = point.dt
-            if not isinstance(dts, list):
-                dts = [dts]
-                inside_mpa_range = [inside_mpa_range]
-            self.table.setColumnCount(len(dts) * 2 + 2)
-            for i, dt in enumerate(dts):
+            if isinstance(point, MultipleCustomPoint):
+                indices = [i + 1 for i in range(len(point.pts))]
+            else:
+                indices = point.dt
+                if not isinstance(indices, list):
+                    indices = [indices]
+                    inside_mpa_range = [inside_mpa_range]
+            self.table.setColumnCount(len(indices) * 2 + 2)
+            for i, idx in enumerate(indices):
                 asterisk_if_mpa_out = ""
                 if not inside_mpa_range[i]:
                     show_range_mpa_info = True
                     asterisk_if_mpa_out = " **"
+                if isinstance(idx, int):
+                    idstr = str(idx)
+                else:
+                    idstr = idx.strftime("%Y-%m-%d %H:%M:%S UTC")
                 item_title_value = QtWidgets.QTableWidgetItem(
                     "Irradiance (Wm⁻²nm⁻¹) on {}{}".format(
-                        dt.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                        idstr,
                         asterisk_if_mpa_out,
                     )
                 )

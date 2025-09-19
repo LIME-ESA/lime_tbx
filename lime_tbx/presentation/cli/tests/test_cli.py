@@ -216,7 +216,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-l 0.98,420000,20.5,-30.2,0.69 -o nc,test_files/cli/cliglod.test.nc"
+                "-l 0.98,420000,20.5,-30.2,39.53 -o nc,test_files/cli/cliglod.test.nc"
             )
         )
         self.assertEqual(errcode, 1)
@@ -228,7 +228,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-l 0.98,420000,20.5,-30.2,0.69,15,2 -o nc,test_files/cli/cliglod.test.nc"
+                "-l 0.98,420000,20.5,-30.2,39.53,15,2 -o nc,test_files/cli/cliglod.test.nc"
             )
         )
         self.assertEqual(errcode, 1)
@@ -239,7 +239,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
     def test_lunar_forbidden_path(self):
         cli = get_cli()
         errcode = cli.handle_input(
-            *get_opts("-l 0.98,420000,20.5,-30.2,0.69,15 -o nc,/root")
+            *get_opts("-l 0.98,420000,20.5,-30.2,39.53,15 -o nc,/root")
         )
         self.assertEqual(errcode, 1)
         f = open("./test_files/cli/err_l_forbidden_path.txt")
@@ -539,7 +539,16 @@ class TestCLI(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-l 0.98,420000,20.5,-30.2,0.69,15 -o nc,test_files/cli/cliglod.test.nc"
+                "-l 0.98,420000,20.5,-30.2,39.53,15 -o nc,test_files/cli/cliglod.test.nc"
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_lunar_multiplefile_ok(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                "-l test_files/csv/multiseleno.csv -o nc,test_files/cli/cliglod.test.nc"
             )
         )
         self.assertEqual(errcode, 0)

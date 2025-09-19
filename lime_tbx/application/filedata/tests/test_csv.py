@@ -18,6 +18,7 @@ from lime_tbx.common.datatypes import (
     SpectralData,
     SpectralResponseFunction,
     SurfacePoint,
+    MultipleCustomPoint,
     ComparisonData,
     MoonData,
 )
@@ -54,8 +55,10 @@ SPOINT = SurfacePoint(43, 45, 4500, DT1)
 SPOINT2 = SurfacePoint(42, 45, 4500, [DT1, DT2])
 SPOINT3 = SurfacePoint(43, 45, 4500, DT2)
 CPOINT = CustomPoint(0.9, 450000, 30, 30, 1, 11.2, -11.2)
+CPOINT2 = CustomPoint(0.95, 453000, 30.1, 30.2, 1.2, -11, -13.66)
 SATPOINT = SatellitePoint("BIOMASS", DT1)
 SATPOINT2 = SatellitePoint("BIOMASS", [DT1, DT2])
+CPOINTS = MultipleCustomPoint([CPOINT, CPOINT2])
 
 SD1 = SpectralData(WLENS, DATA, UNCS, None)
 SD2 = SpectralData(WLENS, DATA2, UNCS2, None)
@@ -181,6 +184,24 @@ class TestCSV(unittest.TestCase):
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_5.csv"))
 
+    def test_export_csv_6(self):
+        data = [SD1, SD2]
+        path = "./test_files/csv/export_6.test.csv"
+        export_csv_simulation(
+            data,
+            "Wavelength",
+            "Irradiance",
+            CPOINTS,
+            path,
+            "test",
+            [True, True],
+            "ASD",
+            False,
+            CIMEL_DATA,
+            None,
+        )
+        self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_6.csv"))
+
     def test_export_csv_comparison_1(self):
         data = [
             SpectralData(
@@ -280,7 +301,7 @@ class TestCSV(unittest.TestCase):
         uncs = np.array(
             [np.array(UNCS)[0:2] * (i + 1) for i in range(len(srf.channels))]
         )
-        data = SpectralData(WLENS, signals, uncs, None)
+        data = SpectralData(WLENS[:3], signals, uncs, None)
         path = "./test_files/csv/export_intirr_1.test.csv"
         export_csv_integrated_irradiance(
             srf,
@@ -294,6 +315,29 @@ class TestCSV(unittest.TestCase):
             30,
         )
         self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_1.csv"))
+
+    def test_export_csv_integrated_irradiance_multicp(self):
+        srf = get_srf()
+        signals = np.array(
+            [np.array(DATA)[0:2] * (i + 1) for i in range(len(srf.channels))]
+        )
+        uncs = np.array(
+            [np.array(UNCS)[0:2] * (i + 1) for i in range(len(srf.channels))]
+        )
+        data = SpectralData(WLENS[:3], signals, uncs, None)
+        path = "./test_files/csv/export_intirr_2.test.csv"
+        export_csv_integrated_irradiance(
+            srf,
+            data,
+            path,
+            CPOINTS,
+            "test",
+            [True, True],
+            "ASD",
+            False,
+            30,
+        )
+        self.assertTrue(filecmp.cmp(path, "./test_files/csv/export_intirr_2.csv"))
 
     def test_export_csv_srf(self):
         srf = SettingsManager().get_default_srf()

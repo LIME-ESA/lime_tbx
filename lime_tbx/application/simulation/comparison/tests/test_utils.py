@@ -15,7 +15,12 @@ from lime_tbx.common.datatypes import (
     SpectralData,
     MoonData,
 )
-from ..utils import sort_by_mpa, average_comparisons
+from ..utils import (
+    sort_by_mpa,
+    average_comparisons,
+    filter_out_3sigmas_iter,
+    _filter_out_3sigmas_comp,
+)
 
 
 """___Authorship___"""
@@ -56,6 +61,49 @@ def _get_random_moondatas_from_mpas(mpas: List[float]) -> List[MoonData]:
             )
         )
     return mdas
+
+
+def _get_comps_for_filter(n_elems: int) -> ComparisonData:
+    comps = []
+    mpas = [
+        [10, 20, 30],
+        [30, 20, 10],
+        [120, 100, 110],
+        [115, 150, -5],
+        [-1, -2, -80],
+    ]
+    wlcs = [440, 600, 750.0, 800.0, 1566]
+    for i in range(len(wlcs)):
+        sds = get_random_spectral_data_dts(n_elems)
+        sd = SpectralData(
+            sds[0].wlens.copy(),
+            [sds[0].data[0] for _ in range(n_elems)],
+            [sds[0].uncertainties[0] for _ in range(n_elems)],
+            None,
+        )
+        comp = ComparisonData(
+            SpectralData(
+                sd.wlens.copy(), sd.data.copy(), sd.uncertainties.copy(), None
+            ),
+            SpectralData(
+                sd.wlens.copy(), sd.data.copy(), sd.uncertainties.copy(), None
+            ),
+            SpectralData(
+                sd.wlens.copy(), sd.data.copy(), sd.uncertainties.copy(), None
+            ),
+            sd.data[0],
+            sd.data[0],
+            0,
+            3,
+            sd.wlens.copy(),
+            [None, None, None],
+            [True, True, True],
+            sds[1],
+            0,
+            _get_random_moondatas_from_mpas(mpas[i]),
+        )
+        comps.append(comp)
+    return comps
 
 
 class TestCompUtils(unittest.TestCase):
@@ -238,6 +286,40 @@ class TestCompUtils(unittest.TestCase):
         np.testing.assert_array_equal(comp.simulated_signal.data, smeans)
         dmeans = np.array([np.mean(c.diffs_signal.data) for c in comps])
         np.testing.assert_array_equal(comp.diffs_signal.data, dmeans)
+
+    def test_filter3sigmasiter_once_ok(self):
+        n_elems = 100
+        comps = _get_comps_for_filter(n_elems)
+        preshapes = [co.observed_signal.data.shape for co in comps]
+        for co in comps:
+            _filter_out_3sigmas_comp(co)
+        shapes = [co.observed_signal.data.shape for co in comps]
+        self.assertEqual(preshapes, shapes)
+        comps[1].diffs_signal.data[0] = comps[1].diffs_signal.data[2] * 1e10
+        comps[1].diffs_signal.data[1] = comps[1].diffs_signal.data[2] * 1e3
+        comps[1].standard_deviation_mrd = np.std(comps[1].diffs_signal.data)
+        comps[1].mean_relative_difference = np.mean(comps[1].diffs_signal.data)
+        for co in comps:
+            _filter_out_3sigmas_comp(co)
+        shapes = [co.observed_signal.data.shape for co in comps]
+        self.assertNotEqual(preshapes, shapes)
+        self.assertEqual(comps[1].observed_signal.data.shape[0], n_elems - 1)
+
+    def test_filter3sigmasiter_iter_ok(self):
+        n_elems = 100
+        comps = _get_comps_for_filter(n_elems)
+        preshapes = [co.observed_signal.data.shape for co in comps]
+        comps = filter_out_3sigmas_iter(comps)
+        shapes = [co.observed_signal.data.shape for co in comps]
+        self.assertEqual(preshapes, shapes)
+        comps[1].diffs_signal.data[0] = comps[1].diffs_signal.data[2] * 1e10
+        comps[1].diffs_signal.data[1] = comps[1].diffs_signal.data[2] * 1e3
+        comps[1].standard_deviation_mrd = np.std(comps[1].diffs_signal.data)
+        comps[1].mean_relative_difference = np.mean(comps[1].diffs_signal.data)
+        comps = filter_out_3sigmas_iter(comps)
+        shapes = [co.observed_signal.data.shape for co in comps]
+        self.assertNotEqual(preshapes, shapes)
+        self.assertEqual(comps[1].observed_signal.data.shape[0], n_elems - 2)
 
 
 if __name__ == "__main__":
