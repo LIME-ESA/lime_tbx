@@ -27,15 +27,14 @@ parse_args() {
 
 compile_c() {
   echo "[build] Compiling C code (EO-CFI) for macOS..."
-  cd repo/lime_tbx/business/eocfi_adapter/eocfi_c
+  cd lime_tbx/business/eocfi_adapter/eocfi_c
   cp MakefileDarwin.mak Makefile
   make
-  cd ../../../../..
+  cd ../../../..
 }
 
 package_python() {
   echo "[build] Packaging Python app for macOS..."
-  cd repo
   rm -rf lime_tbx.egg-info dist build
   # python3.9 is the manually installed, we avoid using the builtin one
   python3.9 -m build
@@ -47,7 +46,7 @@ package_python() {
   pyinstaller lime_tbx.spec
   cd deployment/installer
   ./build_mac_installer.sh
-  cd ../../..
+  cd ../..
 }
 
 main() {
