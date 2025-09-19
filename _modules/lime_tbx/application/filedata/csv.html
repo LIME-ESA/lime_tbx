@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.application.filedata.csv &mdash; Lime Tbx 1.2.2 documentation</title>
+  <title>lime_tbx.application.filedata.csv &mdash; Lime Tbx 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fd7cadf9"></script>
+      <script src="../../../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -126,11 +126,15 @@
     <span class="n">SpectralValidity</span><span class="p">,</span>
     <span class="n">SurfacePoint</span><span class="p">,</span>
     <span class="n">CustomPoint</span><span class="p">,</span>
+    <span class="n">MultipleCustomPoint</span><span class="p">,</span>
+    <span class="n">SatellitePoint</span><span class="p">,</span>
     <span class="n">ComparisonData</span><span class="p">,</span>
     <span class="n">MoonData</span><span class="p">,</span>
+    <span class="n">LimeException</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompFields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.moon_data_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoonDataFactory</span>
 
 <span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
@@ -141,6 +145,9 @@
 
 <span class="n">_EXPORT_ERROR_STR</span> <span class="o">=</span> <span class="s2">&quot;Error while exporting as CSV. See log for details.&quot;</span>
 <span class="n">_READ_FILE_DTS_ERROR_STR</span> <span class="o">=</span> <span class="s2">&quot;There was a problem while loading datetimes csv file.</span><span class="se">\n\</span>
+<span class="s2">Check that every row has the correct format and see log for details.&quot;</span>
+<span class="n">_READ_FILE_SELENOPTS_ERROR_STR</span> <span class="o">=</span> <span class="s2">&quot;There was a problem while loading selnographic</span><span class="se">\</span>
+<span class="s2">points csv file.</span><span class="se">\n\</span>
 <span class="s2">Check that every row has the correct format and see log for details.&quot;</span>
 <span class="n">_WARN_OUT_MPA_RANGE</span> <span class="o">=</span> <span class="s2">&quot;The LIME can only give a reliable simulation </span><span class="se">\</span>
 <span class="s2">for absolute moon phase angles between 2° and 90°&quot;</span>
@@ -161,20 +168,11 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;datetime&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dt</span><span class="p">)])</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;moon phase angle (deg)&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">moon_phase_angle</span><span class="p">])</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;distance observer moon (km)&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">distance_observer_moon</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;distance sun moon (AU)&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">])</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;selenographic latitude of observer (deg)&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">selen_obs_lat</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;selenographic longitude of observer (deg)&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">selen_obs_lon</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;selenographic longitude of sun (rad)&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">selen_sun_lon</span><span class="p">]</span>
-            <span class="p">)</span>
+            <span class="n">mds</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_from_custom</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+            <span class="n">_write_moondata</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">mds</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">MultipleCustomPoint</span><span class="p">):</span>
+            <span class="n">mds</span> <span class="o">=</span> <span class="n">MoonDataFactory</span><span class="o">.</span><span class="n">get_md_from_multi_custom</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+            <span class="n">_write_moondata</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">mds</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;satellite&quot;</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
             <span class="n">dt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">dt</span>
@@ -303,28 +301,35 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">some_out_mpa_range</span><span class="p">:</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="n">_WARN_OUT_MPA_RANGE</span><span class="p">])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
-                <span class="c1"># CustomPoint data already written with write_moondata</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">CustomPoint</span><span class="p">,</span> <span class="n">MultipleCustomPoint</span><span class="p">))</span> <span class="ow">or</span> <span class="n">mda</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># MultiCustomPoint and CustomPoint data already written with write_moondata</span>
                 <span class="n">_write_point</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mda</span><span class="p">:</span>
                 <span class="n">_write_moondata</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">mda</span><span class="p">)</span>
             <span class="n">ylabels</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">cimel_ylabels</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">)</span> <span class="ow">and</span> <span class="n">point</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">dts</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">dt</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">dts</span><span class="p">]</span>
-                    <span class="n">inside_mpa_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">inside_mpa_range</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">inside_mpa</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">inside_mpa_range</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">SurfacePoint</span><span class="p">,</span> <span class="n">SatellitePoint</span><span class="p">)):</span>
+                    <span class="n">dts</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">dt</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">dts</span><span class="p">]</span>
+                        <span class="n">inside_mpa_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">inside_mpa_range</span><span class="p">]</span>
+                    <span class="n">ids</span> <span class="o">=</span> <span class="n">dts</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">pts</span><span class="p">))]</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">inside_mpa</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">inside_mpa_range</span><span class="p">):</span>
                     <span class="n">warn_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">inside_mpa</span><span class="p">:</span>
                         <span class="n">warn_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot; **&quot;</span>
-                    <span class="n">dtprint</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">timespec</span><span class="o">=</span><span class="s2">&quot;milliseconds&quot;</span><span class="p">)</span>
-                    <span class="n">ylab</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dtprint</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+                        <span class="n">idprint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">idprint</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">timespec</span><span class="o">=</span><span class="s2">&quot;milliseconds&quot;</span><span class="p">)</span>
+                    <span class="n">ylab</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idprint</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="n">ylabels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ylab</span><span class="p">)</span>
                     <span class="n">cimel_ylabels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ylab</span><span class="p">)</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_uncs</span><span class="p">:</span>
-                        <span class="n">halfy2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dtprint</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2"> uncertainties (k=2)&quot;</span>
+                        <span class="n">halfy2</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idprint</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ylabel</span><span class="si">}</span><span class="s2"> uncertainties (k=2)&quot;</span>
                         <span class="n">ylabels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">halfy2</span><span class="si">}{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="n">cimel_ylabels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">halfy2</span><span class="si">}{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -620,7 +625,9 @@
             <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;LIME coefficients version&quot;</span><span class="p">,</span> <span class="n">coeff_version</span><span class="p">])</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;Interpolation spectrum&quot;</span><span class="p">,</span> <span class="n">interp_spectrum_name</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">mpa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mpa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">MultipleCustomPoint</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">)</span>
+            <span class="p">):</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;moon phase angle (deg)&quot;</span><span class="p">,</span> <span class="n">mpa</span><span class="p">])</span>
             <span class="n">some_out_mpa_range</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="ow">not</span> <span class="n">inside_mpa_range</span>
@@ -632,25 +639,27 @@
             <span class="n">_write_point</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;srf name&quot;</span><span class="p">,</span> <span class="n">srf</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
             <span class="n">irr_titles</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">)</span> <span class="ow">and</span> <span class="n">point</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">dts</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">dt</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                    <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">dts</span><span class="p">]</span>
-                    <span class="n">inside_mpa_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">inside_mpa_range</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">inside_mpa</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">inside_mpa_range</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">SurfacePoint</span><span class="p">,</span> <span class="n">SatellitePoint</span><span class="p">)):</span>
+                    <span class="n">ids</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">dt</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
+                        <span class="n">inside_mpa_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">inside_mpa_range</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ids</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">pts</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">inside_mpa</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">inside_mpa_range</span><span class="p">):</span>
                     <span class="n">warn_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">inside_mpa</span><span class="p">:</span>
                         <span class="n">warn_out_mpa_range</span> <span class="o">=</span> <span class="s2">&quot; **&quot;</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+                        <span class="n">idstr</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">timespec</span><span class="o">=</span><span class="s2">&quot;milliseconds&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">idstr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
                     <span class="n">irr_titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> irradiances (Wm⁻²nm⁻¹)</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">dt</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">timespec</span><span class="o">=</span><span class="s2">&quot;milliseconds&quot;</span><span class="p">),</span>
-                            <span class="n">warn_out_mpa_range</span><span class="p">,</span>
-                        <span class="p">)</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idstr</span><span class="si">}</span><span class="s2"> irradiances (Wm⁻²nm⁻¹)</span><span class="si">{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_uncs</span><span class="p">:</span>
-                        <span class="n">irr_titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dt</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">timespec</span><span class="o">=</span><span class="s1">&#39;milliseconds&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> uncertainties</span><span class="si">{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span>
-                        <span class="p">)</span>
+                        <span class="n">irr_titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">idstr</span><span class="si">}</span><span class="s2"> uncertainties</span><span class="si">{</span><span class="n">warn_out_mpa_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">irr_titles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;irradiances (Wm⁻²nm⁻¹)&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_uncs</span><span class="p">:</span>
@@ -690,7 +699,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dts: list of datetime</span>
-<span class="sd">        Datetimes that where stored in that file.</span>
+<span class="sd">        Datetimes that were stored in that file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
@@ -713,6 +722,59 @@
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">_READ_FILE_DTS_ERROR_STR</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_selenopoints">
+<a class="viewcode-back" href="../../../../content/api/lime_tbx.application.filedata.csv.html#lime_tbx.application.filedata.csv.read_selenopoints">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_selenopoints</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CustomPoint</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a custompoint data-series CSV file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path: str</span>
+<span class="sd">        Path where the file is stored.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pts: list of CustomPoint</span>
+<span class="sd">        Selenographic CustomPoint that were stored in that file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">points</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CustomPoint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">row</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">irow</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+                <span class="n">dsm</span><span class="p">,</span> <span class="n">dom</span><span class="p">,</span> <span class="n">solat</span><span class="p">,</span> <span class="n">solon</span><span class="p">,</span> <span class="n">sslon</span><span class="p">,</span> <span class="n">mpa</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">irow</span><span class="p">)</span>
+                <span class="n">pt</span> <span class="o">=</span> <span class="n">CustomPoint</span><span class="p">(</span>
+                    <span class="n">dsm</span><span class="p">,</span> <span class="n">dom</span><span class="p">,</span> <span class="n">solat</span><span class="p">,</span> <span class="n">solon</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">sslon</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">mpa</span><span class="p">),</span> <span class="n">mpa</span>
+                <span class="p">)</span>
+                <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">_READ_FILE_SELENOPTS_ERROR_STR</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+        <span class="n">msgs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">pt</span><span class="o">.</span><span class="n">distance_sun_moon</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="p">:</span>
+            <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Dist. Sun-Moon (AU) must be between 0.5 and 1.5&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">pt</span><span class="o">.</span><span class="n">distance_observer_moon</span> <span class="o">&lt;=</span> <span class="mi">1000000</span><span class="p">:</span>
+            <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Dist. Obs-Moon (km) must be between 1 and 1000000&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">90</span> <span class="o">&lt;=</span> <span class="n">pt</span><span class="o">.</span><span class="n">selen_obs_lat</span> <span class="o">&lt;=</span> <span class="mi">90</span><span class="p">:</span>
+            <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Obs. sel. lat. (°) must be between -90 and 90&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">180</span> <span class="o">&lt;=</span> <span class="n">pt</span><span class="o">.</span><span class="n">selen_obs_lon</span> <span class="o">&lt;=</span> <span class="mi">180</span><span class="p">:</span>
+            <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Obs. sel. lon. (°) must be between -180 and 180&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">180</span> <span class="o">&lt;=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">selen_sun_lon</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">180</span><span class="p">:</span>
+            <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Sun sel. lon. (°) must be between -180 and 180&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">180</span> <span class="o">&lt;=</span> <span class="n">pt</span><span class="o">.</span><span class="n">moon_phase_angle</span> <span class="o">&lt;=</span> <span class="mi">180</span><span class="p">:</span>
+            <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Moon phase angle (°) must be between -180 and 180&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msgs</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid values in point </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">points</span></div>
 
 </pre></div>
 

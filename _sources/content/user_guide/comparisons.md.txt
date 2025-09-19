@@ -1,11 +1,11 @@
 # Comparisons
 
 Users must switch to the comparison page. Go to the action menu bar and navigate
-to "File → Perform comparisons from a remote sensing instrument" as seen in [Figure 15](#fig-15).
+to "File → Perform comparisons from a remote sensing instrument" as seen in [Figure 17](#fig-17).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/action_to_comparisons.png
-   :name: fig-15
+   :name: fig-17
    :align: center
    :alt: Action menu option to switch to the comparisons page
 
@@ -16,14 +16,14 @@ to "File → Perform comparisons from a remote sensing instrument" as seen in [F
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/initial_comparison_page.png
-   :name: fig-16
+   :name: fig-18
    :align: center
    :alt: Initial view of the comparison page
 
    Initial view of the comparison page.
 ```
 
-The comparison page ([Figure 16](#fig-16)) contains the user input fields at the top:
+The comparison page ([Figure 18](#fig-18)) contains the user input fields at the top:
 - **Lunar Observation Files**:
   - Instrument observation netCDF files in GLOD format to be compared.
     - GLOD formats are explained in the [File Formats](./formats.md) section.
@@ -34,12 +34,12 @@ The comparison page ([Figure 16](#fig-16)) contains the user input fields at the
     - Must contain channels matching those in the observation files.
   - "LOAD FILE": Opens a file selection dialog for selecting the SRF file.
 - **Compare Button**:
-  - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 17](#fig-17)).
+  - Initiates the comparison processing, displaying a progress indicator (as shown in [Figure 19](#fig-19)).
   - This button is enabled once valid observations and an SRF file are loaded.
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/processing_comparison_page.png
-   :name: fig-17
+   :name: fig-19
    :align: center
    :alt: Comparison page processing comparisons
 
@@ -49,11 +49,11 @@ The comparison page ([Figure 16](#fig-16)) contains the user input fields at the
 ## Comparison Output
 
 Once comparisons are computed, the comparison page presents the results and
-provides tools for exploring the data, as shown in [Figure 18](#fig-18).
+provides tools for exploring the data, as shown in [Figure 20](#fig-20).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/comparison_finished.png
-   :name: fig-18
+   :name: fig-20
    :align: center
    :alt: Comparison page after comparisons are computed
 
@@ -77,13 +77,16 @@ provides tools for exploring the data, as shown in [Figure 18](#fig-18).
   - **Moon phase angle**
   - **Wavelength**, with two visualization options:
     - **Mean-based Comparison**: Computes the mean of all observations and simulations for each channel.
-    - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 19](#fig-19).
+    - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 21](#fig-21).
+- **Filter outliers**: Iteratively remove data points that deviate by three or more standard deviations from
+  the mean. The process continues automatically until all remaining points fall within the range.
+  To apply it, press the "FILTER 3σ" button. 
 - **New Comparison**: Click "NEW" (top-left) to clear results and start a new comparison.  
-  - A **confirmation dialog** appears, as shown in [Figure 20](#fig-20).
+  - A **confirmation dialog** appears, as shown in [Figure 22](#fig-22).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/boxplot_meaning.png
-   :name: fig-19
+   :name: fig-21
    :align: center
    :alt: LIME comparisons boxplots dissected
 
@@ -92,7 +95,7 @@ provides tools for exploring the data, as shown in [Figure 18](#fig-18).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/clear_comparison.png
-   :name: fig-20
+   :name: fig-22
    :align: center
    :alt: Dialog asking for confirmation after clicking \"NEW\"
 
@@ -178,4 +181,11 @@ Specify the netCDF file path:
 **Example:**
 ```sh
 -o nc,output.nc
+```
+
+### CLI Comparison Filters
+
+Users can also apply the 3σ outlier filter by adding the `--filter3sigma` flag:
+```sh
+lime -c "files/*.nc" --filter3sigma
 ```

@@ -9,11 +9,11 @@ These models are continuously updated, improving their accuracy with each new co
 
 To update the coefficients, navigate to "Coefficients → Download updated coefficients" in the action menu bar.
 
-A window will appear indicating that the coefficient download is in progress, as shown in [Figure 21](#fig-21).
+A window will appear indicating that the coefficient download is in progress, as shown in [Figure 23](#fig-23).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/downloading_coefficients.png
-   :name: fig-21
+   :name: fig-23
    :align: center
    :alt: Window displaying coefficients download in progress
 
@@ -24,13 +24,13 @@ Once the process is complete, the window will display:
 - The number of new coefficient versions downloaded.  
 - Any errors encountered during the download.
 
-The result may indicate that new coefficients were downloaded ([Figure 22](#fig-22))
-or that no new updates were available ([Figure 23](#fig-23)).
-If there was an issue connecting to the coefficients server, an error message will be displayed ([Figure 24](#fig-24)).
+The result may indicate that new coefficients were downloaded ([Figure 24](#fig-24))
+or that no new updates were available ([Figure 25](#fig-25)).
+If there was an issue connecting to the coefficients server, an error message will be displayed ([Figure 26](#fig-26)).
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/download_coeffs_one.png
-   :name: fig-22
+   :name: fig-24
    :align: center
    :alt: Window displaying that there was one new coefficient version
 
@@ -39,7 +39,7 @@ If there was an issue connecting to the coefficients server, an error message wi
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/download_coeffs_none.png
-   :name: fig-23
+   :name: fig-25
    :align: center
    :alt: Window displaying that there were no new coefficients
 
@@ -48,7 +48,7 @@ If there was an issue connecting to the coefficients server, an error message wi
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/download_coeffs_err.png
-   :name: fig-24
+   :name: fig-26
    :align: center
    :alt: Window displaying that there were errors downloading the coefficients
 
@@ -66,7 +66,7 @@ lime -u
 
 To use a specific coefficient version, navigate to "Coefficients → Select coefficients" in the action menu bar.
 
-A window will appear, displaying a dropdown menu containing all available coefficient versions ([Figure 25](#fig-25)).
+A window will appear, displaying a dropdown menu containing all available coefficient versions ([Figure 27](#fig-27)).
 To change the version:
 1. Open the dropdown menu.
 2. Select the desired coefficient version.
@@ -74,7 +74,7 @@ To change the version:
 
 ```{eval-rst}
 .. figure:: ../../images/user_guide/select_coefficients.png
-   :name: fig-25
+   :name: fig-27
    :align: center
    :alt: Window displaying coefficient selection options
 

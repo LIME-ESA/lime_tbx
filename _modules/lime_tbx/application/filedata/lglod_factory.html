@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.application.filedata.lglod_factory &mdash; Lime Tbx 1.2.2 documentation</title>
+  <title>lime_tbx.application.filedata.lglod_factory &mdash; Lime Tbx 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fd7cadf9"></script>
+      <script src="../../../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -228,7 +228,7 @@
             <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elrefs_cimel</span>
         <span class="p">]</span>
     <span class="n">signals</span> <span class="o">=</span> <span class="n">lime_simulation</span><span class="o">.</span><span class="n">get_signals</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">SurfacePoint</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">SatellitePoint</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">SurfacePoint</span><span class="p">,</span> <span class="n">SatellitePoint</span><span class="p">)):</span>
         <span class="n">dts</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">dt</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">dts</span><span class="p">]</span>
@@ -278,44 +278,50 @@
                 <span class="n">constants</span><span class="o">.</span><span class="n">LIME_TBX_DATA_SOURCE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">obs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ob</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
-        <span class="n">sat_pos</span> <span class="o">=</span> <span class="n">SatellitePosition</span><span class="p">(</span>
-            <span class="o">*</span><span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_rectangular_same_frame</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="p">(</span>
-                        <span class="n">point</span><span class="o">.</span><span class="n">selen_obs_lat</span><span class="p">,</span>
-                        <span class="n">point</span><span class="o">.</span><span class="n">selen_obs_lon</span><span class="p">,</span>
-                        <span class="n">point</span><span class="o">.</span><span class="n">distance_observer_moon</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="p">],</span>
-                <span class="s2">&quot;MOON&quot;</span><span class="p">,</span>
-                <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
-            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">sat_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Custom or MultiCustom</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">CustomPoint</span><span class="p">):</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">point</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">pts</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">sat_pos_ref</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">MOON_FRAME</span>
-        <span class="n">obs</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">LunarObservationWrite</span><span class="p">(</span>
-                <span class="n">ch_names</span><span class="p">,</span>
-                <span class="n">sat_pos_ref</span><span class="p">,</span>
-                <span class="kc">None</span><span class="p">,</span>
-                <span class="n">sat_pos</span><span class="p">,</span>
-                <span class="n">elis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">elrefs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">polars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">aolp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">sat_name</span><span class="p">,</span>
-                <span class="n">SelenographicDataWrite</span><span class="p">(</span>
-                    <span class="n">point</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">,</span>
-                    <span class="n">point</span><span class="o">.</span><span class="n">selen_sun_lon</span><span class="p">,</span>
-                    <span class="n">point</span><span class="o">.</span><span class="n">moon_phase_angle</span><span class="p">,</span>
-                    <span class="n">point</span><span class="o">.</span><span class="n">selen_obs_lat</span><span class="p">,</span>
-                    <span class="n">point</span><span class="o">.</span><span class="n">selen_obs_lon</span><span class="p">,</span>
-                    <span class="n">point</span><span class="o">.</span><span class="n">distance_observer_moon</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="n">constants</span><span class="o">.</span><span class="n">LIME_TBX_DATA_SOURCE</span><span class="p">,</span>
+        <span class="n">sat_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+            <span class="n">sat_pos</span> <span class="o">=</span> <span class="n">SatellitePosition</span><span class="p">(</span>
+                <span class="o">*</span><span class="n">SPICEAdapter</span><span class="o">.</span><span class="n">to_rectangular_same_frame</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span>
+                            <span class="n">pt</span><span class="o">.</span><span class="n">selen_obs_lat</span><span class="p">,</span>
+                            <span class="n">pt</span><span class="o">.</span><span class="n">selen_obs_lon</span><span class="p">,</span>
+                            <span class="n">pt</span><span class="o">.</span><span class="n">distance_observer_moon</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;MOON&quot;</span><span class="p">,</span>
+                    <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
+                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="p">)</span>
-        <span class="p">]</span>
+            <span class="n">obs</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">LunarObservationWrite</span><span class="p">(</span>
+                    <span class="n">ch_names</span><span class="p">,</span>
+                    <span class="n">sat_pos_ref</span><span class="p">,</span>
+                    <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">sat_pos</span><span class="p">,</span>
+                    <span class="n">elis</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">elrefs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">polars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">aolp</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">sat_name</span><span class="p">,</span>
+                    <span class="n">SelenographicDataWrite</span><span class="p">(</span>
+                        <span class="n">pt</span><span class="o">.</span><span class="n">distance_sun_moon</span><span class="p">,</span>
+                        <span class="n">pt</span><span class="o">.</span><span class="n">selen_sun_lon</span><span class="p">,</span>
+                        <span class="n">pt</span><span class="o">.</span><span class="n">moon_phase_angle</span><span class="p">,</span>
+                        <span class="n">pt</span><span class="o">.</span><span class="n">selen_obs_lat</span><span class="p">,</span>
+                        <span class="n">pt</span><span class="o">.</span><span class="n">selen_obs_lon</span><span class="p">,</span>
+                        <span class="n">pt</span><span class="o">.</span><span class="n">distance_observer_moon</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">constants</span><span class="o">.</span><span class="n">LIME_TBX_DATA_SOURCE</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
     <span class="n">is_not_default_srf</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">srf</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_SRF_NAME</span>

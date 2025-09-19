@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulations &mdash; Lime Tbx 1.2.2 documentation</title>
+  <title>Simulations &mdash; Lime Tbx 1.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fd7cadf9"></script>
+      <script src="../../_static/documentation_options.js?v=1f29e9d3"></script>
       <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -69,6 +69,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#simulation-using-selenographic-coordinates">Simulation Using Selenographic Coordinates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-points-input">Multiple Points Input</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Command-Line Interface (CLI)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id2">Example</a></li>
 </ul>
@@ -262,6 +263,31 @@ Users must provide:</p>
 <p><span class="caption-number"><i>Figure 9:</i> </span><span class="caption-text">Selenographic coordinates input.</span><a class="headerlink" href="#fig-9" title="Link to this image"></a></p>
 </figcaption>
 </figure>
+<section id="multiple-points-input">
+<h3>Multiple Points Input<a class="headerlink" href="#multiple-points-input" title="Link to this heading"></a></h3>
+<p>You can load several selenographic coordinates at once instead of entering them individually.</p>
+<figure class="align-center" id="fig-10">
+<img alt="Selenographic tab's dropdown menu, with Multiple Points option highlighted" src="../../_images/dropdown_multiseleno.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 10:</i> </span><span class="caption-text">Selenographic tab’s dropdown menu, with Multiple Points option highlighted.</span><a class="headerlink" href="#fig-10" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<ol class="arabic simple">
+<li><p>Open the Selenographic tab’s dropdown menu and select Multiple Points (<a class="reference internal" href="#fig-10">Figure 10</a>).</p></li>
+<li><p>The multiple selenographic input page will appear (<a class="reference internal" href="#fig-11">Figure 11</a>). Click “LOAD FILE” and choose
+a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file containing the coordinates.</p></li>
+</ol>
+<figure class="align-center" id="fig-11">
+<img alt="Multiple selenographic points input page" src="../../_images/initial_multiseleno_page.png" />
+<figcaption>
+<p><span class="caption-number"><i>Figure 11:</i> </span><span class="caption-text">Multiple selenographic points input page.</span><a class="headerlink" href="#fig-11" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The file should have one point per line, with six comma-separated values in the following order:</p>
+<div class="highlight-csv notranslate"><div class="highlight"><pre><span></span>sun_moon_distance_au,observer_moon_distance_km,observer_selenographic_latitude_deg,observer_selenographic_longitude_deg,solar_selenographic_longitude_deg,moon_phase_angle_deg
+</pre></div>
+</div>
+</section>
 <section id="id1">
 <h3>Command-Line Interface (CLI)<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">-l</span></code> or <code class="docutils literal notranslate"><span class="pre">--lunar</span></code> option:</p>
@@ -281,7 +307,7 @@ selenographic latitude and longitude of the observer,
 </section>
 <section id="simulation-using-satellite-positions">
 <h2>Simulation Using Satellite Positions<a class="headerlink" href="#simulation-using-satellite-positions" title="Link to this heading"></a></h2>
-<p>Selecting the <strong>“Satellite”</strong> tab enables simulation based on <strong>orbiting satellites</strong> (<a class="reference internal" href="#fig-10">Figure 10</a>).<br />
+<p>Selecting the <strong>“Satellite”</strong> tab enables simulation based on <strong>orbiting satellites</strong> (<a class="reference internal" href="#fig-12">Figure 12</a>).<br />
 Users must:</p>
 <ul class="simple">
 <li><p><strong>Select a satellite</strong> from the available list.</p></li>
@@ -290,7 +316,7 @@ Users must:</p>
 <blockquote>
 <div><p><em>Note:</em> Time-series input works the same as in <a class="reference internal" href="#simulation-using-geographic-coordinates"><span class="xref myst">Geographic Coordinates</span></a>.</p>
 </div></blockquote>
-<p>Selecting the “Satellite” tab enables simulations based on orbiting satellite (<a class="reference internal" href="#fig-10">Figure 10</a>).
+<p>Selecting the “Satellite” tab enables simulations based on orbiting satellite (<a class="reference internal" href="#fig-12">Figure 12</a>).
 Users must:</p>
 <ul>
 <li><p><strong>Select a satellite</strong> from the available list.</p></li>
@@ -300,10 +326,10 @@ Users must:</p>
 </div></blockquote>
 </li>
 </ul>
-<figure class="align-center" id="fig-10">
+<figure class="align-center" id="fig-12">
 <img alt="Satellite position input" src="../../_images/satellite_input.png" />
 <figcaption>
-<p><span class="caption-number"><i>Figure 10:</i> </span><span class="caption-text">Satellite position input.</span><a class="headerlink" href="#fig-10" title="Link to this image"></a></p>
+<p><span class="caption-number"><i>Figure 12:</i> </span><span class="caption-text">Satellite position input.</span><a class="headerlink" href="#fig-12" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <section id="adding-a-new-satellite">
@@ -311,7 +337,7 @@ Users must:</p>
 <p>It’s possible to add user-defined satellites to the list of available satellites.</p>
 <ol class="arabic simple">
 <li><p>Click the button with a plus (+) sign on the right of the dropdown.</p></li>
-<li><p>The user will be prompted with the <em>Add Satellite Data</em> window (<a class="reference internal" href="#fig-11">Figure 11</a>).</p></li>
+<li><p>The user will be prompted with the <em>Add Satellite Data</em> window (<a class="reference internal" href="#fig-13">Figure 13</a>).</p></li>
 <li><p>Click “LOAD FILE” which opens a file selection dialog where users can load Orbit Scenario Files
 (OSF) or Three-Line Element Set files (TLE/3LE).</p></li>
 <li><p>The <em>Add Satellite Data</em> window will now display information of the loaded file, and the user
@@ -324,10 +350,10 @@ must fill the last details.</p>
 </li>
 <li><p>Click “SAVE SATELLITE DATA” to store the loaded data in the local LIME Toolbox system.</p></li>
 </ol>
-<figure class="align-center" id="fig-11">
+<figure class="align-center" id="fig-13">
 <img alt="Add Satellite Data window" src="../../_images/add_satellite_data_window.png" />
 <figcaption>
-<p><span class="caption-number"><i>Figure 11:</i> </span><span class="caption-text">Add Satellite Data window.</span><a class="headerlink" href="#fig-11" title="Link to this image"></a></p>
+<p><span class="caption-number"><i>Figure 13:</i> </span><span class="caption-text">Add Satellite Data window.</span><a class="headerlink" href="#fig-13" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -362,11 +388,11 @@ Users can select one of the following button to run simulations and view results
 <li><p><strong>“DOLP”</strong> – Visualises the Degree of Linear Polarisation (DoLP).</p></li>
 <li><p><strong>“AOLP”</strong> – Visualises the Angle of Linear Polarisation (AoLP).</p></li>
 </ul>
-<p>These buttons are positioned between the input and the output, as shown on top of <a class="reference internal" href="#fig-12">Figure 12</a>.</p>
-<figure class="align-center" id="fig-12">
+<p>These buttons are positioned between the input and the output, as shown on top of <a class="reference internal" href="#fig-14">Figure 14</a>.</p>
+<figure class="align-center" id="fig-14">
 <img alt="Simulation output" src="../../_images/simulation_output.png" />
 <figcaption>
-<p><span class="caption-number"><i>Figure 12:</i> </span><span class="caption-text">Simulation output.</span><a class="headerlink" href="#fig-12" title="Link to this image"></a></p>
+<p><span class="caption-number"><i>Figure 14:</i> </span><span class="caption-text">Simulation output.</span><a class="headerlink" href="#fig-14" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Results are plotted with:</p>
@@ -450,18 +476,18 @@ based on the desired output type.</p>
 <section id="integrated-irradiance">
 <h2>Integrated Irradiance<a class="headerlink" href="#integrated-irradiance" title="Link to this heading"></a></h2>
 <p>LIME Toolbox integrates the calculated irradiance over the selected spectral response function (SRF).
-These values appear in the “Signal” tab (<a class="reference internal" href="#fig-13">Figure 13</a>), showing one value per SRF channel,
+These values appear in the “Signal” tab (<a class="reference internal" href="#fig-15">Figure 15</a>), showing one value per SRF channel,
 and can be exported as CSV.</p>
-<figure class="align-center" id="fig-13">
+<figure class="align-center" id="fig-15">
 <img alt="Signal tab showing some results for the CIMEL SRF" src="../../_images/signal_tab.png" />
 <figcaption>
-<p><span class="caption-number"><i>Figure 13:</i> </span><span class="caption-text">Signal tab showing some results for the CIMEL SRF.</span><a class="headerlink" href="#fig-13" title="Link to this image"></a></p>
+<p><span class="caption-number"><i>Figure 15:</i> </span><span class="caption-text">Signal tab showing some results for the CIMEL SRF.</span><a class="headerlink" href="#fig-15" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <section id="spectral-response-functions-srf">
 <h3>Spectral Response Functions (SRF)<a class="headerlink" href="#spectral-response-functions-srf" title="Link to this heading"></a></h3>
 <p>Users can visualise, load, and switch between different SRFs in the “SRF” tab
-(<a class="reference internal" href="#fig-14">Figure 14</a>). This tab presents:</p>
+(<a class="reference internal" href="#fig-16">Figure 16</a>). This tab presents:</p>
 <ul class="simple">
 <li><p>A graph of the currently selected SRF, where:</p>
 <ul>
@@ -471,17 +497,17 @@ and can be exported as CSV.</p>
 </li>
 <li><p>Two vertical black lines marking the lower and upper simulation limits of LIME Toolbox.</p></li>
 </ul>
-<figure class="align-center" id="fig-14">
+<figure class="align-center" id="fig-16">
 <img alt="SRF tab showing CIMEL SRF" src="../../_images/srf_tab.png" />
 <figcaption>
-<p><span class="caption-number"><i>Figure 14:</i> </span><span class="caption-text">SRF tab showing CIMEL SRF.</span><a class="headerlink" href="#fig-14" title="Link to this image"></a></p>
+<p><span class="caption-number"><i>Figure 16:</i> </span><span class="caption-text">SRF tab showing CIMEL SRF.</span><a class="headerlink" href="#fig-16" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>By default, LIME Toolbox includes a default SRF that encompasses the entire LIME spectrum, named “Default”.</p>
 <section id="loading-a-new-srf">
 <h4>Loading a New SRF<a class="headerlink" href="#loading-a-new-srf" title="Link to this heading"></a></h4>
 <ol class="arabic simple">
-<li><p>Click “LOAD” (top-right corner in <a class="reference internal" href="#fig-14">Figure 14</a>).</p></li>
+<li><p>Click “LOAD” (top-right corner in <a class="reference internal" href="#fig-16">Figure 16</a>).</p></li>
 <li><p>Select a netCDF SRF file in GLOD format (explained in the <a class="reference internal" href="formats.html"><span class="std std-doc">File Formats</span></a> section).</p></li>
 <li><p>Once loaded, use the dropdown menu next to the “LOAD” button to switch between SRFs.</p></li>
 </ol>
