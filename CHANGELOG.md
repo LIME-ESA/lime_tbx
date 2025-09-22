@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Fixed
+
+- About page picture links now work on Linux.
+
 ## [1.3.0] - 2025-09-19
 
 ### Added

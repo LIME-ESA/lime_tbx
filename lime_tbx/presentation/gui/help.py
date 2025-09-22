@@ -92,11 +92,11 @@ def _launch_cmd(cmd: str) -> Tuple[str, str]:
 def _try_go_to_link_sensible_browser(link: str) -> bool:
     if which("sensible-browser") is not None:
         logger.get_logger().info("Using sensible-browser to open link")
-        cmd = f"sensible-browser {link} >/dev/null 2>&1 &"
+        cmd = f"env -u LD_LIBRARY_PATH -u LD_PRELOAD sensible-browser {link} &"
         so, serr = _launch_cmd(cmd)
-        logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+        logger.get_logger().debug("Linux running '%s'\nOutput: %s", cmd, so)
         if serr is not None and len(serr) > 0:
-            logger.get_logger().error(f"Returned error: Linux {cmd}: {serr}")
+            logger.get_logger().error("Returned error: Linux '%s': %s", cmd, serr)
             return False
         return True
     return False
@@ -108,11 +108,10 @@ def _get_mimeapps_lines() -> List[str]:
     if xdg_config_home is None:
         xdg_config_home = os.path.join(user_home, ".config")
     mimeapps_list = os.path.join(xdg_config_home, "mimeapps.list")
+    lines = []
     if os.path.exists(mimeapps_list):
-        with open(mimeapps_list, "r") as fp:
+        with open(mimeapps_list, "r", encoding="utf-8") as fp:
             lines = fp.readlines()
-    else:
-        lines = []
     return lines
 
 
@@ -130,8 +129,7 @@ def _get_default_mimeapps_browser_desktopfile() -> Union[str, None]:
             end = line.index("\n") if ";" not in line else line.index(";")
             appname = line[start:end]
             return appname
-    else:
-        return None
+    return None
 
 
 def _get_default_xdg_settings_browser_desktopfile() -> Union[str, None]:
@@ -146,9 +144,9 @@ def _get_default_xdg_settings_browser_desktopfile() -> Union[str, None]:
 
 def _get_default_browser_desktoppath() -> Union[str, None]:
     appname = _get_default_xdg_settings_browser_desktopfile()
-    if appname == None:
+    if appname is None:
         appname = _get_default_mimeapps_browser_desktopfile()
-    if appname == None:
+    if appname is None:
         return None
     user_home = os.environ.get("HOME")
     desktop_folders = [
@@ -173,11 +171,11 @@ def _go_to_link(link: str) -> bool:
     if sensible_worked:
         return True
     appname = _get_default_browser_desktoppath()
-    if appname != None:
+    if appname is not None:
         try:
             # cmd = f"nohup $(grep '^Exec' {appname} | head -1 | sed 's/^Exec=//' | sed 's/%.//' | sed 's/^\"//g' | sed 's/\" *$//g') {link} >/dev/null 2>&1 &"
             line = ""
-            with open(appname) as fp:
+            with open(appname, encoding="utf-8") as fp:
                 for line in fp.readlines():
                     if line.startswith("Exec"):
                         break
@@ -185,12 +183,12 @@ def _go_to_link(link: str) -> bool:
             browsercmd = functools.reduce(
                 lambda a, b: re.sub(b, "", a), [line, "^Exec=", "%.", '^"', '" *$']
             )
-            cmd = f"nohup {browsercmd} {link} >/dev/null 2>&1 &"
+            cmd = f"nohup env -u LD_LIBRARY_PATH -u LD_PRELOAD {browsercmd} '{link}' >/dev/null 2>&1 &"
             so, serr = _launch_cmd(cmd)
-            logger.get_logger().debug(f"Linux executing {cmd}: {so}")
+            logger.get_logger().debug("Linux running '%s'\n Output: %s", cmd, so)
             if serr is not None and len(serr) > 0:
                 logger.get_logger().warning(
-                    f"Returned error messages: Linux {cmd}: {serr}"
+                    "Returned error messages: Linux '%s': %s", cmd, serr
                 )
             return True
         except Exception as e:
