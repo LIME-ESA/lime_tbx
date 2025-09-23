@@ -140,3 +140,4 @@ log_*.txt
 coeff_data/selected.txt
 doc-cov.svg
 test_report
+user_manual.pdf

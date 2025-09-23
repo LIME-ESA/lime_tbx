@@ -80,7 +80,7 @@ provides tools for exploring the data, as shown in [Figure 20](#fig-20).
     - **Boxplot Visualization**: Displays the distribution of values per channel, as explained in [Figure 21](#fig-21).
 - **Filter outliers**: Iteratively remove data points that deviate by three or more standard deviations from
   the mean. The process continues automatically until all remaining points fall within the range.
-  To apply it, press the "FILTER 3σ" button. 
+  To apply it, press the "FILTER $3\sigma$" button. 
 - **New Comparison**: Click "NEW" (top-left) to clear results and start a new comparison.  
   - A **confirmation dialog** appears, as shown in [Figure 22](#fig-22).
 
@@ -185,7 +185,7 @@ Specify the netCDF file path:
 
 ### CLI Comparison Filters
 
-Users can also apply the 3σ outlier filter by adding the `--filter3sigma` flag:
+Users can also apply the $3\sigma$ outlier filter by adding the `--filter3sigma` flag:
 ```sh
 lime -c "files/*.nc" --filter3sigma
 ```
