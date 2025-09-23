@@ -33,11 +33,12 @@ jobs:
           sphinx-build docs latex -b latex
           cp -r latex ./docs/quality_documentation/latex
       - name: Compile PDF
-        run: |
-          cd docs/quality_documentation/latex
-          make
-          cp user_manual.pdf ../../../user_manual.pdf
-          cd ../../../
+        uses: xu-cheng/latex-action@v4
+        with:
+          working_directory: docs/quality_documentation/latex
+          root_file: user_manual.tex
+      - name: Copy PDF to root
+        run: cp docs/quality_documentation/latex/user_manual.pdf user_manual.pdf
       - name: Upload PDF
         uses: actions/upload-artifact@v4
         with:
