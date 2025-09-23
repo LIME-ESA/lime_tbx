@@ -6,6 +6,8 @@ on:
       - '*'
   workflow_dispatch:
 
+permissions: write-all
+
 jobs:
   build-latex:
     runs-on: ubuntu-latest
@@ -27,7 +29,9 @@ jobs:
             MANIFEST.in
           install-cmd: pip install .[docs]
       - name: Build LaTeX
-        run: sphinx-build docs latex -b latex
+        run: |
+          sphinx-build docs latex -b latex
+          cp -r latex ./docs/quality_documentation/latex
       - name: Compile PDF
         run: |
           cd docs/quality_documentation/latex
