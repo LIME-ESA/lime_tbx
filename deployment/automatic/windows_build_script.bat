@@ -13,6 +13,9 @@ python -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
 .venv\Scripts\pip install PySide6~=6.9
 python -m PyInstaller lime_tbx.spec
+mkdir dist\LimeTBX\bin
+> dist\LimeTBX\bin\lime.cmd echo @echo off
+>> dist\LimeTBX\bin\lime.cmd echo "%%~dp0..\LimeTBX.exe" %%*
 del "deployment\installer\windows\LimeTBX installer.exe"
 cd deployment\installer\windows\
 iscc inno_installer_builder.iss
