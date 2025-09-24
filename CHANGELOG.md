@@ -9,11 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] - yyyy-mm-dd
 
+### Added
+
+- Windows: `lime` CLI shortcut is now installed to the system `PATH` for easier use from Command Prompt or PowerShell.
+
 ### Fixed
 
 - About page picture links now work on Linux.
 - Linux: CLI arguments containing spaces (e.g., JSON passed to `-i`) are now forwarded correctly by
   the launcher. Previously they could be split or mangled.
+- Windows GUI no longer leaves an idle console window open.
 
 ## [1.3.0] - 2025-09-19
 
