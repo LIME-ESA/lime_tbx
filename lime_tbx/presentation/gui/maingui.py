@@ -86,7 +86,7 @@ for absolute moon phase angles between 2° and 90°"
 
 
 def _simplify_mdas_mda(
-    mdas: Union[List[MoonData], MoonData, None]
+    mdas: Union[List[MoonData], MoonData, None],
 ) -> Union[MoonData, None]:
     mda = None
     if mdas:
@@ -1975,15 +1975,17 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._close_box.setWindowTitle("Window Close")
         self._close_box.setText("Are you sure you want to close the application?")
         yes = self._close_box.addButton(QtWidgets.QMessageBox.Yes)
-        no  = self._close_box.addButton(QtWidgets.QMessageBox.No)
+        no = self._close_box.addButton(QtWidgets.QMessageBox.No)
         self._close_box.setDefaultButton(no)
         self._close_box.setWindowModality(QtCore.Qt.ApplicationModal)
         self._close_box.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+
         def on_finished(_):
             if self._close_box.clickedButton() is yes:
                 self._get_lime_widget().propagate_close_event()
                 QtCore.QTimer.singleShot(0, QtCore.QCoreApplication.quit)
                 os.kill(os.getpid(), 9)
+
         self._close_box.finished.connect(on_finished)
         self._close_box.open()
         QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
