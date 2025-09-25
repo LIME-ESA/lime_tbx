@@ -1969,23 +1969,25 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         else:
             self.showFullScreen()
 
-    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+    def closeEvent(self, event: QtGui.QCloseEvent):
+        self._close_box = QtWidgets.QMessageBox(self)
+        self._close_box.setIcon(QtWidgets.QMessageBox.Question)
+        self._close_box.setWindowTitle("Window Close")
+        self._close_box.setText("Are you sure you want to close the application?")
+        yes = self._close_box.addButton(QtWidgets.QMessageBox.Yes)
+        no  = self._close_box.addButton(QtWidgets.QMessageBox.No)
+        self._close_box.setDefaultButton(no)
+        self._close_box.setWindowModality(QtCore.Qt.ApplicationModal)
+        self._close_box.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        def on_finished(_):
+            if self._close_box.clickedButton() is yes:
+                self._get_lime_widget().propagate_close_event()
+                QtCore.QTimer.singleShot(0, QtCore.QCoreApplication.quit)
+                os.kill(os.getpid(), 9)
+        self._close_box.finished.connect(on_finished)
+        self._close_box.open()
         QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
-        reply = QtWidgets.QMessageBox.question(
-            self,
-            "Window Close",
-            "Are you sure you want to close the application?",
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No,
-        )
-        if reply == QtWidgets.QMessageBox.Yes:
-            lime_tbx_w = self._get_lime_widget()
-            lime_tbx_w.propagate_close_event()
-            QtCore.QCoreApplication.quit()
-            os.kill(os.getpid(), 9)
-            return super().closeEvent(event)
-        else:
-            event.ignore()
+        event.ignore()
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
