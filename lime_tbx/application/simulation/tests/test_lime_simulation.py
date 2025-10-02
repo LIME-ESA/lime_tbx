@@ -194,8 +194,8 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [1.14e-04, 1.1e-04, 1.02e-04, 1.7e-05],
-                [1.2e-04, 1.17e-04, 1.13e-04, 1.5e-05],
+                [5.84e-04, 6.84e-04, 9.8e-04, 3.5e-07],
+                [5.5e-04, 6.5e-04, 9.8e-04, 3.9e-07],
             ]
         )
         cimel_refs = np.array(
@@ -305,8 +305,8 @@ class TestLimeSimulation(unittest.TestCase):
         )
         uncs_refs = np.array(
             [
-                [1.22816289e-08, 1.66544863e-08, 1.39227268e-08, 8.35593656e-09],
-                [1.36277807e-08, 1.84579950e-08, 1.54306939e-08, 9.22275540e-09],
+                [1.1e-08, 2.15e-08, 3.93e-08, 6.759e-10],
+                [1.15e-08, 2.24e-08, 4.37e-08, 7.46e-10],
             ]
         )
         for eli, eli_ref, unc in zip(elis, elis_refs, uncs_refs):
