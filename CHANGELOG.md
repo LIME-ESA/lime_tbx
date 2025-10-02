@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Windows: `lime` CLI shortcut is now installed to the system `PATH` for easier use from Command Prompt or PowerShell.
 
+### Changed
+
+- Updated ASD spectrum dataset to the latest version, incorporating more data and improved filtering, increasing overall quality.
+
 ### Fixed
 
 - About dialog picture links now work on Linux.
