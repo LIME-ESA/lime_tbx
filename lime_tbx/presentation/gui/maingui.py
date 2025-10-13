@@ -86,7 +86,7 @@ for absolute moon phase angles between 2° and 90°"
 
 
 def _simplify_mdas_mda(
-    mdas: Union[List[MoonData], MoonData, None]
+    mdas: Union[List[MoonData], MoonData, None],
 ) -> Union[MoonData, None]:
     mda = None
     if mdas:
@@ -1969,23 +1969,93 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         else:
             self.showFullScreen()
 
-    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+    def closeEvent(self, event: QtGui.QCloseEvent):
+        event.ignore()
+        if getattr(self, "_confirming_close", False):
+            return
+        self._confirming_close = True
+        QtCore.QTimer.singleShot(0, self._show_confirm_close)
+
+    def _show_confirm_close(self):
+        try:
+            self.releaseMouse()
+            self.releaseKeyboard()
+            QtWidgets.QApplication.restoreOverrideCursor()
+        except Exception:
+            pass
+        self._close_box = QtWidgets.QMessageBox(self)
+        self._close_box.setIcon(QtWidgets.QMessageBox.Question)
+        self._close_box.setWindowTitle("Window Close")
+        self._close_box.setText("Are you sure you want to close the application?")
+        yes = self._close_box.addButton(QtWidgets.QMessageBox.Yes)
+        no = self._close_box.addButton(QtWidgets.QMessageBox.No)
+        self._close_box.setDefaultButton(no)
+        self._close_box.setWindowModality(QtCore.Qt.ApplicationModal)
+        self._close_box.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        try:
+            if QtCore.__version__.startswith("6"):
+                self._close_box.setOption(
+                    QtWidgets.QMessageBox.DontUseNativeDialog, True
+                )
+            else:
+                # PySide2 cant do setOption
+                self._close_box.setWindowFlags(
+                    self._close_box.windowFlags()
+                    | QtCore.Qt.Dialog
+                    | QtCore.Qt.WindowTitleHint
+                )
+        except Exception:
+            pass
+
+        def on_finished(_):
+            self._confirming_close = False
+            if self._close_box.clickedButton() is yes:
+                self._get_lime_widget().propagate_close_event()
+                QtCore.QTimer.singleShot(0, QtCore.QCoreApplication.quit)
+                os.kill(os.getpid(), 9)
+
+        self._close_box.finished.connect(on_finished)
+        self._close_box.open()
+        self._close_box.adjustSize()
+        self._close_box.activateWindow()
+        self._close_box.raise_()
         QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
-        reply = QtWidgets.QMessageBox.question(
-            self,
-            "Window Close",
-            "Are you sure you want to close the application?",
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No,
-        )
-        if reply == QtWidgets.QMessageBox.Yes:
-            lime_tbx_w = self._get_lime_widget()
-            lime_tbx_w.propagate_close_event()
-            QtCore.QCoreApplication.quit()
-            os.kill(os.getpid(), 9)
-            return super().closeEvent(event)
-        else:
-            event.ignore()
+
+        def _watchdog_autoclose():
+            # To avoid the bug of freezing with a blank dialog
+            # We automatically check, and if it's not showing, the dialog is closed.
+            box = self._close_box
+            btns_ok = bool(box.buttons()) and any(
+                b.isVisible() and b.width() > 0 and b.height() > 0 and b.text().strip()
+                for b in box.buttons()
+            )
+            label_text_ok = any(
+                bool(lbl.isVisible() and lbl.text().strip())
+                for lbl in box.findChildren(QtWidgets.QLabel)
+            )
+            exposed_ok = True
+            try:
+                wh = box.windowHandle()
+                if wh is not None:
+                    exposed_ok = wh.isExposed()
+            except Exception:
+                pass
+            ok = (
+                btns_ok
+                and label_text_ok
+                and exposed_ok
+                and box.isVisible()
+                and box.width() > 0
+                and box.height() > 0
+            )
+            if not ok:
+                try:
+                    box.done(QtWidgets.QMessageBox.No)
+                except Exception:
+                    pass
+                self._confirming_close = False
+
+        QtCore.QTimer.singleShot(500, _watchdog_autoclose)
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
@@ -2158,21 +2228,17 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         )
         select_coefficients_dialog.exec()
 
-    def _restore_main_focus(self):
-        QtWidgets.QApplication.processEvents()
-        self.raise_()
-        self.activateWindow()
-        self.repaint()
-
     def about(self):
         about_dialog = help.AboutDialog(self)
-        about_dialog.exec()
-        self._restore_main_focus()
+        about_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        about_dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        about_dialog.open()
 
     def help(self):
         help_dialog = help.HelpDialog(self)
-        help_dialog.exec()
-        self._restore_main_focus()
+        help_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        help_dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        help_dialog.open()
 
     def update_calculability(self):
         lime_tbx_w = self._get_lime_widget()

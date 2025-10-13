@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "LimeTBX"
-#define MyAppVersion "1.3.0"
+#define MyAppVersion "1.4.0"
 #define MyAppPublisher "European Space Agency"
-#define MyAppExeName "LimeTBX.exe"
+#define MyAppExeName "LimeTBX_GUI.exe"
 #define MyAppDevPath "C:\repo\"
 ;"W:\"
 ;"C:\Users\Javier\Repositorios\lime_tbx"
@@ -28,6 +28,7 @@ UninstallDisplayIcon={app}\LimeTBX\{#MyAppExeName}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+ChangesEnvironment=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -60,6 +61,7 @@ Filename: "{app}\LimeTBX\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#Str
 Root: HKLM64; Subkey: "SOFTWARE\ESA"; Flags: uninsdeletekeyifempty; Check: IsWin64
 Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}"; Flags: uninsdeletekey; Check: IsWin64
 Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}\Settings"; Flags: createvalueifdoesntexist; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Check: IsWin64
+Root: HKLM64; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\LimeTBX\bin"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\kernels"

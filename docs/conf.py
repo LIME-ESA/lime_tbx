@@ -171,6 +171,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "myst_parser",
+    "sphinx.ext.mathjax",
 ]
 
 myst_enable_extensions = [

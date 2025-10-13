@@ -12,7 +12,6 @@ a_binaries = []
 a_datas = []
 a_icon = ''
 a_hooksconfig = {}
-e_console = False
 deploy_name = "LimeTBX"
 
 if sys.platform == 'linux':
@@ -96,7 +95,6 @@ elif sys.platform == 'win32' or sys.platform == 'win64':
         (src_path + 'business\\lime_algorithms\\lime\\assets\\tsis_fwhm_1_1_triangle.csv', '.\\lime_tbx\\business\\lime_algorithms\\lime\\assets'),
     ] + copy_metadata("lime_tbx")
     a_icon = src_path + 'presentation\\gui\\assets\\lime_logo.ico'
-    e_console = True
 elif sys.platform == 'darwin':
     eocfi_bin_path = 'business/eocfi_adapter/eocfi_c/bin/get_positions_darwin'
     import platform
@@ -159,17 +157,41 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+cli_exe = None
+exename = deploy_name + ".exe"
+if sys.platform == 'win32' or sys.platform == 'win64':
+    cli_exe = EXE(
+        pyz,
+        a.scripts,
+        [],
+        exclude_binaries=True,
+        name=exename,
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=True,
+        console=True,
+        icon=a_icon,
+        disable_windowed_traceback=False,
+        target_arch=None,
+        argv_emulation=None,
+        codesign_identity=None,
+        entitlements_file=None,
+        contents_directory='.',
+    )
+    exename = deploy_name + "_GUI.exe"
+
 exe = EXE(
     pyz,
     a.scripts,
     [],
     exclude_binaries=True,
-    name=deploy_name + ".exe",
+    name=exename,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=e_console,
+    console=False,
     icon=a_icon,
     disable_windowed_traceback=False,
     target_arch=None,
@@ -179,16 +201,28 @@ exe = EXE(
     contents_directory='.',
 )
 
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name=deploy_name,
-)
+if cli_exe is not None:
+    coll = COLLECT(
+        cli_exe, exe,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        strip=False,
+        upx=True,
+        upx_exclude=[],
+        name=deploy_name,
+    )
+else:
+    coll = COLLECT(
+        exe,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        strip=False,
+        upx=True,
+        upx_exclude=[],
+        name=deploy_name,
+    )
 
 if sys.platform == "darwin":
     app = BUNDLE(

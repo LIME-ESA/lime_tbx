@@ -7,11 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [1.4.0] - 2025-10-13
+
+### Added
+
+- Windows: `lime` CLI shortcut is now installed to the system `PATH` for easier use from Command Prompt or PowerShell.
+- Now includes coefficient set `20251010_v1`.
+
+### Changed
+
+- Updated ASD spectrum dataset to the latest version, incorporating more data and improved filtering, increasing overall quality.
+
+### Fixed
+
+- About dialog picture links now work on Linux.
+- Linux: CLI arguments containing spaces (e.g., JSON passed to `-i`) are now forwarded correctly by
+  the launcher. Previously they could be split or mangled.
+- Windows GUI no longer leaves an idle console window open.
+- Fixed rare crashes and freezes triggered by Help, About, and Close-confirmation dialogs.
+
 ## [1.3.0] - 2025-09-19
 
 ### Added
 
-- Filter 3σ: Option in the Comparison page to filter out measurements that are more than 3σ away
+- Filter $3\sigma$: Option in the Comparison page to filter out measurements that are more than $3\sigma$ away
   from the mean relative difference. Filtering is done channel-wise.
 - Multiple Selenographic Points: Support for loading multiple selenographic coordinates at once
   via CSV file input in the selenographic input tab.
@@ -126,7 +145,8 @@ calculations compared to v1.0.3. (**NFR306**)
 
 Initial version that serves as the baseline for tracking changes in the change log.
 
-[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/LIME-ESA/lime_tbx/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.3.0...1.4.0
 [1.3.0]: https://github.com/LIME-ESA/lime_tbx/compare/v1.2.2...1.3.0
 [1.2.2]: https://github.com/LIME-ESA/lime_tbx/compare/v1.2.1...1.2.2
 [1.2.1]: https://github.com/LIME-ESA/lime_tbx/compare/v1.2.0...1.2.1

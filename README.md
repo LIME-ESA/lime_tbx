@@ -1,4 +1,4 @@
-[![Version 1.3.0](https://img.shields.io/badge/version-1.3.0-informational?style=for-the-badge)](https://github.com/LIME-ESA/lime_tbx/tags)
+[![Version 1.4.0](https://img.shields.io/badge/version-1.4.0-informational?style=for-the-badge)](https://github.com/LIME-ESA/lime_tbx/tags)
 [![License: LGPL 3.0][license-shield]][license-url]
 [![Issues][issues-shield]][issues-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -151,15 +151,13 @@ to fully explore the capabilities of the toolbox.
 
 ## Roadmap
 
-- [x] New feature: Simulate Angle of Lunar Polarisation (AoLP)
+<!--
 - [ ] Allow coefficients of more than six wavelengths, being as flexible as possible. (**NFR108**)
-    - [x] The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nm band. (**NFR108-A**)
     - [ ] The TBX must accept coefficients made for any response function specified in the coefficients file. (**NFR108-B**)
 - [ ] Sign installers with official certificates
 - [ ] Fully migrate project to GitHub (issues, CI pipeline, etc.)
 - [ ] Automate Mac Build & Packaging Process through Github actions (**NFR409-C**)
-- [ ] Allow users to simulate series of lunar observations, where not only the time varies. (**FR107**)
-
+-->
 
 See the [open issues](https://github.com/LIME-ESA/lime_tbx/issues) for a full list of proposed features (and known issues).
 
