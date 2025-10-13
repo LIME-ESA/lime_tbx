@@ -49,7 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="readme.html">README</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Releases</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#change-log">Change Log</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">1.4.0 - 2025-10-13</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">1.4.0 - 2025-10-14</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#added">Added</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#changed">Changed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#fixed">Fixed</a></li>
@@ -147,7 +147,7 @@
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
 and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <section id="id1">
-<h3><a class="reference external" href="https://github.com/LIME-ESA/lime_tbx/compare/v1.3.0...1.4.0">1.4.0</a> - 2025-10-13<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<h3><a class="reference external" href="https://github.com/LIME-ESA/lime_tbx/compare/v1.3.0...1.4.0">1.4.0</a> - 2025-10-14<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <section id="added">
 <h4>Added<a class="headerlink" href="#added" title="Link to this heading"></a></h4>
 <ul class="simple">
@@ -164,11 +164,16 @@ and this project adheres to <a class="reference external" href="https://semver.o
 <section id="fixed">
 <h4>Fixed<a class="headerlink" href="#fixed" title="Link to this heading"></a></h4>
 <ul class="simple">
+<li><p><strong>Channel data mapping</strong>: Fixed a bug introduced in <strong>v1.3.0</strong> where channel data was swapped because simulated data was returned in
+alphabetical order due to sorting of the spectral response function names. This caused simulated signals to be assigned to the
+wrong channels. The data is now correctly mapped to each channel.</p></li>
 <li><p>About dialog picture links now work on Linux.</p></li>
 <li><p>Linux: CLI arguments containing spaces (e.g., JSON passed to <code class="docutils literal notranslate"><span class="pre">-i</span></code>) are now forwarded correctly by
 the launcher. Previously they could be split or mangled.</p></li>
 <li><p>Windows GUI no longer leaves an idle console window open.</p></li>
 <li><p>Fixed rare crashes and freezes triggered by Help, About, and Close-confirmation dialogs.</p></li>
+<li><p>Builder scripts for Linux and Debian installers no longer copy the <code class="docutils literal notranslate"><span class="pre">coeff_data/selected.txt</span></code> file from the development environment.
+Previously, if the file existed, it was included in the installation package, causing permission issues at runtime.</p></li>
 </ul>
 </section>
 </section>
