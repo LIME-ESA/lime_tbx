@@ -1970,6 +1970,19 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
             self.showFullScreen()
 
     def closeEvent(self, event: QtGui.QCloseEvent):
+        event.ignore()
+        if getattr(self, "_confirming_close", False):
+            return
+        self._confirming_close = True
+        QtCore.QTimer.singleShot(0, self._show_confirm_close)
+
+    def _show_confirm_close(self):
+        try:
+            self.releaseMouse()
+            self.releaseKeyboard()
+            QtWidgets.QApplication.restoreOverrideCursor()
+        except Exception:
+            pass
         self._close_box = QtWidgets.QMessageBox(self)
         self._close_box.setIcon(QtWidgets.QMessageBox.Question)
         self._close_box.setWindowTitle("Window Close")
@@ -1979,8 +1992,10 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._close_box.setDefaultButton(no)
         self._close_box.setWindowModality(QtCore.Qt.ApplicationModal)
         self._close_box.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        self._close_box.setOption(QtWidgets.QMessageBox.DontUseNativeDialog, True)
 
         def on_finished(_):
+            self._confirming_close = False
             if self._close_box.clickedButton() is yes:
                 self._get_lime_widget().propagate_close_event()
                 QtCore.QTimer.singleShot(0, QtCore.QCoreApplication.quit)
@@ -1988,8 +2003,46 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
 
         self._close_box.finished.connect(on_finished)
         self._close_box.open()
+        self._close_box.adjustSize()
+        self._close_box.activateWindow()
+        self._close_box.raise_()
         QtCore.QTimer.singleShot(0, _set_all_messagebox_buttons_pointing_hands)
-        event.ignore()
+
+        def _watchdog_autoclose():
+            # To avoid the bug of freezing with a blank dialog
+            # We automatically check, and if it's not showing, the dialog is closed.
+            box = self._close_box
+            btns_ok = bool(box.buttons()) and any(
+                b.isVisible() and b.width() > 0 and b.height() > 0 and b.text().strip()
+                for b in box.buttons()
+            )
+            label_text_ok = any(
+                bool(lbl.isVisible() and lbl.text().strip())
+                for lbl in box.findChildren(QtWidgets.QLabel)
+            )
+            exposed_ok = True
+            try:
+                wh = box.windowHandle()
+                if wh is not None:
+                    exposed_ok = wh.isExposed()
+            except Exception:
+                pass
+            ok = (
+                btns_ok
+                and label_text_ok
+                and exposed_ok
+                and box.isVisible()
+                and box.width() > 0
+                and box.height() > 0
+            )
+            if not ok:
+                try:
+                    box.done(QtWidgets.QMessageBox.No)
+                except Exception:
+                    pass
+                self._confirming_close = False
+
+        QtCore.QTimer.singleShot(500, _watchdog_autoclose)
 
     def set_save_simulation_action_disabled(self, disable: bool) -> None:
         self.save_simulation_action.setDisabled(disable)
