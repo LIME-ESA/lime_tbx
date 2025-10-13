@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Fixed
+
+- Builder scripts for Linux and Debian installers no longer copy the `coeff_data/selected.txt` file from the development environment.
+  Previously, if the file existed, it was included in the installation package, causing permission issues at runtime.
+
 ## [1.4.0] - 2025-10-13
 
 ### Added
