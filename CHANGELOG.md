@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Windows: `lime` CLI shortcut is now installed to the system `PATH` for easier use from Command Prompt or PowerShell.
+- Now includes coefficient set `20251010_v1`.
 
 ### Changed
 
