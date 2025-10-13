@@ -7,13 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
-## [unreleased] - yyyy-mm-dd
-
-### Fixed
-
-- Builder scripts for Linux and Debian installers no longer copy the `coeff_data/selected.txt` file from the development environment.
-  Previously, if the file existed, it was included in the installation package, causing permission issues at runtime.
-
 ## [1.4.0] - 2025-10-13
 
 ### Added
@@ -27,11 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Channel data mapping**: Fixed a bug introduced in **v1.3.0** where channel data was swapped because simulated data was returned in
+  alphabetical order due to sorting of the spectral response function names. This caused simulated signals to be assigned to the
+  wrong channels. The data is now correctly mapped to each channel.
 - About dialog picture links now work on Linux.
 - Linux: CLI arguments containing spaces (e.g., JSON passed to `-i`) are now forwarded correctly by
   the launcher. Previously they could be split or mangled.
 - Windows GUI no longer leaves an idle console window open.
 - Fixed rare crashes and freezes triggered by Help, About, and Close-confirmation dialogs.
+- Builder scripts for Linux and Debian installers no longer copy the `coeff_data/selected.txt` file from the development environment.
+  Previously, if the file existed, it was included in the installation package, causing permission issues at runtime.
 
 ## [1.3.0] - 2025-09-19
 
