@@ -966,15 +966,15 @@ class SpectralData:
     def wlens(self):
         """Return the array of wavelengths."""
         if self._is_multichannel:
-            return np.array(
-                sorted(
-                    set(
-                        col.rsplit("_", 1)[0]
-                        for col in self._df.columns
-                        if col.endswith("_data")
-                    )
-                )
+            vals = np.array(
+                [
+                    col.rsplit("_", 1)[0]
+                    for col in self._df.columns
+                    if col.endswith("_data")
+                ]
             )
+            vals, index = np.unique(vals, return_index=True)
+            return vals[index.argsort()]
         return self._df["wlens"].values
 
     @property
