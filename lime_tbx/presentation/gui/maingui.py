@@ -1992,7 +1992,20 @@ class LimeTBXWindow(QtWidgets.QMainWindow):
         self._close_box.setDefaultButton(no)
         self._close_box.setWindowModality(QtCore.Qt.ApplicationModal)
         self._close_box.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-        self._close_box.setOption(QtWidgets.QMessageBox.DontUseNativeDialog, True)
+        try:
+            if QtCore.__version__.startswith("6"):
+                self._close_box.setOption(
+                    QtWidgets.QMessageBox.DontUseNativeDialog, True
+                )
+            else:
+                # PySide2 cant do setOption
+                self._close_box.setWindowFlags(
+                    self._close_box.windowFlags()
+                    | QtCore.Qt.Dialog
+                    | QtCore.Qt.WindowTitleHint
+                )
+        except Exception:
+            pass
 
         def on_finished(_):
             self._confirming_close = False
