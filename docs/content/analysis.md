@@ -58,7 +58,7 @@ those in any previous official LIME documentation, as they are subject to change
   for **FR101** and **FR105**.
 - **FR105**: The user must be able to simulate lunar observations for an ESA satellite.
 - **FR106**: Allow users to choose which SRF are simulations running with (**FR103**).
-- **FR107**: Allow users to simulate series of lunar observations, where not only the time varies. 
+- **FR107**: Allow users to simulate a series of lunar observations, where multiple paremeters can vary simultaneosuly, not only the time.
 - **FR108**: Allow users to simulate lunar observation using a user-defined satellite.
 
 #### Non Functional Requirements (NFR)
@@ -75,9 +75,10 @@ those in any previous official LIME documentation, as they are subject to change
   - **NFR108-A** : The TBX must accept coefficients that also include data for the 1088 CIMEL photometer's 2130 nanometer band.
   - **NFR108-B** : The TBX must accept coefficients made for a different response function, for the wavelengths specified in the coefficients.
 - **NFR109**: The ESA satellites available for selection must include METOP first generation: METOP-A, METOP-B and METOP-C.
-- **NFR110**: The simulation input for series of lunar observations (FR107) must be done via an input file.
+- **NFR110**: The simulation input for multi-parameter series of lunar observations (**FR107**) must be provided via an input file.
 - **NFR111**: The satellites for **FR108** must be defined using Orbit Scenario Files (OSF) or Three-Line
   Element Set (TLE/3LE) files.
+- **NFR112**: The simulation input for multi-parameter series of lunar observations (**FR107**) must allow multiple entries of selenographic coordinates, where all selenographic coordinates can vary independently.
 
 ### 2. Comparisons
 
@@ -143,7 +144,7 @@ those in any previous official LIME documentation, as they are subject to change
   - **NFR409-C**: Automated compilation and packaging for Mac.
 - **NFR410**: The TBX compilation must be automated as much as possible, ideally using GitLab CI.
 - **NFR411**: Migrate the project to GitHub
-  - **NFR411-A**: During development mirror the repository to GitHub.
+  - **NFR411-A**: During development, mirror the repository to GitHub.
   - **NFR411-B**: Migrate the issues to GitHub. GitLab issues must be used during development by the LIME team to
     add issues, and GitHub issues when finished.
   - **NFR411-C**: Migrate the CI pipeline to GitHub.
@@ -151,5 +152,5 @@ those in any previous official LIME documentation, as they are subject to change
 - **NFR412**: Code modules should be as independent as possible so it could be possible to add a “choose model” option
   in the future without requiring too much development.
 - **NFR413**: Keep EO-CFI version updated to the latest release.
-- **NFR414**: The TBX should be able to simulate the satellite positions for all satellites with OSF files in the EOP-CFI server.
+- **NFR414**: The TBX should be able to simulate satellite positions for all satellites with OSF files in the EOP-CFI server.
 - **NFR415**: The TBX code will be under LGPL license, in a repository with public access.
