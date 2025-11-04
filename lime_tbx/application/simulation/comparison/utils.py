@@ -148,7 +148,10 @@ def average_comparisons(
         np.array([np.mean(c.perc_diffs.uncertainties) for c in comps]),
         None,
     )
-    mpd = np.ma.masked_invalid(perc_diffs.data).mean()
+    mpd = np.ma.masked_invalid(
+        np.concatenate([c.perc_diffs.data for c in comps])
+    ).mean()
+    meanmpd = np.ma.masked_invalid(perc_diffs.data).mean()
     c = AvgComparisonData(
         obs,
         sim,
@@ -165,6 +168,7 @@ def average_comparisons(
         None,
         meanmrd,
         meanstdrd,
+        meanmpd,
     )
     return c
 

@@ -1184,6 +1184,7 @@ class ComparisonData:
 class AvgComparisonData(ComparisonData):
     mean_mrd: float
     mean_stdrd: float
+    mean_mpd: float
 
 
 @dataclass

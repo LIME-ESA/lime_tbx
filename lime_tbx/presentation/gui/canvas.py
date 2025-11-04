@@ -180,6 +180,10 @@ def _redraw_canvas_compare_only_diffs(
                 data_compare_info = "MPD: {:.4f}%".format(
                     sdata_compare.mean_perc_difference
                 )
+                if isinstance(sdata_compare, AvgComparisonData):
+                    data_compare_info += " | μMPD: {:.4f}%".format(
+                        sdata_compare.mean_mpd,
+                    )
             else:
                 ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
                 data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
@@ -296,10 +300,13 @@ def _redraw_canvas_compare_boxplot_only_diffs(
             ylim = max(list(map(abs, ax2.get_ylim())))
             if chosen_diffs == CompFields.DIFF_PERC:
                 ax2.set_ylim((0.0, ylim + 0.5))
-                data_compare_info = "MPD: {:.4f}%".format(
+                data_compare_info = "MPD: {:.4f}% | μMPD {:.4f}%".format(
+                    np.ma.masked_invalid(
+                        np.concatenate([sd.perc_diffs.data for sd in sdata_compare])
+                    ).mean(),
                     np.ma.masked_invalid(
                         [sd.mean_perc_difference for sd in sdata_compare]
-                    ).mean()
+                    ).mean(),
                 )
             else:
                 ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
