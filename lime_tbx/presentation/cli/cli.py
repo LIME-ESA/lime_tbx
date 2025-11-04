@@ -1123,7 +1123,10 @@ class CLI:
         """
         # Check if the user has forgotten one dash, or has set one dash but all together
         if any(
-            item.startswith("-") and not item.startswith("--") and len(item) > 2
+            item.startswith("-")
+            and not item.startswith("--")
+            and len(item) > 2
+            and not item[1].isnumeric()
             for item in sysargs
         ):
             problem_flags = [

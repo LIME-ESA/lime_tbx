@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Fixed
+
+- CLI flags such as `-e` and `-l` now correctly accept negative first values in comma-separated input sequences
+  without being misinterpreted as new flags.
+  > Thanks to [Aria Alinejad](https://github.com/ariaalinejad) for reporting the issue (#27).
+
+
 ## [1.4.0] - 2025-10-14
 
 ### Added
@@ -39,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from the mean relative difference. Filtering is done channel-wise.
 - Multiple Selenographic Points: Support for loading multiple selenographic coordinates at once
   via CSV file input in the selenographic input tab.
+  > Thanks to Matthijs Krijger (ESS) for helping suggest these ideas.
 
 ### Changed
 
@@ -98,6 +108,7 @@ values are preliminary and subject to changes.
 cause the GUI to incorrectly show the previous file as still loaded. The file now does remain loaded
 correctly in such cases.
 - CLI for simulations from geographic coordinates was wrongly interpreting the height parameter
+  > Thanks to Laurent Devillaine (CIMEL) for reporting the issue.
 
 ## [1.1.0] - 2025-04-21
 
