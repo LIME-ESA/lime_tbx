@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Comparison subtitle for wavelength-based data now includes both the overall MRD/$\sigma$ computed across
-  all data and the mean of channel MRDs/$\sigma$ values. This provides clearer summary statistics in the plot header.
+- Comparison subtitle for wavelength-based data now includes both the overall MRD/$\sigma$/MPD computed across
+  all data and the mean of channel MRDs/$\sigma$/MPD values. This provides clearer summary statistics in the plot header.
 
 ### Fixed
 
