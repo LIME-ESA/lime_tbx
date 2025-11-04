@@ -19,6 +19,7 @@ import numpy as np
 from lime_tbx.application.simulation.lime_simulation import is_ampa_valid_range
 from lime_tbx.common.datatypes import (
     ComparisonData,
+    AvgComparisonData,
     SpectralData,
     MoonData,
 )
@@ -101,7 +102,7 @@ def sort_by_mpa(comparisons: List[ComparisonData]) -> List[ComparisonData]:
 
 def average_comparisons(
     wlens: List[float], comps: List[ComparisonData]
-) -> ComparisonData:
+) -> AvgComparisonData:
     """Returns a ComparisonData based on the average of a list of ComparisonData,
     now classified by channel.
 
@@ -112,7 +113,7 @@ def average_comparisons(
 
     Returns
     -------
-    avg_comparison: ComparisonData
+    avg_comparison: AvgComparisonData
         ComparisonData based on the average data of the given comparisons.
     """
     obs = SpectralData(
@@ -127,17 +128,18 @@ def average_comparisons(
         np.array([np.mean(c.simulated_signal.uncertainties) for c in comps]),
         None,
     )
-    diffs = SpectralData(
+    meandiffs = SpectralData(
         wlens,
         np.array([np.mean(c.diffs_signal.data) for c in comps]),
         np.array([np.mean(c.diffs_signal.uncertainties) for c in comps]),
         None,
     )
-    mrd = np.ma.masked_invalid(diffs.data).mean()
-    mard = np.ma.masked_invalid(
-        [c.mean_absolute_relative_difference for c in comps]
-    ).mean()
-    stdrd = np.ma.masked_invalid([c.standard_deviation_mrd for c in comps]).mean()
+    diffs = np.ma.masked_invalid(np.concatenate([c.diffs_signal.data for c in comps]))
+    mrd = diffs.mean()
+    stdrd = diffs.std()
+    meanmrd = np.ma.masked_invalid(meandiffs.data).mean()
+    mard = np.abs(diffs).mean()
+    meanstdrd = np.ma.masked_invalid([c.standard_deviation_mrd for c in comps]).mean()
     ns = np.mean([c.number_samples for c in comps])
     ampavr = np.array([np.all(c.ampa_valid_range) for c in comps])
     perc_diffs = SpectralData(
@@ -147,10 +149,10 @@ def average_comparisons(
         None,
     )
     mpd = np.ma.masked_invalid(perc_diffs.data).mean()
-    c = ComparisonData(
+    c = AvgComparisonData(
         obs,
         sim,
-        diffs,
+        meandiffs,
         mrd,
         mard,
         stdrd,
@@ -161,6 +163,8 @@ def average_comparisons(
         perc_diffs,
         mpd,
         None,
+        meanmrd,
+        meanstdrd,
     )
     return c
 

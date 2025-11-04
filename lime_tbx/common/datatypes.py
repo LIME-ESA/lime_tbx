@@ -1181,6 +1181,12 @@ class ComparisonData:
 
 
 @dataclass
+class AvgComparisonData(ComparisonData):
+    mean_mrd: float
+    mean_stdrd: float
+
+
+@dataclass
 class KernelsPath:
     """Dataclass containing the needed information in order to find all SPICE kernels.
 

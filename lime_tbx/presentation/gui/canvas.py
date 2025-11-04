@@ -24,6 +24,7 @@ import mplcursors
 """___LIME_TBX Modules___"""
 from lime_tbx.common.datatypes import (
     ComparisonData,
+    AvgComparisonData,
     SpectralData,
 )
 from lime_tbx.common.constants import CompFields
@@ -186,6 +187,11 @@ def _redraw_canvas_compare_only_diffs(
                     sdata_compare.standard_deviation_mrd,
                     sdata_compare.mean_absolute_relative_difference,
                 )
+                if isinstance(sdata_compare, AvgComparisonData):
+                    data_compare_info += " | μMRD: {:.4f}% | μσ: {:.4f}%".format(
+                        sdata_compare.mean_mrd,
+                        sdata_compare.mean_stdrd,
+                    )
             ax2.set_ylabel(
                 ylabeltit,
                 fontproperties=label_font_prop,
@@ -297,15 +303,18 @@ def _redraw_canvas_compare_boxplot_only_diffs(
                 )
             else:
                 ax2.set_ylim((-ylim - 0.5, ylim + 0.5))
-                data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD: {:.4f}%".format(
+                diffs = np.ma.masked_invalid(
+                    np.concatenate([sd.diffs_signal.data for sd in sdata_compare])
+                )
+                data_compare_info = "MRD: {:.4f}% | σ: {:.4f}% | MARD {:.4f}% | μMRD: {:.4f}% | μσ: {:.4f}%".format(
+                    diffs.mean(),
+                    diffs.std(),
+                    np.abs(diffs).mean(),
                     np.ma.masked_invalid(
                         [sd.mean_relative_difference for sd in sdata_compare]
                     ).mean(),
                     np.ma.masked_invalid(
                         [sd.standard_deviation_mrd for sd in sdata_compare]
-                    ).mean(),
-                    np.ma.masked_invalid(
-                        [sd.mean_absolute_relative_difference for sd in sdata_compare]
                     ).mean(),
                 )
         else:
