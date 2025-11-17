@@ -20,6 +20,7 @@ import pandas as pd
 
 """___NPL Modules___"""
 from lime_tbx.common.datatypes import (
+    AvgComparisonData,
     Point,
     SpectralData,
     SpectralResponseFunction,
@@ -35,6 +36,7 @@ from lime_tbx.common.datatypes import (
 from lime_tbx.common import logger
 from lime_tbx.common.constants import CompFields
 from lime_tbx.application.simulation.moon_data_factory import MoonDataFactory
+from lime_tbx.application.simulation.comparison import utils
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -304,34 +306,32 @@ def export_csv_comparison(
     """
     ampa_valid_range = data.ampa_valid_range
     try:
+        init_rows = [
+            ("LIME coefficients version", coeff_version),
+            ("Interpolation spectrum", interp_spectrum_name),
+            ("MRD (Mean Relative Difference %)", data.mean_relative_difference),
+            (
+                "STD-RD (Standard deviation of Relative Difference %)",
+                data.standard_deviation_mrd,
+            ),
+            (
+                "MARD (Mean of the Absolutes of the Relative Differences %)",
+                data.mean_absolute_relative_difference,
+            ),
+            ("MPD (Mean Percentage Difference %)", data.mean_perc_difference),
+        ]
+        if isinstance(data, AvgComparisonData):
+            init_rows += [
+                ("Mean MRD (Mean of channel MRDs %)", data.mean_mrd),
+                (
+                    "Mean STD-RD (Mean of channel Relative Difference Standard Deviations %)",
+                    data.mean_stdrd,
+                ),
+                ("Mean MPD (Mean of channel MPDs %)", data.mean_mpd),
+            ]
         with open(name, "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["LIME coefficients version", coeff_version])
-            writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-            writer.writerow(
-                [
-                    "MRD (Mean Relative Difference %)",
-                    data.mean_relative_difference,
-                ]
-            )
-            writer.writerow(
-                [
-                    "STD-RD (Standard deviation of Relative Difference %)",
-                    data.standard_deviation_mrd,
-                ]
-            )
-            writer.writerow(
-                [
-                    "MARD (Mean of the Absolutes of the Relative Differences %)",
-                    data.mean_absolute_relative_difference,
-                ]
-            )
-            writer.writerow(
-                [
-                    "MPD (Mean Percentage Difference %)",
-                    data.mean_perc_difference,
-                ]
-            )
+            writer.writerows(init_rows)
             if False in ampa_valid_range:
                 writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             if (
@@ -424,31 +424,31 @@ def export_csv_comparison_bywlen(
     wlens = [w for w, d in zip(wlens, data) if d is not None]
     data = [d for d in data if d is not None]
     if data:
+        avgc = utils.average_comparisons(wlens, data)
+        init_rows = [
+            ("LIME coefficients version", coeff_version),
+            ("Interpolation spectrum", interp_spectrum_name),
+            ("MRD (Mean Relative Difference %)", avgc.mean_relative_difference),
+            (
+                "STD-RD (Standard deviation of Relative Difference %)",
+                avgc.standard_deviation_mrd,
+            ),
+            (
+                "MARD (Mean of the Absolutes of the Relative Differences %)",
+                avgc.mean_absolute_relative_difference,
+            ),
+            ("MPD (Mean Percentage Difference %)", avgc.mean_perc_difference),
+            ("Mean MRD (Mean of channel MRDs %)", avgc.mean_mrd),
+            (
+                "Mean STD-RD (Mean of channel Relative Difference Standard Deviations %)",
+                avgc.mean_stdrd,
+            ),
+            ("Mean MPD (Mean of channel MPDs %)", avgc.mean_mpd),
+        ]
         try:
             with open(name, "w", newline="", encoding="utf-8") as file:
                 writer = csv.writer(file)
-                mpd = np.ma.masked_invalid(
-                    [sd.mean_perc_difference for sd in data]
-                ).mean()
-                mrd = np.ma.masked_invalid(
-                    [sd.mean_relative_difference for sd in data]
-                ).mean()
-                stdrd = np.ma.masked_invalid(
-                    [sd.standard_deviation_mrd for sd in data]
-                ).mean()
-                mard = np.ma.masked_invalid(
-                    [sd.mean_absolute_relative_difference for sd in data]
-                ).mean()
-                writer.writerow(["LIME coefficients version", coeff_version])
-                writer.writerow(["Interpolation spectrum", interp_spectrum_name])
-                writer.writerow(["MRD (Mean Relative Difference %)", mrd])
-                writer.writerow(
-                    ["STD-RD (Standard deviation of Relative Difference %)", stdrd]
-                )
-                writer.writerow(
-                    ["MARD (Mean of the Absolutes of the Relative Differences %)", mard]
-                )
-                writer.writerow(["MPD (Mean Percentage Difference %)", mpd])
+                writer.writerows(init_rows)
                 if False in [not np.all(d.ampa_valid_range) for d in data]:
                     writer.writerow(["**", _WARN_OUT_MPA_RANGE])
             # Now with pandas the rest

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased] - yyyy-mm-dd
 
+### Changed
+
+- Comparison subtitle for wavelength-based data now includes both the overall MRD/$\sigma$/MPD computed across
+  all data and the mean of channel MRDs/$\sigma$/MPD values. This provides clearer summary statistics in the plot header.
+
 ### Fixed
 
 - CLI flags such as `-e` and `-l` now correctly accept negative first values in comma-separated input sequences

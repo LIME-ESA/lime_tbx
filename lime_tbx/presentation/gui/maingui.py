@@ -358,7 +358,7 @@ def show_comparisons_wlen_callback(
         f"LIME coefficients version: {version}{spectrum_info}{warning_out_mpa_range}"
     )
     _subtitle_date_format = canvas.SUBTITLE_DATE_FORMAT
-    subtitle = "{}\nData start: {} | Data end: {}\nMean number of points: {}".format(
+    subtitle = "{}\nData start: {} | Data end: {}\nMean points: {}".format(
         subtitle,
         data_start.strftime(_subtitle_date_format),
         data_end.strftime(_subtitle_date_format),
