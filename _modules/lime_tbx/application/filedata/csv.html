@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.application.filedata.csv &mdash; Lime Tbx 1.4.0 documentation</title>
+  <title>lime_tbx.application.filedata.csv &mdash; Lime Tbx 1.4.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=9172181d"></script>
+      <script src="../../../../_static/documentation_options.js?v=350a9c04"></script>
       <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -120,6 +120,7 @@
 
 <span class="sd">&quot;&quot;&quot;___NPL Modules___&quot;&quot;&quot;</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AvgComparisonData</span><span class="p">,</span>
     <span class="n">Point</span><span class="p">,</span>
     <span class="n">SpectralData</span><span class="p">,</span>
     <span class="n">SpectralResponseFunction</span><span class="p">,</span>
@@ -135,6 +136,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompFields</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.moon_data_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">MoonDataFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.application.simulation.comparison</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
 
 <span class="sd">&quot;&quot;&quot;___Authorship___&quot;&quot;&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Javier Gatón Herguedas&quot;</span>
@@ -412,34 +414,32 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ampa_valid_range</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ampa_valid_range</span>
     <span class="k">try</span><span class="p">:</span>
+        <span class="n">init_rows</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;LIME coefficients version&quot;</span><span class="p">,</span> <span class="n">coeff_version</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Interpolation spectrum&quot;</span><span class="p">,</span> <span class="n">interp_spectrum_name</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;MRD (Mean Relative Difference %)&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">mean_relative_difference</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;STD-RD (Standard deviation of Relative Difference %)&quot;</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">standard_deviation_mrd</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;MARD (Mean of the Absolutes of the Relative Differences %)&quot;</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">mean_absolute_relative_difference</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;MPD (Mean Percentage Difference %)&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">mean_perc_difference</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">AvgComparisonData</span><span class="p">):</span>
+            <span class="n">init_rows</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;Mean MRD (Mean of channel MRDs %)&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">mean_mrd</span><span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Mean STD-RD (Mean of channel Relative Difference Standard Deviations %)&quot;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">mean_stdrd</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;Mean MPD (Mean of channel MPDs %)&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">mean_mpd</span><span class="p">),</span>
+            <span class="p">]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;LIME coefficients version&quot;</span><span class="p">,</span> <span class="n">coeff_version</span><span class="p">])</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;Interpolation spectrum&quot;</span><span class="p">,</span> <span class="n">interp_spectrum_name</span><span class="p">])</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="s2">&quot;MRD (Mean Relative Difference %)&quot;</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">.</span><span class="n">mean_relative_difference</span><span class="p">,</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="s2">&quot;STD-RD (Standard deviation of Relative Difference %)&quot;</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">.</span><span class="n">standard_deviation_mrd</span><span class="p">,</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="s2">&quot;MARD (Mean of the Absolutes of the Relative Differences %)&quot;</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">.</span><span class="n">mean_absolute_relative_difference</span><span class="p">,</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="s2">&quot;MPD (Mean Percentage Difference %)&quot;</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">.</span><span class="n">mean_perc_difference</span><span class="p">,</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">init_rows</span><span class="p">)</span>
             <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">ampa_valid_range</span><span class="p">:</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="n">_WARN_OUT_MPA_RANGE</span><span class="p">])</span>
             <span class="k">if</span> <span class="p">(</span>
@@ -535,31 +535,31 @@
     <span class="n">wlens</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">avgc</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">average_comparisons</span><span class="p">(</span><span class="n">wlens</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">init_rows</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;LIME coefficients version&quot;</span><span class="p">,</span> <span class="n">coeff_version</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Interpolation spectrum&quot;</span><span class="p">,</span> <span class="n">interp_spectrum_name</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;MRD (Mean Relative Difference %)&quot;</span><span class="p">,</span> <span class="n">avgc</span><span class="o">.</span><span class="n">mean_relative_difference</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;STD-RD (Standard deviation of Relative Difference %)&quot;</span><span class="p">,</span>
+                <span class="n">avgc</span><span class="o">.</span><span class="n">standard_deviation_mrd</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;MARD (Mean of the Absolutes of the Relative Differences %)&quot;</span><span class="p">,</span>
+                <span class="n">avgc</span><span class="o">.</span><span class="n">mean_absolute_relative_difference</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;MPD (Mean Percentage Difference %)&quot;</span><span class="p">,</span> <span class="n">avgc</span><span class="o">.</span><span class="n">mean_perc_difference</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Mean MRD (Mean of channel MRDs %)&quot;</span><span class="p">,</span> <span class="n">avgc</span><span class="o">.</span><span class="n">mean_mrd</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Mean STD-RD (Mean of channel Relative Difference Standard Deviations %)&quot;</span><span class="p">,</span>
+                <span class="n">avgc</span><span class="o">.</span><span class="n">mean_stdrd</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Mean MPD (Mean of channel MPDs %)&quot;</span><span class="p">,</span> <span class="n">avgc</span><span class="o">.</span><span class="n">mean_mpd</span><span class="p">),</span>
+        <span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
                 <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-                <span class="n">mpd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">sd</span><span class="o">.</span><span class="n">mean_perc_difference</span> <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="n">mrd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">sd</span><span class="o">.</span><span class="n">mean_relative_difference</span> <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="n">stdrd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">sd</span><span class="o">.</span><span class="n">standard_deviation_mrd</span> <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="n">mard</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">sd</span><span class="o">.</span><span class="n">mean_absolute_relative_difference</span> <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;LIME coefficients version&quot;</span><span class="p">,</span> <span class="n">coeff_version</span><span class="p">])</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;Interpolation spectrum&quot;</span><span class="p">,</span> <span class="n">interp_spectrum_name</span><span class="p">])</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;MRD (Mean Relative Difference %)&quot;</span><span class="p">,</span> <span class="n">mrd</span><span class="p">])</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                    <span class="p">[</span><span class="s2">&quot;STD-RD (Standard deviation of Relative Difference %)&quot;</span><span class="p">,</span> <span class="n">stdrd</span><span class="p">]</span>
-                <span class="p">)</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
-                    <span class="p">[</span><span class="s2">&quot;MARD (Mean of the Absolutes of the Relative Differences %)&quot;</span><span class="p">,</span> <span class="n">mard</span><span class="p">]</span>
-                <span class="p">)</span>
-                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;MPD (Mean Percentage Difference %)&quot;</span><span class="p">,</span> <span class="n">mpd</span><span class="p">])</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">init_rows</span><span class="p">)</span>
                 <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="p">[</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">ampa_valid_range</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]:</span>
                     <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;**&quot;</span><span class="p">,</span> <span class="n">_WARN_OUT_MPA_RANGE</span><span class="p">])</span>
             <span class="c1"># Now with pandas the rest</span>

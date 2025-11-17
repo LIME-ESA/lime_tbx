@@ -20,7 +20,7 @@ This glossary provides definitions for key terms and concepts used throughout th
 | **FR** | Functional Requirement | |
 | **GIRO** | GSICS Implementation of the ROLO Model | |
 | **GLOD** | GSICS Lunar Observation Dataset | |
-| **GSICS** | Global Space Based Inter-calibration System | |
+| **GSICS** | Global Space Based Inter-Calibration System | |
 | **GUI** | Graphical User Interface | |
 | **KO** | Kick-off meeting | |
 | **LGLOD** | LIME-GLOD | Former term, now deprecated |

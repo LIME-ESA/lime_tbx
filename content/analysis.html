@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Analysis &mdash; Lime Tbx 1.4.0 documentation</title>
+  <title>Analysis &mdash; Lime Tbx 1.4.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=f2acf8a4" />
@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/favicon.png"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=9172181d"></script>
+      <script src="../_static/documentation_options.js?v=350a9c04"></script>
       <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -213,7 +213,7 @@ those in any previous official LIME documentation, as they are subject to change
 for <strong>FR101</strong> and <strong>FR105</strong>.</p></li>
 <li><p><strong>FR105</strong>: The user must be able to simulate lunar observations for an ESA satellite.</p></li>
 <li><p><strong>FR106</strong>: Allow users to choose which SRF are simulations running with (<strong>FR103</strong>).</p></li>
-<li><p><strong>FR107</strong>: Allow users to simulate series of lunar observations, where not only the time varies.</p></li>
+<li><p><strong>FR107</strong>: Allow users to simulate a series of lunar observations, where multiple paremeters can vary simultaneosuly, not only the time.</p></li>
 <li><p><strong>FR108</strong>: Allow users to simulate lunar observation using a user-defined satellite.</p></li>
 </ul>
 </section>
@@ -235,9 +235,10 @@ orbital scenario file in EO-CFI compatible format.</p></li>
 </ul>
 </li>
 <li><p><strong>NFR109</strong>: The ESA satellites available for selection must include METOP first generation: METOP-A, METOP-B and METOP-C.</p></li>
-<li><p><strong>NFR110</strong>: The simulation input for series of lunar observations (FR107) must be done via an input file.</p></li>
+<li><p><strong>NFR110</strong>: The simulation input for multi-parameter series of lunar observations (<strong>FR107</strong>) must be provided via an input file.</p></li>
 <li><p><strong>NFR111</strong>: The satellites for <strong>FR108</strong> must be defined using Orbit Scenario Files (OSF) or Three-Line
 Element Set (TLE/3LE) files.</p></li>
+<li><p><strong>NFR112</strong>: The simulation input for multi-parameter series of lunar observations (<strong>FR107</strong>) must allow multiple entries of selenographic coordinates, where all selenographic coordinates can vary independently.</p></li>
 </ul>
 </section>
 </section>
@@ -328,7 +329,7 @@ the software (e.g., GitHub).</p></li>
 <li><p><strong>NFR410</strong>: The TBX compilation must be automated as much as possible, ideally using GitLab CI.</p></li>
 <li><p><strong>NFR411</strong>: Migrate the project to GitHub</p>
 <ul>
-<li><p><strong>NFR411-A</strong>: During development mirror the repository to GitHub.</p></li>
+<li><p><strong>NFR411-A</strong>: During development, mirror the repository to GitHub.</p></li>
 <li><p><strong>NFR411-B</strong>: Migrate the issues to GitHub. GitLab issues must be used during development by the LIME team to
 add issues, and GitHub issues when finished.</p></li>
 <li><p><strong>NFR411-C</strong>: Migrate the CI pipeline to GitHub.</p></li>
@@ -338,7 +339,7 @@ add issues, and GitHub issues when finished.</p></li>
 <li><p><strong>NFR412</strong>: Code modules should be as independent as possible so it could be possible to add a “choose model” option
 in the future without requiring too much development.</p></li>
 <li><p><strong>NFR413</strong>: Keep EO-CFI version updated to the latest release.</p></li>
-<li><p><strong>NFR414</strong>: The TBX should be able to simulate the satellite positions for all satellites with OSF files in the EOP-CFI server.</p></li>
+<li><p><strong>NFR414</strong>: The TBX should be able to simulate satellite positions for all satellites with OSF files in the EOP-CFI server.</p></li>
 <li><p><strong>NFR415</strong>: The TBX code will be under LGPL license, in a repository with public access.</p></li>
 </ul>
 </section>
