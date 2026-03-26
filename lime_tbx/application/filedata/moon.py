@@ -11,8 +11,8 @@ from datetime import datetime, timezone
 """___Third-Party Modules___"""
 import numpy as np
 import xarray as xr
-from xarray_schema import DatasetSchema, DataArraySchema, SchemaError
-from xarray_schema.components import AttrsSchema
+from xarrera import DatasetSchema, DataArraySchema, SchemaError
+from xarrera.components import AttrsSchema, AttrSchema
 
 """___LIME_TBX Modules___"""
 from lime_tbx.common.datatypes import (
@@ -29,7 +29,6 @@ from lime_tbx.business.eocfi_adapter.eocfi_adapter import EOCFIConverter
 from lime_tbx.application.filedata.netcdfcommon import (
     xr_open_dataset,
     validate_schema,
-    AttrSchema,
     get_length_conversion_factor,
 )
 

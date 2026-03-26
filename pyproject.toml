@@ -62,7 +62,7 @@ dependencies = [
     "spicedmoon~=1.1",
     "spiceypy~=6.0",
     "xarray>=2024.7.0",
-    "xarray_schema>=0.0.3",
+    "xarrera~=0.0.5",
 ]
 
 [project.optional-dependencies]

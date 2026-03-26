@@ -1,17 +1,13 @@
 """Common functionalities for reading netCDF files with `xarray`."""
 
 """___Built-In Modules___"""
-from typing import Iterable, Mapping, Any, Union
+from typing import Iterable, Mapping, Union
 
 """___Third-Party Modules___"""
 import numpy as np
 import xarray as xr
-from xarray_schema import DatasetSchema, SchemaError
-from xarray_schema.components import (
-    AttrSchema as BrAttrSchema,
-    DTypeSchema as BrDTypeSchema,
-    DTypeLike,
-)
+from xarrera import DatasetSchema, SchemaError
+
 
 """___Authorship___"""
 __author__ = "Javier Gatón Herguedas"
@@ -75,49 +71,6 @@ def get_length_conversion_factor(from_unit: str, to_unit: str) -> float:
     return factor
 
 
-class AttrSchema(BrAttrSchema):
-    """
-    Re-implementation of `xarray_schema.AttrSchema` but correctly validating and raising `SchemaError`s
-    """
-
-    def validate(self, attr: Any):
-        """Validate that `attr` follows the schema.
-
-        Parameters
-        ----------
-        attr: Any
-            xarray dataset attribute that is going to be validated against the schema.
-
-        Raises
-        ------
-        SchemaError
-            Error indicating that `attr` is not following the schema.
-        """
-        if self.type is not None:
-            if not np.issubdtype(type(attr), self.type):
-                raise SchemaError(
-                    f"Error in attribute {attr}: is not of type {self.type}"
-                )
-        if self.value is not None:
-            if self.value is not None and self.value != attr:
-                raise SchemaError(f"name {attr} != {self.value}")
-
-
-class DTypeSchema(BrDTypeSchema):
-    def __init__(self, dtype: DTypeLike) -> None:
-        if dtype in [
-            np.floating,
-            np.integer,
-            np.signedinteger,
-            np.unsignedinteger,
-            np.generic,
-            np.character,
-        ]:
-            self.dtype = dtype
-        else:
-            self.dtype = np.dtype(dtype)
-
-
 def xr_open_dataset(
     filepath: str,
     mask_fillvalue: Union[bool, Mapping[str, bool]] = True,
@@ -169,36 +122,6 @@ def xr_open_dataset(
     return ds
 
 
-def _validate_schema(dss: DatasetSchema, ds: xr.Dataset):
-    """Validates the dataset `ds` against the schema `dss`.
-
-    Parameters
-    ----------
-    dss: xarray_schema.DatasetSchema
-        Schema that the dataset is going to be validated against.
-    ds: xarray.Dataset
-        Dataset to validate.
-
-    Raises
-    ------
-    SchemaError
-        Error indicating that the dataset is not following the schema.
-    """
-    try:
-        dss.validate(ds)
-    except NotImplementedError:
-        pass
-    if dss.coords is not None:
-        for key, da_schema in dss.coords.items():
-            if da_schema is not None:
-                if key not in ds.coords:
-                    raise SchemaError(f"Coordinate '{key}' not in dataset")
-                try:
-                    da_schema.validate(ds.coords[key])
-                except SchemaError as e:
-                    raise SchemaError(f"Error in coordinate '{key}': {e}") from e
-
-
 def validate_schema(
     dss: DatasetSchema, ds: xr.Dataset, other_schemas: Iterable[DatasetSchema] = None
 ):
@@ -206,11 +129,11 @@ def validate_schema(
 
     Parameters
     ----------
-    dss: xarray_schema.DatasetSchema
+    dss: xarrera.DatasetSchema
         Schema that the dataset is going to be validated against.
     ds: xarray.Dataset
         Dataset to validate.
-    other_schemas: Iterable[xarray_schema.DatasetSchema]
+    other_schemas: Iterable[xarrera.DatasetSchema]
         If the dataset can have multiple schemas, it will be validated
         against those before the canonical one. Once it succeeds in a validation,
         it's understood as validated and finishes the validation.
@@ -223,8 +146,8 @@ def validate_schema(
     if other_schemas is not None:
         for odss in other_schemas:
             try:
-                _validate_schema(odss, ds)
+                odss.validate(ds)
                 return
             except SchemaError:
                 pass
-    _validate_schema(dss, ds)
+    dss.validate(ds)
