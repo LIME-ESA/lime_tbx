@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [//]: # "## [unreleased] - yyyy-mm-dd"
 
+## [unreleased] - yyyy-mm-dd
+
+### Added
+
+- Added support for Python 3.13 and 3.14
+
+### Deleted
+
+- Dropped support for Python 3.9
+
 ## [1.4.1] - 2025-11-17
 
 ### Changed

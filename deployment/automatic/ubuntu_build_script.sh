@@ -37,9 +37,9 @@ package_python() {
   echo "[build] Packaging Python app..."
   cd repo
   rm -rf lime_tbx.egg-info dist build
-  python3.9 -m build
+  python3.10 -m build
   rm -rf .venv
-  python3.9 -m venv .venv
+  python3.10 -m venv .venv
   .venv/bin/pip install wheel
   .venv/bin/pip install -r requirements.txt
   .venv/bin/pip install "PySide2~=5.15"
