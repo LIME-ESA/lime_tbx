@@ -95,7 +95,7 @@ def _validate_schema_regular_moonobs(ds: xr.Dataset):
         "irr_obs": DataArraySchema(np.floating, dims=["chan"]),
     }
     coords = {"date": DataArraySchema(np.floating, shape=(1,))}
-    attrs = AttrsSchema({"data_source": AttrSchema(np.generic)})
+    attrs = AttrsSchema({"data_source": AttrSchema(str)})
 
     dss = DatasetSchema(
         data_vars=data_vars,
