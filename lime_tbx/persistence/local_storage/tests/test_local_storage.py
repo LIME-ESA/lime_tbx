@@ -1,22 +1,13 @@
-"""Tests for classname module"""
+"""Tests for appdata and programdata modules"""
 
-"""___Built-In Modules___"""
 import logging
 import os
 import pathlib
+import tempfile
 
-"""___Third-Party Modules___"""
 import unittest
 
-"""___LIME_TBX Modules___"""
-from .. import appdata, programdata
-
-"""___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
-__status__ = "Development"
+from .. import appdata, programdata, config_paths
 
 
 def get_logger() -> logging.Logger:
@@ -63,6 +54,33 @@ class TestAppdata(unittest.TestCase):
             os.path.expanduser(os.path.join("~", "." + appdata.APPNAME)),
         )
 
+    def test_appdata_override_valid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.makedirs(os.path.join(tmpdir, "kernels"))
+            os.makedirs(os.path.join(tmpdir, "coeff_data"))
+            self.assertIsNone(config_paths.APPDATA_OVERRIDE)
+            config_paths.APPDATA_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(appdata.get_appdata_folder(get_logger()), tmpdir)
+            finally:
+                config_paths.APPDATA_OVERRIDE = None
+
+    def test_appdata_override_invalid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.assertIsNone(config_paths.APPDATA_OVERRIDE)
+            config_paths.APPDATA_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(appdata.get_appdata_folder(get_logger()), ".")
+            finally:
+                config_paths.APPDATA_OVERRIDE = None
+
+    def test_appdata_override_none(self):
+        self.assertIsNone(config_paths.APPDATA_OVERRIDE)
+        self.assertEqual(
+            appdata.get_appdata_folder(get_logger()),
+            os.path.expanduser(os.path.join("~", "." + appdata.APPNAME)),
+        )
+
 
 class TestProgramdata(unittest.TestCase):
     # get_programfiles_folder can't be tested for other platforms in linux as the function
@@ -85,6 +103,33 @@ class TestProgramdata(unittest.TestCase):
 
     def test_get_programfiles(self):
         # This will fail if lime_tbx is installed
+        self.assertEqual(programdata.get_programfiles_folder(), ".")
+
+    def test_programfiles_override_valid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.makedirs(os.path.join(tmpdir, "kernels"))
+            os.makedirs(os.path.join(tmpdir, "eocfi_data"))
+            os.makedirs(os.path.join(tmpdir, "coeff_data"))
+            self.assertIsNone(config_paths.PROGRAMFILES_OVERRIDE)
+            config_paths.PROGRAMFILES_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(programdata.get_programfiles_folder(), tmpdir)
+            finally:
+                config_paths.PROGRAMFILES_OVERRIDE = None
+
+    def test_programfiles_override_invalid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.makedirs(os.path.join(tmpdir, "kernels"))
+            self.assertIsNone(config_paths.PROGRAMFILES_OVERRIDE)
+            config_paths.PROGRAMFILES_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(programdata.get_programfiles_folder(), ".")
+            finally:
+                config_paths.PROGRAMFILES_OVERRIDE = None
+
+    def test_programfiles_override_none(self):
+        # This will fail if lime_tbx is installed
+        self.assertIsNone(config_paths.PROGRAMFILES_OVERRIDE)
         self.assertEqual(programdata.get_programfiles_folder(), ".")
 
 

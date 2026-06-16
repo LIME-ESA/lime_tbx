@@ -6,25 +6,14 @@ It exports the following functions:
     * get_appdata_folder - Get the path of the appdata folder as a string.
 """
 
-"""___Built-In Modules___"""
 import sys
 import pathlib
 from os import path
 import os
 from logging import Logger
 
-"""___Third-Party Modules___"""
-# import here
+import lime_tbx.persistence.local_storage.config_paths as config_paths
 
-"""___LIME_TBX Modules___"""
-# import here
-
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas"
-__created__ = "05/05/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
 
 APPNAME = "LimeTBX"
 
@@ -103,7 +92,10 @@ def get_appdata_folder(logger: Logger) -> str:
         Appdata folder absolute path
     """
     platf = sys.platform
-    appdata = _get_appdata_folder(logger, platf)
+    if config_paths.APPDATA_OVERRIDE is not None:
+        appdata = config_paths.APPDATA_OVERRIDE
+    else:
+        appdata = _get_appdata_folder(logger, platf)
     if not _is_valid_appdata(appdata, logger):
         logger.warning("Appdata folder not valid, using '.'")
         appdata = "."

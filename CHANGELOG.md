@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added support for Python 3.13 and 3.14
+- Added configuration overrides for appdata and programfiles paths (`APPDATA_OVERRIDE`, `PROGRAMFILES_OVERRIDE`) to
+  support integration with external systems directly through python package installation.
 
 ### Deleted
 

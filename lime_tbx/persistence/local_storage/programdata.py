@@ -5,24 +5,13 @@ It exports the following functions:
     * get_appdata_folder() - Get the path of the appdata folder as a string.
 """
 
-"""___Built-In Modules___"""
 import sys
 from os import path
 import os
 
-"""___Third-Party Modules___"""
-# import here
-
-"""___LIME_TBX Modules___"""
 from lime_tbx.common import logger
 from lime_tbx.persistence.local_storage import appdata
-
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas"
-__created__ = "16/10/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+import lime_tbx.persistence.local_storage.config_paths as config_paths
 
 APPNAME = "LimeTBX"
 
@@ -39,7 +28,9 @@ def _is_valid_programfiles(programdata: str) -> bool:
 
 def get_programfiles_folder() -> str:
     log = logger.get_logger()
-    if sys.platform == "darwin":
+    if config_paths.PROGRAMFILES_OVERRIDE is not None:
+        programfiles = config_paths.PROGRAMFILES_OVERRIDE
+    elif sys.platform == "darwin":
         _stream = os.popen('mdfind "kMDItemCFBundleIdentifier = int.esa.LimeTBX"')
         output = _stream.read()
         _stream.close()
