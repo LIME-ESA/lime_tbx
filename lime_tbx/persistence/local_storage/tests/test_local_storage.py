@@ -56,23 +56,23 @@ class TestAppdata(unittest.TestCase):
 
     def test_appdata_override_valid(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            os.makedirs(os.path.join(tmpdir, "kernels"))
-            os.makedirs(os.path.join(tmpdir, "coeff_data"))
             self.assertIsNone(config_paths.APPDATA_OVERRIDE)
             config_paths.APPDATA_OVERRIDE = tmpdir
             try:
+                self.assertEqual(appdata.get_appdata_folder(get_logger()), tmpdir)
+                self.assertTrue(os.path.exists(os.path.join(tmpdir, "kernels")))
+                self.assertTrue(os.path.exists(os.path.join(tmpdir, "coeff_data")))
                 self.assertEqual(appdata.get_appdata_folder(get_logger()), tmpdir)
             finally:
                 config_paths.APPDATA_OVERRIDE = None
 
     def test_appdata_override_invalid(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            self.assertIsNone(config_paths.APPDATA_OVERRIDE)
-            config_paths.APPDATA_OVERRIDE = tmpdir
-            try:
-                self.assertEqual(appdata.get_appdata_folder(get_logger()), ".")
-            finally:
-                config_paths.APPDATA_OVERRIDE = None
+        self.assertIsNone(config_paths.APPDATA_OVERRIDE)
+        config_paths.APPDATA_OVERRIDE = "./test_files/non_editable/file"
+        try:
+            self.assertEqual(appdata.get_appdata_folder(get_logger()), ".")
+        finally:
+            config_paths.APPDATA_OVERRIDE = None
 
     def test_appdata_override_none(self):
         self.assertIsNone(config_paths.APPDATA_OVERRIDE)
