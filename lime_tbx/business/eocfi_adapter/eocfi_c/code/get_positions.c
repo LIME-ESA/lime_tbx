@@ -26,7 +26,6 @@
       { exit(1); }                                                                                  \
     }                                                                                               \
   }
-#define DEFAULT_TERMINATE_CHECK_STATUS 1
 
 #if defined(EXAMPLE_DATA_BASED_INIT)
 DEFINE_CHECK_STATUS(xd, XD)
@@ -98,7 +97,7 @@ static char* to_timestamp(const xl_time_id *time, double instant) {
     long time_ref = XL_TIME_UTC;
     long fmt_in   = XL_PROC;
     long fmt_out  = XL_ASCII_CCSDSA_MICROSEC;
-    char* buffer = (char*)malloc(100*sizeof(char));
+    static char buffer[100];
     long errors[XL_NUM_ERR_PROC_ASCII];
 
     long status = xl_time_processing_to_ascii((xl_time_id *)(time), &fmt_in, &time_ref, &instant, &fmt_out,
@@ -106,203 +105,6 @@ static char* to_timestamp(const xl_time_id *time, double instant) {
     check_xl_status(XL_TIME_PROCESSING_TO_ASCII_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
 
     return buffer;
-}
-
-double * get_sun_position(
-        int y,
-        int m,
-        int d,
-        int hh,
-        int mm,
-        int ss,
-        int microsecs,
-        char *init_time_file
-){
-
-    double static position_returns[3];
-    struct Date dt = {y, m, d, hh, mm, ss, microsecs};
-
-    xl_model_id model = {NULL};
-    {
-        long mode = XL_MODEL_DEFAULT;
-        long errors[XL_NUM_ERR_MODEL_INIT];
-        long status = xl_model_init(&mode, NULL, &model, errors);
-        check_xl_status(XL_MODEL_INIT_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-    }
-
-    // Initialize time, based on the correlation provided with the orbit
-    xl_time_id time = {NULL};
-    double vstart, vstop;  // Validity start/stop, decimal days from 2000-01-01T00:00:00.000000 UTC
-    {
-        long mode           = XL_TIMEMOD_AUTO;
-        const char *files[] = {init_time_file};
-        long n_files        = 1;
-        long selection      = XL_SEL_FILE;
-        long time_ref       = XL_TIME_UTC;
-        long errors[XL_NUM_ERR_TIME_REF_INIT_FILE];
-
-        long status = xl_time_ref_init_file(&mode, &n_files, (char **)(files), &selection, &time_ref, NULL,
-                                            NULL, NULL, NULL, &vstart, &vstop, &time, errors);
-
-        check_xl_status(XL_TIME_REF_INIT_FILE_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-    }
-
-    // Convert the datetime to a correct format
-    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss + dt.microsecs/1000000.0;  // [seconds]
-    double start     = getDifference(dt);
-
-    double instant =
-            start + seconds / 86400.;  // calculate instant with 300. seconds step from start
-
-#ifdef DEBUG
-    printf("At time instant: %lf (%s)\n", instant, to_timestamp(&time, instant));
-#endif
-
-    // Calculate Sun ephemeris
-    double sun_position[3];  // (px, py, pz), in Earth Fixed
-    double sun_velocity[3];  // (vx, vy, vz), in Earth Fixed
-    {
-        long time_ref = XL_TIME_UTC;
-        long errors[XL_NUM_ERR_SUN];
-
-        long status = xl_sun(&model, &time, &time_ref, &instant, sun_position, sun_velocity, errors);
-        check_xl_status(XL_SUN_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-    }
-#ifdef DEBUG
-    printf("Moon position: (px, py, pz) = (%lf, %lf, %lf)\n", sun_position[0], sun_position[1], sun_position[2]);
-#endif
-    position_returns[0] = sun_position[0];
-    position_returns[1] = sun_position[1];
-    position_returns[2] = sun_position[2];
-
-    return position_returns;
-
-}
-
-double * get_moon_position(
-        int y,
-        int m,
-        int d,
-        int hh,
-        int mm,
-        int ss,
-        int microsecs,
-        char *init_time_file
-        ){
-
-    double static position_returns[3];
-    struct Date dt = {y, m, d, hh, mm, ss, microsecs};
-
-    xl_model_id model = {NULL};
-    {
-        long mode = XL_MODEL_DEFAULT;
-        long errors[XL_NUM_ERR_MODEL_INIT];
-        long status = xl_model_init(&mode, NULL, &model, errors);
-        check_xl_status(XL_MODEL_INIT_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-    }
-
-    // Initialize time, based on the correlation provided with the orbit
-    xl_time_id time = {NULL};
-    double vstart, vstop;  // Validity start/stop, decimal days from 2000-01-01T00:00:00.000000 UTC
-    {
-        long mode           = XL_TIMEMOD_AUTO;
-        const char *files[] = {init_time_file};
-        long n_files        = 1;
-        long selection      = XL_SEL_FILE;
-        long time_ref       = XL_TIME_UTC;
-        long errors[XL_NUM_ERR_TIME_REF_INIT_FILE];
-
-        long status = xl_time_ref_init_file(&mode, &n_files, (char **)(files), &selection, &time_ref, NULL,
-                                            NULL, NULL, NULL, &vstart, &vstop, &time, errors);
-
-        check_xl_status(XL_TIME_REF_INIT_FILE_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-    }
-
-    // Convert the datetime to a correct format
-    double seconds = (dt.hh * 3600) + (dt.mm * 60) + dt.ss + dt.microsecs/1000000.0;  // [seconds]
-    double start     = getDifference(dt);
-
-    double instant =
-            start + seconds / 86400.;  // calculate instant with 300. seconds step from start
-
-#if defined DEBUG
-    printf("At time instant: %lf (%s)\n", instant, to_timestamp(&time, instant));
-#endif
-
-    // Calculate Moon ephemeris
-    double moon_position[3];  // (px, py, pz), in Earth Fixed
-    double moon_velocity[3];  // (vx, vy, vz), in Earth Fixed
-    {
-        long time_ref = XL_TIME_UTC;
-        long errors[XL_NUM_ERR_MOON];
-
-        long status = xl_moon(&model, &time, &time_ref, &instant, moon_position, moon_velocity, errors);
-        check_xl_status(XL_MOON_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-    }
-#if defined DEBUG
-    printf("Moon position: (px, py, pz) = (%lf, %lf, %lf)\n", moon_position[0], moon_position[1], moon_position[2]);
-#endif
-    position_returns[0] = moon_position[0];
-    position_returns[1] = moon_position[1];
-    position_returns[2] = moon_position[2];
-
-    return position_returns;
-
-}
-
-
-
-#ifdef _WIN32
-__declspec(dllexport) int position_to_j2000(
-#else
-    int  position_to_j2000(
-#endif
-        double* position,
-        double* vel,
-        double* acc,
-        xl_time_id* time_id,
-        long* time_ref,
-        double* time
-    ){
-    long status, func_id, n;
-    long xl_ierr[XL_ERR_VECTOR_MAX_LENGTH];
-    char msg[XL_MAX_COD][XL_MAX_STR];
-    xl_model_id model_id = {NULL};
-    long model_mode,
-    models[XL_NUM_MODEL_TYPES_ENUM];
-    long cs_in, cs_out;
-    long calc_mode = XL_CALC_POS_VEL_ACC;
-    double pos_out[3] = {0.0, 0.0, 0.0};
-    double vel_out[3] = {0.0, 0.0, 0.0};
-    double acc_out[3] = {0.0, 0.0, 0.0};
-
-    model_mode = XL_MODEL_DEFAULT;
-    status = xl_model_init(&model_mode, models, &model_id, xl_ierr);
-    if (status != XL_OK)
-    {
-        func_id = XL_MODEL_INIT_ID;
-        xl_get_msg(&func_id, xl_ierr, &n, msg);
-        xl_print_msg(&n, msg);
-        if (status <= XL_ERR) return(XL_ERR);
-    }
-
-
-    cs_in = XL_EF; /* Initial coordinate system = Earth fixed ITRF */
-    cs_out = XL_GM2000; /* Final coordinate system =  J2000 */
-    status = xl_change_cart_cs(&model_id, time_id, &calc_mode, &cs_in, &cs_out,
-                                time_ref, time, position, vel, acc, pos_out, vel_out, acc_out);
-    if (status != XL_OK)
-    {
-        func_id = XL_CHANGE_CART_CS_ID;
-        xl_get_msg(&func_id, &status, &n, msg);
-        xl_print_msg(&n, msg);
-        if (status <= XL_ERR) return(XL_ERR);
-    }
-    position[0] = pos_out[0];
-    position[1] = pos_out[1];
-    position[2] = pos_out[2];
-
-    return XO_OK;
 }
 
 
@@ -452,8 +254,6 @@ __declspec(dllexport) int  get_satellite_position_osf(
         position_returns[i][1] = pos[1];
         position_returns[i][2] = pos[2];
     }
-
-
 
     /* Calling to xo_orbit_close */
     /* ------------------------- */
