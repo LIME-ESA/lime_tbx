@@ -35,7 +35,10 @@ typedef enum {
 #if defined(EXAMPLE_DATA_BASED_INIT)
 DEFINE_CHECK_STATUS(xd, XD)
 #endif
+
+#ifdef DEBUG
 DEFINE_CHECK_STATUS(xl, XL)
+#endif
 
 struct Date{
     int y, m, d, hh, mm, ss, microsecs;
@@ -79,23 +82,22 @@ static int getDifference(struct Date dt)
     return (n2 - n1);
 }
 
+#ifdef DEBUG
 static char* to_timestamp(const xl_time_id *time, double instant) {
-
     long time_ref = XL_TIME_UTC;
     long fmt_in   = XL_PROC;
     long fmt_out  = XL_ASCII_CCSDSA_MICROSEC;
     static char buffer[100];
     long errors[XL_NUM_ERR_PROC_ASCII];
-
     long status = xl_time_processing_to_ascii((xl_time_id *)(time), &fmt_in, &time_ref, &instant, &fmt_out,
                                               &time_ref, buffer, errors);
     check_xl_status(XL_TIME_PROCESSING_TO_ASCII_ID, status, errors, DEFAULT_TERMINATE_CHECK_STATUS);
-
     return buffer;
 }
+#endif
 
 static int compute_position_for_date(
-        const xo_orbit_id *orbit_id,
+        xo_orbit_id *orbit_id,
         const xl_time_id *time_id,
         const struct Date *dt,
         long propag_model,
@@ -167,7 +169,7 @@ __declspec(dllexport) int  get_satellite_position_osf(
         long sat_id,
         int quant_dates,
         int** dates,
-        const char* orbit_file,
+        char* orbit_file,
         double** position_returns
     ){
     char msg[XO_MAX_COD][XO_MAX_STR];
@@ -209,7 +211,7 @@ __declspec(dllexport) int  get_satellite_position_osf(
     trif_time_ref       = XL_TIME_UTC;
 
     status = xl_time_ref_init_file(&trif_time_model, &one,
-                                   (char**)&orbit_file,
+                                   &orbit_file,
                                    &trif_time_init_mode, &trif_time_ref, NULL,
                                    NULL, NULL, NULL, &vstart, &vstop, &time_id, errors);
 
@@ -276,11 +278,11 @@ __declspec(dllexport) int  get_satellite_position_tle(
         long sat_id,
         int quant_dates,
         int** dates,
-        const char *time_file,
+        char *time_file,
         long norad,
-        const char *sat_name,
-        const char *intdes,
-        const char *tle_file,
+        char *sat_name,
+        char *intdes,
+        char *tle_file,
         double** position_returns
         ){
 
