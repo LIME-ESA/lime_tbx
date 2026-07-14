@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added orbit validity check and improved error handling.
   - Fixed potential memory leaks.
 
+### Changed
+- TLE time reference: now uses manual initialization (`xl_time_ref_init`) to the MJD2000
+  epoch instead of relying on an external `time_file`.
+
 ### Deleted
 
 - Dropped support for Python 3.9
