@@ -121,27 +121,18 @@ static int compute_position_for_date(
 
     double time = val_time0;
 
-    xo_validity_time val_time;
-    long status = xo_orbit_get_osv_compute_validity(orbit_id, &val_time);
-    if (status != XO_OK) {
-        fprintf(stderr, "xo_orbit_get_osv_compute_validity failed with status %ld\n", status);
-        return status;
-    }
-    if (time < val_time.start || time > val_time.stop) {
-        fprintf(stderr, "Requested time %f is outside orbit validity [%f, %f]\n", time, val_time.start, val_time.stop);
-        return XL_ERR;
-    }
-
     long time_ref_utc = XO_TIME_UTC;
 
-    status = xo_osv_compute(orbit_id, &propag_model, &time_ref_utc, &time,
+    long status = xo_osv_compute(orbit_id, &propag_model, &time_ref_utc, &time,
                             pos, vel, acc, errors);
 
     if (status != XO_OK) {
         long func_id = XO_OSV_COMPUTE_ID;
         xo_get_msg(&func_id, errors, &n, msg);
         xo_print_msg(&n, msg);
-        return status;
+        if (status == XO_ERR) {
+            return status;
+        }
     }
 
 #ifdef DEBUG
@@ -278,7 +269,6 @@ __declspec(dllexport) int  get_satellite_position_tle(
         long sat_id,
         int quant_dates,
         int** dates,
-        char *time_file,
         long norad,
         char *sat_name,
         char *intdes,
@@ -306,7 +296,6 @@ __declspec(dllexport) int  get_satellite_position_tle(
     xl_time_id time_id = {NULL};
     double vstart, vstop;
 
-    long   trif_time_model, trif_time_init_mode, trif_time_ref ;
     long   errors[XO_ERR_VECTOR_MAX_LENGTH], status;
 
     xo_orbit_id    orbit_id    = {NULL};
@@ -329,23 +318,30 @@ __declspec(dllexport) int  get_satellite_position_tle(
 #endif
 
     // Input validation
-    if (dates == NULL || position_returns == NULL || time_file == NULL || tle_file == NULL) {
+    if (dates == NULL || position_returns == NULL || tle_file == NULL) {
         return XL_ERR;
     }
-
-    /* Time Initialization */
-    trif_time_model     = XL_TIMEMOD_AUTO;
-    trif_time_init_mode = XL_SEL_FILE;
-    trif_time_ref       = XL_TIME_UTC;
 
 #ifdef DEBUG
     printf("init\n");fflush(stdout);
 #endif
 
-    status = xl_time_ref_init_file(&trif_time_model, &one,
-                                   &time_file,
-                                   &trif_time_init_mode, &trif_time_ref, NULL,
-                                   NULL, NULL, NULL, &vstart, &vstop, &time_id, errors);
+    double time[4] = {0.0, 0.0, 0.0, 0.0};  // TAI, UTC, UT1, GPS (all zero)
+    long orbit_num = 0;
+    double anx_time = 0.0;
+    double orbit_duration = 0.0;
+
+    status = xl_time_ref_init(time, &orbit_num, &anx_time, &orbit_duration,
+                              &time_id, errors);
+
+    if (status != XL_OK) {
+        fprintf(stderr, "xl_time_ref_init failed\n");
+        return XL_ERR;
+    }
+
+    // Los tiempos de validez los calculas tú con getDifference
+    vstart = -1.0;  // No se usan porque el archivo no tiene validez fija
+    vstop = -1.0;
 
 #ifdef DEBUG
     printf("check\n");fflush(stdout);
@@ -486,7 +482,6 @@ int main (int argc, char *argv[]){
             sat_id,
             n_dates,
             dates,
-            orbit_file,
             norad,
             sat_name,
             intdes,
@@ -515,6 +510,17 @@ int main (int argc, char *argv[]){
     free(orbit_file);
     free(sat_name);
     free(intdes);
+    if (status != XL_OK) {
+        fprintf(stderr, "function failed with code %ld\n", status);
+        fflush(stderr);
+        for(int i = 0; i < n_dates; i++){
+            free(dates[i]);
+            free(positions[i]);
+        }
+        free(dates);
+        free(positions);
+        return status;
+    }
     int digs = DECIMAL_DIG;
     for(int i = 0; i < n_dates; i++){
         printf("%.*e\n", digs, positions[i][0]);
@@ -526,9 +532,5 @@ int main (int argc, char *argv[]){
     }
     free(dates);
     free(positions);
-    if (status != XL_OK) {
-        fprintf(stderr, "function failed with code %ld\n", status);
-        return status;
-    }
     return 0;
 }
