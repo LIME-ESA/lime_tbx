@@ -201,12 +201,12 @@ __declspec(dllexport) int  get_satellite_position_osf(
     trif_time_init_mode = XL_SEL_FILE;
     trif_time_ref       = XL_TIME_UTC;
 
-    status = xl_time_ref_init_file(&trif_time_model, &one,
-                                   &orbit_file,
+    char *file_list[1] = { orbit_file };
+    status = xl_time_ref_init_file(&trif_time_model, &one, file_list,
                                    &trif_time_init_mode, &trif_time_ref, NULL,
                                    NULL, NULL, NULL, &vstart, &vstop, &time_id, errors);
 
-    if (status != XO_OK)
+    if (status != XL_OK)
     {
         func_id = XL_TIME_REF_INIT_FILE_ID;
         xl_get_msg(&func_id, errors, &n, msg);
@@ -219,7 +219,7 @@ __declspec(dllexport) int  get_satellite_position_osf(
     orbit_mode = XO_ORBIT_INIT_AUTO;
 
     status =  xo_orbit_init_file(&sat_id, &model_id, &time_id,
-                                 &orbit_mode, &one, (char**)&orbit_file,
+                                 &orbit_mode, &one, file_list,
                                  &time_init_mode, &time_ref_utc,
                                  &vstart, &vstop, &orbit0, &orbit1,
                                  &val_time0, &val_time1, &orbit_id,
@@ -284,7 +284,7 @@ __declspec(dllexport) int  get_satellite_position_tle(
         }
         printf("\n");
     }
-    printf("%s\n%ld, %s, %s\n%s\n", time_file, norad, sat_name, intdes, tle_file);
+    printf("%ld, %s, %s\n%s\n", norad, sat_name, intdes, tle_file);
     fflush(stdout);
 #endif
 
@@ -347,19 +347,11 @@ __declspec(dllexport) int  get_satellite_position_tle(
     printf("check\n");fflush(stdout);
 #endif
 
-    if (status != XO_OK)
-    {
-        func_id = XL_TIME_REF_INIT_FILE_ID;
-        xl_get_msg(&func_id, errors, &n, msg);
-        xl_print_msg(&n, msg);
-        return XL_ERR;
-    }
-
     /* TLE Initialization */
-    char norad_satcat[50];
-    char int_des[10];
-    strcpy(norad_satcat, sat_name);
-    strcpy(int_des, intdes);
+    char norad_satcat[100];
+    char int_des[50];
+    snprintf(norad_satcat, 100, "%s", sat_name);
+    snprintf(int_des, 50, "%s", intdes);
     status = xl_set_tle_sat_data(&sat_id, &norad, norad_satcat, int_des);
     if (status != XL_OK){
         if (status <= XL_ERR) return(XL_ERR);
@@ -371,8 +363,9 @@ __declspec(dllexport) int  get_satellite_position_tle(
 #ifdef DEBUG
     printf("almost\n");fflush(stdout);
 #endif
+    char *file_list[1] = { tle_file };
     status =  xo_orbit_init_file(&sat_id, &model_id, &time_id,
-                                 &orbit_mode, &one, &tle_file,
+                                 &orbit_mode, &one, file_list,
                                  &time_init_mode, &time_ref_utc,
                                  &vstart, &vstop, &orbit0, &orbit1,
                                  &val_time0, &val_time1, &orbit_id,
@@ -417,7 +410,7 @@ __declspec(dllexport) int  get_satellite_position_tle(
 }
 
 
-#define STR_SIZE_INPUT 1000
+#define STR_SIZE_INPUT 2000
 
 int main (int argc, char *argv[]){
     int n_dates, file_input_type;
@@ -463,16 +456,16 @@ int main (int argc, char *argv[]){
     if(argc < 6){
         sat_id = 200;
         dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0; dates[0][6] = 0;
-        strcpy(tle_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/TLE/PROBA-V_20130507T000000_20221012T000000_0001.TLE");
+        snprintf(tle_file, STR_SIZE_INPUT, "%s", "../../../eocfi_data/data/mission_configuration_files/PROBAV/TLE/PROBA-V_20130507T000000_20221012T000000_0001.TLE");
         norad = 39159;
-        strcpy(sat_name, "PROBA-V");
-        strcpy(intdes, "13021A");
+        snprintf(sat_name, STR_SIZE_INPUT, "%s", "PROBA-V");
+        snprintf(intdes, STR_SIZE_INPUT, "%s", "13021A");
     }else if(file_input_type == INPUT_TYPE_TLE){
         sat_id = atol(argv[3]);
         norad = atol(argv[4]);
-        strcpy(tle_file, argv[5]);
-        strcpy(sat_name, argv[6]);
-        strcpy(intdes, argv[7]);
+        snprintf(tle_file, STR_SIZE_INPUT, "%s", argv[5]);
+        snprintf(sat_name, STR_SIZE_INPUT, "%s", argv[6]);
+        snprintf(intdes, STR_SIZE_INPUT, "%s", argv[7]);
         for(int i = 0; i < n_dates; i++){
             sscanf(argv[8+i], "%d-%d-%dT%d:%d:%d.%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5], &dates[i][6]);
         }
@@ -488,7 +481,7 @@ int main (int argc, char *argv[]){
         );
     }else if (file_input_type == INPUT_TYPE_OSF){
         sat_id = atol(argv[3]);
-        strcpy(orbit_file, argv[4]);
+        snprintf(orbit_file, STR_SIZE_INPUT, "%s", argv[4]);
         for(int i = 0; i < n_dates; i++){
             sscanf(argv[5+i], "%d-%d-%dT%d:%d:%d.%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5], &dates[i][6]);
         }
