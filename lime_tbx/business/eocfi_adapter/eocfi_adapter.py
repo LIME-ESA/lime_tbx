@@ -399,14 +399,13 @@ class EOCFIConverter:
             )
         else:
             tle_file = '"{}"'.format(tle_file)
-            cmd = "{} {} {} {} {} {} {} {} {}".format(
+            cmd = "{} {} {} {} {} {} {} {}".format(
                 _exe_path,
                 1,
                 n_dates,
                 sat.id,
                 norad,
                 tle_file,
-                orbit_path,
                 f'"{sat.name}"',
                 intdes,
             )

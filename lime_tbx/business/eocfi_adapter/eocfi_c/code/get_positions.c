@@ -463,7 +463,6 @@ int main (int argc, char *argv[]){
     if(argc < 6){
         sat_id = 200;
         dates[0][0] = 2022; dates[0][1] = 1; dates[0][2] = 1; dates[0][3] = 0; dates[0][4] = 12; dates[0][5] = 0; dates[0][6] = 0;
-        strcpy(orbit_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/OSF/PROBA-V_TLE2ORBPRE_20130507T052939_20221002T205653_0001.EOF");
         strcpy(tle_file, "../../../eocfi_data/data/mission_configuration_files/PROBAV/TLE/PROBA-V_20130507T000000_20221012T000000_0001.TLE");
         norad = 39159;
         strcpy(sat_name, "PROBA-V");
@@ -472,11 +471,10 @@ int main (int argc, char *argv[]){
         sat_id = atol(argv[3]);
         norad = atol(argv[4]);
         strcpy(tle_file, argv[5]);
-        strcpy(orbit_file, argv[6]);
-        strcpy(sat_name, argv[7]);
-        strcpy(intdes, argv[8]);
+        strcpy(sat_name, argv[6]);
+        strcpy(intdes, argv[7]);
         for(int i = 0; i < n_dates; i++){
-            sscanf(argv[9+i], "%d-%d-%dT%d:%d:%d.%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5], &dates[i][6]);
+            sscanf(argv[8+i], "%d-%d-%dT%d:%d:%d.%d", &dates[i][0], &dates[i][1], &dates[i][2], &dates[i][3], &dates[i][4], &dates[i][5], &dates[i][6]);
         }
         status = get_satellite_position_tle(
             sat_id,
