@@ -239,6 +239,20 @@
  *               +----------------------------------------------------------------------------------+
  *               |   4.29  |09/04/25  | DEIMOS Space S.L.U| Maintenance release                     |
  *               +----------------------------------------------------------------------------------+
+ *               |   4.30  |04/02/26  | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |   + Add support for SENTINEL1D,         |
+ *               |         |          |                   |     SENTINED2D, SENTINEL6C,             |
+ *               |         |          |                   |     HARMONY-A/B and ALTIUS              |
+ *               |         |          |                   |   + Update orbital parameter and        |
+ *               |         |          |                   |     SATCAT/NORAD ID for BIOMASS         |
+ *               +----------------------------------------------------------------------------------+
+ *               |   4.31  |18/06/26  | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |   + Implement the ability to handle a   |
+ *               |         |          |                   |     different reference for ocean pixels|
+ *               |         |          |                   |     in GDEM tiles                       |
+ *               +----------------------------------------------------------------------------------+
  *
  ****************************************************************************************************/
 
@@ -443,6 +457,12 @@ extern "C"
     XL_SAT_LSTM = 152,
     XL_SAT_FORUM = 153,
     XL_SAT_TRUTHS = 154,
+    XL_SAT_SENTINEL_1D = 155,
+    XL_SAT_SENTINEL_2D = 156,
+    XL_SAT_SENTINEL_6C = 157,
+    XL_SAT_HARMONY_A = 158,
+    XL_SAT_HARMONY_B = 159,
+    XL_SAT_ALTIUS = 160,
     XL_SAT_GENERIC = 200,
     XL_SAT_GENERIC_GEO = 300, /* ANR-353 */
     XL_SAT_MTG = 301, /* ANR-353 */

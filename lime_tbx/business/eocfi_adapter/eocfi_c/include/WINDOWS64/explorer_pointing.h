@@ -223,6 +223,20 @@
  *               +--------------------------------------------------------------------------------+
  *               |   4.29  |09/04/25| DEIMOS Space S.L.U| Maintenance release                     |
  *               +--------------------------------------------------------------------------------+
+ *               |   4.30  |04/02/26| DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |        |                   | New features:                           |
+ *               |         |        |                   |   + Add support for SENTINEL1D,         |
+ *               |         |        |                   |     SENTINED2D, SENTINEL6C,             |
+ *               |         |        |                   |     HARMONY-A/B and ALTIUS              |
+ *               |         |        |                   |   + Update orbital parameter and        |
+ *               |         |        |                   |     SATCAT/NORAD ID for BIOMASS         |
+ *               +--------------------------------------------------------------------------------+
+ *               |   4.31  |18/06/26| DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |        |                   | New features:                           |
+ *               |         |        |                   |   + Implement the ability to handle a   |
+ *               |         |        |                   |     different reference for ocean pixels|
+ *               |         |        |                   |     in GDEM tiles                       |
+ *               +--------------------------------------------------------------------------------+
  *
  **************************************************************************************************/
 #ifndef EXPLORER_POINTING_H
@@ -2166,6 +2180,12 @@ typedef enum
   XP_SAT_LSTM = XL_SAT_LSTM,
   XP_SAT_FORUM = XL_SAT_FORUM,
   XP_SAT_TRUTHS = XL_SAT_TRUTHS,
+  XP_SAT_SENTINEL_1D = XL_SAT_SENTINEL_1D,
+  XP_SAT_SENTINEL_2D = XL_SAT_SENTINEL_2D,
+  XP_SAT_SENTINEL_6C = XL_SAT_SENTINEL_6C,
+  XP_SAT_HARMONY_A = XL_SAT_HARMONY_A,
+  XP_SAT_HARMONY_B = XL_SAT_HARMONY_B,
+  XP_SAT_ALTIUS = XL_SAT_ALTIUS,
   XP_SAT_GENERIC = XL_SAT_GENERIC,
   XP_SAT_GENERIC_GEO = XL_SAT_GENERIC_GEO, /* ANR-353 */
   XP_SAT_MTG = XL_SAT_MTG, /* ANR-353 */
