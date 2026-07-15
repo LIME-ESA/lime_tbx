@@ -586,9 +586,6 @@ class Satellite:
     intdes: str | None
         International Designator of the object.
         Only present if the satellite has TLE files.
-    time_file: str | None
-        File used for time initialization.
-        Only present if the satellite has TLE files.
     """
 
     name: str
@@ -596,7 +593,6 @@ class Satellite:
     orbit_files: List[OrbitFile]
     norad_sat_number: Union[int, None]
     intdes: Union[str, None]
-    time_file: Union[str, None]
 
     def get_datetime_range(self) -> Tuple[datetime, datetime]:
         """

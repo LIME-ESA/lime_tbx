@@ -74,7 +74,6 @@ def _callback_save_satellite(
     orbf = sat.orbit_files[0]
     sat.orbit_files = []
     eo = eocfi_adapter.EOCFIConverter(eocfi_path, kernels_path)
-    sat.time_file = eo.get_default_timefile()
     valid = eo.check_data_file_works(sat, [start_date, end_date], orbf)
     if not valid:
         errmsg = (
@@ -1019,8 +1018,7 @@ class AddSatDialog(QtWidgets.QDialog):
         norad = int(norad) if norad else None
         intdes = self.intdes_field.text()
         intdes = intdes if intdes else None
-        time_file = None
-        sat = Satellite(satname, satid, datafiles, norad, intdes, time_file)
+        sat = Satellite(satname, satid, datafiles, norad, intdes)
         start_date = (
             self.start_time_field.dateTime().toPython().replace(tzinfo=timezone.utc)
         )

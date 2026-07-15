@@ -214,6 +214,20 @@
  *               +----------------------------------------------------------------------------------+
  *               |   4.29  |09/04/25  | DEIMOS Space S.L.U| Maintenance release                     |
  *               +----------------------------------------------------------------------------------+
+ *               |   4.30  |04/02/26  | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |   + Add support for SENTINEL1D,         |
+ *               |         |          |                   |     SENTINED2D, SENTINEL6C,             |
+ *               |         |          |                   |     HARMONY-A/B and ALTIUS              |
+ *               |         |          |                   |   + Update orbital parameter and        |
+ *               |         |          |                   |     SATCAT/NORAD ID for BIOMASS         |
+ *               +----------------------------------------------------------------------------------+
+ *               |   4.31  |18/06/26  | DEIMOS Space S.L.U| Maintenance release                     |
+ *               |         |          |                   | New features:                           |
+ *               |         |          |                   |   + Implement the ability to handle a   |
+ *               |         |          |                   |     different reference for ocean pixels|
+ *               |         |          |                   |     in GDEM tiles                       |
+ *               +----------------------------------------------------------------------------------+
  *
  ****************************************************************************************************/
 
@@ -384,6 +398,12 @@ extern "C"
     XO_SAT_LSTM = XL_SAT_LSTM,
     XO_SAT_FORUM = XL_SAT_FORUM,
     XO_SAT_TRUTHS = XL_SAT_TRUTHS,
+    XO_SAT_SENTINEL_1D = XL_SAT_SENTINEL_1D,
+    XO_SAT_SENTINEL_2D = XL_SAT_SENTINEL_2D,
+    XO_SAT_SENTINEL_6C = XL_SAT_SENTINEL_6C,
+    XO_SAT_HARMONY_A = XL_SAT_HARMONY_A,
+    XO_SAT_HARMONY_B = XL_SAT_HARMONY_B,
+    XO_SAT_ALTIUS = XL_SAT_ALTIUS,
     XO_SAT_GENERIC = XL_SAT_GENERIC,
     XO_SAT_GENERIC_GEO = XL_SAT_GENERIC_GEO, /* ANR-353 */
     XO_SAT_MTG = XL_SAT_MTG, /* ANR-353 */
