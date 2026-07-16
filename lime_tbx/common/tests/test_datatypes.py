@@ -128,7 +128,9 @@ class TestSatellite(unittest.TestCase):
         sat = Satellite("SAT", 0, obfs, None, None)
         self.assertEqual(sat.get_best_orbit_file(DT2 - timedelta(5)), obfs[0])
         self.assertEqual(sat.get_best_orbit_file(DT2 + timedelta(5)), obfs[1])
-        self.assertIsNone(sat.get_best_orbit_file(DT3 + timedelta(5)))
+        self.assertEqual(sat.get_best_orbit_file(DT3 + timedelta(5)), obfs[1])
+        self.assertIsNone(sat.get_best_orbit_file(DT1 - timedelta(5)))
+        self.assertIsNone(sat.get_best_orbit_file(constants.MAX_DATE + timedelta(5)))
         self.assertEqual(sat.get_datetime_range(), (DT1, DT3))
 
 
