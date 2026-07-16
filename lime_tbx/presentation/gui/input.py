@@ -494,6 +494,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self._skip_uncs = skip_uncs
         self.min_date = min_date
         self.max_date = max_date
+        self.all_loaded_datetimes = []
         self.loaded_datetimes = []
         self.single_datetime = True
         self._build_layout()
@@ -561,14 +562,15 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.info_hidden_datetimes_a_lot.setPixmap(self.info_pixmap)
         self.info_hidden_datetimes_a_lot.setWordWrap(True)
         self.info_hidden_datetimes_a_lot.hide()
-        self.warning_icon = self.style().standardIcon(
-            QtWidgets.QStyle.SP_MessageBoxWarning
+        self.critical_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxCritical
         )
-        self.warning_pixmap = self.warning_icon.pixmap(32)
-        self.warn_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
-        self.warn_hidden_datetimes_invalid.setPixmap(self.warning_pixmap)
-        self.warn_hidden_datetimes_invalid.setWordWrap(True)
-        self.warn_hidden_datetimes_invalid.hide()
+        self.critical_pixmap = self.critical_icon.pixmap(32)
+        self.crit_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
+        self.crit_hidden_datetimes_invalid.setPixmap(self.critical_pixmap)
+        self.crit_hidden_datetimes_invalid.setWordWrap(True)
+        self.crit_hidden_datetimes_invalid.hide()
+        self.dts_buttons.addWidget(self.crit_hidden_datetimes_invalid)
         self.dts_buttons.addWidget(self.info_hidden_datetimes_a_lot)
         self.dts_buttons.addWidget(QtWidgets.QLabel(), 1)
         ### Datetimes switch
@@ -583,6 +585,14 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         self.multiple_dt_layout.setContentsMargins(0, 0, 0, 0)
         self.multiple_dt_frame.setLayout(self.multiple_dt_layout)
         self.main_layout.addWidget(self.multiple_dt_frame)
+        self.warning_icon = self.style().standardIcon(
+            QtWidgets.QStyle.SP_MessageBoxWarning
+        )
+        self.warning_pixmap = self.warning_icon.pixmap(32)
+        self.warn_hidden_datetimes_invalid = QtWidgets.QLabel(" ")
+        self.warn_hidden_datetimes_invalid.setPixmap(self.warning_pixmap)
+        self.warn_hidden_datetimes_invalid.setWordWrap(True)
+        self.warn_hidden_datetimes_invalid.hide()
         self.main_layout.addWidget(self.warn_hidden_datetimes_invalid)
         self.multiple_dt_frame.setHidden(True)
         # Build single dt
@@ -637,6 +647,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         if path != "":
             try:
                 self.loaded_datetimes = csv.read_datetimes(path)
+                self.all_loaded_datetimes = self.loaded_datetimes
                 self.update_dates_with_limits()
             except Exception as e:
                 self.show_error(e)
@@ -671,7 +682,7 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         ):
             if self.single_datetime:
                 self.change_multiple_datetime()
-            self.loaded_datetimes = dt
+            self.all_loaded_datetimes = dt
             self.loaded_datetimes_label.setText("Loaded from LGLOD file.")
             self.loaded_datetimes_label.setToolTip("")
             self.update_dates_with_limits()
@@ -719,7 +730,37 @@ class FlexibleDateTimeInput(QtWidgets.QWidget):
         out_dts = [dt for dt in dts if not (sat_start <= dt <= sat_end)]
         return out_dts
 
+    def _update_dates_hard_limits_multiple(self):
+        min_date = self.min_date
+        if self.min_date is None:
+            min_date = _DEF_MIN_DATE
+        self.loaded_datetimes = [
+            dt for dt in self.loaded_datetimes if min_date <= dt <= _DEF_MAX_DATE
+        ]
+        if len(self.loaded_datetimes) != len(self.all_loaded_datetimes):
+            missing_dts = [
+                dt
+                for dt in self.all_loaded_datetimes
+                if dt not in self.loaded_datetimes
+            ]
+            missing_dts_msg = ",".join(
+                [dt.strftime("%Y-%m-%d %H:%M:%S") for dt in missing_dts]
+            )
+            self.crit_hidden_datetimes_invalid.show()
+            self.crit_hidden_datetimes_invalid.setToolTip(
+                f"The following datetimes are not available for computation: {missing_dts_msg}"
+                "\nComputation date limits: "
+                f'{min_date.strftime("%Y-%m-%d %H:%M:%S")}, '
+                f'{_DEF_MAX_DATE.strftime("%Y-%m-%d %H:%M:%S")}.'
+            )
+        else:
+            self.crit_hidden_datetimes_invalid.hide()
+            self.crit_hidden_datetimes_invalid.setToolTip("")
+
     def update_dates_with_limits(self):
+        self.loaded_datetimes = self.all_loaded_datetimes
+        if not self.single_datetime:
+            self._update_dates_hard_limits_multiple()
         out_dts = self._get_dts_outside_range()
         if out_dts:
             msg = (
@@ -1050,7 +1091,7 @@ class AddSatDialog(QtWidgets.QDialog):
 
 
 _DEF_MIN_DATE = datetime(1970, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-_DEF_MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
+_DEF_MAX_DATE = constants.MAX_DATE
 _SPICE_MIN_DATE = datetime(1900, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 _SPICE_MAX_DATE = datetime(2050, 12, 31, 23, 58, 50, tzinfo=timezone.utc)
 

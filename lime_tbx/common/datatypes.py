@@ -633,6 +633,8 @@ class Satellite:
         orbit_file: OrbitFile
             Selected orbit file for the given datetime.
         """
+        if dt >= constants.MAX_DATE:
+            return None
         sel_td = None
         sel_orf = None
         for orf in self.orbit_files:
@@ -641,13 +643,14 @@ class Satellite:
                 if sel_td is None or td < sel_td:
                     sel_td = td
                     sel_orf = orf
-        # If no orbit file contains the dt, look for the nearest one.
+        # If no orbit file contains the dt, look for the nearest previous one.
         if sel_orf is None:
             for orf in self.orbit_files:
-                td = min(abs(dt - orf.dt0), abs(orf.dtf - dt))
-                if sel_td is None or td < sel_td:
-                    sel_td = td
-                    sel_orf = orf
+                if dt >= orf.dt0:
+                    td = min(abs(dt - orf.dt0), abs(orf.dtf - dt))
+                    if sel_td is None or td < sel_td:
+                        sel_td = td
+                        sel_orf = orf
         return sel_orf
 
 

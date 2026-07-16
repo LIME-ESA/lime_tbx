@@ -25,7 +25,7 @@ from lime_tbx.common.datatypes import (
     Satellite,
     EocfiPath,
 )
-from lime_tbx.common import logger
+from lime_tbx.common import logger, constants
 from lime_tbx.business.spice_adapter.spice_adapter import SPICEAdapter
 
 
@@ -335,6 +335,14 @@ class EOCFIConverter:
     ) -> List[Tuple[float, float, float]]:
         orbit_path = ""
         if sat.orbit_files:
+            if orb_f == None:
+                dt0, dtf = sat.get_datetime_range()
+                dtf = min(constants.MAX_DATE, dtf)
+                raise LimeException(
+                    "The satellite position can't be calculated for a given datetime. "
+                    "Computation date limits for the satellite: "
+                    f'{dt0.strftime("%Y-%m-%d %H:%M:%S")}, {dtf.strftime("%Y-%m-%d %H:%M:%S")}.'
+                )
             sat_start, sat_end = sat.get_datetime_range()
             out_dts = [dt for dt in dts if not (sat_start <= dt <= sat_end)]
             if out_dts:
