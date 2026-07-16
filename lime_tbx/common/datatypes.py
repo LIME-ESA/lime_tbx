@@ -521,6 +521,8 @@ class SatellitePoint(Point):
                 if not isinstance(a0, (Iterable, Callable)):
                     if a0 != a1:
                         return False
+        if self.name != o.name:
+            return False
         sdt = self.dt
         odt = o.dt
         if not isinstance(sdt, list):
@@ -629,13 +631,20 @@ class Satellite:
         Returns
         -------
         orbit_file: OrbitFile
-            Selected orbit file for the fiven datetime.
+            Selected orbit file for the given datetime.
         """
         sel_td = None
         sel_orf = None
         for orf in self.orbit_files:
             if dt >= orf.dt0 and dt <= orf.dtf:
                 td = min(dt - orf.dt0, orf.dtf - dt)
+                if sel_td is None or td < sel_td:
+                    sel_td = td
+                    sel_orf = orf
+        # If no orbit file contains the dt, look for the nearest one.
+        if sel_orf is None:
+            for orf in self.orbit_files:
+                td = min(abs(dt - orf.dt0), abs(orf.dtf - dt))
                 if sel_td is None or td < sel_td:
                     sel_td = td
                     sel_orf = orf

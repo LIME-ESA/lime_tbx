@@ -335,9 +335,15 @@ class EOCFIConverter:
     ) -> List[Tuple[float, float, float]]:
         orbit_path = ""
         if sat.orbit_files:
-            if orb_f == None:
-                raise LimeException(
-                    "The satellite position can't be calculated for a given datetime."
+            sat_start, sat_end = sat.get_datetime_range()
+            out_dts = [dt for dt in dts if not (sat_start <= dt <= sat_end)]
+            if out_dts:
+                logger.get_logger().warning(
+                    "Satellite position being computed for dates outside the valid "
+                    "range (%s to %s): %s.",
+                    sat_start.strftime("%Y-%m-%d %H:%M:%S"),
+                    sat_end.strftime("%Y-%m-%d %H:%M:%S"),
+                    ", ".join(dt.strftime("%Y-%m-%d %H:%M:%S") for dt in out_dts),
                 )
             orbit_path = os.path.join(
                 self.eocfi_path.custom_eocfi_path,
@@ -349,9 +355,7 @@ class EOCFIConverter:
                     f"data/missions/{orb_f.name}",
                 )
                 if not os.path.exists(orbit_path):
-                    raise LimeException(
-                        "The orbit file {} is missing".format(orbit_path)
-                    )
+                    raise LimeException(f"The orbit file {orbit_path} is missing")
         return self._get_sat_position_orbit_path(sat, dts, orbit_path)
 
     def _get_sat_position_orbit_path(
