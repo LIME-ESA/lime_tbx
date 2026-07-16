@@ -336,8 +336,8 @@ class EOCFIConverter:
         orbit_path = ""
         if sat.orbit_files:
             if orb_f == None:
-                dt0, dtf = sat.get_datetime_range()
-                dtf = min(constants.MAX_DATE, dtf)
+                dt0, _ = sat.get_datetime_range()
+                dtf = constants.MAX_DATE
                 raise LimeException(
                     "The satellite position can't be calculated for a given datetime. "
                     "Computation date limits for the satellite: "

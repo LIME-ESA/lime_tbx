@@ -96,21 +96,45 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 1)
-        f = open("./test_files/cli/sat_err_date.txt")
-        self.assertEqual(self.capturedErr.getvalue(), f.read())
-        f.close()
+        expected_err = (
+            "Error: The satellite position can't be calculated for a given datetime. "
+            "Computation date limits for the satellite: 2013-05-07 00:00:00, 2037-07-16 23:59:55.\n"
+        )
+        self.assertEqual(self.capturedErr.getvalue(), expected_err)
 
     def test_sat_err_date_timeseries(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                "-s ENVISAT -t ./test_files/csv/timeseries_out.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
+            )
+        )
+        self.assertEqual(errcode, 1)
+        expected_err = (
+            "Error: The satellite position can't be calculated for a given datetime. "
+            "Computation date limits for the satellite: 2002-03-01 01:13:16, 2037-07-16 23:59:55.\n"
+        )
+        self.assertEqual(self.capturedErr.getvalue(), expected_err)
+
+    def test_sat_warn_date_timeseries(self):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
                 "-s ENVISAT -t ./test_files/csv/timeseries.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
-        self.assertEqual(errcode, 1)
-        f = open("./test_files/cli/sat_err_date.txt")
-        self.assertEqual(self.capturedErr.getvalue(), f.read())
-        f.close()
+        self.assertEqual(errcode, 0)
+        eowarn = "\n".join(
+            "EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day."
+            for _ in range(8)
+        )
+        expected_warn = (
+            "WARNING: [eocfi_adapter.py:349 - _get_sat_position_one_orbit_file() ] Satellite position being computed for dates outside the"
+            " valid range (2002-03-01 01:13:16 to 2012-04-09 09:49:40): 2022-01-17 02:30:00, 2022-01-26 03:25:14, 2022-01-11 03:21:04,"
+            " 2022-01-13 05:29:34, 2022-01-15 07:28:14, 2022-01-16 07:23:04, 2022-01-13 03:26:34, 2022-01-14 11:22:04.\n"
+            f"WARNING: [eocfi_adapter.py:428 - _get_sat_position_orbit_path() ] Executing EO CFI: {eowarn}"
+        )
+        self.assertTrue(self.capturedOutput.getvalue().startswith(expected_warn))
 
     def test_sat_err_forbidden_path_refl(self):
         if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
