@@ -748,7 +748,7 @@ class TestLimeSimulation(unittest.TestCase):
         np.testing.assert_array_equal(
             lglod.observations[1].irrs.data, ls.get_elis()[1].data
         )
-        self.assertEquals(lglod.signals.data.shape, (1, 2))
+        self.assertEqual(lglod.signals.data.shape, (1, 2))
 
     def test_load_glod_multiseleno_cimelsrf(self):
         ls = get_lime_simulation()
@@ -767,7 +767,7 @@ class TestLimeSimulation(unittest.TestCase):
             lglod.observations[1].irrs.data, ls.get_elis()[1].data
         )
         np.testing.assert_array_equal(lglod.signals.data, ls.get_signals().data)
-        self.assertEquals(lglod.signals.data.shape, (6, 2))
+        self.assertEqual(lglod.signals.data.shape, (6, 2))
 
     def test_set_observations_unrelated_lglod_srf(self):
         # loading does not check that they are related (at this level)
