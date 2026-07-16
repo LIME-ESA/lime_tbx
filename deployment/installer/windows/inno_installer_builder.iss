@@ -3,6 +3,7 @@
 
 #define MyAppName "LimeTBX"
 #define MyAppVersion "1.4.1"
+#define MyFullAppName "{#MyAppName}_{#MyAppVersion}"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX_GUI.exe"
 #define MyAppDevPath "C:\repo\"
@@ -12,12 +13,12 @@
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{BA556966-3F6F-4065-8A45-BF787E56A6DF}}
+AppId={{BA556966-3F6F-4065-8A45-BF787E56A6DF}_{#MyAppVersion}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-DefaultDirName={autopf64}\{#MyAppName}
+DefaultDirName={autopf64}\{#MyFullAppName}
 DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64compatible
 PrivilegesRequired=admin
@@ -51,16 +52,16 @@ Source: "{#MyAppDevPath}\kernels\*"; DestDir: "{app}\kernels"; Flags: ignorevers
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\{#MyFullAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyFullAppName}"; Filename: "{app}\LimeTBX\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\LimeTBX\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Registry]
 Root: HKLM64; Subkey: "SOFTWARE\ESA"; Flags: uninsdeletekeyifempty; Check: IsWin64
-Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}"; Flags: uninsdeletekey; Check: IsWin64
-Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyAppName}\Settings"; Flags: createvalueifdoesntexist; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyFullAppName}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "SOFTWARE\ESA\{#MyFullAppName}\Settings"; Flags: createvalueifdoesntexist; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Check: IsWin64
 Root: HKLM64; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\LimeTBX\bin"
 
 [UninstallDelete]

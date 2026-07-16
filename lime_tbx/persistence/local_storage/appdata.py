@@ -13,6 +13,7 @@ import os
 from logging import Logger
 
 import lime_tbx.persistence.local_storage.config_paths as config_paths
+from lime_tbx import __version__
 
 
 APPNAME = "LimeTBX"
@@ -70,7 +71,8 @@ def _get_appdata_folder(logger: Logger, platform: str) -> str:
         appdata = str(home / "Library/Application Support" / APPNAME)
     elif platform == "win32":
         appdata = path.join(
-            os.environ.get("APPDATA", path.join(os.getcwd(), "appdata")), APPNAME
+            os.environ.get("APPDATA", path.join(os.getcwd(), "appdata")),
+            f"{APPNAME}_{__version__}",
         )
     else:
         appdata = path.expanduser(path.join("~", "." + APPNAME))
