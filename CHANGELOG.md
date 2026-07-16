@@ -18,14 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed minor errors inside EO-CFI satellite position module:
   - Fixed TLE propagation: now uses `XO_PROPAG_MODEL_TLE` (was `XO_PROPAG_MODEL_MEAN_KEPL`).
-  - Refactored duplicated code, removed unused code.
-  - Added orbit validity check and improved error handling.
+  - Refactored duplicated code, removed unused code, improved error handling.
   - Fixed potential memory leaks.
+- Satellite points equality check now includes satellite name (previously only dates were compared).
 
 ### Changed
+- Datetime input now warns (instead rejecting) for dates after the satellite's valid range; dates before the range remain invalid.
 - TLE time reference: now uses manual initialization (`xl_time_ref_init`) to the MJD2000
   epoch instead of relying on an external `time_file`.
 - Updated EO-CFI library dependencies to version 4.31 and recompiled EO-CFI dependent binaries.
+- Logger now outputs messages to stdout by default for events at warning level or higher.
 
 ### Deleted
 

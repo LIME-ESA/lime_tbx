@@ -83,7 +83,7 @@ def get_programfiles_folder() -> str:
         programfiles = path.join("/opt/esa", APPNAME)
     log.debug("Programfiles: {}".format(programfiles))
     if not _is_valid_programfiles(programfiles):
-        log.warning("Programfiles directory not valid. Using current dir.")
+        log.info("Programfiles directory not valid. Using current dir.")
         programfiles = "."  # os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     return programfiles

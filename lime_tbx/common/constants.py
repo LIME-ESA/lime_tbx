@@ -1,4 +1,6 @@
 """This module contains the values of LIME Toolbox constants."""
+from datetime import datetime, timezone
+
 from lime_tbx import __version__
 
 MIN_WLEN = 350
@@ -15,6 +17,7 @@ LIME_TBX_DATA_SOURCE = "LIME-TBX"
 MAX_LIMIT_REFL_ERR_CORR_ARE_STORED = 25
 NUM_CIMEL_WLENS = 6
 DEBUG_INTERMEDIATE_RESULTS_PATH = "LIMETBX_INTERMEDIATE_PATH"
+MAX_DATE = datetime(2037, 7, 16, 23, 59, 55, tzinfo=timezone.utc)
 
 
 class CompFields:
