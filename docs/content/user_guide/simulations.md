@@ -135,17 +135,24 @@ sun_moon_distance_au,observer_moon_distance_km,observer_selenographic_latitude_d
 ```
 
 ### Command-Line Interface (CLI)
-Use the `-l` or `--lunar` option:
+Use the `-l` or `--lunar` option to run a lunar simulation. You can provide the input parameters in two ways:
+#### 1. Single simulation (inline):
 ```sh
 lime -l distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle
 ```
-#### Example
+##### Example
 For a simulation for 0.98 AU of Sun-Moon Distance, 420000 km of Observer-Moon Distance, 20.5° and -30.2° as the
 selenographic latitude and longitude of the observer,
 69° as the selenographic longitude of the Sun, and 15° as the moon phase angle:
 ```sh
 lime -l 0.98,420000,20.5,-30.2,69,15
 ```
+#### 2. Batch simulation (`.csv` file):
+```sh
+lime -l multiple_points.csv
+```
+The `.csv` file must follow the exact same format described in the
+[Multiple Points Input](#multiple-points-input) section above (same column names and order).
 
 ## Simulation Using Satellite Positions
 
