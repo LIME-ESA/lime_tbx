@@ -94,8 +94,8 @@ def _write_moondata(writer, mdas: Union[List[MoonData], MoonData]):
             ["selenographic latitude (deg)", *[mda.lat_obs for mda in mdas]],
             ["selenographic longitude (deg)", *[mda.long_obs for mda in mdas]],
             [
-                "solar selenographic longitude (rad)",
-                *[mda.long_sun_radians for mda in mdas],
+                "solar selenographic longitude (deg)",
+                *[np.degrees(mda.long_sun_radians) for mda in mdas],
             ],
             ["distance sun moon (AU)", *[mda.distance_sun_moon for mda in mdas]],
             [
@@ -342,7 +342,7 @@ def export_csv_comparison(
                     "moon phase angle (deg)",
                     "selenographic latitude (deg)",
                     "selenographic longitude (deg)",
-                    "solar selenographic longitude (rad)",
+                    "solar selenographic longitude (deg)",
                     "distance sun moon (AU)",
                     "distance observer moon (km)",
                 ]
@@ -375,11 +375,12 @@ def export_csv_comparison(
                     # Just for understanding it, but if either points or mdas is none, the other should be too.
                     # They are None when it's not representing real measurements, like when using means.
                     mda = data.mdas[i]
+                    lonsunrad = mda.long_sun_radians
                     pt_datarow = [
                         mda.mpa_degrees,
                         mda.lat_obs,
                         mda.long_obs,
-                        mda.long_sun_radians,
+                        np.degrees(lonsunrad),
                         mda.distance_sun_moon,
                         mda.distance_observer_moon,
                     ]

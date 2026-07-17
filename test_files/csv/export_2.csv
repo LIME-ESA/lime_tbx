@@ -3,7 +3,7 @@ Interpolation spectrum,ASD
 moon phase angle (deg),-11.2
 selenographic latitude (deg),30
 selenographic longitude (deg),30
-solar selenographic longitude (rad),1
+solar selenographic longitude (deg),57.29577951308232
 distance sun moon (AU),0.9
 distance observer moon (km),450000
 CIMEL Wavelength,Irradiance,Irradiance uncertainties (k=2)

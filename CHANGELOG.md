@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   support integration with external systems directly through python package installation.
 
 ### Fixed
+- CSV export: input variable "solar selenographic longitude" now saved in degrees (was radians).
 - Fixed minor errors inside EO-CFI satellite position module:
   - Fixed TLE propagation: now uses `XO_PROPAG_MODEL_TLE` (was `XO_PROPAG_MODEL_MEAN_KEPL`).
   - Refactored duplicated code, removed unused code, improved error handling.
