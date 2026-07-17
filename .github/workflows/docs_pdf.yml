@@ -40,7 +40,7 @@ jobs:
       - name: Copy PDF to root
         run: cp docs/quality_documentation/latex/user_manual.pdf user_manual.pdf
       - name: Upload PDF
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: user-manual
           path: user_manual.pdf

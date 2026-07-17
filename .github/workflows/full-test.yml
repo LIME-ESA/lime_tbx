@@ -10,19 +10,30 @@ jobs:
       matrix:
         python-version: ["3.10"]
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout code
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
-      - uses: getsentry/action-setup-venv@v3.2.0
-        id: venv
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-          cache-dependency-path: |
-            requirements.txt
-            pyproject.toml
-            MANIFEST.in
-          install-cmd: pip install .[dev] .[pyside2]
+      - name: Cache virtual environment
+        uses: actions/cache@v6
+        id: cache-venv
+        with:
+          path: .venv
+          key: ${{ runner.os }}-venv-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'pyproject.toml', 'MANIFEST.in') }}
+          restore-keys: |
+            ${{ runner.os }}-venv-${{ matrix.python-version }}-
+      - name: Create and install dependencies
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install .[dev] .[pyside2]
       - name: Run Tox tests
         run: |
           mkdir test_report
@@ -30,7 +41,7 @@ jobs:
           export GITLAB_CI="GITLAB_CI"
           tox -- --runslow -m slow
       - name: Upload test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-report
           path: test_report/

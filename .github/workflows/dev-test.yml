@@ -44,7 +44,7 @@ jobs:
           export GITLAB_CI="GITLAB_CI"
           tox
       - name: Upload test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-report
           path: test_report/
