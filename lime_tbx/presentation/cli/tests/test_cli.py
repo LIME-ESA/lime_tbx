@@ -203,7 +203,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
