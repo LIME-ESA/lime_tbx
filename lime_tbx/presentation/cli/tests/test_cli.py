@@ -51,6 +51,11 @@ def get_opts(args_str: str):
 
 
 class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
+    def __init__(self, methodName="runTest"):
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        super().__init__(methodName)
+
     @classmethod
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
@@ -66,8 +71,10 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
 
     def setUp(self):
         warnings.filterwarnings("ignore")
-        self.capturedOutput = io.StringIO()
-        self.capturedErr = io.StringIO()
+        self.capturedOutput.seek(0)
+        self.capturedOutput.truncate(0)
+        self.capturedErr.seek(0)
+        self.capturedErr.truncate(0)
         sys.stdout = self.capturedOutput
         sys.stderr = self.capturedErr
         self._prev_skip = interp_data.is_skip_uncertainties()
@@ -124,17 +131,29 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 0)
-        eowarn = "\n".join(
-            "EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day."
-            for _ in range(8)
+        lines = self.capturedOutput.getvalue().split("\n")
+        self.assertTrue(lines[0].startswith("WARNING: [eocfi_adapter.py:"))
+        self.assertTrue(
+            lines[0].endswith(
+                " - _get_sat_position_one_orbit_file() ] Satellite position being computed for dates outside the"
+                " valid range (2002-03-01 01:13:16 to 2012-04-09 09:49:40): 2022-01-17 02:30:00, 2022-01-26 03:25:14, 2022-01-11 03:21:04,"
+                " 2022-01-13 05:29:34, 2022-01-15 07:28:14, 2022-01-16 07:23:04, 2022-01-13 03:26:34, 2022-01-14 11:22:04."
+            )
         )
-        expected_warn = (
-            "WARNING: [eocfi_adapter.py:349 - _get_sat_position_one_orbit_file() ] Satellite position being computed for dates outside the"
-            " valid range (2002-03-01 01:13:16 to 2012-04-09 09:49:40): 2022-01-17 02:30:00, 2022-01-26 03:25:14, 2022-01-11 03:21:04,"
-            " 2022-01-13 05:29:34, 2022-01-15 07:28:14, 2022-01-16 07:23:04, 2022-01-13 03:26:34, 2022-01-14 11:22:04.\n"
-            f"WARNING: [eocfi_adapter.py:428 - _get_sat_position_orbit_path() ] Executing EO CFI: {eowarn}"
+        eowarn = "EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day."
+        self.assertTrue(lines[1].startswith("WARNING: [eocfi_adapter.py:"))
+        self.assertTrue(
+            lines[1].endswith(
+                f" - _get_sat_position_orbit_path() ] Executing EO CFI: {eowarn}"
+            )
         )
-        self.assertTrue(self.capturedOutput.getvalue().startswith(expected_warn))
+        self.assertEqual(lines[2], eowarn)
+        self.assertEqual(lines[3], eowarn)
+        self.assertEqual(lines[4], eowarn)
+        self.assertEqual(lines[5], eowarn)
+        self.assertEqual(lines[6], eowarn)
+        self.assertEqual(lines[7], eowarn)
+        self.assertEqual(lines[8], eowarn)
 
     def test_sat_err_forbidden_path_refl(self):
         if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
