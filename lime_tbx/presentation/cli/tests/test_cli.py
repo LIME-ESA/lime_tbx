@@ -18,6 +18,7 @@ import requests
 from lime_tbx.common.datatypes import KernelsPath, EocfiPath
 from lime_tbx.business.interpolation.interp_data import interp_data
 from lime_tbx.application.coefficients.tests.test_update import HTTPServer, get_updater
+from lime_tbx.common import logger
 from ..cli import (
     CLI,
     OPTIONS,
@@ -71,6 +72,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        logger._logger = None
         self.capturedOutput.seek(0)
         self.capturedOutput.truncate(0)
         self.capturedErr.seek(0)
