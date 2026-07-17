@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     container: cytopia/black
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Black
         run: black --check lime_tbx
 
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Mypy
         uses: jpetrucciani/mypy-check@master
         with:
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     container: cytopia/pylint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Pylint
         run: |
           LINTER_FAILED=""
@@ -38,7 +38,7 @@ jobs:
   doc-coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
