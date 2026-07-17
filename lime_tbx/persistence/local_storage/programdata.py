@@ -12,6 +12,7 @@ import os
 from lime_tbx.common import logger
 from lime_tbx.persistence.local_storage import appdata
 import lime_tbx.persistence.local_storage.config_paths as config_paths
+from lime_tbx import __version__
 
 APPNAME = "LimeTBX"
 
@@ -47,24 +48,23 @@ def get_programfiles_folder() -> str:
         import winreg
 
         programfiles = ""
+        fullappname = f"{APPNAME} {'.'.join(__version__.split('.')[:3])}"
         a_reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
         valid = True
         try:
-            sub_key_install_folder = "SOFTWARE\\ESA\\LimeTBX\\Settings"
+            sub_key_install_folder = f"SOFTWARE\\ESA\\{fullappname}\\Settings"
             a_key = winreg.OpenKey(a_reg, sub_key_install_folder)
             programfiles = winreg.QueryValueEx(a_key, "InstallPath")[0]
         except:
             valid = False
         if not valid:  # Search for admin uninstall key
-            sub_key_admin = (
-                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
-            )
+            sub_key_admin = f"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{fullappname}_is1"
             try:
                 a_key = winreg.OpenKey(a_reg, sub_key_admin)
             except:
                 valid = False
             if not valid:  # Search for user uninstall key
-                sub_key_user = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
+                sub_key_user = f"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{fullappname}_is1"
                 a_reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
                 valid = True
                 try:
@@ -77,8 +77,8 @@ def get_programfiles_folder() -> str:
                 except:
                     valid = False
         if not valid:
-            log.warning("Did not find LimeTBX key in winreg registry.")
-            programfiles = path.join(os.environ["PROGRAMFILES"], APPNAME)
+            log.warning(f"Did not find {fullappname} key in winreg registry.")
+            programfiles = path.join(os.environ["PROGRAMFILES"], fullappname)
     else:
         programfiles = path.join("/opt/esa", APPNAME)
     log.debug("Programfiles: {}".format(programfiles))
