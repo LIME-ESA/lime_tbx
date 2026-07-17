@@ -30,7 +30,6 @@ jobs:
           key: ${{ runner.os }}-venv-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'pyproject.toml', 'MANIFEST.in') }}
           restore-keys: |
             ${{ runner.os }}-venv-${{ matrix.python-version }}-
-
       - name: Create and install dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -38,7 +37,6 @@ jobs:
           source .venv/bin/activate
           pip install --upgrade pip
           pip install .[dev] .[pyside2]
-
       - name: Run Tox tests
         run: |
           mkdir test_report
