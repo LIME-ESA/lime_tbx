@@ -3,7 +3,7 @@
 
 #define MyAppName "LimeTBX"
 #define MyAppVersion "1.4.1"
-#define MyFullAppName "{#MyAppName}_{#MyAppVersion}"
+#define MyFullAppName "{#MyAppName} {#MyAppVersion}"
 #define MyAppPublisher "European Space Agency"
 #define MyAppExeName "LimeTBX_GUI.exe"
 #define MyAppDevPath "C:\repo\"
