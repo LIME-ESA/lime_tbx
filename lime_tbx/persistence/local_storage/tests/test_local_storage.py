@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 from .. import appdata, programdata, config_paths
+from lime_tbx import __version__
 
 
 def get_logger() -> logging.Logger:
@@ -40,7 +41,8 @@ class TestAppdata(unittest.TestCase):
         )
         winappdata = appdata._get_appdata_folder(get_logger(), "win32")
         self.assertEqual(
-            winappdata, os.path.join(os.getcwd(), "appdata", appdata.APPNAME)
+            winappdata,
+            os.path.join(os.getcwd(), "appdata", f"{appdata.APPNAME}_{__version__}"),
         )
         macappdata = appdata._get_appdata_folder(get_logger(), "darwin")
         self.assertEqual(
