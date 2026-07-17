@@ -61,17 +61,29 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         logger._logger = None
         self.capturedOutput.seek(0)
         self.capturedOutput.truncate(0)
@@ -889,17 +901,29 @@ class TestCLIUpdateNoServer(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
@@ -929,10 +953,11 @@ class TestCLIUpdate(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
         dirname = os.path.join(os.path.dirname(__file__), "../../../../coeff_data")
         cls.httpd = HTTPServer(dirname, ("localhost", 8000))
@@ -943,13 +968,24 @@ class TestCLIUpdate(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
         cls.httpd.shutdown()
         cls.httpd.server_close()
         cls.t.join()
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
@@ -977,10 +1013,11 @@ class TestCLITrueUpdate(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
         dirname = os.path.join(
             os.path.dirname(__file__), "../../../../test_files/update/coeff_data"
@@ -993,7 +1030,15 @@ class TestCLITrueUpdate(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
         cls.httpd.shutdown()
         cls.httpd.server_close()
         cls.t.join()
@@ -1001,6 +1046,9 @@ class TestCLITrueUpdate(unittest.TestCase):
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
