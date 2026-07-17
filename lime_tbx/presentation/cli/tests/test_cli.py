@@ -129,7 +129,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
+                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o csv,ignore_folder/refl.csv,ignore_folder/irr.csv,ignore_folder/polar.csv,ignore_folder/aolp.csv,ignore_folder/intirr.csv"
             )
         )
         self.assertEqual(errcode, 0)
