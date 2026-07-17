@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for Python 3.13 and 3.14
 - Added configuration overrides for appdata and programfiles paths (`APPDATA_OVERRIDE`, `PROGRAMFILES_OVERRIDE`) to
   support integration with external systems directly through python package installation.
+- Command-line option `-i` now supports both `--interpolation` and `--interpolation-settings` as alternative
+  long forms for specifying interpolation settings.
 
 ### Fixed
 - CSV export: input variable "solar selenographic longitude" now saved in degrees (was radians).

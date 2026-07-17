@@ -74,6 +74,7 @@ LONG_OPTIONS = [
     "timeseries=",
     "coefficients=",
     "interpolation=",
+    "interpolation-settings=",
 ]
 _ERROR_RINDEX_BOTH_DOT = """When creating output as CSV or GRAPH \
 files for both DT and MPA, the full CSV/GRAPH filepaths must be \
@@ -1222,7 +1223,7 @@ Run 'lime -h' for help."
                             f"Coefficients version not recognized. Selected: {arg}. Available: {names}."
                         )
                     self.settings_manager.select_lime_coeff(names.index(arg))
-                elif opt in ("-i", "--interpolation-settings"):
+                elif opt in ("-i", "--interpolation", "--interpolation-settings"):
                     self._parse_interp_settings(arg)
                     mod_interp_settings = True
                 elif opt in ("--filter3sigma"):
