@@ -48,7 +48,7 @@ def get_programfiles_folder() -> str:
         import winreg
 
         programfiles = ""
-        fullappname = f"{APPNAME} {__version__}"
+        fullappname = f"{APPNAME} {'.'.join(__version__.split('.')[:3])}"
         a_reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
         valid = True
         try:
