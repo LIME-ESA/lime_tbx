@@ -1,26 +1,16 @@
 """Tests for eocfi_adapter module"""
 
-"""___Built-In Modules___"""
 from datetime import datetime, timezone
 import os
 
-"""___Third-Party Modules___"""
 import unittest
 import numpy as np
 import spiceypy as spice
 
-"""___LIME_TBX Modules___"""
 from ..eocfi_adapter import EOCFIConverter, _get_file_datetimes
 from lime_tbx.common.datatypes import KernelsPath, LimeException, EocfiPath
 from lime_tbx.business.spice_adapter.spice_adapter import SPICEAdapter
 
-
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas"
-__created__ = "30/08/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
 
 EOCFI_PATH = EocfiPath("./eocfi_data", "./eocfi_data2")
 KERNELS_PATH = KernelsPath("./kernels", "./kernels")

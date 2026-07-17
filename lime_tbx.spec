@@ -16,9 +16,9 @@ deploy_name = "LimeTBX"
 
 if sys.platform == 'linux':
     src_path = 'lime_tbx/'
-    a_pathex = ['./.venv/lib/python3.9/site-packages/', './.venv/lib64/python3.9/site-packages/']
+    a_pathex = ['./.venv/lib/python3.10/site-packages/', './.venv/lib64/python3.10/site-packages/']
     a_binaries = [
-        ('.venv/lib/python3.9/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
+        ('.venv/lib/python3.10/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
         (src_path + 'business/eocfi_adapter/eocfi_c/bin/get_positions_linux', './lime_tbx/business/eocfi_adapter/eocfi_c/bin'),
     ]
     a_datas = [
@@ -101,9 +101,9 @@ elif sys.platform == 'darwin':
     if "ARM" in platform.version().upper():
         eocfi_bin_path = 'business/eocfi_adapter/eocfi_c/bin/get_positions_darwin_arm'
     src_path = 'lime_tbx/'
-    a_pathex = ['./.venv/lib/python3.9/site-packages/', './.venv/lib64/python3.9/site-packages/']
+    a_pathex = ['./.venv/lib/python3.10/site-packages/', './.venv/lib64/python3.10/site-packages/']
     a_binaries = [
-        ('.venv/lib/python3.9/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
+        ('.venv/lib/python3.10/site-packages/spiceypy/utils/libcspice.so', './spiceypy/utils'),
         (src_path + eocfi_bin_path, './lime_tbx/business/eocfi_adapter/eocfi_c/bin'),
     ]
     a_datas = [

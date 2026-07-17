@@ -45,27 +45,27 @@ RUN echo "/usr/local/openssl/lib" >> /etc/ld.so.conf.d/openssl-1.1.1.conf && ldc
 # Verify OpenSSL installation
 RUN /usr/local/openssl/bin/openssl version -a
 
-# Install Python 3.9 (linked to OpenSSL 1.1.1)
+# Install Python 3.10 (linked to OpenSSL 1.1.1)
 WORKDIR /usr/local/src
-RUN wget https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz
-RUN tar xzf Python-3.9.21.tgz
-WORKDIR /usr/local/src/Python-3.9.21
+RUN wget https://www.python.org/ftp/python/3.10.20/Python-3.10.20.tgz
+RUN tar xzf Python-3.10.20.tgz
+WORKDIR /usr/local/src/Python-3.10.20
 RUN ./configure --with-openssl=/usr/local/openssl --enable-shared --enable-optimizations
 RUN make -j$(nproc) && make install
 
 # Ensure Python can find shared libraries
-RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/python3.9.conf && ldconfig
+RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/python3.10.conf && ldconfig
 
 # Verify Python installation
-RUN python3.9 --version
-RUN python3.9 -c "import ssl; print(ssl.OPENSSL_VERSION)"
+RUN python3.10 --version
+RUN python3.10 -c "import ssl; print(ssl.OPENSSL_VERSION)"
 
 # Install pip and pyinstaller
 RUN wget https://bootstrap.pypa.io/get-pip.py
-RUN python3.9 get-pip.py
-RUN python3.9 -m pip install --upgrade pip
-RUN python3.9 -m pip install pyinstaller
-RUN python3.9 -m pip install build
+RUN python3.10 get-pip.py
+RUN python3.10 -m pip install --upgrade pip
+RUN python3.10 -m pip install pyinstaller
+RUN python3.10 -m pip install build
 
 # Suppress fontconfig warnings keeping an updated version
 RUN apt-get install libpng16-16

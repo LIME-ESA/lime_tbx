@@ -1,5 +1,5 @@
 # Default image, if not specified
-image: python:3.9
+image: python:3.10
 
 stages:
   - Static Analysis
@@ -123,10 +123,10 @@ doc-coverage:
       junit: cov_report.xml
     expire_in: 1 hour
 
-tox-3.9:
+tox-3.10:
   extends: ".tox"
   stage: "Test"
-  image: "python:3.9"
+  image: "python:3.10"
   
 tox_slowtests:
   extends: .py_venv
@@ -168,7 +168,7 @@ tox_slowtests_manual:
   allow_failure: true
 
 test_report:
-  needs: ["tox-3.9"]
+  needs: ["tox-3.10"]
   stage: Publish test report
   image: 
     name: oberonamsterdam/wkhtmltopdf

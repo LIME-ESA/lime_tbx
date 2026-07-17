@@ -5,24 +5,14 @@ It exports the following functions:
     * get_appdata_folder() - Get the path of the appdata folder as a string.
 """
 
-"""___Built-In Modules___"""
 import sys
 from os import path
 import os
 
-"""___Third-Party Modules___"""
-# import here
-
-"""___LIME_TBX Modules___"""
 from lime_tbx.common import logger
 from lime_tbx.persistence.local_storage import appdata
-
-"""___Authorship___"""
-__author__ = "Javier Gatón Herguedas"
-__created__ = "16/10/2022"
-__maintainer__ = "Javier Gatón Herguedas"
-__email__ = "gaton@goa.uva.es"
-__status__ = "Development"
+import lime_tbx.persistence.local_storage.config_paths as config_paths
+from lime_tbx import __version__
 
 APPNAME = "LimeTBX"
 
@@ -39,7 +29,9 @@ def _is_valid_programfiles(programdata: str) -> bool:
 
 def get_programfiles_folder() -> str:
     log = logger.get_logger()
-    if sys.platform == "darwin":
+    if config_paths.PROGRAMFILES_OVERRIDE is not None:
+        programfiles = config_paths.PROGRAMFILES_OVERRIDE
+    elif sys.platform == "darwin":
         _stream = os.popen('mdfind "kMDItemCFBundleIdentifier = int.esa.LimeTBX"')
         output = _stream.read()
         _stream.close()
@@ -56,24 +48,23 @@ def get_programfiles_folder() -> str:
         import winreg
 
         programfiles = ""
+        fullappname = f"{APPNAME} {'.'.join(__version__.split('.')[:3])}"
         a_reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
         valid = True
         try:
-            sub_key_install_folder = "SOFTWARE\\ESA\\LimeTBX\\Settings"
+            sub_key_install_folder = f"SOFTWARE\\ESA\\{fullappname}\\Settings"
             a_key = winreg.OpenKey(a_reg, sub_key_install_folder)
             programfiles = winreg.QueryValueEx(a_key, "InstallPath")[0]
         except:
             valid = False
         if not valid:  # Search for admin uninstall key
-            sub_key_admin = (
-                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
-            )
+            sub_key_admin = f"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{fullappname}_is1"
             try:
                 a_key = winreg.OpenKey(a_reg, sub_key_admin)
             except:
                 valid = False
             if not valid:  # Search for user uninstall key
-                sub_key_user = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\LimeTBX_is1"
+                sub_key_user = f"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{fullappname}_is1"
                 a_reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
                 valid = True
                 try:
@@ -86,13 +77,13 @@ def get_programfiles_folder() -> str:
                 except:
                     valid = False
         if not valid:
-            log.warning("Did not find LimeTBX key in winreg registry.")
-            programfiles = path.join(os.environ["PROGRAMFILES"], APPNAME)
+            log.warning(f"Did not find {fullappname} key in winreg registry.")
+            programfiles = path.join(os.environ["PROGRAMFILES"], fullappname)
     else:
         programfiles = path.join("/opt/esa", APPNAME)
     log.debug("Programfiles: {}".format(programfiles))
     if not _is_valid_programfiles(programfiles):
-        log.warning("Programfiles directory not valid. Using current dir.")
+        log.info("Programfiles directory not valid. Using current dir.")
         programfiles = "."  # os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     return programfiles

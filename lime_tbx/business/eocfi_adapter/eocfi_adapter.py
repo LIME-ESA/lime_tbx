@@ -25,7 +25,7 @@ from lime_tbx.common.datatypes import (
     Satellite,
     EocfiPath,
 )
-from lime_tbx.common import logger
+from lime_tbx.common import logger, constants
 from lime_tbx.business.spice_adapter.spice_adapter import SPICEAdapter
 
 
@@ -167,7 +167,6 @@ class EOCFIConverter:
                 if is_tle and "norad_sat_number" not in y[satname]:
                     y[satname]["norad_sat_number"] = sat["norad_sat_number"]
                     y[satname]["intdes"] = sat["intdes"]
-                    y[satname]["time_file"] = sat["time_file"]
                 for orbf in sat["orbit_files"][::-1]:
                     y[satname]["orbit_files"].insert(0, orbf)
                 n_files = int(y[satname]["n_files"])
@@ -198,10 +197,6 @@ class EOCFIConverter:
             intdes = None
             if intdes_key in sat_data:
                 intdes = sat_data[intdes_key]
-            time_file_key = "time_file"
-            time_file = None
-            if time_file_key in sat_data:
-                time_file = sat_data[time_file_key]
             if orbit_files_names == None:
                 orbit_files_names = []
             orbit_files = []
@@ -209,7 +204,7 @@ class EOCFIConverter:
                 d0, df = _get_file_datetimes(file)
                 orbit_f = OrbitFile(file, d0, df)
                 orbit_files.append(orbit_f)
-            sat = Satellite(name, id, orbit_files, norad, intdes, time_file)
+            sat = Satellite(name, id, orbit_files, norad, intdes)
             sat_list.append(sat)
         return sat_list
 
@@ -226,14 +221,11 @@ class EOCFIConverter:
         if sat.norad_sat_number is not None:
             is_tle = True
         sat_yaml = self._get_sat_list_yaml()
-        if is_tle and sat.time_file is None:
-            sat.time_file = sat_yaml["ENVISAT"]["time_file"]
         if is_tle:
             sat_data = {
                 "id": sat.id,
                 "norad_sat_number": sat.norad_sat_number,
                 "intdes": sat.intdes,
-                "time_file": sat.time_file,
                 "orbit_files": sat.orbit_files,
                 "n_files": len(sat.orbit_files),
             }
@@ -249,7 +241,6 @@ class EOCFIConverter:
             if is_tle and "norad_sat_number" not in sat_yaml[sat.name]:
                 sat_yaml[sat.name]["norad_sat_number"] = sat_data["norad_sat_number"]
                 sat_yaml[sat.name]["intdes"] = sat_data["intdes"]
-                sat_yaml[sat.name]["time_file"] = sat_data["time_file"]
             for orbf in sat_data["orbit_files"][::-1]:
                 sat_yaml[sat.name]["orbit_files"].insert(0, orbf)
             n_files = int(sat_yaml[sat.name]["n_files"])
@@ -345,8 +336,22 @@ class EOCFIConverter:
         orbit_path = ""
         if sat.orbit_files:
             if orb_f == None:
+                dt0, _ = sat.get_datetime_range()
+                dtf = constants.MAX_DATE
                 raise LimeException(
-                    "The satellite position can't be calculated for a given datetime."
+                    "The satellite position can't be calculated for a given datetime. "
+                    "Computation date limits for the satellite: "
+                    f'{dt0.strftime("%Y-%m-%d %H:%M:%S")}, {dtf.strftime("%Y-%m-%d %H:%M:%S")}.'
+                )
+            sat_start, sat_end = sat.get_datetime_range()
+            out_dts = [dt for dt in dts if not (sat_start <= dt <= sat_end)]
+            if out_dts:
+                logger.get_logger().warning(
+                    "Satellite position being computed for dates outside the valid "
+                    "range (%s to %s): %s.",
+                    sat_start.strftime("%Y-%m-%d %H:%M:%S"),
+                    sat_end.strftime("%Y-%m-%d %H:%M:%S"),
+                    ", ".join(dt.strftime("%Y-%m-%d %H:%M:%S") for dt in out_dts),
                 )
             orbit_path = os.path.join(
                 self.eocfi_path.custom_eocfi_path,
@@ -358,9 +363,7 @@ class EOCFIConverter:
                     f"data/missions/{orb_f.name}",
                 )
                 if not os.path.exists(orbit_path):
-                    raise LimeException(
-                        "The orbit file {} is missing".format(orbit_path)
-                    )
+                    raise LimeException(f"The orbit file {orbit_path} is missing")
         return self._get_sat_position_orbit_path(sat, dts, orbit_path)
 
     def _get_sat_position_orbit_path(
@@ -376,12 +379,6 @@ class EOCFIConverter:
             intdes = sat.intdes
         if orbit_path.endswith(".txt") or orbit_path.endswith(".TLE"):
             tle_file = orbit_path
-            orbit_path = os.path.join(
-                self.eocfi_path.main_eocfi_path,
-                "data",
-                "missions",
-                sat.time_file,
-            )
         # CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK
         if platform.system() == "Windows":  # pragma: no cover
             orbit_path = orbit_path.replace("/", "\\")
@@ -399,14 +396,13 @@ class EOCFIConverter:
             )
         else:
             tle_file = '"{}"'.format(tle_file)
-            cmd = "{} {} {} {} {} {} {} {} {}".format(
+            cmd = "{} {} {} {} {} {} {} {}".format(
                 _exe_path,
                 1,
                 n_dates,
                 sat.id,
                 norad,
                 tle_file,
-                orbit_path,
                 f'"{sat.name}"',
                 intdes,
             )
@@ -478,20 +474,3 @@ class EOCFIConverter:
         if np.any(np.all(np.array(positions) == 0.0, axis=1)):
             return False
         return True
-
-    def get_default_timefile(self) -> str:
-        """
-        Get the default time file for TLEs when it's not known.
-
-        Returns
-        -------
-        time_file: str
-            Default time_file path value for TLEs
-        """
-        sats = self._get_sat_list_yaml()
-        _def_value = "SENTINEL2B/OSF/S2B_OPER_MPL_ORBSCT_20170309T104400_99999999T999999_0007.EOF"
-        sats_with_timefile = ["PLEIADES 1A", "PLEIADES 1B", "PROBA-V", "ENVISAT"]
-        for satname in sats_with_timefile:
-            if satname in sats and "time_file" in sats[satname]:
-                return sats[satname]["time_file"]
-        return _def_value

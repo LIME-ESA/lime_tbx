@@ -6,7 +6,7 @@ datetime,2018-02-27 02:00:00+00:00
 moon phase angle (deg),-12.2
 selenographic latitude (deg),45.6
 selenographic longitude (deg),42.1
-solar selenographic longitude (rad),1.15
+solar selenographic longitude (deg),65.89014644004466
 distance sun moon (AU),1.000001
 distance observer moon (km),400100
 CIMEL Wavelength,2018-02-27 02:00:00.000+00:00 Irradiance **,2018-02-27 02:00:00.000+00:00 Irradiance uncertainties (k=2) **

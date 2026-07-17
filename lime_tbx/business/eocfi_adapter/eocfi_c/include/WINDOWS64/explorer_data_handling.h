@@ -183,6 +183,20 @@
  *              +-----------------------------------------------------------------------------+
  *              |   4.29  |09/04/25  | DEIMOS Space S.L.U| Maintenance release                |
  *              +-----------------------------------------------------------------------------+
+ *              |   4.30  |04/02/26  | DEIMOS Space S.L.U| Maintenance release                |
+ *              |         |          |                   | New features:                      |
+ *              |         |          |                   |   + Add support for SENTINEL1D,    |
+ *              |         |          |                   |     SENTINED2D, SENTINEL6C,        |
+ *              |         |          |                   |     HARMONY-A/B and ALTIUS         |
+ *              |         |          |                   |   + Update orbital parameter and   |
+ *              |         |          |                   |     SATCAT/NORAD ID for BIOMASS    |
+ *              +-----------------------------------------------------------------------------+
+ *              |   4.31  |18/06/26  | DEIMOS Space S.L.U| Maintenance release                |
+ *              |         |          |                   | New features:                      |
+ *              |         |          |                   |   + Implement the ability to handle|
+ *              |         |          |                   |     a different reference for ocean|
+ *              |         |          |                   |     pixels in GDEM tiles           |
+ *              +-----------------------------------------------------------------------------+
  *
  *****************************************************************************/
 
@@ -407,6 +421,12 @@ extern "C"
     XD_SAT_LSTM = 152,
     XD_SAT_FORUM = 153,
     XD_SAT_TRUTHS = 154,
+    XD_SAT_SENTINEL_1D = 155,
+    XD_SAT_SENTINEL_2D = 156,
+    XD_SAT_SENTINEL_6C = 157,
+    XD_SAT_HARMONY_A = 158,
+    XD_SAT_HARMONY_B = 159,
+    XD_SAT_ALTIUS = 160,
     XD_SAT_GENERIC = 200,
     XD_SAT_GENERIC_GEO = 300, /* ANR-353 */
     XD_SAT_MTG = 301, /* ANR-353 */
@@ -2171,7 +2191,8 @@ extern "C"
     long columns; /* Number of points along X-axis (columns)     */
     long data_resolution; /* Resolution                                  */
     long data_res_unit; /* Resolution type (deg, min, sec)             */
-    long data_reference; /* Data reference type (WGS84, EGM96)          */
+    long data_reference; /* Default Data reference type (WGS84, EGM96)   */
+    long ocean_reference; /* Data reference type for ocean pixels(WGS84, EGM96) */
     long void_value; /* Value that identifies a void value (-32768) */
     double maximum_height_value; /* Maximum height value in the DEM (optional, by default 9000. m) */
     long flag_type; /* Flag type (int8, int16, int32, int64)       */

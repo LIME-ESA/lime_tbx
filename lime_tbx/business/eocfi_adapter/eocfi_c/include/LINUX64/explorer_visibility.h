@@ -192,6 +192,20 @@
  *             +----------------------------------------------------------------------------------+
  *             |   4.29  |09/04/25  | DEIMOS Space S.L.U    | Maintenance release                 |
  *             +----------------------------------------------------------------------------------+
+ *             |   4.30  |04/02/26  | DEIMOS Space S.L.U    | Maintenance release                 |
+ *             |         |          |                       | New features:                       |
+ *             |         |          |                       |   + Add support for SENTINEL1D,     |
+ *             |         |          |                       |     SENTINED2D, SENTINEL6C,         |
+ *             |         |          |                       |     HARMONY-A/B and ALTIUS          |
+ *             |         |          |                       |   + Update orbital parameter and    |
+ *             |         |          |                       |     SATCAT/NORAD ID for BIOMASS     |
+ *             +----------------------------------------------------------------------------------+
+ *             |   4.31  |18/06/26  | DEIMOS Space S.L.U    | Maintenance release                 |
+ *             |         |          |                       | New features:                       |
+ *             |         |          |                       |   + Implement the ability to handle |
+ *             |         |          |                       |     a different reference for ocean |
+ *             |         |          |                       |     pixels in GDEM tiles            |
+ *             +----------------------------------------------------------------------------------+
  *
  **************************************************************************************************/
 #ifndef EXPLORER_VISIBILITY_H
@@ -1718,6 +1732,12 @@ typedef enum
   XV_SAT_LSTM = XL_SAT_LSTM,
   XV_SAT_FORUM = XL_SAT_FORUM,
   XV_SAT_TRUTHS = XL_SAT_TRUTHS,
+  XV_SAT_SENTINEL_1D = XL_SAT_SENTINEL_1D,
+  XV_SAT_SENTINEL_2D = XL_SAT_SENTINEL_2D,
+  XV_SAT_SENTINEL_6C = XL_SAT_SENTINEL_6C,
+  XV_SAT_HARMONY_A = XL_SAT_HARMONY_A,
+  XV_SAT_HARMONY_B = XL_SAT_HARMONY_B,
+  XV_SAT_ALTIUS = XL_SAT_ALTIUS,
   XV_SAT_GENERIC = XL_SAT_GENERIC,
   XV_SAT_GENERIC_GEO = XL_SAT_GENERIC_GEO, /* ANR-353 */
   XV_SAT_MTG = XL_SAT_MTG, /* ANR-353 */

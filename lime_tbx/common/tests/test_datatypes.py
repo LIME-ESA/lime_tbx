@@ -125,10 +125,12 @@ DT3 = datetime(2032, 1, 17, 3, tzinfo=timezone.utc)
 class TestSatellite(unittest.TestCase):
     def test_satellite_functions_ok(self):
         obfs = [OrbitFile("a", DT1, DT2), OrbitFile("e", DT2, DT3)]
-        sat = Satellite("SAT", 0, obfs, None, None, None)
+        sat = Satellite("SAT", 0, obfs, None, None)
         self.assertEqual(sat.get_best_orbit_file(DT2 - timedelta(5)), obfs[0])
         self.assertEqual(sat.get_best_orbit_file(DT2 + timedelta(5)), obfs[1])
-        self.assertIsNone(sat.get_best_orbit_file(DT3 + timedelta(5)))
+        self.assertEqual(sat.get_best_orbit_file(DT3 + timedelta(5)), obfs[1])
+        self.assertIsNone(sat.get_best_orbit_file(DT1 - timedelta(5)))
+        self.assertIsNone(sat.get_best_orbit_file(constants.MAX_DATE + timedelta(5)))
         self.assertEqual(sat.get_datetime_range(), (DT1, DT3))
 
 

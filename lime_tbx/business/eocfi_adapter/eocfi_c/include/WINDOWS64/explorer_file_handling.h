@@ -3,8 +3,8 @@
     @brief  Public header file for the explorer_file_handling library.
 */
 /*
-    @version  4.25
-    @date   10/05/2022
+    @version  4.31
+    @date   18/06/2026
 
     <b>Copyright DEIMOS SPACE S.L.U</b>
 
@@ -2241,6 +2241,12 @@ extern "C"
     XF_SAT_LSTM = 152,
     XF_SAT_FORUM = 153,
     XF_SAT_TRUTHS = 154,
+    XF_SAT_SENTINEL_1D = 155,
+    XF_SAT_SENTINEL_2D = 156,
+    XF_SAT_SENTINEL_6C = 157,
+    XF_SAT_HARMONY_A = 158,
+    XF_SAT_HARMONY_B = 159,
+    XF_SAT_ALTIUS = 160,
     XF_SAT_GENERIC = 200,
     XF_SAT_GENERIC_GEO = 300, /* ANR-353 */
     XF_SAT_MTG = 301, /* ANR-353 */

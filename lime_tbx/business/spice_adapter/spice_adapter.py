@@ -14,6 +14,7 @@ import os
 
 """___Third-Party Modules___"""
 import spicedmoon
+import spicedmoon.basics
 import spiceypy as spice
 import numpy as np
 
@@ -345,11 +346,12 @@ class SPICEAdapter(ISPICEAdapter):
         # if source_frame = 'MOON_ME' or contains 'MOON' its from MOON
         xyzs = [(x / 1000, y / 1000, z / 1000) for x, y, z in xyzs]
         times = list(map(lambda dt: dt.strftime("%Y-%m-%d %H:%M:%S"), dts))
-        mds = spicedmoon.spicedmoon.get_moon_datas_xyzs_no_zenith_azimuth(
+        mds = spicedmoon.get_moon_datas_xyzs(
             xyzs,
             times,
             kernels_path.main_kernels_path,
             source_frame,
+            intercept_ellipsoid=False,
         )
         return [
             datatypes.MoonData(
@@ -378,7 +380,7 @@ class SPICEAdapter(ISPICEAdapter):
         ]
         for kernel in kernels:
             k_path = os.path.join(kernels_path, kernel)
-            spicedmoon.spicedmoon._furnsh_safer(k_path)
+            spicedmoon.basics.furnsh_safer(k_path)
 
     @staticmethod
     def _clear_kernels():

@@ -12,7 +12,7 @@ import os
 """___Third-Party Modules___"""
 import numpy as np
 import xarray as xr
-from xarray_schema import DatasetSchema, DataArraySchema, SchemaError
+from xarrera import DatasetSchema, DataArraySchema, SchemaError, DTypeSchema
 
 """___LIME_TBX Modules___"""
 from lime_tbx.common.datatypes import (
@@ -23,7 +23,6 @@ from lime_tbx.application.filedata.netcdfcommon import (
     validate_schema,
     xr_open_dataset,
     get_length_conversion_factor,
-    DTypeSchema,
 )
 from lime_tbx.common import logger
 

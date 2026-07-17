@@ -18,6 +18,7 @@ import requests
 from lime_tbx.common.datatypes import KernelsPath, EocfiPath
 from lime_tbx.business.interpolation.interp_data import interp_data
 from lime_tbx.application.coefficients.tests.test_update import HTTPServer, get_updater
+from lime_tbx.common import logger
 from ..cli import (
     CLI,
     OPTIONS,
@@ -51,23 +52,43 @@ def get_opts(args_str: str):
 
 
 class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
+    def __init__(self, methodName="runTest"):
+        self.capturedOutput = io.StringIO()
+        self.capturedErr = io.StringIO()
+        super().__init__(methodName)
+
     @classmethod
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
 
     def setUp(self):
         warnings.filterwarnings("ignore")
-        self.capturedOutput = io.StringIO()
-        self.capturedErr = io.StringIO()
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
+        logger._logger = None
+        self.capturedOutput.seek(0)
+        self.capturedOutput.truncate(0)
+        self.capturedErr.seek(0)
+        self.capturedErr.truncate(0)
         sys.stdout = self.capturedOutput
         sys.stderr = self.capturedErr
         self._prev_skip = interp_data.is_skip_uncertainties()
@@ -96,21 +117,57 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
             )
         )
         self.assertEqual(errcode, 1)
-        f = open("./test_files/cli/sat_err_date.txt")
-        self.assertEqual(self.capturedErr.getvalue(), f.read())
-        f.close()
+        expected_err = (
+            "Error: The satellite position can't be calculated for a given datetime. "
+            "Computation date limits for the satellite: 2013-05-07 00:00:00, 2037-07-16 23:59:55.\n"
+        )
+        self.assertEqual(self.capturedErr.getvalue(), expected_err)
 
     def test_sat_err_date_timeseries(self):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
+                "-s ENVISAT -t ./test_files/csv/timeseries_out.csv -o graph,png,ignore_folder/refl,ignore_folder/irr,ignore_folder/polar,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
-        f = open("./test_files/cli/sat_err_date.txt")
-        self.assertEqual(self.capturedErr.getvalue(), f.read())
-        f.close()
+        expected_err = (
+            "Error: The satellite position can't be calculated for a given datetime. "
+            "Computation date limits for the satellite: 2002-03-01 01:13:16, 2037-07-16 23:59:55.\n"
+        )
+        self.assertEqual(self.capturedErr.getvalue(), expected_err)
+
+    def test_sat_warn_date_timeseries(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                "-s ENVISAT -t ./test_files/csv/timeseries.csv -o csv,ignore_folder/refl.csv,ignore_folder/irr.csv,ignore_folder/polar.csv,ignore_folder/aolp.csv,ignore_folder/intirr.csv"
+            )
+        )
+        self.assertEqual(errcode, 0)
+        lines = self.capturedOutput.getvalue().split("\n")
+        self.assertTrue(lines[0].startswith("WARNING: [eocfi_adapter.py:"))
+        self.assertTrue(
+            lines[0].endswith(
+                " - _get_sat_position_one_orbit_file() ] Satellite position being computed for dates outside the"
+                " valid range (2002-03-01 01:13:16 to 2012-04-09 09:49:40): 2022-01-17 02:30:00, 2022-01-26 03:25:14, 2022-01-11 03:21:04,"
+                " 2022-01-13 05:29:34, 2022-01-15 07:28:14, 2022-01-16 07:23:04, 2022-01-13 03:26:34, 2022-01-14 11:22:04."
+            )
+        )
+        eowarn = "EXPLORER_ORBIT >>> WARNING in xo_osv_compute: Warnings during TLE propagated for more than one day."
+        self.assertTrue(lines[1].startswith("WARNING: [eocfi_adapter.py:"))
+        self.assertTrue(
+            lines[1].endswith(
+                f" - _get_sat_position_orbit_path() ] Executing EO CFI: {eowarn}"
+            )
+        )
+        self.assertEqual(lines[2], eowarn)
+        self.assertEqual(lines[3], eowarn)
+        self.assertEqual(lines[4], eowarn)
+        self.assertEqual(lines[5], eowarn)
+        self.assertEqual(lines[6], eowarn)
+        self.assertEqual(lines[7], eowarn)
+        self.assertEqual(lines[8], eowarn)
 
     def test_sat_err_forbidden_path_refl(self):
         if GITLAB_CI in os.environ and os.environ[GITLAB_CI] == GITLAB_CI_VALUE:
@@ -146,7 +203,7 @@ class TestCLI_CaptureSTDOUTERR(unittest.TestCase):
         cli = get_cli()
         errcode = cli.handle_input(
             *get_opts(
-                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root"
+                "-s PROBA-V,2020-01-20T02:00:00 -o graph,png,ignore_folder/refl,ignore_folder/irr,/root,ignore_folder/aolp"
             )
         )
         self.assertEqual(errcode, 1)
@@ -472,6 +529,16 @@ class TestCLI(unittest.TestCase):
         )
         self.assertEqual(errcode, 0)
 
+    def test_earth_glod_made_up_option(self):
+        with self.assertRaises(getopt.GetoptError):
+            get_opts(
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -z \'{"interp_spectrum": "ASD"}\''
+            )
+        with self.assertRaises(getopt.GetoptError):
+            get_opts(
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc --interpopulation \'{"interp_spectrum": "ASD"}\''
+            )
+
     def test_earth_glod_ok_neg_vals(self):
         cli = get_cli()
         errcode = cli.handle_input(
@@ -496,6 +563,21 @@ class TestCLI(unittest.TestCase):
         errcode = cli.handle_input(
             *get_opts(
                 '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc -i \'{"interp_spectrum": "ASD"}\''
+            )
+        )
+        self.assertEqual(errcode, 0)
+
+    def test_earth_glod_ok_select_spectrum_long(self):
+        cli = get_cli()
+        errcode = cli.handle_input(
+            *get_opts(
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc --interpolation \'{"interp_spectrum": "ASD"}\''
+            )
+        )
+        self.assertEqual(errcode, 0)
+        errcode = cli.handle_input(
+            *get_opts(
+                '-e 80,80,2,2010-10-01T02:02:02 -o nc,./test_files/cli/cliglod.test.nc --interpolation-settings \'{"interp_spectrum": "ASD"}\''
             )
         )
         self.assertEqual(errcode, 0)
@@ -819,17 +901,29 @@ class TestCLIUpdateNoServer(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
@@ -859,10 +953,11 @@ class TestCLIUpdate(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
         dirname = os.path.join(os.path.dirname(__file__), "../../../../coeff_data")
         cls.httpd = HTTPServer(dirname, ("localhost", 8000))
@@ -873,13 +968,24 @@ class TestCLIUpdate(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
         cls.httpd.shutdown()
         cls.httpd.server_close()
         cls.t.join()
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput
@@ -907,10 +1013,11 @@ class TestCLITrueUpdate(unittest.TestCase):
     def setUpClass(cls):
         if not os.path.exists("ignore_folder"):
             os.mkdir("ignore_folder")
-        cls._prev_lang = ""
-        if "LC_ALL" in os.environ:
-            cls._prev_lang = os.environ["LC_ALL"]
+        cls._prev_lang = os.environ.get("LC_ALL", "")
+        cls._prev_lang_lang = os.environ.get("LANG", "")
         locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
 
         dirname = os.path.join(
             os.path.dirname(__file__), "../../../../test_files/update/coeff_data"
@@ -923,7 +1030,15 @@ class TestCLITrueUpdate(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        locale.setlocale(locale.LC_ALL, cls._prev_lang)
+        if cls._prev_lang:
+            os.environ["LC_ALL"] = cls._prev_lang
+        else:
+            os.environ.pop("LC_ALL", None)
+        if cls._prev_lang_lang:
+            os.environ["LANG"] = cls._prev_lang_lang
+        else:
+            os.environ.pop("LANG", None)
+        locale.setlocale(locale.LC_ALL, cls._prev_lang or "")
         cls.httpd.shutdown()
         cls.httpd.server_close()
         cls.t.join()
@@ -931,6 +1046,9 @@ class TestCLITrueUpdate(unittest.TestCase):
 
     def setUp(self):
         warnings.filterwarnings("ignore")
+        locale.setlocale(locale.LC_ALL, "C")
+        os.environ["LC_ALL"] = "C"
+        os.environ["LANG"] = "C"
         self.capturedOutput = io.StringIO()
         self.capturedErr = io.StringIO()
         sys.stdout = self.capturedOutput

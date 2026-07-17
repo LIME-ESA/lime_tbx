@@ -403,26 +403,26 @@ class TestLimeSimulation(unittest.TestCase):
         cimel_refs = np.array(
             [
                 [
-                    2.6237802025548067e-06,
-                    3.1685931571619723e-06,
-                    3.1508629556748644e-06,
-                    2.1881525065050035e-06,
-                    1.787553267951884e-06,
-                    8.068699993533158e-07,
+                    2.6239143798893360e-06,
+                    3.1687533846468561e-06,
+                    3.1510197863207095e-06,
+                    2.1882599087308460e-06,
+                    1.7876401765329162e-06,
+                    8.0690793455666935e-07,
                 ],
                 [
-                    2.9030938832113895e-06,
-                    3.4994114313499266e-06,
-                    3.4651529237610166e-06,
-                    2.3971455172115902e-06,
-                    1.953601260023857e-06,
-                    8.754072576766165e-07,
+                    2.9032305618769571e-06,
+                    3.4995752111705080e-06,
+                    3.4653127916686673e-06,
+                    2.3972549405594178e-06,
+                    1.9536898577866895e-06,
+                    8.7544599236841019e-07,
                 ],
             ]
         )
         cimel_unc_refs = np.zeros(cimel_refs.shape)
         for cimel, data, unc in zip(cimels, cimel_refs, cimel_unc_refs):
-            np.testing.assert_array_almost_equal(cimel.data, data)
+            np.testing.assert_array_equal(cimel.data, data)
             np.testing.assert_array_equal(cimel.uncertainties, unc)
 
     # Function update_polarisation
@@ -748,7 +748,7 @@ class TestLimeSimulation(unittest.TestCase):
         np.testing.assert_array_equal(
             lglod.observations[1].irrs.data, ls.get_elis()[1].data
         )
-        self.assertEquals(lglod.signals.data.shape, (1, 2))
+        self.assertEqual(lglod.signals.data.shape, (1, 2))
 
     def test_load_glod_multiseleno_cimelsrf(self):
         ls = get_lime_simulation()
@@ -767,7 +767,7 @@ class TestLimeSimulation(unittest.TestCase):
             lglod.observations[1].irrs.data, ls.get_elis()[1].data
         )
         np.testing.assert_array_equal(lglod.signals.data, ls.get_signals().data)
-        self.assertEquals(lglod.signals.data.shape, (6, 2))
+        self.assertEqual(lglod.signals.data.shape, (6, 2))
 
     def test_set_observations_unrelated_lglod_srf(self):
         # loading does not check that they are related (at this level)

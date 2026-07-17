@@ -1,22 +1,14 @@
-"""Tests for classname module"""
+"""Tests for appdata and programdata modules"""
 
-"""___Built-In Modules___"""
 import logging
 import os
 import pathlib
+import tempfile
 
-"""___Third-Party Modules___"""
 import unittest
 
-"""___LIME_TBX Modules___"""
-from .. import appdata, programdata
-
-"""___Authorship___"""
-__author__ = "Pieter De Vis"
-__created__ = "01/02/2022"
-__maintainer__ = "Pieter De Vis"
-__email__ = "pieter.de.vis@npl.co.uk"
-__status__ = "Development"
+from .. import appdata, programdata, config_paths
+from lime_tbx import __version__
 
 
 def get_logger() -> logging.Logger:
@@ -49,7 +41,8 @@ class TestAppdata(unittest.TestCase):
         )
         winappdata = appdata._get_appdata_folder(get_logger(), "win32")
         self.assertEqual(
-            winappdata, os.path.join(os.getcwd(), "appdata", appdata.APPNAME)
+            winappdata,
+            os.path.join(os.getcwd(), "appdata", f"{appdata.APPNAME}_{__version__}"),
         )
         macappdata = appdata._get_appdata_folder(get_logger(), "darwin")
         self.assertEqual(
@@ -58,6 +51,33 @@ class TestAppdata(unittest.TestCase):
         )
 
     def test_get_appdata_folder(self):
+        self.assertEqual(
+            appdata.get_appdata_folder(get_logger()),
+            os.path.expanduser(os.path.join("~", "." + appdata.APPNAME)),
+        )
+
+    def test_appdata_override_valid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.assertIsNone(config_paths.APPDATA_OVERRIDE)
+            config_paths.APPDATA_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(appdata.get_appdata_folder(get_logger()), tmpdir)
+                self.assertTrue(os.path.exists(os.path.join(tmpdir, "kernels")))
+                self.assertTrue(os.path.exists(os.path.join(tmpdir, "coeff_data")))
+                self.assertEqual(appdata.get_appdata_folder(get_logger()), tmpdir)
+            finally:
+                config_paths.APPDATA_OVERRIDE = None
+
+    def test_appdata_override_invalid(self):
+        self.assertIsNone(config_paths.APPDATA_OVERRIDE)
+        config_paths.APPDATA_OVERRIDE = "./test_files/non_editable/file"
+        try:
+            self.assertEqual(appdata.get_appdata_folder(get_logger()), ".")
+        finally:
+            config_paths.APPDATA_OVERRIDE = None
+
+    def test_appdata_override_none(self):
+        self.assertIsNone(config_paths.APPDATA_OVERRIDE)
         self.assertEqual(
             appdata.get_appdata_folder(get_logger()),
             os.path.expanduser(os.path.join("~", "." + appdata.APPNAME)),
@@ -85,6 +105,33 @@ class TestProgramdata(unittest.TestCase):
 
     def test_get_programfiles(self):
         # This will fail if lime_tbx is installed
+        self.assertEqual(programdata.get_programfiles_folder(), ".")
+
+    def test_programfiles_override_valid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.makedirs(os.path.join(tmpdir, "kernels"))
+            os.makedirs(os.path.join(tmpdir, "eocfi_data"))
+            os.makedirs(os.path.join(tmpdir, "coeff_data"))
+            self.assertIsNone(config_paths.PROGRAMFILES_OVERRIDE)
+            config_paths.PROGRAMFILES_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(programdata.get_programfiles_folder(), tmpdir)
+            finally:
+                config_paths.PROGRAMFILES_OVERRIDE = None
+
+    def test_programfiles_override_invalid(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.makedirs(os.path.join(tmpdir, "kernels"))
+            self.assertIsNone(config_paths.PROGRAMFILES_OVERRIDE)
+            config_paths.PROGRAMFILES_OVERRIDE = tmpdir
+            try:
+                self.assertEqual(programdata.get_programfiles_folder(), ".")
+            finally:
+                config_paths.PROGRAMFILES_OVERRIDE = None
+
+    def test_programfiles_override_none(self):
+        # This will fail if lime_tbx is installed
+        self.assertIsNone(config_paths.PROGRAMFILES_OVERRIDE)
         self.assertEqual(programdata.get_programfiles_folder(), ".")
 
 

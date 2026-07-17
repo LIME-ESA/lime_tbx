@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: ["3.10"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
-      - uses: getsentry/action-setup-venv@v2.1.1
+      - uses: getsentry/action-setup-venv@v3.2.0
         id: venv
         with:
           python-version: ${{ matrix.python-version }}
@@ -40,7 +40,7 @@ jobs:
       - name: Copy PDF to root
         run: cp docs/quality_documentation/latex/user_manual.pdf user_manual.pdf
       - name: Upload PDF
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: user-manual
           path: user_manual.pdf

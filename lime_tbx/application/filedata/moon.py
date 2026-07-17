@@ -11,8 +11,8 @@ from datetime import datetime, timezone
 """___Third-Party Modules___"""
 import numpy as np
 import xarray as xr
-from xarray_schema import DatasetSchema, DataArraySchema, SchemaError
-from xarray_schema.components import AttrsSchema
+from xarrera import DatasetSchema, DataArraySchema, SchemaError
+from xarrera.components import AttrsSchema, AttrSchema
 
 """___LIME_TBX Modules___"""
 from lime_tbx.common.datatypes import (
@@ -29,7 +29,6 @@ from lime_tbx.business.eocfi_adapter.eocfi_adapter import EOCFIConverter
 from lime_tbx.application.filedata.netcdfcommon import (
     xr_open_dataset,
     validate_schema,
-    AttrSchema,
     get_length_conversion_factor,
 )
 
@@ -91,33 +90,24 @@ def _validate_schema_regular_moonobs(ds: xr.Dataset):
     """
     data_vars = {
         "channel_name": DataArraySchema(np.generic, dims=["chan"]),
-        "sat_pos": DataArraySchema(np.floating, dims=["sat_xyz"]),
+        "sat_pos": DataArraySchema(np.floating, shape=(3,), dims=["sat_xyz"]),
         "sat_pos_ref": DataArraySchema(np.generic, dims=[]),
         "irr_obs": DataArraySchema(np.floating, dims=["chan"]),
     }
-    coords = {"date": DataArraySchema(np.floating)}
-    attrs = AttrsSchema({"data_source": AttrSchema(np.generic)})
+    coords = {"date": DataArraySchema(np.floating, shape=(1,))}
+    attrs = AttrsSchema({"data_source": AttrSchema(str)})
 
-    def _check_dim_lengths(ds: xr.Dataset):
-        if len(ds["sat_xyz"]) != 3:
-            raise SchemaError("Dimension 'sat_xyz' should be of length=3.")
-        if len(ds["date"]) != 1:
-            raise SchemaError("Dimension 'date' should be of length=1.")
-
-    checks = [_check_dim_lengths]
     dss = DatasetSchema(
         data_vars=data_vars,
         coords=coords,
         attrs=attrs,
-        checks=checks,
     )
-    date_datetime = {"date": DataArraySchema(np.datetime64)}
+    date_datetime = {"date": DataArraySchema(np.datetime64, shape=(1,))}
     odss = [
         DatasetSchema(
             data_vars=data_vars,
             coords=date_datetime,
             attrs=attrs,
-            checks=checks,
         )
     ]
     odss += [
