@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.eocfi_adapter.eocfi_adapter &mdash; Lime Tbx 1.4.1 documentation</title>
+  <title>lime_tbx.business.eocfi_adapter.eocfi_adapter &mdash; Lime Tbx 1.4.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
 
   
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=350a9c04"></script>
-      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/documentation_options.js?v=02f2166e"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -125,7 +125,7 @@
     <span class="n">Satellite</span><span class="p">,</span>
     <span class="n">EocfiPath</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span><span class="p">,</span> <span class="n">constants</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">lime_tbx.business.spice_adapter.spice_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">SPICEAdapter</span>
 
 
@@ -272,7 +272,6 @@
                 <span class="k">if</span> <span class="n">is_tle</span> <span class="ow">and</span> <span class="s2">&quot;norad_sat_number&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">y</span><span class="p">[</span><span class="n">satname</span><span class="p">]:</span>
                     <span class="n">y</span><span class="p">[</span><span class="n">satname</span><span class="p">][</span><span class="s2">&quot;norad_sat_number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat</span><span class="p">[</span><span class="s2">&quot;norad_sat_number&quot;</span><span class="p">]</span>
                     <span class="n">y</span><span class="p">[</span><span class="n">satname</span><span class="p">][</span><span class="s2">&quot;intdes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat</span><span class="p">[</span><span class="s2">&quot;intdes&quot;</span><span class="p">]</span>
-                    <span class="n">y</span><span class="p">[</span><span class="n">satname</span><span class="p">][</span><span class="s2">&quot;time_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat</span><span class="p">[</span><span class="s2">&quot;time_file&quot;</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">orbf</span> <span class="ow">in</span> <span class="n">sat</span><span class="p">[</span><span class="s2">&quot;orbit_files&quot;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
                     <span class="n">y</span><span class="p">[</span><span class="n">satname</span><span class="p">][</span><span class="s2">&quot;orbit_files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">orbf</span><span class="p">)</span>
                 <span class="n">n_files</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">satname</span><span class="p">][</span><span class="s2">&quot;n_files&quot;</span><span class="p">])</span>
@@ -305,10 +304,6 @@
             <span class="n">intdes</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">intdes_key</span> <span class="ow">in</span> <span class="n">sat_data</span><span class="p">:</span>
                 <span class="n">intdes</span> <span class="o">=</span> <span class="n">sat_data</span><span class="p">[</span><span class="n">intdes_key</span><span class="p">]</span>
-            <span class="n">time_file_key</span> <span class="o">=</span> <span class="s2">&quot;time_file&quot;</span>
-            <span class="n">time_file</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">time_file_key</span> <span class="ow">in</span> <span class="n">sat_data</span><span class="p">:</span>
-                <span class="n">time_file</span> <span class="o">=</span> <span class="n">sat_data</span><span class="p">[</span><span class="n">time_file_key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">orbit_files_names</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">orbit_files_names</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">orbit_files</span> <span class="o">=</span> <span class="p">[]</span>
@@ -316,7 +311,7 @@
                 <span class="n">d0</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">_get_file_datetimes</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
                 <span class="n">orbit_f</span> <span class="o">=</span> <span class="n">OrbitFile</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">d0</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
                 <span class="n">orbit_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">orbit_f</span><span class="p">)</span>
-            <span class="n">sat</span> <span class="o">=</span> <span class="n">Satellite</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">orbit_files</span><span class="p">,</span> <span class="n">norad</span><span class="p">,</span> <span class="n">intdes</span><span class="p">,</span> <span class="n">time_file</span><span class="p">)</span>
+            <span class="n">sat</span> <span class="o">=</span> <span class="n">Satellite</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">orbit_files</span><span class="p">,</span> <span class="n">norad</span><span class="p">,</span> <span class="n">intdes</span><span class="p">)</span>
             <span class="n">sat_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sat</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sat_list</span></div>
 
@@ -336,14 +331,11 @@
         <span class="k">if</span> <span class="n">sat</span><span class="o">.</span><span class="n">norad_sat_number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">is_tle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">sat_yaml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sat_list_yaml</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">is_tle</span> <span class="ow">and</span> <span class="n">sat</span><span class="o">.</span><span class="n">time_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">sat</span><span class="o">.</span><span class="n">time_file</span> <span class="o">=</span> <span class="n">sat_yaml</span><span class="p">[</span><span class="s2">&quot;ENVISAT&quot;</span><span class="p">][</span><span class="s2">&quot;time_file&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">is_tle</span><span class="p">:</span>
             <span class="n">sat_data</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">sat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                 <span class="s2">&quot;norad_sat_number&quot;</span><span class="p">:</span> <span class="n">sat</span><span class="o">.</span><span class="n">norad_sat_number</span><span class="p">,</span>
                 <span class="s2">&quot;intdes&quot;</span><span class="p">:</span> <span class="n">sat</span><span class="o">.</span><span class="n">intdes</span><span class="p">,</span>
-                <span class="s2">&quot;time_file&quot;</span><span class="p">:</span> <span class="n">sat</span><span class="o">.</span><span class="n">time_file</span><span class="p">,</span>
                 <span class="s2">&quot;orbit_files&quot;</span><span class="p">:</span> <span class="n">sat</span><span class="o">.</span><span class="n">orbit_files</span><span class="p">,</span>
                 <span class="s2">&quot;n_files&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">sat</span><span class="o">.</span><span class="n">orbit_files</span><span class="p">),</span>
             <span class="p">}</span>
@@ -359,7 +351,6 @@
             <span class="k">if</span> <span class="n">is_tle</span> <span class="ow">and</span> <span class="s2">&quot;norad_sat_number&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sat_yaml</span><span class="p">[</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
                 <span class="n">sat_yaml</span><span class="p">[</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;norad_sat_number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat_data</span><span class="p">[</span><span class="s2">&quot;norad_sat_number&quot;</span><span class="p">]</span>
                 <span class="n">sat_yaml</span><span class="p">[</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;intdes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat_data</span><span class="p">[</span><span class="s2">&quot;intdes&quot;</span><span class="p">]</span>
-                <span class="n">sat_yaml</span><span class="p">[</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;time_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sat_data</span><span class="p">[</span><span class="s2">&quot;time_file&quot;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">orbf</span> <span class="ow">in</span> <span class="n">sat_data</span><span class="p">[</span><span class="s2">&quot;orbit_files&quot;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="n">sat_yaml</span><span class="p">[</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;orbit_files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">orbf</span><span class="p">)</span>
             <span class="n">n_files</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sat_yaml</span><span class="p">[</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;n_files&quot;</span><span class="p">])</span>
@@ -462,8 +453,22 @@
         <span class="n">orbit_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">sat</span><span class="o">.</span><span class="n">orbit_files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">orb_f</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dt0</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sat</span><span class="o">.</span><span class="n">get_datetime_range</span><span class="p">()</span>
+                <span class="n">dtf</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">MAX_DATE</span>
                 <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span>
-                    <span class="s2">&quot;The satellite position can&#39;t be calculated for a given datetime.&quot;</span>
+                    <span class="s2">&quot;The satellite position can&#39;t be calculated for a given datetime. &quot;</span>
+                    <span class="s2">&quot;Computation date limits for the satellite: &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dt0</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">dtf</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span>
+                <span class="p">)</span>
+            <span class="n">sat_start</span><span class="p">,</span> <span class="n">sat_end</span> <span class="o">=</span> <span class="n">sat</span><span class="o">.</span><span class="n">get_datetime_range</span><span class="p">()</span>
+            <span class="n">out_dts</span> <span class="o">=</span> <span class="p">[</span><span class="n">dt</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dts</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">sat_start</span> <span class="o">&lt;=</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="n">sat_end</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">out_dts</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Satellite position being computed for dates outside the valid &quot;</span>
+                    <span class="s2">&quot;range (</span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span>
+                    <span class="n">sat_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span>
+                    <span class="n">sat_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">out_dts</span><span class="p">),</span>
                 <span class="p">)</span>
             <span class="n">orbit_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="o">.</span><span class="n">custom_eocfi_path</span><span class="p">,</span>
@@ -475,9 +480,7 @@
                     <span class="sa">f</span><span class="s2">&quot;data/missions/</span><span class="si">{</span><span class="n">orb_f</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">orbit_path</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span>
-                        <span class="s2">&quot;The orbit file </span><span class="si">{}</span><span class="s2"> is missing&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">orbit_path</span><span class="p">)</span>
-                    <span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">LimeException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The orbit file </span><span class="si">{</span><span class="n">orbit_path</span><span class="si">}</span><span class="s2"> is missing&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sat_position_orbit_path</span><span class="p">(</span><span class="n">sat</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">orbit_path</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_sat_position_orbit_path</span><span class="p">(</span>
@@ -493,12 +496,6 @@
             <span class="n">intdes</span> <span class="o">=</span> <span class="n">sat</span><span class="o">.</span><span class="n">intdes</span>
         <span class="k">if</span> <span class="n">orbit_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">orbit_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.TLE&quot;</span><span class="p">):</span>
             <span class="n">tle_file</span> <span class="o">=</span> <span class="n">orbit_path</span>
-            <span class="n">orbit_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">eocfi_path</span><span class="o">.</span><span class="n">main_eocfi_path</span><span class="p">,</span>
-                <span class="s2">&quot;data&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;missions&quot;</span><span class="p">,</span>
-                <span class="n">sat</span><span class="o">.</span><span class="n">time_file</span><span class="p">,</span>
-            <span class="p">)</span>
         <span class="c1"># CALLING EXE BECAUSE SHARED LIBRARY DOESNT WORK</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">orbit_path</span> <span class="o">=</span> <span class="n">orbit_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -516,14 +513,13 @@
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tle_file</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tle_file</span><span class="p">)</span>
-            <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">_exe_path</span><span class="p">,</span>
                 <span class="mi">1</span><span class="p">,</span>
                 <span class="n">n_dates</span><span class="p">,</span>
                 <span class="n">sat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                 <span class="n">norad</span><span class="p">,</span>
                 <span class="n">tle_file</span><span class="p">,</span>
-                <span class="n">orbit_path</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">sat</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
                 <span class="n">intdes</span><span class="p">,</span>
             <span class="p">)</span>
@@ -597,26 +593,6 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
-
-
-<div class="viewcode-block" id="EOCFIConverter.get_default_timefile">
-<a class="viewcode-back" href="../../../../content/api/lime_tbx.business.eocfi_adapter.eocfi_adapter.html#lime_tbx.business.eocfi_adapter.eocfi_adapter.EOCFIConverter.get_default_timefile">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_timefile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the default time file for TLEs when it&#39;s not known.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        time_file: str</span>
-<span class="sd">            Default time_file path value for TLEs</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sat_list_yaml</span><span class="p">()</span>
-        <span class="n">_def_value</span> <span class="o">=</span> <span class="s2">&quot;SENTINEL2B/OSF/S2B_OPER_MPL_ORBSCT_20170309T104400_99999999T999999_0007.EOF&quot;</span>
-        <span class="n">sats_with_timefile</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PLEIADES 1A&quot;</span><span class="p">,</span> <span class="s2">&quot;PLEIADES 1B&quot;</span><span class="p">,</span> <span class="s2">&quot;PROBA-V&quot;</span><span class="p">,</span> <span class="s2">&quot;ENVISAT&quot;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">satname</span> <span class="ow">in</span> <span class="n">sats_with_timefile</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">satname</span> <span class="ow">in</span> <span class="n">sats</span> <span class="ow">and</span> <span class="s2">&quot;time_file&quot;</span> <span class="ow">in</span> <span class="n">sats</span><span class="p">[</span><span class="n">satname</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="n">sats</span><span class="p">[</span><span class="n">satname</span><span class="p">][</span><span class="s2">&quot;time_file&quot;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">_def_value</span></div>
 </div>
 
 </pre></div>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.common.templates module &mdash; Lime Tbx 1.4.2 documentation</title>
+  <title>lime_tbx.persistence.local_storage.config_paths module &mdash; Lime Tbx 1.4.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
@@ -21,8 +21,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="lime_tbx.persistence package" href="lime_tbx.persistence.html" />
-    <link rel="prev" title="lime_tbx.common.logger module" href="lime_tbx.common.logger.html" /> 
+    <link rel="next" title="lime_tbx.persistence.local_storage.programdata module" href="lime_tbx.persistence.local_storage.programdata.html" />
+    <link rel="prev" title="lime_tbx.persistence.local_storage.appdata module" href="lime_tbx.persistence.local_storage.appdata.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -72,11 +72,11 @@
 <li class="toctree-l2 current"><a class="reference internal" href="lime_tbx.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="lime_tbx.application.html">lime_tbx.application package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lime_tbx.business.html">lime_tbx.business package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="lime_tbx.common.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lime_tbx.common.html">lime_tbx.common package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="lime_tbx.persistence.html#subpackages">Subpackages</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="lime_tbx.presentation.html">lime_tbx.presentation package</a></li>
 </ul>
 </li>
@@ -104,10 +104,11 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="lime_tbx.html">lime_tbx package</a></li>
-          <li class="breadcrumb-item"><a href="lime_tbx.common.html">lime_tbx.common package</a></li>
-      <li class="breadcrumb-item active">lime_tbx.common.templates module</li>
+          <li class="breadcrumb-item"><a href="lime_tbx.persistence.html">lime_tbx.persistence package</a></li>
+          <li class="breadcrumb-item"><a href="lime_tbx.persistence.local_storage.html">lime_tbx.persistence.local_storage package</a></li>
+      <li class="breadcrumb-item active">lime_tbx.persistence.local_storage.config_paths module</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/content/api/lime_tbx.common.templates.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/content/api/lime_tbx.persistence.local_storage.config_paths.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -115,17 +116,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-lime_tbx.common.templates">
-<span id="lime-tbx-common-templates-module"></span><h1>lime_tbx.common.templates module<a class="headerlink" href="#module-lime_tbx.common.templates" title="Link to this heading"></a></h1>
-<p>This module contains constant templates for the creation of datasets with obsarray</p>
+  <section id="module-lime_tbx.persistence.local_storage.config_paths">
+<span id="lime-tbx-persistence-local-storage-config-paths-module"></span><h1>lime_tbx.persistence.local_storage.config_paths module<a class="headerlink" href="#module-lime_tbx.persistence.local_storage.config_paths" title="Link to this heading"></a></h1>
+<p>Configuration overrides for lime_tbx path detection.</p>
+<p>This module defines global variables that allow overriding the default
+locations for application data and program files. They are intended to be
+set by the user or installer before calling the corresponding getter
+functions in <code class="code docutils literal notranslate"><span class="pre">appdata</span></code> and <code class="code docutils literal notranslate"><span class="pre">programdata</span></code> modules.</p>
+<dl class="simple">
+<dt>Variables:</dt><dd><dl class="simple">
+<dt>APPDATA_OVERRIDE (str | None): If set to an absolute path, the</dt><dd><p><code class="code docutils literal notranslate"><span class="pre">get_appdata_folder()</span></code> function will use this path instead of the
+platform-specific default. The path must contain subdirectories
+‘kernels’ and ‘coeff_data’. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, the default is used.</p>
+</dd>
+<dt>PROGRAMFILES_OVERRIDE (str | None): If set to an absolute path, the</dt><dd><p><code class="code docutils literal notranslate"><span class="pre">get_programfiles_folder()</span></code> function will use this path instead of
+the system-detected one. The path must contain subdirectories
+‘kernels’, ‘eocfi_data’, and ‘coeff_data’. If <code class="code docutils literal notranslate"><span class="pre">None</span></code>, the default
+is used.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting these variables after the getter functions have already been
+called may have no effect, as some modules import the values at runtime
+(they are read each time the getter is called if imported dynamically).
+It is recommended to set them before any lime_tbx operations.</p>
+</div>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="lime_tbx.common.logger.html" class="btn btn-neutral float-left" title="lime_tbx.common.logger module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="lime_tbx.persistence.html" class="btn btn-neutral float-right" title="lime_tbx.persistence package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="lime_tbx.persistence.local_storage.appdata.html" class="btn btn-neutral float-left" title="lime_tbx.persistence.local_storage.appdata module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lime_tbx.persistence.local_storage.programdata.html" class="btn btn-neutral float-right" title="lime_tbx.persistence.local_storage.programdata module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

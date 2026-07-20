@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lime_tbx.business.spice_adapter.spice_adapter &mdash; Lime Tbx 1.4.1 documentation</title>
+  <title>lime_tbx.business.spice_adapter.spice_adapter &mdash; Lime Tbx 1.4.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=f2acf8a4" />
 
   
     <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=350a9c04"></script>
-      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/documentation_options.js?v=02f2166e"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -114,6 +114,7 @@
 
 <span class="sd">&quot;&quot;&quot;___Third-Party Modules___&quot;&quot;&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">spicedmoon</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">spicedmoon.basics</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">spiceypy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">spice</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -476,11 +477,12 @@
         <span class="c1"># if source_frame = &#39;MOON_ME&#39; or contains &#39;MOON&#39; its from MOON</span>
         <span class="n">xyzs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">z</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">xyzs</span><span class="p">]</span>
         <span class="n">times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">dt</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">),</span> <span class="n">dts</span><span class="p">))</span>
-        <span class="n">mds</span> <span class="o">=</span> <span class="n">spicedmoon</span><span class="o">.</span><span class="n">spicedmoon</span><span class="o">.</span><span class="n">get_moon_datas_xyzs_no_zenith_azimuth</span><span class="p">(</span>
+        <span class="n">mds</span> <span class="o">=</span> <span class="n">spicedmoon</span><span class="o">.</span><span class="n">get_moon_datas_xyzs</span><span class="p">(</span>
             <span class="n">xyzs</span><span class="p">,</span>
             <span class="n">times</span><span class="p">,</span>
             <span class="n">kernels_path</span><span class="o">.</span><span class="n">main_kernels_path</span><span class="p">,</span>
             <span class="n">source_frame</span><span class="p">,</span>
+            <span class="n">intercept_ellipsoid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">datatypes</span><span class="o">.</span><span class="n">MoonData</span><span class="p">(</span>
@@ -510,7 +512,7 @@
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="n">kernels</span><span class="p">:</span>
             <span class="n">k_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kernels_path</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-            <span class="n">spicedmoon</span><span class="o">.</span><span class="n">spicedmoon</span><span class="o">.</span><span class="n">_furnsh_safer</span><span class="p">(</span><span class="n">k_path</span><span class="p">)</span>
+            <span class="n">spicedmoon</span><span class="o">.</span><span class="n">basics</span><span class="o">.</span><span class="n">furnsh_safer</span><span class="p">(</span><span class="n">k_path</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_clear_kernels</span><span class="p">():</span>

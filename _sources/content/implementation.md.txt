@@ -146,7 +146,7 @@ automated deployment whenever possible, whioh is explained in Section
 [Automated Deployment](#automated-deployment).
 
 #### Requirements:
-- Python 3.9.
+- Python 3.10.
 - `pyinstaller` installed outside of the virtual environment.
 
 
@@ -248,18 +248,18 @@ However, deployment can still be automated using native macOS tools or CI platfo
 like GitHub Actions with macOS runners (planned for future improvements).
 
 In the meantime, the recommended manual approach is to use a local macOS environment
-with the official Python 3.9 (via Homebrew), not the system-provided one.
+with the official Python 3.10 (via Homebrew), not the system-provided one.
 
-1. Install Python 3.9 via Homebrew (avoid system Python):
+1. Install Python 3.10 via Homebrew (avoid system Python):
 
   ```sh
-  brew install python@3.9
+  brew install python@3.10
   ```
 
 2. Install required Python tools:
 
   ```sh
-  python3.9 -m pip install pyinstaller build
+  python3.10 -m pip install pyinstaller build
   ```
 
 3. Run the macOS build script:

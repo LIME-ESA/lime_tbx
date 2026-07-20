@@ -6,17 +6,17 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulations &mdash; Lime Tbx 1.4.1 documentation</title>
+  <title>Simulations &mdash; Lime Tbx 1.4.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=f2acf8a4" />
 
   
     <link rel="shortcut icon" href="../../_static/favicon.png"/>
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=350a9c04"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/documentation_options.js?v=02f2166e"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -71,7 +71,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#simulation-using-selenographic-coordinates">Simulation Using Selenographic Coordinates</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#multiple-points-input">Multiple Points Input</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Command-Line Interface (CLI)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id2">Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#single-simulation-inline">1. Single simulation (inline):</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#batch-simulation-csv-file">2. Batch simulation (<code class="docutils literal notranslate"><span class="pre">.csv</span></code> file):</a></li>
 </ul>
 </li>
 </ul>
@@ -290,18 +291,29 @@ a <code class="docutils literal notranslate"><span class="pre">.csv</span></code
 </section>
 <section id="id1">
 <h3>Command-Line Interface (CLI)<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">-l</span></code> or <code class="docutils literal notranslate"><span class="pre">--lunar</span></code> option:</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">-l</span></code> or <code class="docutils literal notranslate"><span class="pre">--lunar</span></code> option to run a lunar simulation. You can provide the input parameters in two ways:</p>
+<section id="single-simulation-inline">
+<h4>1. Single simulation (inline):<a class="headerlink" href="#single-simulation-inline" title="Link to this heading"></a></h4>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span>distance_sun_moon,distance_observer_moon,selen_obs_lat,selen_obs_lon,selen_sun_lon,moon_phase_angle
 </pre></div>
 </div>
 <section id="id2">
-<h4>Example<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<h5>Example<a class="headerlink" href="#id2" title="Link to this heading"></a></h5>
 <p>For a simulation for 0.98 AU of Sun-Moon Distance, 420000 km of Observer-Moon Distance, 20.5° and -30.2° as the
 selenographic latitude and longitude of the observer,
 69° as the selenographic longitude of the Sun, and 15° as the moon phase angle:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span><span class="m">0</span>.98,420000,20.5,-30.2,69,15
 </pre></div>
 </div>
+</section>
+</section>
+<section id="batch-simulation-csv-file">
+<h4>2. Batch simulation (<code class="docutils literal notranslate"><span class="pre">.csv</span></code> file):<a class="headerlink" href="#batch-simulation-csv-file" title="Link to this heading"></a></h4>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lime<span class="w"> </span>-l<span class="w"> </span>multiple_points.csv
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file must follow the exact same format described in the
+<a class="reference internal" href="#multiple-points-input"><span class="xref myst">Multiple Points Input</span></a> section above (same column names and order).</p>
 </section>
 </section>
 </section>

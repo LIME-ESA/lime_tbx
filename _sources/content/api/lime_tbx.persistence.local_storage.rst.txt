@@ -13,4 +13,5 @@ Submodules
    :maxdepth: 4
 
    lime_tbx.persistence.local_storage.appdata
+   lime_tbx.persistence.local_storage.config_paths
    lime_tbx.persistence.local_storage.programdata
