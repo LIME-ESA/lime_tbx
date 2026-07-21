@@ -28,12 +28,13 @@ RUN apt install libxcb-shm0 libxcb-randr0 libxcb-image0 libxcb-render-util0 \
     libxcb-render0 libxcb-util1 -y
 RUN apt install libcairo-gobject2 libpango-1.0-0 libpangocairo-1.0-0 libcairo2 \
     libgtk-3-0 libxcomposite-dev libgtk-3-dev libatk1.0-0 -y
+RUN apt install libhdf5-dev libhdf5-serial-dev -y
 
 #libxcb1 libfreetype6-dev curl ca-certificates
 
 # Install OpenSSL 1.1.1w (without breaking system OpenSSL)
 WORKDIR /usr/local/src
-RUN wget https://www.openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz
+RUN wget https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1w/openssl-1.1.1w.tar.gz
 RUN tar xzvf openssl-1.1.1w.tar.gz
 WORKDIR /usr/local/src/openssl-1.1.1w
 RUN ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib-dynamic

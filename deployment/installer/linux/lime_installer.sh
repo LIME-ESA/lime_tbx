@@ -25,6 +25,7 @@ ln -s $dst/LimeTBX/$x11_executable $bin_path
 ln -s $dst/limetbx.desktop $desktop_applications
 mv $bin_path/$x11_executable $bin_path/$command_name
 chmod -R +rx $dst
+chmod -R 777 $dst/eocfi_data/data/missions
 # Removing the packaged libstdc++.so.6 library if the system's version is greater or equal
 packaged_libstdcp=$dst/LimeTBX/libstdc++.so.6
 sys_libstd="$(ldconfig -p | grep libstdc++.so.6 | grep x86-64 | tr ' ' '\n' | grep / | head -1)"
