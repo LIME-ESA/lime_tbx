@@ -41,6 +41,7 @@ package_python() {
   rm -rf .venv
   python3.10 -m venv .venv
   .venv/bin/pip install wheel
+  .venv/bin/pip install "h5py==3.9.0"
   .venv/bin/pip install -r requirements.txt
   .venv/bin/pip install "PySide2~=5.15"
   pyinstaller lime_tbx.spec
