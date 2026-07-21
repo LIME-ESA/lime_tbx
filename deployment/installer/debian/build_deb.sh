@@ -36,5 +36,5 @@ mkdir $name/DEBIAN
 cp control $name/DEBIAN
 cp postinst $name/DEBIAN
 chmod -R +rx $name/opt/esa/LimeTBX
-chmod -R +w $name/opt/esa/LimeTBX/eocfi_data/data/missions
+chmod -R 777 $name/opt/esa/LimeTBX/eocfi_data/data/missions
 dpkg-deb --build $name
