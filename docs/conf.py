@@ -292,6 +292,7 @@ htmlhelp_basename = "lime_tbxdoc"
 
 latex_elements = {
     "fontpkg": "",
+    "sphinxsetup": "noteicons=0",
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
