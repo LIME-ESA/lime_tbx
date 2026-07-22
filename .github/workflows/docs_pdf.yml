@@ -41,6 +41,8 @@ jobs:
       - name: Build LaTeX
         run: |
           source .venv/bin/activate
+          rm -rf latex/
+          rm -rf docs/quality_documentation/latex/
           sphinx-build docs latex -b latex
           cp -r latex ./docs/quality_documentation/latex
       - name: Compile PDF
