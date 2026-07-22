@@ -291,6 +291,7 @@ htmlhelp_basename = "lime_tbxdoc"
 # -- Options for LaTeX output ------------------------------------------
 
 latex_elements = {
+    "fontpkg": "",
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
@@ -304,7 +305,7 @@ latex_elements = {
 \graphicspath{{./_static/}}
 \usepackage{caption}
 \captionsetup[figure]{labelfont=it, textfont=normalfont}
-% Increase LaTeX capacity for large tables
+% Aumentar capacidad para tablas grandes
 \setcounter{LTchunksize}{100}
 \maxdeadcycles=1000
 \def\maxdimen{10000pt}
