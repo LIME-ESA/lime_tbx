@@ -42,8 +42,6 @@ jobs:
         run: |
           source .venv/bin/activate
           sphinx-build docs latex -b latex
-          sed -i '/\\usepackage{tgtermes}/d' latex/user_manual.tex
-          sed -i '/\\usepackage{tgheros}/d' latex/user_manual.tex
           cp -r latex ./docs/quality_documentation/latex
       - name: Compile PDF
         uses: xu-cheng/latex-action@v4

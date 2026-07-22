@@ -299,14 +299,6 @@ latex_elements = {
 \newunicodechar{²}{\ifmmode{}^2\else\texttwosuperior\fi}
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-    # Additional stuff for the LaTeX preamble.
-    #
     "preamble": r"""
 \usepackage{graphicx}
 \graphicspath{{./_static/}}
@@ -315,25 +307,12 @@ latex_elements = {
 % Increase LaTeX capacity for large tables
 \setcounter{LTchunksize}{100}
 \maxdeadcycles=1000
-% Increase TeX memory for large tables
 \def\maxdimen{10000pt}
-% For longtable package
 \setlength{\LTpre}{0pt}
 \setlength{\LTpost}{0pt}
-% IMPORTANTE: Reemplazar TeX Gyre con fuentes estándar
-% NO usar tgtermes ni tgheros
-% Usar estas fuentes estándar disponibles en todas las instalaciones:
-\usepackage{mathptmx}   % Times Roman (similar a tgtermes)
-\usepackage{helvet}     % Helvetica (similar a tgheros)  
-\usepackage{courier}    % Courier
-% Configurar como fuentes por defecto
-\renewcommand{\rmdefault}{ptm}  % Times
-\renewcommand{\sfdefault}{phv}  % Helvetica
-\renewcommand{\ttdefault}{pcr}  % Courier
+% Usar fuentes por defecto de LaTeX (Computer Modern)
+% NO cargar fuentes personalizadas
 """,
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
