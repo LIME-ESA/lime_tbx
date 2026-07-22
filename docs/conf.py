@@ -320,6 +320,16 @@ latex_elements = {
 % For longtable package
 \setlength{\LTpre}{0pt}
 \setlength{\LTpost}{0pt}
+% IMPORTANTE: Reemplazar TeX Gyre con fuentes estándar
+% NO usar tgtermes ni tgheros
+% Usar estas fuentes estándar disponibles en todas las instalaciones:
+\usepackage{mathptmx}   % Times Roman (similar a tgtermes)
+\usepackage{helvet}     % Helvetica (similar a tgheros)  
+\usepackage{courier}    % Courier
+% Configurar como fuentes por defecto
+\renewcommand{\rmdefault}{ptm}  % Times
+\renewcommand{\sfdefault}{phv}  % Helvetica
+\renewcommand{\ttdefault}{pcr}  % Courier
 """,
     # Latex figure (float) alignment
     #
