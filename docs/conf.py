@@ -312,6 +312,14 @@ latex_elements = {
 \graphicspath{{./_static/}}
 \usepackage{caption}
 \captionsetup[figure]{labelfont=it, textfont=normalfont}
+% Increase LaTeX capacity for large tables
+\setcounter{LTchunksize}{100}
+\maxdeadcycles=1000
+% Increase TeX memory for large tables
+\def\maxdimen{10000pt}
+% For longtable package
+\setlength{\LTpre}{0pt}
+\setlength{\LTpost}{0pt}
 """,
     # Latex figure (float) alignment
     #
