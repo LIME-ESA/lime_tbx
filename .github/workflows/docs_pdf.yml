@@ -38,6 +38,7 @@ jobs:
           source .venv/bin/activate
           pip install --upgrade pip
           pip install .[docs]
+          pip list | grep sphinx
       - name: Build LaTeX
         run: |
           source .venv/bin/activate
