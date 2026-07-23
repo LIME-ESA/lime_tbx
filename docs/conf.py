@@ -300,14 +300,6 @@ latex_elements = {
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
     "preamble": r"""
-
-\renewcommand{\sphinxnoteicon}{}
-\renewcommand{\sphinxwarningicon}{}
-\renewcommand{\sphinxcautionicon}{}
-\renewcommand{\sphinximportanticon}{}
-\renewcommand{\sphinxtipicon}{}
-\renewcommand{\sphinxattentionicon}{}
-
 \renewcommand{\rowcolors}[3]{}
 
 \usepackage{graphicx}
