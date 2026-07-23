@@ -289,10 +289,8 @@ htmlhelp_basename = "lime_tbxdoc"
 
 
 # -- Options for LaTeX output ------------------------------------------
-
 latex_elements = {
     "fontpkg": "",
-    "sphinxsetup": "iconpackage=none, noteicons=0",  # <--- Desactiva Font Awesome
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
@@ -302,21 +300,7 @@ latex_elements = {
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
     "preamble": r"""
-% FORZAR VERSIÓN ANTIGUA DE COLORTBL para evitar el error de pila
-\RequirePackage{colortbl}[2020/01/01]
-\makeatletter
-\@ifpackagelater{colortbl}{2020/01/01}{}{\PackageWarning{}{Usando version antigua de colortbl}}
-\makeatother
 
-% DESACTIVAR SOMBREADO DE FILAS (causa el error de pila)
-\renewcommand{\rowcolors}[3]{}
-
-\usepackage{graphicx}
-\graphicspath{{./_static/}}
-\usepackage{caption}
-\captionsetup[figure]{labelfont=it, textfont=normalfont}
-
-% Desactivar iconos por si acaso
 \renewcommand{\sphinxnoteicon}{}
 \renewcommand{\sphinxwarningicon}{}
 \renewcommand{\sphinxcautionicon}{}
@@ -324,7 +308,13 @@ latex_elements = {
 \renewcommand{\sphinxtipicon}{}
 \renewcommand{\sphinxattentionicon}{}
 
-% Aumentar capacidad para tablas grandes
+\renewcommand{\rowcolors}[3]{}
+
+\usepackage{graphicx}
+\graphicspath{{./_static/}}
+\usepackage{caption}
+\captionsetup[figure]{labelfont=it, textfont=normalfont}
+
 \setcounter{LTchunksize}{100}
 \maxdeadcycles=1000
 \def\maxdimen{10000pt}
