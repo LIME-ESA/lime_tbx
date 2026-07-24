@@ -30,7 +30,7 @@ jobs:
           path: .venv
           key: ${{ runner.os }}-venv-docs-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'pyproject.toml', 'MANIFEST.in') }}
           restore-keys: |
-            ${{ runner.os }}-venv-docs-${{ matrix.python-version }}-
+            ${{ runner.os }}-venv-docs-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'pyproject.toml', 'MANIFEST.in') }}
       - name: Create and install dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
