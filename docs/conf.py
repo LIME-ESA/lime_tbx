@@ -290,7 +290,8 @@ htmlhelp_basename = "lime_tbxdoc"
 
 # -- Options for LaTeX output ------------------------------------------
 latex_elements = {
-    "fontpkg": "",  # Opcional
+    "fontpkg": "",
+    "sphinxsetup": "noteicons=0",
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
