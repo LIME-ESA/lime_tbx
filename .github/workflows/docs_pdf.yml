@@ -52,6 +52,16 @@ jobs:
           root_file: user_manual.tex
           latexmk_use_lualatex: false
           latexmk_use_xelatex: false
+          continue_on_error: true
+      - name: Upload LaTeX files for debugging
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: latex-debug-files
+          path: |
+            docs/quality_documentation/latex/user_manual.tex
+            docs/quality_documentation/latex/user_manual.log
+          retention-days: 1
       - name: Copy PDF to root
         run: cp docs/quality_documentation/latex/user_manual.pdf user_manual.pdf
       - name: Upload PDF
