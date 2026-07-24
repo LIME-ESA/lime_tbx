@@ -45,6 +45,12 @@ jobs:
           rm -rf docs/quality_documentation/latex/
           python3 -m sphinx docs latex -b latex
           sed -i '/usepackage{fontawesome5}/d' latex/user_manual.tex
+          if grep -q 'usepackage{fontawesome5}' latex/user_manual.tex; then
+            echo "ERROR: no se eliminó la línea de fontawesome5"
+            exit 1
+          else
+            echo "OK: línea de fontawesome5 eliminada"
+          fi
           cp -r latex ./docs/quality_documentation/latex
       - name: Compile PDF
         uses: xu-cheng/latex-action@v4
@@ -54,13 +60,6 @@ jobs:
           texlive_version: 2025
           latexmk_use_lualatex: true
           continue_on_error: true
-          pre_compile: |
-            tlmgr install fontawesome5
-            mkdir -p /usr/local/texlive/texmf-local/fonts/opentype/fontawesome
-            wget -O /tmp/fontawesome.zip https://github.com/FortAwesome/Font-Awesome/releases/download/6.5.1/fontawesome-free-6.5.1-desktop.zip
-            unzip -j /tmp/fontawesome.zip "fontawesome-free-6.5.1-desktop/otfs/*.otf" -d /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/
-            mktexlsr
-            luaotfload-tool --update
       - name: Upload LaTeX files for debugging
         if: always()
         uses: actions/upload-artifact@v7
