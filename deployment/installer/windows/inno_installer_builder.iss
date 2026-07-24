@@ -39,6 +39,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Dirs]
 Name: "{app}\coeff_data"; Permissions: everyone-full
+Name: "{app}\eocfi_data"; Permissions: everyone-full
 
 [Files]
 ;Source: "{#MyAppDevPath}\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -46,7 +47,7 @@ Source: "{#MyAppDevPath}\dist\LimeTBX\*"; DestDir: "{app}\LimeTBX"; Flags: ignor
 ;Source: "{#MyAppDevPath}\dist\LimeTBX\scipy\.libs\*"; DestDir: "{app}\LimeTBX\scipy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "{#MyAppDevPath}\dist\LimeTBX\numpy\.libs\*"; DestDir: "{app}\LimeTBX\numpy\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDevPath}\dist\LimeTBX\sklearn\.libs\*"; DestDir: "{app}\LimeTBX\sklearn\.libs\"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MyAppDevPath}\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDevPath}\eocfi_data\*"; DestDir: "{app}\eocfi_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "{#MyAppDevPath}\coeff_data\*"; DestDir: "{app}\coeff_data"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "{#MyAppDevPath}\kernels\*"; DestDir: "{app}\kernels"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
