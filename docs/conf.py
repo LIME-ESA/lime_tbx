@@ -300,16 +300,16 @@ latex_elements = {
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
     "preamble": r"""
-
 \PassOptionsToPackage{old}{colortbl}
 
-\renewcommand{\sphinxnoteicon}{}
-\renewcommand{\sphinxwarningicon}{}
-\renewcommand{\sphinxcautionicon}{}
-\renewcommand{\sphinximportanticon}{}
-\renewcommand{\sphinxtipicon}{}
-\renewcommand{\sphinxattentionicon}{}
+\providecommand{\sphinxnoteicon}{}
+\providecommand{\sphinxwarningicon}{}
+\providecommand{\sphinxcautionicon}{}
+\providecommand{\sphinximportanticon}{}
+\providecommand{\sphinxtipicon}{}
+\providecommand{\sphinxattentionicon}{}
 
+\providecommand{\sphinxstyletheadfamily}{}
 \renewrobustcmd{\sphinxstyletheadfamily}{\bfseries}
 
 \setcounter{LTchunksize}{100}
