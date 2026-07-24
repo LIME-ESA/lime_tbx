@@ -291,7 +291,6 @@ htmlhelp_basename = "lime_tbxdoc"
 # -- Options for LaTeX output ------------------------------------------
 latex_elements = {
     "fontpkg": "",
-    "sphinxsetup": "noteicons=0",
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
@@ -303,6 +302,9 @@ latex_elements = {
     "preamble": r"""
 \usepackage{exscale}
 \usepackage{fix-cm}
+
+\PassOptionsToPackage{draft}{fontawesome5}
+\PassOptionsToPackage{quiet}{fontawesome5}
 
 \providecommand{\sphinxnoteicon}{}
 \providecommand{\sphinxwarningicon}{}
