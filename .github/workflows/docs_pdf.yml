@@ -31,6 +31,7 @@ jobs:
           key: ${{ runner.os }}-venv-docs-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'pyproject.toml', 'MANIFEST.in') }}
           restore-keys: |
             ${{ runner.os }}-venv-docs-${{ matrix.python-version }}-
+          save-always: true
       - name: Create and install dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
@@ -55,8 +56,6 @@ jobs:
           latexmk_use_lualatex: false
           continue_on_error: true
           pre_compile: |
-            tlmgr install cm-super
-            tlmgr install texlive-fonts-recommended
             fmtutil-sys --all
             updmap-sys
       - name: Upload LaTeX files for debugging
