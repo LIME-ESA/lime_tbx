@@ -54,6 +54,17 @@ jobs:
           texlive_version: 2025
           latexmk_use_lualatex: true
           continue_on_error: true
+          pre_compile: |
+            tlmgr install fontawesome5
+            mkdir -p /usr/local/texlive/texmf-local/fonts/opentype/fontawesome
+            wget -O /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/FontAwesome5Free-Solid-900.otf \
+              https://github.com/FortAwesome/Font-Awesome/raw/6.x/otfs/FontAwesome5Free-Solid-900.otf
+            wget -O /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/FontAwesome5Free-Regular-400.otf \
+              https://github.com/FortAwesome/Font-Awesome/raw/6.x/otfs/FontAwesome5Free-Regular-400.otf
+            wget -O /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/FontAwesome5Brands-Regular-400.otf \
+              https://github.com/FortAwesome/Font-Awesome/raw/6.x/otfs/FontAwesome5Brands-Regular-400.otf
+            mktexlsr
+            luaotfload-tool --update
       - name: Upload LaTeX files for debugging
         if: always()
         uses: actions/upload-artifact@v7
