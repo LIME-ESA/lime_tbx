@@ -54,7 +54,7 @@ jobs:
           latexmk_use_xelatex: false
           continue_on_error: true
           pre_compile: |
-            sed -i '/^\\documentclass/a \\\\PassOptionsToPackage{old}{colortbl}' user_manual.tex
+            sed -i '/^\\documentclass/a \\\\RequirePackage\[old\]{colortbl}' user_manual.tex
       - name: Upload LaTeX files for debugging
         if: always()
         uses: actions/upload-artifact@v7
