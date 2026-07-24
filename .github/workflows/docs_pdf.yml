@@ -57,12 +57,8 @@ jobs:
           pre_compile: |
             tlmgr install fontawesome5
             mkdir -p /usr/local/texlive/texmf-local/fonts/opentype/fontawesome
-            wget -O /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/FontAwesome5Free-Solid-900.otf \
-              https://github.com/FortAwesome/Font-Awesome/raw/6.x/otfs/FontAwesome5Free-Solid-900.otf
-            wget -O /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/FontAwesome5Free-Regular-400.otf \
-              https://github.com/FortAwesome/Font-Awesome/raw/6.x/otfs/FontAwesome5Free-Regular-400.otf
-            wget -O /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/FontAwesome5Brands-Regular-400.otf \
-              https://github.com/FortAwesome/Font-Awesome/raw/6.x/otfs/FontAwesome5Brands-Regular-400.otf
+            wget -O /tmp/fontawesome.zip https://github.com/FortAwesome/Font-Awesome/releases/download/6.5.1/fontawesome-free-6.5.1-desktop.zip
+            unzip -j /tmp/fontawesome.zip "fontawesome-free-6.5.1-desktop/otfs/*.otf" -d /usr/local/texlive/texmf-local/fonts/opentype/fontawesome/
             mktexlsr
             luaotfload-tool --update
       - name: Upload LaTeX files for debugging
