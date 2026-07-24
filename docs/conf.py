@@ -290,7 +290,7 @@ htmlhelp_basename = "lime_tbxdoc"
 
 # -- Options for LaTeX output ------------------------------------------
 latex_elements = {
-    "fontpkg": "",
+    "fontpkg": "",  # Opcional
     "extrapackages": r"""
 \usepackage{textcomp}
 \usepackage{newunicodechar}
@@ -300,8 +300,8 @@ latex_elements = {
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
     "preamble": r"""
-\PassOptionsToPackage{old}{colortbl}
-
+% --- PARCHE PARA PDFLATEX ---
+% Definir comandos de iconos si no existen (evita errores)
 \providecommand{\sphinxnoteicon}{}
 \providecommand{\sphinxwarningicon}{}
 \providecommand{\sphinxcautionicon}{}
@@ -309,9 +309,10 @@ latex_elements = {
 \providecommand{\sphinxtipicon}{}
 \providecommand{\sphinxattentionicon}{}
 
-\providecommand{\sphinxstyletheadfamily}{}
+% Redefinir encabezado de tabla para evitar recursión
 \renewrobustcmd{\sphinxstyletheadfamily}{\bfseries}
 
+% Ajustes de tablas
 \setcounter{LTchunksize}{100}
 \maxdeadcycles=1000
 \def\maxdimen{10000pt}
