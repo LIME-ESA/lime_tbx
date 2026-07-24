@@ -300,18 +300,28 @@ latex_elements = {
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
     "preamble": r"""
-\renewcommand{\rowcolors}[3]{}
 
-\usepackage{graphicx}
-\graphicspath{{./_static/}}
-\usepackage{caption}
-\captionsetup[figure]{labelfont=it, textfont=normalfont}
+\PassOptionsToPackage{old}{colortbl}
+
+\renewcommand{\sphinxnoteicon}{}
+\renewcommand{\sphinxwarningicon}{}
+\renewcommand{\sphinxcautionicon}{}
+\renewcommand{\sphinximportanticon}{}
+\renewcommand{\sphinxtipicon}{}
+\renewcommand{\sphinxattentionicon}{}
+
+\renewrobustcmd{\sphinxstyletheadfamily}{\bfseries}
 
 \setcounter{LTchunksize}{100}
 \maxdeadcycles=1000
 \def\maxdimen{10000pt}
 \setlength{\LTpre}{0pt}
 \setlength{\LTpost}{0pt}
+
+\usepackage{graphicx}
+\graphicspath{{./_static/}}
+\usepackage{caption}
+\captionsetup[figure]{labelfont=it, textfont=normalfont}
 """,
 }
 
