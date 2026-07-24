@@ -54,6 +54,11 @@ jobs:
           texlive_version: 2025
           latexmk_use_lualatex: false
           continue_on_error: true
+          pre_compile: |
+            tlmgr install cm-super
+            tlmgr install texlive-fonts-recommended
+            fmtutil-sys --all
+            updmap-sys
       - name: Upload LaTeX files for debugging
         if: always()
         uses: actions/upload-artifact@v7

@@ -300,8 +300,9 @@ latex_elements = {
 \newunicodechar{³}{\ifmmode{}^3\else\textthreesuperior\fi}
 """,
     "preamble": r"""
-% --- PARCHE PARA PDFLATEX ---
-% Definir comandos de iconos si no existen (evita errores)
+\usepackage{exscale}
+\usepackage{fix-cm}
+
 \providecommand{\sphinxnoteicon}{}
 \providecommand{\sphinxwarningicon}{}
 \providecommand{\sphinxcautionicon}{}
@@ -309,10 +310,8 @@ latex_elements = {
 \providecommand{\sphinxtipicon}{}
 \providecommand{\sphinxattentionicon}{}
 
-% Redefinir encabezado de tabla para evitar recursión
 \renewrobustcmd{\sphinxstyletheadfamily}{\bfseries}
 
-% Ajustes de tablas
 \setcounter{LTchunksize}{100}
 \maxdeadcycles=1000
 \def\maxdimen{10000pt}
