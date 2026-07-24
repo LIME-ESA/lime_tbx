@@ -303,9 +303,6 @@ latex_elements = {
 \usepackage{exscale}
 \usepackage{fix-cm}
 
-\PassOptionsToPackage{draft}{fontawesome5}
-\PassOptionsToPackage{quiet}{fontawesome5}
-
 \providecommand{\sphinxnoteicon}{}
 \providecommand{\sphinxwarningicon}{}
 \providecommand{\sphinxcautionicon}{}

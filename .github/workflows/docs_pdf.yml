@@ -44,7 +44,7 @@ jobs:
           rm -rf latex/
           rm -rf docs/quality_documentation/latex/
           python3 -m sphinx docs latex -b latex
-          printf '\\RequirePackage{color}\n\\RequirePackage[old]{colortbl}\n' | sed -i '/^\\documentclass/r /dev/stdin' latex/user_manual.tex
+          printf '\\RequirePackage[nofont]{fontawesome5}\n' | sed -i '/^\\documentclass/r /dev/stdin' latex/user_manual.tex
           cp -r latex ./docs/quality_documentation/latex
       - name: Compile PDF
         uses: xu-cheng/latex-action@v4
